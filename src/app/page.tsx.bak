@@ -1,0 +1,110 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { Container } from "@/components/container";
+import { PostCard } from "@/components/post-card";
+import { getFeaturedPosts } from "@/lib/posts";
+import { siteConfig } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
+
+export default function HomePage() {
+  const posts = getFeaturedPosts(3);
+
+  return (
+    <main>
+      <section className="hero">
+        <Container>
+          <p className="eyebrow">LIN QINGAN · DIGITAL GARDEN</p>
+          <h1>
+            用代码构建
+            <br />
+            持续运行的系统
+          </h1>
+          <p className="hero-description">
+            我是林清安。这里记录 Screeps 自动化、JavaScript、
+            系统架构、网站建设，以及真实的开发与迭代过程。
+          </p>
+          <div className="button-row">
+            <Link className="button button-primary" href="/blog">
+              阅读文章
+            </Link>
+            <Link className="button button-secondary" href="/projects">
+              查看项目
+            </Link>
+          </div>
+        </Container>
+      </section>
+
+      <Container>
+        <section className="status-panel" aria-labelledby="current-project">
+          <div>
+            <p className="eyebrow">CURRENT PROJECT</p>
+            <h2 id="current-project">Screeps Contract Kernel</h2>
+            <p>
+              围绕任务合同、资源调度、市场采购和自动冲级构建的
+              Screeps 自动化系统。
+            </p>
+          </div>
+          <dl className="status-grid">
+            <div>
+              <dt>状态</dt>
+              <dd>持续开发</dd>
+            </div>
+            <div>
+              <dt>方向</dt>
+              <dd>自动运营</dd>
+            </div>
+            <div>
+              <dt>当前重点</dt>
+              <dd>市场与 RCL8</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="home-section">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">FEATURED WRITING</p>
+              <h2>精选文章</h2>
+            </div>
+            <Link className="text-link" href="/blog">
+              全部文章 →
+            </Link>
+          </div>
+
+          <div className="post-grid">
+            {posts.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </section>
+
+        <section className="principles">
+          <p className="eyebrow">WHAT I WRITE ABOUT</p>
+          <div className="principle-grid">
+            <article>
+              <span>01</span>
+              <h2>自动化系统</h2>
+              <p>调度、状态机、资源预算，以及如何让代码长期稳定运行。</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h2>真实开发</h2>
+              <p>记录错误判断、架构调整、性能问题和版本演进。</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h2>持续成长</h2>
+              <p>把学习过程变成可以检索、复用和继续完善的知识。</p>
+            </article>
+          </div>
+        </section>
+      </Container>
+    </main>
+  );
+}
