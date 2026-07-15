@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { getBlogTotalPages } from "@/lib/blog-pagination";
 import { getAllPosts } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
 
@@ -43,12 +44,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const posts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+  const allPosts = getAllPosts();
+  const totalPages = getBlogTotalPages(allPosts.length);
+  const archivePages: MetadataRoute.Sitemap = Array.from(
+    { length: Math.max(0, totalPages - 1) },
+    (_, index) => {
+      const page = index + 2;
+
+      return {
+        url: `${siteConfig.url}/blog/page/${page}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.65,
+      };
+    },
+  );
+
+  const posts: MetadataRoute.Sitemap = allPosts.map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt ?? post.publishedAt),
     changeFrequency: "monthly",
     priority: 0.8,
   }));
 
-  return [...staticPages, ...posts];
+  return [...staticPages, ...archivePages, ...posts];
 }
