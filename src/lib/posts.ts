@@ -27,8 +27,15 @@ export interface PostSummary extends PostFrontmatter {
   readingMinutes: number;
 }
 
+export interface TableOfContentsItem {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
 export interface Post extends PostSummary {
   html: string;
+  tableOfContents: TableOfContentsItem[];
 }
 
 function assertString(
@@ -99,6 +106,44 @@ function calculateReadingMinutes(markdown: string): number {
     1,
     Math.ceil(chineseCharacters / 400 + englishWords / 220),
   );
+}
+
+function decodeHtmlText(value: string): string {
+  return value
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
+
+function addHeadingIds(html: string): {
+  html: string;
+  tableOfContents: TableOfContentsItem[];
+} {
+  const tableOfContents: TableOfContentsItem[] = [];
+  let headingIndex = 0;
+
+  const htmlWithIds = html.replace(
+    /<h([23])>([\s\S]*?)<\/h\1>/g,
+    (_match, rawLevel: string, content: string) => {
+      headingIndex += 1;
+      const level = Number(rawLevel) as 2 | 3;
+      const id = `section-${headingIndex}`;
+      const text = decodeHtmlText(content);
+
+      tableOfContents.push({ id, text, level });
+
+      return `<h${level} id="${id}">${content}</h${level}>`;
+    },
+  );
+
+  return {
+    html: htmlWithIds,
+    tableOfContents,
+  };
 }
 
 function getMarkdownFiles(): string[] {
@@ -184,9 +229,11 @@ export async function getPostBySlug(
     .use(remarkGfm)
     .use(remarkHtml)
     .process(rawPost.content);
+  const { html, tableOfContents } = addHeadingIds(result.toString());
 
   return {
     ...toSummary(rawPost),
-    html: result.toString(),
+    html,
+    tableOfContents,
   };
 }
