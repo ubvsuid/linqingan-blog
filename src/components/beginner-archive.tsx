@@ -3,7 +3,10 @@ import Link from "next/link";
 import { CollectionPagination } from "@/components/collection-pagination";
 import { Container } from "@/components/container";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
-import { paginateItems } from "@/lib/pagination";
+import {
+  DEFAULT_ITEMS_PER_PAGE,
+  paginateItems,
+} from "@/lib/pagination";
 import { getAllPosts } from "@/lib/posts";
 
 interface BeginnerArchiveProps {
@@ -17,7 +20,8 @@ export function BeginnerArchive({ currentPage }: BeginnerArchiveProps) {
     return post ? [post] : [];
   });
   const pagination = paginateItems(posts, currentPage);
-  const firstItemIndex = (pagination.currentPage - 1) * 6;
+  const firstItemIndex =
+    (pagination.currentPage - 1) * DEFAULT_ITEMS_PER_PAGE;
 
   return (
     <main className="page-shell beginner-page">
