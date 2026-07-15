@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "临清安",
-  title: "临清安的数字花园",
+  title: "临清安",
   description:
     "记录 Screeps 自动化系统、JavaScript 工程实践、软件架构与真实开发过程。",
   url:
