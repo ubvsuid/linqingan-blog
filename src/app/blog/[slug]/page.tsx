@@ -74,6 +74,7 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const articleUrl = `${siteConfig.url}/blog/${post.slug}`;
+  const isBeginnerPost = post.category === "Screeps 入门";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -107,8 +108,11 @@ export default async function PostPage({ params }: PostPageProps) {
 
         <article>
           <header className="article-header">
-            <Link href="/blog" className="back-link">
-              ← 返回文章
+            <Link
+              href={isBeginnerPost ? "/beginner" : "/blog"}
+              className="back-link"
+            >
+              ← {isBeginnerPost ? "返回入门" : "返回文章"}
             </Link>
             <p className="eyebrow">{post.category}</p>
             <h1>{post.title}</h1>

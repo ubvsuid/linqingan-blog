@@ -15,7 +15,7 @@ export const siteConfig = {
   },
   navigation: [
     { label: "首页", href: "/" },
-    { label: "入门", href: "/blog/screeps-introduction" },
+    { label: "入门", href: "/beginner" },
     { label: "文章", href: "/blog" },
     { label: "项目", href: "/projects" },
     { label: "近况", href: "/now" },
