@@ -21,7 +21,7 @@ export function SiteHeader() {
     }
 
     if (href === "/beginner") {
-      return pathname === "/beginner" || isBeginnerArticle;
+      return pathname.startsWith("/beginner") || isBeginnerArticle;
     }
 
     if (href === "/blog") {
