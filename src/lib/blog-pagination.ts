@@ -1,6 +1,12 @@
+import {
+  DEFAULT_ITEMS_PER_PAGE,
+  getCollectionPageHref,
+  getTotalPages,
+  paginateItems,
+} from "@/lib/pagination";
 import type { PostSummary } from "@/lib/posts";
 
-export const BLOG_POSTS_PER_PAGE = 6;
+export const BLOG_POSTS_PER_PAGE = DEFAULT_ITEMS_PER_PAGE;
 
 export interface PaginatedBlogPosts {
   posts: PostSummary[];
@@ -10,28 +16,27 @@ export interface PaginatedBlogPosts {
 }
 
 export function getBlogTotalPages(totalPosts: number): number {
-  return Math.max(1, Math.ceil(totalPosts / BLOG_POSTS_PER_PAGE));
+  return getTotalPages(totalPosts, BLOG_POSTS_PER_PAGE);
 }
 
 export function getBlogPageHref(page: number): string {
-  return page <= 1 ? "/blog" : `/blog/page/${page}`;
+  return getCollectionPageHref("/blog", page);
 }
 
 export function paginateBlogPosts(
   posts: PostSummary[],
   requestedPage: number,
 ): PaginatedBlogPosts {
-  const totalPages = getBlogTotalPages(posts.length);
-  const currentPage = Math.min(
-    Math.max(1, Math.trunc(requestedPage)),
-    totalPages,
+  const pagination = paginateItems(
+    posts,
+    requestedPage,
+    BLOG_POSTS_PER_PAGE,
   );
-  const start = (currentPage - 1) * BLOG_POSTS_PER_PAGE;
 
   return {
-    posts: posts.slice(start, start + BLOG_POSTS_PER_PAGE),
-    currentPage,
-    totalPages,
-    totalPosts: posts.length,
+    posts: pagination.items,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    totalPosts: pagination.totalItems,
   };
 }
