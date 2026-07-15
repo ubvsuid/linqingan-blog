@@ -20,14 +20,11 @@ export default function HomePage() {
         <Container>
           <p className="eyebrow">LIN QINGAN · DIGITAL GARDEN</p>
           <h1>
-            用代码构建
+            构建，运行
             <br />
-            持续运行的系统
+            迭代
           </h1>
-          <p className="hero-description">
-            我是临清安。这里记录 Screeps 自动化系统、JavaScript 工程实践、
-            软件架构，以及一个项目从想法走向长期运行的真实过程。
-          </p>
+          <p className="hero-description">Screeps 与系统实践。</p>
           <div className="button-row">
             <Link className="button button-primary" href="/blog">
               阅读文章
