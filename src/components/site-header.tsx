@@ -1,11 +1,39 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Container } from "@/components/container";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { siteConfig } from "@/lib/site";
 
 export function SiteHeader() {
+  const pathname = usePathname();
+  const isBeginnerArticle = beginnerSeriesSlugs.some(
+    (slug) => pathname === `/blog/${slug}`,
+  );
+
+  function isActive(href: string): boolean {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    if (href === "/beginner") {
+      return pathname === "/beginner" || isBeginnerArticle;
+    }
+
+    if (href === "/blog") {
+      return (
+        pathname === "/blog" ||
+        (pathname.startsWith("/blog/") && !isBeginnerArticle)
+      );
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
     <header className="site-header">
       <Container className="header-inner">
@@ -26,11 +54,20 @@ export function SiteHeader() {
 
         <div className="header-actions">
           <nav className="site-nav" aria-label="主导航">
-            {siteConfig.navigation.map((item) => (
-              <Link key={item.href} href={item.href}>
-                {item.label}
-              </Link>
-            ))}
+            {siteConfig.navigation.map((item) => {
+              const active = isActive(item.href);
+
+              return (
+                <Link
+                  className={active ? "nav-link-active" : undefined}
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
           <ThemeToggle />
         </div>
@@ -69,6 +106,32 @@ export function SiteHeader() {
           justify-self: center;
           gap: 34px;
           font-size: 17px;
+        }
+
+        .site-nav a {
+          position: relative;
+          padding-block: 8px;
+        }
+
+        .site-nav a::after {
+          content: "";
+          position: absolute;
+          right: 0;
+          bottom: 2px;
+          left: 0;
+          height: 1px;
+          transform: scaleX(0);
+          transform-origin: center;
+          background: var(--foreground);
+          transition: transform 160ms ease;
+        }
+
+        .site-nav a.nav-link-active {
+          color: var(--foreground);
+        }
+
+        .site-nav a.nav-link-active::after {
+          transform: scaleX(1);
         }
 
         .theme-toggle {

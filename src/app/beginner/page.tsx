@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { getAllPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
@@ -13,17 +14,9 @@ export const metadata: Metadata = {
   },
 };
 
-const beginnerSlugs = [
-  "screeps-introduction",
-  "screeps-first-room",
-  "screeps-tick-and-game-loop",
-  "screeps-first-creep-harvest",
-  "screeps-creep-deliver-energy",
-] as const;
-
 export default function BeginnerPage() {
   const allPosts = getAllPosts();
-  const posts = beginnerSlugs.flatMap((slug) => {
+  const posts = beginnerSeriesSlugs.flatMap((slug) => {
     const post = allPosts.find((item) => item.slug === slug);
     return post ? [post] : [];
   });
