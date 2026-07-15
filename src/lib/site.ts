@@ -1,15 +1,15 @@
 export const siteConfig = {
-  name: "林清安",
-  title: "林清安的数字花园",
+  name: "临清安",
+  title: "临清安的数字花园",
   description:
-    "记录 Screeps 自动化、JavaScript、系统架构、网站建设与个人成长。",
+    "记录 Screeps 自动化系统、JavaScript 工程实践、软件架构与真实开发过程。",
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://linqingan.com",
   locale: "zh_CN",
   language: "zh-CN",
   author: {
-    name: "林清安",
+    name: "临清安",
     handle: "@linqingan501",
     email: "linqingan501@gmail.com",
   },
@@ -21,6 +21,6 @@ export const siteConfig = {
     { label: "关于", href: "/about" },
   ],
   links: {
-    github: "",
+    github: "https://github.com/ubvsuid",
   },
 } as const;
