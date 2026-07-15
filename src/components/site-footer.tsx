@@ -14,6 +14,9 @@ export function SiteFooter() {
 
         <div className="footer-links">
           <Link href="/feed.xml">RSS</Link>
+          <a href={siteConfig.links.github} rel="noreferrer" target="_blank">
+            GitHub
+          </a>
           <a href={`mailto:${siteConfig.author.email}`}>Email</a>
         </div>
 
