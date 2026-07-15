@@ -1,6 +1,6 @@
-# 林清安个人博客 · Clean V1
+# 临清安个人博客 · Clean V1
 
-一套不依赖第三方博客主题的 Next.js App Router 个人博客。
+一套不依赖第三方博客主题的 Next.js App Router 个人博客，用于记录 Screeps 自动化、JavaScript 工程实践、软件架构和真实开发过程。
 
 ## 已包含
 
@@ -28,10 +28,22 @@ npm run dev
 
 打开 <http://localhost:3000>。
 
+Windows PowerShell 如果阻止 `npm.ps1`，可以使用：
+
+```powershell
+npm.cmd run dev
+```
+
 ## 发布前检查
 
 ```bash
 npm run check
+```
+
+PowerShell 中可以使用：
+
+```powershell
+npm.cmd run check
 ```
 
 ## 发布文章
@@ -49,8 +61,8 @@ content/posts/my-first-post.md
 ---
 title: "文章标题"
 description: "文章摘要"
-publishedAt: "2026-07-14"
-updatedAt: "2026-07-14"
+publishedAt: "2026-07-15"
+updatedAt: "2026-07-15"
 category: "Screeps"
 tags:
   - "Screeps"
@@ -60,12 +72,16 @@ featured: true
 ---
 ```
 
-## 需要优先修改
+新手文章应以解释、介绍和解惑为主，每篇优先解决一个当前会遇到的问题。复杂机制、工程架构和性能分析放入单独的进阶文章。
 
-1. `src/lib/site.ts`：网站名称、说明、社交链接。
-2. `src/app/about/page.tsx`：个人介绍。
-3. `src/app/projects/page.tsx`：项目资料。
-4. `content/posts/`：替换示例文章。
-5. `src/app/opengraph-image.tsx`：分享图文字。
+## 主要维护位置
 
-迁移旧项目请阅读 `MIGRATION.md`。
+1. `src/lib/site.ts`：网站名称、说明、作者和社交链接。
+2. `src/app/page.tsx`：首页定位和当前项目。
+3. `src/app/about/page.tsx`：个人介绍与写作原则。
+4. `src/app/projects/page.tsx`：项目资料。
+5. `src/app/now/page.tsx`：当前开发和学习进度。
+6. `content/posts/`：博客文章。
+7. `src/app/opengraph-image.tsx`：社交平台分享图。
+
+迁移旧项目请阅读 `MIGRATION.md`，部署说明请阅读 `DEPLOY.md`。

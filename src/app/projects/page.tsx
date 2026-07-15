@@ -4,7 +4,7 @@ import { Container } from "@/components/container";
 
 export const metadata: Metadata = {
   title: "项目",
-  description: "Screeps Contract Kernel V7.3。",
+  description: "临清安正在开发的 Screeps Contract Kernel V7.3。",
   alternates: {
     canonical: "/projects",
   },
@@ -25,28 +25,32 @@ export default function ProjectsPage() {
             <span className="status-dot" aria-hidden="true" />
             <span>持续开发中</span>
           </div>
-          <h2>Screeps Contract Kernel</h2>
+          <h2>Screeps Contract Kernel V7.3</h2>
           <p className="project-summary">
-            一个围绕合同任务、房间经济、Spawn 调度、市场采购和自动冲级
-            构建的 Screeps 自动化系统。
+            一个围绕合同任务、房间经济、Spawn 调度、市场能量采购、Link
+            调度和 Upgrader 扩容构建的 Screeps 自动化系统。
           </p>
 
           <dl className="project-data">
             <div>
-              <dt>当前方向</dt>
-              <dd>稳定自动运营</dd>
+              <dt>当前版本</dt>
+              <dd>V7.3 All-In Market Rush</dd>
             </div>
             <div>
-              <dt>市场购买能量、提高升级效率、稳定冲击 RCL8</dt>
-              <dd>市场补能与 RCL8 冲刺</dd>
+              <dt>近期目标</dt>
+              <dd>通过市场补能提高升级效率，稳定冲击 RCL8</dd>
             </div>
             <div>
-              <dt>JavaScript / 状态机 / 任务调度 / 资源预算</dt>
-              <dd>JavaScript / 状态机 / 任务调度</dd>
+              <dt>核心技术</dt>
+              <dd>JavaScript / 状态机 / 任务调度 / 资源预算</dd>
             </div>
             <div>
-              <dt>记录方式</dt>
-              <dd>架构文章 / 版本日志 / 失败复盘</dd>
+              <dt>主要模块</dt>
+              <dd>Spawn / Market / Link / Terminal / Upgrader</dd>
+            </div>
+            <div>
+              <dt>记录内容</dt>
+              <dd>架构说明 / 版本日志 / 性能分析 / 失败复盘</dd>
             </div>
           </dl>
         </article>

@@ -25,8 +25,8 @@ export default function HomePage() {
             持续运行的系统
           </h1>
           <p className="hero-description">
-            我是林清安。这里记录 Screeps 自动化系统、
-            JavaScript 工程实践、网站开发，以及真实的项目迭代过程。
+            我是临清安。这里记录 Screeps 自动化系统、JavaScript 工程实践、
+            软件架构，以及一个项目从想法走向长期运行的真实过程。
           </p>
           <div className="button-row">
             <Link className="button button-primary" href="/blog">
@@ -43,24 +43,24 @@ export default function HomePage() {
         <section className="status-panel" aria-labelledby="current-project">
           <div>
             <p className="eyebrow">CURRENT PROJECT</p>
-            <h2 id="current-project">Screeps Contract Kernel</h2>
+            <h2 id="current-project">Screeps Contract Kernel V7.3</h2>
             <p>
-              围绕任务合同、资源调度、市场采购和自动冲级构建的
-              Screeps 自动化系统。
+              围绕任务调度、房间经济、资源预算和市场补能构建的 Screeps
+              自动化系统，当前目标是稳定冲击 RCL8。
             </p>
           </div>
           <dl className="status-grid">
+            <div>
+              <dt>版本</dt>
+              <dd>V7.3</dd>
+            </div>
             <div>
               <dt>状态</dt>
               <dd>持续开发</dd>
             </div>
             <div>
-              <dt>方向</dt>
-              <dd>自动运营</dd>
-            </div>
-            <div>
               <dt>当前重点</dt>
-              <dd>市场与 RCL8</dd>
+              <dd>市场补能与 RCL8</dd>
             </div>
           </dl>
         </section>
@@ -88,18 +88,18 @@ export default function HomePage() {
           <div className="principle-grid">
             <article>
               <span>01</span>
-              <h2>自动化系统</h2>
-              <p>调度、状态机、资源预算，以及如何让代码长期稳定运行。</p>
+              <h2>Screeps 自动化</h2>
+              <p>从基础概念到房间运营，解释代码如何在长期世界中持续工作。</p>
             </article>
             <article>
               <span>02</span>
-              <h2>真实开发</h2>
-              <p>记录错误判断、架构调整、性能问题和版本演进。</p>
+              <h2>真实工程记录</h2>
+              <p>保留设计选择、失败原因、性能问题和版本迭代，而不只展示结果。</p>
             </article>
             <article>
               <span>03</span>
-              <h2>持续成长</h2>
-              <p>把学习过程变成可以检索、复用和继续完善的知识。</p>
+              <h2>新手友好写作</h2>
+              <p>先解决当前会遇到的问题，再把复杂架构留给单独的进阶文章。</p>
             </article>
           </div>
         </section>

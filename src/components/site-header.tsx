@@ -1,14 +1,18 @@
 import Link from "next/link";
 
-import { siteConfig } from "@/lib/site";
 import { Container } from "@/components/container";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { siteConfig } from "@/lib/site";
 
 export function SiteHeader() {
   return (
     <header className="site-header">
       <Container className="header-inner">
-        <Link href="/" className="brand" aria-label="林清安首页">
+        <Link
+          href="/"
+          className="brand"
+          aria-label={`${siteConfig.name}首页`}
+        >
           <span className="brand-mark" aria-hidden="true">
             LQ
           </span>
