@@ -9,7 +9,7 @@ export function SiteFooter() {
       <Container className="footer-inner">
         <div>
           <strong>{siteConfig.name}</strong>
-          <p>用代码构建持续运行的系统。</p>
+          <p>构建，运行，迭代。</p>
         </div>
 
         <div className="footer-links">
