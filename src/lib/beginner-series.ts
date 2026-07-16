@@ -22,11 +22,26 @@ export const beginnerStages = [
     ],
   },
   {
-    id: "start-production-loop",
+    id: "build-room-team",
     number: 3,
-    title: "开始建立生产循环",
-    description: "从创建新的 Creep 开始，逐步让房间具备持续运行的能力。",
-    slugs: ["screeps-spawn-create-creep"],
+    title: "建立房间分工",
+    description: "创建新的 Creep，认识基础角色分工，并让 Upgrader 持续升级 Controller。",
+    slugs: [
+      "screeps-spawn-create-creep",
+      "screeps-creep-roles",
+      "screeps-upgrade-controller",
+    ],
+  },
+  {
+    id: "complete-room-loop",
+    number: 4,
+    title: "完成基础房间循环",
+    description: "建造第一个 Extension，让 Builder 处理建造和维修，并整理第一份房间基础代码。",
+    slugs: [
+      "screeps-first-extension",
+      "screeps-build-and-repair",
+      "screeps-first-room-code",
+    ],
   },
 ] as const;
 
