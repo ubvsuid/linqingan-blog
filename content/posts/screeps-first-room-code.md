@@ -1,0 +1,255 @@
+---
+title: "把前面学过的代码放到一起：第一份房间基础代码"
+description: "用固定名称整理 Harvester1、Upgrader1 和 Builder1，把创建、运输、升级、建造和维修放进一份新手可读代码。"
+publishedAt: "2026-07-16"
+updatedAt: "2026-07-16"
+category: "Screeps 入门"
+tags:
+  - "Screeps"
+  - "新手入门"
+  - "房间代码"
+  - "Harvester"
+  - "Upgrader"
+  - "Builder"
+  - "JavaScript"
+draft: false
+featured: false
+---
+
+> **Screeps 新手入门 · 第 12 篇**
+> 建议按照系列顺序阅读；每篇只解决一个新手当前会遇到的问题。
+
+> **这是新手系列的收尾**
+> 这份代码把前面的内容放到一起，但仍然是学习代码，不是成熟的长期房间框架。
+
+## 一、这份代码管理哪三只 Creep
+
+| 名称 | 主要工作 |
+| --- | --- |
+| `Harvester1` | 采集 Energy，并填充 Spawn 和 Extension |
+| `Upgrader1` | 采集 Energy，然后升级 Controller |
+| `Builder1` | 建造、维修，空闲时升级 Controller |
+
+Spawn 空闲时，会按这个顺序尝试创建缺失的 Creep。
+
+## 二、运行前需要准备什么
+
+- 把 `Spawn1` 换成自己的 Spawn 名称；
+- 确保房间可以提供至少 200 Energy；
+- 替换代码前先保存自己的旧版本；
+- 同名 Creep 已经存在时，代码会直接使用它。
+
+> **标题中的“基础代码”很重要**
+> 它只是把新手阶段学过的动作整理到一起，不保证在所有异常情况下自动恢复。
+
+## 三、完整代码
+
+```javascript
+function runHarvester(creep) {
+  const source = creep.room.find(FIND_SOURCES)[0];
+
+  if (creep.memory.delivering &&
+      creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+    creep.memory.delivering = false;
+  }
+
+  if (!creep.memory.delivering &&
+      creep.store.getFreeCapacity() === 0) {
+    creep.memory.delivering = true;
+  }
+
+  if (!creep.memory.delivering) {
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(source);
+    }
+    return;
+  }
+
+  const targets = creep.room.find(FIND_MY_STRUCTURES, {
+    filter: function (structure) {
+      const acceptsEnergy =
+        structure.structureType === STRUCTURE_SPAWN ||
+        structure.structureType === STRUCTURE_EXTENSION;
+
+      return acceptsEnergy &&
+        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+    }
+  });
+
+  if (targets.length > 0 &&
+      creep.transfer(targets[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+    creep.moveTo(targets[0]);
+  }
+}
+
+function runUpgrader(creep) {
+  const source = creep.room.find(FIND_SOURCES)[0];
+  const controller = creep.room.controller;
+
+  if (creep.memory.upgrading &&
+      creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+    creep.memory.upgrading = false;
+  }
+
+  if (!creep.memory.upgrading &&
+      creep.store.getFreeCapacity() === 0) {
+    creep.memory.upgrading = true;
+  }
+
+  if (creep.memory.upgrading) {
+    if (creep.upgradeController(controller) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(controller);
+    }
+  } else if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+    creep.moveTo(source);
+  }
+}
+
+function runBuilder(creep) {
+  const source = creep.room.find(FIND_SOURCES)[0];
+
+  if (creep.memory.working &&
+      creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+    creep.memory.working = false;
+  }
+
+  if (!creep.memory.working &&
+      creep.store.getFreeCapacity() === 0) {
+    creep.memory.working = true;
+  }
+
+  if (!creep.memory.working) {
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(source);
+    }
+    return;
+  }
+
+  const site = creep.room.find(FIND_MY_CONSTRUCTION_SITES)[0];
+
+  if (site) {
+    if (creep.build(site) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(site);
+    }
+    return;
+  }
+
+  const damaged = creep.room.find(FIND_STRUCTURES, {
+    filter: function (structure) {
+      const repairable =
+        structure.my ||
+        structure.structureType === STRUCTURE_ROAD ||
+        structure.structureType === STRUCTURE_CONTAINER;
+
+      return repairable &&
+        structure.hits < structure.hitsMax &&
+        structure.structureType !== STRUCTURE_WALL &&
+        structure.structureType !== STRUCTURE_RAMPART;
+    }
+  })[0];
+
+  if (damaged) {
+    if (creep.repair(damaged) === ERR_NOT_IN_RANGE) {
+      creep.moveTo(damaged);
+    }
+    return;
+  }
+
+  const controller = creep.room.controller;
+
+  if (controller &&
+      creep.upgradeController(controller) === ERR_NOT_IN_RANGE) {
+    creep.moveTo(controller);
+  }
+}
+
+module.exports.loop = function () {
+  const spawn = Game.spawns['Spawn1'];
+
+  if (spawn && !spawn.spawning) {
+    if (!Game.creeps['Harvester1']) {
+      spawn.spawnCreep([WORK, CARRY, MOVE], 'Harvester1');
+    } else if (!Game.creeps['Upgrader1']) {
+      spawn.spawnCreep([WORK, CARRY, MOVE], 'Upgrader1');
+    } else if (!Game.creeps['Builder1']) {
+      spawn.spawnCreep([WORK, CARRY, MOVE], 'Builder1');
+    }
+  }
+
+  const harvester = Game.creeps['Harvester1'];
+  const upgrader = Game.creeps['Upgrader1'];
+  const builder = Game.creeps['Builder1'];
+
+  if (harvester) {
+    runHarvester(harvester);
+  }
+
+  if (upgrader) {
+    runUpgrader(upgrader);
+  }
+
+  if (builder) {
+    runBuilder(builder);
+  }
+};
+```
+
+> **保存前修改 Spawn 名称**
+> 代码使用 `Game.spawns['Spawn1']`。名称和大小写必须与游戏中一致。
+
+## 四、代码分成哪些部分
+
+### runHarvester()
+
+负责 Harvester1 的采集和交付。目标只包括仍有空余 Energy 容量的 Spawn 与 Extension。
+
+### runUpgrader()
+
+负责 Upgrader1 在采集和升级之间切换。
+
+### runBuilder()
+
+负责 Builder1 的采集、建造、维修和空闲升级。
+
+### module.exports.loop
+
+每个 tick 先检查是否缺少 Creep，再分别运行三只 Creep 的工作代码。
+
+> **为什么还要使用 function？**
+> 这里只使用三个名称明确的函数，把三种工作分开。没有使用动态角色字段、动态 Memory 键或复杂模块结构。
+
+## 五、运行后观察什么
+
+1. 缺少 Creep 时，Spawn 是否按顺序尝试创建；
+2. Harvester1 是否填充 Spawn 和 Extension；
+3. Upgrader1 是否持续增加 Controller 进度；
+4. Builder1 是否先建造，再维修，最后升级；
+5. 三只 Creep Energy 用完后是否分别返回 Source。
+
+## 六、这份代码有哪些限制
+
+- 三只 Creep 都选择搜索结果中的第一个 Source；
+- 每种角色只有一个固定名称；
+- 没有在 Creep 死亡前提前生产替代者；
+- 如果所有 Creep 都死亡，并且房间可用于生成的 Energy 少于 200，代码无法自行恢复；
+- 没有最近目标、任务缓存、CPU 优化或多房间管理。
+
+**为什么全灭且 Energy 不足时不能恢复？**
+
+创建 `[WORK, CARRY, MOVE]` 需要 200 Energy。如果没有活着的 Creep 补充 Energy，Spawn 就无法创建新的基础工作 Creep。
+
+**为什么 Harvester1 在 Spawn 和 Extension 都满后停下？**
+
+当前只负责填充这两类建筑。没有可接收 Energy 的目标时，它会暂时等待。
+
+## 新手系列总结
+
+> 认识 tick 和界面 → 控制 Creep → 采集运输 → 创建 Creep → 分工 → 升级、建造和维修
+
+完成这一篇后，你已经拥有一份可以继续修改的学习代码。下一阶段应进入单独的专业分类，例如角色 Memory、动态命名、提前补员、多 Source 分配、寻路与 CPU 优化。
+
+## 官方参考资料
+
+1. [Screeps API Reference](https://docs.screeps.com/api/)
+2. [Screeps Documentation：Room Controller Level](https://docs.screeps.com/control.html)
+3. [Screeps Documentation：Creeps](https://docs.screeps.com/creeps.html)
