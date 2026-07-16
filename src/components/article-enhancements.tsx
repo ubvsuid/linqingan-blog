@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+
+import { SeriesArticleJump } from "@/components/series-article-jump";
+import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 
 interface ArticleEnhancementsProps {
   articleId: string;
@@ -9,6 +13,12 @@ interface ArticleEnhancementsProps {
 export function ArticleEnhancements({
   articleId,
 }: ArticleEnhancementsProps) {
+  const pathname = usePathname();
+  const currentSlug = pathname.split("/").filter(Boolean).at(-1) ?? "";
+  const beginnerIndex = beginnerSeriesSlugs.findIndex(
+    (slug) => slug === currentSlug,
+  );
+
   useEffect(() => {
     const article = document.getElementById(articleId);
 
@@ -60,5 +70,16 @@ export function ArticleEnhancements({
     };
   }, [articleId]);
 
-  return null;
+  if (beginnerIndex < 0) {
+    return null;
+  }
+
+  return (
+    <SeriesArticleJump
+      key={currentSlug}
+      articleHrefs={beginnerSeriesSlugs.map((slug) => `/blog/${slug}`)}
+      currentArticle={beginnerIndex + 1}
+      seriesLabel="Screeps 新手入门"
+    />
+  );
 }
