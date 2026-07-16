@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/now",
   },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function NowPage() {
