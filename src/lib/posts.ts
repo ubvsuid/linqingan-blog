@@ -6,6 +6,8 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
+import { isBeginnerSeriesPost } from "@/lib/beginner-series";
+
 const postsDirectory = path.join(process.cwd(), "content", "posts");
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -209,6 +211,10 @@ export function getAllPosts(): PostSummary[] {
         new Date(a.publishedAt).getTime(),
     )
     .map(toSummary);
+}
+
+export function getArticlePosts(): PostSummary[] {
+  return getAllPosts().filter((post) => !isBeginnerSeriesPost(post.slug));
 }
 
 export function getFeaturedPosts(limit = 3): PostSummary[] {
