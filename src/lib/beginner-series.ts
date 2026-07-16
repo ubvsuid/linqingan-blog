@@ -4,6 +4,8 @@ export const beginnerSeriesSlugs = [
   "screeps-tick-and-game-loop",
   "screeps-first-creep-harvest",
   "screeps-creep-deliver-energy",
+  "screeps-creep-body-parts",
+  "screeps-spawn-create-creep",
 ] as const;
 
 export function getBeginnerSeriesIndex(slug: string): number {

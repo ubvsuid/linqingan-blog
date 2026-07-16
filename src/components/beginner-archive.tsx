@@ -30,7 +30,7 @@ export function BeginnerArchive({ currentPage }: BeginnerArchiveProps) {
           <p className="eyebrow">SCREEPS BEGINNER</p>
           <h1>Screeps 新手入门</h1>
           <p>
-            从认识游戏开始，按顺序完成界面、tick、移动、采集和运输。
+            从认识游戏开始，按顺序完成界面、tick、移动、采集、运输、身体部件和创建 Creep。
             每篇只解决一个问题。
           </p>
         </header>
