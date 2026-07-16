@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Container } from "@/components/container";
+import { HomeLearningActions } from "@/components/home-learning-actions";
 
 export const metadata: Metadata = {
   alternates: {
@@ -14,6 +15,7 @@ export default function HomePage() {
       <Container className="minimal-home-inner">
         <h1>构建，运行，迭代</h1>
         <p>Screeps 与系统实践。</p>
+        <HomeLearningActions />
       </Container>
 
       <style>{`
@@ -50,7 +52,7 @@ export default function HomePage() {
         @media (max-width: 860px) {
           .minimal-home,
           .minimal-home-inner {
-            min-height: calc(100vh - 148px);
+            min-height: calc(100vh - 112px);
           }
 
           .minimal-home-inner {
