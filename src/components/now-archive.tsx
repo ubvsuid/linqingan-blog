@@ -1,5 +1,6 @@
 import { CollectionPagination } from "@/components/collection-pagination";
 import { Container } from "@/components/container";
+import { formatDate } from "@/lib/date";
 import { nowEntries } from "@/lib/now-entries";
 import { paginateItems } from "@/lib/pagination";
 
@@ -16,6 +17,7 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         <header className="page-header">
           <p className="eyebrow">NOW</p>
           <h1>近况</h1>
+          <p>记录网站与 Screeps 内容目前正在发生什么，不写成长文章，只保留阶段性的变化。</p>
         </header>
 
         <div
@@ -24,6 +26,7 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         >
           {pagination.items.map((entry) => (
             <section className="now-entry" key={entry.id}>
+              <time dateTime={entry.date}>{formatDate(entry.date)}</time>
               <h2>{entry.title}</h2>
               {entry.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
@@ -57,12 +60,23 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         }
 
         .now-entry {
+          position: relative;
           border-top: 1px solid var(--border);
-          padding: 4px 0 42px;
+          padding: 32px 0 46px;
         }
 
         .now-entry:last-child {
           border-bottom: 1px solid var(--border);
+        }
+
+        .now-entry > time {
+          color: var(--muted);
+          font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+          font-size: 12px;
+        }
+
+        .now-entry h2 {
+          margin-top: 14px;
         }
       `}</style>
     </main>
