@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { nowEntries } from "@/lib/now-entries";
 import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts, getArticlePosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 
@@ -35,6 +35,8 @@ function createArchivePages(
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const allPosts = getAllPosts();
+  const articlePosts = getArticlePosts();
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteConfig.url,
@@ -48,35 +50,45 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.95,
     },
-    {
-      url: `${siteConfig.url}/blog`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${siteConfig.url}/projects`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteConfig.url}/now`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteConfig.url}/about`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
+    ...(articlePosts.length > 0
+      ? [
+          {
+            url: `${siteConfig.url}/blog`,
+            lastModified: new Date(),
+            changeFrequency: "weekly" as const,
+            priority: 0.9,
+          },
+        ]
+      : []),
+    ...(projects.length > 0
+      ? [
+          {
+            url: `${siteConfig.url}/projects`,
+            lastModified: new Date(),
+            changeFrequency: "monthly" as const,
+            priority: 0.8,
+          },
+        ]
+      : []),
+    ...(nowEntries.length > 0
+      ? [
+          {
+            url: `${siteConfig.url}/now`,
+            lastModified: new Date(),
+            changeFrequency: "monthly" as const,
+            priority: 0.7,
+          },
+        ]
+      : []),
   ];
 
-  const allPosts = getAllPosts();
   const archivePages: MetadataRoute.Sitemap = [
-    ...createArchivePages("/blog", allPosts.length, "weekly", 0.65),
+    ...createArchivePages(
+      "/blog",
+      articlePosts.length,
+      "weekly",
+      0.65,
+    ),
     ...createArchivePages(
       "/beginner",
       beginnerSeriesSlugs.length,
