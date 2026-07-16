@@ -14,9 +14,8 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
     <main className="page-shell">
       <Container className="narrow-container">
         <header className="page-header">
-          <p className="eyebrow">NOW · JULY 2026</p>
-          <h1>最近在做什么</h1>
-          <p>更新于 2026 年 7 月，这个页面会随着当前重点持续变化。</p>
+          <p className="eyebrow">NOW</p>
+          <h1>近况</h1>
         </header>
 
         <div

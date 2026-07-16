@@ -4,7 +4,7 @@ import { NowArchive } from "@/components/now-archive";
 
 export const metadata: Metadata = {
   title: "近况",
-  description: "临清安最近正在开发、学习和关注的事情。",
+  description: "近况内容将在后续更新。",
   alternates: {
     canonical: "/now",
   },

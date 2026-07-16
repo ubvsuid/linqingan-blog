@@ -4,7 +4,7 @@ import { ProjectsArchive } from "@/components/projects-archive";
 
 export const metadata: Metadata = {
   title: "项目",
-  description: "临清安正在开发和持续维护的项目档案。",
+  description: "项目内容将在后续更新。",
   alternates: {
     canonical: "/projects",
   },

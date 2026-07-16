@@ -2,14 +2,14 @@ import { CollectionPagination } from "@/components/collection-pagination";
 import { Container } from "@/components/container";
 import { PostCard } from "@/components/post-card";
 import { paginateBlogPosts } from "@/lib/blog-pagination";
-import { getAllPosts } from "@/lib/posts";
+import { getArticlePosts } from "@/lib/posts";
 
 interface BlogArchiveProps {
   currentPage: number;
 }
 
 export function BlogArchive({ currentPage }: BlogArchiveProps) {
-  const pagination = paginateBlogPosts(getAllPosts(), currentPage);
+  const pagination = paginateBlogPosts(getArticlePosts(), currentPage);
 
   return (
     <main className="page-shell">
@@ -17,9 +17,6 @@ export function BlogArchive({ currentPage }: BlogArchiveProps) {
         <header className="page-header">
           <p className="eyebrow">WRITING</p>
           <h1>文章</h1>
-          <p>
-            关于 Screeps、JavaScript、自动化系统、网站建设和开发复盘。
-          </p>
         </header>
 
         <div className="post-list" aria-label={`文章第 ${currentPage} 页`}>

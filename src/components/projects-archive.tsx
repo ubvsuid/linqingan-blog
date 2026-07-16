@@ -16,7 +16,6 @@ export function ProjectsArchive({ currentPage }: ProjectsArchiveProps) {
         <header className="page-header">
           <p className="eyebrow">PROJECTS</p>
           <h1>项目</h1>
-          <p>把长期开发过程整理成可阅读、可追踪的项目档案。</p>
         </header>
 
         <div
