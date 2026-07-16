@@ -67,7 +67,7 @@ export function BeginnerArchive({ currentPage }: BeginnerArchiveProps) {
         "@type": "ItemList",
         name: "Screeps 新手入门学习路线",
         description:
-          "按顺序学习 Screeps 的基础概念、Creep 控制和最初的生产循环。",
+          "按顺序学习 Screeps：从基础概念和 Creep 控制，到角色分工、Controller 升级、Extension 建造与房间基础代码。",
         numberOfItems: posts.length,
         itemListOrder: "https://schema.org/ItemListOrderAscending",
         itemListElement: pagination.items.map((post, index) => ({
@@ -94,7 +94,7 @@ export function BeginnerArchive({ currentPage }: BeginnerArchiveProps) {
           <p className="eyebrow">SCREEPS BEGINNER</p>
           <h1>Screeps 新手入门</h1>
           <p>
-            从认识游戏开始，按顺序完成界面、tick、移动、采集、运输、身体部件和创建 Creep。
+            从认识游戏开始，按顺序学习 Creep 控制、角色分工、Controller 升级、Extension 建造与房间基础代码。
             每篇只解决一个问题。
           </p>
         </header>
