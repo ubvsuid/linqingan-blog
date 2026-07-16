@@ -90,11 +90,11 @@ export function SeriesArticleJump({
           padding-top: 28px;
         }
 
-        :global(.beginner-progress-panel) + .series-article-jump {
+        .beginner-progress-panel + .series-article-jump {
           margin-top: 24px;
         }
 
-        .series-article-jump + :global(.article-pagination) {
+        .series-article-jump + .article-pagination {
           margin-top: 24px;
         }
 
