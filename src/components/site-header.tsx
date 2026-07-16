@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,6 +16,21 @@ export function SiteHeader() {
   const isBeginnerArticle = beginnerSeriesSlugs.some(
     (slug) => pathname === `/blog/${slug}`,
   );
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen]);
 
   function isActive(href: string): boolean {
     if (href === "/") {
@@ -82,7 +97,7 @@ export function SiteHeader() {
             <ThemeToggle />
             <button
               type="button"
-              className="menu-toggle"
+              className={menuOpen ? "menu-toggle menu-toggle-open" : "menu-toggle"}
               aria-controls="site-navigation"
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "关闭导航菜单" : "打开导航菜单"}
@@ -185,7 +200,21 @@ export function SiteHeader() {
           width: 15px;
           height: 1px;
           background: currentColor;
-          transition: transform 160ms ease;
+          transition:
+            transform 160ms ease,
+            opacity 160ms ease;
+        }
+
+        .menu-toggle-open span:first-child {
+          transform: translateY(5px) rotate(45deg);
+        }
+
+        .menu-toggle-open span:nth-child(2) {
+          opacity: 0;
+        }
+
+        .menu-toggle-open span:last-child {
+          transform: translateY(-5px) rotate(-45deg);
         }
 
         html[data-theme="dark"] .brand-logo {
