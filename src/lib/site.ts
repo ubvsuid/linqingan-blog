@@ -1,11 +1,27 @@
+const DEFAULT_SITE_URL = "https://www.linqingan.com";
+
+function normalizeSiteUrl(value: string | undefined): string {
+  const candidate = value?.trim() || DEFAULT_SITE_URL;
+
+  try {
+    const url = new URL(candidate);
+
+    if (url.hostname === "linqingan.com") {
+      url.hostname = "www.linqingan.com";
+    }
+
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return DEFAULT_SITE_URL;
+  }
+}
+
 export const siteConfig = {
   name: "临清安",
   title: "临清安",
   description:
-    "记录 Screeps 自动化系统、JavaScript 工程实践、软件架构与真实开发过程。",
-  url:
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "https://linqingan.com",
+    "记录 Screeps 中文学习路线、自动化系统、JavaScript 工程实践与真实开发过程。",
+  url: normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL),
   locale: "zh_CN",
   language: "zh-CN",
   author: {

@@ -1,76 +1,130 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { HomeLearningActions } from "@/components/home-learning-actions";
+import { PostCard } from "@/components/post-card";
+import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
+import { createPageMetadata } from "@/lib/metadata";
+import { getAllPosts } from "@/lib/posts";
+import { projects } from "@/lib/projects";
+import { siteConfig } from "@/lib/site";
+
+import styles from "./home.module.css";
+
+const baseMetadata = createPageMetadata({
+  title: siteConfig.title,
+  description:
+    "从 Screeps 中文新手学习路线开始，继续阅读自动化系统、JavaScript 工程实践与真实开发记录。",
+  path: "/",
+});
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: "/",
+  ...baseMetadata,
+  title: {
+    absolute: siteConfig.title,
   },
 };
 
 export default function HomePage() {
+  const latestPosts = getAllPosts().slice(0, 3);
+  const currentProject = projects[0];
+
   return (
-    <main className="minimal-home">
-      <Container className="minimal-home-inner">
-        <h1>构建，运行，迭代</h1>
-        <p>Screeps 与系统实践。</p>
-        <HomeLearningActions />
-      </Container>
+    <main className={styles.home}>
+      <section className={styles.hero}>
+        <Container className={styles.heroInner}>
+          <p className="eyebrow">SCREEPS · JAVASCRIPT · SYSTEMS</p>
+          <h1>构建，运行，迭代</h1>
+          <p className={styles.heroDescription}>
+            从一套按顺序学习的 Screeps 中文入门路线开始，记录代码如何逐步变成可以持续运行的系统。
+          </p>
+          <HomeLearningActions />
+        </Container>
+      </section>
 
-      <style>{`
-        .minimal-home {
-          min-height: calc(100vh - 92px);
-          overflow: hidden;
-        }
+      <section className={styles.learningSection} aria-labelledby="home-learning-title">
+        <Container>
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className="eyebrow">BEGINNER PATH</p>
+              <h2 id="home-learning-title">从第一只 Creep 开始</h2>
+            </div>
+            <Link href="/beginner">查看完整路线 →</Link>
+          </div>
 
-        .minimal-home-inner {
-          display: flex;
-          min-height: calc(100vh - 92px);
-          flex-direction: column;
-          align-items: center;
-          padding-top: clamp(84px, 13vh, 150px);
-          text-align: center;
-        }
+          <div className={styles.learningGrid}>
+            <article className={styles.learningIntro}>
+              <p>
+                现有入门路线包含 {beginnerSeriesSlugs.length} 篇文章，分成 {beginnerStages.length}
+                个阶段。从认识游戏界面和 tick，一直到角色分工、Extension、建造维修与第一份房间基础代码。
+              </p>
+              <div className={styles.statRow} aria-label="入门学习路线数据">
+                <div>
+                  <strong>{beginnerSeriesSlugs.length}</strong>
+                  <span>篇文章</span>
+                </div>
+                <div>
+                  <strong>{beginnerStages.length}</strong>
+                  <span>个阶段</span>
+                </div>
+                <div>
+                  <strong>0</strong>
+                  <span>注册要求</span>
+                </div>
+              </div>
+            </article>
 
-        .minimal-home h1 {
-          margin: 0;
-          font-size: clamp(32px, 6.4vw, 96px);
-          font-weight: 680;
-          line-height: 1.08;
-          letter-spacing: -0.055em;
-          white-space: nowrap;
-        }
+            <ol className={styles.stageList}>
+              {beginnerStages.map((stage) => (
+                <li key={stage.id}>
+                  <span>{String(stage.number).padStart(2, "0")}</span>
+                  <div>
+                    <strong>{stage.title}</strong>
+                    <p>{stage.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </Container>
+      </section>
 
-        .minimal-home p {
-          margin: 28px 0 0;
-          color: var(--muted);
-          font-size: clamp(18px, 2vw, 26px);
-          letter-spacing: 0.01em;
-        }
+      <section className={styles.latestSection} aria-labelledby="latest-posts-title">
+        <Container>
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className="eyebrow">LATEST WRITING</p>
+              <h2 id="latest-posts-title">最近更新</h2>
+            </div>
+            <Link href="/blog">浏览全部文章 →</Link>
+          </div>
 
-        @media (max-width: 860px) {
-          .minimal-home,
-          .minimal-home-inner {
-            min-height: calc(100vh - 112px);
-          }
+          <div className={styles.postGrid}>
+            {latestPosts.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </Container>
+      </section>
 
-          .minimal-home-inner {
-            padding-top: clamp(70px, 11vh, 110px);
-          }
-        }
-
-        @media (max-width: 480px) {
-          .minimal-home h1 {
-            font-size: clamp(30px, 9vw, 42px);
-          }
-
-          .minimal-home p {
-            margin-top: 20px;
-            font-size: 17px;
-          }
-        }
-      `}</style>
+      {currentProject ? (
+        <section className={styles.projectSection} aria-labelledby="home-project-title">
+          <Container>
+            <div className={styles.projectCard}>
+              <div>
+                <p className="eyebrow">CURRENT PROJECT</p>
+                <h2 id="home-project-title">{currentProject.title}</h2>
+                <p>{currentProject.summary}</p>
+              </div>
+              <div className={styles.projectActions}>
+                <span>{currentProject.status}</span>
+                <Link href="/projects">查看项目记录 →</Link>
+              </div>
+            </div>
+          </Container>
+        </section>
+      ) : null}
     </main>
   );
 }
