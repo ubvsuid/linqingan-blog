@@ -1,18 +1,12 @@
-import type { Metadata } from "next";
-
 import { BlogArchive } from "@/components/blog-archive";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "文章",
-  description: "文章内容将在后续更新。",
-  alternates: {
-    canonical: "/blog",
-  },
-  robots: {
-    index: false,
-    follow: true,
-  },
-};
+  description:
+    "浏览临清安发布的全部内容，包括 Screeps 新手入门、基础工程、系统架构与网站建设记录。",
+  path: "/blog",
+});
 
 export default function BlogPage() {
   return <BlogArchive currentPage={1} />;
