@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { nowEntries } from "@/lib/now-entries";
 import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts, getArticlePosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 
@@ -36,6 +36,7 @@ function createArchivePages(
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const allPosts = getAllPosts();
+  const articlePosts = getArticlePosts();
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteConfig.url,
@@ -49,7 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.95,
     },
-    ...(allPosts.length > beginnerSeriesSlugs.length
+    ...(articlePosts.length > 0
       ? [
           {
             url: `${siteConfig.url}/blog`,
@@ -84,7 +85,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const archivePages: MetadataRoute.Sitemap = [
     ...createArchivePages(
       "/blog",
-      Math.max(0, allPosts.length - beginnerSeriesSlugs.length),
+      articlePosts.length,
       "weekly",
       0.65,
     ),
