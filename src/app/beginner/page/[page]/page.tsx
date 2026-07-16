@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 
 import { BeginnerArchive } from "@/components/beginner-archive";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
+import { createPageMetadata } from "@/lib/metadata";
 import {
   getArchiveStaticParams,
   getTotalPages,
@@ -38,13 +39,11 @@ export async function generateMetadata({
     };
   }
 
-  return {
+  return createPageMetadata({
     title: `Screeps 新手入门 · 第 ${pageNumber} 页`,
-    description: `按顺序浏览 Screeps 新手入门内容，第 ${pageNumber} 页。`,
-    alternates: {
-      canonical: `/beginner/page/${pageNumber}`,
-    },
-  };
+    description: `按顺序浏览 Screeps 新手学习路线，第 ${pageNumber} 页。`,
+    path: `/beginner/page/${pageNumber}`,
+  });
 }
 
 export default async function BeginnerPageNumber({
