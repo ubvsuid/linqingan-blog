@@ -85,9 +85,13 @@ export function SeriesArticleJump({
         .series-article-jump {
           display: grid;
           gap: 16px;
-          margin-top: 22px;
+          margin-top: 80px;
           border-top: 1px solid var(--border);
-          padding-top: 24px;
+          padding-top: 28px;
+        }
+
+        .series-article-jump + .article-pagination {
+          margin-top: 24px;
         }
 
         .series-article-jump-summary {
