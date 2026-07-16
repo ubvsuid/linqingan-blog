@@ -5,7 +5,7 @@ import { BeginnerArchive } from "@/components/beginner-archive";
 export const metadata: Metadata = {
   title: "Screeps 新手入门",
   description:
-    "按顺序阅读 Screeps 新手文章，从认识游戏、界面和 tick，到采集、运输、身体部件与创建 Creep。",
+    "按顺序学习 Screeps：从认识游戏、控制 Creep 和采集运输，到角色分工、升级 Controller、建造 Extension 与整理第一份房间代码。",
   alternates: {
     canonical: "/beginner",
   },
