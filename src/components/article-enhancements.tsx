@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+import { BeginnerProgressPanel } from "@/components/beginner-progress-panel";
 import { SeriesArticleJump } from "@/components/series-article-jump";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 
@@ -75,11 +76,14 @@ export function ArticleEnhancements({
   }
 
   return (
-    <SeriesArticleJump
-      key={currentSlug}
-      articleHrefs={beginnerSeriesSlugs.map((slug) => `/blog/${slug}`)}
-      currentArticle={beginnerIndex + 1}
-      seriesLabel="Screeps 新手入门"
-    />
+    <>
+      <BeginnerProgressPanel slug={currentSlug} />
+      <SeriesArticleJump
+        key={currentSlug}
+        articleHrefs={beginnerSeriesSlugs.map((slug) => `/blog/${slug}`)}
+        currentArticle={beginnerIndex + 1}
+        seriesLabel="Screeps 新手入门"
+      />
+    </>
   );
 }
