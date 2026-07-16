@@ -121,11 +121,31 @@ function decodeHtmlText(value: string): string {
     .trim();
 }
 
+function createHeadingId(
+  text: string,
+  headingIndex: number,
+  usedIds: Map<string, number>,
+): string {
+  const normalized = text
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+  const baseId = normalized || `section-${headingIndex}`;
+  const occurrence = usedIds.get(baseId) ?? 0;
+
+  usedIds.set(baseId, occurrence + 1);
+  return occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`;
+}
+
 function addHeadingIds(html: string): {
   html: string;
   tableOfContents: TableOfContentsItem[];
 } {
   const tableOfContents: TableOfContentsItem[] = [];
+  const usedIds = new Map<string, number>();
   let headingIndex = 0;
 
   const htmlWithIds = html.replace(
@@ -133,8 +153,8 @@ function addHeadingIds(html: string): {
     (_match, rawLevel: string, content: string) => {
       headingIndex += 1;
       const level = Number(rawLevel) as 2 | 3;
-      const id = `section-${headingIndex}`;
       const text = decodeHtmlText(content);
+      const id = createHeadingId(text, headingIndex, usedIds);
 
       tableOfContents.push({ id, text, level });
 
