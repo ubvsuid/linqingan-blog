@@ -30,9 +30,9 @@ export const beginnerStages = [
   },
 ] as const;
 
-export const beginnerSeriesSlugs = beginnerStages.flatMap((stage) => [
-  ...stage.slugs,
-]);
+export const beginnerSeriesSlugs: readonly string[] = beginnerStages.flatMap(
+  (stage) => [...stage.slugs],
+);
 
 export function getBeginnerSeriesIndex(slug: string): number {
   return beginnerSeriesSlugs.findIndex((item) => item === slug);
