@@ -1,10 +1,19 @@
+export interface ScreepsErrorLink {
+  label: string;
+  href: string;
+}
+
 export interface ScreepsErrorCode {
   name: string;
   value: number;
   meaning: string;
   commonCause: string;
   fix: string;
+  operations?: string[];
+  checks?: string[];
+  wrongExample?: string;
   example?: string;
+  related?: ScreepsErrorLink[];
 }
 
 export const screepsErrorCodes: ScreepsErrorCode[] = [
@@ -17,7 +26,28 @@ export const screepsErrorCodes: ScreepsErrorCode[] = [
   { name: "ERR_NOT_ENOUGH_ENERGY", value: -6, meaning: "可用能量不足。", commonCause: "创建身体成本超过房间当前能量，或 Creep 没有携带足够能量。", fix: "等待能量补充、降低身体成本，或先采集和装载能量。" },
   { name: "ERR_INVALID_TARGET", value: -7, meaning: "目标不适用于当前动作。", commonCause: "把 Source 传给 transfer()，或把完整建筑当作 Construction Site 建造。", fix: "确认方法需要的目标类型，并在调用前检查对象结构。" },
   { name: "ERR_FULL", value: -8, meaning: "目标已经装满，或没有剩余容量。", commonCause: "向已满的 Spawn、Extension 或 Creep 继续 transfer()。", fix: "用 target.store.getFreeCapacity(RESOURCE_ENERGY) 检查剩余容量。" },
-  { name: "ERR_NOT_IN_RANGE", value: -9, meaning: "Creep 离目标太远。", commonCause: "直接 harvest()、transfer()、build() 或 upgradeController()，但没有先靠近。", fix: "收到该返回值时调用 moveTo()。", example: "const result = creep.harvest(source);\nif (result === ERR_NOT_IN_RANGE) {\n  creep.moveTo(source);\n}" },
+  {
+    name: "ERR_NOT_IN_RANGE",
+    value: -9,
+    meaning: "目标距离当前 Creep 太远，这一次动作没有被安排。",
+    commonCause: "调用 harvest()、transfer()、upgradeController()、build() 或 repair() 时，Creep 还没有进入该动作要求的范围。",
+    fix: "先保存动作返回值。只有返回 ERR_NOT_IN_RANGE 时才调用 moveTo()，然后在后续 tick 中重新尝试原动作。",
+    operations: ["harvest()", "transfer()", "upgradeController()", "build()", "repair()"],
+    checks: [
+      "确认目标变量真实存在，不是 undefined 或空数组中的缺失项。",
+      "确认目标类型适用于当前方法，例如 harvest() 的目标应为 Source 或 Mineral。",
+      "把动作返回值保存并输出，确认实际得到的确实是 ERR_NOT_IN_RANGE（-9）。",
+      "收到 -9 后调用 moveTo(target)，并在下一个 tick 重新执行原动作。",
+      "如果 Creep 仍不移动，再检查 moveTo() 的返回值、疲劳、身体部件和路径。",
+    ],
+    wrongExample: "// 只调用动作，没有处理距离不足\nconst result = creep.harvest(source);\nconsole.log(result); // 可能得到 -9",
+    example: "const result = creep.harvest(source);\n\nif (result === ERR_NOT_IN_RANGE) {\n  const moveResult = creep.moveTo(source);\n\n  if (moveResult !== OK) {\n    console.log(creep.name + ' 移动失败：' + moveResult);\n  }\n}",
+    related: [
+      { label: "让第一只 Creep 移动并采集能量", href: "/blog/screeps-first-creep-harvest" },
+      { label: "让 Builder 自动建造和维修", href: "/blog/screeps-build-and-repair" },
+      { label: "查询 RoomPosition 术语", href: "/glossary#roomposition" },
+    ],
+  },
   { name: "ERR_INVALID_ARGS", value: -10, meaning: "传入参数的类型、数量或内容不正确。", commonCause: "身体数组、名称、方向、资源类型或选项对象写错。", fix: "对照 API 参数顺序，并打印每个参数检查实际值。" },
   { name: "ERR_TIRED", value: -11, meaning: "Creep 当前疲劳，暂时不能移动。", commonCause: "MOVE 部件不足、道路条件差，或拖动其他 Creep 产生疲劳。", fix: "等待疲劳恢复，或重新设计 MOVE 与其他部件的比例。" },
   { name: "ERR_NO_BODYPART", value: -12, meaning: "Creep 缺少执行动作所需的有效身体部件。", commonCause: "没有 WORK 却采集，或相关身体部件已经被摧毁。", fix: "检查 creep.getActiveBodyparts()，并在创建时加入需要的部件。" },

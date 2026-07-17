@@ -4,16 +4,17 @@ const checks = [
   ["/", ["构建，运行，迭代", "Screeps"]],
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
-  ["/blog", ["全部文章", "12"]],
+  ["/blog", ["全部文章", "13"]],
   ["/resources", ["资料中心", "站内搜索"]],
   ["/search", ["搜索整个网站", "错误码"]],
-  ["/glossary", ["Screeps 术语表", "Creep"]],
-  ["/screeps-errors", ["ERR_NOT_IN_RANGE", "返回值"]],
+  ["/glossary", ["Screeps 术语表", "Memory"]],
+  ["/screeps-errors", ["ERR_NOT_IN_RANGE", "建议排查顺序"]],
   ["/tags", ["文章标签", "Screeps"]],
   ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
   ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
-  ["/blog/screeps-introduction", ["发布于", "这篇文章解决了你的问题吗"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/search", "https://www.linqingan.com/about"]],
+  ["/blog/screeps-introduction", ["发布于", "把这篇内容连接到下一步"]],
+  ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/about"]],
 ];
 
 async function waitForServer() {
@@ -22,7 +23,7 @@ async function waitForServer() {
       const response = await fetch(baseUrl, { redirect: "manual" });
       if (response.status >= 200 && response.status < 500) return;
     } catch {
-      // The production server may still be starting; retry below.
+      // Server may still be starting.
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
