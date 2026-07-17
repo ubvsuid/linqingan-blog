@@ -21,7 +21,9 @@ async function waitForServer() {
     try {
       const response = await fetch(baseUrl, { redirect: "manual" });
       if (response.status >= 200 && response.status < 500) return;
-    } catch {}
+    } catch {
+      // The production server may still be starting; retry below.
+    }
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   throw new Error(`服务器未在预期时间内启动：${baseUrl}`);
