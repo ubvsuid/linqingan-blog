@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
 
 import "./globals.css";
+import "./improvements.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
