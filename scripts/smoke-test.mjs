@@ -12,7 +12,7 @@ const checks = [
   ["/tags", ["文章标签", "Screeps"]],
   ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
   ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
-  ["/blog/screeps-what-is-it", ["发布于", "这篇文章解决了你的问题吗"]],
+  ["/blog/screeps-introduction", ["发布于", "这篇文章解决了你的问题吗"]],
   ["/sitemap.xml", ["https://www.linqingan.com/search", "https://www.linqingan.com/about"]],
 ];
 
