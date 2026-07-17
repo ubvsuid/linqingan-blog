@@ -29,6 +29,10 @@ export interface PostSummary extends PostFrontmatter {
   readingMinutes: number;
 }
 
+export interface PostSearchDocument extends PostSummary {
+  text: string;
+}
+
 export interface TableOfContentsItem {
   id: string;
   text: string;
@@ -65,18 +69,24 @@ function parseFrontmatter(
 
   if (
     data.updatedAt !== undefined &&
-    (typeof data.updatedAt !== "string" ||
-      !datePattern.test(data.updatedAt))
+    (typeof data.updatedAt !== "string" || !datePattern.test(data.updatedAt))
   ) {
     throw new Error(`${filePath}: updatedAt 必须使用 YYYY-MM-DD`);
   }
 
   if (
+    typeof data.updatedAt === "string" &&
+    new Date(data.updatedAt).getTime() < new Date(data.publishedAt).getTime()
+  ) {
+    throw new Error(`${filePath}: updatedAt 不能早于 publishedAt`);
+  }
+
+  if (
     data.tags !== undefined &&
     (!Array.isArray(data.tags) ||
-      !data.tags.every((tag) => typeof tag === "string"))
+      !data.tags.every((tag) => typeof tag === "string" && tag.trim() !== ""))
   ) {
-    throw new Error(`${filePath}: tags 必须是字符串数组`);
+    throw new Error(`${filePath}: tags 必须是非空字符串数组`);
   }
 
   if (data.cover !== undefined && typeof data.cover !== "string") {
@@ -97,8 +107,7 @@ function parseFrontmatter(
 }
 
 function calculateReadingMinutes(markdown: string): number {
-  const chineseCharacters =
-    markdown.match(/[\u3400-\u9fff]/g)?.length ?? 0;
+  const chineseCharacters = markdown.match(/[\u3400-\u9fff]/g)?.length ?? 0;
   const englishWords = markdown
     .replace(/[\u3400-\u9fff]/g, " ")
     .split(/\s+/)
@@ -219,6 +228,22 @@ function toSummary(
   };
 }
 
+function normalizeTag(tag: string): string {
+  return tag.normalize("NFKC").trim().toLocaleLowerCase("zh-CN");
+}
+
+function markdownToSearchText(markdown: string): string {
+  return markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[>*_~|-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function getAllPosts(): PostSummary[] {
   return getMarkdownFiles()
     .map((fileName) => fileName.replace(/\.md$/, ""))
@@ -240,6 +265,48 @@ export function getArticlePosts(): PostSummary[] {
 export function getFeaturedPosts(limit = 3): PostSummary[] {
   const featured = getAllPosts().filter((post) => post.featured);
   return (featured.length > 0 ? featured : getAllPosts()).slice(0, limit);
+}
+
+export function getRelatedPosts(
+  post: PostSummary,
+  limit = 3,
+): PostSummary[] {
+  const sourceTags = new Set(post.tags.map(normalizeTag));
+  const scored = getAllPosts()
+    .filter((candidate) => candidate.slug !== post.slug)
+    .map((candidate) => {
+      const sharedTags = candidate.tags.filter((tag) =>
+        sourceTags.has(normalizeTag(tag)),
+      ).length;
+      const score =
+        sharedTags * 4 +
+        (candidate.category === post.category ? 3 : 0) +
+        (candidate.featured ? 1 : 0);
+
+      return { candidate, score };
+    })
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        new Date(right.candidate.publishedAt).getTime() -
+          new Date(left.candidate.publishedAt).getTime(),
+    );
+
+  const relevant = scored.filter((item) => item.score > 0);
+  const source = relevant.length >= limit ? relevant : scored;
+  return source.slice(0, limit).map((item) => item.candidate);
+}
+
+export function getSearchablePosts(): PostSearchDocument[] {
+  return getMarkdownFiles()
+    .map((fileName) => fileName.replace(/\.md$/, ""))
+    .map(readRawPost)
+    .filter((post): post is NonNullable<typeof post> => post !== null)
+    .filter((post) => !post.draft)
+    .map((post) => ({
+      ...toSummary(post),
+      text: markdownToSearchText(post.content),
+    }));
 }
 
 export async function getPostBySlug(
