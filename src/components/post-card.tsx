@@ -9,8 +9,10 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const hasVisibleUpdate =
-    post.updatedAt !== undefined && post.updatedAt !== post.publishedAt;
+  const visibleUpdatedAt =
+    post.updatedAt && post.updatedAt !== post.publishedAt
+      ? post.updatedAt
+      : null;
 
   return (
     <article className="post-card">
@@ -18,10 +20,12 @@ export function PostCard({ post }: PostCardProps) {
         <time dateTime={post.publishedAt}>
           发布于 {formatDate(post.publishedAt)}
         </time>
-        {hasVisibleUpdate ? (
+        {visibleUpdatedAt ? (
           <>
             <span aria-hidden="true">/</span>
-            <time dateTime={post.updatedAt}>更新于 {formatDate(post.updatedAt)}</time>
+            <time dateTime={visibleUpdatedAt}>
+              更新于 {formatDate(visibleUpdatedAt)}
+            </time>
           </>
         ) : null}
         <span aria-hidden="true">/</span>
