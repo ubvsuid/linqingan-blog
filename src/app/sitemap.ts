@@ -6,6 +6,7 @@ import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
+import { getTagRecords } from "@/lib/tags";
 
 type ChangeFrequency = NonNullable<
   MetadataRoute.Sitemap[number]["changeFrequency"]
@@ -35,7 +36,7 @@ function createArchivePages(
   );
 }
 
-function latestDate(values: string[], fallback = "2026-07-16"): Date {
+function latestDate(values: string[], fallback = "2026-07-17"): Date {
   const latest = values
     .filter(Boolean)
     .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0];
@@ -76,6 +77,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: allPostsUpdatedAt,
       changeFrequency: "weekly",
       priority: 0.9,
+    },
+    {
+      url: `${siteConfig.url}/resources`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${siteConfig.url}/glossary`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteConfig.url}/screeps-errors`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteConfig.url}/tags`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "weekly",
+      priority: 0.72,
     },
     {
       url: `${siteConfig.url}/projects`,
@@ -135,5 +160,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...archivePages, ...posts];
+  const tagPages: MetadataRoute.Sitemap = getTagRecords().map((tag) => ({
+    url: `${siteConfig.url}/tags/${tag.slug}`,
+    lastModified: allPostsUpdatedAt,
+    changeFrequency: "weekly",
+    priority: 0.55,
+  }));
+
+  const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
+    url: `${siteConfig.url}/projects/${project.id}`,
+    lastModified: new Date(project.updatedAt),
+    changeFrequency: "monthly",
+    priority: 0.68,
+  }));
+
+  return [
+    ...staticPages,
+    ...archivePages,
+    ...posts,
+    ...tagPages,
+    ...projectPages,
+  ];
 }
