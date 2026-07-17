@@ -114,12 +114,12 @@ for (const fileName of files) {
 }
 
 const beginnerSource = fs.readFileSync(beginnerSeriesPath, "utf8");
-const beginnerArray = beginnerSource.match(/beginnerSeriesSlugs[^=]*=\s*\[([\s\S]*?)\]/);
-if (!beginnerArray) {
-  addError("无法读取 beginnerSeriesSlugs");
+const stageSlugBlocks = [...beginnerSource.matchAll(/slugs:\s*\[([\s\S]*?)\]/g)];
+if (stageSlugBlocks.length === 0) {
+  addError("无法读取 beginnerStages 中的 slugs");
 } else {
-  const beginnerSlugs = [...beginnerArray[1].matchAll(/["']([^"']+)["']/g)].map(
-    (match) => match[1],
+  const beginnerSlugs = stageSlugBlocks.flatMap((block) =>
+    [...block[1].matchAll(/["']([^"']+)["']/g)].map((match) => match[1]),
   );
   const duplicates = beginnerSlugs.filter(
     (slug, index) => beginnerSlugs.indexOf(slug) !== index,
