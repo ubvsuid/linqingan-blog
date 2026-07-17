@@ -44,7 +44,7 @@ export default async function TagPage({ params }: TagPageProps) {
         <div className="tag-post-list">
           {posts.map((post) => (
             <article key={post.slug}>
-              <div className="tag-post-meta"><time dateTime={post.date}>{dateFormatter.format(new Date(`${post.date}T00:00:00`))}</time><span aria-hidden="true">/</span><span>{post.readingTime} 分钟</span><span aria-hidden="true">/</span><span>{post.category}</span></div>
+              <div className="tag-post-meta"><time dateTime={post.publishedAt}>{dateFormatter.format(new Date(`${post.publishedAt}T00:00:00`))}</time><span aria-hidden="true">/</span><span>{post.readingMinutes} 分钟</span><span aria-hidden="true">/</span><span>{post.category}</span></div>
               <h2><Link href={`/blog/${post.slug}`}>{post.title}</Link></h2>
               <p>{post.description}</p>
               <div className="tag-post-tags">{post.tags.map((item) => <span key={item}>{item}</span>)}</div>
