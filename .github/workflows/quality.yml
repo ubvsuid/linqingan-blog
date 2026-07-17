@@ -18,7 +18,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -33,5 +33,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck, lint and build
-        run: npm run check
+      - name: Validate content
+        run: npm run contentcheck
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Start production server and run route smoke tests
+        run: |
+          npm run start > /tmp/linqingan-site.log 2>&1 &
+          SITE_PID=$!
+          trap 'kill $SITE_PID || true' EXIT
+          npm run smoke

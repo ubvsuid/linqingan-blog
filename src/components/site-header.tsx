@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,6 +13,9 @@ import { siteConfig } from "@/lib/site";
 export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
   const isBeginnerArticle = beginnerSeriesSlugs.some(
     (slug) => pathname === `/blog/${slug}`,
   );
@@ -20,12 +23,31 @@ export function SiteHeader() {
   useEffect(() => {
     if (!menuOpen) return;
 
+    firstNavigationLinkRef.current?.focus();
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        headerRef.current &&
+        event.target instanceof Node &&
+        !headerRef.current.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("pointerdown", handlePointerDown);
+    };
   }, [menuOpen]);
 
   function isActive(href: string): boolean {
@@ -45,7 +67,8 @@ export function SiteHeader() {
         pathname.startsWith("/resources/") ||
         pathname === "/glossary" ||
         pathname === "/screeps-errors" ||
-        pathname.startsWith("/tags")
+        pathname.startsWith("/tags") ||
+        pathname === "/search"
       );
     }
 
@@ -53,12 +76,12 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="site-header">
+    <header ref={headerRef} className="site-header">
       <Container className="header-inner">
         <Link
-          href="/about"
+          href="/"
           className="brand"
-          aria-label="查看临清安的个人主页"
+          aria-label="返回首页"
           onClick={() => setMenuOpen(false)}
         >
           <Image className="brand-logo" src="/brand-logo.svg" alt="" width={80} height={72} priority />
@@ -70,10 +93,11 @@ export function SiteHeader() {
             className={menuOpen ? "site-nav site-nav-open" : "site-nav"}
             aria-label="主导航"
           >
-            {siteConfig.navigation.map((item) => {
+            {siteConfig.navigation.map((item, index) => {
               const active = isActive(item.href);
               return (
                 <Link
+                  ref={index === 0 ? firstNavigationLinkRef : undefined}
                   className={active ? "nav-link-active" : undefined}
                   key={item.href}
                   href={item.href}
@@ -87,8 +111,23 @@ export function SiteHeader() {
           </nav>
 
           <div className="header-controls">
+            <Link className="header-icon-link" href="/search" aria-label="搜索网站" title="搜索网站">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </Link>
             <ThemeToggle />
+            <Link
+              className="profile-shortcut"
+              href="/about"
+              aria-label="查看临清安的个人主页"
+              title="个人主页"
+            >
+              <Image src="/profile-avatar.webp" alt="" width={36} height={36} />
+            </Link>
             <button
+              ref={menuButtonRef}
               type="button"
               className={menuOpen ? "menu-toggle menu-toggle-open" : "menu-toggle"}
               aria-controls="site-navigation"
@@ -115,7 +154,12 @@ export function SiteHeader() {
         .site-nav a::after { content: ""; position: absolute; right: 0; bottom: 2px; left: 0; height: 1px; transform: scaleX(0); transform-origin: center; background: var(--foreground); transition: transform 160ms ease; }
         .site-nav a.nav-link-active { color: var(--foreground); }
         .site-nav a.nav-link-active::after { transform: scaleX(1); }
-        .header-controls { display: flex; grid-column: 3; align-items: center; justify-self: end; gap: 10px; }
+        .header-controls { display: flex; grid-column: 3; align-items: center; justify-self: end; gap: 8px; }
+        .header-icon-link, .profile-shortcut { display: inline-grid; width: 42px; height: 42px; place-items: center; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--foreground); transition: border-color 160ms ease, transform 160ms ease; }
+        .header-icon-link:hover, .profile-shortcut:hover { transform: translateY(-1px); border-color: var(--muted); text-decoration: none; }
+        .header-icon-link svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+        .profile-shortcut { overflow: hidden; }
+        .profile-shortcut img { width: 100%; height: 100%; object-fit: cover; }
         .menu-toggle { display: none; width: 42px; height: 42px; align-items: center; justify-content: center; flex-direction: column; gap: 4px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--foreground); cursor: pointer; }
         .menu-toggle span { width: 15px; height: 1px; background: currentColor; transition: transform 160ms ease, opacity 160ms ease; }
         .menu-toggle-open span:first-child { transform: translateY(5px) rotate(45deg); }
@@ -133,6 +177,10 @@ export function SiteHeader() {
           .site-nav a { padding: 13px 18px; text-align: center; }
           .site-nav a + a { border-top: 1px solid var(--border); }
           .site-nav a::after { right: 18px; bottom: 7px; left: 18px; }
+        }
+        @media (max-width: 430px) {
+          .header-icon-link { display: none; }
+          .header-controls { gap: 6px; }
         }
       `}</style>
     </header>

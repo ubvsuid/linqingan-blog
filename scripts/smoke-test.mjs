@@ -1,0 +1,66 @@
+const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+
+const checks = [
+  ["/", ["构建，运行，迭代", "Screeps"]],
+  ["/about", ["临清安", "/profile-avatar.webp"]],
+  ["/beginner", ["Screeps 新手入门", "12"]],
+  ["/blog", ["全部文章", "12"]],
+  ["/resources", ["资料中心", "站内搜索"]],
+  ["/search", ["搜索整个网站", "错误码"]],
+  ["/glossary", ["Screeps 术语表", "Creep"]],
+  ["/screeps-errors", ["ERR_NOT_IN_RANGE", "返回值"]],
+  ["/tags", ["文章标签", "Screeps"]],
+  ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
+  ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
+  ["/blog/screeps-introduction", ["发布于", "这篇文章解决了你的问题吗"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/search", "https://www.linqingan.com/about"]],
+];
+
+async function waitForServer() {
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    try {
+      const response = await fetch(baseUrl, { redirect: "manual" });
+      if (response.status >= 200 && response.status < 500) return;
+    } catch {
+      // The production server may still be starting; retry below.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  throw new Error(`服务器未在预期时间内启动：${baseUrl}`);
+}
+
+await waitForServer();
+
+const failures = [];
+
+for (const [pathname, expectedTexts] of checks) {
+  const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual" });
+  const body = await response.text();
+
+  if (response.status !== 200) {
+    failures.push(`${pathname}: 预期 200，实际 ${response.status}`);
+    continue;
+  }
+
+  for (const expected of expectedTexts) {
+    if (!body.includes(expected)) {
+      failures.push(`${pathname}: 缺少预期内容 “${expected}”`);
+    }
+  }
+
+  if (body.includes("林清安")) {
+    failures.push(`${pathname}: 仍然出现旧姓名“林清安”`);
+  }
+
+  if (pathname !== "/sitemap.xml" && !body.includes("https://www.linqingan.com")) {
+    failures.push(`${pathname}: 未找到统一主域名信号`);
+  }
+}
+
+if (failures.length > 0) {
+  for (const failure of failures) console.error(`ERROR: ${failure}`);
+  console.error(`\n冒烟测试失败：${failures.length} 项。`);
+  process.exit(1);
+}
+
+console.log(`冒烟测试通过：${checks.length} 个关键页面。`);

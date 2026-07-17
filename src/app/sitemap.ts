@@ -85,6 +85,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${siteConfig.url}/search`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "weekly",
+      priority: 0.78,
+    },
+    {
       url: `${siteConfig.url}/glossary`,
       lastModified: allPostsUpdatedAt,
       changeFrequency: "monthly",

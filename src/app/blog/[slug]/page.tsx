@@ -3,14 +3,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArticleEnhancements } from "@/components/article-enhancements";
+import { ArticleFeedback } from "@/components/article-feedback";
 import { Container } from "@/components/container";
 import {
   beginnerSeriesSlugs,
   getBeginnerSeriesIndex,
 } from "@/lib/beginner-series";
 import { formatDate } from "@/lib/date";
-import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import {
+  getAllPosts,
+  getArticlePosts,
+  getPostBySlug,
+  getRelatedPosts,
+} from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { tagToSlug } from "@/lib/tags";
 
 interface PostPageProps {
   params: Promise<{
@@ -82,6 +89,13 @@ export default async function PostPage({ params }: PostPageProps) {
   const beginnerIndex = getBeginnerSeriesIndex(post.slug);
   const isBeginnerPost = beginnerIndex >= 0;
   const allPosts = getAllPosts();
+  const articlePosts = getArticlePosts();
+  const articleIndex = articlePosts.findIndex((item) => item.slug === post.slug);
+  const visibleUpdatedAt =
+    post.updatedAt && post.updatedAt !== post.publishedAt
+      ? post.updatedAt
+      : null;
+
   const previousSlug =
     beginnerIndex > 0 ? beginnerSeriesSlugs[beginnerIndex - 1] : null;
   const nextSlug =
@@ -94,26 +108,69 @@ export default async function PostPage({ params }: PostPageProps) {
   const nextPost = nextSlug
     ? allPosts.find((item) => item.slug === nextSlug)
     : undefined;
+
+  const ordinaryPreviousPost =
+    !isBeginnerPost && articleIndex > 0
+      ? articlePosts[articleIndex - 1]
+      : undefined;
+  const ordinaryNextPost =
+    !isBeginnerPost &&
+    articleIndex >= 0 &&
+    articleIndex < articlePosts.length - 1
+      ? articlePosts[articleIndex + 1]
+      : undefined;
+  const relatedPosts = isBeginnerPost ? [] : getRelatedPosts(post, 3);
   const articleId = `article-content-${post.slug}`;
+  const sectionName = isBeginnerPost ? "Screeps 新手入门" : "文章";
+  const sectionHref = isBeginnerPost ? "/beginner" : "/blog";
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description,
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt ?? post.publishedAt,
-    mainEntityOfPage: articleUrl,
-    url: articleUrl,
-    author: {
-      "@type": "Person",
-      name: siteConfig.author.name,
-      url: siteConfig.url,
-    },
-    publisher: {
-      "@type": "Person",
-      name: siteConfig.author.name,
-    },
-    keywords: post.tags.join(", "),
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        headline: post.title,
+        description: post.description,
+        datePublished: post.publishedAt,
+        dateModified: post.updatedAt ?? post.publishedAt,
+        mainEntityOfPage: articleUrl,
+        url: articleUrl,
+        author: {
+          "@type": "Person",
+          name: siteConfig.author.name,
+          url: `${siteConfig.url}/about`,
+        },
+        publisher: {
+          "@type": "Person",
+          name: siteConfig.author.name,
+          url: `${siteConfig.url}/about`,
+        },
+        keywords: post.tags.join(", "),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "首页",
+            item: siteConfig.url,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: sectionName,
+            item: `${siteConfig.url}${sectionHref}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: articleUrl,
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -128,27 +185,36 @@ export default async function PostPage({ params }: PostPageProps) {
 
         <article>
           <header className="article-header">
-            <Link
-              href={isBeginnerPost ? "/beginner" : "/blog"}
-              className="back-link"
-            >
-              ← {isBeginnerPost ? "返回入门" : "返回文章"}
-            </Link>
+            <nav className="article-breadcrumb" aria-label="面包屑">
+              <Link href="/">首页</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={sectionHref}>{sectionName}</Link>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">本文</span>
+            </nav>
             <p className="eyebrow">{post.category}</p>
             <h1>{post.title}</h1>
             <p className="article-description">{post.description}</p>
             <div className="post-meta">
               <time dateTime={post.publishedAt}>
-                {formatDate(post.publishedAt)}
+                发布于 {formatDate(post.publishedAt)}
               </time>
+              {visibleUpdatedAt ? (
+                <>
+                  <span aria-hidden="true">/</span>
+                  <time dateTime={visibleUpdatedAt}>
+                    更新于 {formatDate(visibleUpdatedAt)}
+                  </time>
+                </>
+              ) : null}
               <span aria-hidden="true">/</span>
               <span>{post.readingMinutes} 分钟阅读</span>
             </div>
-            <div className="tag-list">
+            <div className="tag-list" aria-label="文章标签">
               {post.tags.map((tag) => (
-                <span className="tag" key={tag}>
+                <Link className="tag" key={tag} href={`/tags/${tagToSlug(tag)}`}>
                   {tag}
-                </span>
+                </Link>
               ))}
             </div>
           </header>
@@ -200,6 +266,32 @@ export default async function PostPage({ params }: PostPageProps) {
           />
           <ArticleEnhancements articleId={articleId} />
 
+          <ArticleFeedback
+            slug={post.slug}
+            title={post.title}
+            articleUrl={articleUrl}
+            email={siteConfig.author.email}
+            issueUrl={siteConfig.links.issues}
+          />
+
+          {relatedPosts.length > 0 ? (
+            <section className="related-posts" aria-labelledby="related-posts-title">
+              <div>
+                <p className="eyebrow">CONTINUE</p>
+                <h2 id="related-posts-title">继续阅读</h2>
+              </div>
+              <div className="related-post-grid">
+                {relatedPosts.map((relatedPost) => (
+                  <Link key={relatedPost.slug} href={`/blog/${relatedPost.slug}`}>
+                    <span>{relatedPost.category}</span>
+                    <strong>{relatedPost.title}</strong>
+                    <small>{relatedPost.readingMinutes} 分钟阅读</small>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           {isBeginnerPost ? (
             <nav className="article-pagination" aria-label="系列文章导航">
               {previousPost ? (
@@ -232,11 +324,60 @@ export default async function PostPage({ params }: PostPageProps) {
                 </Link>
               )}
             </nav>
+          ) : ordinaryPreviousPost || ordinaryNextPost ? (
+            <nav className="article-pagination" aria-label="文章导航">
+              {ordinaryPreviousPost ? (
+                <Link
+                  className="article-pagination-link article-pagination-previous"
+                  href={`/blog/${ordinaryPreviousPost.slug}`}
+                >
+                  <span>上一篇</span>
+                  <strong>{ordinaryPreviousPost.title}</strong>
+                </Link>
+              ) : (
+                <span className="article-pagination-placeholder" />
+              )}
+              {ordinaryNextPost ? (
+                <Link
+                  className="article-pagination-link article-pagination-next"
+                  href={`/blog/${ordinaryNextPost.slug}`}
+                >
+                  <span>下一篇</span>
+                  <strong>{ordinaryNextPost.title}</strong>
+                </Link>
+              ) : (
+                <Link
+                  className="article-pagination-link article-pagination-next"
+                  href="/blog"
+                >
+                  <span>继续浏览</span>
+                  <strong>返回全部文章</strong>
+                </Link>
+              )}
+            </nav>
           ) : null}
         </article>
       </Container>
 
       <style>{`
+        .article-breadcrumb {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 34px;
+          color: var(--muted);
+          font-size: 13px;
+        }
+
+        .article-breadcrumb a:hover,
+        .tag-list .tag:hover {
+          color: var(--foreground);
+        }
+
+        .tag-list .tag {
+          text-decoration: none;
+        }
+
         .series-status {
           margin: -24px 0 52px;
           border: 1px solid var(--border);
@@ -329,6 +470,56 @@ export default async function PostPage({ params }: PostPageProps) {
           color: var(--foreground);
         }
 
+        .related-posts {
+          display: grid;
+          grid-template-columns: minmax(180px, .55fr) minmax(0, 1.45fr);
+          gap: 42px;
+          margin-top: 72px;
+        }
+
+        .related-posts h2 {
+          margin: 8px 0 0;
+          font-size: clamp(28px, 4vw, 42px);
+          letter-spacing: -.04em;
+        }
+
+        .related-post-grid {
+          display: grid;
+          gap: 10px;
+        }
+
+        .related-post-grid a {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 8px 18px;
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          padding: 19px 20px;
+          background: var(--surface);
+        }
+
+        .related-post-grid a:hover {
+          border-color: var(--muted);
+          text-decoration: none;
+        }
+
+        .related-post-grid span,
+        .related-post-grid small {
+          color: var(--muted);
+          font-size: 12px;
+        }
+
+        .related-post-grid strong {
+          grid-column: 1;
+          line-height: 1.45;
+        }
+
+        .related-post-grid small {
+          grid-column: 2;
+          grid-row: 1 / span 2;
+          align-self: center;
+        }
+
         .article-pagination {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -346,9 +537,7 @@ export default async function PostPage({ params }: PostPageProps) {
           border-radius: 18px;
           padding: 22px;
           background: var(--surface);
-          transition:
-            transform 160ms ease,
-            border-color 160ms ease;
+          transition: transform 160ms ease, border-color 160ms ease;
         }
 
         .article-pagination-link:hover {
@@ -368,6 +557,13 @@ export default async function PostPage({ params }: PostPageProps) {
 
         .article-pagination-next {
           text-align: right;
+        }
+
+        @media (max-width: 720px) {
+          .related-posts {
+            grid-template-columns: 1fr;
+            gap: 26px;
+          }
         }
 
         @media (max-width: 640px) {

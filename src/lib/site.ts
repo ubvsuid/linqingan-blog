@@ -16,6 +16,8 @@ function normalizeSiteUrl(value: string | undefined): string {
   }
 }
 
+const repositoryUrl = "https://github.com/ubvsuid/linqingan-blog";
+
 export const siteConfig = {
   name: "临清安",
   title: "临清安",
@@ -40,5 +42,7 @@ export const siteConfig = {
   ],
   links: {
     github: "https://github.com/ubvsuid",
+    repository: repositoryUrl,
+    issues: `${repositoryUrl}/issues/new`,
   },
 } as const;
