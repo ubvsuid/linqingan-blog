@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
@@ -122,6 +123,7 @@ export default function RootLayout({
         </div>
         <SiteFooter />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
