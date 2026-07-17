@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 interface ArticleFeedbackProps {
   slug: string;
@@ -12,6 +12,10 @@ interface ArticleFeedbackProps {
 
 type FeedbackValue = "helpful" | "needs-work";
 
+function parseFeedback(value: string | null): FeedbackValue | null {
+  return value === "helpful" || value === "needs-work" ? value : null;
+}
+
 export function ArticleFeedback({
   slug,
   title,
@@ -20,14 +24,37 @@ export function ArticleFeedback({
   issueUrl,
 }: ArticleFeedbackProps) {
   const storageKey = `article-feedback:${slug}`;
-  const [feedback, setFeedback] = useState<FeedbackValue | null>(null);
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const handleStorage = (event: StorageEvent) => {
+        if (event.key === storageKey) onStoreChange();
+      };
+      const handleLocalFeedback = (event: Event) => {
+        if (
+          event instanceof CustomEvent &&
+          typeof event.detail === "object" &&
+          event.detail !== null &&
+          "slug" in event.detail &&
+          event.detail.slug === slug
+        ) {
+          onStoreChange();
+        }
+      };
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem(storageKey);
-    if (saved === "helpful" || saved === "needs-work") {
-      setFeedback(saved);
-    }
-  }, [storageKey]);
+      window.addEventListener("storage", handleStorage);
+      window.addEventListener("site:article-feedback", handleLocalFeedback);
+      return () => {
+        window.removeEventListener("storage", handleStorage);
+        window.removeEventListener("site:article-feedback", handleLocalFeedback);
+      };
+    },
+    [slug, storageKey],
+  );
+  const getSnapshot = useCallback(
+    () => parseFeedback(window.localStorage.getItem(storageKey)),
+    [storageKey],
+  );
+  const feedback = useSyncExternalStore(subscribe, getSnapshot, () => null);
 
   const githubHref = useMemo(() => {
     const body = [
@@ -50,7 +77,6 @@ export function ArticleFeedback({
   }, [articleUrl, issueUrl, title]);
 
   function saveFeedback(value: FeedbackValue) {
-    setFeedback(value);
     window.localStorage.setItem(storageKey, value);
     window.dispatchEvent(
       new CustomEvent("site:article-feedback", {
