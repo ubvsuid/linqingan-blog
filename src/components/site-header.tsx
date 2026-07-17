@@ -55,9 +55,9 @@ export function SiteHeader() {
     <header className="site-header">
       <Container className="header-inner">
         <Link
-          href="/"
+          href="/about"
           className="brand"
-          aria-label={`${siteConfig.name}首页`}
+          aria-label={`查看${siteConfig.name}的个人主页`}
           onClick={() => setMenuOpen(false)}
         >
           <Image
