@@ -7,6 +7,7 @@ interface PageMetadataOptions {
   description: string;
   path: string;
   noindex?: boolean;
+  image?: string;
 }
 
 export function createPageMetadata({
@@ -14,8 +15,14 @@ export function createPageMetadata({
   description,
   path,
   noindex = false,
+  image,
 }: PageMetadataOptions): Metadata {
   const url = `${siteConfig.url}${path === "/" ? "" : path}`;
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`
+    : undefined;
 
   return {
     title,
@@ -36,11 +43,13 @@ export function createPageMetadata({
       siteName: siteConfig.title,
       title,
       description,
+      images: imageUrl ? [{ url: imageUrl }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: imageUrl ? [imageUrl] : undefined,
     },
   };
 }
