@@ -6,6 +6,8 @@ import { siteConfig } from "@/lib/site";
 
 import "./globals.css";
 
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  authors: [{ name: siteConfig.author.name, url: siteConfig.url }],
+  authors: [{ name: siteConfig.author.name, url: `${siteConfig.url}/about` }],
   creator: siteConfig.author.name,
   applicationName: siteConfig.title,
   alternates: {
@@ -22,6 +24,11 @@ export const metadata: Metadata = {
       "application/rss+xml": "/feed.xml",
     },
   },
+  verification: googleVerification
+    ? {
+        google: googleVerification,
+      }
+    : undefined,
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
@@ -61,9 +68,12 @@ const structuredData = {
       "@type": "Person",
       "@id": `${siteConfig.url}/#person`,
       name: siteConfig.author.name,
-      url: siteConfig.url,
+      alternateName: siteConfig.author.handle,
+      url: `${siteConfig.url}/about`,
+      image: `${siteConfig.url}/profile-avatar.webp`,
       email: `mailto:${siteConfig.author.email}`,
       sameAs: [siteConfig.links.github],
+      knowsAbout: ["Screeps", "JavaScript", "系统设计", "内容建设"],
     },
     {
       "@type": "WebSite",
@@ -74,6 +84,11 @@ const structuredData = {
       inLanguage: siteConfig.language,
       author: {
         "@id": `${siteConfig.url}/#person`,
+      },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${siteConfig.url}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
       },
     },
   ],
