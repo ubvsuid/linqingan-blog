@@ -78,7 +78,6 @@ export function SiteSearch({
           value={query}
           onChange={(event) => updateQuery(event.target.value)}
           placeholder="输入 Creep、Memory、ERR_NOT_IN_RANGE、项目……"
-          autoFocus
         />
       </label>
 
