@@ -1,0 +1,29 @@
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 3px;
+}
+
+.tag-list .tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.tag-list a.tag:hover {
+  transform: translateY(-1px);
+  border-color: var(--muted);
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-list .tag,
+  .header-icon-link,
+  .profile-shortcut {
+    transition: none !important;
+  }
+}
