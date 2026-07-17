@@ -17,19 +17,35 @@ const securityHeaders = [
     key: "X-Frame-Options",
     value: "DENY",
   },
+  {
+    key: "X-DNS-Prefetch-Control",
+    value: "on",
+  },
 ];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  images: {
-    remotePatterns: [
+  compress: true,
+  trailingSlash: false,
+  async redirects() {
+    return [
       {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-        pathname: "/u/**",
+        source: "/resources/glossary",
+        destination: "/glossary",
+        permanent: true,
       },
-    ],
+      {
+        source: "/resources/error-codes",
+        destination: "/screeps-errors",
+        permanent: true,
+      },
+      {
+        source: "/resources/tags",
+        destination: "/tags",
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [
