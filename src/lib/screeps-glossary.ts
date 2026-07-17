@@ -18,7 +18,7 @@ export const screepsGlossary: ScreepsGlossaryEntry[] = [
   { term: "Store", chinese: "存储空间", category: "建筑", summary: "Creep 和建筑保存资源的统一接口。", detail: "常用 getFreeCapacity() 判断剩余空间，getUsedCapacity() 判断已使用空间。" },
   { term: "tick", chinese: "游戏刻", category: "运行", summary: "代码执行一次并推进一次游戏状态的单位。", detail: "main.loop 会在每个 tick 重新运行，所以代码需要持续读取状态并重新做决定。", article: { label: "认识 tick 和主循环", href: "/blog/screeps-tick-and-game-loop" } },
   { term: "Game", chinese: "当前状态入口", category: "运行", summary: "读取当前 tick 游戏对象的全局对象。", detail: "Game.creeps、Game.spawns 和 Game.rooms 都只代表当前 tick。" },
-  { term: "Memory", chinese: "持久化内存", category: "运行", summary: "在不同 tick 之间保存简单数据的全局对象。", detail: "适合保存角色、状态和配置，不应该直接保存 Creep 等游戏对象。" },
+  { term: "Memory", chinese: "持久化内存", category: "运行", summary: "在不同 tick 之间保存简单数据的全局对象。", detail: "适合保存角色、状态和配置，不应该直接保存 Creep 等游戏对象。", article: { label: "学习 Memory 基础", href: "/blog/screeps-memory-basics" } },
   { term: "CPU", chinese: "计算额度", category: "运行", summary: "每个 tick 可供代码使用的计算资源。", detail: "代码规模扩大后需要关注 limit、bucket 和 Game.cpu.getUsed()。" },
   { term: "Room", chinese: "房间", category: "对象", summary: "Screeps 世界地图中的基本区域。", detail: "房间包含 Source、建筑、Controller、工地和活动单位。", article: { label: "认识第一个房间", href: "/blog/screeps-first-room" } },
   { term: "RoomPosition", chinese: "房间坐标", category: "对象", summary: "表示房间中 x、y 位置的对象。", detail: "移动、范围判断和目标选择通常都依赖 RoomPosition。" },
