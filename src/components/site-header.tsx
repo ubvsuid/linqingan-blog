@@ -21,10 +21,6 @@ export function SiteHeader() {
   );
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (!menuOpen) return;
 
     firstNavigationLinkRef.current?.focus();
