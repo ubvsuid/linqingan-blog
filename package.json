@@ -16,6 +16,7 @@
     "check": "npm run contentcheck && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^2.0.0",
     "gray-matter": "^4.0.3",
     "next": "^16.2.0",
     "react": "^19.2.0",
