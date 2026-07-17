@@ -12,9 +12,8 @@ export const metadata = createPageMetadata({
   description:
     "认识临清安，了解这个网站正在建设的 Screeps 中文学习路线、JavaScript 实践与系统项目。",
   path: "/about",
+  image: "/profile-avatar.webp",
 });
-
-const profileAvatar = "https://avatars.githubusercontent.com/u/196054005?v=4";
 
 const currentFocus = [
   {
@@ -89,30 +88,50 @@ const profileLinks = [
     title: "浏览全部公开内容",
   },
   {
+    href: "/resources",
+    label: "资料",
+    title: "查询术语、错误码和文章标签",
+  },
+  {
     href: "/projects",
     label: "项目",
     title: "查看正在建设的系统与网站",
   },
-  {
-    href: "/now",
-    label: "近况",
-    title: "了解最近正在推进的事情",
-  },
 ];
 
 export default function AboutPage() {
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "临清安",
+    alternateName: "@linqingan501",
+    url: `${siteConfig.url}/about`,
+    image: `${siteConfig.url}/profile-avatar.webp`,
+    email: siteConfig.author.email,
+    sameAs: [siteConfig.links.github],
+    knowsAbout: ["Screeps", "JavaScript", "系统设计", "内容建设"],
+  };
+
   return (
     <main className="page-shell profile-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+
       <Container>
         <section className="profile-hero" aria-labelledby="profile-name">
-          <Image
-            className="profile-avatar"
-            src={profileAvatar}
-            alt="临清安的个人头像"
-            width={180}
-            height={180}
-            priority
-          />
+          <div className="profile-avatar-frame">
+            <Image
+              className="profile-avatar"
+              src="/profile-avatar.webp"
+              alt="临清安的个人头像：海边背影与飞翔的海鸟"
+              width={512}
+              height={512}
+              sizes="(max-width: 640px) 128px, 180px"
+              priority
+            />
+          </div>
 
           <div className="profile-identity">
             <p className="eyebrow">PERSONAL PROFILE</p>
@@ -228,9 +247,7 @@ export default function AboutPage() {
           <div>
             <p className="eyebrow">CONTACT</p>
             <h2 id="profile-contact-title">联系与纠错</h2>
-            <p>
-              发现文章存在错误、表述不清或示例代码有问题时，可以通过邮箱或 GitHub 联系我。
-            </p>
+            <p>发现文章存在错误、表述不清或示例代码有问题时，可以通过邮箱或 GitHub 联系我。</p>
           </div>
           <div className="profile-contact-links">
             <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>
@@ -256,14 +273,23 @@ export default function AboutPage() {
           border-bottom: 1px solid var(--border);
         }
 
-        .profile-avatar {
+        .profile-avatar-frame {
           width: 180px;
           height: 180px;
+          overflow: hidden;
           border: 1px solid var(--border);
           border-radius: 50%;
-          object-fit: cover;
           background: var(--surface);
           box-shadow: 0 18px 54px color-mix(in srgb, var(--foreground) 10%, transparent);
+        }
+
+        .profile-avatar {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: 50% 50%;
+          transform: scale(1.02);
         }
 
         .profile-identity h1 {
@@ -288,7 +314,9 @@ export default function AboutPage() {
           line-height: 1.55;
         }
 
-        .profile-introduction {
+        .profile-introduction,
+        .profile-section,
+        .profile-contact {
           display: grid;
           grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
           gap: 64px;
@@ -351,88 +379,81 @@ export default function AboutPage() {
           font-size: 13px;
         }
 
-        .profile-section,
-        .profile-contact {
-          padding-top: 82px;
-        }
-
-        .profile-section-heading {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
-          gap: 48px;
-          align-items: end;
-        }
-
-        .profile-section-heading .eyebrow {
-          grid-column: 1 / -1;
-          margin-bottom: -24px;
-        }
-
-        .profile-focus-grid,
-        .profile-interest-grid {
-          display: grid;
-          gap: 18px;
-          margin-top: 38px;
-        }
-
         .profile-focus-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          display: grid;
+          gap: 14px;
         }
 
-        .profile-interest-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+        .profile-focus-grid article {
+          display: grid;
+          grid-template-columns: 52px minmax(0, 1fr);
+          gap: 8px 18px;
+          padding: 24px 0;
+          border-top: 1px solid var(--border);
         }
 
-        .profile-focus-grid article,
-        .profile-interest-grid article {
-          border: 1px solid var(--border);
-          border-radius: 20px;
-          padding: 28px;
-          background: var(--surface);
+        .profile-focus-grid article:last-child {
+          border-bottom: 1px solid var(--border);
         }
 
-        .profile-focus-grid article > span {
+        .profile-focus-grid article > span,
+        .profile-principle-list article > span {
           color: var(--muted);
-          font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+          font-family: "SFMono-Regular", Consolas, monospace;
           font-size: 12px;
         }
 
         .profile-focus-grid h3,
         .profile-interest-grid h3,
         .profile-principle-list h3 {
-          margin: 18px 0 0;
-          font-size: 22px;
+          margin: 0;
+          font-size: 20px;
         }
 
         .profile-focus-grid p,
         .profile-interest-grid p,
         .profile-principle-list p,
         .profile-contact p {
-          margin: 12px 0 0;
+          margin: 9px 0 0;
           color: var(--muted);
           line-height: 1.75;
+        }
+
+        .profile-focus-grid article > p {
+          grid-column: 2;
+        }
+
+        .profile-interest-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .profile-interest-grid article {
+          min-height: 170px;
+          border: 1px solid var(--border);
+          border-radius: 18px;
+          padding: 24px;
+          background: var(--surface);
         }
 
         .profile-link-grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 16px;
-          margin-top: 38px;
+          gap: 12px;
         }
 
         .profile-link-grid a {
           display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 8px 18px;
-          min-height: 148px;
-          align-content: center;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 12px;
+          min-height: 150px;
+          align-content: space-between;
           border: 1px solid var(--border);
-          border-radius: 20px;
-          padding: 26px 28px;
+          border-radius: 18px;
+          padding: 22px;
           background: var(--surface);
-          transition:
-            transform 160ms ease,
-            border-color 160ms ease;
+          transition: transform 160ms ease, border-color 160ms ease;
         }
 
         .profile-link-grid a:hover {
@@ -442,112 +463,103 @@ export default function AboutPage() {
         }
 
         .profile-link-grid a > span:first-child {
-          grid-column: 1;
           color: var(--muted);
           font-size: 13px;
         }
 
         .profile-link-grid strong {
-          grid-column: 1;
-          font-size: 20px;
+          align-self: end;
+          font-size: 18px;
+          line-height: 1.45;
         }
 
         .profile-link-grid a > span:last-child {
           grid-column: 2;
-          grid-row: 1 / 3;
+          grid-row: 1 / span 2;
           align-self: center;
-          font-size: 22px;
+          font-size: 24px;
         }
 
         .profile-principle-list {
           display: grid;
-          margin-top: 38px;
           border-top: 1px solid var(--border);
         }
 
         .profile-principle-list article {
           display: grid;
-          grid-template-columns: 58px minmax(0, 1fr);
-          gap: 24px;
+          grid-template-columns: 52px minmax(0, 1fr);
+          gap: 20px;
+          padding: 24px 0;
           border-bottom: 1px solid var(--border);
-          padding: 28px 0;
-        }
-
-        .profile-principle-list article > span {
-          color: var(--muted);
-          font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-          font-size: 12px;
-        }
-
-        .profile-principle-list h3 {
-          margin-top: 0;
         }
 
         .profile-contact {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(260px, 0.65fr);
-          gap: 52px;
-          align-items: end;
-          margin-top: 82px;
-          border-top: 1px solid var(--border);
+          border-bottom: 0;
+          padding-bottom: 30px;
         }
 
         .profile-contact-links {
-          display: grid;
-          gap: 10px;
+          display: flex;
+          flex-wrap: wrap;
+          align-content: flex-start;
+          gap: 12px;
         }
 
         .profile-contact-links a {
-          border-top: 1px solid var(--border);
-          padding: 13px 0;
+          display: inline-flex;
+          min-height: 44px;
+          align-items: center;
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          padding: 0 16px;
           font-weight: 650;
         }
 
-        @media (max-width: 820px) {
-          .profile-hero {
-            grid-template-columns: 132px minmax(0, 1fr);
-            gap: 28px;
-          }
+        .profile-contact-links a:hover {
+          border-color: var(--muted);
+          text-decoration: none;
+        }
 
-          .profile-avatar {
-            width: 132px;
-            height: 132px;
-          }
-
+        @media (max-width: 800px) {
           .profile-introduction,
-          .profile-section-heading,
+          .profile-section,
           .profile-contact {
             grid-template-columns: 1fr;
-            gap: 30px;
+            gap: 32px;
           }
 
-          .profile-section-heading .eyebrow {
-            margin-bottom: -14px;
+          .profile-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .profile-focus-grid {
-            grid-template-columns: 1fr;
+          .profile-stats div:nth-child(3) {
+            border-top: 1px solid var(--border);
+            border-left: 0;
+          }
+
+          .profile-stats div:nth-child(4) {
+            border-top: 1px solid var(--border);
           }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 620px) {
           .profile-page {
-            padding-top: 12px;
+            padding-top: 10px;
           }
 
           .profile-hero {
-            grid-template-columns: 92px minmax(0, 1fr);
-            gap: 20px;
-            padding: 28px 0 46px;
+            grid-template-columns: 128px minmax(0, 1fr);
+            gap: 22px;
+            padding: 28px 0 42px;
           }
 
-          .profile-avatar {
-            width: 92px;
-            height: 92px;
+          .profile-avatar-frame {
+            width: 128px;
+            height: 128px;
           }
 
           .profile-identity h1 {
-            font-size: clamp(42px, 13vw, 62px);
+            font-size: clamp(42px, 15vw, 62px);
           }
 
           .profile-role {
@@ -556,32 +568,32 @@ export default function AboutPage() {
             font-size: 17px;
           }
 
-          .profile-introduction,
-          .profile-section,
-          .profile-contact {
-            padding-top: 58px;
-          }
-
-          .profile-stats {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .profile-stats div:nth-child(3) {
-            border-left: 0;
-            border-top: 1px solid var(--border);
-          }
-
-          .profile-stats div:nth-child(4) {
-            border-top: 1px solid var(--border);
-          }
-
           .profile-interest-grid,
           .profile-link-grid {
             grid-template-columns: 1fr;
           }
+        }
 
-          .profile-contact {
-            margin-top: 58px;
+        @media (max-width: 420px) {
+          .profile-hero {
+            grid-template-columns: 104px minmax(0, 1fr);
+            gap: 18px;
+          }
+
+          .profile-avatar-frame {
+            width: 104px;
+            height: 104px;
+          }
+
+          .profile-stats {
+            grid-template-columns: 1fr;
+          }
+
+          .profile-stats div + div,
+          .profile-stats div:nth-child(3),
+          .profile-stats div:nth-child(4) {
+            border-top: 1px solid var(--border);
+            border-left: 0;
           }
         }
       `}</style>
