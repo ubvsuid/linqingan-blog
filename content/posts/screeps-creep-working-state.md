@@ -9,7 +9,7 @@ tags:
   - "基础工程"
   - "Memory"
   - "Creep"
-  - "状态管理"
+  - "自动化"
 draft: false
 verification:
   docsChecked: true

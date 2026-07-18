@@ -8,7 +8,7 @@ tags:
   - "Screeps"
   - "新手入门"
   - "Creep"
-  - "采集能量"
+  - "资源采集"
   - "JavaScript"
 draft: false
 verification:
@@ -217,4 +217,3 @@ Source 暂时没有能量时，也需要等待它重新恢复。
 
 > 本文是 Screeps 新手入门系列的第四篇，只介绍最基础的 Creep 移动和采集。
 > 最近 Source 的选择、自动运输、角色分工、Memory 与性能优化会放到后续文章中。
-

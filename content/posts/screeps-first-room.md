@@ -7,7 +7,7 @@ category: "Screeps 入门"
 tags:
   - "Screeps"
   - "新手入门"
-  - "游戏界面"
+  - "视野"
   - "Room"
   - "Spawn"
 draft: false
@@ -143,4 +143,3 @@ Screeps 的学习不需要一次完成。每篇文章只认识一个新知识，
 2. [Screeps Documentation：Control](https://docs.screeps.com/control.html)
 
 > 本文是 Screeps 新手入门系列的第二篇，主要帮助读者认识游戏界面。游戏界面可能随版本更新而变化，实际位置请以当前客户端为准。
-

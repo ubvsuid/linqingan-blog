@@ -7,7 +7,7 @@ category: "Screeps 入门"
 tags:
   - "Screeps"
   - "新手入门"
-  - "房间代码"
+  - "建造"
   - "JavaScript"
   - "自动化"
 draft: false
@@ -257,4 +257,3 @@ module.exports.loop = function () {
 1. [Screeps API Reference](https://docs.screeps.com/api/)
 2. [Screeps Documentation：Room Controller Level](https://docs.screeps.com/control.html)
 3. [Screeps Documentation：Creeps](https://docs.screeps.com/creeps.html)
-
