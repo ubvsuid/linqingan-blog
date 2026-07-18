@@ -1,4 +1,3 @@
-
 ---
 title: "RoomVisual 怎么画文字、圆和连线辅助调试"
 description: "用 room.visual.text、circle 和 line 标出 Creep 状态、目标与移动关系，给出前提检查、完整示例和失败边界。"

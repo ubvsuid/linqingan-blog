@@ -1,4 +1,3 @@
-
 ---
 title: "PathFinder CostMatrix 怎么设置不可走和高成本格子"
 description: "在 roomCallback 中标记道路、不可穿越建筑和自定义高成本位置，按返回值和位置条件给出最小排查代码。"

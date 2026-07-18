@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 
 import { siteConfig } from "@/lib/site";

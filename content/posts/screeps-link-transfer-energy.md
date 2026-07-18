@@ -1,4 +1,3 @@
-
 ---
 title: "StructureLink.transferEnergy() 怎么用"
 description: "在同一房间的两个 Link 之间发送 Energy，检查源 Link 储量、目标 Link 容量、cooldown 与 transferEnergy() 返回值。"

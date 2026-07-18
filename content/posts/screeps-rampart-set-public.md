@@ -1,4 +1,3 @@
-
 ---
 title: "Rampart 的 setPublic() 怎么用"
 description: "读取己方 Rampart，并根据明确配置调用 setPublic() 控制其他玩家单位是否能通过，附完整检查顺序、最小代码和适用边界。"

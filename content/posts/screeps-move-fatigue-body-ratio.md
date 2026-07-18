@@ -1,4 +1,3 @@
-
 ---
 title: "Creep 为什么走得慢：fatigue 与 MOVE 配比"
 description: "读取 fatigue 和有效身体部件，判断负载、地形与 MOVE 数量是否让移动变慢，按返回值和位置条件给出最小排查代码。"

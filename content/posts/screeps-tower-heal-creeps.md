@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps Tower 如何自动治疗己方 Creep"
 description: "找到 hits 低于 hitsMax 的己方 Creep，并调用 Tower.heal() 保存返回值，附完整检查顺序、最小代码和适用边界。"

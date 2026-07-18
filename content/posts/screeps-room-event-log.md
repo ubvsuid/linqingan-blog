@@ -1,4 +1,3 @@
-
 ---
 title: "Room.getEventLog() 怎么读取本 tick 事件"
 description: "用 Room.getEventLog() 读取当前 tick 的事件数组，并按 EVENT_ATTACK 过滤和安全访问 event.data。"

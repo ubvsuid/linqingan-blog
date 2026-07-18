@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 新手入门：让第一只 Creep 移动并采集能量"
 description: "写给 Screeps 新手的第一段 Creep 控制教程：找到自己的 Creep 和 Source，让 Creep 自动靠近并开始采集能量。"

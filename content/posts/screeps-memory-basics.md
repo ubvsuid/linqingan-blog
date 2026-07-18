@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps Memory 是什么？新手为什么需要使用 Memory"
 description: "从 tick、Game 对象和固定 Creep 名称出发，解释 Screeps Memory 如何跨 tick 保存 role、working 等简单状态，以及哪些内容不应该放进 Memory。"

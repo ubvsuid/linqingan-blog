@@ -1,4 +1,3 @@
-
 ---
 title: "Game.notify() 怎么发送限频提醒"
 description: "在 Controller 降级风险首次触发时调用 Game.notify()，并用 Memory 与 groupInterval 控制重复提醒。"

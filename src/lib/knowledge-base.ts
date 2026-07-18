@@ -1,4 +1,3 @@
-
 export interface KnowledgeBaseSection {
   id: string;
   number: number;

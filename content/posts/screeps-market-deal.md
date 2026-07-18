@@ -1,4 +1,3 @@
-
 ---
 title: "Game.market.deal() 怎么成交现有订单"
 description: "在一次性开关下筛选现有卖单，限制成交量，核对 Credits、Terminal cooldown 与交易 Energy 后调用 Game.market.deal()。"

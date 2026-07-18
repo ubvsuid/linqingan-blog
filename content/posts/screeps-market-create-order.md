@@ -1,4 +1,3 @@
-
 ---
 title: "Game.market.createOrder() 怎么创建和维护订单"
 description: "通过一次性 Memory 开关调用 Game.market.createOrder()，并在创建前检查现有订单、参数和 Credits，避免每 tick 重复下单。"

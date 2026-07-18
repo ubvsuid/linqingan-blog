@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 是什么？一个用 JavaScript 控制单位的编程游戏"
 description: "Screeps 是什么？本文用简单易懂的方式介绍 Screeps: World 的游戏特点、Room、Source、Creep、Spawn、Controller，以及玩家在游戏中主要要做什么。"

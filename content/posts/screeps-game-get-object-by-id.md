@@ -1,4 +1,3 @@
-
 ---
 title: "Game.getObjectById() 怎么配合 Memory 保存目标"
 description: "把对象 ID 存入 Memory，并在每个 tick 重新取得当前游戏对象；同时处理首次选择、目标失效与不可见房间。"

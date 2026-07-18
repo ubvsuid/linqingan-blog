@@ -1,4 +1,3 @@
-
 ---
 title: "StructureTerminal.send() 怎么跨房间发送资源"
 description: "用一次性开关调用 StructureTerminal.send()，发送前计算交易 Energy 成本，并检查资源库存、cooldown 与返回值。"

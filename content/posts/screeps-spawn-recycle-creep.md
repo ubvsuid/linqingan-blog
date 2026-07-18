@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps recycleCreep() 怎么回收不再需要的 Creep"
 description: "让指定 Creep 靠近己方 Spawn，并保存 recycleCreep() 返回值，给出最小代码、返回值检查和适用边界。"

@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 中的 tick 是什么？为什么代码会不断运行"
 description: "写给 Screeps 新手的 tick 入门文章：用简单方式解释 tick、Game.time 和 module.exports.loop，以及代码为什么会不断执行。"

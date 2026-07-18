@@ -1,4 +1,3 @@
-
 ---
 title: "StructurePowerSpawn.processPower() 怎么处理 Power"
 description: "检查己方 Power Spawn、Power、Energy、RCL 与 processPower() 返回值后执行一次资源处理。"

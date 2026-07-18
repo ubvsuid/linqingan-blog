@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps Tower 怎么自动攻击敌人：FIND_HOSTILE_CREEPS 与 attack()"
 description: "用最小 JavaScript 示例让 Screeps Tower 查找并攻击房间内的非己方 Creep，检查 Energy、建筑可用性和 attack() 返回值。"

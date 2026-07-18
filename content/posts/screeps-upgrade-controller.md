@@ -1,4 +1,3 @@
-
 ---
 title: "怎样让 Creep 自动升级 Controller？"
 description: "先创建 Upgrader1，再让它在 Source 与 Controller 之间往返，认识 upgradeController() 和最基础的状态切换。"

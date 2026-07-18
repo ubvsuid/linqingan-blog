@@ -1,4 +1,3 @@
-
 export interface ProjectDetail {
   label: string;
   value: string;

@@ -1,4 +1,3 @@
-
 ---
 title: "StructureNuker.launchNuke() 前要检查什么"
 description: "在显式一次性请求下检查目标坐标、距离、cooldown、Energy 和 Ghodium 后再调用 launchNuke，给出前提检查、完整示例和失败边界。"

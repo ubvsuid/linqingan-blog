@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 如何用 require 和 module.exports 拆分代码"
 description: "把角色行为通过 module.exports 导出为独立模块，并在 main 中 require 后遍历 Creep 调用。"

@@ -1,4 +1,3 @@
-
 ---
 title: "StructureObserver.observeRoom() 怎么获取远方房间视野"
 description: "本 tick 发出 observeRoom 请求，并在下一 tick 通过 Game.rooms 读取目标房间，给出前提检查、完整示例和失败边界。"

@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 新手入门：认识游戏界面与第一个房间"
 description: "写给第一次进入 Screeps 的新手：认识房间视图、代码编辑器、Console，以及 Spawn、Source、Controller 和 Creep。"

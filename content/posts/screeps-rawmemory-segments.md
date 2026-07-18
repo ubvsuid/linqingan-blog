@@ -1,4 +1,3 @@
-
 ---
 title: "RawMemory segments 怎么跨 tick 读取"
 description: "激活一个 RawMemory segment，在下一 tick 检查可用性，安全解析 JSON 并把更新结果写回字符串。"

@@ -1,4 +1,3 @@
-
 ---
 title: "多个 Source 时怎样选择最近可达目标"
 description: "用 findClosestByPath 选择当前有 Energy 且能找到路径的 Source，避免固定取数组第一项，附完整检查顺序、最小代码和适用边界。"

@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps moveTo() 不移动怎么排查"
 description: "按目标、MOVE 部件、fatigue、返回值和路径条件排查 Creep 原地不动，按返回值和位置条件给出最小排查代码。"

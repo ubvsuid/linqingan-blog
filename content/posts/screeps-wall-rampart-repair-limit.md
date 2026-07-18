@@ -1,4 +1,3 @@
-
 ---
 title: "Wall 和 Rampart 如何设置维修上限"
 description: "给 Wall 与 Rampart 设置阶段性 hits 上限，只选择低于上限的最弱目标，附完整检查顺序、最小代码和适用边界。"

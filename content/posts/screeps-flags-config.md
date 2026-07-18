@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps Flag 怎么作为房间配置入口"
 description: "从 Game.flags 安全读取指定 Flag，并用 Flag.memory 保存一个明确任务和 Creep 名称。"

@@ -1,4 +1,3 @@
-
 ---
 title: "StructureLab.runReaction() 怎么进行矿物反应"
 description: "用两个输入 Lab 和一个输出 Lab 验证反应配方、距离、冷却、资源与容量后执行反应，给出前提检查、完整示例和失败边界。"

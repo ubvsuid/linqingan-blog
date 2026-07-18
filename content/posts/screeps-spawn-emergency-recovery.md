@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 房间断代后如何自动恢复第一只采集者"
 description: "当房间没有采集者时，检查 Spawn、现存角色和可用能量，再生成最小 WORK/CARRY/MOVE 采集者。"

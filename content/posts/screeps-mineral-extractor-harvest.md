@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps 如何用 Extractor 开采 Mineral"
 description: "确认 Mineral、Extractor、mineralAmount、Extractor cooldown 和 Creep 容量后调用 harvest(mineral)，并处理移动与失败返回值。"

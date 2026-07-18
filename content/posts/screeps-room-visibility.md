@@ -1,4 +1,3 @@
-
 ---
 title: "Game.rooms 为什么没有某个房间"
 description: "判断房间是否当前可见，并在 Game.rooms[roomName] 为 undefined 时安全退出，给出前提检查、完整示例和失败边界。"

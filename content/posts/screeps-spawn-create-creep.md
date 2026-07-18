@@ -1,4 +1,3 @@
-
 ---
 title: "怎样让 Spawn 创建新的 Creep？认识 spawnCreep()"
 description: "写给 Screeps 新手的第一只 Creep 创建教程：找到 Spawn，准备 WORK、CARRY、MOVE 身体，设置名称并调用 spawnCreep()。"

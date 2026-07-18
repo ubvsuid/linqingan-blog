@@ -1,4 +1,3 @@
-
 ---
 title: "怎样建造第一个 Extension？"
 description: "先创建 Builder1，在 RCL 2 放置 Extension Construction Site，并让它自动采集和建造。"

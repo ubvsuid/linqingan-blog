@@ -1,4 +1,3 @@
-
 ---
 title: "Screeps renewCreep() 怎么用：让 Creep 靠近 Spawn 续命"
 description: "用最小 JavaScript 示例检查 ticksToLive，让普通 Creep 靠近 Spawn 调用 renewCreep()，并排查 ERR_BUSY、ERR_FULL 等返回值。"

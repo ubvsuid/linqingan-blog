@@ -1,4 +1,3 @@
-
 ---
 title: "Room.storage 怎么判断存在并读写 Energy"
 description: "介绍如何安全读取 room.storage，并让运输者在 Storage 与缺少 Energy 的 Spawn 或 Extension 之间搬运资源，包含对象检查、容量判断和返回值处理。"
