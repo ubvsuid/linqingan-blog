@@ -4,7 +4,8 @@ const checks = [
   ["/", ["构建，运行，迭代", "Screeps"]],
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
-  ["/blog", ["全部文章", "17"]],
+  ["/blog", ["全部文章", "60"]],
+  ["/knowledge", ["60 篇 Screeps 中文知识库", "8 个主题组"]],
   ["/resources", ["资料中心", "站内搜索"]],
   ["/search", ["搜索整个网站", "错误码"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
@@ -18,7 +19,9 @@ const checks = [
   ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-controller-activate-safe-mode", ["Safe Mode 怎么开启", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-spawn-renew-creep", ["renewCreep() 怎么用", "资料核对日期：2026-07-18"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-creep-withdraw-container-energy", "https://www.linqingan.com/blog/screeps-tower-auto-attack-hostiles", "https://www.linqingan.com/blog/screeps-controller-activate-safe-mode", "https://www.linqingan.com/blog/screeps-spawn-renew-creep", "https://www.linqingan.com/about"]],
+  ["/blog/screeps-clean-dead-creep-memory", ["清理死亡 Creep 的 Memory", "待 Screeps 环境验证"]],
+  ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "待 Screeps 环境验证"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/about"]],
 ];
 
 async function waitForServer() {
@@ -69,3 +72,4 @@ if (failures.length > 0) {
 }
 
 console.log(`冒烟测试通过：${checks.length} 个关键页面。`);
+

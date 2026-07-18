@@ -30,6 +30,7 @@ const knownRoutes = new Set([
   "/about",
   "/beginner",
   "/blog",
+  "/knowledge",
   "/resources",
   "/search",
   "/glossary",
@@ -144,3 +145,4 @@ if (errors.length > 0) {
 }
 
 console.log(`内容检查通过：${files.length} 篇文章，${warnings.length} 个提醒。`);
+

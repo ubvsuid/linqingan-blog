@@ -34,7 +34,7 @@ export const siteConfig = {
   navigation: [
     { label: "首页", href: "/" },
     { label: "入门", href: "/beginner" },
-    { label: "文章", href: "/blog" },
+    { label: "知识库", href: "/knowledge" },
     { label: "资料", href: "/resources" },
     { label: "项目", href: "/projects" },
     { label: "近况", href: "/now" },
@@ -46,3 +46,4 @@ export const siteConfig = {
     issues: `${repositoryUrl}/issues/new`,
   },
 } as const;
+

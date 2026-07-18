@@ -79,6 +79,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${siteConfig.url}/knowledge`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "weekly",
+      priority: 0.92,
+    },
+    {
       url: `${siteConfig.url}/resources`,
       lastModified: allPostsUpdatedAt,
       changeFrequency: "monthly",
@@ -188,3 +194,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...projectPages,
   ];
 }
+

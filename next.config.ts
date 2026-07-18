@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   compress: true,
   trailingSlash: false,
+  turbopack: {
+    root: process.cwd(),
+  },
   async redirects() {
     return [
       {
@@ -58,3 +61,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

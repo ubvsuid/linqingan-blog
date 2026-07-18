@@ -61,6 +61,10 @@ export function SiteHeader() {
       return pathname === "/blog" || (pathname.startsWith("/blog/") && !isBeginnerArticle);
     }
 
+    if (href === "/knowledge") {
+      return pathname === "/knowledge" || (pathname.startsWith("/blog/") && !isBeginnerArticle);
+    }
+
     if (href === "/resources") {
       return (
         pathname === "/resources" ||
@@ -186,3 +190,4 @@ export function SiteHeader() {
     </header>
   );
 }
+

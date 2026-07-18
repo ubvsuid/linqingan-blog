@@ -15,6 +15,13 @@ export const metadata = createPageMetadata({
 
 const resources = [
   {
+    eyebrow: "KNOWLEDGE BASE",
+    title: "60 篇 Screeps 中文知识库",
+    description: "按 8 个主题组浏览完整教程，每篇只解决一个主要搜索意图。",
+    href: "/knowledge",
+    count: "60 篇文章",
+  },
+  {
     eyebrow: "SEARCH",
     title: "站内搜索",
     description: "同时搜索文章正文、术语、错误码、标签和项目说明。",
@@ -121,3 +128,4 @@ export default function ResourcesPage() {
     </main>
   );
 }
+

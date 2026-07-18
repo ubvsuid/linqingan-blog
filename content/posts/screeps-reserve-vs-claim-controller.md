@@ -1,0 +1,87 @@
+---
+title: "reserveController() 和 claimController() 有什么区别"
+description: "根据临时保留或永久占领目的选择 reserveController 与 claimController，并检查 CLAIM 部件和 GCL 前提，附完整检查顺序、最小代码和适用边界。"
+publishedAt: "2026-07-18"
+updatedAt: "2026-07-18"
+category: "Screeps 进阶开发"
+tags:
+  - "Screeps"
+  - "进阶开发"
+  - "Screeps reserveController claimController 区别"
+draft: false
+featured: false
+---
+
+> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
+
+本文处理的不是完整房间 AI，而是一个能明确验证的问题：根据临时保留或永久占领目的选择 reserveController 与 claimController，并检查 CLAIM 部件和 GCL 前提。
+
+## 先确认边界
+
+现有 Controller 升级和 Safe Mode 页面只处理己方房间；本文只讨论中立 Controller 的两种控制动作。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+
+## 规则依据
+
+- 两个方法都需要 CLAIM 身体部件且目标需相邻。
+- claimController 会尝试把中立房间纳入控制，受 GCL 限制。
+- reserveController 增加预定时间，不把房间变为己方已占领房间。
+
+## 可放进 main 的示例
+
+运行前请替换房间名、Creep 名称和策略阈值。
+
+```js
+module.exports.loop = function () {
+  const creep = Game.creeps.Claimer1;
+  if (!creep || creep.getActiveBodyparts(CLAIM) === 0) {
+    return;
+  }
+
+  const controller = creep.room.controller;
+  if (!controller || controller.my) {
+    return;
+  }
+
+  const mission = creep.memory.controllerMission;
+  let result;
+
+  if (mission === 'claim') {
+    result = creep.claimController(controller);
+  } else if (mission === 'reserve') {
+    result = creep.reserveController(controller);
+  } else {
+    return;
+  }
+
+  if (result === ERR_NOT_IN_RANGE) {
+    creep.moveTo(controller);
+  } else if (result !== OK) {
+    console.log('controller action result:', result);
+  }
+};
+```
+
+## 按这个顺序检查
+
+1. 检查有效 CLAIM 部件。
+2. 任务值只允许 claim 或 reserve。
+3. 保存两种动作共同的返回值。
+4. 检查对象所有权、资源和距离。
+5. 对照官方 API 处理非 `OK` 返回值，不用画面现象代替诊断。
+
+## 限制
+
+示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+
+## 相关站内内容
+
+- [Controller 升级基础](/blog/screeps-upgrade-controller)
+- [Creep 身体部件](/blog/screeps-creep-body-parts)
+- [认识第一个房间](/blog/screeps-first-room)
+
+## 官方资料
+
+- [Control](https://docs.screeps.com/control.html)
+- [Creep.claimController API](https://docs.screeps.com/api/#Creep.claimController)
+- [Creep.reserveController API](https://docs.screeps.com/api/#Creep.reserveController)
+
