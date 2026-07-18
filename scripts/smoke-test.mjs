@@ -69,4 +69,3 @@ if (failures.length > 0) {
 }
 
 console.log(`冒烟测试通过：${checks.length} 个关键页面。`);
-
