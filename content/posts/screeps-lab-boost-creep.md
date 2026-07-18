@@ -1,3 +1,4 @@
+
 ---
 title: "StructureLab.boostCreep() 怎么强化身体部件"
 description: "确认 Lab 中的化合物、Energy、目标身体部件和距离后调用 boostCreep，给出前提检查、完整示例和失败边界。"
@@ -7,14 +8,21 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps boostCreep"
+  - "Lab"
+  - "Boost"
+  - "高级资源"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：确认 Lab 中的化合物、Energy、目标身体部件和距离后调用 boostCreep。
+Lab 只能强化与其中化合物对应的身体部件。调用 `boostCreep()` 前，要核对矿物类型与数量、Energy、目标有效部件和 Creep 距离。
 
 ## 先核对这些前提
 
@@ -70,7 +78,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+本文只处理一座 Lab 对一只相邻 Creep 的单次强化，不负责选择化合物、补充资源或安排强化队列。
 
 ## 站内学习路径
 

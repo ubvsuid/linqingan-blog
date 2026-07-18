@@ -1,24 +1,32 @@
+
 ---
 title: "Room.getEventLog() 怎么读取本 tick 事件"
-description: "读取房间当前 tick 的事件数组，并按 EVENT_ATTACK 过滤和安全访问 event.data，提供变量完整的最小示例、边界和验证清单。"
+description: "用 Room.getEventLog() 读取当前 tick 的事件数组，并按 EVENT_ATTACK 过滤和安全访问 event.data。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Room.getEventLog"
+  - "Room API"
+  - "事件日志"
+  - "运行诊断"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文读取房间当前 tick 的事件数组，并按 `EVENT_ATTACK` 过滤和安全访问 `event.data`。
 
 ## 先给结论
 
-本文只处理当前 tick 的原始事件，不声称它会自动形成长期统计或战斗回放。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+`Room.getEventLog()` 只返回当前 tick 的事件数组。示例筛选 `EVENT_ATTACK` 并安全读取 `event.data`，不会把结果自动保存成长期记录。
 
 ## 官方规则
 

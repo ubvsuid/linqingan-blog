@@ -1,24 +1,31 @@
+
 ---
 title: "Screeps 全局缓存为什么会失效"
-description: "把可重建数据放入模块全局变量，并在全局重置或房间变化后安全重建，提供变量完整的最小示例、边界和验证清单。"
+description: "把可重建数据放入模块全局变量，并在全局重置或房间变化后识别失效并安全重建。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps global cache"
+  - "全局缓存"
+  - "性能"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文把可重建数据放入模块全局变量，并在全局重置或房间变化后安全重建。
 
 ## 先给结论
 
-Memory 保存必须跨重置的数据；RawMemory segments 保存额外字符串。本文只处理可丢失的 heap 缓存。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+模块全局变量只适合保存可以重建的缓存。全局重置后它会消失，因此示例会在缓存为空或房间条件变化时重新生成。
 
 ## 官方规则
 

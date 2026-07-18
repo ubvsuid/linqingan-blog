@@ -1,3 +1,4 @@
+
 ---
 title: "PathFinder CostMatrix 怎么设置不可走和高成本格子"
 description: "在 roomCallback 中标记道路、不可穿越建筑和自定义高成本位置，按返回值和位置条件给出最小排查代码。"
@@ -7,14 +8,21 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps CostMatrix"
+  - "PathFinder"
+  - "寻路"
+  - "CostMatrix"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：在 roomCallback 中标记道路、不可穿越建筑和自定义高成本位置。
+CostMatrix 不会主动移动 Creep；它向 PathFinder 描述哪些格子便宜、昂贵或不可走。下面在 `roomCallback` 中标记道路、建筑和一个自定义高成本位置。
 
 ## 第一项检查
 
@@ -86,7 +94,7 @@ module.exports.loop = function () {
 
 ## 文章边界
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+本文只演示在 `roomCallback` 中构造单房间 CostMatrix；权重需要结合实际道路、建筑和交通策略调整。
 
 ## 相关站内内容
 

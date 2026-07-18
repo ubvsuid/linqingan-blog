@@ -7,12 +7,18 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps 清理死亡 Creep Memory"
+  - "Memory"
+  - "Creep"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-19。JavaScript 语法检查通过；清理日志与现有 Memory 结构需要按实际代码确认，运行行为待 Screeps 环境验证。
 
 Creep 死亡后，`Game.creeps` 中已经没有它，但 `Memory.creeps` 里以名称保存的数据可能仍然存在。清理的判断条件因此很简单：Memory 中有这个名称，而当前 tick 的 `Game.creeps` 中没有。
 
@@ -84,4 +90,3 @@ module.exports.loop = function () {
 
 - [Game.creeps 与 Memory](https://docs.screeps.com/api/)
 - [Global Objects](https://docs.screeps.com/global-objects.html)
-

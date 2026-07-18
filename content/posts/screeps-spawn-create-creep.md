@@ -1,3 +1,4 @@
+
 ---
 title: "怎样让 Spawn 创建新的 Creep？认识 spawnCreep()"
 description: "写给 Screeps 新手的第一只 Creep 创建教程：找到 Spawn，准备 WORK、CARRY、MOVE 身体，设置名称并调用 spawnCreep()。"
@@ -9,9 +10,14 @@ tags:
   - "新手入门"
   - "Spawn"
   - "Creep"
-  - "spawnCreep"
-  - "JavaScript"
+  - "Creep Body"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -202,3 +208,4 @@ Spawn 创建每个身体部件需要一定时间。
 
 > 本文是 Screeps 新手入门系列的第七篇，只介绍第一次使用 `spawnCreep()` 创建 Creep。
 > 动态命名、Memory、角色字段、自动补员和生产队列会放到后续文章中。
+

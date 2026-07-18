@@ -1,3 +1,4 @@
+
 export interface ProjectDetail {
   label: string;
   value: string;
@@ -45,7 +46,7 @@ export const projects: ProjectRecord[] = [
     status: "持续建设中",
     title: "linqingan.com",
     summary:
-      "一个围绕 Screeps、JavaScript 与系统实践持续建设的个人技术网站。当前重点是一套适合中文新手按顺序学习的 Screeps 入门路线。",
+      "一个围绕 Screeps、JavaScript 与系统实践持续建设的中文知识库，现有 60 篇文章按 8 个主题组织，并保留 12 篇连续新手路线。",
     purpose:
       "把零散的学习笔记、代码实践和系统建设过程，整理成可以长期阅读、查询和继续扩展的公开网站。",
     challenge:
@@ -63,10 +64,10 @@ export const projects: ProjectRecord[] = [
       { label: "建设原则", value: "简单、可读、可持续迭代" },
     ],
     metrics: [
-      { value: "63+", label: "静态页面", note: "文章、标签、资料与项目页面" },
+      { value: "60", label: "公开文章", note: "每篇对应一个明确问题" },
+      { value: "8", label: "知识主题", note: "覆盖学习、开发与运行诊断" },
       { value: "12", label: "入门文章", note: "按四个阶段连续组织" },
-      { value: "29", label: "文章标签", note: "自动生成独立归档页" },
-      { value: "31", label: "查询条目", note: "术语与错误码合计" },
+      { value: "4", label: "自动检查", note: "内容、路由、代码块与构建" },
     ],
     flow: ["Markdown 内容", "构建与检查", "Vercel 部署", "读者学习与查询"],
     timeline: [
@@ -85,6 +86,16 @@ export const projects: ProjectRecord[] = [
         title: "扩展为 Screeps 知识站",
         description: "上线资料中心、术语表、错误码、标签归档、项目详情和站内搜索。",
       },
+      {
+        date: "2026-07-18",
+        title: "发布完整 Screeps 中文知识库",
+        description: "整理 60 篇公开文章，并划分为 8 个知识主题组。",
+      },
+      {
+        date: "2026-07-19",
+        title: "补全发布前质量检查",
+        description: "修复中文标签路由，并增加内容、路由和 JavaScript 代码块自动检查。",
+      },
     ],
     highlights: [
       "按四个阶段组织新手学习路线",
@@ -94,10 +105,10 @@ export const projects: ProjectRecord[] = [
       "统一搜索文章、术语、错误码和项目内容",
     ],
     nextSteps: [
-      "发布 Screeps 基础工程系列，承接入门路线。",
-      "增加常用 API 快速查询和 Creep 身体计算器。",
-      "根据真实访问和反馈数据持续调整内容。",
-      "继续扩展自动化内容检查和页面冒烟测试。",
+      "逐篇完成技术文章审校。",
+      "验证高风险 API。",
+      "开发 Creep Body 计算器。",
+      "根据真实搜索数据优化内容。",
     ],
     links: [
       { label: "查看项目详情", href: "/projects/linqingan-com" },
@@ -109,7 +120,7 @@ export const projects: ProjectRecord[] = [
         external: true,
       },
     ],
-    updatedAt: "2026-07-17",
+    updatedAt: "2026-07-19",
   },
   {
     id: "screeps-beginner-path",
@@ -177,3 +188,4 @@ export const projects: ProjectRecord[] = [
     updatedAt: "2026-07-17",
   },
 ];
+

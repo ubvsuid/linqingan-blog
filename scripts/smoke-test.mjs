@@ -1,7 +1,8 @@
+
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
-  ["/", ["构建，运行，迭代", "Screeps"]],
+  ["/", ["构建，运行，迭代", "Screeps 知识库", "60", "8 个主题组"]],
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "60"]],
@@ -18,17 +19,34 @@ const checks = [
   ["/tags/advanced-development", ["进阶开发", "当前共有"]],
   ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
   ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
-  ["/blog/screeps-introduction", ["发布于", "把这篇内容连接到下一步"]],
+  ["/blog/screeps-introduction", ["发布于", "验证状态", "没有找到 Harvester1"]],
   ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
   ["/blog/screeps-creep-withdraw-container-energy", ["Creep.withdraw 怎么用", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-controller-activate-safe-mode", ["Safe Mode 怎么开启", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-spawn-renew-creep", ["renewCreep() 怎么用", "资料核对日期：2026-07-18"]],
-  ["/blog/screeps-clean-dead-creep-memory", ["清理死亡 Creep 的 Memory", "待 Screeps 环境验证"]],
+  ["/blog/screeps-clean-dead-creep-memory", ["清理死亡 Creep 的 Memory", "真实主循环", "待验证"]],
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
   ["/blog/screeps-spawn-emergency-recovery", ["房间断代后如何自动恢复第一只采集者", "不会返回", "ERR_NOT_IN_RANGE"]],
-  ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "待 Screeps 环境验证"]],
+  ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
   ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
+];
+
+const redirectChecks = [
+  ["/tags/新手入门", "/tags/beginner"],
+  ["/tags/基础工程", "/tags/basic-engineering"],
+  ["/tags/常见问题", "/tags/common-questions"],
+  ["/tags/错误排查", "/tags/debugging"],
+  ["/tags/进阶开发", "/tags/advanced-development"],
+];
+
+const metadataPaths = [
+  "/",
+  "/knowledge",
+  "/tags/basic-engineering",
+  "/blog/screeps-storage-energy-usage",
+  "/projects/linqingan-com",
+  "/resources",
 ];
 
 async function waitForServer() {
@@ -69,6 +87,28 @@ for (const [pathname, expectedTexts] of checks) {
 
   if (pathname !== "/sitemap.xml" && !body.includes("https://www.linqingan.com")) {
     failures.push(`${pathname}: 未找到统一主域名信号`);
+  }
+}
+
+for (const [source, destination] of redirectChecks) {
+  const response = await fetch(`${baseUrl}${source}`, { redirect: "manual" });
+  const location = response.headers.get("location");
+  if (response.status !== 301) {
+    failures.push(`${source}: 预期 301，实际 ${response.status}`);
+  }
+  if (!location?.endsWith(destination)) {
+    failures.push(`${source}: Location 预期指向 ${destination}，实际 ${location ?? "缺失"}`);
+  }
+}
+
+for (const pathname of metadataPaths) {
+  const response = await fetch(`${baseUrl}${pathname}`);
+  const body = await response.text();
+  if (!/<meta[^>]+property="og:image"[^>]+content="[^"]+"/i.test(body)) {
+    failures.push(`${pathname}: 缺少 og:image`);
+  }
+  if (!/<meta[^>]+name="twitter:image"[^>]+content="[^"]+"/i.test(body)) {
+    failures.push(`${pathname}: 缺少 twitter:image`);
   }
 }
 

@@ -1,24 +1,32 @@
+
 ---
 title: "StructureTerminal.send() 怎么跨房间发送资源"
-description: "计算交易 Energy 成本，并在资源、Energy 与 cooldown 都满足时向另一房间发送资源，用最小示例检查对象、资源、冷却与返回值。"
+description: "用一次性开关调用 StructureTerminal.send()，发送前计算交易 Energy 成本，并检查资源库存、cooldown 与返回值。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Terminal send"
+  - "Terminal"
+  - "物流"
+  - "跨房间"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-这类代码最容易出错的地方不是调用名称，而是前提没有满足。本文只解决：计算交易 Energy 成本，并在资源、Energy 与 cooldown 都满足时向另一房间发送资源。
+`StructureTerminal.send()` 会把资源真实发送到另一房间。主循环必须有明确的一次性入口，并在发送前核对目标房间、资源库存、交易 Energy 和 `cooldown`。
 
 ## 先给检查顺序
 
-本文只讲 Terminal.send 直接发送，不筛选市场订单，也不创建订单。先确认结构存在，再检查资源、容量、冷却和所有权，最后调用 API 并保存返回值。
+本文不经过市场订单：代码只在 `Memory.terminal.sendUtrium === true` 时，使用房间自己的 Terminal 直接发送 Utrium。
 
 ## 官方规则
 
@@ -28,10 +36,14 @@ featured: false
 
 ## 可放进 main 的最小示例
 
-示例中的房间、资源、数量和价格只是演示参数，发布前必须按自己的环境修改。
+示例中的源房间 `W1N1`、目标房间 `W2N2`、资源类型和数量都必须在执行前人工确认。
 
 ```js
 module.exports.loop = function () {
+  if (!Memory.terminal || Memory.terminal.sendUtrium !== true) {
+    return;
+  }
+
   const room = Game.rooms.W1N1;
   if (!room || !room.terminal) {
     return;
@@ -65,6 +77,10 @@ module.exports.loop = function () {
     'manual transfer'
   );
   console.log('terminal send result:', result);
+
+  if (result === OK) {
+    Memory.terminal.sendUtrium = false;
+  }
 };
 ```
 
@@ -74,11 +90,11 @@ module.exports.loop = function () {
 2. 先计算交易 Energy 成本。
 3. 发送资源与 Energy 储量分别检查。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 不在每个 tick 无条件执行一次性市场或发送操作。
+5. 只有返回 `OK` 才关闭发送开关，避免失败被误记成成功。
 
 ## 适用限制
 
-本文不预测价格，不承诺收益，不提供完整多房间物流。代码只经过语法和静态规则检查，待 Screeps 环境验证。
+本文只演示一次跨房间资源发送，不处理接收房间分配、自动补货或多房间物流队列。
 
 ## 相关站内内容
 

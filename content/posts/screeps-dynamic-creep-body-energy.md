@@ -7,14 +7,21 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps 动态 Creep body"
+  - "Spawn"
+  - "Creep Body"
+  - "Energy"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-遇到这个问题时，先不要继续增加角色系统或调度框架。本文只检查一件事：根据 room.energyAvailable 生成不超过 50 个部件的 WORK/CARRY/MOVE 组合。
+固定身体在房间能量变化后可能无法生成，或者浪费已经可用的容量。下面按 `room.energyAvailable` 重复加入 `WORK`、`CARRY`、`MOVE`，同时守住 50 个部件的上限。
 
 ## 先给判断
 
@@ -28,7 +35,7 @@ featured: false
 
 ## 可放进 main 的最小示例
 
-运行前提：示例中的对象名称和房间条件需要按自己的环境修改。
+示例读取 `Spawn1` 所在房间的当前可用 Energy；Spawn 名称需要按实际房间修改。
 
 ```js
 function buildWorkerBody(energy) {
@@ -76,7 +83,7 @@ module.exports.loop = function () {
 
 ## 适用范围
 
-本文不处理多房间调度、全局任务队列、性能排名或自动布局。示例来自官方 API 规则整理，未在用户的 Screeps 账号中运行。
+本文只生成重复的 `WORK/CARRY/MOVE` 基础组合，不比较道路负载、角色需求或不同部件排列。
 
 ## 继续学习
 
@@ -88,4 +95,3 @@ module.exports.loop = function () {
 
 - [StructureSpawn.spawnCreep API](https://docs.screeps.com/api/#StructureSpawn.spawnCreep)
 - [Creeps](https://docs.screeps.com/creeps.html)
-

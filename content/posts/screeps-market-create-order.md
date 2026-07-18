@@ -1,24 +1,32 @@
+
 ---
 title: "Game.market.createOrder() 怎么创建和维护订单"
-description: "在明确的一次性请求下创建订单，并用 Game.market.orders 防止每 tick 重复创建，用最小示例检查对象、资源、冷却与返回值。"
+description: "通过一次性 Memory 开关调用 Game.market.createOrder()，并在创建前检查现有订单、参数和 Credits，避免每 tick 重复下单。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps createOrder"
+  - "市场"
+  - "订单"
+  - "Game API"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-这类代码最容易出错的地方不是调用名称，而是前提没有满足。本文只解决：在明确的一次性请求下创建订单，并用 Game.market.orders 防止每 tick 重复创建。
+`createOrder()` 是一次性市场操作。如果把它无条件放进主循环，代码会在后续 tick 继续尝试创建订单。下面同时使用 Memory 开关和现有订单检查来阻止重复执行。
 
 ## 先给检查顺序
 
-deal 页面处理成交现有订单；本文只处理自己的订单生命周期入口，不提供价格预测。先确认结构存在，再检查资源、容量、冷却和所有权，最后调用 API 并保存返回值。
+先确认一次性开关已开启，再从 `Game.market.orders` 排除同房间、同资源、同类型订单，最后保存 `createOrder()` 返回值。价格和数量必须由玩家在执行前自行确认。
 
 ## 官方规则
 
@@ -68,11 +76,11 @@ module.exports.loop = function () {
 2. 先检查同类型同资源同房间订单。
 3. 只有返回 OK 才清除请求。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 不在每个 tick 无条件执行一次性市场或发送操作。
+5. 创建失败时保留开关，修正参数后才能再次尝试；实际使用时应避免每 tick 刷屏。
 
 ## 适用限制
 
-本文不预测价格，不承诺收益，不提供完整多房间物流。代码只经过语法和静态规则检查，待 Screeps 环境验证。
+本文只演示创建一个卖单并避免重复创建，不覆盖改价、追加数量、取消订单或交易策略。
 
 ## 相关站内内容
 

@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -50,6 +51,7 @@ export async function generateMetadata({
   }
 
   const path = `/blog/${post.slug}`;
+  const socialImage = post.cover ?? `${siteConfig.url}/opengraph-image`;
 
   return {
     title: post.title,
@@ -66,13 +68,13 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
       tags: post.tags,
-      images: post.cover ? [{ url: post.cover }] : undefined,
+      images: [{ url: socialImage }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
-      images: post.cover ? [post.cover] : undefined,
+      images: [socialImage],
     },
   };
 }
@@ -218,6 +220,35 @@ export default async function PostPage({ params }: PostPageProps) {
               ))}
             </div>
           </header>
+
+          <section className="verification-status" aria-labelledby="verification-status-title">
+            <div>
+              <p className="eyebrow">VERIFICATION</p>
+              <h2 id="verification-status-title">验证状态</h2>
+            </div>
+            <dl>
+              <div>
+                <dt>官方文档</dt>
+                <dd>{post.verification.docsChecked ? "已核对" : "待核对"}</dd>
+              </div>
+              <div>
+                <dt>JavaScript 语法</dt>
+                <dd>{post.verification.syntaxChecked ? "已检查" : "待检查"}</dd>
+              </div>
+              <div>
+                <dt>Screeps Console</dt>
+                <dd>{post.verification.consoleTested ? "已测试" : "待测试"}</dd>
+              </div>
+              <div>
+                <dt>真实主循环</dt>
+                <dd>{post.verification.liveTested ? "已验证" : "待验证"}</dd>
+              </div>
+              <div>
+                <dt>最后核对</dt>
+                <dd>{formatDate(post.verification.checkedAt)}</dd>
+              </div>
+            </dl>
+          </section>
 
           {isBeginnerPost ? (
             <section className="series-status" aria-label="系列阅读进度">
@@ -384,6 +415,46 @@ export default async function PostPage({ params }: PostPageProps) {
           border-radius: 18px;
           padding: 20px 22px;
           background: var(--surface);
+        }
+
+        .verification-status {
+          display: grid;
+          grid-template-columns: minmax(150px, .45fr) minmax(0, 1.55fr);
+          gap: 30px;
+          margin: -24px 0 52px;
+          border: 1px solid var(--border);
+          border-radius: 18px;
+          padding: 20px 22px;
+          background: var(--surface);
+        }
+
+        .verification-status h2 {
+          margin: 7px 0 0;
+          font-size: 20px;
+        }
+
+        .verification-status dl {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px 24px;
+          margin: 0;
+        }
+
+        .verification-status dl > div {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          border-bottom: 1px solid var(--border);
+          padding-bottom: 8px;
+        }
+
+        .verification-status dt {
+          color: var(--muted);
+        }
+
+        .verification-status dd {
+          margin: 0;
+          font-weight: 650;
         }
 
         .series-status-copy {
@@ -567,6 +638,14 @@ export default async function PostPage({ params }: PostPageProps) {
         }
 
         @media (max-width: 640px) {
+          .verification-status {
+            grid-template-columns: 1fr;
+          }
+
+          .verification-status dl {
+            grid-template-columns: 1fr;
+          }
+
           .series-status-copy {
             align-items: flex-start;
             flex-direction: column;
@@ -593,3 +672,4 @@ export default async function PostPage({ params }: PostPageProps) {
     </main>
   );
 }
+

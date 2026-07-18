@@ -1,3 +1,4 @@
+
 ---
 title: "Wall 和 Rampart 如何设置维修上限"
 description: "给 Wall 与 Rampart 设置阶段性 hits 上限，只选择低于上限的最弱目标，附完整检查顺序、最小代码和适用边界。"
@@ -7,18 +8,25 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps Wall Rampart 维修上限"
+  - "Wall"
+  - "Rampart"
+  - "维修"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-本文处理的不是完整房间 AI，而是一个能明确验证的问题：给 Wall 与 Rampart 设置阶段性 hits 上限，只选择低于上限的最弱目标。
+Wall 和 Rampart 的 `hitsMax` 很高，按 `hits < hitsMax` 维修会长期占用资源。更可控的做法是设置阶段性上限，并优先修复低于上限的最弱目标。
 
 ## 先确认边界
 
-通用建造维修页按 hits < hitsMax 选损坏结构；本文只解决防御墙体不应无限维修的问题。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+代码只搜索 Wall 与 Rampart，并把玩家设定的 `repairLimit` 用作当前阶段目标，不把 `hitsMax` 当成必须达到的数值。
 
 ## 规则依据
 
@@ -70,7 +78,7 @@ module.exports.loop = function () {
 
 ## 限制
 
-示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+`repairLimit` 是策略参数。示例不判断敌情、Tower Energy 保底或不同位置的防御权重。
 
 ## 相关站内内容
 

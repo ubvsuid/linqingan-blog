@@ -1,3 +1,4 @@
+
 ---
 title: "StructureLab.runReaction() 怎么进行矿物反应"
 description: "用两个输入 Lab 和一个输出 Lab 验证反应配方、距离、冷却、资源与容量后执行反应，给出前提检查、完整示例和失败边界。"
@@ -7,14 +8,21 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Lab runReaction"
+  - "Lab"
+  - "矿物反应"
+  - "高级资源"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：用两个输入 Lab 和一个输出 Lab 验证反应配方、距离、冷却、资源与容量后执行反应。
+`runReaction()` 由输出 Lab 调用，并接收两座输入 Lab。三座 Lab 的位置、输入矿物组合、输出容量与 `cooldown` 都会影响结果。
 
 ## 先核对这些前提
 
@@ -76,7 +84,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+本文只验证两个输入 Lab 和一个输出 Lab 的单次反应，不实现化合物生产链、运输或批次调度。
 
 ## 站内学习路径
 

@@ -1,3 +1,4 @@
+
 ---
 title: "Game.getObjectById() 怎么配合 Memory 保存目标"
 description: "把对象 ID 存入 Memory，并在每个 tick 重新取得当前游戏对象；同时处理首次选择、目标失效与不可见房间。"
@@ -7,12 +8,19 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps Game.getObjectById"
+  - "Memory"
+  - "Game API"
+  - "目标缓存"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-19。JavaScript 语法检查通过；对象名称、房间视野和目标选择策略需要按实际环境确认，运行行为待 Screeps 环境验证。
 
 Screeps 的游戏对象不能直接跨 tick 保存在 Memory 中。需要长期记住 Source、Structure 或其他对象时，保存它的 `id`，下一 tick 再用 `Game.getObjectById()` 取回当前对象。
 

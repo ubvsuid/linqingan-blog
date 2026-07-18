@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps Tower 如何自动治疗己方 Creep"
 description: "找到 hits 低于 hitsMax 的己方 Creep，并调用 Tower.heal() 保存返回值，附完整检查顺序、最小代码和适用边界。"
@@ -7,18 +8,25 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps Tower heal"
+  - "Tower"
+  - "治疗"
+  - "防御"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-本文处理的不是完整房间 AI，而是一个能明确验证的问题：找到 hits 低于 hitsMax 的己方 Creep，并调用 Tower.heal() 保存返回值。
+己方 Creep 受伤后，Tower 不会自动治疗。代码需要筛选 `hits < hitsMax` 的己方目标，再由有 Energy 的 Tower 调用 `heal()`。
 
 ## 先确认边界
 
-Tower 攻击页处理敌对 Creep，维修页处理建筑；本文只处理己方 Creep 的治疗。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+攻击目标来自 `FIND_HOSTILE_CREEPS`，治疗目标则来自 `FIND_MY_CREEPS`。本文只保存 `heal()` 的执行结果，不混入维修分支。
 
 ## 规则依据
 
@@ -68,7 +76,7 @@ module.exports.loop = function () {
 
 ## 限制
 
-示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+示例选择房间里找到的第一名受伤 Creep，不包含按伤势、距离或角色排序，也不处理 Power Creep。
 
 ## 相关站内内容
 

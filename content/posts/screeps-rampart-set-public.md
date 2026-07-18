@@ -1,3 +1,4 @@
+
 ---
 title: "Rampart 的 setPublic() 怎么用"
 description: "读取己方 Rampart，并根据明确配置调用 setPublic() 控制其他玩家单位是否能通过，附完整检查顺序、最小代码和适用边界。"
@@ -7,18 +8,25 @@ category: "Screeps 常见问题"
 tags:
   - "Screeps"
   - "常见问题"
-  - "Screeps Rampart setPublic"
+  - "Rampart"
+  - "防御"
+  - "通行"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-本文处理的不是完整房间 AI，而是一个能明确验证的问题：读取己方 Rampart，并根据明确配置调用 setPublic() 控制其他玩家单位是否能通过。
+己方 Rampart 默认阻挡其他玩家单位。需要开放特定通道时，可以对明确目标调用 `setPublic(true)`，并保存返回值。
 
 ## 先确认边界
 
-Safe Mode 是房间防御状态；本文只改变单个 Rampart 的公共通行属性。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+Safe Mode 是房间防御状态；`setPublic()` 只改变己方 Rampart 是否允许其他玩家单位通过。调用前要核对目标 ID 和当前 `isPublic`。
 
 ## 规则依据
 
@@ -65,7 +73,7 @@ module.exports.loop = function () {
 
 ## 限制
 
-示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+公开 Rampart 会影响其他玩家单位通行。示例只处理一个明确目标，不包含盟友名单、访客规则或自动切换策略。
 
 ## 相关站内内容
 

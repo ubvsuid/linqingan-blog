@@ -7,14 +7,20 @@ category: "Screeps 错误排查"
 tags:
   - "Screeps"
   - "错误排查"
-  - "Screeps ERR_NOT_IN_RANGE"
+  - "错误码"
+  - "Creep API"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；对象、房间、资源和策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：确认动作要求的有效距离，并在返回 ERR_NOT_IN_RANGE 时先移动、下一 tick 再重试。
+`ERR_NOT_IN_RANGE` 表示动作目标存在，但执行者还没进入该 API 要求的距离。常见处理是本 tick 移动，下一 tick 再尝试动作。
 
 ## 第一项检查
 
@@ -69,7 +75,7 @@ module.exports.loop = function () {
 
 ## 文章边界
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+本文只说明动作距离不足时的“先移动、下一 tick 再调用”模式，不替代具体 API 的其他返回值排查。
 
 ## 相关站内内容
 
@@ -81,4 +87,3 @@ module.exports.loop = function () {
 
 - [Screeps API 错误常量](https://docs.screeps.com/api/#Constants-Error-Codes)
 - [Creep API](https://docs.screeps.com/api/#Creep)
-

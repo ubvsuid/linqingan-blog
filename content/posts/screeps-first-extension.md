@@ -1,3 +1,4 @@
+
 ---
 title: "怎样建造第一个 Extension？"
 description: "先创建 Builder1，在 RCL 2 放置 Extension Construction Site，并让它自动采集和建造。"
@@ -8,10 +9,15 @@ tags:
   - "Screeps"
   - "新手入门"
   - "Extension"
-  - "Builder"
-  - "Construction Site"
+  - "建造"
   - "RCL"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -129,3 +135,4 @@ module.exports.loop = function () {
 2. [Screeps API Reference：StructureExtension](https://docs.screeps.com/api/#StructureExtension)
 3. [Screeps API Reference：Creep.build](https://docs.screeps.com/api/#Creep.build)
 4. [Screeps API Reference：CONSTRUCTION_COST](https://docs.screeps.com/api/#CONSTRUCTION_COST)
+

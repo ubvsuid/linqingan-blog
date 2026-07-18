@@ -8,9 +8,15 @@ tags:
   - "Screeps"
   - "Safe Mode"
   - "Controller"
-  - "Defense"
+  - "防御"
   - "activateSafeMode"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -160,4 +166,3 @@ module.exports.loop = function () {
 - [Screeps Documentation：Defending your room](https://docs.screeps.com/defense.html)
 
 资料核对日期：2026-07-18。代码仍需在 Screeps 环境验证。
-

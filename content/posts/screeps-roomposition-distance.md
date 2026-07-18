@@ -1,3 +1,4 @@
+
 ---
 title: "getRangeTo、inRangeTo、isNearTo 有什么区别"
 description: "按需要精确距离、范围布尔值或相邻判断选择 RoomPosition 方法，按返回值和位置条件给出最小排查代码。"
@@ -7,14 +8,21 @@ category: "Screeps 常见问题"
 tags:
   - "Screeps"
   - "常见问题"
-  - "Screeps getRangeTo inRangeTo isNearTo"
+  - "RoomPosition"
+  - "距离"
+  - "移动"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：按需要精确距离、范围布尔值或相邻判断选择 RoomPosition 方法。
+`getRangeTo()` 返回精确 Chebyshev 距离，`inRangeTo()` 判断是否在指定范围内，`isNearTo()` 只判断是否相邻。选择方法取决于代码需要数字还是布尔值。
 
 ## 第一项检查
 
@@ -64,7 +72,7 @@ module.exports.loop = function () {
 
 ## 文章边界
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+本文只比较三个距离判断方法，不负责移动、寻路或目标缓存。
 
 ## 相关站内内容
 

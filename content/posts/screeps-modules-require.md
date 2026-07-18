@@ -1,24 +1,31 @@
+
 ---
 title: "Screeps 如何用 require 和 module.exports 拆分代码"
-description: "把角色行为导出为独立模块，并在 main 中 require 后遍历 Creep 调用，提供变量完整的最小示例、边界和验证清单。"
+description: "把角色行为通过 module.exports 导出为独立模块，并在 main 中 require 后遍历 Creep 调用。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps require module.exports"
+  - "JavaScript"
+  - "模块化"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文把角色行为导出为独立模块，并在 `main` 中 `require` 后遍历 Creep 调用。
 
 ## 先给结论
 
-第一份房间代码把逻辑写在一个 main；本文只解决模块边界、导出和入口，不重写角色行为。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+第一份房间代码把逻辑写在 `main`；这里把角色行为导出到独立模块，再由 `main` 使用 `require()` 引入并逐只调用。
 
 ## 官方规则
 

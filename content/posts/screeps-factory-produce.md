@@ -7,14 +7,20 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Factory produce"
+  - "Factory"
+  - "高级资源"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：从 COMMODITIES 读取配方，检查 Factory cooldown、等级与全部组件后调用 produce。
+Factory 的生产条件来自 `COMMODITIES[product]`。调用 `produce()` 前应逐项检查配方组件、商品容量、Factory 等级和 `cooldown`。
 
 ## 先核对这些前提
 
@@ -72,7 +78,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+本文只验证一个商品配方并尝试一次 `produce()`；不负责组件物流、生产队列或商品销售。
 
 ## 站内学习路径
 
@@ -84,4 +90,3 @@ module.exports.loop = function () {
 
 - [Resources：Commodities](https://docs.screeps.com/resources.html)
 - [StructureFactory.produce API](https://docs.screeps.com/api/#StructureFactory.produce)
-

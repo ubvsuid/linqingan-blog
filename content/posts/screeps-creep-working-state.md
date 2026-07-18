@@ -7,14 +7,21 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps working 状态"
+  - "Memory"
+  - "Creep"
+  - "状态管理"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-遇到这个问题时，先不要继续增加角色系统或调度框架。本文只检查一件事：只在 Energy 为空或容量已满时切换 working，避免每 tick 来回抖动。
+`working` 状态应该只在两个边界切换：Energy 用完时回到取能状态，容量装满时进入工作状态。若每 tick 都按当前数量直接取反，Creep 会在两个任务之间反复抖动。
 
 ## 先给判断
 
@@ -28,7 +35,7 @@ Memory 入门解释 working 是自定义字段；本文给出完整状态切换�
 
 ## 可放进 main 的最小示例
 
-运行前提：示例中的对象名称和房间条件需要按自己的环境修改。
+示例使用 `Harvester1`、当前房间第一个 Source 和房间 Controller；这些目标应按实际角色逻辑替换。
 
 ```js
 module.exports.loop = function () {
@@ -78,7 +85,7 @@ module.exports.loop = function () {
 
 ## 适用范围
 
-本文不处理多房间调度、全局任务队列、性能排名或自动布局。示例来自官方 API 规则整理，未在用户的 Screeps 账号中运行。
+本文只解释 `working` 的边界切换，不负责选择最优 Source、分配多个 Upgrader 或持久化任务队列。
 
 ## 继续学习
 
@@ -90,4 +97,3 @@ module.exports.loop = function () {
 
 - [Creep.store 与 Store API](https://docs.screeps.com/api/#Store)
 - [Memory API](https://docs.screeps.com/api/#Memory)
-

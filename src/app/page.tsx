@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -5,6 +6,7 @@ import { Container } from "@/components/container";
 import { HomeLearningActions } from "@/components/home-learning-actions";
 import { PostCard } from "@/components/post-card";
 import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
+import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
@@ -27,7 +29,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const latestPosts = getAllPosts().slice(0, 3);
+  const allPosts = getAllPosts();
+  const latestPosts = allPosts.slice(0, 3);
+  const articleCount = allPosts.length;
+  const sectionCount = knowledgeBaseSections.length;
   const currentProject = projects[0];
 
   return (
@@ -90,6 +95,33 @@ export default function HomePage() {
         </Container>
       </section>
 
+      <section className={styles.knowledgeSection} aria-labelledby="home-knowledge-title">
+        <Container>
+          <div className={styles.knowledgeCard}>
+            <div className={styles.knowledgeIntro}>
+              <p className="eyebrow">SCREEPS KNOWLEDGE BASE</p>
+              <h2 id="home-knowledge-title">Screeps 知识库</h2>
+              <p>
+                从基础操作到 Memory、Spawn、资源经济、寻路、防御、市场、高级资源与运行诊断。
+              </p>
+              <div className={styles.knowledgeStats} aria-label="知识库规模">
+                <span><strong>{articleCount}</strong> 篇文章</span>
+                <span><strong>{sectionCount}</strong> 个主题组</span>
+              </div>
+              <Link href="/knowledge">进入知识库 →</Link>
+            </div>
+            <ol className={styles.knowledgeTopics}>
+              {knowledgeBaseSections.map((section) => (
+                <li key={section.id}>
+                  <span>{String(section.number).padStart(2, "0")}</span>
+                  <strong>{section.title}</strong>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </Container>
+      </section>
+
       <section className={styles.latestSection} aria-labelledby="latest-posts-title">
         <Container>
           <div className={styles.sectionHeading}>
@@ -128,3 +160,4 @@ export default function HomePage() {
     </main>
   );
 }
+

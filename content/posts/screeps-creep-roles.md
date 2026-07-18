@@ -9,10 +9,13 @@ tags:
   - "新手入门"
   - "Creep"
   - "角色分工"
-  - "Harvester"
-  - "Upgrader"
-  - "Builder"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 

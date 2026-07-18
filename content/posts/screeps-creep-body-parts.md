@@ -8,10 +8,15 @@ tags:
   - "Screeps"
   - "新手入门"
   - "Creep"
-  - "WORK"
-  - "CARRY"
-  - "MOVE"
+  - "Creep Body"
+  - "JavaScript"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 

@@ -1,3 +1,4 @@
+
 ---
 title: "怎样让 Creep 自动升级 Controller？"
 description: "先创建 Upgrader1，再让它在 Source 与 Controller 之间往返，认识 upgradeController() 和最基础的状态切换。"
@@ -9,9 +10,14 @@ tags:
   - "新手入门"
   - "Controller"
   - "Upgrader"
-  - "upgradeController"
   - "Memory"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -144,3 +150,4 @@ module.exports.loop = function () {
 1. [Screeps Documentation：Room Controller Level](https://docs.screeps.com/control.html)
 2. [Screeps API Reference：Creep.upgradeController](https://docs.screeps.com/api/#Creep.upgradeController)
 3. [Screeps API Reference：Creep.memory](https://docs.screeps.com/api/#Creep.memory)
+

@@ -1,3 +1,4 @@
+
 ---
 title: "reserveController() 和 claimController() 有什么区别"
 description: "根据临时保留或永久占领目的选择 reserveController 与 claimController，并检查 CLAIM 部件和 GCL 前提，附完整检查顺序、最小代码和适用边界。"
@@ -7,18 +8,25 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps reserveController claimController 区别"
+  - "Controller"
+  - "CLAIM"
+  - "远程房间"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-本文处理的不是完整房间 AI，而是一个能明确验证的问题：根据临时保留或永久占领目的选择 reserveController 与 claimController，并检查 CLAIM 部件和 GCL 前提。
+远端中立 Controller 有两种不同目标：临时保留使用 `reserveController()`，永久占领使用 `claimController()`。两者都需要有效的 `CLAIM` 部件。
 
 ## 先确认边界
 
-现有 Controller 升级和 Safe Mode 页面只处理己方房间；本文只讨论中立 Controller 的两种控制动作。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+`reserveController()` 用于临时预定中立房间，`claimController()` 用于占领房间。选择动作前先确认目标 Controller 为中立，并检查 Creep 的有效 `CLAIM` 部件。
 
 ## 规则依据
 
@@ -71,7 +79,7 @@ module.exports.loop = function () {
 
 ## 限制
 
-示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+示例只比较两种 Controller 动作，不负责把 Creep 移动到远端房间，也不处理 GCL 规划或预定续期。
 
 ## 相关站内内容
 

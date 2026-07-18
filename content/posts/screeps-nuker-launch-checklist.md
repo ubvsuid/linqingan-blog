@@ -1,3 +1,4 @@
+
 ---
 title: "StructureNuker.launchNuke() 前要检查什么"
 description: "在显式一次性请求下检查目标坐标、距离、cooldown、Energy 和 Ghodium 后再调用 launchNuke，给出前提检查、完整示例和失败边界。"
@@ -7,14 +8,21 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps launchNuke"
+  - "Nuker"
+  - "防御"
+  - "高风险 API"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：在显式一次性请求下检查目标坐标、距离、cooldown、Energy 和 Ghodium 后再调用 launchNuke。
+`launchNuke()` 会产生不可逆的游戏动作。代码必须由一次性请求触发，并在执行前核对目标坐标、距离、`cooldown`、Energy 与 Ghodium。
 
 ## 先核对这些前提
 
@@ -82,7 +90,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+`launchNuke()` 是不可随意重复的高风险动作。示例只提供显式一次性入口和前置检查，不替玩家决定目标。
 
 ## 站内学习路径
 

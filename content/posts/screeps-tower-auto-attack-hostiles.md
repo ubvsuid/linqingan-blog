@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps Tower 怎么自动攻击敌人：FIND_HOSTILE_CREEPS 与 attack()"
 description: "用最小 JavaScript 示例让 Screeps Tower 查找并攻击房间内的非己方 Creep，检查 Energy、建筑可用性和 attack() 返回值。"
@@ -7,10 +8,16 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "Tower"
-  - "Defense"
+  - "防御"
   - "FIND_HOSTILE_CREEPS"
   - "JavaScript"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -200,3 +207,4 @@ Tower 还可以治疗 Creep 或维修建筑，但三类动作都会消耗它的 
 - [Screeps Documentation：Debugging](https://docs.screeps.com/debugging.html)
 
 资料核对日期：2026-07-18。代码仍需在 Screeps 环境验证。
+

@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps moveTo() 不移动怎么排查"
 description: "按目标、MOVE 部件、fatigue、返回值和路径条件排查 Creep 原地不动，按返回值和位置条件给出最小排查代码。"
@@ -7,14 +8,21 @@ category: "Screeps 错误排查"
 tags:
   - "Screeps"
   - "错误排查"
-  - "Screeps moveTo 不移动"
+  - "移动"
+  - "错误排查"
+  - "Creep API"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；对象、房间、资源和策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：按目标、MOVE 部件、fatigue、返回值和路径条件排查 Creep 原地不动。
+`moveTo()` 被调用后 Creep 仍停在原地，应先保存返回值，再检查目标、有效 `MOVE` 部件、`fatigue` 和路径条件。
 
 ## 第一项检查
 
@@ -67,7 +75,7 @@ module.exports.loop = function () {
 
 ## 文章边界
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+本文按目标、有效 `MOVE` 部件、`fatigue`、返回值和路径条件排查单只 Creep，不处理多人交通协调。
 
 ## 相关站内内容
 

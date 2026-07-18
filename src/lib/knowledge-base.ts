@@ -1,3 +1,4 @@
+
 export interface KnowledgeBaseSection {
   id: string;
   number: number;
@@ -136,4 +137,8 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
 export const knowledgeBaseSlugs = knowledgeBaseSections.flatMap((section) => [
   ...section.slugs,
 ]);
+
+export function getKnowledgeBaseSectionId(slug: string): string | null {
+  return knowledgeBaseSections.find((section) => section.slugs.includes(slug))?.id ?? null;
+}
 

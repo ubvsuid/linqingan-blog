@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 
 import { siteConfig } from "@/lib/site";
@@ -22,7 +23,7 @@ export function createPageMetadata({
     ? image.startsWith("http")
       ? image
       : `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`
-    : undefined;
+    : `${siteConfig.url}/opengraph-image`;
 
   return {
     title,
@@ -43,13 +44,14 @@ export function createPageMetadata({
       siteName: siteConfig.title,
       title,
       description,
-      images: imageUrl ? [{ url: imageUrl }] : undefined,
+      images: [{ url: imageUrl }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: [imageUrl],
     },
   };
 }
+

@@ -1,8 +1,9 @@
+
 ---
 title: "Screeps 是什么？一个用 JavaScript 控制单位的编程游戏"
 description: "Screeps 是什么？本文用简单易懂的方式介绍 Screeps: World 的游戏特点、Room、Source、Creep、Spawn、Controller，以及玩家在游戏中主要要做什么。"
 publishedAt: "2026-07-15"
-updatedAt: "2026-07-15"
+updatedAt: "2026-07-19"
 category: "Screeps 入门"
 tags:
   - "Screeps"
@@ -11,6 +12,12 @@ tags:
   - "Room"
   - "Creep"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: true
 ---
 
@@ -66,16 +73,37 @@ Screeps 的不同之处在于：**玩家不是一直用鼠标指挥单位，而�
 下面这段代码只做一件事：让一只名为 `Harvester1` 的单位寻找能量源并开始采集。
 
 ```javascript
-const creep = Game.creeps.Harvester1;
-const source = creep.room.find(FIND_SOURCES)[0];
+module.exports.loop = function () {
+  const creep = Game.creeps.Harvester1;
 
-if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-  creep.moveTo(source);
-}
+  if (!creep) {
+    console.log('没有找到 Harvester1');
+    return;
+  }
+
+  const source = creep.room.find(FIND_SOURCES)[0];
+
+  if (!source) {
+    console.log('当前房间没有找到 Source');
+    return;
+  }
+
+  const result = creep.harvest(source);
+
+  if (result === ERR_NOT_IN_RANGE) {
+    creep.moveTo(source);
+  } else if (result !== OK) {
+    console.log('harvest result:', result);
+  }
+};
 ```
 
 现在不需要看懂每一个单词。你只需要知道：在 Screeps 中，
 “寻找目标、判断距离、移动过去、开始采集”都可以由 JavaScript 控制。
+
+这段示例假设游戏中有一只名为 `Harvester1` 的 Creep。名称区分大小写，需要按照实际名称修改。
+
+这里直接使用搜索结果中的第一个 Source，只是为了展示最小代码。它不一定距离最近，也不适合作为长期目标选择方案。
 
 > **新手最容易遇到的情况**
 > 只写采集代码时，单位装满能量后可能会停下来。这不是游戏坏了，
@@ -96,25 +124,13 @@ Screeps: World 是一个持续运行的在线世界。玩家关闭网页以后�
 Screeps 中有很多建筑和资源，但第一篇文章不需要把它们全部记住。
 对新手来说，先认识下面五个对象就足够了。
 
-### Room：房间
-
-玩家的单位、资源和建筑所在的区域。
-
-### Source：能量源
-
-提供基础能量，是房间前期发展的起点。
-
-### Creep：单位
-
-由玩家代码控制，负责采集、运输、建造和升级。
-
-### Spawn：生产建筑
-
-使用能量创建新的 Creep。
-
-### Controller：房间控制器
-
-决定房间归属和发展等级。
+| 对象 | 简单理解 | 主要作用 |
+| --- | --- | --- |
+| Room | 游戏房间 | 容纳单位、建筑和资源 |
+| Source | 能量源 | 提供 Energy |
+| Creep | 玩家单位 | 执行采集、运输和升级 |
+| Spawn | 生产建筑 | 创建新的 Creep |
+| Controller | 房间控制器 | 决定归属和等级 |
 
 ### 1. Room：游戏发生的地方
 
@@ -215,3 +231,4 @@ Room 是这些事情发生的空间。理解这条简单关系后，
 
 > 本文是 Screeps 新手入门系列的第一篇，主要解决“它是什么”。
 > 游戏机制可能更新，精确规则请以 Screeps 官方文档为准。
+

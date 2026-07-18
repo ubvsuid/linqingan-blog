@@ -1,3 +1,4 @@
+
 ---
 title: "Game.rooms 为什么没有某个房间"
 description: "判断房间是否当前可见，并在 Game.rooms[roomName] 为 undefined 时安全退出，给出前提检查、完整示例和失败边界。"
@@ -7,14 +8,21 @@ category: "Screeps 常见问题"
 tags:
   - "Screeps"
   - "常见问题"
-  - "Screeps Game.rooms undefined"
+  - "视野"
+  - "Game API"
+  - "Room"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：判断房间是否当前可见，并在 Game.rooms[roomName] 为 undefined 时安全退出。
+`Game.rooms` 只包含当前可见的房间。用房间名读取结果可能是 `undefined`，因此访问 Controller、结构或 Source 前必须先判空。
 
 ## 先核对这些前提
 
@@ -67,7 +75,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+本文只解释 `Game.rooms[roomName]` 为 `undefined` 时如何安全退出，不负责主动获取或长期保存房间视野。
 
 ## 站内学习路径
 

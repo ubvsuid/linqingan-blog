@@ -1,3 +1,4 @@
+
 ---
 title: "StructureObserver.observeRoom() 怎么获取远方房间视野"
 description: "本 tick 发出 observeRoom 请求，并在下一 tick 通过 Game.rooms 读取目标房间，给出前提检查、完整示例和失败边界。"
@@ -7,14 +8,21 @@ category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Observer observeRoom"
+  - "Observer"
+  - "视野"
+  - "跨房间"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：本 tick 发出 observeRoom 请求，并在下一 tick 通过 Game.rooms 读取目标房间。
+`observeRoom()` 发出的观察请求不会在当前 tick 立刻填充 `Game.rooms`。正确流程是本 tick 请求目标房间，下一 tick 再读取视野。
 
 ## 先核对这些前提
 
@@ -71,7 +79,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+本文只观察一个明确房间，并在下一 tick 读取视野，不实现观察队列、Intel 数据库或跨 shard 侦察。
 
 ## 站内学习路径
 

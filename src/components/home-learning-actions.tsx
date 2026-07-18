@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -19,15 +20,13 @@ export function HomeLearningActions() {
       <div className="home-learning-links">
         <Link className="home-learning-primary" href={`/blog/${resumeSlug}`}>
           {hasProgress
-            ? `继续学习 · 第 ${resumeIndex} 篇`
-            : "开始学习 Screeps"}
+            ? `继续新手路线 · 第 ${resumeIndex} 篇`
+            : "开始新手路线"}
           <span aria-hidden="true">→</span>
         </Link>
-        {hasProgress ? (
-          <Link className="home-learning-secondary" href="/beginner">
-            查看学习路线
-          </Link>
-        ) : null}
+        <Link className="home-learning-secondary" href="/knowledge">
+          浏览全部知识库
+        </Link>
       </div>
       {hasProgress ? (
         <p>
@@ -113,3 +112,4 @@ export function HomeLearningActions() {
     </div>
   );
 }
+

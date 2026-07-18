@@ -1,3 +1,4 @@
+
 ---
 title: "多个 Source 时怎样选择最近可达目标"
 description: "用 findClosestByPath 选择当前有 Energy 且能找到路径的 Source，避免固定取数组第一项，附完整检查顺序、最小代码和适用边界。"
@@ -7,18 +8,25 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps 选择 Source"
+  - "Source"
+  - "寻路"
+  - "目标选择"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-本文处理的不是完整房间 AI，而是一个能明确验证的问题：用 findClosestByPath 选择当前有 Energy 且能找到路径的 Source，避免固定取数组第一项。
+房间有多个 Source 时，固定选择搜索数组第一项可能让 Creep 绕远路。`findClosestByPath()` 会从候选目标中选择当前可达且路径最近的一个。
 
 ## 先确认边界
 
-第一次采集文章只处理单一 Source 的基础动作；本文只比较目标选择方式。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+第一次采集文章固定取数组第一项；这里改用 `findClosestByPath()`，只从当前有 Energy 且能找到路径的 Source 中选择目标。
 
 ## 规则依据
 
@@ -62,7 +70,7 @@ module.exports.loop = function () {
 
 ## 限制
 
-示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+示例每 tick 重新选择 Source，适合解释路径选择。长期使用时可在 Memory 中保存目标 ID，并在目标失效后重新选择。
 
 ## 相关站内内容
 

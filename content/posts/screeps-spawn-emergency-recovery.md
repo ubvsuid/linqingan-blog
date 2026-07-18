@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps 房间断代后如何自动恢复第一只采集者"
 description: "当房间没有采集者时，检查 Spawn、现存角色和可用能量，再生成最小 WORK/CARRY/MOVE 采集者。"
@@ -7,12 +8,19 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps 断代恢复"
+  - "Spawn"
+  - "补员"
+  - "故障恢复"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-19。JavaScript 语法检查通过；Spawn 名称、角色字段和补员策略需要按实际环境确认，运行行为待 Screeps 环境验证。
 
 房间里最后一只采集者死亡后，普通的“按目标数量补员”逻辑可能因为顺序或能量预算不当而卡住。应急恢复代码只做一件事：当采集者数量为零时，优先尝试生成最小的 `[WORK, CARRY, MOVE]` 单位。
 

@@ -7,14 +7,20 @@ category: "Screeps 错误排查"
 tags:
   - "Screeps"
   - "错误排查"
-  - "Screeps ERR_NO_PATH"
+  - "错误码"
+  - "寻路"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：区分目标存在但不可达、路径搜索受限和出口被阻挡造成的 ERR_NO_PATH。
+`ERR_NO_PATH` 说明本次路径搜索没有找到可用路线。目标格不可达、出口受阻或路径选项过严，都可能触发它。
 
 ## 第一项检查
 
@@ -62,7 +68,7 @@ module.exports.loop = function () {
 
 ## 文章边界
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+本文只排查 `moveTo()` 返回 `ERR_NO_PATH` 的情况，不设计全局道路、交通优先级或跨房间缓存。
 
 ## 相关站内内容
 
@@ -74,4 +80,3 @@ module.exports.loop = function () {
 
 - [Creep.moveTo API](https://docs.screeps.com/api/#Creep.moveTo)
 - [PathFinder API](https://docs.screeps.com/api/#PathFinder)
-

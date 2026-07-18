@@ -1,24 +1,32 @@
+
 ---
 title: "RawMemory segments 怎么跨 tick 读取"
-description: "激活一个 segment，在下一 tick 检查可用性，安全解析 JSON 并写回字符串，提供变量完整的最小示例、边界和验证清单。"
+description: "激活一个 RawMemory segment，在下一 tick 检查可用性，安全解析 JSON 并把更新结果写回字符串。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps RawMemory segments"
+  - "RawMemory"
+  - "Memory"
+  - "Segments"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文激活一个 segment，在下一 tick 检查可用性，安全解析 JSON 并写回字符串。
 
 ## 先给结论
 
-Memory 入门处理常规 JSON 数据；本文只讲异步 segment 的激活时序和原始字符串。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+Segment 在本 tick 激活后，要到下一 tick 才能从 `RawMemory.segments` 读取。示例明确区分激活、等待、解析和写回四个步骤。
 
 ## 官方规则
 

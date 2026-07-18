@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps 中的 tick 是什么？为什么代码会不断运行"
 description: "写给 Screeps 新手的 tick 入门文章：用简单方式解释 tick、Game.time 和 module.exports.loop，以及代码为什么会不断执行。"
@@ -11,6 +12,12 @@ tags:
   - "Game.time"
   - "游戏循环"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -157,3 +164,4 @@ tick 是 Screeps 世界运行的基本节奏。
 
 > 本文是 Screeps 新手入门系列的第三篇，只介绍 tick 和基础游戏循环。
 > CPU、Memory、缓存与代码架构等内容会放到后续进阶分类中。
+

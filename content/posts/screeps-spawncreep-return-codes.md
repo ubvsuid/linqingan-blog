@@ -1,3 +1,4 @@
+
 ---
 title: "spawnCreep() 失败怎么查：按返回值定位问题"
 description: "保存 spawnCreep() 返回值，并根据名称、能量、身体和 Spawn 状态定位失败原因，给出最小代码、返回值检查和适用边界。"
@@ -7,14 +8,21 @@ category: "Screeps 错误排查"
 tags:
   - "Screeps"
   - "错误排查"
-  - "Screeps spawnCreep 返回值"
+  - "Spawn"
+  - "错误码"
+  - "Creep Body"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-遇到这个问题时，先不要继续增加角色系统或调度框架。本文只检查一件事：保存 spawnCreep() 返回值，并根据名称、能量、身体和 Spawn 状态定位失败原因。
+`spawnCreep()` 返回错误时，不要只观察 Spawn 动画。先保存返回值，再按 Creep 名称、房间可用能量、身体数组和 Spawn 是否忙碌逐项定位。
 
 ## 先给判断
 
@@ -28,7 +36,7 @@ featured: false
 
 ## 可放进 main 的最小示例
 
-运行前提：示例中的对象名称和房间条件需要按自己的环境修改。
+示例使用 `Spawn1` 并尝试创建固定名称；请按实际 Spawn 名称和命名规则修改。
 
 ```js
 module.exports.loop = function () {
@@ -64,7 +72,7 @@ module.exports.loop = function () {
 
 ## 适用范围
 
-本文不处理多房间调度、全局任务队列、性能排名或自动布局。示例来自官方 API 规则整理，未在用户的 Screeps 账号中运行。
+本文只按一次 `spawnCreep()` 的返回值定位失败原因，不实现角色配额、动态身体或补员优先级。
 
 ## 继续学习
 

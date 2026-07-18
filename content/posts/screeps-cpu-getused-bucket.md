@@ -1,24 +1,30 @@
 ---
 title: "Game.cpu.getUsed() 和 bucket 怎么监控 CPU"
-description: "测量一段代码在当前 tick 的 CPU 差值，并同时记录 limit、tickLimit 与 bucket，提供变量完整的最小示例、边界和验证清单。"
+description: "用 Game.cpu.getUsed() 测量一段代码在当前 tick 的 CPU 差值，并同时读取 limit、tickLimit 与 bucket。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps CPU getUsed bucket"
+  - "CPU"
+  - "运行诊断"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文用一段最小代码测量当前 tick 的 CPU 差值，并同时记录 `limit`、`tickLimit` 与 `bucket`。
 
 ## 先给结论
 
-本文只建立测量方法，不提供性能排名、固定优化阈值或虚构测试数据。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+本文只建立测量方法：在目标代码前后分别读取 `Game.cpu.getUsed()`，并同时输出当前 `limit`、`tickLimit` 和 `bucket`。
 
 ## 官方规则
 
@@ -74,4 +80,3 @@ module.exports.loop = function () {
 
 - [How does CPU limit work](https://docs.screeps.com/cpu-limit.html)
 - [Game.cpu API](https://docs.screeps.com/api/#Game-cpu)
-

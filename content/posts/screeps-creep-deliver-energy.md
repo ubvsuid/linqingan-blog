@@ -11,6 +11,12 @@ tags:
   - "运输能量"
   - "Spawn"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 

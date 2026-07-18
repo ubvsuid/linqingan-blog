@@ -1,24 +1,32 @@
+
 ---
 title: "Screeps 如何用 Extractor 开采 Mineral"
-description: "确认 Mineral、Extractor、冷却和 Creep 条件后调用 harvest(mineral)，用最小示例检查对象、资源、冷却与返回值。"
+description: "确认 Mineral、Extractor、mineralAmount、Extractor cooldown 和 Creep 容量后调用 harvest(mineral)，并处理移动与失败返回值。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Extractor Mineral"
+  - "Mineral"
+  - "Extractor"
+  - "资源采集"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-这类代码最容易出错的地方不是调用名称，而是前提没有满足。本文只解决：确认 Mineral、Extractor、冷却和 Creep 条件后调用 harvest(mineral)。
+Mineral 不能像 Source 一样在游戏前期直接开采。房间需要先达到相应等级并在 Mineral 位置建成 Extractor，采矿 Creep 也要有可用 `WORK` 部件和剩余容量。
 
 ## 先给检查顺序
 
-现有采集文章只从 Source 获取 Energy；本文只讲 RCL6 后的 Mineral 与 Extractor。先确认结构存在，再检查资源、容量、冷却和所有权，最后调用 API 并保存返回值。
+检查顺序是 Mineral 储量、Extractor 是否建成及其 `cooldown`、Creep 容量，最后调用 `harvest(mineral)` 并按返回值决定是否移动。
 
 ## 官方规则
 
@@ -28,7 +36,7 @@ featured: false
 
 ## 可放进 main 的最小示例
 
-示例中的房间、资源、数量和价格只是演示参数，发布前必须按自己的环境修改。
+示例使用名为 `Miner1` 的 Creep，并查找它所在房间的 Mineral 与己方 Extractor。Creep 名称需要按实际代码修改。
 
 ```js
 module.exports.loop = function () {
@@ -66,11 +74,11 @@ module.exports.loop = function () {
 2. mineralAmount 和 cooldown 检查。
 3. Creep 容量不足时不采集。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 不在每个 tick 无条件执行一次性市场或发送操作。
+5. `ERR_NOT_IN_RANGE` 时移动到 Mineral，其他错误输出返回值。
 
 ## 适用限制
 
-本文不预测价格，不承诺收益，不提供完整多房间物流。代码只经过语法和静态规则检查，待 Screeps 环境验证。
+本文只处理已建成 Extractor 后的基础采矿动作，不包含 Mineral 运输、Lab 反应链或销售策略。
 
 ## 相关站内内容
 

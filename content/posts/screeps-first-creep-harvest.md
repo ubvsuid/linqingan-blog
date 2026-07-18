@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps 新手入门：让第一只 Creep 移动并采集能量"
 description: "写给 Screeps 新手的第一段 Creep 控制教程：找到自己的 Creep 和 Source，让 Creep 自动靠近并开始采集能量。"
@@ -11,6 +12,12 @@ tags:
   - "采集能量"
   - "JavaScript"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -211,3 +218,4 @@ Source 暂时没有能量时，也需要等待它重新恢复。
 
 > 本文是 Screeps 新手入门系列的第四篇，只介绍最基础的 Creep 移动和采集。
 > 最近 Source 的选择、自动运输、角色分工、Memory 与性能优化会放到后续文章中。
+

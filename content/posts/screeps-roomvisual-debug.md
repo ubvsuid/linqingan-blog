@@ -1,3 +1,4 @@
+
 ---
 title: "RoomVisual 怎么画文字、圆和连线辅助调试"
 description: "用 room.visual.text、circle 和 line 标出 Creep 状态、目标与移动关系，给出前提检查、完整示例和失败边界。"
@@ -7,14 +8,21 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps RoomVisual"
+  - "RoomVisual"
+  - "调试"
+  - "可视化"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-如果只复制一行 API 调用，很难知道失败发生在哪个前提。本文的范围是：用 room.visual.text、circle 和 line 标出 Creep 状态、目标与移动关系。
+RoomVisual 可以把调试信息直接画在房间视图上。下面分别用 `text()`、`circle()` 和 `line()` 标出 Creep 状态、目标位置与两者关系。
 
 ## 先核对这些前提
 
@@ -69,7 +77,7 @@ module.exports.loop = function () {
 
 ## 边界和验证
 
-本文不包含自动化大系统、收益或战斗效果承诺。JavaScript 语法检查通过，游戏行为待 Screeps 环境验证。
+本文只用文字、圆和连线显示当前调试信息，不实现持久化日志或自动性能分析。
 
 ## 站内学习路径
 

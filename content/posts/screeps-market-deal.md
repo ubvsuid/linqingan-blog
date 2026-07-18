@@ -1,24 +1,32 @@
+
 ---
 title: "Game.market.deal() 怎么成交现有订单"
-description: "筛选一个现有卖单，限制成交量，检查 Credits、Terminal 和交易 Energy 后执行 deal，用最小示例检查对象、资源、冷却与返回值。"
+description: "在一次性开关下筛选现有卖单，限制成交量，核对 Credits、Terminal cooldown 与交易 Energy 后调用 Game.market.deal()。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps Game.market.deal"
+  - "市场"
+  - "交易"
+  - "Game API"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-这类代码最容易出错的地方不是调用名称，而是前提没有满足。本文只解决：筛选一个现有卖单，限制成交量，检查 Credits、Terminal 和交易 Energy 后执行 deal。
+`Game.market.deal()` 会真实消耗 Credits 或资源，不能在每个 tick 无条件执行。下面只有在 `Memory.market.buyHydrogen === true` 时才筛选卖单并尝试一次成交。
 
 ## 先给检查顺序
 
-Terminal.send 是房间间直接发送；createOrder 是发布自己的订单。本文只成交别人已有的订单。先确认结构存在，再检查资源、容量、冷却和所有权，最后调用 API 并保存返回值。
+成交前需要确认房间 Terminal 可用、订单仍有余量、成交金额不超过 Credits，并为交易 Energy 预留库存。代码还会把一次性开关在 `OK` 后关闭。
 
 ## 官方规则
 
@@ -32,6 +40,10 @@ Terminal.send 是房间间直接发送；createOrder 是发布自己的订单。
 
 ```js
 module.exports.loop = function () {
+  if (!Memory.market || Memory.market.buyHydrogen !== true) {
+    return;
+  }
+
   const room = Game.rooms.W1N1;
   if (!room || !room.terminal || room.terminal.cooldown > 0) {
     return;
@@ -64,6 +76,10 @@ module.exports.loop = function () {
 
   const result = Game.market.deal(order.id, amount, room.name);
   console.log('market deal result:', result);
+
+  if (result === OK) {
+    Memory.market.buyHydrogen = false;
+  }
 };
 ```
 
@@ -73,11 +89,11 @@ module.exports.loop = function () {
 2. 成交量不超过订单余量。
 3. Credits 与交易 Energy 分开检查。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 不在每个 tick 无条件执行一次性市场或发送操作。
+5. 只有返回 `OK` 才清除一次性请求，失败时可先检查日志再人工决定是否重试。
 
 ## 适用限制
 
-本文不预测价格，不承诺收益，不提供完整多房间物流。代码只经过语法和静态规则检查，待 Screeps 环境验证。
+本文只演示一次买入既有卖单的安全入口，不构成价格判断，也不覆盖自动选价、拆单或长期交易策略。
 
 ## 相关站内内容
 

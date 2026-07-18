@@ -1,24 +1,32 @@
+
 ---
 title: "StructureLink.transferEnergy() 怎么用"
-description: "在同一房间的两个 Link 之间发送 Energy，并检查 cooldown、源储量和目标容量，用最小示例检查对象、资源、冷却与返回值。"
+description: "在同一房间的两个 Link 之间发送 Energy，检查源 Link 储量、目标 Link 容量、cooldown 与 transferEnergy() 返回值。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps Link transferEnergy"
+  - "Link"
+  - "Energy"
+  - "物流"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；对象、房间、资源和策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-这类代码最容易出错的地方不是调用名称，而是前提没有满足。本文只解决：在同一房间的两个 Link 之间发送 Energy，并检查 cooldown、源储量和目标容量。
+Link 传输不需要 Creep 搬运，但源 Link 必须有 Energy、目标 Link 必须有空余容量，并且源 Link 的 `cooldown` 已归零。
 
 ## 先给检查顺序
 
-Creep transfer 页面处理单位送能；本文只讲 StructureLink 的远程同房间传输。先确认结构存在，再检查资源、容量、冷却和所有权，最后调用 API 并保存返回值。
+先取得同一房间内两个自己的 Link，再分别读取源储量、目标容量和源 Link 的 `cooldown`，最后保存 `transferEnergy()` 的返回值。
 
 ## 官方规则
 
@@ -28,7 +36,7 @@ Creep transfer 页面处理单位送能；本文只讲 StructureLink 的远程�
 
 ## 可放进 main 的最小示例
 
-示例中的房间、资源、数量和价格只是演示参数，发布前必须按自己的环境修改。
+示例使用 `W1N1` 中查找结果的前两个 Link。实际代码应按位置或保存的 ID 明确区分源 Link 与目标 Link。
 
 ```js
 module.exports.loop = function () {
@@ -65,11 +73,11 @@ module.exports.loop = function () {
 2. cooldown 为 0 才调用。
 3. amount 不超过源储量和目标空闲容量。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 不在每个 tick 无条件执行一次性市场或发送操作。
+5. 两个 Link 的顺序必须与房间布局一致，不能长期依赖数组顺序。
 
 ## 适用限制
 
-本文不预测价格，不承诺收益，不提供完整多房间物流。代码只经过语法和静态规则检查，待 Screeps 环境验证。
+本文只演示同房间两个 Link 的单次传输条件，不处理 Link 网络角色分配、优先级或跨房间物流。
 
 ## 相关站内内容
 

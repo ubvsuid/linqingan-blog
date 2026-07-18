@@ -1,24 +1,32 @@
+
 ---
 title: "Game.notify() 怎么发送限频提醒"
-description: "在 Controller 降级风险首次触发时发送通知，并用 Memory 和 groupInterval 控制重复提醒，提供变量完整的最小示例、边界和验证清单。"
+description: "在 Controller 降级风险首次触发时调用 Game.notify()，并用 Memory 与 groupInterval 控制重复提醒。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps Game.notify"
+  - "Game API"
+  - "通知"
+  - "运行诊断"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文在 Controller 降级风险首次触发时发送通知，并用 Memory 和 `groupInterval` 控制重复提醒。
 
 ## 先给结论
 
-Console 用于当前调试；本文只讲外部通知触发和限频，不建立完整告警平台。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+Console 适合当前调试；`Game.notify()` 用于把重要事件发送到账号通知渠道。示例只在 Controller 首次进入降级风险时触发，并用 Memory 防止重复提醒。
 
 ## 官方规则
 

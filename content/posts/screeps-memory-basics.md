@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps Memory 是什么？新手为什么需要使用 Memory"
 description: "从 tick、Game 对象和固定 Creep 名称出发，解释 Screeps Memory 如何跨 tick 保存 role、working 等简单状态，以及哪些内容不应该放进 Memory。"
@@ -11,6 +12,12 @@ tags:
   - "Creep"
   - "JavaScript"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: true
 ---
 
@@ -422,3 +429,4 @@ creep.memory.role = 'harvester';
 4. [Screeps API Reference：Game.getObjectById](https://docs.screeps.com/api/#Game.getObjectById)
 
 > 本文只介绍 Memory 的基础用途。RawMemory、Memory 解析成本、缓存和性能优化会放到更后面的专业内容中。
+

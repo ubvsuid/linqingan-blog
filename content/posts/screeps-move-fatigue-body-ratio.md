@@ -1,3 +1,4 @@
+
 ---
 title: "Creep 为什么走得慢：fatigue 与 MOVE 配比"
 description: "读取 fatigue 和有效身体部件，判断负载、地形与 MOVE 数量是否让移动变慢，按返回值和位置条件给出最小排查代码。"
@@ -7,14 +8,21 @@ category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps fatigue MOVE"
+  - "Creep Body"
+  - "移动"
+  - "疲劳"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：读取 fatigue 和有效身体部件，判断负载、地形与 MOVE 数量是否让移动变慢。
+Creep 有 `MOVE` 部件却走得很慢时，先读取 `fatigue`。负载、地形和有效 `MOVE` 数量共同决定疲劳积累与恢复速度。
 
 ## 第一项检查
 
@@ -65,7 +73,7 @@ module.exports.loop = function () {
 
 ## 文章边界
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+本文只读取 `fatigue`、负载和有效 `MOVE` 部件解释移动变慢，不给出适用于所有地形的固定身体比例。
 
 ## 相关站内内容
 

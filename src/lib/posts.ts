@@ -1,3 +1,4 @@
+
 import fs from "node:fs";
 import path from "node:path";
 
@@ -7,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
 import { isBeginnerSeriesPost } from "@/lib/beginner-series";
+import { getKnowledgeBaseSectionId } from "@/lib/knowledge-base";
 
 const postsDirectory = path.join(process.cwd(), "content", "posts");
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -22,6 +24,15 @@ export interface PostFrontmatter {
   cover?: string;
   draft: boolean;
   featured: boolean;
+  verification: VerificationStatus;
+}
+
+export interface VerificationStatus {
+  docsChecked: boolean;
+  syntaxChecked: boolean;
+  consoleTested: boolean;
+  liveTested: boolean;
+  checkedAt: string;
 }
 
 export interface PostSummary extends PostFrontmatter {
@@ -93,6 +104,23 @@ function parseFrontmatter(
     throw new Error(`${filePath}: cover 必须是字符串`);
   }
 
+  const verification = data.verification;
+  if (!verification || typeof verification !== "object" || Array.isArray(verification)) {
+    throw new Error(`${filePath}: frontmatter.verification 必须是对象`);
+  }
+  const verificationRecord = verification as Record<string, unknown>;
+  for (const field of ["docsChecked", "syntaxChecked", "consoleTested", "liveTested"]) {
+    if (typeof verificationRecord[field] !== "boolean") {
+      throw new Error(`${filePath}: verification.${field} 必须是布尔值`);
+    }
+  }
+  if (
+    typeof verificationRecord.checkedAt !== "string" ||
+    !datePattern.test(verificationRecord.checkedAt)
+  ) {
+    throw new Error(`${filePath}: verification.checkedAt 必须使用 YYYY-MM-DD`);
+  }
+
   return {
     title: data.title,
     description: data.description,
@@ -103,6 +131,13 @@ function parseFrontmatter(
     cover: data.cover as string | undefined,
     draft: data.draft === true,
     featured: data.featured === true,
+    verification: {
+      docsChecked: verificationRecord.docsChecked as boolean,
+      syntaxChecked: verificationRecord.syntaxChecked as boolean,
+      consoleTested: verificationRecord.consoleTested as boolean,
+      liveTested: verificationRecord.liveTested as boolean,
+      checkedAt: verificationRecord.checkedAt,
+    },
   };
 }
 
@@ -224,6 +259,7 @@ function toSummary(
     cover: post.cover,
     draft: post.draft,
     featured: post.featured,
+    verification: post.verification,
     readingMinutes: post.readingMinutes,
   };
 }
@@ -231,6 +267,15 @@ function toSummary(
 function normalizeTag(tag: string): string {
   return tag.normalize("NFKC").trim().toLocaleLowerCase("zh-CN");
 }
+
+const genericRecommendationTags = new Set([
+  "screeps",
+  "新手入门",
+  "基础工程",
+  "常见问题",
+  "错误排查",
+  "进阶开发",
+]);
 
 function markdownToSearchText(markdown: string): string {
   return markdown
@@ -272,16 +317,19 @@ export function getRelatedPosts(
   limit = 3,
 ): PostSummary[] {
   const sourceTags = new Set(post.tags.map(normalizeTag));
+  const sourceSection = getKnowledgeBaseSectionId(post.slug);
   const scored = getAllPosts()
     .filter((candidate) => candidate.slug !== post.slug)
     .map((candidate) => {
       const sharedTags = candidate.tags.filter((tag) =>
-        sourceTags.has(normalizeTag(tag)),
+        sourceTags.has(normalizeTag(tag)) &&
+        !genericRecommendationTags.has(normalizeTag(tag)),
       ).length;
+      const candidateSection = getKnowledgeBaseSectionId(candidate.slug);
       const score =
-        sharedTags * 4 +
-        (candidate.category === post.category ? 3 : 0) +
-        (candidate.featured ? 1 : 0);
+        sharedTags * 5 +
+        (sourceSection !== null && candidateSection === sourceSection ? 3 : 0) +
+        (candidate.category === post.category ? 2 : 0);
 
       return { candidate, score };
     })
@@ -292,9 +340,10 @@ export function getRelatedPosts(
           new Date(left.candidate.publishedAt).getTime(),
     );
 
-  const relevant = scored.filter((item) => item.score > 0);
-  const source = relevant.length >= limit ? relevant : scored;
-  return source.slice(0, limit).map((item) => item.candidate);
+  return scored
+    .filter((item) => item.score > 0)
+    .slice(0, limit)
+    .map((item) => item.candidate);
 }
 
 export function getSearchablePosts(): PostSearchDocument[] {
@@ -330,3 +379,4 @@ export async function getPostBySlug(
     tableOfContents,
   };
 }
+

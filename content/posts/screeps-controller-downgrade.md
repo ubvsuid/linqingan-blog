@@ -7,18 +7,24 @@ category: "Screeps 常见问题"
 tags:
   - "Screeps"
   - "常见问题"
-  - "Screeps Controller 降级"
+  - "Controller"
+  - "运行诊断"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；房间、对象、资源、阈值和一次性请求需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-本文处理的不是完整房间 AI，而是一个能明确验证的问题：读取 ticksToDowngrade，在低于自定阈值时让有 Energy 的 Upgrader 优先补充升级。
+Controller 的 `ticksToDowngrade` 低于房间策略阈值时，可以临时提高升级优先级，避免日常任务把降级风险继续拖延。
 
 ## 先确认边界
 
-自动升级文章讲日常 working 流程；本文只处理降级风险监控和紧急优先级。第一步始终是确认目标属于正确房间、对象存在，并保存关键动作返回值。
+自动升级文章讲日常 `working` 流程；这里改为监控 `ticksToDowngrade`，只有低于自定阈值时才提高升级优先级。
 
 ## 规则依据
 
@@ -70,7 +76,7 @@ module.exports.loop = function () {
 
 ## 限制
 
-示例只建立最小决策，不包含跨房间调度、战斗策略或性能数据。资料已核对，运行效果待 Screeps 环境验证。
+阈值是玩家策略，不是官方推荐值。示例只负责让一名有 Energy 的 Upgrader 应对当前房间的降级风险。
 
 ## 相关站内内容
 
@@ -82,4 +88,3 @@ module.exports.loop = function () {
 
 - [Control](https://docs.screeps.com/control.html)
 - [StructureController API](https://docs.screeps.com/api/#StructureController)
-

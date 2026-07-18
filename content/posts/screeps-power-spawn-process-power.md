@@ -1,24 +1,32 @@
+
 ---
 title: "StructurePowerSpawn.processPower() 怎么处理 Power"
-description: "检查 Power Spawn、Power、Energy、RCL 与返回值后执行一次 processPower，提供变量完整的最小示例、边界和验证清单。"
+description: "检查己方 Power Spawn、Power、Energy、RCL 与 processPower() 返回值后执行一次资源处理。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
   - "进阶开发"
-  - "Screeps processPower"
+  - "Power Spawn"
+  - "Power"
+  - "高级资源"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文检查 Power Spawn、Power、Energy、RCL 与返回值后执行一次 `processPower`。
 
 ## 先给结论
 
-本文只处理 Power 资源转化，不扩写 Power Bank、Power Creep 技能或 GPL 配置。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+`processPower()` 需要己方 Power Spawn 同时存有 Power 和 Energy，并满足房间等级要求。示例只检查这些前提和返回值。
 
 ## 官方规则
 

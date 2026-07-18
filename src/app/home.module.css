@@ -1,3 +1,4 @@
+
 .home {
   overflow: hidden;
 }
@@ -34,11 +35,13 @@
 }
 
 .learningSection,
+.knowledgeSection,
 .latestSection,
 .projectSection {
   padding: 108px 0;
 }
 
+.knowledgeSection,
 .latestSection,
 .projectSection {
   border-top: 1px solid var(--border);
@@ -151,6 +154,80 @@
   line-height: 1.65;
 }
 
+.knowledgeCard {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(360px, 1.1fr);
+  gap: clamp(36px, 7vw, 88px);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: clamp(32px, 6vw, 64px);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.knowledgeIntro h2 {
+  margin: 8px 0 0;
+  font-size: clamp(38px, 5.5vw, 66px);
+  line-height: 1.06;
+  letter-spacing: -.055em;
+}
+
+.knowledgeIntro > p:not(:first-child) {
+  max-width: 620px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.knowledgeStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin-top: 30px;
+}
+
+.knowledgeStats span {
+  color: var(--muted);
+}
+
+.knowledgeStats strong {
+  color: var(--foreground);
+  font-size: 28px;
+}
+
+.knowledgeIntro > a {
+  display: inline-flex;
+  margin-top: 34px;
+  font-weight: 680;
+}
+
+.knowledgeTopics {
+  display: grid;
+  align-content: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.knowledgeTopics li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+}
+
+.knowledgeTopics li:first-child {
+  border-top: 1px solid var(--border);
+}
+
+.knowledgeTopics span {
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
 .postGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -213,6 +290,7 @@
 
 @media (max-width: 900px) {
   .learningGrid,
+  .knowledgeCard,
   .projectCard {
     grid-template-columns: 1fr;
   }
@@ -240,6 +318,7 @@
   }
 
   .learningSection,
+  .knowledgeSection,
   .latestSection,
   .projectSection {
     padding: 76px 0;
@@ -265,3 +344,4 @@
     padding: 22px 20px;
   }
 }
+

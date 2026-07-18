@@ -1,24 +1,31 @@
+
 ---
 title: "Screeps Flag 怎么作为房间配置入口"
-description: "从 Game.flags 读取 Flag，并用 Flag.memory 保存一个明确任务和 Creep 名称，提供变量完整的最小示例、边界和验证清单。"
+description: "从 Game.flags 安全读取指定 Flag，并用 Flag.memory 保存一个明确任务和 Creep 名称。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
-  - "Screeps Game.flags"
+  - "Flag"
+  - "配置"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
 本文从 `Game.flags` 读取一个 Flag，并用 `Flag.memory` 保存明确的任务和 Creep 名称。
 
 ## 先给结论
 
-本文只把 Flag 当作可视配置入口，不构建全局任务系统，也不替代 Memory 入门。先检查对象和配置是否存在，再执行最小调用；可丢失状态与必须持久化的数据要分开。
+Flag 可以从房间视图中放置和移动，适合作为一个可见配置入口。示例读取指定 Flag，并把任务名称和 Creep 名称保存在该 Flag 的 Memory 中。
 
 ## 官方规则
 

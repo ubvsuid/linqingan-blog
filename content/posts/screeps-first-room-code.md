@@ -1,3 +1,4 @@
+
 ---
 title: "把前面学过的代码放到一起：第一份房间基础代码"
 description: "用固定名称整理 Harvester1、Upgrader1 和 Builder1，把创建、运输、升级、建造和维修放进一份新手可读代码。"
@@ -8,11 +9,15 @@ tags:
   - "Screeps"
   - "新手入门"
   - "房间代码"
-  - "Harvester"
-  - "Upgrader"
-  - "Builder"
   - "JavaScript"
+  - "自动化"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -253,3 +258,4 @@ module.exports.loop = function () {
 1. [Screeps API Reference](https://docs.screeps.com/api/)
 2. [Screeps Documentation：Room Controller Level](https://docs.screeps.com/control.html)
 3. [Screeps Documentation：Creeps](https://docs.screeps.com/creeps.html)
+

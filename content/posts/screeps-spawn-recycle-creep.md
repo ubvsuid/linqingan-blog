@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps recycleCreep() 怎么回收不再需要的 Creep"
 description: "让指定 Creep 靠近己方 Spawn，并保存 recycleCreep() 返回值，给出最小代码、返回值检查和适用边界。"
@@ -7,14 +8,21 @@ category: "Screeps 常见问题"
 tags:
   - "Screeps"
   - "常见问题"
-  - "Screeps recycleCreep"
+  - "Spawn"
+  - "Creep 生命周期"
+  - "Creep API"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
 
-遇到这个问题时，先不要继续增加角色系统或调度框架。本文只检查一件事：让指定 Creep 靠近己方 Spawn，并保存 recycleCreep() 返回值。
+`recycleCreep()` 由 Spawn 对相邻的己方 Creep 调用。目标还没走到 Spawn 旁边时，先让 Creep 移动；到达后再保存并检查回收返回值。
 
 ## 先给判断
 
@@ -28,7 +36,7 @@ featured: false
 
 ## 可放进 main 的最小示例
 
-运行前提：示例中的对象名称和房间条件需要按自己的环境修改。
+示例使用 `Spawn1` 和 `OldWorker1`；两个名称都必须改成实际对象名称。
 
 ```js
 module.exports.loop = function () {
@@ -58,7 +66,7 @@ module.exports.loop = function () {
 
 ## 适用范围
 
-本文不处理多房间调度、全局任务队列、性能排名或自动布局。示例来自官方 API 规则整理，未在用户的 Screeps 账号中运行。
+本文只回收一只明确指定的己方 Creep，不负责自动判断角色是否过剩或选择回收时机。
 
 ## 继续学习
 

@@ -1,3 +1,4 @@
+
 ---
 title: "Screeps 新手入门：认识游戏界面与第一个房间"
 description: "写给第一次进入 Screeps 的新手：认识房间视图、代码编辑器、Console，以及 Spawn、Source、Controller 和 Creep。"
@@ -11,6 +12,12 @@ tags:
   - "Room"
   - "Spawn"
 draft: false
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: false
+  liveTested: false
+  checkedAt: "2026-07-19"
 featured: false
 ---
 
@@ -137,3 +144,4 @@ Screeps 的学习不需要一次完成。每篇文章只认识一个新知识，
 2. [Screeps Documentation：Control](https://docs.screeps.com/control.html)
 
 > 本文是 Screeps 新手入门系列的第二篇，主要帮助读者认识游戏界面。游戏界面可能随版本更新而变化，实际位置请以当前客户端为准。
+
