@@ -14,7 +14,7 @@ featured: false
 
 > 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-本文不搭建大型框架，只把一个容易误解的工程问题说清楚：从 Game.flags 读取 Flag，并用 Flag.memory 保存一个明确任务和 Creep 名称。
+本文从 `Game.flags` 读取一个 Flag，并用 `Flag.memory` 保存明确的任务和 Creep 名称。
 
 ## 先给结论
 

@@ -14,7 +14,7 @@ featured: false
 
 > 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-本文不搭建大型框架，只把一个容易误解的工程问题说清楚：在 Controller 降级风险首次触发时发送通知，并用 Memory 和 groupInterval 控制重复提醒。
+本文在 Controller 降级风险首次触发时发送通知，并用 Memory 和 `groupInterval` 控制重复提醒。
 
 ## 先给结论
 

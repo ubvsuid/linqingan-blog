@@ -12,8 +12,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "contentcheck": "node scripts/content-check.mjs",
+    "routecheck": "node scripts/check-routes.mjs",
+    "codecheck": "node scripts/check-code-blocks.mjs",
     "smoke": "node scripts/smoke-test.mjs",
-    "check": "npm run contentcheck && npm run typecheck && npm run lint && npm run build"
+    "check": "npm run contentcheck && npm run routecheck && npm run codecheck && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -35,3 +37,4 @@
     "typescript": "^5.9.0"
   }
 }
+

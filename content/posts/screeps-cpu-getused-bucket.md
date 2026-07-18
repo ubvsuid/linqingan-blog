@@ -14,7 +14,7 @@ featured: false
 
 > 资料核对日期：2026-07-18。JavaScript 语法检查通过；示例中的房间、名称、Memory 配置、资源与策略参数需要按实际环境替换，运行行为待 Screeps 环境验证。
 
-本文不搭建大型框架，只把一个容易误解的工程问题说清楚：测量一段代码在当前 tick 的 CPU 差值，并同时记录 limit、tickLimit 与 bucket。
+本文用一段最小代码测量当前 tick 的 CPU 差值，并同时记录 `limit`、`tickLimit` 与 `bucket`。
 
 ## 先给结论
 

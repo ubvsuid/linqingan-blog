@@ -18,7 +18,7 @@ featured: false
 
 ## 先给判断
 
-renewCreep 延长寿命，spawnCreep 创建单位；本文只处理主动回收。第一项检查是确认代码拿到的对象确实存在，再保存关键 API 的返回值。没有返回值，画面上的“没反应”很难区分是距离、资源、所有权还是目标问题。
+`renewCreep` 延长寿命，`spawnCreep` 创建单位；本文只处理主动回收。先确认 Spawn 与目标 Creep 都存在，再根据 `recycleCreep` 的返回值决定是否移动。
 
 ## 需要知道的规则
 
@@ -47,15 +47,14 @@ module.exports.loop = function () {
 };
 ```
 
-这段代码的重点不是架构，而是让每个可能为空的对象都有检查，并把关键调用结果保留下来。
+回收动作由 Spawn 调用，目标必须是己方 Creep 且位于相邻格；距离不足时才由 Creep 向 Spawn 移动。
 
 ## 按顺序排查
 
 1. Spawn 与 Creep 均检查 undefined。
 2. 保存 recycleCreep 返回值。
-3. 只在 ERR_NOT_IN_RANGE 时移动。
-4. 返回 `ERR_NOT_IN_RANGE` 时只安排移动，下一 tick 再调用动作。
-5. 返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和冷却条件。
+3. 返回 `ERR_NOT_IN_RANGE` 时只安排移动，下一 tick 再调用回收。
+4. 返回 `ERR_NOT_OWNER` 时检查 Spawn 与 Creep 所有权；返回 `ERR_INVALID_TARGET` 时确认传入的是 Creep。
 
 ## 适用范围
 

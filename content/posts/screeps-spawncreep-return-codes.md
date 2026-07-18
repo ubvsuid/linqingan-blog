@@ -18,7 +18,7 @@ featured: false
 
 ## 先给判断
 
-现有 spawnCreep 入门负责第一次创建；本文不重复参数教学，只给诊断顺序。第一项检查是确认代码拿到的对象确实存在，再保存关键 API 的返回值。没有返回值，画面上的“没反应”很难区分是距离、资源、所有权还是目标问题。
+现有 spawnCreep 入门负责第一次创建；本文不重复参数教学，只按 Spawn 状态、名称、能量、body 与返回值给出诊断顺序。
 
 ## 需要知道的规则
 
@@ -52,15 +52,15 @@ module.exports.loop = function () {
 };
 ```
 
-这段代码的重点不是架构，而是让每个可能为空的对象都有检查，并把关键调用结果保留下来。
+`dryRun` 只检查能否生成，不会开始生产。检查通过后仍应保存实际 `spawnCreep` 的返回值，因为同一 tick 的其他逻辑可能已经改变了 Spawn 状态。
 
 ## 按顺序排查
 
 1. 先检查 Spawn、spawning 和重名。
 2. 先用 dryRun 保存返回值。
 3. 实际创建也保存返回值。
-4. 返回 `ERR_NOT_IN_RANGE` 时只安排移动，下一 tick 再调用动作。
-5. 返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和冷却条件。
+4. `ERR_NAME_EXISTS` 检查名称；`ERR_BUSY` 检查 `spawn.spawning`。
+5. `ERR_NOT_ENOUGH_ENERGY` 检查房间可用能量；`ERR_INVALID_ARGS` 检查 body、名称和 options。`spawnCreep` 不会返回 `ERR_NOT_IN_RANGE`。
 
 ## 适用范围
 

@@ -1,4 +1,5 @@
 import { getAllPosts } from "@/lib/posts";
+import fixedTagSlugs from "@/lib/tag-slugs.json";
 
 export interface TagRecord {
   name: string;
@@ -7,11 +8,14 @@ export interface TagRecord {
 }
 
 export function tagToSlug(tag: string): string {
-  return tag
-    .normalize("NFKC")
-    .trim()
+  const normalizedTag = tag.normalize("NFKC").trim();
+  const fixedSlug = (fixedTagSlugs as Record<string, string>)[normalizedTag];
+
+  if (fixedSlug) return fixedSlug;
+
+  return normalizedTag
     .toLocaleLowerCase("zh-CN")
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
 
@@ -39,3 +43,4 @@ export function getTagRecord(slug: string): TagRecord | undefined {
 export function getPostsForTag(slug: string) {
   return getAllPosts().filter((post) => post.tags.some((tag) => tagToSlug(tag) === slug));
 }
+

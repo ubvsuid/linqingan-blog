@@ -1,4 +1,3 @@
-
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
@@ -6,12 +5,17 @@ const checks = [
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "60"]],
-  ["/knowledge", ["Screeps知识库", "8 个主题组"]],
+  ["/knowledge", ["Screeps知识库", "知识库主题导航"]],
   ["/resources", ["资料中心", "站内搜索"]],
   ["/search", ["搜索整个网站", "错误码"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
   ["/screeps-errors", ["ERR_NOT_IN_RANGE", "建议排查顺序"]],
   ["/tags", ["文章标签", "Screeps"]],
+  ["/tags/beginner", ["新手入门", "当前共有"]],
+  ["/tags/basic-engineering", ["基础工程", "当前共有"]],
+  ["/tags/common-questions", ["常见问题", "当前共有"]],
+  ["/tags/debugging", ["错误排查", "当前共有"]],
+  ["/tags/advanced-development", ["进阶开发", "当前共有"]],
   ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
   ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
   ["/blog/screeps-introduction", ["发布于", "把这篇内容连接到下一步"]],
@@ -21,8 +25,10 @@ const checks = [
   ["/blog/screeps-controller-activate-safe-mode", ["Safe Mode 怎么开启", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-spawn-renew-creep", ["renewCreep() 怎么用", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-clean-dead-creep-memory", ["清理死亡 Creep 的 Memory", "待 Screeps 环境验证"]],
+  ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
+  ["/blog/screeps-spawn-emergency-recovery", ["房间断代后如何自动恢复第一只采集者", "不会返回", "ERR_NOT_IN_RANGE"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "待 Screeps 环境验证"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/about"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
 ];
 
 async function waitForServer() {
@@ -66,11 +72,40 @@ for (const [pathname, expectedTexts] of checks) {
   }
 }
 
+const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
+const sitemapBody = await sitemapResponse.text();
+const sitemapUrls = [
+  ...new Set(
+    [...sitemapBody.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
+      match[1].replaceAll("&amp;", "&"),
+    ),
+  ),
+];
+
+for (let index = 0; index < sitemapUrls.length; index += 10) {
+  const batch = sitemapUrls.slice(index, index + 10);
+  const results = await Promise.all(
+    batch.map(async (url) => {
+      const parsed = new URL(url);
+      const response = await fetch(`${baseUrl}${parsed.pathname}${parsed.search}`, {
+        redirect: "manual",
+      });
+      return { url, status: response.status };
+    }),
+  );
+
+  for (const result of results) {
+    if (result.status !== 200) {
+      failures.push(`Sitemap URL ${result.url}: 预期 200，实际 ${result.status}`);
+    }
+  }
+}
+
 if (failures.length > 0) {
   for (const failure of failures) console.error(`ERROR: ${failure}`);
   console.error(`\n冒烟测试失败：${failures.length} 项。`);
   process.exit(1);
 }
 
-console.log(`冒烟测试通过：${checks.length} 个关键页面。`);
+console.log(`冒烟测试通过：${checks.length} 个关键页面，${sitemapUrls.length} 个 Sitemap URL。`);
 

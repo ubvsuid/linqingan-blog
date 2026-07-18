@@ -18,7 +18,7 @@ featured: false
 
 ## 先给判断
 
-harvest 从 Source 产生 Energy，withdraw 从容器取资源；本文只处理 Resource 掉落物。第一项检查是确认代码拿到的对象确实存在，再保存关键 API 的返回值。没有返回值，画面上的“没反应”很难区分是距离、资源、所有权还是目标问题。
+harvest 从 Source 采集 Energy，withdraw 从容器取资源；本文只处理地面上的 Resource 掉落物。先确认 Creep 仍有容量，再筛选最近可达的 `RESOURCE_ENERGY`。
 
 ## 需要知道的规则
 
@@ -53,15 +53,15 @@ module.exports.loop = function () {
 };
 ```
 
-这段代码的重点不是架构，而是让每个可能为空的对象都有检查，并把关键调用结果保留下来。
+目标每个 tick 都重新查找，因为掉落物可能被捡完或衰减消失。`pickup` 的返回值只用于处理当前这个 Resource，不应套用其他 API 的排错条件。
 
 ## 按顺序排查
 
 1. 只筛选 RESOURCE_ENERGY。
 2. 容量满时不调用 pickup。
 3. 保存并处理 pickup 返回值。
-4. 返回 `ERR_NOT_IN_RANGE` 时只安排移动，下一 tick 再调用动作。
-5. 返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和冷却条件。
+4. 返回 `ERR_NOT_IN_RANGE` 时移动到掉落物附近，下一 tick 再尝试拾取。
+5. 返回 `ERR_FULL` 时检查容量；返回 `ERR_INVALID_TARGET` 时重新查找当前仍存在的 Resource。
 
 ## 适用范围
 

@@ -1,8 +1,8 @@
 ---
 title: "Game.getObjectById() 怎么配合 Memory 保存目标"
-description: "把对象 ID 存入 Memory，并在每个 tick 重新取得当前游戏对象，给出最小代码、返回值检查和适用边界。"
+description: "把对象 ID 存入 Memory，并在每个 tick 重新取得当前游戏对象；同时处理首次选择、目标失效与不可见房间。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -12,82 +12,92 @@ draft: false
 featured: false
 ---
 
-> 资料核对日期：2026-07-18。本文示例只经过 JavaScript 语法与静态 API 检查；对象名称、房间、资源和策略参数需要按实际环境修改，运行行为待 Screeps 环境验证。
+> 资料核对日期：2026-07-19。JavaScript 语法检查通过；对象名称、房间视野和目标选择策略需要按实际环境确认，运行行为待 Screeps 环境验证。
 
-遇到这个问题时，先不要继续增加角色系统或调度框架。本文只检查一件事：把对象 ID 存入 Memory，并在每个 tick 重新取得当前游戏对象。
+Screeps 的游戏对象不能直接跨 tick 保存在 Memory 中。需要长期记住 Source、Structure 或其他对象时，保存它的 `id`，下一 tick 再用 `Game.getObjectById()` 取回当前对象。
 
-## 先给判断
+## 保存 ID，而不是保存对象
 
-Memory 入门只提醒不要保存完整对象；本文专门处理首次选择、ID 失效和重新选择。第一项检查是确认代码拿到的对象确实存在，再保存关键 API 的返回值。没有返回值，画面上的“没反应”很难区分是距离、资源、所有权还是目标问题。
+Memory 适合保存字符串、数字、布尔值、数组和普通对象。Source 这样的游戏对象由当前 tick 提供，应该这样处理：
 
-## 需…1346 tokens truncated…码。  
-**Slug：** `screeps-moveto-not-moving`  
-**分类：** 错误排查  
-**主关键词：** Screeps moveTo 不移动
+1. 首次选择目标并保存 `target.id`。
+2. 后续 tick 读取 ID。
+3. 调用 `Game.getObjectById(id)` 取得当前对象。
+4. 返回 `null` 时删除旧 ID，并重新选择目标。
 
-画面上“单位没走”只是结果，不能直接说明原因。本文把范围限制在：按目标、MOVE 部件、fatigue、返回值和路径条件排查 Creep 原地不动。
+官方 API 还说明：只有当前可见房间中的对象能够通过 ID 取得。因此返回 `null` 不一定表示对象已经被摧毁，也可能是对应房间当前没有视野。
 
-## 第一项检查
-
-先确认目标对象存在，再把相关方法的返回值写进变量。新手采集页只演示距离太远时调用 moveTo；本文只解决 moveTo 已调用但单位不动。
-
-## 官方规则中的关键点
-
-- Creep.fatigue 大于 0 时不能移动。
-- 没有有效 MOVE 部件会影响移动能力。
-- moveTo 返回错误常量时必须先处理返回值，而不是只看画面。
-
-## 最小完整示例
-
-代码放在 `main` 模块；名称和目标需要按自己的房间修改。
+## 可放进 main 的最小示例
 
 ```js
+function getSourceForCreep(creep) {
+  let source = null;
+
+  if (creep.memory.sourceId) {
+    source = Game.getObjectById(creep.memory.sourceId);
+  }
+
+  if (!source) {
+    delete creep.memory.sourceId;
+
+    source = creep.pos.findClosestByPath(FIND_SOURCES);
+    if (!source) {
+      return null;
+    }
+
+    creep.memory.sourceId = source.id;
+  }
+
+  return source;
+}
+
 module.exports.loop = function () {
-  const creep = Game.creeps.Scout1;
-  const target = Game.flags.MoveTarget;
-
-  if (!creep || !target) {
+  const creep = Game.creeps.Harvester1;
+  if (!creep) {
     return;
   }
 
-  if (creep.getActiveBodyparts(MOVE) === 0) {
-    console.log('Scout1 没有可用的 MOVE 部件');
+  const source = getSourceForCreep(creep);
+  if (!source) {
+    console.log('Harvester1 没有找到可达的 Source');
     return;
   }
 
-  if (creep.fatigue > 0) {
-    console.log('Scout1 fatigue:', creep.fatigue);
-    return;
+  const result = creep.harvest(source);
+  if (result === ERR_NOT_IN_RANGE) {
+    creep.moveTo(source);
+  } else if (result !== OK) {
+    console.log('harvest result:', result);
   }
-
-  const result = creep.moveTo(target, {
-    reusePath: 5,
-    visualizePathStyle: { stroke: '#ffffff' }
-  });
-  console.log('moveTo result:', result);
 };
 ```
 
-## 排查顺序
+## 为什么每个 tick 都要重新取对象
 
-1. 目标 Flag 与 Creep 都检查。
-2. 检查可用 MOVE 部件与 fatigue。
-3. 保存 moveTo 返回值并画出计划路径。
-4. 确认目标位置是否可站立，动作目标不可站立时使用正确的距离范围。
-5. 临时输出返回值和关键状态，确认问题后再删减日志。
+Memory 中的 `sourceId` 只是字符串。`Game.getObjectById()` 返回的对象才属于当前 tick，可以安全读取位置、能量和其他属性。不要把取得的 Source 对象再次写回 Memory。
 
-## 文章边界
+示例在取回失败时删除旧 ID，再从当前房间选择 Source。对跨房间目标，应先恢复视野，再判断目标是否真的失效，避免因为暂时不可见而频繁改写任务。
 
-本文不提供完整交通系统、自动布局或 CPU 优化结论。没有真实环境材料，路径与移动效果待 Screeps 环境验证。
+## 常见错误
 
-## 相关站内内容
+1. 把完整 Source 或 Structure 写进 Memory。序列化后的数据不是下一 tick 的实时游戏对象。
+2. 不处理 `null`。目标消失或房间不可见时，后续读取属性会报错。
+3. 每个 tick 都重新寻路选择目标。已有有效 ID 时应直接复用，减少无意义的重复选择。
+4. 把 `getObjectById()` 的 `null` 当成动作错误码。它返回对象或 `null`，不是 `OK`、`ERR_NOT_IN_RANGE` 这类常量。
+5. 使用旧 ID 后不清理。重新选择前先删除失效字段，避免其他逻辑继续读取。
 
-- [Creep 身体部件](/blog/screeps-creep-body-parts)
+## 适用边界
+
+这个模式适合保存 Source、Structure、ConstructionSite 等具有稳定 ID 的对象。Flag 使用名称访问，Room 使用房间名访问；不同对象应选择与官方 API 一致的标识方式。
+
+## 继续学习
+
+- [Memory 基础用法](/blog/screeps-memory-basics)
+- [Game.rooms 为什么没有某个房间](/blog/screeps-room-visibility)
 - [第一次移动与采集](/blog/screeps-first-creep-harvest)
-- [tick 与主循环](/blog/screeps-tick-and-game-loop)
 
 ## 官方资料
 
-- [Creep.moveTo API](https://docs.screeps.com/api/#Creep.moveTo)
-- [Creeps：Movement](https://docs.screeps.com/creeps.html)
+- [Game.getObjectById API](https://docs.screeps.com/api/#Game.getObjectById)
+- [Memory API](https://docs.screeps.com/api/#Memory)
 

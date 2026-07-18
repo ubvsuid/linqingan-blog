@@ -47,6 +47,27 @@ for (const fileName of files) {
   const source = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(source);
 
+  if (source.includes("tokens truncated")) {
+    addError(`${fileName}: 正文包含工具截断残留`);
+  }
+
+  for (const residue of [
+    "这段代码的重点不是架构，而是让每个可能为空的对象都有检查，并把关键调用结果保留下来。",
+    "返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和冷却条件。",
+  ]) {
+    if (content.includes(residue)) addError(`${fileName}: 正文包含跨主题模板残留`);
+  }
+
+  const levelTwoHeadings = [...content.matchAll(/^##\s+(.+)$/gm)].map((match) =>
+    match[1].trim(),
+  );
+  const duplicateHeadings = levelTwoHeadings.filter(
+    (heading, index) => levelTwoHeadings.indexOf(heading) !== index,
+  );
+  if (duplicateHeadings.length > 0) {
+    addError(`${fileName}: 二级标题重复 ${[...new Set(duplicateHeadings)].join(", ")}`);
+  }
+
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     addError(`${fileName}: slug 只能使用小写字母、数字和连字符`);
   }

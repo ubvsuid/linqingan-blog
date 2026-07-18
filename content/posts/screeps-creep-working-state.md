@@ -18,7 +18,7 @@ featured: false
 
 ## 先给判断
 
-Memory 入门解释 working 是自定义字段；本文给出完整状态切换和动作分支。第一项检查是确认代码拿到的对象确实存在，再保存关键 API 的返回值。没有返回值，画面上的“没反应”很难区分是距离、资源、所有权还是目标问题。
+Memory 入门解释 working 是自定义字段；本文给出完整状态切换和动作分支。先检查 Energy 是否为空或已满，再分别确认 Source、Controller 和动作返回值。
 
 ## 需要知道的规则
 
@@ -66,15 +66,15 @@ module.exports.loop = function () {
 };
 ```
 
-这段代码的重点不是架构，而是让每个可能为空的对象都有检查，并把关键调用结果保留下来。
+状态只在“空”和“满”两个边界切换；Energy 处于中间值时保持原状态。采集与升级分别处理距离，避免同一 tick 同时安排两类动作。
 
 ## 按顺序排查
 
 1. 空时切到取能、满时切到工作。
 2. source 和 controller 都检查 undefined。
 3. 保存 harvest 与 upgradeController 返回值。
-4. 返回 `ERR_NOT_IN_RANGE` 时只安排移动，下一 tick 再调用动作。
-5. 返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和冷却条件。
+4. `harvest` 或 `upgradeController` 返回 `ERR_NOT_IN_RANGE` 时只安排移动。
+5. 其他返回值分别对照对应 API，重点检查 Source 状态、Creep 的 WORK 部件、Energy 和 Controller 所有权。
 
 ## 适用范围
 
