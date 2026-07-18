@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 import { Container } from "@/components/container";
@@ -16,7 +17,7 @@ export const metadata = createPageMetadata({
 const resources = [
   {
     eyebrow: "KNOWLEDGE BASE",
-    title: "60 篇 Screeps 中文知识库",
+    title: "Screeps知识库",
     description: "按 8 个主题组浏览完整教程，每篇只解决一个主要搜索意图。",
     href: "/knowledge",
     count: "60 篇文章",

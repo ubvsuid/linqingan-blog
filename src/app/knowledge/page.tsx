@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 import { Container } from "@/components/container";
@@ -6,7 +7,7 @@ import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
 
 export const metadata = createPageMetadata({
-  title: "Screeps 中文知识库",
+  title: "Screeps知识库",
   description: "60 篇互不重复的 Screeps 中文教程，按入门、Memory、Spawn、资源经济、寻路、防御、高级资源与运行诊断分组。",
   path: "/knowledge",
 });
@@ -20,7 +21,7 @@ export default function KnowledgePage() {
       <Container>
         <header className="page-header knowledge-header">
           <p className="eyebrow">SCREEPS KNOWLEDGE BASE</p>
-          <h1>60 篇 Screeps 中文知识库</h1>
+          <h1>Screeps知识库</h1>
           <p>
             每篇只解决一个主要问题。建议第一次学习从第 1 组开始；遇到具体报错或 API 问题时，直接进入对应主题组。
           </p>

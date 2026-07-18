@@ -1,3 +1,4 @@
+
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
@@ -5,7 +6,7 @@ const checks = [
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "60"]],
-  ["/knowledge", ["60 篇 Screeps 中文知识库", "8 个主题组"]],
+  ["/knowledge", ["Screeps知识库", "8 个主题组"]],
   ["/resources", ["资料中心", "站内搜索"]],
   ["/search", ["搜索整个网站", "错误码"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
