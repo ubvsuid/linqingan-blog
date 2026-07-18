@@ -10,6 +10,17 @@ const sitePath = path.join(root, "src", "lib", "site.ts");
 const errors = [];
 const warnings = [];
 
+const descriptionTemplatePhrases = [
+  "附完整检查顺序",
+  "最小代码和适用边界",
+  "完整示例和失败边界",
+  "按返回值和位置条件",
+  "给出前提检查",
+  "提供变量完整的最小示例",
+];
+
+const descriptionRecords = [];
+
 const articleRules = {
   "screeps-storage-energy-usage": {
     forbidden: ["预测价格", "承诺收益", "订单", "市场操作", "交易 Energy"],
@@ -18,6 +29,94 @@ const articleRules = {
   "screeps-clean-dead-creep-memory": {
     forbidden: ["ERR_NOT_IN_RANGE", "cooldown", "目标容量"],
     required: ["Memory.creeps", "Game.creeps", "delete"],
+  },
+  "screeps-roomvisual-debug": {
+    forbidden: [
+      "一次性高影响动作",
+      "市场操作",
+      "交易 Energy",
+      "保存动作返回值",
+      "动作错误常量",
+    ],
+    required: ["每个 tick", "visual", "text", "circle", "line", "CPU"],
+  },
+  "screeps-tower-heal-creeps": {
+    forbidden: ["ERR_NOT_IN_RANGE"],
+    required: [
+      "FIND_MY_CREEPS",
+      "hitsMax",
+      "tower.heal",
+      "findClosestByRange",
+      "ERR_NOT_OWNER",
+      "ERR_NOT_ENOUGH_ENERGY",
+      "ERR_INVALID_TARGET",
+      "ERR_RCL_NOT_ENOUGH",
+    ],
+  },
+  "screeps-rawmemory-segments": {
+    forbidden: ["本 tick 写入后立即从目标 Segment 读取"],
+    required: ["RawMemory.segments", "setActiveSegments", "下一 tick", "JSON"],
+  },
+  "screeps-lab-run-reaction": {
+    required: ["runReaction", "REACTIONS", "cooldown", "ERR_RCL_NOT_ENOUGH"],
+  },
+  "screeps-lab-boost-creep": {
+    required: ["boostCreep", "mineralType", "body", "ERR_RCL_NOT_ENOUGH"],
+  },
+  "screeps-factory-produce": {
+    required: ["COMMODITIES", "produce", "cooldown", "level"],
+  },
+  "screeps-power-spawn-process-power": {
+    required: ["processPower", "RESOURCE_POWER", "RESOURCE_ENERGY", "ERR_RCL_NOT_ENOUGH"],
+  },
+  "screeps-observer-observe-room": {
+    required: ["observeRoom", "下一 tick", "Game.rooms", "ERR_RCL_NOT_ENOUGH"],
+  },
+  "screeps-market-deal": {
+    required: [
+      "Memory.market",
+      "Game.market.credits",
+      "calcTransactionCost",
+      "result === OK",
+      "失败后必须人工",
+      "真实消耗 Credits",
+    ],
+  },
+  "screeps-market-create-order": {
+    required: [
+      "Memory.market",
+      "Game.market.orders",
+      "result === OK",
+      "失败后必须人工",
+      "Credits 费用",
+    ],
+  },
+  "screeps-terminal-send-resources": {
+    required: [
+      "Memory.terminal",
+      "calcTransactionCost",
+      "result === OK",
+      "失败后必须人工",
+      "真实发送",
+    ],
+  },
+  "screeps-controller-activate-safe-mode": {
+    required: [
+      "Memory.safeModeRequest",
+      "delete Memory.safeModeRequest",
+      "失败后",
+      "激活次数",
+      "Console",
+    ],
+  },
+  "screeps-nuker-launch-checklist": {
+    required: [
+      "Memory.nuker",
+      "result === OK",
+      "失败后必须人工",
+      "不可逆",
+      "RESOURCE_GHODIUM",
+    ],
   },
 };
 
@@ -63,6 +162,42 @@ function addOccurrence(map, text, fileName) {
   if (!normalized) return;
   if (!map.has(normalized)) map.set(normalized, new Set());
   map.get(normalized).add(fileName);
+}
+
+function normalizeDescription(value) {
+  const screepsObjects = [
+    "Screeps", "RoomVisual", "PowerCreep", "Controller", "Structure", "Terminal",
+    "Factory", "Observer", "Nuker", "Rampart", "Storage", "Source", "Spawn",
+    "Tower", "Creep", "RoomPosition", "PathFinder", "RawMemory", "Memory",
+    "Energy", "Lab", "Wall", "Flag", "Game", "CPU",
+  ];
+  let normalized = String(value ?? "").normalize("NFKC").toLowerCase();
+  for (const objectName of screepsObjects) {
+    normalized = normalized.replaceAll(objectName.toLowerCase(), "");
+  }
+  return normalized
+    .replace(/[a-z][a-z0-9_.]*(?:\(\))?/gi, "")
+    .replace(/[0-9０-９]/g, "")
+    .replace(/[^\p{Script=Han}]/gu, "");
+}
+
+function bigramDice(left, right) {
+  if (left.length < 2 || right.length < 2) return 0;
+  const leftPairs = new Map();
+  for (let index = 0; index < left.length - 1; index += 1) {
+    const pair = left.slice(index, index + 2);
+    leftPairs.set(pair, (leftPairs.get(pair) ?? 0) + 1);
+  }
+  let overlap = 0;
+  for (let index = 0; index < right.length - 1; index += 1) {
+    const pair = right.slice(index, index + 2);
+    const remaining = leftPairs.get(pair) ?? 0;
+    if (remaining > 0) {
+      overlap += 1;
+      leftPairs.set(pair, remaining - 1);
+    }
+  }
+  return (2 * overlap) / (left.length + right.length - 2);
 }
 
 const files = fs
@@ -112,12 +247,20 @@ for (const fileName of files) {
 
   const rule = articleRules[slug];
   if (rule) {
-    for (const forbidden of rule.forbidden) {
-      if (content.includes(forbidden)) {
+    for (const forbidden of rule.forbidden ?? []) {
+      const matchingLines = content
+        .split("\n")
+        .filter((line) => line.includes(forbidden));
+      const onlyExplicitNegation =
+        slug === "screeps-tower-heal-creeps" &&
+        forbidden === "ERR_NOT_IN_RANGE" &&
+        matchingLines.length > 0 &&
+        matchingLines.every((line) => /不会|不返回|不在/.test(line));
+      if (matchingLines.length > 0 && !onlyExplicitNegation) {
         addError(`${fileName}: 出现与主题不符的“${forbidden}”`);
       }
     }
-    for (const required of rule.required) {
+    for (const required of rule.required ?? []) {
       if (!content.includes(required)) {
         addError(`${fileName}: 缺少主题必需内容“${required}”`);
       }
@@ -134,7 +277,7 @@ for (const fileName of files) {
     .filter((line) => !/不会返回|不返回|不替代|区别/.test(line))
     .join("\n");
   if (/ERR_NOT_IN_RANGE/.test(rangeScanText)) {
-    const hasRelevantCreepAction = /\.(?:attack|build|claimController|dismantle|drop|harvest|heal|move|moveTo|pickup|rangedAttack|rangedHeal|repair|reserveController|transfer|upgradeController|withdraw|renewCreep|recycleCreep|boostCreep)\s*\(/.test(code);
+    const hasRelevantCreepAction = /\.(?:attack|build|claimController|dismantle|drop|harvest|heal|move|moveTo|pickup|rangedAttack|rangedHeal|repair|reserveController|transfer|upgradeController|withdraw|renewCreep|recycleCreep|boostCreep|runReaction|observeRoom)\s*\(/.test(code);
     if (!hasRelevantCreepAction && slug !== "screeps-err-not-in-range") {
       addWarning(`${fileName}: ERR_NOT_IN_RANGE 未与移动或 Creep 动作代码同时出现`);
     }
@@ -212,6 +355,15 @@ for (const fileName of files) {
     const length = data.description.trim().length;
     if (length < 24) addWarning(`${fileName}: description 少于 24 个字符`);
     if (length > 180) addWarning(`${fileName}: description 超过 180 个字符`);
+    for (const phrase of descriptionTemplatePhrases) {
+      if (data.description.includes(phrase)) {
+        addError(`${fileName}: description 包含模板式表达“${phrase}”`);
+      }
+    }
+    descriptionRecords.push({
+      fileName,
+      normalized: normalizeDescription(data.description),
+    });
   }
 
   if (!Array.isArray(data.tags) || data.tags.length < 3) {
@@ -234,6 +386,17 @@ for (const fileName of files) {
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data.verification.checkedAt ?? "")) {
       addError(`${fileName}: verification.checkedAt 必须使用 YYYY-MM-DD`);
+    }
+    const hasRuntimeEvidence = data.verification.consoleTested || data.verification.liveTested;
+    if (hasRuntimeEvidence) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(data.verification.testedAt ?? "")) {
+        addError(`${fileName}: 已标记运行验证时必须填写 verification.testedAt`);
+      }
+      for (const field of ["testEnvironment", "testResult"]) {
+        if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {
+          addError(`${fileName}: 已标记运行验证时必须填写 verification.${field}`);
+        }
+      }
     }
   }
 
@@ -261,6 +424,21 @@ for (const fileName of files) {
     const normalized = sentence.replace(/^>\s*/gm, "").trim();
     if (chineseCount(normalized) >= 30) {
       addOccurrence(sentenceOccurrences, normalized, fileName);
+    }
+  }
+}
+
+for (let leftIndex = 0; leftIndex < descriptionRecords.length; leftIndex += 1) {
+  for (let rightIndex = leftIndex + 1; rightIndex < descriptionRecords.length; rightIndex += 1) {
+    const left = descriptionRecords[leftIndex];
+    const right = descriptionRecords[rightIndex];
+    if (left.normalized.length < 12 || right.normalized.length < 12) continue;
+    const similarity = bigramDice(left.normalized, right.normalized);
+    const percent = Math.round(similarity * 100);
+    if (similarity > 0.85) {
+      addError(`${left.fileName} 与 ${right.fileName}: description 去除对象/API 后相似度 ${percent}%`);
+    } else if (similarity > 0.75) {
+      addWarning(`${left.fileName} 与 ${right.fileName}: description 去除对象/API 后相似度 ${percent}%`);
     }
   }
 }
@@ -327,4 +505,3 @@ if (errors.length > 0) {
 }
 
 console.log(`内容检查通过：${files.length} 篇文章，${warnings.length} 个提醒。`);
-

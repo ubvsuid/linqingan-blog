@@ -1,8 +1,8 @@
 ---
 title: "Screeps Tower 如何按耐久阈值维修建筑"
-description: "在没有敌人时，让 Tower 只维修低于阈值的非墙体建筑，并保留最低 Energy，附完整检查顺序、最小代码和适用边界。"
+description: "让 Tower 在没有敌人且 Energy 高于保底值时，维修低于耐久阈值的非墙体建筑。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -23,7 +23,7 @@ featured: false
 
 Tower 若无条件维修，可能在敌人出现前耗尽 Energy。下面只在房间没有敌对 Creep、Tower Energy 高于保底值时维修低于阈值的非墙体建筑。
 
-## 先确认边界
+## 为什么要保留 Tower Energy
 
 维修前依次检查敌对目标、Tower Energy 保底和结构耐久；任何条件不满足都不调用 `repair()`。
 
@@ -33,7 +33,7 @@ Tower 若无条件维修，可能在敌人出现前耗尽 Energy。下面只在�
 - Tower 可以维修结构并返回动作结果。
 - 墙和 Rampart 的高 hitsMax 容易长期占用维修，应单独设策略。
 
-## 可放进 main 的示例
+## 只在空闲时维修的 main 示例
 
 运行前请替换房间名、Creep 名称和策略阈值。
 
@@ -68,7 +68,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 按这个顺序检查
+## Tower 没有维修时检查
 
 1. 只查找己方 Tower。
 2. Energy 保底值标记为自定义。
@@ -90,4 +90,3 @@ module.exports.loop = function () {
 
 - [StructureTower.repair API](https://docs.screeps.com/api/#StructureTower.repair)
 - [Defense](https://docs.screeps.com/defense.html)
-

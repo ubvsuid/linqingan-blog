@@ -1,6 +1,6 @@
 ---
 title: "StructureObserver.observeRoom() 怎么获取远方房间视野"
-description: "本 tick 发出 observeRoom 请求，并在下一 tick 通过 Game.rooms 读取目标房间，给出前提检查、完整示例和失败边界。"
+description: "说明 observeRoom() 的跨 tick 视野时序，并在下一 tick 从 Game.rooms 安全读取目标房间。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
@@ -30,6 +30,7 @@ featured: false
 - observeRoom 调用成功后，目标房间在下一 tick 获得可见性。
 - Observer 有官方限制的观察距离。
 - 当前 tick 立即读取 Game.rooms[target] 不能当作观察成功判定。
+- `ERR_RCL_NOT_ENOUGH` 表示房间 Controller 等级不足，Observer 当前不可用。
 
 ## 完整示例
 
@@ -73,8 +74,8 @@ module.exports.loop = function () {
 1. Observer 结构检查。
 2. 用 Game.time 记录请求 tick。
 3. 下一 tick 才读取目标 Game.rooms。
-4. 保存动作返回值，并对照官方 API 的错误常量。
-5. 一次性高影响动作必须保留显式请求开关。
+4. `ERR_NOT_IN_RANGE` 检查目标房间是否超出观察距离，`ERR_INVALID_ARGS` 检查房间名格式。
+5. `ERR_RCL_NOT_ENOUGH` 检查房间等级；`OK` 后也必须等到下一 tick 再判断视野。
 
 ## 边界和验证
 
@@ -90,4 +91,3 @@ module.exports.loop = function () {
 
 - [StructureObserver.observeRoom API](https://docs.screeps.com/api/#StructureObserver.observeRoom)
 - [Game.rooms API](https://docs.screeps.com/api/#Game-rooms)
-

@@ -1,6 +1,6 @@
 ---
 title: "getRangeTo、inRangeTo、isNearTo 有什么区别"
-description: "按需要精确距离、范围布尔值或相邻判断选择 RoomPosition 方法，按返回值和位置条件给出最小排查代码。"
+description: "比较 getRangeTo()、inRangeTo() 与 isNearTo()，为精确距离、范围判断和相邻判断选择正确方法。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 常见问题"
@@ -83,4 +83,3 @@ module.exports.loop = function () {
 
 - [RoomPosition API](https://docs.screeps.com/api/#RoomPosition)
 - [RoomPosition.getRangeTo API](https://docs.screeps.com/api/#RoomPosition.getRangeTo)
-

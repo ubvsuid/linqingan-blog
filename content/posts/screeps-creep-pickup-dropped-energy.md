@@ -1,6 +1,6 @@
 ---
 title: "Screeps Creep.pickup() 怎么捡地上的 Energy"
-description: "查找掉落的 RESOURCE_ENERGY，并处理 pickup() 的距离、容量和目标变化，给出最小代码、返回值检查和适用边界。"
+description: "查找地上的 RESOURCE_ENERGY，并根据 pickup() 返回值处理距离、背包容量和目标失效问题。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 常见问题"

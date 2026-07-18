@@ -163,9 +163,12 @@ const tagPageSource = fs.readFileSync(
 if (!tagPageSource.includes("getTagRecords().map")) {
   addError("标签页没有从 getTagRecords 生成静态参数");
 }
+if (!tagPageSource.includes("noindex: record.count < 3")) {
+  addError("薄标签页没有按文章数量设置 noindex");
+}
 
 const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "sitemap.ts"), "utf8");
-for (const marker of ["getAllPosts()", "getTagRecords().map", "/knowledge"]) {
+for (const marker of ["getAllPosts()", "getTagRecords()", ".filter((tag) => tag.count >= 3)", "/knowledge"]) {
   if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
 }
 
@@ -178,4 +181,3 @@ if (errors.length > 0) {
 console.log(
   `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${knowledgeSet.size} 个知识库条目。`,
 );
-

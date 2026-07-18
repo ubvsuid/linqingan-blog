@@ -1,8 +1,8 @@
 ---
 title: "Wall 和 Rampart 如何设置维修上限"
-description: "给 Wall 与 Rampart 设置阶段性 hits 上限，只选择低于上限的最弱目标，附完整检查顺序、最小代码和适用边界。"
+description: "为 Wall 和 Rampart 设置阶段性耐久上限，并优先维修低于上限的最弱防御结构。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -23,7 +23,7 @@ featured: false
 
 Wall 和 Rampart 的 `hitsMax` 很高，按 `hits < hitsMax` 维修会长期占用资源。更可控的做法是设置阶段性上限，并优先修复低于上限的最弱目标。
 
-## 先确认边界
+## 为什么不能一直修到 hitsMax
 
 代码只搜索 Wall 与 Rampart，并把玩家设定的 `repairLimit` 用作当前阶段目标，不把 `hitsMax` 当成必须达到的数值。
 
@@ -33,7 +33,7 @@ Wall 和 Rampart 的 `hitsMax` 很高，按 `hits < hitsMax` 维修会长期占�
 - repair 目标可以使用自定义 hitsLimit 过滤。
 - 维修上限是玩家策略，不能写成官方固定安全值。
 
-## 可放进 main 的示例
+## 优先修最弱目标的 main 示例
 
 运行前请替换房间名、Creep 名称和策略阈值。
 
@@ -67,7 +67,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 按这个顺序检查
+## 防御结构没有被选中时
 
 1. hitsLimit 明确为自定义值。
 2. 只选择 Wall 和 Rampart。
@@ -89,4 +89,3 @@ module.exports.loop = function () {
 
 - [Creep.repair API](https://docs.screeps.com/api/#Creep.repair)
 - [StructureWall 与 StructureRampart API](https://docs.screeps.com/api/)
-

@@ -172,12 +172,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  const tagPages: MetadataRoute.Sitemap = getTagRecords().map((tag) => ({
+  const tagPages: MetadataRoute.Sitemap = getTagRecords()
+    .filter((tag) => tag.count >= 3)
+    .map((tag) => ({
     url: `${siteConfig.url}/tags/${tag.slug}`,
     lastModified: allPostsUpdatedAt,
     changeFrequency: "weekly",
     priority: 0.55,
-  }));
+    }));
 
   const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${siteConfig.url}/projects/${project.id}`,
@@ -194,4 +196,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...projectPages,
   ];
 }
-

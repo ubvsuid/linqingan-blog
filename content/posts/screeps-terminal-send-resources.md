@@ -69,6 +69,7 @@ module.exports.loop = function () {
     return;
   }
 
+  Memory.terminal.sendUtrium = false;
   const result = terminal.send(
     resourceType,
     amount,
@@ -78,7 +79,7 @@ module.exports.loop = function () {
   console.log('terminal send result:', result);
 
   if (result === OK) {
-    Memory.terminal.sendUtrium = false;
+    console.log('一次性发送请求已接受');
   }
 };
 ```
@@ -89,7 +90,7 @@ module.exports.loop = function () {
 2. 先计算交易 Energy 成本。
 3. 发送资源与 Energy 储量分别检查。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 只有返回 `OK` 才关闭发送开关，避免失败被误记成成功。
+5. 调用前关闭发送开关，避免失败后在下一 tick 自动重发。失败后必须人工检查目标房间、资源、Energy、cooldown 和返回值，再明确重新开启请求。
 
 ## 适用限制
 
@@ -105,4 +106,3 @@ module.exports.loop = function () {
 
 - [StructureTerminal API](https://docs.screeps.com/api/#StructureTerminal)
 - [Market System](https://docs.screeps.com/market.html)
-

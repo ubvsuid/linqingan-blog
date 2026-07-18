@@ -1,8 +1,8 @@
 ---
 title: "Screeps Tower 如何自动治疗己方 Creep"
-description: "找到 hits 低于 hitsMax 的己方 Creep，并调用 Tower.heal() 保存返回值，附完整检查顺序、最小代码和适用边界。"
+description: "让有 Energy 的 Tower 自动选择受伤的己方 Creep，并说明距离如何影响实际治疗量。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -21,21 +21,24 @@ featured: false
 ---
 
 
-己方 Creep 受伤后，Tower 不会自动治疗。代码需要筛选 `hits < hitsMax` 的己方目标，再由有 Energy 的 Tower 调用 `heal()`。
+己方 Creep 受伤后，Tower 不会自动治疗。下面从 `FIND_MY_CREEPS` 中筛出 `hits < hitsMax` 的目标，选择离 Tower 最近的一名，再由有 Energy 的 Tower 调用 `heal()`。
 
-## 先确认边界
+## 距离影响治疗量，不影响能否调用
 
-攻击目标来自 `FIND_HOSTILE_CREEPS`，治疗目标则来自 `FIND_MY_CREEPS`。本文只保存 `heal()` 的执行结果，不混入维修分支。
+Tower 可以治疗同一房间内的 Creep 或 Power Creep。治疗范围覆盖整个房间，距离只会线性影响实际治疗量：官方数据是距离不超过 5 格时 400 hits，距离达到 20 格及以上时 100 hits，中间距离线性衰减。因此，远处目标不会因为距离返回 `ERR_NOT_IN_RANGE`。
 
-## 规则依据
+本文的候选集使用 `FIND_MY_CREEPS`，只包含己方普通 Creep；目标策略是“距离 Tower 最近的受伤目标”，不混入攻击和维修分支。
 
-- StructureTower.heal 的目标是 Creep 或 PowerCreep。
-- FIND_MY_CREEPS 可限制目标为己方普通 Creep。
-- Tower 没有 Energy 时治疗会失败。
+## Tower 能执行治疗的条件
 
-## 可放进 main 的示例
+- Tower 属于自己，并且当前 Controller 等级允许该结构工作。
+- Tower 至少有一次动作所需的 Energy。
+- 目标是仍然存在的有效 Creep，并且 `hits < hitsMax`。
+- Power Creep 虽然也是 `heal()` 的有效目标，但不在 `FIND_MY_CREEPS` 的结果里。
 
-运行前请替换房间名、Creep 名称和策略阈值。
+## 选择最近受伤目标的 main 示例
+
+运行前请替换房间名。示例只取第一座己方 Tower，并选择离它最近的受伤 Creep。
 
 ```js
 module.exports.loop = function () {
@@ -65,17 +68,21 @@ module.exports.loop = function () {
 };
 ```
 
-## 按这个顺序检查
+## `heal()` 返回值怎么解释
 
-1. Tower、Energy 与受伤目标均检查。
-2. 目标使用 FIND_MY_CREEPS。
-3. 保存 Tower.heal 返回值。
-4. 检查对象所有权、资源和距离。
-5. 对照官方 API 处理非 `OK` 返回值，不用画面现象代替诊断。
+| 返回值 | 需要检查的条件 |
+| --- | --- |
+| `OK` | 治疗动作已经安排在当前 tick 执行。 |
+| `ERR_NOT_OWNER` | Tower 不是自己的结构。 |
+| `ERR_NOT_ENOUGH_ENERGY` | Tower 的 Energy 不足以执行一次治疗。 |
+| `ERR_INVALID_TARGET` | 目标不是有效的 Creep 或已经失效。 |
+| `ERR_RCL_NOT_ENOUGH` | 房间 Controller 等级不足，Tower 当前不可用。 |
 
-## 限制
+距离不在这张错误表里。看到治疗量偏低时，应比较 Tower 与目标的距离；看到非 `OK` 返回值时，则按所有权、Energy、目标类型和 RCL 排查。
 
-示例选择房间里找到的第一名受伤 Creep，不包含按伤势、距离或角色排序，也不处理 Power Creep。
+## 目标策略的限制
+
+示例使用“最近受伤目标”策略，不比较角色优先级、缺失 hits 数量或战斗价值，也不处理 Power Creep。防守代码若需要先救治疗者或关键运输单位，应另行定义明确的优先级，而不是把它混进这个距离示例。
 
 ## 相关站内内容
 
@@ -87,4 +94,3 @@ module.exports.loop = function () {
 
 - [StructureTower.heal API](https://docs.screeps.com/api/#StructureTower.heal)
 - [StructureTower API](https://docs.screeps.com/api/#StructureTower)
-

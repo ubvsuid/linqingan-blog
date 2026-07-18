@@ -1,6 +1,6 @@
 ---
 title: "Screeps moveTo() 不移动怎么排查"
-description: "按目标、MOVE 部件、fatigue、返回值和路径条件排查 Creep 原地不动，按返回值和位置条件给出最小排查代码。"
+description: "按目标、MOVE 部件、fatigue、返回值和路径条件，定位 Creep 调用 moveTo() 后仍不移动的原因。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 错误排查"
@@ -86,4 +86,3 @@ module.exports.loop = function () {
 
 - [Creep.moveTo API](https://docs.screeps.com/api/#Creep.moveTo)
 - [Creeps：Movement](https://docs.screeps.com/creeps.html)
-

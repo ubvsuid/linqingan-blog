@@ -32,6 +32,9 @@ export interface VerificationStatus {
   consoleTested: boolean;
   liveTested: boolean;
   checkedAt: string;
+  testedAt?: string;
+  testEnvironment?: string;
+  testResult?: string;
 }
 
 export interface PostSummary extends PostFrontmatter {
@@ -119,6 +122,24 @@ function parseFrontmatter(
   ) {
     throw new Error(`${filePath}: verification.checkedAt 必须使用 YYYY-MM-DD`);
   }
+  const hasRuntimeEvidence =
+    verificationRecord.consoleTested === true || verificationRecord.liveTested === true;
+  if (hasRuntimeEvidence) {
+    if (
+      typeof verificationRecord.testedAt !== "string" ||
+      !datePattern.test(verificationRecord.testedAt)
+    ) {
+      throw new Error(`${filePath}: 已标记运行验证时必须填写 verification.testedAt`);
+    }
+    for (const field of ["testEnvironment", "testResult"]) {
+      if (
+        typeof verificationRecord[field] !== "string" ||
+        verificationRecord[field].trim() === ""
+      ) {
+        throw new Error(`${filePath}: 已标记运行验证时必须填写 verification.${field}`);
+      }
+    }
+  }
 
   return {
     title: data.title,
@@ -136,6 +157,9 @@ function parseFrontmatter(
       consoleTested: verificationRecord.consoleTested as boolean,
       liveTested: verificationRecord.liveTested as boolean,
       checkedAt: verificationRecord.checkedAt,
+      testedAt: verificationRecord.testedAt as string | undefined,
+      testEnvironment: verificationRecord.testEnvironment as string | undefined,
+      testResult: verificationRecord.testResult as string | undefined,
     },
   };
 }
@@ -378,4 +402,3 @@ export async function getPostBySlug(
     tableOfContents,
   };
 }
-

@@ -9,7 +9,7 @@ tags:
   - "基础工程"
   - "Spawn"
   - "补员"
-  - "故障恢复"
+  - "常见问题"
 draft: false
 verification:
   docsChecked: true
@@ -109,4 +109,3 @@ module.exports.loop = function () {
 
 - [StructureSpawn.spawnCreep API](https://docs.screeps.com/api/#StructureSpawn.spawnCreep)
 - [Creep body 与 BODYPART_COST](https://docs.screeps.com/creeps.html)
-

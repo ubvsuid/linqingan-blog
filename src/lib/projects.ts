@@ -45,7 +45,7 @@ export const projects: ProjectRecord[] = [
     status: "持续建设中",
     title: "linqingan.com",
     summary:
-      "一个围绕 Screeps、JavaScript 与系统实践持续建设的中文知识库，现有 60 篇文章按 8 个主题组织，并保留 12 篇连续新手路线。",
+      "一个围绕 Screeps、JavaScript 与系统实践持续建设的中文知识库，内容按主题组织，并保留连续的新手学习路线。",
     purpose:
       "把零散的学习笔记、代码实践和系统建设过程，整理成可以长期阅读、查询和继续扩展的公开网站。",
     challenge:
@@ -62,12 +62,7 @@ export const projects: ProjectRecord[] = [
       { label: "当前内容", value: "教程、资料与项目档案" },
       { label: "建设原则", value: "简单、可读、可持续迭代" },
     ],
-    metrics: [
-      { value: "60", label: "公开文章", note: "每篇对应一个明确问题" },
-      { value: "8", label: "知识主题", note: "覆盖学习、开发与运行诊断" },
-      { value: "12", label: "入门文章", note: "按四个阶段连续组织" },
-      { value: "4", label: "自动检查", note: "内容、路由、代码块与构建" },
-    ],
+    metrics: [],
     flow: ["Markdown 内容", "构建与检查", "Vercel 部署", "读者学习与查询"],
     timeline: [
       {
@@ -187,4 +182,3 @@ export const projects: ProjectRecord[] = [
     updatedAt: "2026-07-17",
   },
 ];
-

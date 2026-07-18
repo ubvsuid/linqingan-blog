@@ -2,7 +2,7 @@
 title: "Game.notify() 怎么发送限频提醒"
 description: "在 Controller 降级风险首次触发时调用 Game.notify()，并用 Memory 与 groupInterval 控制重复提醒。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -23,7 +23,7 @@ featured: false
 
 本文在 Controller 降级风险首次触发时发送通知，并用 Memory 和 `groupInterval` 控制重复提醒。
 
-## 先给结论
+## 先定义什么情况值得提醒
 
 Console 适合当前调试；`Game.notify()` 用于把重要事件发送到账号通知渠道。示例只在 Controller 首次进入降级风险时触发，并用 Memory 防止重复提醒。
 
@@ -33,7 +33,7 @@ Console 适合当前调试；`Game.notify()` 用于把重要事件发送到账�
 - 可选 groupInterval 用于合并一定时间内相同消息。
 - 高频条件必须有状态或间隔控制，避免每 tick 重复通知。
 
-## 最小完整示例
+## Controller 风险只提醒一次
 
 ### `main` 模块
 
@@ -65,7 +65,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 检查顺序
+## 没有收到通知时
 
 1. Room 与己方 Controller 检查。
 2. 阈值与 tick 间隔标记为自定义。
@@ -87,4 +87,3 @@ module.exports.loop = function () {
 
 - [Game.notify API](https://docs.screeps.com/api/#Game.notify)
 - [StructureController API](https://docs.screeps.com/api/#StructureController)
-

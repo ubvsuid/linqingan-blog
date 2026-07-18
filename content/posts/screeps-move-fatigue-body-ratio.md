@@ -1,6 +1,6 @@
 ---
 title: "Creep 为什么走得慢：fatigue 与 MOVE 配比"
-description: "读取 fatigue 和有效身体部件，判断负载、地形与 MOVE 数量是否让移动变慢，按返回值和位置条件给出最小排查代码。"
+description: "读取 Creep.fatigue、负载和有效 MOVE 部件，判断地形与身体配比为什么让移动变慢。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 基础工程"
@@ -84,4 +84,3 @@ module.exports.loop = function () {
 
 - [Creeps：Movement](https://docs.screeps.com/creeps.html)
 - [Creep.fatigue API](https://docs.screeps.com/api/#Creep-fatigue)
-

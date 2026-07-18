@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
     title: `${record.name} 相关文章`,
     description: `浏览临清安发布的 ${record.name} 相关文章，当前共 ${record.count} 篇。`,
     path: `/tags/${record.slug}`,
+    noindex: record.count < 3,
   });
 }
 

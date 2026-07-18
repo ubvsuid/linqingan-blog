@@ -1,6 +1,6 @@
 ---
 title: "Screeps ERR_NO_PATH 怎么排查"
-description: "区分目标存在但不可达、路径搜索受限和出口被阻挡造成的 ERR_NO_PATH，按返回值和位置条件给出最小排查代码。"
+description: "区分目标不可达、出口受阻和路径选项过严造成的 ERR_NO_PATH，并按实际返回值定位原因。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 错误排查"

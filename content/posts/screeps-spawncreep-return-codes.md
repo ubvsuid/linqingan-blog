@@ -1,6 +1,6 @@
 ---
 title: "spawnCreep() 失败怎么查：按返回值定位问题"
-description: "保存 spawnCreep() 返回值，并根据名称、能量、身体和 Spawn 状态定位失败原因，给出最小代码、返回值检查和适用边界。"
+description: "保存 spawnCreep() 返回值，并根据名称、Energy、身体数组和 Spawn 状态定位生成失败原因。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 错误排查"
@@ -83,4 +83,3 @@ module.exports.loop = function () {
 
 - [StructureSpawn.spawnCreep API](https://docs.screeps.com/api/#StructureSpawn.spawnCreep)
 - [Creeps](https://docs.screeps.com/creeps.html)
-

@@ -1,6 +1,6 @@
 ---
 title: "Screeps ERR_NOT_IN_RANGE 怎么处理"
-description: "确认动作要求的有效距离，并在返回 ERR_NOT_IN_RANGE 时先移动、下一 tick 再重试，按返回值和位置条件给出最小排查代码。"
+description: "解释 ERR_NOT_IN_RANGE 表示的距离条件，并用“先移动、下一 tick 再重试”处理需要接近目标的 Creep 动作。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 错误排查"

@@ -43,6 +43,9 @@ export default function HomePage() {
           <p className={styles.heroDescription}>
             从一套按顺序学习的 Screeps 中文入门路线开始，记录代码如何逐步变成可以持续运行的系统。
           </p>
+          <p className={styles.heroStats}>
+            {articleCount} 篇文章 · {sectionCount} 个主题 · {beginnerSeriesSlugs.length} 篇新手路线
+          </p>
           <HomeLearningActions />
         </Container>
       </section>
@@ -159,4 +162,3 @@ export default function HomePage() {
     </main>
   );
 }
-

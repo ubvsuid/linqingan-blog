@@ -1,6 +1,6 @@
 ---
 title: "Controller 快降级了怎么办"
-description: "读取 ticksToDowngrade，在低于自定阈值时让有 Energy 的 Upgrader 优先补充升级，附完整检查顺序、最小代码和适用边界。"
+description: "监控 Controller.ticksToDowngrade，并在低于房间策略阈值时优先安排有 Energy 的 Upgrader。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 常见问题"

@@ -27,6 +27,8 @@ featured: false
 
 `processPower()` 需要己方 Power Spawn 同时存有 Power 和 Energy，并满足房间等级要求。示例只检查这些前提和返回值。
 
+如果返回 `ERR_RCL_NOT_ENOUGH`，应检查房间 Controller 等级以及 Power Spawn 当前是否可用；这不是 Power 或 Energy 库存不足。
+
 ## 官方规则
 
 - StructurePowerSpawn.processPower 消耗 Power 与 Energy 并增加 GPL 进度。
@@ -87,4 +89,3 @@ module.exports.loop = function () {
 
 - [Power](https://docs.screeps.com/power.html)
 - [StructurePowerSpawn.processPower API](https://docs.screeps.com/api/#StructurePowerSpawn.processPower)
-

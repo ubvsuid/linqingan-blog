@@ -1,6 +1,6 @@
 ---
 title: "Screeps recycleCreep() 怎么回收不再需要的 Creep"
-description: "让指定 Creep 靠近己方 Spawn，并保存 recycleCreep() 返回值，给出最小代码、返回值检查和适用边界。"
+description: "让指定 Creep 移动到己方 Spawn 旁边，并根据 recycleCreep() 返回值完成回收。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 常见问题"
@@ -77,4 +77,3 @@ module.exports.loop = function () {
 
 - [StructureSpawn.recycleCreep API](https://docs.screeps.com/api/#StructureSpawn.recycleCreep)
 - [Creep.suicide API](https://docs.screeps.com/api/#Creep.suicide)
-

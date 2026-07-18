@@ -1,6 +1,6 @@
 ---
 title: "Game.map.findRoute() 怎么规划跨房间路线"
-description: "获取从当前房间到目标房间的出口序列，并移动到当前房间的第一个出口，按返回值和位置条件给出最小排查代码。"
+description: "用 Game.map.findRoute() 取得跨房间出口序列，并让 Creep 前往当前房间对应的第一个出口。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
@@ -89,4 +89,3 @@ module.exports.loop = function () {
 
 - [Game.map.findRoute API](https://docs.screeps.com/api/#Game-map.findRoute)
 - [Game.map API](https://docs.screeps.com/api/#Game-map)
-

@@ -2,7 +2,7 @@
 title: "Game.cpu.getUsed() 和 bucket 怎么监控 CPU"
 description: "用 Game.cpu.getUsed() 测量一段代码在当前 tick 的 CPU 差值，并同时读取 limit、tickLimit 与 bucket。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -22,7 +22,7 @@ featured: false
 
 本文用一段最小代码测量当前 tick 的 CPU 差值，并同时记录 `limit`、`tickLimit` 与 `bucket`。
 
-## 先给结论
+## 怎样测量一段代码
 
 本文只建立测量方法：在目标代码前后分别读取 `Game.cpu.getUsed()`，并同时输出当前 `limit`、`tickLimit` 和 `bucket`。
 
@@ -32,7 +32,7 @@ featured: false
 - Game.cpu.limit、tickLimit 与 bucket 表示不同的预算状态。
 - Simulation 模式下 getUsed 按官方说明可能始终返回 0。
 
-## 最小完整示例
+## 每 100 tick 记录一次 CPU
 
 ### `main` 模块
 
@@ -58,7 +58,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 检查顺序
+## CPU 数值异常时
 
 1. 同一 tick 内用两次 getUsed 做差。
 2. 同时记录 limit、tickLimit、bucket。

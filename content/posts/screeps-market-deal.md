@@ -8,7 +8,6 @@ tags:
   - "Screeps"
   - "进阶开发"
   - "市场"
-  - "交易"
   - "Game API"
 draft: false
 verification:
@@ -73,11 +72,12 @@ module.exports.loop = function () {
     return;
   }
 
+  Memory.market.buyHydrogen = false;
   const result = Game.market.deal(order.id, amount, room.name);
   console.log('market deal result:', result);
 
   if (result === OK) {
-    Memory.market.buyHydrogen = false;
+    console.log('一次性成交请求已接受');
   }
 };
 ```
@@ -88,7 +88,7 @@ module.exports.loop = function () {
 2. 成交量不超过订单余量。
 3. Credits 与交易 Energy 分开检查。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 只有返回 `OK` 才清除一次性请求，失败时可先检查日志再人工决定是否重试。
+5. 调用前就清除一次性开关，避免非 `OK` 结果在下一 tick 自动重试。失败后必须人工核对订单、库存和参数，再明确重新开启请求。
 
 ## 适用限制
 
@@ -104,4 +104,3 @@ module.exports.loop = function () {
 
 - [Market System](https://docs.screeps.com/market.html)
 - [Game.market.deal API](https://docs.screeps.com/api/#Game-market.deal)
-

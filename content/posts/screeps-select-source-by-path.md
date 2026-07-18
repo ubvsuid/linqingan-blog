@@ -1,8 +1,8 @@
 ---
 title: "多个 Source 时怎样选择最近可达目标"
-description: "用 findClosestByPath 选择当前有 Energy 且能找到路径的 Source，避免固定取数组第一项，附完整检查顺序、最小代码和适用边界。"
+description: "用 findClosestByPath() 从有 Energy 的 Source 中选择当前可达且路径最近的目标。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -23,7 +23,7 @@ featured: false
 
 房间有多个 Source 时，固定选择搜索数组第一项可能让 Creep 绕远路。`findClosestByPath()` 会从候选目标中选择当前可达且路径最近的一个。
 
-## 先确认边界
+## 路径最近与直线最近不同
 
 第一次采集文章固定取数组第一项；这里改用 `findClosestByPath()`，只从当前有 Energy 且能找到路径的 Source 中选择目标。
 
@@ -33,7 +33,7 @@ featured: false
 - findClosestByPath 根据路径成本选择目标。
 - findClosestByPath 找不到路径时可能返回 null。
 
-## 可放进 main 的示例
+## 选择当前可达的活跃 Source
 
 运行前请替换房间名、Creep 名称和策略阈值。
 
@@ -59,7 +59,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 按这个顺序检查
+## 找不到 Source 时
 
 1. 不使用 room.find(...)[0] 直接取目标。
 2. 对 null 目标提前返回。
@@ -81,4 +81,3 @@ module.exports.loop = function () {
 
 - [RoomPosition.findClosestByPath API](https://docs.screeps.com/api/#RoomPosition.findClosestByPath)
 - [Room.find 常量](https://docs.screeps.com/api/#Constants-Find-Constants)
-

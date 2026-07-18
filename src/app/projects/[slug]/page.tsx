@@ -3,9 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Container } from "@/components/container";
+import { beginnerSeriesSlugs } from "@/lib/beginner-series";
+import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
+import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
+import { getTagRecords } from "@/lib/tags";
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -38,6 +42,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
   const project = projects.find((item) => item.id === slug);
   if (!project) notFound();
+
+  const articleCount = getAllPosts().length;
+  const sectionCount = knowledgeBaseSections.length;
+  const tagCount = getTagRecords().length;
+  const beginnerCount = beginnerSeriesSlugs.length;
+  const projectMetrics = project.id === "linqingan-com"
+    ? [
+        { value: String(articleCount), label: "公开文章", note: "构建时读取已发布 Markdown" },
+        { value: String(sectionCount), label: "知识主题", note: "来自知识库分组配置" },
+        { value: String(beginnerCount), label: "入门文章", note: "来自连续学习路线" },
+        { value: String(tagCount), label: "文章标签", note: "来自当前文章实际标签" },
+      ]
+    : project.metrics;
 
   const projectUrl = `${siteConfig.url}/projects/${project.id}`;
   const jsonLd = {
@@ -125,7 +142,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <p>使用可核对的数据展示项目当前状态，而不只依赖文字描述。</p>
           </div>
           <div className="project-metric-grid">
-            {project.metrics.map((metric) => (
+            {projectMetrics.map((metric) => (
               <article key={metric.label}>
                 <strong>{metric.value}</strong>
                 <h3>{metric.label}</h3>

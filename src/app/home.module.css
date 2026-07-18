@@ -3,7 +3,7 @@
 }
 
 .hero {
-  min-height: calc(100vh - 92px);
+  min-height: min(78vh, 760px);
   display: grid;
   align-items: center;
   border-bottom: 1px solid var(--border);
@@ -31,6 +31,14 @@
   color: var(--muted);
   font-size: clamp(18px, 2.2vw, 24px);
   line-height: 1.75;
+}
+
+.heroStats {
+  margin: 16px 0 0;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .learningSection,
@@ -305,7 +313,7 @@
 
 @media (max-width: 640px) {
   .hero {
-    min-height: calc(100vh - 88px);
+    min-height: auto;
   }
 
   .heroInner {
@@ -343,4 +351,3 @@
     padding: 22px 20px;
   }
 }
-

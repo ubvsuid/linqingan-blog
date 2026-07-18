@@ -1,6 +1,6 @@
 ---
 title: "StructureLab.runReaction() 怎么进行矿物反应"
-description: "用两个输入 Lab 和一个输出 Lab 验证反应配方、距离、冷却、资源与容量后执行反应，给出前提检查、完整示例和失败边界。"
+description: "验证两座输入 Lab 的矿物配方、距离和库存，再由输出 Lab 执行 runReaction()。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
@@ -30,6 +30,7 @@ Mineral 开采页只取得基础矿物；本文只处理三座 Lab 的一次反�
 - 一次反应需要两个输入 Lab 和一个输出 Lab。
 - 输出 Lab 必须在两个输入 Lab 的有效范围内。
 - runReaction 会受配方、资源、容量、RCL 和 cooldown 限制。
+- `ERR_RCL_NOT_ENOUGH` 表示当前房间等级不足，输出 Lab 不能执行反应。
 
 ## 完整示例
 
@@ -78,8 +79,8 @@ module.exports.loop = function () {
 1. 三座 Lab 均检查。
 2. 使用 REACTIONS 验证输入矿物组合。
 3. 检查输出 cooldown 和产品容量。
-4. 保存动作返回值，并对照官方 API 的错误常量。
-5. 一次性高影响动作必须保留显式请求开关。
+4. 返回 `ERR_NOT_IN_RANGE` 时检查输出 Lab 与两座输入 Lab 的位置关系。
+5. 返回 `ERR_RCL_NOT_ENOUGH` 时检查房间等级；配方或资源问题则分别核对 `REACTIONS` 与输入库存。
 
 ## 边界和验证
 
@@ -95,4 +96,3 @@ module.exports.loop = function () {
 
 - [Resources：Mineral compounds](https://docs.screeps.com/resources.html)
 - [StructureLab.runReaction API](https://docs.screeps.com/api/#StructureLab.runReaction)
-

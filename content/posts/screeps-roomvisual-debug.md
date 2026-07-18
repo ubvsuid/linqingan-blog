@@ -1,14 +1,14 @@
 ---
 title: "RoomVisual 怎么画文字、圆和连线辅助调试"
-description: "用 room.visual.text、circle 和 line 标出 Creep 状态、目标与移动关系，给出前提检查、完整示例和失败边界。"
+description: "用 RoomVisual 在房间中显示 Creep 状态、目标位置和移动关系，帮助定位任务选择与寻路问题。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
   - "RoomVisual"
-  - "调试"
+  - "运行诊断"
   - "可视化"
 draft: false
 verification:
@@ -21,19 +21,19 @@ featured: false
 ---
 
 
-RoomVisual 可以把调试信息直接画在房间视图上。下面分别用 `text()`、`circle()` 和 `line()` 标出 Creep 状态、目标位置与两者关系。
+RoomVisual 可以把 Creep 当前状态、任务目标和移动关系直接画在房间视图上。看到“选错目标”“目标位置异常”或“移动方向不符合预期”时，`text()`、`circle()` 和 `line()` 能把代码里的对象关系变成一张每 tick 更新的调试图。
 
-## 先核对这些前提
+## 三种图形分别回答什么问题
 
-本文只做可视化调试，不改变 Creep 行为，也不声称 RoomVisual 会持久保存。
+- `text()` 显示名称、角色、Energy 或当前任务。
+- `circle()` 圈出正在观察的 Creep 或目标位置。
+- `line()` 连接 Creep 与目标，检查任务选择和移动关系。
 
-- Room.visual 是当前 Room 的 RoomVisual 对象。
-- 视觉内容只保留一个 tick，需要每 tick 重新绘制。
-- 绘制调用用于浏览器显示调试信息，不替代 API 返回值检查。
+绘图只负责显示，不会移动 Creep、修改目标或把数据永久保存。官方文档说明每次绘制只保留一个 tick，因此持续观察时必须在 `module.exports.loop` 中每 tick 重画。
 
-## 完整示例
+## 在 main 中画出状态、目标和连线
 
-代码放进 `main` 模块。房间、结构、资源和目标坐标必须改成自己的配置。
+示例读取 `Worker1`，用文字显示名称与 Energy，用圆圈标记当前位置，并把它与当前房间的 Controller 连起来。Creep 名称需要替换成自己的配置。
 
 ```js
 module.exports.loop = function () {
@@ -66,17 +66,18 @@ module.exports.loop = function () {
 };
 ```
 
-## 排查顺序
+## 房间里没有出现图形时
 
-1. Creep 与 Controller 分别检查。
-2. 所有绘图都在当前 tick 执行。
-3. 可视化不替代动作返回值。
-4. 保存动作返回值，并对照官方 API 的错误常量。
-5. 一次性高影响动作必须保留显式请求开关。
+1. 确认当前账号能看到目标房间；不可见房间也能用 `new RoomVisual(roomName)` 绘制，但必须写对房间名。
+2. 检查坐标是否落在房间范围内。整数坐标位于格子中心，传入 `RoomPosition` 时要确认它属于预期房间。
+3. 确认绘图代码每个 tick 都会执行；RoomVisual 数据不会跨 tick 保留。
+4. 把 `text()`、`circle()`、`line()` 分开启用，定位是对象缺失、目标缺失还是样式颜色不明显。
+5. RoomVisual 只显示调试信息，不会改变 Creep 的任务选择或寻路结果。
+6. 若 CPU 或视觉数据量异常，减少每 tick 的文字数量和连线数量，并用 `RoomVisual.getSize()` 检查序列化数据大小。官方说明绘图没有额外 API CPU 费用，但序列化等代码执行仍有自然开销，且每个房间的视觉数据有大小限制。
 
-## 边界和验证
+## 这段调试图不会替你判断什么
 
-本文只用文字、圆和连线显示当前调试信息，不实现持久化日志或自动性能分析。
+示例只显示当前 tick 的对象关系，不保存历史轨迹，也不判断目标是否最优。要比较多个 tick 的变化，需要自行把必要字段写入 Memory 或外部日志；不要把 RoomVisual 当成持久化记录。
 
 ## 站内学习路径
 
@@ -88,4 +89,3 @@ module.exports.loop = function () {
 
 - [RoomVisual API](https://docs.screeps.com/api/#RoomVisual)
 - [Room.visual API](https://docs.screeps.com/api/#Room-visual)
-

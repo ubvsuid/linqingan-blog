@@ -1,6 +1,6 @@
 ---
 title: "Creep 如何在取能和工作之间切换状态"
-description: "只在 Energy 为空或容量已满时切换 working，避免每 tick 来回抖动，给出最小代码、返回值检查和适用边界。"
+description: "只在 Energy 为空或容量已满时切换 Creep.memory.working，避免工作状态在相邻 tick 反复抖动。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 基础工程"

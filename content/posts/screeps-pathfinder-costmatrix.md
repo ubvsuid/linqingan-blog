@@ -1,6 +1,6 @@
 ---
 title: "PathFinder CostMatrix 怎么设置不可走和高成本格子"
-description: "在 roomCallback 中标记道路、不可穿越建筑和自定义高成本位置，按返回值和位置条件给出最小排查代码。"
+description: "在 PathFinder roomCallback 中标记道路、不可穿越建筑和高成本格子，控制单房间寻路偏好。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
@@ -105,4 +105,3 @@ module.exports.loop = function () {
 
 - [PathFinder API](https://docs.screeps.com/api/#PathFinder)
 - [PathFinder.CostMatrix API](https://docs.screeps.com/api/#PathFinder-CostMatrix)
-

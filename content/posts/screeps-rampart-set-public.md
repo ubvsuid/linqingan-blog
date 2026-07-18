@@ -1,6 +1,6 @@
 ---
 title: "Rampart 的 setPublic() 怎么用"
-description: "读取己方 Rampart，并根据明确配置调用 setPublic() 控制其他玩家单位是否能通过，附完整检查顺序、最小代码和适用边界。"
+description: "读取己方 Rampart 的公开状态，并用 setPublic() 控制其他玩家单位能否通过。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 常见问题"
@@ -84,4 +84,3 @@ module.exports.loop = function () {
 
 - [StructureRampart.setPublic API](https://docs.screeps.com/api/#StructureRampart.setPublic)
 - [Defense](https://docs.screeps.com/defense.html)
-

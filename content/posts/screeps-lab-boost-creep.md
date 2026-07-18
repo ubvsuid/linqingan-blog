@@ -1,6 +1,6 @@
 ---
 title: "StructureLab.boostCreep() 怎么强化身体部件"
-description: "确认 Lab 中的化合物、Energy、目标身体部件和距离后调用 boostCreep，给出前提检查、完整示例和失败边界。"
+description: "确认 Lab 的化合物、Energy、目标身体部件和距离后，为指定 Creep 执行 boostCreep()。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
@@ -30,6 +30,7 @@ runReaction 页面制造化合物；本文只处理把已存在化合物应用�
 - boostCreep 需要 Lab 内有匹配化合物与 Energy。
 - 目标 Creep 必须相邻。
 - 一个身体部件只能应用一种化合物，实际可强化数量受资源和未强化部件限制。
+- `ERR_RCL_NOT_ENOUGH` 表示房间 Controller 等级不足，Lab 当前不能执行强化。
 
 ## 完整示例
 
@@ -72,8 +73,8 @@ module.exports.loop = function () {
 1. Lab 与 mineralType 检查。
 2. 至少检查一次部件所需资源下限。
 3. 保存 boostCreep 返回值并处理距离。
-4. 保存动作返回值，并对照官方 API 的错误常量。
-5. 一次性高影响动作必须保留显式请求开关。
+4. 返回 `ERR_RCL_NOT_ENOUGH` 时检查房间等级和 Lab 是否处于可用状态。
+5. 返回其他错误时只核对 `boostCreep()` 对应的目标、资源和身体部件条件。
 
 ## 边界和验证
 
@@ -89,4 +90,3 @@ module.exports.loop = function () {
 
 - [Resources：Creep boosts](https://docs.screeps.com/resources.html)
 - [StructureLab.boostCreep API](https://docs.screeps.com/api/#StructureLab.boostCreep)
-

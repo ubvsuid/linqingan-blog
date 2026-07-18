@@ -1,7 +1,7 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
-  ["/", ["构建，运行，迭代", "Screeps 知识库", "60", "8 个主题组"]],
+  ["/", ["构建，运行，迭代", "Screeps 知识库", "60 篇文章", "8 个主题"]],
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "60"]],
@@ -18,6 +18,7 @@ const checks = [
   ["/tags/advanced-development", ["进阶开发", "当前共有"]],
   ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
   ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
+  ["/feed.xml", ["<rss", "linqingan.com"]],
   ["/blog/screeps-introduction", ["发布于", "验证状态", "没有找到 Harvester1"]],
   ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
   ["/blog/screeps-creep-withdraw-container-energy", ["Creep.withdraw 怎么用", "资料核对日期：2026-07-18"]],
@@ -29,6 +30,10 @@ const checks = [
   ["/blog/screeps-spawn-emergency-recovery", ["房间断代后如何自动恢复第一只采集者", "不会返回", "ERR_NOT_IN_RANGE"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
   ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
+];
+
+const assetChecks = [
+  ["/opengraph-image", "image/"],
 ];
 
 const redirectChecks = [
@@ -68,6 +73,7 @@ const failures = [];
 for (const [pathname, expectedTexts] of checks) {
   const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual" });
   const body = await response.text();
+  const searchableBody = body.replace(/<!--.*?-->/g, "");
 
   if (response.status !== 200) {
     failures.push(`${pathname}: 预期 200，实际 ${response.status}`);
@@ -75,7 +81,7 @@ for (const [pathname, expectedTexts] of checks) {
   }
 
   for (const expected of expectedTexts) {
-    if (!body.includes(expected)) {
+    if (!searchableBody.includes(expected)) {
       failures.push(`${pathname}: 缺少预期内容 “${expected}”`);
     }
   }
@@ -100,6 +106,17 @@ for (const [source, destination] of redirectChecks) {
   }
 }
 
+for (const [pathname, expectedContentType] of assetChecks) {
+  const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual" });
+  if (response.status !== 200) {
+    failures.push(`${pathname}: 预期 200，实际 ${response.status}`);
+  }
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.startsWith(expectedContentType)) {
+    failures.push(`${pathname}: Content-Type 预期 ${expectedContentType}*，实际 ${contentType || "缺失"}`);
+  }
+}
+
 for (const pathname of metadataPaths) {
   const response = await fetch(`${baseUrl}${pathname}`);
   const body = await response.text();
@@ -120,6 +137,42 @@ const sitemapUrls = [
     ),
   ),
 ];
+
+function evenlySample(values, limit) {
+  if (values.length <= limit) return values;
+  return Array.from({ length: limit }, (_, index) =>
+    values[Math.floor(index * values.length / limit)],
+  );
+}
+
+const sitemapPaths = sitemapUrls.map((url) => new URL(url).pathname);
+const sampledPaths = [
+  ...evenlySample(sitemapPaths.filter((pathname) => pathname.startsWith("/blog/")), 5),
+  ...evenlySample(sitemapPaths.filter((pathname) => pathname.startsWith("/tags/")), 5),
+];
+
+for (const pathname of sampledPaths) {
+  const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual" });
+  const body = await response.text();
+  if (response.status !== 200) {
+    failures.push(`${pathname}: 抽样页面预期 200，实际 ${response.status}`);
+  } else if (!/<title>[^<]+<\/title>/i.test(body)) {
+    failures.push(`${pathname}: 抽样页面缺少有效标题`);
+  }
+}
+
+const thinTagPath = "/tags/roomvisual";
+const thinTagResponse = await fetch(`${baseUrl}${thinTagPath}`);
+const thinTagBody = await thinTagResponse.text();
+if (thinTagResponse.status !== 200) {
+  failures.push(`${thinTagPath}: 薄标签页预期保留 200，实际 ${thinTagResponse.status}`);
+}
+if (!/<meta[^>]+name="robots"[^>]+content="[^"]*noindex[^"]*"/i.test(thinTagBody)) {
+  failures.push(`${thinTagPath}: 薄标签页缺少 noindex`);
+}
+if (sitemapPaths.includes(thinTagPath)) {
+  failures.push(`${thinTagPath}: 薄标签页不应出现在 Sitemap`);
+}
 
 for (let index = 0; index < sitemapUrls.length; index += 10) {
   const batch = sitemapUrls.slice(index, index + 10);
@@ -147,4 +200,3 @@ if (failures.length > 0) {
 }
 
 console.log(`冒烟测试通过：${checks.length} 个关键页面，${sitemapUrls.length} 个 Sitemap URL。`);
-

@@ -1,6 +1,6 @@
 ---
 title: "Game.rooms 为什么没有某个房间"
-description: "判断房间是否当前可见，并在 Game.rooms[roomName] 为 undefined 时安全退出，给出前提检查、完整示例和失败边界。"
+description: "解释 Game.rooms[roomName] 为什么可能是 undefined，并在房间不可见时避免继续读取对象。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 常见问题"
@@ -86,4 +86,3 @@ module.exports.loop = function () {
 
 - [Game.rooms API](https://docs.screeps.com/api/#Game-rooms)
 - [Global Objects](https://docs.screeps.com/global-objects.html)
-

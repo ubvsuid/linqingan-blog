@@ -1,6 +1,6 @@
 ---
 title: "StructureFactory.produce() 怎么生产商品"
-description: "从 COMMODITIES 读取配方，检查 Factory cooldown、等级与全部组件后调用 produce，给出前提检查、完整示例和失败边界。"
+description: "读取 COMMODITIES 商品配方，确认 Factory 等级、组件和 cooldown 后安全调用 produce()。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"

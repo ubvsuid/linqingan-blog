@@ -246,6 +246,24 @@ export default async function PostPage({ params }: PostPageProps) {
                 <dt>最后核对</dt>
                 <dd>{formatDate(post.verification.checkedAt)}</dd>
               </div>
+              {post.verification.testEnvironment ? (
+                <div>
+                  <dt>测试环境</dt>
+                  <dd>{post.verification.testEnvironment}</dd>
+                </div>
+              ) : null}
+              {post.verification.testedAt ? (
+                <div>
+                  <dt>测试日期</dt>
+                  <dd>{formatDate(post.verification.testedAt)}</dd>
+                </div>
+              ) : null}
+              {post.verification.testResult ? (
+                <div>
+                  <dt>测试结果</dt>
+                  <dd>{post.verification.testResult}</dd>
+                </div>
+              ) : null}
             </dl>
           </section>
 
@@ -671,4 +689,3 @@ export default async function PostPage({ params }: PostPageProps) {
     </main>
   );
 }
-

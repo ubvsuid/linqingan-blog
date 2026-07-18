@@ -1,8 +1,8 @@
 ---
 title: "StructureNuker.launchNuke() 前要检查什么"
-description: "在显式一次性请求下检查目标坐标、距离、cooldown、Energy 和 Ghodium 后再调用 launchNuke，给出前提检查、完整示例和失败边界。"
+description: "在一次性请求下核对目标距离、Nuker cooldown、Energy 和 Ghodium，再决定是否调用 launchNuke()。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
@@ -70,11 +70,12 @@ module.exports.loop = function () {
     return;
   }
 
+  Memory.nuker.launchRequested = false;
   const result = nuker.launchNuke(target);
   console.log('launchNuke result:', result);
 
   if (result === OK) {
-    Memory.nuker.launchRequested = false;
+    console.log('一次性发射请求已接受');
   }
 };
 ```
@@ -83,13 +84,13 @@ module.exports.loop = function () {
 
 1. 必须有显式 launchRequested。
 2. 目标 RoomPosition 和线性距离检查。
-3. 只有 OK 才清除请求，避免误判。
+3. 调用前清除一次性请求，避免非 `OK` 结果在下一 tick 自动重试。
 4. 保存动作返回值，并对照官方 API 的错误常量。
 5. 一次性高影响动作必须保留显式请求开关。
 
 ## 边界和验证
 
-`launchNuke()` 是不可随意重复的高风险动作。示例只提供显式一次性入口和前置检查，不替玩家决定目标。
+`launchNuke()` 是不可随意重复的高风险动作。示例只提供显式一次性入口和前置检查，不替玩家决定目标。失败后必须人工检查返回值、目标和资源，再明确重新开启请求；代码不会自动重试。
 
 ## 站内学习路径
 
@@ -101,4 +102,3 @@ module.exports.loop = function () {
 
 - [StructureNuker.launchNuke API](https://docs.screeps.com/api/#StructureNuker.launchNuke)
 - [Defense](https://docs.screeps.com/defense.html)
-

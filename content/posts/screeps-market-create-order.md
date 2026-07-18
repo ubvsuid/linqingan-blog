@@ -8,7 +8,6 @@ tags:
   - "Screeps"
   - "进阶开发"
   - "市场"
-  - "订单"
   - "Game API"
 draft: false
 verification:
@@ -54,6 +53,7 @@ module.exports.loop = function () {
     return;
   }
 
+  Memory.market.createUtriumOrder = false;
   const result = Game.market.createOrder({
     type: ORDER_SELL,
     resourceType: RESOURCE_UTRIUM,
@@ -64,7 +64,7 @@ module.exports.loop = function () {
   console.log('createOrder result:', result);
 
   if (result === OK) {
-    Memory.market.createUtriumOrder = false;
+    console.log('一次性创建订单请求已接受');
   }
 };
 ```
@@ -73,9 +73,9 @@ module.exports.loop = function () {
 
 1. 只在显式 Memory 请求下创建。
 2. 先检查同类型同资源同房间订单。
-3. 只有返回 OK 才清除请求。
+3. 调用前清除请求，保证一次开关最多触发一次创建调用。
 4. 非 `OK` 返回值应回到对应 API 页面逐项对照。
-5. 创建失败时保留开关，修正参数后才能再次尝试；实际使用时应避免每 tick 刷屏。
+5. 创建失败后必须人工检查 Credits、订单参数和返回值，再明确重新开启请求；代码不会在后续 tick 自动重试。
 
 ## 适用限制
 
@@ -91,4 +91,3 @@ module.exports.loop = function () {
 
 - [Market System](https://docs.screeps.com/market.html)
 - [Game.market.createOrder API](https://docs.screeps.com/api/#Game-market.createOrder)
-

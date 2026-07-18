@@ -2,13 +2,13 @@
 title: "Screeps Flag 怎么作为房间配置入口"
 description: "从 Game.flags 安全读取指定 Flag，并用 Flag.memory 保存一个明确任务和 Creep 名称。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
   - "基础工程"
   - "Flag"
-  - "配置"
+  - "自动化"
 draft: false
 verification:
   docsChecked: true
@@ -22,7 +22,7 @@ featured: false
 
 本文从 `Game.flags` 读取一个 Flag，并用 `Flag.memory` 保存明确的任务和 Creep 名称。
 
-## 先给结论
+## Flag 适合保存什么配置
 
 Flag 可以从房间视图中放置和移动，适合作为一个可见配置入口。示例读取指定 Flag，并把任务名称和 Creep 名称保存在该 Flag 的 Memory 中。
 
@@ -32,7 +32,7 @@ Flag 可以从房间视图中放置和移动，适合作为一个可见配置入
 - Flag.memory 是对应 Memory.flags[name] 的快捷入口。
 - Flag 有位置但不一定拥有当前可见的 Room 对象。
 
-## 最小完整示例
+## 用 WorkTarget 指定一只 Creep
 
 ### `main` 模块
 
@@ -56,7 +56,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 检查顺序
+## Flag 配置没有生效时
 
 1. Flag 和 enabled 配置检查。
 2. creepName 缺失时不索引 Game.creeps。
@@ -78,4 +78,3 @@ module.exports.loop = function () {
 
 - [Flag API](https://docs.screeps.com/api/#Flag)
 - [Game.flags API](https://docs.screeps.com/api/#Game-flags)
-

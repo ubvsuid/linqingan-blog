@@ -1,6 +1,6 @@
 ---
 title: "reserveController() 和 claimController() 有什么区别"
-description: "根据临时保留或永久占领目的选择 reserveController 与 claimController，并检查 CLAIM 部件和 GCL 前提，附完整检查顺序、最小代码和适用边界。"
+description: "比较 reserveController() 与 claimController() 的用途，并根据临时预定或永久占领选择动作。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-18"
 category: "Screeps 进阶开发"
@@ -91,4 +91,3 @@ module.exports.loop = function () {
 - [Control](https://docs.screeps.com/control.html)
 - [Creep.claimController API](https://docs.screeps.com/api/#Creep.claimController)
 - [Creep.reserveController API](https://docs.screeps.com/api/#Creep.reserveController)
-

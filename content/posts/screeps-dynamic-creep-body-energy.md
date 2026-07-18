@@ -1,8 +1,8 @@
 ---
 title: "Screeps 如何按房间能量动态生成 Creep 身体"
-description: "根据 room.energyAvailable 生成不超过 50 个部件的 WORK/CARRY/MOVE 组合，给出最小代码、返回值检查和适用边界。"
+description: "根据 room.energyAvailable 计算 WORK、CARRY、MOVE 组合，让 Spawn 生成不超过 50 个部件的 Worker。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -23,7 +23,7 @@ featured: false
 
 固定身体在房间能量变化后可能无法生成，或者浪费已经可用的容量。下面按 `room.energyAvailable` 重复加入 `WORK`、`CARRY`、`MOVE`，同时守住 50 个部件的上限。
 
-## 先给判断
+## 先算一组身体的成本
 
 身体部件入门解释作用；本文只解决动态组装、成本和部件上限。先用 `BODYPART_COST` 计算一组 body 的成本，再用房间当前可用能量决定组数。
 
@@ -33,7 +33,7 @@ featured: false
 - BODYPART_COST 可读取部件成本。
 - Creep body 最多 50 个部件，顺序会影响受伤时能力损失。
 
-## 可放进 main 的最小示例
+## 按当前 Energy 组装身体
 
 示例读取 `Spawn1` 所在房间的当前可用 Energy；Spawn 名称需要按实际房间修改。
 
@@ -73,7 +73,7 @@ module.exports.loop = function () {
 
 示例最多生成 16 组、共 48 个部件，既保留完整的 WORK/CARRY/MOVE 配比，也不会超过 50 个部件上限。
 
-## 按顺序排查
+## Spawn 拒绝这个身体时
 
 1. 使用 BODYPART_COST 计算成本。
 2. 最多 16 组共 48 个部件。

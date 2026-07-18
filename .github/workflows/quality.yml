@@ -36,6 +36,12 @@ jobs:
       - name: Validate content
         run: npm run contentcheck
 
+      - name: Validate routes
+        run: npm run routecheck
+
+      - name: Validate JavaScript examples
+        run: npm run codecheck
+
       - name: Typecheck
         run: npm run typecheck
 

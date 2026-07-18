@@ -2,7 +2,7 @@
 title: "Screeps 如何用 require 和 module.exports 拆分代码"
 description: "把角色行为通过 module.exports 导出为独立模块，并在 main 中 require 后遍历 Creep 调用。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-19"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -22,7 +22,7 @@ featured: false
 
 本文把角色行为导出为独立模块，并在 `main` 中 `require` 后遍历 Creep 调用。
 
-## 先给结论
+## main 和角色模块各负责什么
 
 第一份房间代码把逻辑写在 `main`；这里把角色行为导出到独立模块，再由 `main` 使用 `require()` 引入并逐只调用。
 
@@ -32,7 +32,7 @@ featured: false
 - main 模块必须导出 module.exports.loop。
 - 自定义模块应导出调用方实际使用的属性或函数。
 
-## 最小完整示例
+## 拆成 role.worker 与 main
 
 ### `role.worker` 模块
 
@@ -62,7 +62,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 检查顺序
+## require 后没有执行时
 
 1. 导出的 run 与调用属性一致。
 2. main 顶层 require 模块。
@@ -84,4 +84,3 @@ module.exports.loop = function () {
 
 - [Organizing scripts using modules](https://docs.screeps.com/modules.html)
 - [Scripting Basics](https://docs.screeps.com/scripting-basics.html)
-
