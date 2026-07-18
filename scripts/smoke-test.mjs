@@ -4,7 +4,7 @@ const checks = [
   ["/", ["构建，运行，迭代", "Screeps"]],
   ["/about", ["临清安", "/profile-avatar.webp"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
-  ["/blog", ["全部文章", "13"]],
+  ["/blog", ["全部文章", "15"]],
   ["/resources", ["资料中心", "站内搜索"]],
   ["/search", ["搜索整个网站", "错误码"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
@@ -14,7 +14,9 @@ const checks = [
   ["/projects/linqingan-com", ["当前成果", "建设时间线"]],
   ["/blog/screeps-introduction", ["发布于", "把这篇内容连接到下一步"]],
   ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/about"]],
+  ["/blog/screeps-creep-withdraw-container-energy", ["Creep.withdraw 怎么用", "资料核对日期：2026-07-18"]],
+  ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "资料核对日期：2026-07-18"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-creep-withdraw-container-energy", "https://www.linqingan.com/blog/screeps-tower-auto-attack-hostiles", "https://www.linqingan.com/about"]],
 ];
 
 async function waitForServer() {
