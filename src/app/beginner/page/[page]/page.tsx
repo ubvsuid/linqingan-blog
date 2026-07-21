@@ -1,66 +1,20 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
-
-import { BeginnerArchive } from "@/components/beginner-archive";
-import { beginnerSeriesSlugs } from "@/lib/beginner-series";
-import { createPageMetadata } from "@/lib/metadata";
-import {
-  getArchiveStaticParams,
-  getTotalPages,
-  parsePositivePageNumber,
-} from "@/lib/pagination";
-
-interface BeginnerPageNumberProps {
-  params: Promise<{
-    page: string;
-  }>;
-}
+import { permanentRedirect } from "next/navigation";
 
 export const dynamicParams = true;
 
 export function generateStaticParams() {
-  return getArchiveStaticParams(beginnerSeriesSlugs.length);
+  return [];
 }
 
-export async function generateMetadata({
-  params,
-}: BeginnerPageNumberProps): Promise<Metadata> {
-  const { page } = await params;
-  const pageNumber = parsePositivePageNumber(page);
-  const totalPages = getTotalPages(beginnerSeriesSlugs.length);
+export const metadata: Metadata = {
+  title: "Screeps 新手入门",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
-  if (!pageNumber || pageNumber === 1 || pageNumber > totalPages) {
-    return {
-      title: "入门分页不存在",
-      robots: {
-        index: false,
-        follow: false,
-      },
-    };
-  }
-
-  return createPageMetadata({
-    title: `Screeps 新手入门 · 第 ${pageNumber} 页`,
-    description: `按顺序浏览 Screeps 新手学习路线，第 ${pageNumber} 页。`,
-    path: `/beginner/page/${pageNumber}`,
-  });
-}
-
-export default async function BeginnerPageNumber({
-  params,
-}: BeginnerPageNumberProps) {
-  const { page } = await params;
-  const pageNumber = parsePositivePageNumber(page);
-
-  if (pageNumber === 1) {
-    permanentRedirect("/beginner");
-  }
-
-  const totalPages = getTotalPages(beginnerSeriesSlugs.length);
-
-  if (!pageNumber || pageNumber > totalPages) {
-    notFound();
-  }
-
-  return <BeginnerArchive currentPage={pageNumber} />;
+export default function BeginnerPageNumber() {
+  permanentRedirect("/beginner");
 }
