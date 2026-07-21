@@ -143,13 +143,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       0.65,
     ),
     ...createArchivePages(
-      "/beginner",
-      beginnerSeriesSlugs.length,
-      beginnerUpdatedAt,
-      "weekly",
-      0.7,
-    ),
-    ...createArchivePages(
       "/projects",
       projects.length,
       projectsUpdatedAt,
@@ -175,10 +168,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const tagPages: MetadataRoute.Sitemap = getTagRecords()
     .filter((tag) => tag.count >= 3)
     .map((tag) => ({
-    url: `${siteConfig.url}/tags/${tag.slug}`,
-    lastModified: allPostsUpdatedAt,
-    changeFrequency: "weekly",
-    priority: 0.55,
+      url: `${siteConfig.url}/tags/${tag.slug}`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "weekly",
+      priority: 0.55,
     }));
 
   const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
