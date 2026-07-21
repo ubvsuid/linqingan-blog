@@ -1,8 +1,8 @@
 ---
 title: "怎样让 Spawn 创建新的 Creep？认识 spawnCreep()"
-description: "写给 Screeps 新手的第一只 Creep 创建教程：找到 Spawn，准备 WORK、CARRY、MOVE 身体，设置名称并调用 spawnCreep()。"
+description: "写给 Screeps 新手的第一只 Creep 创建教程：安全找到 Spawn，准备 WORK、CARRY、MOVE 身体，设置名称并检查 spawnCreep() 返回结果。"
 publishedAt: "2026-07-16"
-updatedAt: "2026-07-16"
+updatedAt: "2026-07-21"
 category: "Screeps 入门"
 tags:
   - "Screeps"
@@ -16,7 +16,7 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-19"
+  checkedAt: "2026-07-21"
 featured: false
 ---
 
@@ -26,6 +26,8 @@ featured: false
 > **这一篇会用到上一篇的身体部件**
 > `[WORK, CARRY, MOVE]` 是新 Creep 的身体清单，
 > `spawnCreep()` 会让 Spawn 按照这张清单开始创建。
+
+还不熟悉三个基础部件时，可以先回到[第 6 篇：认识 WORK、CARRY 和 MOVE](/blog/screeps-creep-body-parts)。
 
 ## 一、创建前需要准备什么
 
@@ -54,8 +56,16 @@ Spawn 名称：Spawn1
 const spawn = Game.spawns['Spawn1'];
 ```
 
-这行代码表示：找到名为 `Spawn1` 的 Spawn，
-并把它临时称为 `spawn`。
+这行代码表示：找到名为 `Spawn1` 的 Spawn，并把它临时称为 `spawn`。
+
+名称写错时，`spawn` 会是 `undefined`。在访问 `spawn.spawning` 或调用 `spawn.spawnCreep()` 前，要先检查：
+
+```javascript
+if (!spawn) {
+  console.log('找不到 Spawn1，请检查名称和大小写');
+  return;
+}
+```
 
 ### 2. 准备身体部件
 
@@ -78,15 +88,14 @@ const spawn = Game.spawns['Spawn1'];
 ```
 
 Creep 的名称需要放在引号中，并且不能和现有 Creep 重复。
-创建完成后，可以通过
-`Game.creeps['Worker1']` 找到它。
+创建完成后，可以通过 `Game.creeps['Worker1']` 找到它。
 
 ## 三、第一次调用 spawnCreep()
 
 准备好 Spawn、身体部件和名称后，可以写：
 
 ```javascript
-spawn.spawnCreep(
+const result = spawn.spawnCreep(
   [WORK, CARRY, MOVE],
   'Worker1'
 );
@@ -94,109 +103,111 @@ spawn.spawnCreep(
 
 这段代码可以理解成：
 
-> 让这个 Spawn 使用 WORK、CARRY 和 MOVE，
-> 开始创建一只名为 Worker1 的 Creep。
+> 让这个 Spawn 使用 WORK、CARRY 和 MOVE，开始创建一只名为 Worker1 的 Creep，并把调用结果保存到 result。
 
-`spawnCreep()` 返回 `OK` 时，
-表示创建任务已经成功开始，不代表 Creep 已经立刻完成。
+`spawnCreep()` 返回 `OK` 时，表示创建任务已经成功开始，不代表 Creep 已经立刻完成。
 
 ## 四、完整的新手代码
 
 Screeps 会在每个 tick 中重新运行主循环。
-为了避免每个 tick 都重复尝试创建同一只 Creep，
-可以先检查它是否已经存在，以及 Spawn 是否正在工作。
+为了避免每个 tick 都重复尝试创建同一只 Creep，可以先检查它是否已经存在，以及 Spawn 是否正在创建其他 Creep。
 
 ```javascript
 module.exports.loop = function () {
   const spawn = Game.spawns['Spawn1'];
 
-  if (!Game.creeps['Worker1'] && !spawn.spawning) {
-    const result = spawn.spawnCreep(
-      [WORK, CARRY, MOVE],
-      'Worker1'
-    );
+  if (!spawn) {
+    console.log('找不到 Spawn1，请检查名称和大小写');
+    return;
+  }
 
-    console.log(result);
+  if (Game.creeps['Worker1'] || spawn.spawning) {
+    return;
+  }
+
+  const result = spawn.spawnCreep(
+    [WORK, CARRY, MOVE],
+    'Worker1'
+  );
+
+  if (result === OK) {
+    console.log('Worker1 已经开始创建');
+  } else if (result !== ERR_NOT_ENOUGH_ENERGY &&
+             result !== ERR_NAME_EXISTS &&
+             result !== ERR_BUSY) {
+    console.log(`创建 Worker1 返回：${result}`);
   }
 };
 ```
 
 > **保存前先修改 Spawn 名称**
 > 把 `'Spawn1'` 换成自己游戏中真实显示的 Spawn 名称。
-> `'Worker1'` 也可以换成其他没有被使用的名称。
+> `'Worker1'` 也可以换成其他没有被使用的名称，但名称检查与创建命令必须一起修改。
 
 > **判断代码怎么理解？**
-> `!` 可以暂时理解成“没有”，
-> `&&` 可以理解成“并且”。
-> 整段判断表示：没有 Worker1，并且 Spawn 当前没有在创建其他 Creep。
+> `||` 可以暂时理解成“或者”。
+> `Game.creeps['Worker1'] || spawn.spawning` 表示：Worker1 已经存在，或者 Spawn 当前正在创建其他 Creep。只要其中一种情况成立，本 tick 就不再发起新的创建请求。
 
 ## 五、怎样查看创建结果
 
-`spawnCreep()` 会返回一个结果。
-代码中的：
+`spawnCreep()` 会返回一个结果。完整代码会对结果进行分类：
 
-```javascript
-console.log(result);
-```
+| 返回结果 | 最简单的理解 | 当前代码怎样处理 |
+| --- | --- | --- |
+| `OK`（数值为 `0`） | 已经成功开始创建 | 输出“已经开始创建” |
+| `ERR_NOT_ENOUGH_ENERGY` | 房间当前可用于生成的 Energy 不足 | 等待 Energy 增加后再尝试 |
+| `ERR_NAME_EXISTS` | 已经存在同名 Creep | 检查名称与存在判断 |
+| `ERR_BUSY` | Spawn 当前正在创建其他 Creep | 等待当前创建结束 |
 
-会把这个结果显示在 Console 中。
-
-| 返回结果 | 最简单的理解 |
-| --- | --- |
-| `OK`（数值为 `0`） | 已经成功开始创建 |
-| `ERR_NOT_ENOUGH_ENERGY` | 房间当前可用于生成的 Energy 不足 |
-| `ERR_NAME_EXISTS` | 已经存在同名 Creep |
-
-第一次练习时，先认识这三个结果就足够了。
+第一次练习时，先认识这四个结果就足够了。
+想继续查阅其他返回码，可以打开站内的[Screeps 错误码页面](/screeps-errors)。
 
 ## 六、保存代码后观察什么
 
-1. Console 是否出现 `0`，也就是 `OK`；
-2. Spawn 是否显示正在创建 Creep；
-3. 等待创建过程完成；
-4. 房间中是否出现名为 `Worker1` 的新 Creep；
-5. 点击它后，是否能看到 `WORK`、`CARRY` 和 `MOVE`。
+1. Console 中是否没有持续出现“找不到 Spawn1”；
+2. Energy 足够时，Console 是否出现“Worker1 已经开始创建”；
+3. Spawn 是否显示正在创建 Creep；
+4. 等待创建过程完成；
+5. 房间中是否出现名为 `Worker1` 的新 Creep；
+6. 点击它后，是否能看到 `WORK`、`CARRY` 和 `MOVE`。
 
 Spawn 创建每个身体部件需要一定时间。
 这只 Creep 有三个身体部件，所以不会在调用代码后立刻出现。
 
 ## 七、三个常见问题
 
-**1. Console 显示 ERR_NOT_ENOUGH_ENERGY**
+**1. Console 没有输出，但 Worker1 也没有出现**
 
-这表示房间当前可用于生成的 Energy 不足。
-本文中的 `[WORK, CARRY, MOVE]` 需要 200 Energy。
+先检查 `Worker1` 是否已经存在，或者 Spawn 是否正在创建其他 Creep。完整代码遇到这两种情况会直接 `return`。
 
-**2. Console 显示 ERR_NAME_EXISTS**
+**2. Energy 一直不足**
 
-这表示已经存在名为 `Worker1` 的 Creep。
-可以换成 `Worker2`，但代码中的名称检查也要一起修改。
+本文中的 `[WORK, CARRY, MOVE]` 需要 200 Energy。等待 Harvester 向 Spawn 交付 Energy，再观察创建是否开始。
 
-**3. Spawn 没有反应**
+**3. Spawn 名称写错**
 
-依次检查：
+完整代码会输出“找不到 Spawn1”，不会继续读取 `spawn.spawning`，因此不会因为访问 `undefined.spawning` 而中断整个主循环。
 
-- Spawn 名称和大小写是否正确；
-- Creep 名称是否写在引号中；
-- 身体部件是否写在方括号中；
-- Console 中是否出现错误结果。
+## 这一篇需要记住什么
 
-> **补充：如果出现 ERR_BUSY**
-> 表示 Spawn 正在创建另一只 Creep。
-> 等当前创建结束后，它才能开始下一次创建。
+| 代码 | 最简单的理解 |
+| --- | --- |
+| `Game.spawns['Spawn1']` | 找到指定名称的 Spawn |
+| `if (!spawn) return` | 找不到 Spawn 时停止后续代码 |
+| `[WORK, CARRY, MOVE]` | 新 Creep 的身体清单 |
+| `spawn.spawnCreep(body, name)` | 请求 Spawn 创建 Creep |
+| `result === OK` | 创建任务已经成功开始 |
+| `spawn.spawning` | Spawn 当前是否正在创建 Creep |
 
 ## 总结
 
-这一篇，我们第一次让 Spawn 创建了一只新的 Creep。
+这一篇，我们第一次让 Spawn 安全地创建一只新的 Creep。
 
-> 找到 Spawn → 提供身体部件 → 设置唯一名称
-> → 调用 `spawnCreep()` → 等待创建完成
+> 找到 Spawn → 检查 Spawn → 提供身体部件 → 设置唯一名称 → 调用 `spawnCreep()` → 检查返回结果 → 等待创建完成
 
-当你看到 Spawn 开始生产，并最终在房间中出现
-`Worker1` 时，这篇文章的目标就已经完成了。
+当你看到 Spawn 开始生产，并最终在房间中出现 `Worker1` 时，这篇文章的目标就已经完成了。
 
-下一篇将继续介绍：房间中有多只 Creep 后，
-为什么需要给它们分配不同的工作。
+[下一篇](/blog/screeps-creep-roles)将继续介绍：房间中有多只 Creep 后，为什么需要给它们分配不同的工作。
 
 ## 官方参考资料
 
@@ -207,4 +218,3 @@ Spawn 创建每个身体部件需要一定时间。
 
 > 本文是 Screeps 新手入门系列的第七篇，只介绍第一次使用 `spawnCreep()` 创建 Creep。
 > 动态命名、Memory、角色字段、自动补员和生产队列会放到后续文章中。
-
