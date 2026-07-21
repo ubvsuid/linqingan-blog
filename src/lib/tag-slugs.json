@@ -10,6 +10,8 @@
   "游戏界面": "game-interface",
   "房间代码": "room-code",
   "游戏循环": "game-loop",
+  "编程游戏": "programming-game",
+  "基础概念": "basic-concepts",
   "建造": "construction",
   "维修": "repair",
   "运行诊断": "operations-diagnostics",
@@ -47,4 +49,3 @@
   "自动化": "automation",
   "Creep 生命周期": "creep-lifecycle"
 }
-
