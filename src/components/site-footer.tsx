@@ -13,6 +13,7 @@ export function SiteFooter() {
         </div>
 
         <div className="footer-links">
+          <Link href="/blog">文章</Link>
           <Link href="/feed.xml">RSS</Link>
           <a href={siteConfig.links.github} rel="noreferrer" target="_blank">
             GitHub
