@@ -23,6 +23,14 @@ function tagToSlug(tag) {
     .replace(/^-+|-+$/g, "");
 }
 
+function extractConfiguredSlugs(source) {
+  const blocks = [...source.matchAll(/slugs:\s*\[([\s\S]*?)\]/g)];
+
+  return blocks.flatMap((block) =>
+    [...block[1].matchAll(/["']([^"']+)["']/g)].map((match) => match[1]),
+  );
+}
+
 const requiredTagSlugs = {
   新手入门: "beginner",
   基础工程: "basic-engineering",
@@ -89,19 +97,30 @@ const knowledgeSource = fs.readFileSync(
   path.join(root, "src", "lib", "knowledge-base.ts"),
   "utf8",
 );
-const knowledgeBlocks = [...knowledgeSource.matchAll(/slugs:\s*\[([\s\S]*?)\]/g)];
-const knowledgeSlugs = knowledgeBlocks.flatMap((block) =>
-  [...block[1].matchAll(/["']([^"']+)["']/g)].map((match) => match[1]),
+const beginnerSource = fs.readFileSync(
+  path.join(root, "src", "lib", "beginner-series.ts"),
+  "utf8",
 );
+const knowledgeSlugs = extractConfiguredSlugs(knowledgeSource);
+const beginnerSlugs = extractConfiguredSlugs(beginnerSource);
 const knowledgeSet = new Set(knowledgeSlugs);
+const beginnerSet = new Set(beginnerSlugs);
+const classifiedSet = new Set([...knowledgeSlugs, ...beginnerSlugs]);
 
 for (const slug of knowledgeSlugs) {
   if (!postSlugs.has(slug)) addError(`知识库引用了不存在的文章：${slug}`);
 }
-for (const slug of postSlugs) {
-  if (!knowledgeSet.has(slug)) addError(`文章未进入知识库：${slug}`);
+for (const slug of beginnerSlugs) {
+  if (!postSlugs.has(slug)) addError(`新手路线引用了不存在的文章：${slug}`);
 }
-if (knowledgeSet.size !== knowledgeSlugs.length) addError("知识库中存在重复文章 slug");
+for (const slug of postSlugs) {
+  if (!classifiedSet.has(slug)) addError(`文章未进入新手路线或知识模块：${slug}`);
+}
+for (const slug of beginnerSet) {
+  if (knowledgeSet.has(slug)) addError(`文章同时进入新手路线和知识模块：${slug}`);
+}
+if (knowledgeSet.size !== knowledgeSlugs.length) addError("知识模块中存在重复文章 slug");
+if (beginnerSet.size !== beginnerSlugs.length) addError("新手路线中存在重复文章 slug");
 
 for (const fileName of files) {
   const { content } = matter(
@@ -179,5 +198,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${knowledgeSet.size} 个知识库条目。`,
+  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章。`,
 );
