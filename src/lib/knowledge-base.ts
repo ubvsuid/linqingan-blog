@@ -8,45 +8,25 @@ export interface KnowledgeBaseSection {
 
 export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
   {
-    id: "start",
+    id: "memory-engineering",
     number: 1,
-    title: "从零开始",
-    description: "认识 Screeps、tick、Creep 与基础房间循环，按顺序完成第一套可持续运行的代码。",
-    slugs: [
-      "screeps-introduction",
-      "screeps-first-room",
-      "screeps-tick-and-game-loop",
-      "screeps-first-creep-harvest",
-      "screeps-creep-deliver-energy",
-      "screeps-creep-body-parts",
-      "screeps-spawn-create-creep",
-      "screeps-creep-roles",
-      "screeps-upgrade-controller",
-      "screeps-first-extension",
-      "screeps-build-and-repair",
-      "screeps-first-room-code",
-    ],
-  },
-  {
-    id: "memory-state",
-    number: 2,
-    title: "Memory 与状态",
-    description: "保存跨 tick 状态、恢复对象引用、清理过期数据，并理解常规 Memory、segments 与全局缓存的边界。",
+    title: "Memory 与代码工程",
+    description: "保存跨 tick 状态、恢复对象引用、清理过期数据，并逐步理解模块拆分、segments 与全局缓存。",
     slugs: [
       "screeps-memory-basics",
       "screeps-clean-dead-creep-memory",
       "screeps-creep-working-state",
       "screeps-game-get-object-by-id",
+      "screeps-modules-require",
       "screeps-rawmemory-segments",
       "screeps-global-cache",
-      "screeps-modules-require",
     ],
   },
   {
     id: "spawn-lifecycle",
-    number: 3,
-    title: "Spawn 与单位生命周期",
-    description: "从返回值、动态身体、续命、回收到断代恢复，处理 Creep 从创建到退出的完整生命周期。",
+    number: 2,
+    title: "Spawn 与 Creep 生命周期",
+    description: "从创建、身体配置和返回值排查，到续命、回收与房间断代恢复，管理 Creep 的完整生命周期。",
     slugs: [
       "screeps-spawncreep-return-codes",
       "screeps-dynamic-creep-body-energy",
@@ -57,9 +37,9 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
   },
   {
     id: "room-economy",
-    number: 4,
+    number: 3,
     title: "资源采集与房间经济",
-    description: "覆盖掉落资源、Container、Storage、Link、Terminal 与 Mineral，让资源流动的每一步都有明确边界。",
+    description: "覆盖掉落资源、Container、Storage、Link、Terminal 与 Mineral，让资源采集、储存和运输形成清楚的链路。",
     slugs: [
       "screeps-creep-withdraw-container-energy",
       "screeps-creep-pickup-dropped-energy",
@@ -72,9 +52,9 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
   },
   {
     id: "movement-vision",
-    number: 5,
+    number: 4,
     title: "移动、寻路与视野",
-    description: "逐一解决距离、疲劳、无路径、跨房间路线、CostMatrix、视野与远程观察问题。",
+    description: "逐一解决距离、疲劳、无路径、跨房间路线、CostMatrix、房间可见性与远程观察问题。",
     slugs: [
       "screeps-err-not-in-range",
       "screeps-moveto-not-moving",
@@ -89,14 +69,22 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
     ],
   },
   {
-    id: "control-defense",
-    number: 6,
-    title: "Controller、建设与防御",
-    description: "处理 Controller 状态、工地管理、Tower 动作、Rampart 通行、墙体维修和高等级防御建筑。",
+    id: "controller-control",
+    number: 5,
+    title: "Controller 与房间控制",
+    description: "处理 Safe Mode、Controller 降级、预订与占领边界，集中管理房间控制权相关问题。",
     slugs: [
       "screeps-controller-activate-safe-mode",
       "screeps-controller-downgrade",
       "screeps-reserve-vs-claim-controller",
+    ],
+  },
+  {
+    id: "construction-defense",
+    number: 6,
+    title: "建设与防御",
+    description: "管理 Construction Site、建筑拆除、Tower 动作、Rampart 通行、墙体维修和高等级防御建筑。",
+    slugs: [
       "screeps-room-create-construction-site",
       "screeps-construction-site-progress",
       "screeps-construction-site-remove",
@@ -113,7 +101,7 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
     id: "market-advanced-resources",
     number: 7,
     title: "市场与高级资源",
-    description: "从市场成交和订单维护继续进入 Lab、Factory 与 Power Spawn，每篇只解决一个 API 任务。",
+    description: "从市场成交和订单维护继续进入 Lab、Factory 与 Power Spawn，每篇聚焦一个清晰的高级资源任务。",
     slugs: [
       "screeps-market-deal",
       "screeps-market-create-order",
@@ -127,7 +115,7 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
     id: "operations-debugging",
     number: 8,
     title: "工程配置与运行诊断",
-    description: "使用 Flag、CPU 指标、通知与事件日志观察系统，而不把调试工具混进具体业务动作。",
+    description: "使用 Flag、CPU 指标、通知与事件日志观察系统，把配置、监控和调试从具体业务动作中分离出来。",
     slugs: [
       "screeps-flags-config",
       "screeps-cpu-getused-bucket",
