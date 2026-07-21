@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 
 import { Container } from "@/components/container";
@@ -8,7 +7,7 @@ import { getAllPosts } from "@/lib/posts";
 
 export const metadata = createPageMetadata({
   title: "Screeps知识库",
-  description: "60 篇互不重复的 Screeps 中文教程，按入门、Memory、Spawn、资源经济、寻路、防御、高级资源与运行诊断分组。",
+  description: "互不重复的 Screeps 中文教程，按入门、Memory、Spawn、资源经济、寻路、防御、高级资源与运行诊断分组。",
   path: "/knowledge",
 });
 
@@ -30,6 +29,9 @@ export default function KnowledgePage() {
             <span><strong>{knowledgeBaseSections.length}</strong> 个主题组</span>
             <span><strong>{allPosts.length}</strong> 篇已发布</span>
           </div>
+          <Link className="knowledge-all-posts" href="/blog">
+            浏览全部文章 →
+          </Link>
         </header>
 
         <nav className="knowledge-jump" aria-label="知识库主题导航">
@@ -76,6 +78,7 @@ export default function KnowledgePage() {
         .knowledge-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
         .knowledge-stats span { border: 1px solid var(--border); border-radius: 999px; padding: 9px 14px; color: var(--muted); font-size: 13px; }
         .knowledge-stats strong { color: var(--foreground); font-size: 16px; }
+        .knowledge-all-posts { display: inline-flex; width: fit-content; margin-top: 18px; font-weight: 680; }
         .knowledge-jump { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 60px; }
         .knowledge-jump a { border: 1px solid var(--border); border-radius: 999px; padding: 10px 14px; background: var(--surface); font-size: 13px; }
         .knowledge-jump a:hover { border-color: var(--muted); text-decoration: none; }
@@ -100,4 +103,3 @@ export default function KnowledgePage() {
     </main>
   );
 }
-
