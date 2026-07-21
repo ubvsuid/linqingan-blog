@@ -92,11 +92,13 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
     id: "control-defense",
     number: 6,
     title: "Controller、建设与防御",
-    description: "处理降级、预定与占领、Tower 三类动作、Rampart 通行、墙体维修和高等级防御建筑。",
+    description: "处理 Controller 状态、工地管理、Tower 动作、Rampart 通行、墙体维修和高等级防御建筑。",
     slugs: [
       "screeps-controller-activate-safe-mode",
       "screeps-controller-downgrade",
       "screeps-reserve-vs-claim-controller",
+      "screeps-room-create-construction-site",
+      "screeps-construction-site-remove",
       "screeps-tower-auto-attack-hostiles",
       "screeps-tower-repair-threshold",
       "screeps-tower-heal-creeps",
@@ -140,4 +142,3 @@ export const knowledgeBaseSlugs = knowledgeBaseSections.flatMap((section) => [
 export function getKnowledgeBaseSectionId(slug: string): string | null {
   return knowledgeBaseSections.find((section) => section.slugs.includes(slug))?.id ?? null;
 }
-
