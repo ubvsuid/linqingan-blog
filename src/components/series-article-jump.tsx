@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface SeriesArticleJumpProps {
@@ -9,6 +10,21 @@ interface SeriesArticleJumpProps {
   currentArticle: number;
   seriesLabel: string;
 }
+
+const beginnerKnowledgeDestinations = [
+  { label: "浏览完整知识库", href: "/knowledge" },
+  { label: "移动、寻路与视野", href: "/knowledge#movement-vision" },
+  { label: "Memory 与代码工程", href: "/knowledge#memory-engineering" },
+  { label: "移动、寻路与视野", href: "/knowledge#movement-vision" },
+  { label: "资源采集与房间经济", href: "/knowledge#room-economy" },
+  { label: "Spawn 与 Creep 生命周期", href: "/knowledge#spawn-lifecycle" },
+  { label: "Spawn 与 Creep 生命周期", href: "/knowledge#spawn-lifecycle" },
+  { label: "Memory 与代码工程", href: "/knowledge#memory-engineering" },
+  { label: "Controller 与房间控制", href: "/knowledge#controller-control" },
+  { label: "建设与防御", href: "/knowledge#construction-defense" },
+  { label: "建设与防御", href: "/knowledge#construction-defense" },
+  { label: "Memory 与代码工程", href: "/knowledge#memory-engineering" },
+] as const;
 
 export function SeriesArticleJump({
   articleHrefs,
@@ -19,6 +35,9 @@ export function SeriesArticleJump({
   const totalArticles = articleHrefs.length;
   const [articleValue, setArticleValue] = useState(String(currentArticle));
   const [error, setError] = useState("");
+  const knowledgeDestination =
+    beginnerKnowledgeDestinations[currentArticle - 1] ??
+    beginnerKnowledgeDestinations[0];
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -80,6 +99,14 @@ export function SeriesArticleJump({
       >
         {error}
       </p>
+
+      <nav className="series-support-links" aria-label="入门文章辅助导航">
+        <Link href="/beginner">返回12篇入门目录</Link>
+        <Link href={knowledgeDestination.href}>
+          进入“{knowledgeDestination.label}”模块
+        </Link>
+        <Link href="/knowledge">浏览全部知识模块</Link>
+      </nav>
 
       <style>{`
         .series-article-jump {
@@ -155,6 +182,25 @@ export function SeriesArticleJump({
           color: var(--muted);
           font-size: 13px;
           text-align: center;
+        }
+
+        .series-support-links {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px 18px;
+          border-top: 1px solid var(--border);
+          padding-top: 16px;
+          font-size: 13px;
+          font-weight: 650;
+        }
+
+        .series-support-links a {
+          color: var(--muted);
+        }
+
+        .series-support-links a:hover {
+          color: var(--foreground);
         }
       `}</style>
     </section>
