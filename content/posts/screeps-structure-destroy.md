@@ -200,7 +200,7 @@ Memory.destroyStructureRequest = {
 | `ERR_NOT_OWNER` | 不是该 Structure 的所有者 | 核对对象是否属于 `Game.structures` |
 | `ERR_BUSY` | 房间中有敌对 Creep | 先处理房间内的敌对单位 |
 
-`ERR_BUSY` 说的是房间中的敌对 Creep，不是 Structure 正在生产、冷却或被其他代码占用。
+`ERR_BUSY` 说的是房间中的敌对 Creep，不是目标 Structure 正在执行某个内部任务，也不是代码调用发生冲突。
 
 官方对 `destroy()` 的描述使用“立即销毁”，返回值说明则写明 `OK` 表示操作已安排。编写主循环时，稳妥做法仍是保存返回值，并在下一 tick 重新查询，而不是继续使用当前 tick 中的旧对象引用。
 
