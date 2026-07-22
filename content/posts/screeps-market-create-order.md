@@ -39,7 +39,7 @@ featured: false
 | 增加订单剩余总量 | `Game.market.extendOrder()` | 扩大已有订单容量 |
 | 取消自己的订单 | `Game.market.cancelOrder()` | 删除已有订单 |
 
-创建订单时支付的是Credits挂单费用；实际成交时还会涉及Terminal和传输Energy。本文不处理`deal()`的交易距离和传输成本。
+创建订单会产生 **Credits 费用**；实际成交时还会涉及Terminal和传输Energy。本文不处理`deal()`的交易距离和传输成本。
 
 ## 官方参数
 
@@ -322,7 +322,7 @@ request.enabled = false;
 
 然后保存返回值。即使API返回错误，代码也不会自动重复尝试。
 
-需要重试时，先检查：
+失败后必须人工检查：
 
 - `request.result`；
 - `request.status`；
@@ -387,7 +387,7 @@ Game.market.orders
 | `ERR_FULL` | 无法继续创建更多订单 | 检查当前订单数量，不要自动重试 |
 | `ERR_INVALID_ARGS` | 参数无效 | 检查类型、资源、价格、数量和房间 |
 
-不要为`createOrder()`编写`ERR_NOT_IN_RANGE`处理，它不是这个方法的返回值。
+`createOrder()`不返回`ERR_NOT_IN_RANGE`，因此不需要为它编写距离处理。
 
 ## 官方订单上限文字存在不一致
 
@@ -521,7 +521,7 @@ JavaScript语法、参数检查、费用和重复订单分支已经离线验证�
 - [StructureTerminal.send()怎么跨房间发送资源](/blog/screeps-terminal-send-resources)
 - [Screeps Memory是什么](/blog/screeps-memory-basics)
 - [Game.cpu.getUsed()和bucket怎么监控CPU](/blog/screeps-cpu-getused-bucket)
-- [市场与高级资源模块](/knowledge/market-advanced-resources)
+- [进入 Screeps 知识库](/knowledge)
 
 ## 官方资料
 
