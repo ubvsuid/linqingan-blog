@@ -121,7 +121,7 @@ module.exports.loop = function () {
 
 ## 继续学习
 
-- [Creep 身体计算器](/tools/creep-body-calculator)
+- [Creep 身体计算器](https://www.linqingan.com/tools/creep-body-calculator)
 - [按房间能量动态生成身体](/blog/screeps-dynamic-creep-body-energy)
 - [spawnCreep 入门](/blog/screeps-spawn-create-creep)
 - [Creep 角色分工](/blog/screeps-creep-roles)
