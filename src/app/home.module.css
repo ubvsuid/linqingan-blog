@@ -44,13 +44,13 @@
 .learningSection,
 .knowledgeSection,
 .latestSection,
-.projectSection {
+.quickSection {
   padding: 108px 0;
 }
 
 .knowledgeSection,
 .latestSection,
-.projectSection {
+.quickSection {
   border-top: 1px solid var(--border);
 }
 
@@ -62,8 +62,7 @@
   margin-bottom: 38px;
 }
 
-.sectionHeading h2,
-.projectCard h2 {
+.sectionHeading h2 {
   margin: 0;
   font-size: clamp(38px, 5.5vw, 66px);
   line-height: 1.06;
@@ -245,69 +244,61 @@
   min-height: 100%;
 }
 
-.projectCard {
+.quickGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 50px;
-  align-items: end;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quickGrid > a {
+  display: grid;
+  min-height: 260px;
+  align-content: start;
   border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: clamp(32px, 6vw, 58px);
+  border-radius: 22px;
+  padding: 25px;
   background: var(--surface);
-  box-shadow: var(--shadow);
+  transition: transform 160ms ease, border-color 160ms ease;
 }
 
-.projectCard > div:first-child > p:last-child {
-  max-width: 750px;
-  margin: 22px 0 0;
-  color: var(--muted);
-  font-size: 18px;
-  line-height: 1.8;
-}
-
-.projectActions {
-  display: grid;
-  justify-items: end;
-  gap: 18px;
-  white-space: nowrap;
-}
-
-.projectActions span {
-  color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
-}
-
-.projectActions a {
-  display: inline-flex;
-  min-height: 46px;
-  align-items: center;
-  border: 1px solid var(--foreground);
-  border-radius: 999px;
-  padding: 0 19px;
-  background: var(--foreground);
-  color: var(--background);
-  font-weight: 680;
-}
-
-.projectActions a:hover {
+.quickGrid > a:hover {
+  transform: translateY(-3px);
+  border-color: var(--muted);
   text-decoration: none;
-  transform: translateY(-2px);
+}
+
+.quickGrid strong {
+  margin-top: 24px;
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.quickGrid p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.quickGrid > a > span:last-child {
+  margin-top: auto;
+  padding-top: 24px;
+  font-size: 24px;
+}
+
+@media (max-width: 1020px) {
+  .quickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 900px) {
   .learningGrid,
-  .knowledgeCard,
-  .projectCard {
+  .knowledgeCard {
     grid-template-columns: 1fr;
   }
 
   .postGrid {
     grid-template-columns: 1fr;
-  }
-
-  .projectActions {
-    justify-items: start;
   }
 }
 
@@ -327,7 +318,7 @@
   .learningSection,
   .knowledgeSection,
   .latestSection,
-  .projectSection {
+  .quickSection {
     padding: 76px 0;
   }
 
@@ -337,7 +328,8 @@
     gap: 14px;
   }
 
-  .learningGrid {
+  .learningGrid,
+  .quickGrid {
     grid-template-columns: 1fr;
   }
 
@@ -349,5 +341,9 @@
     grid-template-columns: 36px minmax(0, 1fr);
     gap: 14px;
     padding: 22px 20px;
+  }
+
+  .quickGrid > a {
+    min-height: 0;
   }
 }
