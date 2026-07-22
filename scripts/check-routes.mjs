@@ -154,8 +154,7 @@ for (const fileName of files) {
       !href.startsWith("/blog/page/") &&
       !href.startsWith("/beginner/page/") &&
       !href.startsWith("/now/page/") &&
-      !href.startsWith("/changelog/page/") &&
-      !href.startsWith("/projects/page/")
+      !href.startsWith("/changelog/page/")
     ) {
       addError(`${fileName}: 内链目标不存在 ${href}`);
     }
@@ -171,8 +170,6 @@ const routeFiles = new Map([
   ["/glossary", "src/app/glossary/page.tsx"],
   ["/knowledge", "src/app/knowledge/page.tsx"],
   ["/now", "src/app/now/page.tsx"],
-  ["/projects", "src/app/projects/page.tsx"],
-  ["/resources", "src/app/resources/page.tsx"],
   ["/screeps-errors", "src/app/screeps-errors/page.tsx"],
   ["/search", "src/app/search/page.tsx"],
   ["/tags", "src/app/tags/page.tsx"],
@@ -195,12 +192,37 @@ for (const relativePath of [
   if (!fs.existsSync(path.join(root, relativePath))) addError(`缺少动态路由文件 ${relativePath}`);
 }
 
+for (const retiredPath of [
+  "src/app/resources/page.tsx",
+  "src/app/projects/page.tsx",
+  "src/app/projects/[slug]/page.tsx",
+  "src/app/projects/page/[page]/page.tsx",
+]) {
+  if (fs.existsSync(path.join(root, retiredPath))) addError(`已合并页面仍然存在：${retiredPath}`);
+}
+
 const knowledgePageSource = fs.readFileSync(
+  path.join(root, "src", "app", "knowledge", "page.tsx"),
+  "utf8",
+);
+if (!knowledgePageSource.includes('id="reference-tools"')) {
+  addError("知识库没有承接资料中心的查询与工具区域");
+}
+
+const knowledgeModulePageSource = fs.readFileSync(
   path.join(root, "src", "app", "knowledge", "[section]", "page.tsx"),
   "utf8",
 );
-if (!knowledgePageSource.includes("knowledgeBaseSections.map")) {
+if (!knowledgeModulePageSource.includes("knowledgeBaseSections.map")) {
   addError("知识模块页没有从 knowledgeBaseSections 生成静态参数");
+}
+
+const aboutPageSource = fs.readFileSync(
+  path.join(root, "src", "app", "about", "page.tsx"),
+  "utf8",
+);
+if (!aboutPageSource.includes('id="public-projects"') || !aboutPageSource.includes("projects.map")) {
+  addError("关于页没有承接公开项目内容");
 }
 
 const tagPageSource = fs.readFileSync(
@@ -238,6 +260,16 @@ if (!nowPageSource.includes("changelogEntries.slice(0, 3)")) {
   addError("近况页没有自动读取最近三条更新日志");
 }
 
+const nextConfigSource = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
+for (const marker of [
+  'source: "/resources"',
+  'destination: "/knowledge#reference-tools"',
+  'source: "/projects/:path*"',
+  'destination: "/about#public-projects"',
+]) {
+  if (!nextConfigSource.includes(marker)) addError(`缺少旧页面重定向：${marker}`);
+}
+
 const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "sitemap.ts"), "utf8");
 for (const marker of [
   "getAllPosts()",
@@ -253,6 +285,9 @@ for (const marker of [
 }
 if (sitemapSource.includes("`${siteConfig.url}/search`")) {
   addError("站内搜索页不应出现在 Sitemap");
+}
+if (sitemapSource.includes("`${siteConfig.url}/resources`") || sitemapSource.includes("`${siteConfig.url}/projects`")) {
+  addError("已合并的资料或项目页面不应出现在 Sitemap");
 }
 
 if (errors.length > 0) {
