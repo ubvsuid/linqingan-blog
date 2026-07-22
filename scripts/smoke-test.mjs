@@ -1,16 +1,17 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
-  ["/", ["构建，运行，迭代", "Screeps 知识库", "篇文章", "个主题"]],
-  ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章", "公开建设项目"]],
+  ["/", ["构建，运行，迭代", "Screeps 知识库", "篇文章", "个知识模块", "已经遇到问题？", "计算 Creep 身体"]],
+  ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章", "公开建设项目", "查看建设日志"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "篇"]],
-  ["/changelog", ["更新日志", "新增独立更新日志", "重新设计关于页面"]],
-  ["/knowledge", ["Screeps知识库", "查询与工具", "选择你要解决的问题"]],
-  ["/search", ["搜索整个网站", "筛选搜索结果"]],
+  ["/changelog", ["更新日志", "新增独立更新日志", "合并资料中心与项目页面"]],
+  ["/knowledge", ["Screeps 知识库", "查询与工具", "Creep 身体计算器", "选择你要解决的问题"]],
+  ["/tools/creep-body-calculator", ["Creep 身体计算器", "选择身体部件", "计算结果", "复制身体数组"]],
+  ["/search", ["搜索整个网站", "筛选搜索结果", "身体计算器"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
   ["/screeps-errors", ["ERR_NOT_IN_RANGE", "建议排查顺序"]],
-  ["/verification", ["文章验证方法", "五种验证状态", "真实主循环已验证"]],
+  ["/verification", ["文章验证方法", "五种验证状态", "离线模拟已通过", "真实主循环已验证"]],
   ["/tags", ["文章标签", "核心标签", "更多标签"]],
   ["/tags/beginner", ["新手入门", "当前共有"]],
   ["/tags/basic-engineering", ["基础工程", "当前共有"]],
@@ -25,15 +26,21 @@ const checks = [
   ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-controller-activate-safe-mode", ["Safe Mode 怎么开启", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-spawn-renew-creep", ["renewCreep() 怎么用", "资料核对日期：2026-07-18"]],
-  ["/blog/screeps-clean-dead-creep-memory", ["清理死亡 Creep 的 Memory", "真实主循环", "待验证"]],
+  ["/blog/screeps-dynamic-creep-body-energy", ["离线模拟结果", "Node.js 24 离线模拟", "真实 Screeps Console 与主循环仍待环境验证"]],
+  ["/blog/screeps-clean-dead-creep-memory", ["离线模拟结果", "删除 2 个死亡名称", "真实 Screeps Console 与主循环仍待环境验证"]],
+  ["/blog/screeps-construction-site-progress", ["离线模拟结果", "超过总量保护", "仍为待环境验证"]],
+  ["/blog/screeps-tower-repair-threshold", ["为什么要先检查敌人", "离线模拟结果", "真实 Tower 行为"]],
+  ["/blog/screeps-spawn-emergency-recovery", ["离线模拟结果", "Energy 为 200", "真实 `spawnCreep()` 返回值"]],
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
-  ["/blog/screeps-spawn-emergency-recovery", ["房间断代后如何自动恢复第一只采集者", "不会返回", "ERR_NOT_IN_RANGE"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
 ];
 
 const assetChecks = [
   ["/opengraph-image", "image/"],
+  ["/knowledge/opengraph-image", "image/"],
+  ["/beginner/opengraph-image", "image/"],
+  ["/tools/creep-body-calculator/opengraph-image", "image/"],
 ];
 
 const redirectChecks = [
@@ -49,8 +56,10 @@ const redirectChecks = [
 
 const metadataPaths = [
   "/",
+  "/beginner",
   "/changelog",
   "/knowledge",
+  "/tools/creep-body-calculator",
   "/tags/basic-engineering",
   "/blog/screeps-storage-energy-usage",
   "/about",
@@ -156,20 +165,13 @@ function evenlySample(values, limit) {
 }
 
 const sitemapPaths = sitemapUrls.map((url) => new URL(url).pathname);
-if (sitemapPaths.includes("/search")) {
-  failures.push("/search: 不应出现在 Sitemap");
-}
-if (sitemapPaths.includes("/resources")) {
-  failures.push("/resources: 已合并，不应出现在 Sitemap");
-}
+if (sitemapPaths.includes("/search")) failures.push("/search: 不应出现在 Sitemap");
+if (sitemapPaths.includes("/resources")) failures.push("/resources: 已合并，不应出现在 Sitemap");
 if (sitemapPaths.some((pathname) => pathname === "/projects" || pathname.startsWith("/projects/"))) {
   failures.push("/projects: 已合并，不应出现在 Sitemap");
 }
-if (!sitemapPaths.includes("/verification")) {
-  failures.push("/verification: 应出现在 Sitemap");
-}
-if (!sitemapPaths.includes("/changelog")) {
-  failures.push("/changelog: 应出现在 Sitemap");
+for (const requiredPath of ["/verification", "/changelog", "/tools/creep-body-calculator"]) {
+  if (!sitemapPaths.includes(requiredPath)) failures.push(`${requiredPath}: 应出现在 Sitemap`);
 }
 
 const sampledPaths = [
