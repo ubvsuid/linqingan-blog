@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev",
     "prebuild": "npm run contentcheck && npm run routecheck && npm run codecheck && npm run typecheck && npm run lint",
-    "build": "next build",
+    "build": "next build && node scripts/run-smoke.mjs",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -16,7 +16,7 @@
     "routecheck": "node scripts/check-routes.mjs",
     "codecheck": "node scripts/check-code-blocks.mjs",
     "smoke": "node scripts/smoke-test.mjs",
-    "check": "npm run prebuild && npm run build"
+    "check": "npm run build"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
