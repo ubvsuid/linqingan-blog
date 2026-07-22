@@ -72,12 +72,22 @@ export function CreepBodyCalculator() {
       }
     }
 
-    const budget = Number.parseInt(params.get("energy") ?? "", 10);
-    if (Number.isFinite(budget) && budget >= 0) setEnergyBudget(Math.min(100000, budget));
-    if (hasBodyParam && Object.values(parsed).reduce((sum, value) => sum + value, 0) <= 50) {
-      setCounts(parsed);
-    }
-    setReady(true);
+    const parsedBudget = Number.parseInt(params.get("energy") ?? "", 10);
+    const nextBudget = Number.isFinite(parsedBudget) && parsedBudget >= 0
+      ? Math.min(100000, parsedBudget)
+      : 300;
+    const parsedTotal = Object.values(parsed).reduce((sum, value) => sum + value, 0);
+    const nextCounts = hasBodyParam && parsedTotal <= 50
+      ? parsed
+      : createCounts({ WORK: 1, CARRY: 1, MOVE: 1 });
+
+    const timer = window.setTimeout(() => {
+      setEnergyBudget(nextBudget);
+      setCounts(nextCounts);
+      setReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const body = useMemo(
