@@ -94,15 +94,14 @@ record(
 
 record(
   "screeps-room-create-construction-site",
-  "覆盖请求参数、房间视野、墙体地形、已有Road、已有工地、账号上限和可提交场景。",
+  "覆盖请求参数、房间视野、已有Road、已有工地、账号上限，以及普通地面和自然墙体Road场景。",
   () => {
-    function evaluate({ request, roomVisible, terrain, hasRoad, hasSite, siteCount }) {
+    function evaluate({ request, roomVisible, hasRoad, hasSite, siteCount }) {
       if (!request?.enabled) return "disabled";
       if (!request.roomName || !Number.isInteger(request.x) || !Number.isInteger(request.y)
         || request.x < 0 || request.x > 49 || request.y < 0 || request.y > 49
         || request.structureType !== "road") return "invalid-request";
       if (!roomVisible) return "room-not-visible";
-      if (terrain === 1) return "terrain-wall";
       if (hasRoad) return "road-exists";
       if (hasSite) return "site-exists";
       if (siteCount >= 100) return "site-limit";
@@ -110,15 +109,22 @@ record(
     }
 
     const request = { enabled: true, roomName: "W1N1", x: 20, y: 20, structureType: "road" };
-    const base = { request, roomVisible: true, terrain: 0, hasRoad: false, hasSite: false, siteCount: 10 };
+    const base = { request, roomVisible: true, hasRoad: false, hasSite: false, siteCount: 10 };
 
     assert.equal(evaluate({ ...base, request: { ...request, x: -1 } }), "invalid-request");
     assert.equal(evaluate({ ...base, roomVisible: false }), "room-not-visible");
-    assert.equal(evaluate({ ...base, terrain: 1 }), "terrain-wall");
     assert.equal(evaluate({ ...base, hasRoad: true }), "road-exists");
     assert.equal(evaluate({ ...base, hasSite: true }), "site-exists");
     assert.equal(evaluate({ ...base, siteCount: 100 }), "site-limit");
     assert.equal(evaluate(base), "ready");
+
+    const terrainScenarios = [
+      { terrain: 0, expected: "ready" },
+      { terrain: 1, expected: "ready" },
+    ];
+    for (const scenario of terrainScenarios) {
+      assert.equal(evaluate(base), scenario.expected);
+    }
   },
 );
 
