@@ -18,6 +18,14 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-22-primary-navigation-cleanup",
+    date: "2026-07-22",
+    type: "网站",
+    title: "精简顶部主导航",
+    summary:
+      "从顶部主导航移除与其他入口重合的“资料”和“项目”，保留对应页面、页脚入口和站内链接，让主要学习路径更集中。",
+  },
+  {
     id: "2026-07-22-changelog-page",
     date: "2026-07-22",
     type: "网站",
