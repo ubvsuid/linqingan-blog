@@ -68,12 +68,11 @@ const knownRoutes = new Set([
   "/glossary",
   "/knowledge",
   "/now",
-  "/projects",
-  "/resources",
   "/screeps-errors",
   "/search",
   "/sitemap.xml",
   "/tags",
+  "/tools/creep-body-calculator",
   "/verification",
 ]);
 
@@ -150,7 +149,6 @@ for (const fileName of files) {
     const href = match[1].replace(/\/$/, "") || "/";
     if (
       !knownRoutes.has(href) &&
-      !href.startsWith("/projects/") &&
       !href.startsWith("/blog/page/") &&
       !href.startsWith("/beginner/page/") &&
       !href.startsWith("/now/page/") &&
@@ -173,6 +171,7 @@ const routeFiles = new Map([
   ["/screeps-errors", "src/app/screeps-errors/page.tsx"],
   ["/search", "src/app/search/page.tsx"],
   ["/tags", "src/app/tags/page.tsx"],
+  ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],
   ["/verification", "src/app/verification/page.tsx"],
 ]);
 for (const [route, relativePath] of routeFiles) {
@@ -208,6 +207,12 @@ const knowledgePageSource = fs.readFileSync(
 if (!knowledgePageSource.includes('id="reference-tools"')) {
   addError("知识库没有承接资料中心的查询与工具区域");
 }
+if (!knowledgePageSource.includes("CollectionPage") || !knowledgePageSource.includes("ItemList")) {
+  addError("知识库缺少集合型结构化数据");
+}
+if (!knowledgePageSource.includes("/tools/creep-body-calculator")) {
+  addError("知识库没有加入 Creep 身体计算器");
+}
 
 const knowledgeModulePageSource = fs.readFileSync(
   path.join(root, "src", "app", "knowledge", "[section]", "page.tsx"),
@@ -223,6 +228,9 @@ const aboutPageSource = fs.readFileSync(
 );
 if (!aboutPageSource.includes('id="public-projects"') || !aboutPageSource.includes("projects.map")) {
   addError("关于页没有承接公开项目内容");
+}
+if (aboutPageSource.includes("profile-project-columns")) {
+  addError("关于页仍然展示过长的项目详情列");
 }
 
 const tagPageSource = fs.readFileSync(
@@ -280,6 +288,7 @@ for (const marker of [
   "/knowledge",
   "/verification",
   "/changelog",
+  "/tools/creep-body-calculator",
 ]) {
   if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
 }
