@@ -75,10 +75,9 @@ module.exports.loop = function () {
 
 - [Memory 基础用法](/blog/screeps-memory-basics)
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 
 ## 官方资料
 
 - [RawMemory API](https://docs.screeps.com/api/#RawMemory)
 - [Global Objects](https://docs.screeps.com/global-objects.html)
-
