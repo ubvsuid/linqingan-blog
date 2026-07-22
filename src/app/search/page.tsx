@@ -9,6 +9,7 @@ export const metadata = createPageMetadata({
   title: "站内搜索",
   description: "搜索临清安网站中的 Screeps 文章、术语、错误码和项目内容。",
   path: "/search",
+  noindex: true,
 });
 
 interface SearchPageProps {
