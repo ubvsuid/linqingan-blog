@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
+import {
+  CHANGELOG_ITEMS_PER_PAGE,
+  changelogEntries,
+} from "@/lib/changelog";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
 import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
@@ -27,8 +31,9 @@ function createArchivePages(
   lastModified: Date,
   changeFrequency: ChangeFrequency,
   priority: number,
+  itemsPerPage?: number,
 ): MetadataRoute.Sitemap {
-  const totalPages = getTotalPages(totalItems);
+  const totalPages = getTotalPages(totalItems, itemsPerPage);
 
   return Array.from(
     { length: Math.max(0, totalPages - 1) },
@@ -67,7 +72,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
   const projectsUpdatedAt = latestDate(projects.map((project) => project.updatedAt));
-  const nowUpdatedAt = latestDate(nowEntries.map((entry) => entry.date));
+  const changelogUpdatedAt = latestDate(changelogEntries.map((entry) => entry.date));
+  const nowUpdatedAt = latestDate([
+    ...nowEntries.map((entry) => entry.date),
+    ...changelogEntries.map((entry) => entry.date),
+  ]);
   const resourcesUpdatedAt = latestDate([
     staticPageDates.resources,
     allPostsPublishedAt.toISOString(),
@@ -141,8 +150,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${siteConfig.url}/now`,
       lastModified: nowUpdatedAt,
-      changeFrequency: "monthly",
+      changeFrequency: "weekly",
       priority: 0.7,
+    },
+    {
+      url: `${siteConfig.url}/changelog`,
+      lastModified: changelogUpdatedAt,
+      changeFrequency: "daily",
+      priority: 0.72,
     },
     {
       url: `${siteConfig.url}/about`,
@@ -187,6 +202,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       nowUpdatedAt,
       "monthly",
       0.55,
+    ),
+    ...createArchivePages(
+      "/changelog",
+      changelogEntries.length,
+      changelogUpdatedAt,
+      "weekly",
+      0.58,
+      CHANGELOG_ITEMS_PER_PAGE,
     ),
   ];
 
