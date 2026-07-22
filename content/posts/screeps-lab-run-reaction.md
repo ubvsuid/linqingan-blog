@@ -90,7 +90,7 @@ module.exports.loop = function () {
 
 - [Mineral 开采前置知识](/blog/screeps-first-creep-harvest)
 - [Creep 运输 Energy](/blog/screeps-creep-deliver-energy)
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 
 ## 官方资料
 
