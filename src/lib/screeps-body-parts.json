@@ -1,0 +1,10 @@
+{
+  "MOVE": { "cost": 50, "label": "移动", "description": "降低移动产生的 fatigue" },
+  "WORK": { "cost": 100, "label": "工作", "description": "采集、建造、维修和升级" },
+  "CARRY": { "cost": 50, "label": "携带", "description": "提供资源容量" },
+  "ATTACK": { "cost": 80, "label": "近战", "description": "执行近距离攻击" },
+  "RANGED_ATTACK": { "cost": 150, "label": "远程", "description": "执行远程攻击" },
+  "HEAL": { "cost": 250, "label": "治疗", "description": "治疗己方单位" },
+  "CLAIM": { "cost": 600, "label": "控制", "description": "占领、预订或攻击 Controller" },
+  "TOUGH": { "cost": 10, "label": "承伤", "description": "增加低成本生命值" }
+}
