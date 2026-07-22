@@ -11,7 +11,7 @@ import { siteConfig } from "@/lib/site";
 export const metadata = createPageMetadata({
   title: "关于临清安",
   description:
-    "认识临清安，了解这个 Screeps 中文知识站为什么建立、如何组织内容，以及文章怎样区分资料核对、语法检查、离线模拟和真实运行验证。",
+    "认识临清安，了解这个 Screeps 中文知识站为什么建立、如何组织内容、公开项目怎样推进，以及文章如何区分不同验证状态。",
   path: "/about",
   image: "/profile-avatar.webp",
 });
@@ -53,8 +53,8 @@ const readingPaths = [
   {
     href: "/knowledge",
     label: "已经遇到具体问题",
-    title: "进入对应知识模块",
-    description: "按 Memory、Spawn、资源经济、寻路、建设和运行诊断等主题继续学习。",
+    title: "进入知识库与查询工具",
+    description: "按专题继续学习，或查询术语、错误码、标签和验证方法。",
   },
   {
     href: "/verification",
@@ -132,22 +132,10 @@ export default function AboutPage() {
         </section>
 
         <section className="profile-stats" aria-label="网站当前公开内容">
-          <div>
-            <strong>{beginnerSeriesSlugs.length}</strong>
-            <span>篇入门文章</span>
-          </div>
-          <div>
-            <strong>{knowledgeBaseSlugs.length}</strong>
-            <span>篇专题文章</span>
-          </div>
-          <div>
-            <strong>{knowledgeBaseSections.length}</strong>
-            <span>个知识模块</span>
-          </div>
-          <div>
-            <strong>{projects.length}</strong>
-            <span>个公开项目</span>
-          </div>
+          <div><strong>{beginnerSeriesSlugs.length}</strong><span>篇入门文章</span></div>
+          <div><strong>{knowledgeBaseSlugs.length}</strong><span>篇专题文章</span></div>
+          <div><strong>{knowledgeBaseSections.length}</strong><span>个知识模块</span></div>
+          <div><strong>{projects.length}</strong><span>个公开项目</span></div>
         </section>
 
         <p className="profile-stats-note">
@@ -163,10 +151,7 @@ export default function AboutPage() {
             {contentMethods.map((method) => (
               <article key={method.number}>
                 <span>{method.number}</span>
-                <div>
-                  <h3>{method.title}</h3>
-                  <p>{method.description}</p>
-                </div>
+                <div><h3>{method.title}</h3><p>{method.description}</p></div>
               </article>
             ))}
           </div>
@@ -188,17 +173,61 @@ export default function AboutPage() {
           </div>
         </section>
 
+        <section id="public-projects" className="profile-projects" aria-labelledby="profile-projects-title">
+          <div className="profile-section-heading">
+            <p className="eyebrow">PUBLIC PROJECTS</p>
+            <h2 id="profile-projects-title">公开建设项目</h2>
+            <p>这里保留项目为什么建立、怎样推进以及已经完成的主要成果，不再单独建立重复的项目归档页。</p>
+          </div>
+          <div className="profile-project-list">
+            {projects.map((project) => (
+              <article id={`project-${project.id}`} key={project.id}>
+                <div className="profile-project-topline">
+                  <span>{project.status}</span>
+                  <time dateTime={project.updatedAt}>更新于 {project.updatedAt}</time>
+                </div>
+                <h3>{project.title}</h3>
+                <p className="profile-project-summary">{project.summary}</p>
+                <div className="profile-project-story">
+                  <div><strong>为什么做</strong><p>{project.purpose}</p></div>
+                  <div><strong>需要解决的问题</strong><p>{project.challenge}</p></div>
+                </div>
+                <div className="profile-project-columns">
+                  <div>
+                    <strong>建设方式</strong>
+                    <ol>{project.approach.slice(0, 4).map((item) => <li key={item}>{item}</li>)}</ol>
+                  </div>
+                  <div>
+                    <strong>已经完成</strong>
+                    <ul>{project.highlights.slice(0, 5).map((item) => <li key={item}>{item}</li>)}</ul>
+                  </div>
+                </div>
+                <div className="profile-project-links">
+                  {project.id === "linqingan-com" ? (
+                    <>
+                      <Link href="/knowledge">浏览知识库 →</Link>
+                      <Link href="/changelog">查看更新日志 →</Link>
+                      <a href={siteConfig.links.repository} rel="noreferrer" target="_blank">查看 GitHub ↗</a>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/beginner">开始新手路线 →</Link>
+                      <Link href="/verification">查看验证方法 →</Link>
+                    </>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section className="profile-section" aria-labelledby="profile-current-title">
           <div className="profile-section-heading">
             <p className="eyebrow">CURRENT WORK</p>
             <h2 id="profile-current-title">现在正在推进的事情</h2>
           </div>
           <div className="profile-current-copy">
-            <ul>
-              {currentWork.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+            <ul>{currentWork.map((item) => <li key={item}>{item}</li>)}</ul>
             <Link href="/now">查看最近进展 →</Link>
           </div>
         </section>
@@ -211,10 +240,7 @@ export default function AboutPage() {
           <div className="profile-reading-grid">
             {readingPaths.map((item) => (
               <Link href={item.href} key={item.href}>
-                <span>{item.label}</span>
-                <strong>{item.title}</strong>
-                <p>{item.description}</p>
-                <span aria-hidden="true">→</span>
+                <span>{item.label}</span><strong>{item.title}</strong><p>{item.description}</p><span aria-hidden="true">→</span>
               </Link>
             ))}
           </div>
@@ -230,10 +256,8 @@ export default function AboutPage() {
           </div>
           <div className="profile-contact-links">
             <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>
-            <a href={siteConfig.links.github} rel="noreferrer" target="_blank">
-              GitHub ↗
-            </a>
-            <Link href="/projects">查看公开项目 →</Link>
+            <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub ↗</a>
+            <Link href="/changelog">查看更新日志 →</Link>
           </div>
         </section>
       </Container>
@@ -264,6 +288,21 @@ export default function AboutPage() {
         .profile-method-list h3 { margin: 0; font-size: 21px; }
         .profile-method-list p, .profile-contact p { margin: 9px 0 0; color: var(--muted); line-height: 1.75; }
         .profile-trust-copy a, .profile-current-copy > a { display: inline-flex; margin-top: 24px; font-weight: 700; }
+        .profile-projects { scroll-margin-top: 24px; padding: 76px 0; border-bottom: 1px solid var(--border); }
+        .profile-projects > .profile-section-heading { max-width: 820px; }
+        .profile-projects > .profile-section-heading > p:last-child { margin: 18px 0 0; color: var(--muted); line-height: 1.75; }
+        .profile-project-list { display: grid; gap: 22px; margin-top: 38px; }
+        .profile-project-list > article { scroll-margin-top: 24px; border: 1px solid var(--border); border-radius: 24px; padding: clamp(24px, 4vw, 38px); background: var(--surface); }
+        .profile-project-topline { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+        .profile-project-list h3 { margin: 24px 0 0; font-size: clamp(30px, 5vw, 46px); letter-spacing: -.045em; }
+        .profile-project-summary { max-width: 820px; margin: 16px 0 0; color: var(--muted); font-size: 17px; line-height: 1.75; }
+        .profile-project-story { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 30px; }
+        .profile-project-story > div { border-top: 1px solid var(--border); padding-top: 22px; }
+        .profile-project-story p { margin: 10px 0 0; color: var(--muted); line-height: 1.75; }
+        .profile-project-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; margin-top: 30px; }
+        .profile-project-columns ol, .profile-project-columns ul { display: grid; gap: 9px; margin: 14px 0 0; padding-left: 22px; color: var(--muted); line-height: 1.65; }
+        .profile-project-links { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 30px; }
+        .profile-project-links a { font-weight: 700; }
         .profile-current-copy ul { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
         .profile-current-copy li { position: relative; border-bottom: 1px solid var(--border); padding: 22px 0 22px 28px; line-height: 1.7; }
         .profile-current-copy li::before { content: ""; position: absolute; top: 31px; left: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--foreground); }
@@ -284,6 +323,7 @@ export default function AboutPage() {
           .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .profile-stats div:nth-child(3) { border-top: 1px solid var(--border); border-left: 0; }
           .profile-stats div:nth-child(4) { border-top: 1px solid var(--border); }
+          .profile-project-story, .profile-project-columns { grid-template-columns: 1fr; }
         }
         @media (max-width: 620px) {
           .profile-page { padding-top: 10px; }
