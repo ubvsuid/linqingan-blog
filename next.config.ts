@@ -59,6 +59,11 @@ const nextConfig: NextConfig = {
         statusCode: 301,
       },
       {
+        source: "/resources",
+        destination: "/knowledge#reference-tools",
+        statusCode: 301,
+      },
+      {
         source: "/resources/glossary",
         destination: "/glossary",
         permanent: true,
@@ -73,6 +78,16 @@ const nextConfig: NextConfig = {
         destination: "/tags",
         permanent: true,
       },
+      {
+        source: "/projects",
+        destination: "/about#public-projects",
+        statusCode: 301,
+      },
+      {
+        source: "/projects/:path*",
+        destination: "/about#public-projects",
+        statusCode: 301,
+      },
     ];
   },
   async headers() {
@@ -86,4 +101,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
