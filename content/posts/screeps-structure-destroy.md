@@ -1,157 +1,280 @@
 ---
-title: "Structure.destroy() 怎么用：安全拆除建错的 Extension"
-description: "用 Structure.destroy() 拆除已经完工且确认无误的 Extension，加入坐标、结构类型和确认词检查，并处理 ERR_NOT_OWNER 与 ERR_BUSY。"
+title: "Structure.destroy() 怎么安全拆除建错的 Extension"
+description: "使用结构ID、预期房间、坐标、类型和确认词锁定己方Extension，检查敌对Creep与全部返回码后提交一次性destroy()请求，并在下一tick重新核对。"
 publishedAt: "2026-07-21"
-updatedAt: "2026-07-21"
+updatedAt: "2026-07-22"
 category: "Screeps 常见问题"
 tags:
   - "Screeps"
   - "Structure"
   - "Room API"
   - "常见问题"
-  - "基础工程"
+  - "运行安全"
 draft: false
 verification:
   docsChecked: true
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-21"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（结构ID、所有权、房间、坐标、类型、确认词与敌对单位，不是 Screeps 官方服务器）"
+  testResult: "对象缺失、非己方结构、类型或位置不一致、确认失败、房间有敌对Creep和可提交场景通过。"
 featured: false
 ---
 
-工地放错时可以调用 `ConstructionSite.remove()`。一旦 Builder 把工地完成，目标已经变成 Structure，删除方法也随之改变。
+`Structure.destroy()` 会拆除已经完工的 Structure。它不是工地删除方法，也不适合写成每 tick 运行的自动清理逻辑。
 
-本文只处理一种明确场景：**拆除自己房间中、已经完工且位置放错的 Extension**。示例故意不开放 Spawn、Storage、Terminal、Road 或其他结构，避免一段通用代码误删关键建筑。
+本文只处理一个明确场景：拆除自己房间里、已经人工确认位置错误的 Extension。示例不允许 Spawn、Storage、Terminal、Nuker 或其他关键结构。
 
-## 先分清工地和完整建筑
+## 先分清对象阶段
 
-| 当前目标 | 使用的方法 |
+| 目标 | 方法 |
 |---|---|
 | 尚未完成的 Construction Site | `site.remove()` |
-| 已经完成的 Structure | `structure.destroy()` |
+| 已经完成的 Extension | `structure.destroy()` |
 
-不知道目标处于哪个阶段时，先看游戏界面，或者在该坐标分别查询 `LOOK_CONSTRUCTION_SITES` 与 `LOOK_STRUCTURES`。
-
-未完成工地的处理已经在[ConstructionSite.remove() 怎么用](/blog/screeps-construction-site-remove)中说明，这里不再重复。
-
-## 不要从 Console 直接猜 ID 并销毁
-
-下面这种调用缺少对象、类型和所有权检查：
+执行前先用只读查询确认：
 
 ```js
-Game.getObjectById('某个ID').destroy();
-```
+const room = Game.rooms.W1N1;
 
-ID 错误或对象不可见时，`Game.getObjectById()` 会返回 `null`。即使取得了对象，也不代表它就是准备拆除的 Extension。
-
-先执行只读检查更稳妥：
-
-```js
-const room = Game.rooms['W1N1'];
-
-if (!room) {
-  console.log('房间当前不可见');
-} else {
-  const structures = room.lookForAt(
-    LOOK_STRUCTURES,
-    20,
-    20
+if (room) {
+  console.log(
+    room.lookForAt(LOOK_STRUCTURES, 20, 20).map(
+      structure => ({
+        id: structure.id,
+        my: structure.my,
+        structureType: structure.structureType,
+        roomName: structure.pos.roomName,
+        x: structure.pos.x,
+        y: structure.pos.y,
+        hits: structure.hits,
+        hitsMax: structure.hitsMax
+      })
+    )
   );
-
-  console.log(structures);
 }
 ```
 
-确认房间、X、Y 和结构类型后，再提交拆除请求。
+只读结果确认后，再把结构ID和预期信息写进请求。
 
-## 使用坐标、类型和确认词三重检查
+## 为什么同时使用ID和坐标
 
-下面的完整示例只允许 `STRUCTURE_EXTENSION`。请求必须同时提供：
+ID用于恢复精确对象，房间、坐标和类型用于交叉验证。
 
-- 房间名；
-- 0～49 的整数坐标；
-- 预期结构类型；
-- 完全一致的确认词 `DESTROY`。
+请求：
+
+```js
+Memory.destroyStructureRequest = {
+  enabled: true,
+  structureId: '替换为Extension ID',
+  roomName: 'W1N1',
+  x: 20,
+  y: 20,
+  expectedType: STRUCTURE_EXTENSION,
+  confirmation: 'DESTROY_EXTENSION'
+};
+```
+
+如果结构被重建、ID改变或请求被错误复制，交叉检查会拒绝执行。
+
+## 为什么示例只允许 Extension
+
+拆除是破坏性操作。允许任意 `STRUCTURE_*` 会放大配置错误。
+
+本文允许列表只有：
 
 ```js
 const ALLOWED_DESTROY_TYPES = new Set([
   STRUCTURE_EXTENSION
 ]);
+```
+
+要支持其他结构，应为对应资源迁移、房间依赖和确认流程单独设计规则。
+
+## 可离线测试的计划函数
+
+```js
+function evaluateDestroyRequest(input) {
+  const {
+    request,
+    structure,
+    owned,
+    hostileCount
+  } = input;
+
+  if (!request || request.enabled !== true) {
+    return { ready: false, reason: 'disabled' };
+  }
+
+  if (
+    typeof request.structureId !== 'string'
+    || typeof request.roomName !== 'string'
+    || !Number.isInteger(request.x)
+    || !Number.isInteger(request.y)
+    || request.x < 0
+    || request.x > 49
+    || request.y < 0
+    || request.y > 49
+    || request.expectedType !== STRUCTURE_EXTENSION
+    || request.confirmation !== 'DESTROY_EXTENSION'
+  ) {
+    return { ready: false, reason: 'invalid-request' };
+  }
+
+  if (!structure) {
+    return { ready: false, reason: 'structure-missing' };
+  }
+
+  if (!owned) {
+    return { ready: false, reason: 'not-owner' };
+  }
+
+  if (structure.structureType !== request.expectedType) {
+    return { ready: false, reason: 'type-mismatch' };
+  }
+
+  if (structure.pos.roomName !== request.roomName) {
+    return { ready: false, reason: 'room-mismatch' };
+  }
+
+  if (
+    structure.pos.x !== request.x
+    || structure.pos.y !== request.y
+  ) {
+    return { ready: false, reason: 'position-mismatch' };
+  }
+
+  if (hostileCount > 0) {
+    return { ready: false, reason: 'hostiles-present' };
+  }
+
+  return { ready: true, reason: 'ready' };
+}
+```
+
+## 完整示例
+
+```js
+function evaluateDestroyRequest(input) {
+  const {
+    request,
+    structure,
+    owned,
+    hostileCount
+  } = input;
+
+  if (!request || request.enabled !== true) {
+    return { ready: false, reason: 'disabled' };
+  }
+
+  if (
+    typeof request.structureId !== 'string'
+    || typeof request.roomName !== 'string'
+    || !Number.isInteger(request.x)
+    || !Number.isInteger(request.y)
+    || request.x < 0
+    || request.x > 49
+    || request.y < 0
+    || request.y > 49
+    || request.expectedType !== STRUCTURE_EXTENSION
+    || request.confirmation !== 'DESTROY_EXTENSION'
+  ) {
+    return { ready: false, reason: 'invalid-request' };
+  }
+
+  if (!structure) {
+    return { ready: false, reason: 'structure-missing' };
+  }
+
+  if (!owned) {
+    return { ready: false, reason: 'not-owner' };
+  }
+
+  if (structure.structureType !== request.expectedType) {
+    return { ready: false, reason: 'type-mismatch' };
+  }
+
+  if (structure.pos.roomName !== request.roomName) {
+    return { ready: false, reason: 'room-mismatch' };
+  }
+
+  if (
+    structure.pos.x !== request.x
+    || structure.pos.y !== request.y
+  ) {
+    return { ready: false, reason: 'position-mismatch' };
+  }
+
+  if (hostileCount > 0) {
+    return { ready: false, reason: 'hostiles-present' };
+  }
+
+  return { ready: true, reason: 'ready' };
+}
 
 function handleDestroyStructureRequest() {
   const request = Memory.destroyStructureRequest;
 
-  if (!request) {
+  if (!request || request.enabled !== true) {
     return;
   }
 
-  delete Memory.destroyStructureRequest;
-
-  const roomName = request.roomName;
-  const x = request.x;
-  const y = request.y;
-  const expectedType = request.expectedType;
-  const confirmation = request.confirmation;
-
-  if (
-    typeof roomName !== 'string' ||
-    !Number.isInteger(x) ||
-    !Number.isInteger(y) ||
-    x < 0 ||
-    x > 49 ||
-    y < 0 ||
-    y > 49 ||
-    typeof expectedType !== 'string'
-  ) {
-    console.log('[destroy] 请求参数不正确');
-    return;
-  }
-
-  if (confirmation !== 'DESTROY') {
-    console.log('[destroy] 确认词不正确，已取消');
-    return;
-  }
-
-  if (!ALLOWED_DESTROY_TYPES.has(expectedType)) {
-    console.log(`[destroy] 示例不允许拆除：${expectedType}`);
-    return;
-  }
-
-  const room = Game.rooms[roomName];
-
-  if (!room) {
-    console.log(`[destroy] 房间当前不可见：${roomName}`);
-    return;
-  }
-
-  const structures = room.lookForAt(
-    LOOK_STRUCTURES,
-    x,
-    y
+  const structure = typeof request.structureId === 'string'
+    ? Game.getObjectById(request.structureId)
+    : null;
+  const owned = Boolean(
+    structure
+    && Game.structures[structure.id]
   );
+  const hostileCount = structure?.room
+    ? structure.room.find(FIND_HOSTILE_CREEPS).length
+    : 0;
 
-  const target = structures.find(function (structure) {
-    return (
-      structure.structureType === expectedType &&
-      Boolean(Game.structures[structure.id])
-    );
+  const plan = evaluateDestroyRequest({
+    request,
+    structure,
+    owned,
+    hostileCount
   });
 
-  if (!target) {
-    console.log(
-      `[destroy] ${roomName} (${x}, ${y}) ` +
-      `没有符合条件的己方 ${expectedType}`
-    );
+  if (!plan.ready) {
+    request.enabled = false;
+    request.status = `precheck-${plan.reason}`;
+    request.checkedAt = Game.time;
     return;
   }
 
-  const result = target.destroy();
+  request.enabled = false;
+  request.status = 'submitted';
+  request.submittedAt = Game.time;
+  request.snapshot = {
+    structureId: structure.id,
+    roomName: structure.pos.roomName,
+    x: structure.pos.x,
+    y: structure.pos.y,
+    structureType: structure.structureType,
+    hostileCount
+  };
 
-  console.log(
-    `[destroy] ${target.structureType} ` +
-    `(${x}, ${y}) 返回值：${result}`
-  );
+  const result = structure.destroy();
+
+  request.result = result;
+  request.resultAt = Game.time;
+  request.status = result === OK
+    ? 'accepted'
+    : 'failed-review-required';
+
+  console.log({
+    type: 'destroy-structure-result',
+    structureId: structure.id,
+    roomName: structure.pos.roomName,
+    x: structure.pos.x,
+    y: structure.pos.y,
+    structureType: structure.structureType,
+    result
+  });
 }
 
 module.exports.loop = function () {
@@ -159,111 +282,141 @@ module.exports.loop = function () {
 };
 ```
 
-代码还通过 `Game.structures[target.id]` 再确认一次对象属于自己的 Structure 集合。单看坐标或 `structureType` 不足以证明目标可由当前玩家销毁。
+## 为什么使用 `Game.structures`
 
-在 Console 中提交一次请求：
+`Game.structures` 只包含自己的 Structure。示例已经通过ID恢复对象，再检查：
 
 ```js
-Memory.destroyStructureRequest = {
-  roomName: 'W1N1',
-  x: 20,
-  y: 20,
-  expectedType: STRUCTURE_EXTENSION,
-  confirmation: 'DESTROY'
-};
+Boolean(Game.structures[structure.id])
 ```
 
-主循环会先消费请求，再做检查。参数不正确、房间不可见或目标不符合时，后续 tick 不会持续尝试。
+作为所有权的第二层证据。
 
-需要再次执行时，必须重新提交请求。这个限制是有意的：拆除不应该成为每 tick 自动运行的普通任务。
+仅仅看到 `structure.my` 或结构类型，不足以替代完整请求验证。
 
-## 为什么示例只允许 Extension
+## 为什么有敌对 Creep 时提前停止
 
-`Structure.destroy()` 是破坏性操作。把所有 `STRUCTURE_*` 类型都加入允许列表，会让坐标写错的后果更严重。
+官方 `destroy()` 会在房间有敌对 Creep 时返回 `ERR_BUSY`。
 
-本文选择 Extension，是因为它与站内[怎样建造第一个 Extension](/blog/screeps-first-extension)形成明确的前后关系。准备支持其他结构时，应单独核对：
+预检查能让状态更清楚，但不能替代API返回值，因为房间状态可能在脚本检查与命令结算之间变化。
 
-- 该对象是否属于 `Game.structures`；
-- 该结构是否承载关键资源或房间功能；
-- 坐标和预期类型是否来自可靠配置；
-- 是否需要额外的人工确认。
+所有预检查失败都会关闭请求。失败后需要重新查看房间状态，再明确提交新请求。
 
-不要为了“通用”删掉 `expectedType` 和确认词检查。
+## 官方返回值
 
-## destroy() 的返回值
-
-官方 API 当前列出三个结果：
-
-| 返回值 | 含义 | 排查方向 |
+| 返回值 | 官方含义 | 优先检查 |
 |---|---|---|
-| `OK` | 操作已成功安排 | 下一 tick 重新查询该坐标 |
-| `ERR_NOT_OWNER` | 不是该 Structure 的所有者 | 核对对象是否属于 `Game.structures` |
-| `ERR_BUSY` | 房间中有敌对 Creep | 先处理房间内的敌对单位 |
+| `OK` | 拆除已安排 | 下一 tick 重新查询结构 |
+| `ERR_NOT_OWNER` | 不是结构所有者 | ID、`Game.structures`与所有权 |
+| `ERR_BUSY` | 房间中存在敌对 Creep | 当前房间敌对对象 |
 
-`ERR_BUSY` 说的是房间中的敌对 Creep，不是目标 Structure 正在执行某个内部任务，也不是代码调用发生冲突。
-
-官方对 `destroy()` 的描述使用“立即销毁”，返回值说明则写明 `OK` 表示操作已安排。编写主循环时，稳妥做法仍是保存返回值，并在下一 tick 重新查询，而不是继续使用当前 tick 中的旧对象引用。
+官方描述使用“立即销毁”，返回值仍说明操作已安排。主循环中应保存结果，并在下一 tick 重新取得对象。
 
 ## 下一 tick 怎样确认
 
-可以再次执行只读查询：
+```js
+const structure = Game.getObjectById(
+  Memory.destroyStructureRequest.structureId
+);
+
+console.log(structure);
+```
+
+还应在房间可见时按原坐标检查：
 
 ```js
-const room = Game.rooms['W1N1'];
+const room = Game.rooms.W1N1;
 
 if (room) {
-  const structures = room.lookForAt(
-    LOOK_STRUCTURES,
-    20,
-    20
+  console.log(
+    room.lookForAt(LOOK_STRUCTURES, 20, 20)
   );
-
-  console.log(structures);
 }
 ```
 
-目标不再出现，才说明后续状态中该 Structure 已经消失。
+对象不再出现，才说明后续状态中结构已被拆除。
 
-站内的[Game.getObjectById() 怎么配合 Memory 保存目标](/blog/screeps-game-get-object-by-id)解释了为什么跨 tick 应重新取得对象，而不是长期保存运行时对象。
+## 拆除前需要处理结构依赖
 
-## 本文没有讨论资源返还
+Extension通常不保存长期资源，但它仍参与房间孵化容量。拆除后可能影响：
 
-本文不承诺拆除后返还 Energy、掉落资源或保留建筑内容，因为这不是完成当前搜索意图所必需的结论，也没有在文章中提供真实环境材料。
+- `room.energyCapacityAvailable`；
+- 大型Creep身体能否孵化；
+- Extension布局和物流路线；
+- RCL结构数量规划；
+- Rampart覆盖；
+- Spawn周边交通。
 
-执行拆除前，应自行处理目标 Structure 中的资源和房间依赖。本文代码只确认目标并调用 API，不承担迁移资源或重新规划布局。
+本文不承诺资源返还，也不自动重建新位置。
 
-## 常见错误
+## 离线模拟结果
 
-### 房间不在 Game.rooms 中
+构建检查覆盖：
 
-房间名存在于 Memory，不代表当前可见。先阅读[Game.rooms 为什么没有某个房间](/blog/screeps-room-visibility)。
+1. 请求未启用或确认词错误；
+2. 结构ID无法恢复；
+3. 对象不属于 `Game.structures`；
+4. 结构类型不是Extension；
+5. 房间名不一致；
+6. 坐标不一致；
+7. 房间存在敌对 Creep；
+8. 全部字段一致时允许提交。
 
-### 坐标上同时有多个对象
+离线模拟没有调用真实 `destroy()`，也没有模拟房间孵化容量变化。
 
-Rampart 等结构可能与其他对象共享位置。代码通过 `expectedType` 精确选择 Extension，不取数组中的第一个对象。
+## 常见误区
 
-### 把 Construction Site 当作 Structure
+### 只按坐标取第一个结构
 
-未完成工地不会通过本文的 Extension Structure 条件。需要删除工地时使用 `ConstructionSite.remove()`。
+Rampart等结构可能与其他对象共格，应使用ID和预期类型。
 
-### 收到 OK 后继续调用旧对象
+### 使用通用结构允许列表
 
-命令产生的对象变化在后续 tick 体现。下一 tick 重新查询，不要基于旧引用继续执行业务逻辑。
+会让坐标错误影响关键建筑。
 
-## 相关内容
+### 把Construction Site当成Structure
 
-- [创建一个明确坐标的 Construction Site](/blog/screeps-room-create-construction-site)
-- [删除尚未完成的 Construction Site](/blog/screeps-construction-site-remove)
-- [怎样建造第一个 Extension](/blog/screeps-first-extension)
+未完工工地应使用 `remove()`。
+
+### 失败请求保持开启
+
+敌对单位离开或结构变化后，旧请求可能突然执行。
+
+### `OK`后继续使用旧引用
+
+下一tick重新取得对象。
+
+### 忽略Extension对房间容量的影响
+
+拆除前应核对 `energyCapacityAvailable` 与孵化需求。
+
+## 适用边界
+
+本文没有实现：
+
+- 自动布局迁移；
+- 其他结构类型拆除；
+- 资源搬空；
+- 自动重建；
+- 多结构批量清理；
+- 建筑依赖图；
+- 房间交通重算。
+
+JavaScript语法和请求匹配离线模拟已经通过。真实拆除、敌对状态与房间容量变化仍待Screeps环境验证。
+
+## 相关站内内容
+
+- [Room.createConstructionSite() 怎么创建工地](/blog/screeps-room-create-construction-site)
+- [ConstructionSite.remove() 怎么删除工地](/blog/screeps-construction-site-remove)
+- [怎样建造第一个Extension](/blog/screeps-first-extension)
+- [Game.getObjectById() 为什么返回 null](/blog/screeps-game-get-object-by-id)
 - [查询 Screeps 错误码](/screeps-errors)
+- [进入建设与防御模块](/knowledge/construction-defense)
 
 ## 官方资料
 
-- [Screeps API Reference：Structure.destroy](https://docs.screeps.com/api/#Structure.destroy)
-- [Screeps API Reference：Room.lookForAt](https://docs.screeps.com/api/#Room.lookForAt)
-- [Screeps API Reference：Game.structures](https://docs.screeps.com/api/#Game.structures)
-- [Screeps Documentation：Understanding game loop, time and ticks](https://docs.screeps.com/game-loop.html)
+- [Structure.destroy API](https://docs.screeps.com/api/#Structure.destroy)
+- [Game.structures API](https://docs.screeps.com/api/#Game-structures)
+- [Room.lookForAt API](https://docs.screeps.com/api/#Room.lookForAt)
 
-资料核对日期：2026-07-21。
-
-代码已完成 JavaScript 语法检查；房间名、坐标、Extension 所有权、敌对单位状态和真实拆除结果均为**待环境验证**。
+资料核对日期：2026-07-22。离线请求匹配已通过；真实拆除仍待环境验证。
