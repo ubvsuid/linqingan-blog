@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { SearchDocument, SearchDocumentType } from "@/lib/search";
 
-const typeOrder: SearchDocumentType[] = ["文章", "术语", "错误码", "项目"];
+const typeOrder: SearchDocumentType[] = ["文章", "术语", "错误码", "工具", "项目"];
 type SearchFilter = "全部" | SearchDocumentType;
 
 const synonymGroups = [
@@ -16,7 +16,28 @@ const synonymGroups = [
   ["维修", "repair"],
   ["没能量", "能量不足", "err_not_enough_energy"],
   ["距离不足", "够不到", "err_not_in_range"],
+  ["身体", "body", "部件", "bodpart", "bodypart_cost"],
+  ["移动速度", "走得慢", "fatigue", "move"],
+  ["出生", "生成", "spawn", "spawncreep"],
 ] as const;
+
+const emptyRecommendations = [
+  {
+    href: "/tools/creep-body-calculator",
+    title: "Creep 身体计算器",
+    description: "计算身体成本、生成时间和移动比例。",
+  },
+  {
+    href: "/screeps-errors",
+    title: "错误码查询",
+    description: "按返回值检查常见失败原因。",
+  },
+  {
+    href: "/knowledge",
+    title: "知识模块",
+    description: "按当前问题进入对应学习模块。",
+  },
+];
 
 function normalize(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("zh-CN");
@@ -154,7 +175,7 @@ export function SiteSearch({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  });
+  }, [query]);
 
   function updateQuery(value: string) {
     setQuery(value);
@@ -176,12 +197,10 @@ export function SiteSearch({
             type="search"
             value={query}
             onChange={(event) => updateQuery(event.target.value)}
-            placeholder="输入 Creep、Memory、ERR_NOT_IN_RANGE、项目……"
+            placeholder="输入 Creep、Memory、ERR_NOT_IN_RANGE、身体计算器……"
           />
           {query ? (
-            <button type="button" onClick={() => updateQuery("")}>
-              清空
-            </button>
+            <button type="button" onClick={() => updateQuery("")}>清空</button>
           ) : (
             <small>按 / 快速搜索</small>
           )}
@@ -227,9 +246,7 @@ export function SiteSearch({
                   <HighlightedText text={result.title} query={query} />
                 </Link>
               </h2>
-              <p>
-                <HighlightedText text={result.description} query={query} />
-              </p>
+              <p><HighlightedText text={result.description} query={query} /></p>
               {result.keywords.length > 0 ? (
                 <div className="site-search-keywords" aria-label="相关关键词">
                   {result.keywords.slice(0, 5).map((keyword) => (
@@ -242,9 +259,21 @@ export function SiteSearch({
         </div>
       ) : (
         <div className="site-search-empty">
-          <strong>没有找到匹配内容</strong>
-          <p>可以缩短关键词，或尝试使用 Screeps 对象、API、错误码和中文描述。</p>
-          <Link href="/resources">进入资料中心 →</Link>
+          <strong>没有找到“{query.trim()}”</strong>
+          <p>
+            可以去掉括号、点号或方法后的参数，只保留对象名、方法名、错误码或中文问题。例如把 <code>spawn.spawnCreep()</code> 改成 <code>spawnCreep</code>。
+          </p>
+          <div className="site-search-empty-grid">
+            {emptyRecommendations.map((item) => (
+              <Link href={item.href} key={item.href}>
+                <strong>{item.title}</strong>
+                <span>{item.description}</span>
+              </Link>
+            ))}
+          </div>
+          <a className="site-search-feedback" href="https://github.com/ubvsuid/linqingan-blog/issues/new" rel="noreferrer" target="_blank">
+            提交缺少的内容 ↗
+          </a>
         </div>
       )}
 
@@ -257,7 +286,7 @@ export function SiteSearch({
         .site-search-field button { min-height: 42px; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
         .site-search-field small { white-space: nowrap; color: var(--muted); }
         .site-search-filters { display: flex; flex-wrap: wrap; gap: 8px; }
-        .site-search-filters button { display: inline-flex; min-height: 40px; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 999px; padding: 0 12px 0 15px; background: var(--surface); color: var(--muted); cursor: pointer; }
+        .site-search-filters button { display: inline-flex; min-height: 42px; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 999px; padding: 0 12px 0 15px; background: var(--surface); color: var(--muted); cursor: pointer; }
         .site-search-filters button[aria-pressed="true"] { border-color: var(--foreground); background: var(--foreground); color: var(--background); }
         .site-search-filters small { display: grid; min-width: 22px; min-height: 22px; place-items: center; border-radius: 999px; background: color-mix(in srgb, currentColor 10%, transparent); font-size: 10px; }
         .site-search-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; color: var(--muted); font-size: 13px; }
@@ -271,9 +300,15 @@ export function SiteSearch({
         .site-search-results mark { border-radius: 3px; padding: 0 .12em; background: color-mix(in srgb, var(--foreground) 14%, transparent); color: inherit; }
         .site-search-keywords { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 17px; }
         .site-search-keywords span { border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; color: var(--muted); font-size: 11px; }
-        .site-search-empty { border: 1px dashed var(--border); border-radius: 20px; padding: 48px 24px; text-align: center; }
-        .site-search-empty p { margin: 10px auto 0; max-width: 560px; color: var(--muted); line-height: 1.7; }
-        .site-search-empty a { display: inline-flex; margin-top: 20px; font-weight: 650; }
+        .site-search-empty { border: 1px dashed var(--border); border-radius: 20px; padding: clamp(28px, 5vw, 48px); text-align: center; }
+        .site-search-empty > p { margin: 12px auto 0; max-width: 680px; color: var(--muted); line-height: 1.75; }
+        .site-search-empty code { border-radius: 5px; padding: .1em .35em; background: var(--surface); }
+        .site-search-empty-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; text-align: left; }
+        .site-search-empty-grid a { display: grid; gap: 8px; border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--surface); }
+        .site-search-empty-grid a:hover { border-color: var(--muted); text-decoration: none; }
+        .site-search-empty-grid span { color: var(--muted); font-size: 13px; line-height: 1.6; }
+        .site-search-feedback { display: inline-flex; margin-top: 24px; font-weight: 650; }
+        @media (max-width: 720px) { .site-search-empty-grid { grid-template-columns: 1fr; } }
         @media (max-width: 560px) { .site-search-field > div { grid-template-columns: 1fr; } .site-search-field button, .site-search-field small { justify-self: start; } }
       `}</style>
     </div>
