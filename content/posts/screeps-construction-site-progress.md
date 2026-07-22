@@ -2,7 +2,7 @@
 title: "Screeps 工地进度怎么看：progress、progressTotal 与剩余量"
 description: "读取 ConstructionSite.progress 与 progressTotal，计算完成率和剩余进度，并用 FIND_MY_CONSTRUCTION_SITES 定期输出房间工地状态。"
 publishedAt: "2026-07-21"
-updatedAt: "2026-07-21"
+updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -16,7 +16,10 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-21"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（普通对象模拟 ConstructionSite 数值）"
+  testResult: "正常进度、超过总量保护、总量为 0 和按剩余量排序场景通过。"
 featured: false
 ---
 
@@ -154,6 +157,25 @@ logConstructionSiteReport('W1N1');
 
 `Game.time % 50` 是这份示例选择的输出频率，不是官方规定。改成 `10` 会更频繁，改成 `100` 会更安静。若每个 tick 都输出，Console 很快会被重复信息占满。
 
+## 离线模拟结果
+
+构建检查使用三个简化工地对象：
+
+| 对象 | progress | progressTotal | 结果 |
+|---|---:|---:|---|
+| A | 40 | 100 | 40%，剩余 60 |
+| B | 120 | 100 | 100%，剩余 0 |
+| C | 0 | 0 | 0%，剩余 0 |
+
+模拟确认：
+
+- `progress` 超过 `progressTotal` 时，显示值不会超过 100%；
+- `progressTotal` 为 0 时不会除以 0；
+- 剩余量不会小于 0；
+- 报告按剩余量从少到多排序。
+
+这属于 **Node.js 离线数值模拟**。它没有模拟 `Room.find()`、房间视野、Construction Site 完成后的对象替换，也没有证明 Console 输出已经出现在官方服务器。真实环境仍待验证。
+
 ## 为什么当前 tick 的数字可能没有变化
 
 Screeps 在 tick 开始时提供当前对象状态，随后执行玩家脚本并收集命令。Builder 在本 tick 调用 `build()` 后，不应假设同一段代码再次读取 `site.progress` 就一定得到更新值。
@@ -179,8 +201,6 @@ Screeps 在 tick 开始时提供当前对象状态，随后执行玩家脚本并
 尚未完成的工地可以通过[ConstructionSite.remove() 删除](/blog/screeps-construction-site-remove)。删除成功后，下一 tick 的工地列表中自然不再包含它。
 
 ## 用 Game.constructionSites 查看账号内的己方工地
-
-本文的完整代码从一个当前可见房间读取工地，适合排查“这个房间还剩多少施工”。
 
 需要查看当前 shard 中自己的全部 Construction Site 时，可以从 `Game.constructionSites` 取得以 ID 为键的集合：
 
@@ -209,6 +229,4 @@ console.log(`己方工地数量：${allMySites.length}`);
 - [Screeps API Reference：Room.find](https://docs.screeps.com/api/#Room.find)
 - [Screeps Documentation：Understanding game loop, time and ticks](https://docs.screeps.com/game-loop.html)
 
-资料核对日期：2026-07-21。
-
-代码已完成 JavaScript 语法检查；房间名、工地数量、实际进度变化和 Console 输出均为**待环境验证**。
+资料核对日期：2026-07-22。代码语法与离线数值模拟已通过；房间名、工地数量、实际进度变化和 Console 输出仍为待环境验证。
