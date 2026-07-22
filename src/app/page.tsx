@@ -5,7 +5,7 @@ import { Container } from "@/components/container";
 import { HomeLearningActions } from "@/components/home-learning-actions";
 import { PostCard } from "@/components/post-card";
 import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
-import { knowledgeBaseSections } from "@/lib/knowledge-base";
+import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
@@ -31,6 +31,7 @@ export default function HomePage() {
   const allPosts = getAllPosts();
   const latestPosts = allPosts.slice(0, 3);
   const articleCount = allPosts.length;
+  const knowledgeArticleCount = knowledgeBaseSlugs.length;
   const sectionCount = knowledgeBaseSections.length;
   const currentProject = projects[0];
 
@@ -107,8 +108,8 @@ export default function HomePage() {
                 从基础操作到 Memory、Spawn、资源经济、寻路、防御、市场、高级资源与运行诊断。
               </p>
               <div className={styles.knowledgeStats} aria-label="知识库规模">
-                <span><strong>{articleCount}</strong> 篇文章</span>
-                <span><strong>{sectionCount}</strong> 个主题组</span>
+                <span><strong>{knowledgeArticleCount}</strong> 篇专题文章</span>
+                <span><strong>{sectionCount}</strong> 个知识模块</span>
               </div>
               <Link href="/knowledge">进入知识库 →</Link>
             </div>
