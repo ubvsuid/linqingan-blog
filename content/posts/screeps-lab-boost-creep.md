@@ -84,7 +84,7 @@ module.exports.loop = function () {
 
 - [Creep 身体部件](/blog/screeps-creep-body-parts)
 - [Creep 角色分工](/blog/screeps-creep-roles)
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 
 ## 官方资料
 
