@@ -15,6 +15,7 @@
   "建造": "construction",
   "维修": "repair",
   "运行诊断": "operations-diagnostics",
+  "运行安全": "operational-safety",
   "资源采集": "resource-harvesting",
   "状态管理": "state-management",
   "错误码": "error-codes",
