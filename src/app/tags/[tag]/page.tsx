@@ -50,7 +50,7 @@ export default async function TagPage({ params }: TagPageProps) {
     <main className="page-shell tag-page">
       <Container>
         <nav className="tag-breadcrumb" aria-label="面包屑">
-          <Link href="/resources">资料中心</Link>
+          <Link href="/knowledge">知识库</Link>
           <span aria-hidden="true">/</span>
           <Link href="/tags">文章标签</Link>
           <span aria-hidden="true">/</span>
