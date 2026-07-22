@@ -15,7 +15,7 @@ export default function ScreepsErrorsPage() {
   return (
     <main className="page-shell">
       <Container>
-        <nav className="resource-breadcrumb" aria-label="面包屑"><Link href="/resources">资料中心</Link><span aria-hidden="true">/</span><span>错误码查询</span></nav>
+        <nav className="resource-breadcrumb" aria-label="面包屑"><Link href="/knowledge">知识库</Link><span aria-hidden="true">/</span><span>错误码查询</span></nav>
         <header className="page-header"><p className="eyebrow">ERROR CODES</p><h1>Screeps 错误码查询</h1><p>Screeps 的多数动作不会抛出异常，而是返回一个数字。先保存返回值，再根据错误码决定移动、等待、换目标或修正参数。</p></header>
         <aside className="error-tip"><strong>推荐调试方式</strong><code>const result = creep.harvest(source); console.log(result);</code><p>不要只看 Creep 有没有行动。把返回值打印出来，通常能更快找到问题。</p></aside>
         <ErrorCodeExplorer codes={screepsErrorCodes} />
