@@ -18,12 +18,24 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-22-merge-resources-projects",
+    date: "2026-07-22",
+    type: "网站",
+    title: "合并资料中心与项目页面",
+    summary:
+      "把术语、错误码、标签、验证方法和工具规划并入知识库，把公开项目说明并入关于页面；旧地址保留永久重定向，减少重复页面。",
+    links: [
+      { label: "查看知识库", href: "/knowledge#reference-tools" },
+      { label: "查看公开项目", href: "/about#public-projects" },
+    ],
+  },
+  {
     id: "2026-07-22-primary-navigation-cleanup",
     date: "2026-07-22",
     type: "网站",
     title: "精简顶部主导航",
     summary:
-      "从顶部主导航移除与其他入口重合的“资料”和“项目”，保留对应页面、页脚入口和站内链接，让主要学习路径更集中。",
+      "从顶部主导航移除与主要学习入口重合的“资料”和“项目”，让首页、入门、文章、知识库、近况与关于成为更清晰的主路径。",
   },
   {
     id: "2026-07-22-changelog-page",
@@ -105,10 +117,10 @@ export const changelogEntries: ChangelogEntry[] = [
     type: "网站",
     title: "站点内容统计改为自动计算",
     summary:
-      "首页、资料中心和关于页的文章数、模块数与项目数改为读取真实数据，新增内容后不再手工修改数字。",
+      "首页、知识库和关于页的文章数、模块数与项目数改为读取真实数据，新增内容后不再手工修改数字。",
     links: [
       { label: "查看首页", href: "/" },
-      { label: "查看资料中心", href: "/resources" },
+      { label: "查看知识库", href: "/knowledge" },
     ],
   },
 ];
