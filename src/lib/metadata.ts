@@ -10,6 +10,12 @@ interface PageMetadataOptions {
   image?: string;
 }
 
+const pageSocialImages: Record<string, string> = {
+  "/beginner": "/beginner/opengraph-image",
+  "/knowledge": "/knowledge/opengraph-image",
+  "/tools/creep-body-calculator": "/tools/creep-body-calculator/opengraph-image",
+};
+
 export function createPageMetadata({
   title,
   description,
@@ -18,10 +24,11 @@ export function createPageMetadata({
   image,
 }: PageMetadataOptions): Metadata {
   const url = `${siteConfig.url}${path === "/" ? "" : path}`;
-  const imageUrl = image
-    ? image.startsWith("http")
-      ? image
-      : `${siteConfig.url}${image.startsWith("/") ? image : `/${image}`}`
+  const selectedImage = image ?? pageSocialImages[path];
+  const imageUrl = selectedImage
+    ? selectedImage.startsWith("http")
+      ? selectedImage
+      : `${siteConfig.url}${selectedImage.startsWith("/") ? selectedImage : `/${selectedImage}`}`
     : `${siteConfig.url}/opengraph-image`;
 
   return {
@@ -53,4 +60,3 @@ export function createPageMetadata({
     },
   };
 }
-
