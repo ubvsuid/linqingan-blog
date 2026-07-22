@@ -2,12 +2,11 @@ const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
   ["/", ["构建，运行，迭代", "Screeps 知识库", "篇文章", "个主题"]],
-  ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章"]],
+  ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章", "公开建设项目"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "篇"]],
   ["/changelog", ["更新日志", "新增独立更新日志", "重新设计关于页面"]],
-  ["/knowledge", ["Screeps知识库", "选择你要解决的问题"]],
-  ["/resources", ["资料中心", "站内搜索", "文章验证方法"]],
+  ["/knowledge", ["Screeps知识库", "查询与工具", "选择你要解决的问题"]],
   ["/search", ["搜索整个网站", "筛选搜索结果"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
   ["/screeps-errors", ["ERR_NOT_IN_RANGE", "建议排查顺序"]],
@@ -18,8 +17,6 @@ const checks = [
   ["/tags/common-questions", ["常见问题", "当前共有"]],
   ["/tags/debugging", ["错误排查", "当前共有"]],
   ["/tags/advanced-development", ["进阶开发", "当前共有"]],
-  ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
-  ["/projects/linqingan-com", ["当前成果", "建设时间线", "验证方法"]],
   ["/now", ["更新日志", "查看完整更新日志", "阶段性记录"]],
   ["/feed.xml", ["<rss", "linqingan.com"]],
   ["/blog/screeps-introduction", ["Screeps 是什么", "发布于", "验证状态"]],
@@ -45,6 +42,9 @@ const redirectChecks = [
   ["/tags/常见问题", "/tags/common-questions"],
   ["/tags/错误排查", "/tags/debugging"],
   ["/tags/进阶开发", "/tags/advanced-development"],
+  ["/resources", "/knowledge#reference-tools"],
+  ["/projects", "/about#public-projects"],
+  ["/projects/linqingan-com", "/about#public-projects"],
 ];
 
 const metadataPaths = [
@@ -53,8 +53,7 @@ const metadataPaths = [
   "/knowledge",
   "/tags/basic-engineering",
   "/blog/screeps-storage-energy-usage",
-  "/projects/linqingan-com",
-  "/resources",
+  "/about",
   "/verification",
 ];
 
@@ -103,8 +102,8 @@ for (const [pathname, expectedTexts] of checks) {
 for (const [source, destination] of redirectChecks) {
   const response = await fetch(`${baseUrl}${source}`, { redirect: "manual" });
   const location = response.headers.get("location");
-  if (response.status !== 301) {
-    failures.push(`${source}: 预期 301，实际 ${response.status}`);
+  if (![301, 308].includes(response.status)) {
+    failures.push(`${source}: 预期永久重定向，实际 ${response.status}`);
   }
   if (!location?.endsWith(destination)) {
     failures.push(`${source}: Location 预期指向 ${destination}，实际 ${location ?? "缺失"}`);
@@ -159,6 +158,12 @@ function evenlySample(values, limit) {
 const sitemapPaths = sitemapUrls.map((url) => new URL(url).pathname);
 if (sitemapPaths.includes("/search")) {
   failures.push("/search: 不应出现在 Sitemap");
+}
+if (sitemapPaths.includes("/resources")) {
+  failures.push("/resources: 已合并，不应出现在 Sitemap");
+}
+if (sitemapPaths.some((pathname) => pathname === "/projects" || pathname.startsWith("/projects/"))) {
+  failures.push("/projects: 已合并，不应出现在 Sitemap");
 }
 if (!sitemapPaths.includes("/verification")) {
   failures.push("/verification: 应出现在 Sitemap");
