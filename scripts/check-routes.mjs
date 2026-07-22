@@ -63,6 +63,7 @@ const knownRoutes = new Set([
   "/about",
   "/beginner",
   "/blog",
+  "/changelog",
   "/feed.xml",
   "/glossary",
   "/knowledge",
@@ -153,6 +154,7 @@ for (const fileName of files) {
       !href.startsWith("/blog/page/") &&
       !href.startsWith("/beginner/page/") &&
       !href.startsWith("/now/page/") &&
+      !href.startsWith("/changelog/page/") &&
       !href.startsWith("/projects/page/")
     ) {
       addError(`${fileName}: 内链目标不存在 ${href}`);
@@ -165,6 +167,7 @@ const routeFiles = new Map([
   ["/about", "src/app/about/page.tsx"],
   ["/beginner", "src/app/beginner/page.tsx"],
   ["/blog", "src/app/blog/page.tsx"],
+  ["/changelog", "src/app/changelog/page.tsx"],
   ["/glossary", "src/app/glossary/page.tsx"],
   ["/knowledge", "src/app/knowledge/page.tsx"],
   ["/now", "src/app/now/page.tsx"],
@@ -186,6 +189,7 @@ for (const relativePath of [
   "src/app/tags/[tag]/page.tsx",
   "src/app/blog/page/[page]/page.tsx",
   "src/app/beginner/page/[page]/page.tsx",
+  "src/app/changelog/page/[page]/page.tsx",
   "src/app/sitemap.ts",
 ]) {
   if (!fs.existsSync(path.join(root, relativePath))) addError(`缺少动态路由文件 ${relativePath}`);
@@ -218,14 +222,32 @@ if (!searchPageSource.includes("noindex: true")) {
   addError("站内搜索页没有设置 noindex");
 }
 
+const changelogPageSource = fs.readFileSync(
+  path.join(root, "src", "components", "changelog-archive.tsx"),
+  "utf8",
+);
+if (!changelogPageSource.includes("changelogEntries")) {
+  addError("更新日志页没有从 changelogEntries 读取数据");
+}
+
+const nowPageSource = fs.readFileSync(
+  path.join(root, "src", "components", "now-archive.tsx"),
+  "utf8",
+);
+if (!nowPageSource.includes("changelogEntries.slice(0, 3)")) {
+  addError("近况页没有自动读取最近三条更新日志");
+}
+
 const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "sitemap.ts"), "utf8");
 for (const marker of [
   "getAllPosts()",
   "getTagRecords()",
   ".filter((tag) => tag.count >= 3)",
   "knowledgeBaseSections.map",
+  "changelogEntries",
   "/knowledge",
   "/verification",
+  "/changelog",
 ]) {
   if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
 }
