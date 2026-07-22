@@ -61,9 +61,9 @@ export default function KnowledgePage() {
         <div className="knowledge-module-heading">
           <div>
             <p className="eyebrow">TOPIC MODULES</p>
-            <h2>按问题进入知识模块</h2>
+            <h2>选择你要解决的问题</h2>
           </div>
-          <p>每个模块现在都有独立页面、适合人群、学习目标、分阶段顺序和专题内文章导航。</p>
+          <p>根据当前问题进入对应模块，沿着推荐顺序继续学习。</p>
         </div>
 
         <nav className="knowledge-jump" aria-label="知识库主题导航">
