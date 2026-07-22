@@ -62,7 +62,7 @@ if (!storage) {
 
 同一房间最多一座Storage，因此不需要像Container一样从多个对象中选择。
 
-## Storage与Container的职责差异
+## Storage 与 Container 的职责差异
 
 两者都使用Store，也都能作为 `withdraw()` 和 `transfer()` 目标，但常见用途不同：
 

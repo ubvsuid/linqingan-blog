@@ -370,8 +370,8 @@ JavaScript语法和离线前置条件已检查，真实Mineral采集与再生仍
 
 - [如何从Container取Energy](/blog/screeps-creep-withdraw-container-energy)
 - [Game.getObjectById()怎么恢复目标](/blog/screeps-game-get-object-by-id)
-- [Lab怎么运行Reaction](/blog/screeps-lab-reaction-basics)
-- [Terminal怎么发送资源](/blog/screeps-terminal-send-resource)
+- [Lab怎么运行Reaction](/blog/screeps-lab-run-reaction)
+- [Terminal怎么发送资源](/blog/screeps-terminal-send-resources)
 - [Creep身体部件怎么看](/blog/screeps-creep-body-parts)
 - [进入资源采集与房间经济专题](/knowledge/room-economy)
 
