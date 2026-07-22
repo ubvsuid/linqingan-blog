@@ -22,6 +22,7 @@ const staticPageDates = {
   glossary: "2026-07-18",
   screepsErrors: "2026-07-18",
   verification: "2026-07-22",
+  creepBodyCalculator: "2026-07-22",
 };
 
 function createArchivePages(
@@ -105,6 +106,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: allPostsUpdatedAt,
       changeFrequency: "weekly",
       priority: 0.94,
+    },
+    {
+      url: `${siteConfig.url}/tools/creep-body-calculator`,
+      lastModified: new Date(staticPageDates.creepBodyCalculator),
+      changeFrequency: "monthly",
+      priority: 0.86,
     },
     {
       url: `${siteConfig.url}/glossary`,
