@@ -2,7 +2,7 @@
 title: "Screeps 如何清理死亡 Creep 的 Memory"
 description: "介绍如何检测已经死亡的 Creep，并删除 Memory.creeps 中的残留数据，包含最小代码、放置位置和常见错误。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-19"
+updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -15,10 +15,12 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-19"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（普通对象模拟 Memory 与 Game.creeps）"
+  testResult: "保留 1 个存活名称，删除 2 个死亡名称；Memory.creeps 缺失时返回 0。"
 featured: false
 ---
-
 
 Creep 死亡后，`Game.creeps` 中已经没有它，但 `Memory.creeps` 里以名称保存的数据可能仍然存在。清理的判断条件因此很简单：Memory 中有这个名称，而当前 tick 的 `Game.creeps` 中没有。
 
@@ -68,21 +70,48 @@ module.exports.loop = function () {
 
 删除时输出名称，便于确认清理条件确实命中。观察几个死亡与补员周期后，应删除这行日志或改成受控的调试开关，避免控制台长期重复输出。
 
+## 离线模拟结果
+
+构建检查使用普通 JavaScript 对象模拟：
+
+```js
+Memory.creeps = {
+  Alive: { role: 'worker' },
+  DeadA: {},
+  DeadB: {}
+};
+
+Game.creeps = {
+  Alive: { name: 'Alive' }
+};
+```
+
+模拟执行后：
+
+- 返回值为 `2`；
+- `DeadA` 与 `DeadB` 被删除；
+- `Alive` 的 Memory 保留；
+- 当 `Memory.creeps` 不存在时返回 `0`，不会抛出异常。
+
+这属于 **Node.js 离线对象模拟**。它验证遍历方向、删除条件和返回数量，但没有覆盖 Screeps Memory 序列化、全局重置或真实多 tick 行为。Console 与真实主循环仍然待环境验证。
+
 ## 常见错误
 
 1. 遍历 `Game.creeps` 查找死亡单位。死亡 Creep 已经不在这个对象中，应该遍历 `Memory.creeps`。
 2. 使用 `if (!Memory.creeps[name])` 判断。循环中的键本来就存在，应该检查 `Game.creeps[name]`。
 3. 直接执行 `delete Memory.creeps`。这会同时删除所有存活 Creep 的 Memory。
 4. 把清理代码放在角色循环之后。前面的统计仍可能读到过期条目。
-5. 长期保留每次删除的日志。日志只用于验证清理逻辑，不应当成运行成功证明。
+5. 长期保留每次删除的日志。日志只用于观察清理逻辑，不应当成真实主循环稳定证明。
 
 ## 适用边界
 
-示例只清理 `Memory.creeps`。如果你的系统还保存了按 Creep 名称索引的任务表、队列或缓存，需要为那些自定义结构另写清理规则，不能假设删除 `Memory.creeps[name]` 会自动同步其他数据。
+示例只清理 `Memory.creeps`。如果系统还保存了按 Creep 名称索引的任务表、队列或缓存，需要为那些自定义结构另写清理规则，不能假设删除 `Memory.creeps[name]` 会自动同步其他数据。
 
 ## 继续学习
 
 - [Memory 基础用法](/blog/screeps-memory-basics)
+- [按角色统计 Creep](/blog/screeps-count-creeps-by-role)
+- [房间断代后恢复采集者](/blog/screeps-spawn-emergency-recovery)
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
 - [第一份房间基础代码](/blog/screeps-first-room-code)
 
@@ -90,3 +119,5 @@ module.exports.loop = function () {
 
 - [Game.creeps 与 Memory](https://docs.screeps.com/api/)
 - [Global Objects](https://docs.screeps.com/global-objects.html)
+
+资料核对日期：2026-07-22。离线模拟已通过；真实 Screeps Console 与主循环仍待环境验证。
