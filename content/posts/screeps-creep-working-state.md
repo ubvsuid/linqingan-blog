@@ -1,6 +1,6 @@
 ---
 title: "Creep 如何在取能和工作之间稳定切换状态"
-description: "用Creep.store边界和memory.working建立两阶段状态，处理首次初始化、部分Energy、目标缺失、动作返回值和移动结果。"
+description: "用Creep.store边界和memory.working建立两阶段状态，处理首次初始化、部分Energy、无容量、目标缺失、动作结果和移动结果。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
@@ -33,15 +33,11 @@ working = true
 → 消耗Energy执行工作
 ```
 
-稳定状态的关键不是每tick把布尔值取反，而是只在两个明确边界切换：
+稳定切换只依赖两个边界：Energy用完时回到取能，容量装满时进入工作。Energy处于中间值时保持上一状态。
 
-- Energy用完时回到取能；
-- 可用容量装满时进入工作；
-- Energy处于中间值时保持上一状态。
+本文以“采集Source—升级Controller”为例，重点解释状态初始化、Store边界和动作结果。
 
-本文聚焦状态切换本身，并给出采集与升级的完整示例。
-
-## 为什么每tick取反会抖动
+## 为什么不能每tick直接取反
 
 错误写法：
 
@@ -49,54 +45,46 @@ working = true
 creep.memory.working = !creep.memory.working;
 ```
 
-它会产生：
+它会让Creep在相邻tick反复改变任务，可能还没有到达Source就转向Controller。
 
-```text
-tick 100：取能
-tick 101：工作
-tick 102：取能
-tick 103：工作
-```
+状态应该由资源边界驱动，而不是由tick数量驱动。
 
-Creep可能还没走到Source就改变任务，或者只采集一次就转向Controller。
-
-状态应由Store边界驱动，而不是由tick数量驱动。
-
-## `getUsedCapacity()` 和 `getFreeCapacity()`
-
-当前Energy数量：
+## 读取Energy与剩余容量
 
 ```js
-const used = creep.store.getUsedCapacity(
+const usedEnergy = creep.store.getUsedCapacity(
+  RESOURCE_ENERGY
+);
+
+const freeEnergyCapacity = creep.store.getFreeCapacity(
+  RESOURCE_ENERGY
+);
+
+const totalEnergyCapacity = creep.store.getCapacity(
   RESOURCE_ENERGY
 );
 ```
 
-剩余可装Energy容量：
+没有有效CARRY容量时，总容量为0，这种身体不适合本文的取能—工作循环。
 
-```js
-const free = creep.store.getFreeCapacity(
-  RESOURCE_ENERGY
-);
-```
-
-对于普通Creep，Store容量来自有效CARRY部件。没有有效CARRY部件时，容量可能为0，这种身体不适合本文的取能—工作循环。
-
-## 用纯函数决定下一状态
+## 用纯函数计算下一状态
 
 ```js
 function getNextWorkingState(input) {
   const {
     usedEnergy,
     freeEnergyCapacity,
+    totalEnergyCapacity,
     previousWorking
   } = input;
 
   if (
     !Number.isFinite(usedEnergy)
     || !Number.isFinite(freeEnergyCapacity)
+    || !Number.isFinite(totalEnergyCapacity)
     || usedEnergy < 0
     || freeEnergyCapacity < 0
+    || totalEnergyCapacity <= 0
   ) {
     return {
       valid: false,
@@ -129,52 +117,30 @@ function getNextWorkingState(input) {
 }
 ```
 
-### 首次运行且只有部分Energy怎么办
+### 首次运行只有部分Energy
 
-当 `working` 还没有初始化，而Creep已有部分Energy时，纯函数会把：
+当 `working` 尚未初始化，而Creep已有部分Energy时，示例把 `undefined` 视为假，因此默认继续取能。
 
-```js
-previousWorking === true
-```
+这是本站选择的初始化策略，不是官方规则。其他角色也可以选择部分Energy时立即工作，但必须明确写出规则。
 
-判断为假，因此默认继续取能。
-
-这是本站选择的初始策略，不是官方规则。也可以根据角色决定部分Energy时立即工作，但必须明确写出初始化规则。
-
-## 为什么先判断空，再判断满
-
-正常Store不会同时满足：
-
-```text
-usedEnergy === 0
-freeEnergyCapacity === 0
-```
-
-除非总容量为0。
-
-对于没有CARRY容量的异常身体，本文先返回取能状态，但完整主循环还会单独检查：
-
-```js
-creep.store.getCapacity(RESOURCE_ENERGY)
-```
-
-避免让没有容量的Creep无限尝试采集。
-
-## 完整示例：采集与升级
+## 完整示例
 
 ```js
 function getNextWorkingState(input) {
   const {
     usedEnergy,
     freeEnergyCapacity,
+    totalEnergyCapacity,
     previousWorking
   } = input;
 
   if (
     !Number.isFinite(usedEnergy)
     || !Number.isFinite(freeEnergyCapacity)
+    || !Number.isFinite(totalEnergyCapacity)
     || usedEnergy < 0
     || freeEnergyCapacity < 0
+    || totalEnergyCapacity <= 0
   ) {
     return {
       valid: false,
@@ -207,20 +173,14 @@ function getNextWorkingState(input) {
 }
 
 function updateWorkingState(creep) {
-  const capacity = creep.store.getCapacity(
-    RESOURCE_ENERGY
-  );
-
-  if (!Number.isFinite(capacity) || capacity <= 0) {
-    creep.memory.lastStateReason = 'no-energy-capacity';
-    return false;
-  }
-
   const decision = getNextWorkingState({
     usedEnergy: creep.store.getUsedCapacity(
       RESOURCE_ENERGY
     ),
     freeEnergyCapacity: creep.store.getFreeCapacity(
+      RESOURCE_ENERGY
+    ),
+    totalEnergyCapacity: creep.store.getCapacity(
       RESOURCE_ENERGY
     ),
     previousWorking: creep.memory.working
@@ -230,13 +190,16 @@ function updateWorkingState(creep) {
   creep.memory.lastStateReason = decision.reason;
   creep.memory.lastStateCheckedAt = Game.time;
 
-  return decision.valid;
+  return decision;
 }
 
 function runWorker(creep) {
-  if (!updateWorkingState(creep)) {
+  const state = updateWorkingState(creep);
+
+  if (!state.valid) {
     return {
-      status: 'invalid-working-state'
+      status: 'invalid-working-state',
+      reason: state.reason
     };
   }
 
@@ -328,54 +291,48 @@ module.exports.loop = function () {
 };
 ```
 
-把 `Worker1` 换成真实Creep名称。
+把 `Worker1` 换成真实名称。
 
-## 为什么取能分支执行后立即 `return`
+## 为什么取能分支结束后不继续工作分支
 
-一只Creep在同一tick可能可以安排移动，也可能提交一个动作，但本文不让代码继续进入工作分支。
-
-```js
-if (!creep.memory.working) {
-  // 取能逻辑
-  return;
-}
-```
-
-这样可以避免：
+取能逻辑处理完后直接返回，可以避免：
 
 - 同一tick先采集再尝试升级；
-- 两个分支都覆盖移动意图；
-- 日志同时出现两种互相矛盾的状态。
+- 两个分支同时安排移动；
+- 日志出现互相矛盾的状态。
+
+状态切换只决定当前分支，不代表动作已经完成。
 
 ## `harvest()` 的关键返回值
 
+本文目标是Energy Source，因此重点处理：
+
 | 返回值 | 常见原因 | 处理方向 |
 |---|---|---|
-| `OK` | 采集命令已提交 | 下一tick读取Store与Source |
-| `ERR_NOT_OWNER` | Creep不是自己的 | 检查对象来源 |
+| `OK` | 采集命令已安排 | 下一tick读取Store与Source |
+| `ERR_NOT_OWNER` | Creep不是自己的，或房间控制状态限制动作 | 检查对象和房间状态 |
 | `ERR_BUSY` | Creep仍在生成 | 等待生成完成 |
-| `ERR_NOT_FOUND` | Source当前没有Energy | 等恢复或更换目标 |
-| `ERR_NOT_ENOUGH_RESOURCES` | Source没有可采资源 | 检查Source状态 |
-| `ERR_INVALID_TARGET` | 目标不能采集 | 检查对象类型 |
+| `ERR_NOT_ENOUGH_RESOURCES` | Source当前没有可采Energy | 等待恢复或选择其他活跃Source |
+| `ERR_INVALID_TARGET` | 目标不是可采对象 | 检查目标类型 |
 | `ERR_FULL` | Creep没有剩余容量 | 状态应切到工作 |
 | `ERR_NOT_IN_RANGE` | 不相邻 | 移动到范围1 |
 | `ERR_NO_BODYPART` | 没有有效WORK部件 | 检查身体与受伤状态 |
 
-不同服务器版本可能对无资源情况使用文档列出的对应错误常量，代码应以实际返回值和当前官方API为准。
+`ERR_NOT_FOUND` 在采集矿物时可表示缺少Extractor，不是Energy Source为空的返回值。
 
 ## `upgradeController()` 的关键返回值
 
 | 返回值 | 常见原因 | 处理方向 |
 |---|---|---|
-| `OK` | 升级命令已提交 | 下一tick读取进度与Store |
-| `ERR_NOT_OWNER` | Creep不是自己的 | 检查对象 |
+| `OK` | 升级命令已安排 | 下一tick读取进度与Store |
+| `ERR_NOT_OWNER` | Creep或Controller所有权不符 | 检查对象 |
 | `ERR_BUSY` | Creep仍在生成 | 等生成结束 |
 | `ERR_NOT_ENOUGH_RESOURCES` | Creep没有Energy | 状态应切回取能 |
-| `ERR_INVALID_TARGET` | Controller不是有效目标 | 检查房间控制状态 |
+| `ERR_INVALID_TARGET` | Controller不是有效目标或升级受阻 | 检查控制状态 |
 | `ERR_NOT_IN_RANGE` | 超过3格 | 移动到范围3 |
 | `ERR_NO_BODYPART` | 没有有效WORK部件 | 检查身体 |
 
-返回 `OK` 只表示命令已接受，Store与Controller变化在后续tick观察。
+`OK`只表示命令已安排，Store和Controller变化在后续tick观察。
 
 ## 中间Energy为什么保持上一状态
 
@@ -392,79 +349,72 @@ if (!creep.memory.working) {
 → 保持之前状态
 ```
 
-若Creep正在工作并剩30 Energy，它应该继续消耗；若正在取能并有30 Energy，它应该继续装满。
+正在工作且剩30 Energy时继续工作；正在取能且已有30 Energy时继续装满。
 
-这就是两边界状态比“有Energy就工作”更稳定的原因。
+## 哪些角色不适合这种状态
 
-## 什么时候不适合使用两阶段状态
-
-以下任务可能不需要 `working`：
+可能不需要 `working` 的任务包括：
 
 - 固定站位升级者从Link持续取能；
-- 专职运输者按任务订单搬运多种资源；
+- 专职运输者按任务清单搬运多种资源；
 - 战斗Creep；
-- 只执行一次的临时任务；
-- 基于集中调度器的状态系统。
+- 一次性临时任务；
+- 由集中调度器分配动作的系统。
 
-例如固定升级者可能在每tick先从相邻Link取能，再保持升级位置。强行套用“装满才工作”会降低效率。
+固定升级者强行等待装满才工作，可能降低Controller升级效率。
 
 ## 常见错误
 
 ### 每tick取反
 
-任务会在相邻tick反复切换。
+任务会持续抖动。
 
-### 只判断是否有Energy
+### 有Energy就立即工作
 
-```js
-creep.memory.working =
-  creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-```
+采集到少量Energy后就离开Source，往返次数增加。
 
-Creep采集到少量Energy后就会立即离开Source。
+### 部分Energy时没有初始化规则
 
-### 不初始化状态
+明确默认继续取能还是立即工作。
 
-部分Energy的首次状态会依赖 `undefined` 的隐式真假。应明确规定默认策略。
+### 没有CARRY容量仍运行
 
-### 没有CARRY容量仍运行取能逻辑
+检查总容量，避免无意义动作循环。
 
-必须检查Store总容量，避免无意义动作循环。
+### 忽略移动结果
 
-### 忽略移动返回值
+距离不足后调用 `moveTo()`，仍需记录无路径、fatigue或身体问题。
 
-动作距离不足后调用 `moveTo()`，仍应保存移动结果以排查无路径、fatigue或身体问题。
+### 同一tick进入两个分支
 
-### 同一tick执行两个业务分支
-
-每个状态分支结束后返回，保持当前tick意图单一。
+每个业务分支结束后返回，保持意图单一。
 
 ## 离线模拟结果
 
 构建检查覆盖：
 
-1. 首次空载进入取能；
-2. 首次部分Energy默认继续取能；
-3. 装满后进入工作；
-4. 工作状态耗尽后回到取能；
-5. 中间值保持上一状态；
+1. 首次空载；
+2. 首次部分Energy；
+3. 装满进入工作；
+4. 工作耗尽回到取能；
+5. 中间值保持原状态；
 6. 总容量为0；
-7. 负数和非数字输入；
+7. 负数与非数字输入；
 8. 状态原因字段。
 
 离线测试不能模拟真实Store更新、动作结算、路径、Source恢复或Controller进度。
 
 ## 适用边界
 
-本文只实现一只Creep的采集—升级两阶段状态，不覆盖：
+本文只实现单个Creep的采集—升级两阶段状态，不覆盖：
 
 - 多资源Store；
 - Container或Storage取能；
 - 多Source分配；
-- Builder、Repairer任务选择；
+- Builder与Repairer任务选择；
 - Link供能固定升级；
 - 集中任务队列；
-- 多房间角色调度。
+- 多房间调度。
 
 JavaScript语法和离线状态函数已检查，真实动作与多tick切换仍待Screeps环境验证。
 
