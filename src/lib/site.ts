@@ -36,8 +36,6 @@ export const siteConfig = {
     { label: "入门", href: "/beginner" },
     { label: "文章", href: "/blog" },
     { label: "知识库", href: "/knowledge" },
-    { label: "资料", href: "/resources" },
-    { label: "项目", href: "/projects" },
     { label: "近况", href: "/now" },
     { label: "关于", href: "/about" },
   ],
