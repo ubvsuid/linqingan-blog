@@ -1,9 +1,10 @@
+import { getKnowledgeBaseSectionBySlug } from "@/lib/knowledge-base";
 import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 
-export type SearchDocumentType = "文章" | "术语" | "错误码" | "项目";
+export type SearchDocumentType = "文章" | "术语" | "错误码" | "工具" | "项目";
 
 export interface SearchDocument {
   id: string;
@@ -16,17 +17,46 @@ export interface SearchDocument {
   text: string;
 }
 
+const toolDocuments: SearchDocument[] = [
+  {
+    id: "tool:creep-body-calculator",
+    type: "工具",
+    title: "Screeps Creep 身体计算器",
+    description: "组合身体部件，计算 Energy 成本、生成时间、生命值、携带容量和满载移动速度。",
+    href: "/tools/creep-body-calculator",
+    meta: "免费工具 · 支持链接分享",
+    keywords: [
+      "Creep Body",
+      "BODYPART_COST",
+      "MOVE",
+      "WORK",
+      "CARRY",
+      "身体计算器",
+      "生成时间",
+      "fatigue",
+    ],
+    text: "Screeps 身体部件 成本 Spawn 生成时间 50 个部件 MOVE 比例 Road Plain Swamp",
+  },
+];
+
 export function getSearchDocuments(): SearchDocument[] {
-  const posts: SearchDocument[] = getSearchablePosts().map((post) => ({
-    id: `post:${post.slug}`,
-    type: "文章",
-    title: post.title,
-    description: post.description,
-    href: `/blog/${post.slug}`,
-    meta: `${post.category} · ${post.readingMinutes} 分钟`,
-    keywords: [...post.tags, post.category],
-    text: post.text,
-  }));
+  const posts: SearchDocument[] = getSearchablePosts().map((post) => {
+    const section = getKnowledgeBaseSectionBySlug(post.slug);
+    return {
+      id: `post:${post.slug}`,
+      type: "文章",
+      title: post.title,
+      description: post.description,
+      href: `/blog/${post.slug}`,
+      meta: `${section?.title ?? post.category} · ${post.readingMinutes} 分钟`,
+      keywords: [
+        ...post.tags,
+        post.category,
+        ...(section ? [section.title, section.description] : []),
+      ],
+      text: post.text,
+    };
+  });
 
   const glossary: SearchDocument[] = screepsGlossary.map((entry) => ({
     id: `glossary:${entry.term}`,
@@ -67,5 +97,5 @@ export function getSearchDocuments(): SearchDocument[] {
     ].join(" "),
   }));
 
-  return [...posts, ...glossary, ...errors, ...projectDocuments];
+  return [...posts, ...glossary, ...errors, ...toolDocuments, ...projectDocuments];
 }
