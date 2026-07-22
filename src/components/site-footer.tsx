@@ -11,6 +11,7 @@ const learningLinks = [
 ];
 
 const siteLinks = [
+  { href: "/verification", label: "验证方法" },
   { href: "/projects", label: "项目" },
   { href: "/now", label: "近况" },
   { href: "/about", label: "关于" },
