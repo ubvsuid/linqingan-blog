@@ -64,7 +64,7 @@ export const projects: ProjectRecord[] = [
       "使用 Next.js 静态生成文章、分页、Sitemap、RSS 和结构化数据。",
       "把学习进度保存在浏览器本地，不引入账号系统和数据库。",
       "让文章数量、模块数量和项目数据从统一配置自动生成，减少重复维护。",
-      "通过内容、路由、代码、类型、Lint 和页面冒烟测试阻止明显问题上线。",
+      "通过内容、路由、链接、代码、类型、Lint、离线模拟和页面冒烟测试阻止明显问题上线。",
     ],
     details: [
       { label: "类型", value: "个人技术网站" },
@@ -112,7 +112,7 @@ export const projects: ProjectRecord[] = [
       {
         date: "2026-07-17",
         title: "扩展为 Screeps 知识站",
-        description: "上线资料中心、术语表、错误码、标签归档、项目详情和站内搜索。",
+        description: "上线术语表、错误码、标签归档、公开建设说明和站内搜索。",
       },
       {
         date: "2026-07-18",
@@ -134,22 +134,23 @@ export const projects: ProjectRecord[] = [
     highlights: [
       `按 ${beginnerStageCount} 个阶段组织 ${beginnerArticleCount} 篇新手学习路线`,
       `把 ${knowledgeArticleCount} 篇专题文章组织为 ${knowledgeModuleCount} 个知识模块`,
-      "在浏览器本地记录阅读进度",
+      "上线 Creep 身体计算器与问题快速查询入口",
       "支持目录、代码复制、专题进度和前后篇跳转",
       "静态生成文章、Sitemap、RSS 与结构化数据",
-      "统一搜索文章、术语、错误码和项目内容",
+      "统一搜索文章、术语、错误码、工具和项目内容",
       "明确区分文档核对、语法检查、离线模拟与真实运行验证",
     ],
     nextSteps: [
       "补齐文章较少的 Controller 与运行诊断模块。",
       "继续收集真实 Screeps Console 和多 tick 运行证据。",
-      "开发 Creep 身体计算器与常用 API 快速查询。",
+      "扩展身体计算器，并开发常用 API 快速查询。",
       "根据 Google Search Console 的真实数据优化重要页面。",
     ],
     links: [
-      { label: "查看项目详情", href: "/projects/linqingan-com" },
+      { label: "查看项目摘要", href: "/about#project-linqingan-com" },
       { label: "进入学习路线", href: "/beginner" },
       { label: "浏览知识库", href: "/knowledge" },
+      { label: "使用身体计算器", href: "/tools/creep-body-calculator" },
       { label: "查看验证方法", href: "/verification" },
       {
         label: "查看 GitHub",
@@ -232,7 +233,7 @@ export const projects: ProjectRecord[] = [
       "保持与专题知识库之间的前置知识和继续阅读链接。",
     ],
     links: [
-      { label: "查看项目详情", href: "/projects/screeps-beginner-path" },
+      { label: "查看项目摘要", href: "/about#project-screeps-beginner-path" },
       { label: "开始学习", href: "/beginner" },
       { label: "进入知识库", href: "/knowledge" },
       { label: "查看验证方法", href: "/verification" },
