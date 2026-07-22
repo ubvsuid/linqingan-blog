@@ -1,7 +1,7 @@
-
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
 import { getSearchDocuments } from "@/lib/search";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
@@ -18,9 +18,9 @@ const resources = [
   {
     eyebrow: "KNOWLEDGE BASE",
     title: "Screeps知识库",
-    description: "按 8 个主题组浏览完整教程，每篇只解决一个主要搜索意图。",
+    description: `按 ${knowledgeBaseSections.length} 个知识模块浏览专题文章，每篇集中解决一个主要问题。`,
     href: "/knowledge",
-    count: "60 篇文章",
+    count: `${knowledgeBaseSlugs.length} 篇专题文章`,
   },
   {
     eyebrow: "SEARCH",
@@ -101,8 +101,8 @@ export default function ResourcesPage() {
             <li>
               <span>03</span>
               <div>
-                <strong>基础工程学习路线</strong>
-                <p>从固定名称代码继续走向 Memory、自动补员、模块拆分和房间管理。</p>
+                <strong>房间运行诊断清单</strong>
+                <p>按 Spawn、Creep、Energy、Controller、工地和 CPU 逐项检查常见运行问题。</p>
               </div>
             </li>
           </ol>
@@ -129,4 +129,3 @@ export default function ResourcesPage() {
     </main>
   );
 }
-
