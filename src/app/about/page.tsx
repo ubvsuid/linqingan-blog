@@ -11,102 +11,56 @@ import { siteConfig } from "@/lib/site";
 export const metadata = createPageMetadata({
   title: "关于临清安",
   description:
-    "认识临清安，了解这个网站正在建设的 Screeps 中文知识库、JavaScript 实践、代码验证与实用工具。",
+    "认识临清安，了解这个 Screeps 中文知识站为什么建立、如何组织内容，以及文章怎样区分资料核对、语法检查、离线模拟和真实运行验证。",
   path: "/about",
   image: "/profile-avatar.webp",
 });
 
-const currentFocus = [
+const contentMethods = [
   {
     number: "01",
-    title: "补充 Screeps 专题模块",
+    title: "先解决一个真实问题",
     description:
-      "围绕现有知识模块继续补齐关键问题，并保持明确的学习顺序、文章归属和上下文链接。",
+      "每篇文章围绕一个明确问题展开，不为了覆盖更多关键词而把多个搜索意图堆在一起。",
   },
   {
     number: "02",
-    title: "增加代码验证与运行证据",
+    title: "代码必须说明边界",
     description:
-      "持续核对官方文档、检查 JavaScript 语法、补充离线模拟，并在获得真实日志后记录实际运行结果。",
+      "对象、返回值、适用条件和仍未验证的部分都会尽量写清楚，让读者知道代码解决了什么，也知道它没有证明什么。",
   },
   {
     number: "03",
-    title: "建设 Screeps 实用工具",
+    title: "发现问题就继续修正",
     description:
-      "逐步加入 Creep 身体计算、常用 API 查询和房间运行诊断，让资料中心不仅能读，也能直接使用。",
+      "文章不是发布后永久不变的成品。官方文档、代码检查和真实运行材料都会用于后续核对与更新。",
   },
 ];
 
-const interests = [
-  {
-    title: "Screeps",
-    description: "游戏机制、房间自动化、角色分工与长期运行的代码系统。",
-  },
-  {
-    title: "JavaScript",
-    description: "从新手可读代码到模块拆分、状态管理与工程实践。",
-  },
-  {
-    title: "系统设计",
-    description: "怎样把多个小功能组织成稳定、可维护、能持续迭代的系统。",
-  },
-  {
-    title: "内容建设",
-    description: "把复杂知识拆成清晰路线，让文章真正解决读者当前的问题。",
-  },
+const currentWork = [
+  "继续补齐现有 Screeps 专题模块中的关键问题",
+  "收集真实 Console 返回值和多 tick 运行材料",
+  "开发 Creep 身体计算、API 查询和房间诊断工具",
 ];
 
-const principles = [
-  {
-    number: "01",
-    title: "先让新手看懂",
-    description:
-      "入门内容只讲读者当前会接触到的问题。复杂机制、工程架构与性能优化会进入对应的专题模块。",
-  },
-  {
-    number: "02",
-    title: "每篇解决一个问题",
-    description:
-      "文章不为了显得专业而堆知识，而是先回答一个明确问题，再给出可以观察和验证的结果。",
-  },
-  {
-    number: "03",
-    title: "明确验证边界",
-    description:
-      "官方文档核对、语法检查、离线模拟与真实主循环验证会分别标记，不把模拟结果写成服务器实测。",
-  },
-];
-
-const profileLinks = [
+const readingPaths = [
   {
     href: "/beginner",
-    label: "入门",
-    title: "从第一篇开始学习 Screeps",
+    label: "第一次接触 Screeps",
+    title: "从 12 篇新手路线开始",
+    description: "按顺序认识游戏、控制 Creep，并完成第一份房间基础代码。",
   },
   {
     href: "/knowledge",
-    label: "知识库",
-    title: "按问题进入对应知识模块",
+    label: "已经遇到具体问题",
+    title: "进入对应知识模块",
+    description: "按 Memory、Spawn、资源经济、寻路、建设和运行诊断等主题继续学习。",
   },
   {
-    href: "/blog",
-    label: "文章",
-    title: "浏览全部公开内容",
-  },
-  {
-    href: "/resources",
-    label: "资料",
-    title: "查询术语、错误码和文章标签",
-  },
-  {
-    href: "/projects",
-    label: "项目",
-    title: "查看正在建设的系统与网站",
-  },
-  {
-    href: "/now",
-    label: "近况",
-    title: "查看最近正在推进的工作",
+    href: "/verification",
+    label: "想了解内容依据",
+    title: "查看文章验证方法",
+    description: "了解文档核对、语法检查、离线模拟、Console 与真实主循环验证的区别。",
   },
 ];
 
@@ -120,7 +74,7 @@ export default function AboutPage() {
     image: `${siteConfig.url}/profile-avatar.webp`,
     email: siteConfig.author.email,
     sameAs: [siteConfig.links.github],
-    knowsAbout: ["Screeps", "JavaScript", "系统设计", "内容建设"],
+    knowsAbout: ["Screeps", "JavaScript", "系统设计", "技术写作"],
   };
 
   return (
@@ -147,32 +101,37 @@ export default function AboutPage() {
           </div>
 
           <div className="profile-identity">
-            <p className="eyebrow">PERSONAL PROFILE</p>
+            <p className="eyebrow">ABOUT</p>
             <h1 id="profile-name">临清安</h1>
             <p className="profile-handle">@linqingan501</p>
-            <p className="profile-role">Screeps 玩家 · JavaScript 学习者 · 系统建设记录者</p>
+            <p className="profile-role">
+              Screeps 中文知识站作者 · JavaScript 实践者 · 系统建设记录者
+            </p>
           </div>
         </section>
 
-        <section className="profile-introduction" aria-labelledby="profile-introduction-title">
+        <section className="profile-story" aria-labelledby="profile-story-title">
           <div>
-            <p className="eyebrow">INTRODUCTION</p>
-            <h2 id="profile-introduction-title">你好，我是临清安</h2>
+            <p className="eyebrow">WHY THIS SITE</p>
+            <h2 id="profile-story-title">我为什么建立这个网站</h2>
           </div>
-          <div className="profile-introduction-copy">
+          <div className="profile-story-copy">
             <p className="lead">
-              我正在把玩 Screeps、写 JavaScript 和搭建长期运行系统的过程，整理成一套清晰、可验证、能够持续扩展的中文内容。
+              我喜欢构建能够在没有人工干预的情况下，持续运行和自我调整的系统。
             </p>
             <p>
-              网站先用 {beginnerSeriesSlugs.length} 篇新手路线帮助第一次接触 Screeps 的玩家建立基础，再通过 {knowledgeBaseSections.length} 个知识模块继续解决 Memory、Spawn、资源经济、寻路、Controller、建设防御、高级资源和运行诊断问题。
+              Screeps 把代码、资源管理和长期运行放进同一个世界。这个网站则用来把我在学习、编写和整理这些系统时遇到的问题，沉淀成一套清晰的中文内容。
             </p>
             <p>
-              接下来的重点是补齐专题内容、增加代码验证证据，并把资料中心逐步扩展成可以直接使用的 Screeps 工具集合。
+              我希望文章不只说明某个 API 是什么，还能交代代码应该观察什么、失败时怎样根据返回值继续排查，以及哪些结论仍然缺少真实环境证据。
+            </p>
+            <p>
+              目标不是尽快堆积文章数量，而是让内容能够被查到、被理解、被验证，并在发现问题后继续修正。
             </p>
           </div>
         </section>
 
-        <section className="profile-stats" aria-label="网站当前数据">
+        <section className="profile-stats" aria-label="网站当前公开内容">
           <div>
             <strong>{beginnerSeriesSlugs.length}</strong>
             <span>篇入门文章</span>
@@ -191,67 +150,72 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="profile-section" aria-labelledby="profile-focus-title">
+        <p className="profile-stats-note">
+          这些数字代表当前公开内容规模，不代表所有示例都已经完成真实 Screeps 服务器验证。
+        </p>
+
+        <section className="profile-section" aria-labelledby="profile-method-title">
           <div className="profile-section-heading">
-            <p className="eyebrow">CURRENT FOCUS</p>
-            <h2 id="profile-focus-title">我现在在做什么</h2>
+            <p className="eyebrow">METHOD</p>
+            <h2 id="profile-method-title">我怎样处理内容</h2>
           </div>
-          <div className="profile-focus-grid">
-            {currentFocus.map((item) => (
-              <article key={item.number}>
-                <span>{item.number}</span>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
+          <div className="profile-method-list">
+            {contentMethods.map((method) => (
+              <article key={method.number}>
+                <span>{method.number}</span>
+                <div>
+                  <h3>{method.title}</h3>
+                  <p>{method.description}</p>
+                </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="profile-section" aria-labelledby="profile-interests-title">
-          <div className="profile-section-heading">
-            <p className="eyebrow">INTERESTS</p>
-            <h2 id="profile-interests-title">我关注的方向</h2>
+        <section className="profile-trust" aria-labelledby="profile-trust-title">
+          <div>
+            <p className="eyebrow">TRUST</p>
+            <h2 id="profile-trust-title">关于内容可信度</h2>
           </div>
-          <div className="profile-interest-grid">
-            {interests.map((interest) => (
-              <article key={interest.title}>
-                <h3>{interest.title}</h3>
-                <p>{interest.description}</p>
-              </article>
-            ))}
+          <div className="profile-trust-copy">
+            <p>
+              网站会区分官方文档核对、JavaScript 语法检查、离线模拟、Screeps Console 验证和真实主循环验证。
+            </p>
+            <p>
+              没有真实日志支持的内容会明确保留“待环境验证”。一次 Console 成功，也不会被扩大描述成长期稳定运行。
+            </p>
+            <Link href="/verification">查看完整的文章验证方法 →</Link>
           </div>
         </section>
 
-        <section className="profile-section" aria-labelledby="profile-navigation-title">
+        <section className="profile-section" aria-labelledby="profile-current-title">
           <div className="profile-section-heading">
-            <p className="eyebrow">EXPLORE</p>
-            <h2 id="profile-navigation-title">从这里继续了解我</h2>
+            <p className="eyebrow">CURRENT WORK</p>
+            <h2 id="profile-current-title">现在正在推进的事情</h2>
           </div>
-          <div className="profile-link-grid">
-            {profileLinks.map((item) => (
+          <div className="profile-current-copy">
+            <ul>
+              {currentWork.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <Link href="/now">查看最近进展 →</Link>
+          </div>
+        </section>
+
+        <section className="profile-section" aria-labelledby="profile-start-title">
+          <div className="profile-section-heading">
+            <p className="eyebrow">START HERE</p>
+            <h2 id="profile-start-title">从这里开始阅读</h2>
+          </div>
+          <div className="profile-reading-grid">
+            {readingPaths.map((item) => (
               <Link href={item.href} key={item.href}>
                 <span>{item.label}</span>
                 <strong>{item.title}</strong>
+                <p>{item.description}</p>
                 <span aria-hidden="true">→</span>
               </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="profile-section" aria-labelledby="profile-principles-title">
-          <div className="profile-section-heading">
-            <p className="eyebrow">EDITORIAL PRINCIPLES</p>
-            <h2 id="profile-principles-title">写作与验证原则</h2>
-          </div>
-          <div className="profile-principle-list">
-            {principles.map((principle) => (
-              <article key={principle.number}>
-                <span>{principle.number}</span>
-                <div>
-                  <h3>{principle.title}</h3>
-                  <p>{principle.description}</p>
-                </div>
-              </article>
             ))}
           </div>
         </section>
@@ -260,14 +224,16 @@ export default function AboutPage() {
           <div>
             <p className="eyebrow">CONTACT</p>
             <h2 id="profile-contact-title">联系与纠错</h2>
-            <p>发现文章存在错误、表述不清或示例代码有问题时，可以通过邮箱或 GitHub 联系我。</p>
+            <p>
+              发现文章中的事实、代码、链接或表达存在问题，欢迎通过邮箱或 GitHub 反馈。未经真实验证的结果不会直接标记为已通过。
+            </p>
           </div>
           <div className="profile-contact-links">
             <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>
             <a href={siteConfig.links.github} rel="noreferrer" target="_blank">
               GitHub ↗
             </a>
-            <Link href="/projects">查看项目 →</Link>
+            <Link href="/projects">查看公开项目 →</Link>
           </div>
         </section>
       </Container>
@@ -279,40 +245,42 @@ export default function AboutPage() {
         .profile-avatar { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; transform: scale(1.02); }
         .profile-identity h1 { margin: 6px 0 8px; font-size: clamp(54px, 9vw, 92px); line-height: .95; letter-spacing: -.065em; }
         .profile-handle { margin: 0; color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 14px; }
-        .profile-role { max-width: 660px; margin: 24px 0 0; color: var(--muted); font-size: clamp(18px, 2.4vw, 24px); line-height: 1.55; }
-        .profile-introduction, .profile-section, .profile-contact { display: grid; grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr); gap: 64px; padding: 72px 0; border-bottom: 1px solid var(--border); }
-        .profile-introduction h2, .profile-section-heading h2, .profile-contact h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 52px); line-height: 1.08; letter-spacing: -.045em; }
-        .profile-introduction-copy { color: var(--muted); font-size: 17px; line-height: 1.85; }
-        .profile-introduction-copy p { margin: 0; }
-        .profile-introduction-copy p + p { margin-top: 18px; }
-        .profile-introduction-copy .lead { color: var(--foreground); font-size: 21px; line-height: 1.7; }
+        .profile-role { max-width: 760px; margin: 24px 0 0; color: var(--muted); font-size: clamp(18px, 2.4vw, 24px); line-height: 1.55; }
+        .profile-story, .profile-section, .profile-trust, .profile-contact { display: grid; grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr); gap: 64px; padding: 72px 0; border-bottom: 1px solid var(--border); }
+        .profile-story h2, .profile-section-heading h2, .profile-trust h2, .profile-contact h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 52px); line-height: 1.08; letter-spacing: -.045em; }
+        .profile-story-copy, .profile-trust-copy { color: var(--muted); font-size: 17px; line-height: 1.85; }
+        .profile-story-copy p, .profile-trust-copy p { margin: 0; }
+        .profile-story-copy p + p, .profile-trust-copy p + p { margin-top: 18px; }
+        .profile-story-copy .lead { color: var(--foreground); font-size: 22px; line-height: 1.7; }
         .profile-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--border); }
         .profile-stats div { display: grid; gap: 8px; padding: 34px 26px; }
         .profile-stats div + div { border-left: 1px solid var(--border); }
         .profile-stats strong { font-size: clamp(30px, 4vw, 44px); letter-spacing: -.04em; }
         .profile-stats span { color: var(--muted); font-size: 13px; }
-        .profile-focus-grid { display: grid; }
-        .profile-focus-grid article { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px 18px; border-top: 1px solid var(--border); padding: 24px 0; }
-        .profile-focus-grid article:last-child { border-bottom: 1px solid var(--border); }
-        .profile-focus-grid article > span, .profile-principle-list article > span { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
-        .profile-focus-grid h3, .profile-interest-grid h3, .profile-principle-list h3 { margin: 0; font-size: 20px; }
-        .profile-focus-grid p, .profile-interest-grid p, .profile-principle-list p, .profile-contact p { margin: 9px 0 0; color: var(--muted); line-height: 1.75; }
-        .profile-focus-grid article > p { grid-column: 2; }
-        .profile-interest-grid, .profile-link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-        .profile-interest-grid article { min-height: 170px; border: 1px solid var(--border); border-radius: 18px; padding: 24px; background: var(--surface); }
-        .profile-link-grid a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; min-height: 150px; align-content: space-between; border: 1px solid var(--border); border-radius: 18px; padding: 22px; background: var(--surface); transition: transform 160ms ease, border-color 160ms ease; }
-        .profile-link-grid a:hover { transform: translateY(-3px); border-color: var(--muted); text-decoration: none; }
-        .profile-link-grid a > span:first-child { color: var(--muted); font-size: 13px; }
-        .profile-link-grid strong { align-self: end; font-size: 18px; line-height: 1.45; }
-        .profile-link-grid a > span:last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 24px; }
-        .profile-principle-list { display: grid; border-top: 1px solid var(--border); }
-        .profile-principle-list article { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 20px; border-bottom: 1px solid var(--border); padding: 24px 0; }
+        .profile-stats-note { margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+        .profile-method-list { display: grid; border-top: 1px solid var(--border); }
+        .profile-method-list article { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 20px; border-bottom: 1px solid var(--border); padding: 25px 0; }
+        .profile-method-list article > span { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
+        .profile-method-list h3 { margin: 0; font-size: 21px; }
+        .profile-method-list p, .profile-contact p { margin: 9px 0 0; color: var(--muted); line-height: 1.75; }
+        .profile-trust-copy a, .profile-current-copy > a { display: inline-flex; margin-top: 24px; font-weight: 700; }
+        .profile-current-copy ul { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+        .profile-current-copy li { position: relative; border-bottom: 1px solid var(--border); padding: 22px 0 22px 28px; line-height: 1.7; }
+        .profile-current-copy li::before { content: ""; position: absolute; top: 31px; left: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--foreground); }
+        .profile-reading-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+        .profile-reading-grid a { display: grid; min-height: 235px; align-content: start; border: 1px solid var(--border); border-radius: 18px; padding: 23px; background: var(--surface); transition: transform 160ms ease, border-color 160ms ease; }
+        .profile-reading-grid a:hover { transform: translateY(-3px); border-color: var(--muted); text-decoration: none; }
+        .profile-reading-grid a > span:first-child { color: var(--muted); font-size: 12px; }
+        .profile-reading-grid strong { margin-top: 24px; font-size: 20px; line-height: 1.4; }
+        .profile-reading-grid p { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+        .profile-reading-grid a > span:last-child { margin-top: auto; padding-top: 22px; font-size: 24px; }
         .profile-contact { border-bottom: 0; padding-bottom: 30px; }
         .profile-contact-links { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 12px; }
         .profile-contact-links a { display: inline-flex; min-height: 44px; align-items: center; border: 1px solid var(--border); border-radius: 999px; padding: 0 16px; font-weight: 650; }
         .profile-contact-links a:hover { border-color: var(--muted); text-decoration: none; }
+        @media (max-width: 900px) { .profile-reading-grid { grid-template-columns: 1fr; } .profile-reading-grid a { min-height: 0; } }
         @media (max-width: 800px) {
-          .profile-introduction, .profile-section, .profile-contact { grid-template-columns: 1fr; gap: 32px; }
+          .profile-story, .profile-section, .profile-trust, .profile-contact { grid-template-columns: 1fr; gap: 32px; }
           .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .profile-stats div:nth-child(3) { border-top: 1px solid var(--border); border-left: 0; }
           .profile-stats div:nth-child(4) { border-top: 1px solid var(--border); }
@@ -323,7 +291,6 @@ export default function AboutPage() {
           .profile-avatar-frame { width: 128px; height: 128px; }
           .profile-identity h1 { font-size: clamp(42px, 15vw, 62px); }
           .profile-role { grid-column: 1 / -1; margin-top: 18px; font-size: 17px; }
-          .profile-interest-grid, .profile-link-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 420px) {
           .profile-hero { grid-template-columns: 104px minmax(0, 1fr); gap: 18px; }
