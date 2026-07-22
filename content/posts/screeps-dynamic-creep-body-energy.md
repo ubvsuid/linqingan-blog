@@ -101,7 +101,7 @@ module.exports.loop = function () {
 
 这属于 **Node.js 离线纯函数模拟**，只验证组数、成本和上限分支；没有证明 `Spawn1` 存在，也没有证明 `spawnCreep()` 已在官方服务器返回 `OK`。Console 与真实主循环仍然待环境验证。
 
-需要快速比较其他身体方案时，可以使用站内的 [Creep 身体计算器](/tools/creep-body-calculator)。
+需要快速比较其他身体方案时，可以使用站内的 [Creep 身体计算器](https://www.linqingan.com/tools/creep-body-calculator)。
 
 ## 适用范围
 
@@ -109,7 +109,7 @@ module.exports.loop = function () {
 
 ## 继续学习
 
-- [Creep 身体计算器](/tools/creep-body-calculator)
+- [Creep 身体计算器](https://www.linqingan.com/tools/creep-body-calculator)
 - [身体部件基础](/blog/screeps-creep-body-parts)
 - [MOVE 与 fatigue 配比](/blog/screeps-move-fatigue-body-ratio)
 - [第一个 Extension](/blog/screeps-first-extension)
