@@ -55,7 +55,7 @@ export function getSearchDocuments(): SearchDocument[] {
     type: "项目",
     title: project.title,
     description: project.summary,
-    href: `/projects/${project.id}`,
+    href: `/about#project-${project.id}`,
     meta: project.status,
     keywords: project.details.map((detail) => detail.value),
     text: [
