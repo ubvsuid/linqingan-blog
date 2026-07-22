@@ -443,7 +443,7 @@ JavaScript语法和离线事件筛选已经检查，真实事件生成、上一t
 - [Tower如何自动治疗己方Creep](/blog/screeps-tower-heal-creeps)
 - [Game.notify()怎么发送限频提醒](/blog/screeps-game-notify)
 - [Screeps Memory是什么](/blog/screeps-memory-basics)
-- [工程配置与运行诊断模块](/knowledge/operations-debugging)
+- [进入 Screeps 知识库](/knowledge)
 
 ## 官方资料
 
