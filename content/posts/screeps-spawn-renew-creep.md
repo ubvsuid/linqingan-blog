@@ -1,8 +1,8 @@
 ---
-title: "Screeps renewCreep() 怎么用：让 Creep 靠近 Spawn 续命"
-description: "用最小 JavaScript 示例检查 ticksToLive，让普通 Creep 靠近 Spawn 调用 renewCreep()，并排查 ERR_BUSY、ERR_FULL 等返回值。"
+title: "Screeps renewCreep() 怎么用：TTL、Energy、Boost 与 Spawn 占用"
+description: "在TTL阈值下校验普通Creep、CLAIM部件、Boost、Spawn状态和相邻距离，计算单次续命tick与Energy，并处理renewCreep返回值。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -16,186 +16,506 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-19"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（身体成本、单次TTL、单次Energy、CLAIM、Boost、阈值和Spawn状态，不是Screeps官方服务器）"
+  testResult: "目标缺失、仍在生成、TTL充足、CLAIM、Boost未确认、Spawn忙碌、Energy不足、距离不足和可续命场景通过。"
 featured: false
 ---
 
-一只 Creep 的 `ticksToLive` 不断下降时，`StructureSpawn.renewCreep()` 可以增加普通 Creep 的剩余寿命。调用前先确认 Spawn 和 Creep 都存在，再保存返回值。距离、Spawn 忙碌、Energy、`CLAIM` 身体部件和当前 TTL 都可能让续命失败。
+`StructureSpawn.renewCreep()` 可以增加普通Creep的剩余寿命，但它会占用Spawn、消耗Spawn自身Energy，并移除目标Creep的全部Boost。
 
-本文只处理固定名称普通 Creep 的最小续命流程。它不证明续命一定比提前生产替代 Creep 更划算，也不设计生产队列。
+因此续命不能只写成“TTL低于300就调用”。调用前至少需要确认：
 
-## renewCreep() 与 spawnCreep() 的区别
+- 目标是自己的普通Creep；
+- 不含 `CLAIM` 部件；
+- Boost是否允许被移除；
+- Spawn当前没有生成其他Creep；
+- Creep与Spawn相邻；
+- Spawn自身Energy足够；
+- 续命没有阻塞更重要的补员。
 
-`spawnCreep()` 创建一只新 Creep，`renewCreep()` 操作已经存在的 Creep。还没有完成第一次创建流程时，先阅读[如何使用 spawnCreep() 创建 Creep](/blog/screeps-spawn-create-creep)。
+## 官方单次续命公式
 
-当前官方 API 规定，每次成功续命增加 `floor(600 / body_size)` ticks；每次所需 Energy 为 `ceil(creep_cost / 2.5 / body_size)`。身体越大，单次增加的 TTL 越少。实际结算由游戏 API 完成，不需要在主循环重新实现公式。
+单次增加的TTL：
 
-如果不熟悉身体数组，可以先看[WORK、CARRY 和 MOVE 的基础作用](/blog/screeps-creep-body-parts)。
-
-## 先读取 ticksToLive
-
-下面代码只读取状态，不会调用续命：
-
-```javascript
-const creep = Game.creeps['Worker1'];
-
-if (!creep) {
-  console.log('没有找到 Worker1');
-} else if (creep.spawning) {
-  console.log('Worker1 仍在生成中');
-} else {
-  console.log('Worker1 剩余 TTL：' + creep.ticksToLive);
-}
+```text
+floor(600 / body_size)
 ```
 
-`ticksToLive` 的单位是游戏 tick，不是现实时间。主循环为何持续执行，可以回看[Screeps 中的 tick 与游戏循环](/blog/screeps-tick-and-game-loop)。
+单次消耗的Energy：
 
-## 调用前先排除 CLAIM 与 boosts
+```text
+ceil(creep_cost / 2.5 / body_size)
+```
 
-官方 API 明确列出两个限制：
+其中：
 
-- 带 `CLAIM` 身体部件的 Creep 不能使用 `renewCreep()`；
-- 续命会移除目标 Creep 的全部 boosts。
+- `body_size` 是身体部件总数；
+- `creep_cost` 是全部身体部件的生成成本。
 
-下面示例面向没有 `CLAIM`、没有需要保留 boosts 的普通 Worker。不要把它直接套用到 Claimer 或强化单位。
+可以用纯函数计算：
 
-## 最小调用：先续命，再处理距离
+```js
+function getBodyCost(body) {
+  return body.reduce((total, part) => {
+    const cost = BODYPART_COST[part.type];
 
-```javascript
-const spawn = Game.spawns['Spawn1'];
-const creep = Game.creeps['Worker1'];
-
-if (spawn && creep && !creep.spawning) {
-  const renewResult = spawn.renewCreep(creep);
-
-  if (renewResult === ERR_NOT_IN_RANGE) {
-    const moveResult = creep.moveTo(spawn);
-
-    if (moveResult !== OK) {
-      console.log('Worker1 moveTo 返回值：' + moveResult);
+    if (!Number.isFinite(cost)) {
+      throw new TypeError(
+        `unknown body part: ${String(part.type)}`
+      );
     }
-  } else if (renewResult !== OK) {
-    console.log('renewCreep 返回值：' + renewResult);
+
+    return total + cost;
+  }, 0);
+}
+
+function getRenewStep(body) {
+  if (!Array.isArray(body) || body.length === 0) {
+    return {
+      valid: false,
+      reason: 'body-invalid'
+    };
   }
+
+  const bodyCost = getBodyCost(body);
+
+  return {
+    valid: true,
+    reason: 'ready',
+    bodySize: body.length,
+    bodyCost,
+    addedTicks: Math.floor(600 / body.length),
+    energyCost: Math.ceil(
+      bodyCost / 2.5 / body.length
+    )
+  };
 }
 ```
 
-目标 Creep 必须站在 Spawn 相邻格。分别保存 `renewCreep()` 与 `moveTo()` 的返回值，才能区分续命失败和移动失败。
+身体越大，单次增加的TTL越少。不同部件成本也会影响单次Energy。
 
-## 带 TTL 阈值的完整示例
+## Boost为什么必须单独确认
 
-下面示例只在 `Worker1` 的 TTL 不高于 300 时进入续命流程。`300` 是便于说明的配置，不是官方推荐值，应根据路程、替代生产与 Spawn 任务自行调整。
+官方API明确说明：续命会移除目标Creep的全部Boost。
 
-```javascript
-module.exports.loop = function () {
-  const spawn = Game.spawns['Spawn1'];
-  const creep = Game.creeps['Worker1'];
-  const renewThreshold = 300;
+检查：
 
-  if (!spawn) {
-    console.log('没有找到 Spawn1');
-    return;
+```js
+function getBoostedParts(creep) {
+  return creep.body.filter(part =>
+    typeof part.boost === 'string'
+  );
+}
+```
+
+对强化战斗单位、强化采集者或强化升级者，自动续命可能直接破坏原任务配置。
+
+本文要求：
+
+```js
+allowBoostRemoval === true
+```
+
+才允许对带Boost的Creep继续执行。这是人工安全条件，不是官方API参数。
+
+## CLAIM部件为什么直接拒绝
+
+`renewCreep()`不能用于带有 `CLAIM` 身体部件的Creep。
+
+```js
+function hasClaimPart(creep) {
+  return creep.body.some(part =>
+    part.type === CLAIM
+  );
+}
+```
+
+这里检查身体中是否存在CLAIM，而不是只检查有效部件数量。Claimer应通过替代生产管理寿命。
+
+## 续命阈值不是越高越好
+
+阈值过高会让Creep很早回到Spawn并持续占用它；阈值过低则可能在走回Spawn前死亡。
+
+阈值需要考虑：
+
+- Creep到Spawn的路程；
+- 身体生成时间；
+- Spawn当前生成队列；
+- 任务是否能离开工作位置；
+- 续命后计划保留到什么TTL；
+- 是否有替代Creep接班。
+
+`300`只能作为示例，不是官方推荐值。
+
+## 用纯函数决定当前动作
+
+```js
+function evaluateRenewRequest(input) {
+  const {
+    creepExists,
+    creepSpawning,
+    ticksToLive,
+    renewThreshold,
+    hasClaimPart,
+    boostedPartCount,
+    allowBoostRemoval,
+    spawnBusy,
+    spawnEnergy,
+    energyCost,
+    isNearSpawn
+  } = input;
+
+  if (!creepExists) {
+    return {
+      ready: false,
+      action: 'wait',
+      reason: 'creep-missing'
+    };
   }
 
-  if (!creep) {
-    console.log('没有找到 Worker1');
-    return;
+  if (creepSpawning) {
+    return {
+      ready: false,
+      action: 'wait',
+      reason: 'creep-spawning'
+    };
   }
 
-  if (creep.spawning || creep.ticksToLive > renewThreshold) {
-    return;
+  if (
+    !Number.isFinite(ticksToLive)
+    || !Number.isFinite(renewThreshold)
+    || renewThreshold < 0
+  ) {
+    return {
+      ready: false,
+      action: 'wait',
+      reason: 'ttl-invalid'
+    };
+  }
+
+  if (ticksToLive > renewThreshold) {
+    return {
+      ready: false,
+      action: 'work',
+      reason: 'ttl-sufficient'
+    };
+  }
+
+  if (hasClaimPart) {
+    return {
+      ready: false,
+      action: 'replace',
+      reason: 'claim-part-present'
+    };
+  }
+
+  if (
+    boostedPartCount > 0
+    && allowBoostRemoval !== true
+  ) {
+    return {
+      ready: false,
+      action: 'replace',
+      reason: 'boost-removal-not-confirmed'
+    };
+  }
+
+  if (!isNearSpawn) {
+    return {
+      ready: false,
+      action: 'move',
+      reason: 'move-to-spawn'
+    };
+  }
+
+  if (spawnBusy) {
+    return {
+      ready: false,
+      action: 'wait',
+      reason: 'spawn-busy'
+    };
+  }
+
+  if (
+    !Number.isFinite(spawnEnergy)
+    || !Number.isFinite(energyCost)
+    || spawnEnergy < energyCost
+  ) {
+    return {
+      ready: false,
+      action: 'wait',
+      reason: 'spawn-energy-not-enough'
+    };
+  }
+
+  return {
+    ready: true,
+    action: 'renew',
+    reason: 'ready'
+  };
+}
+```
+
+## 完整示例
+
+```js
+function getBodyCost(body) {
+  return body.reduce((total, part) => {
+    const cost = BODYPART_COST[part.type];
+
+    if (!Number.isFinite(cost)) {
+      throw new TypeError(
+        `unknown body part: ${String(part.type)}`
+      );
+    }
+
+    return total + cost;
+  }, 0);
+}
+
+function getRenewStep(body) {
+  if (!Array.isArray(body) || body.length === 0) {
+    return null;
+  }
+
+  const bodyCost = getBodyCost(body);
+
+  return {
+    bodySize: body.length,
+    bodyCost,
+    addedTicks: Math.floor(600 / body.length),
+    energyCost: Math.ceil(
+      bodyCost / 2.5 / body.length
+    )
+  };
+}
+
+function runRenewMission(input) {
+  const {
+    spawn,
+    creep,
+    renewThreshold,
+    targetTtl,
+    allowBoostRemoval
+  } = input;
+
+  if (!spawn || !creep || creep.spawning) {
+    return {
+      status: 'object-unavailable'
+    };
+  }
+
+  const step = getRenewStep(creep.body);
+
+  if (!step) {
+    return {
+      status: 'body-invalid'
+    };
+  }
+
+  const hasClaimPart = creep.body.some(part =>
+    part.type === CLAIM
+  );
+  const boostedPartCount = creep.body.filter(part =>
+    typeof part.boost === 'string'
+  ).length;
+
+  if (hasClaimPart) {
+    return {
+      status: 'claim-creep-must-be-replaced'
+    };
+  }
+
+  if (
+    boostedPartCount > 0
+    && allowBoostRemoval !== true
+  ) {
+    return {
+      status: 'boost-removal-not-confirmed',
+      boostedPartCount
+    };
+  }
+
+  if (creep.ticksToLive > renewThreshold) {
+    return {
+      status: 'ttl-sufficient',
+      ticksToLive: creep.ticksToLive
+    };
+  }
+
+  if (creep.ticksToLive >= targetTtl) {
+    return {
+      status: 'target-ttl-reached',
+      ticksToLive: creep.ticksToLive
+    };
+  }
+
+  if (!creep.pos.isNearTo(spawn)) {
+    const moveResult = creep.moveTo(spawn, {
+      range: 1,
+      reusePath: 10
+    });
+
+    return {
+      status: 'moving-to-spawn',
+      moveResult,
+      step
+    };
   }
 
   if (spawn.spawning) {
-    if (!creep.pos.isNearTo(spawn)) {
-      const moveResult = creep.moveTo(spawn);
-
-      if (moveResult !== OK) {
-        console.log('Worker1 等待续命时 moveTo 返回值：' + moveResult);
-      }
-    }
-    return;
+    return {
+      status: 'spawn-busy',
+      step
+    };
   }
 
-  const renewResult = spawn.renewCreep(creep);
+  const spawnEnergy = spawn.store.getUsedCapacity(
+    RESOURCE_ENERGY
+  );
 
-  if (renewResult === ERR_NOT_IN_RANGE) {
-    const moveResult = creep.moveTo(spawn);
-
-    if (moveResult !== OK) {
-      console.log('Worker1 moveTo 返回值：' + moveResult);
-    }
-    return;
+  if (spawnEnergy < step.energyCost) {
+    return {
+      status: 'spawn-energy-not-enough',
+      spawnEnergy,
+      step
+    };
   }
 
-  if (renewResult !== OK) {
-    console.log('Worker1 renewCreep 返回值：' + renewResult);
+  const result = spawn.renewCreep(creep);
+
+  return {
+    status: result === OK
+      ? 'renew-submitted'
+      : 'renew-failed',
+    result,
+    step,
+    ticksToLiveBefore: creep.ticksToLive
+  };
+}
+
+module.exports.loop = function () {
+  const spawn = Game.spawns.Spawn1;
+  const creep = Game.creeps.Worker1;
+
+  const outcome = runRenewMission({
+    spawn,
+    creep,
+    renewThreshold: 300,
+    targetTtl: 1200,
+    allowBoostRemoval: false
+  });
+
+  if (outcome.status === 'renew-failed') {
+    console.log({
+      type: 'renew-creep-failed',
+      spawnName: spawn?.name ?? null,
+      creepName: creep?.name ?? null,
+      ...outcome
+    });
   }
 };
 ```
 
-Spawn 忙碌时，示例不会调用续命，但会让尚未相邻的 Creep 继续靠近。Spawn 空闲后，只要 TTL 仍不高于阈值，代码可能在多个 tick 连续请求续命。
+`targetTtl`用于防止低于阈值后无限续命到 `ERR_FULL`。具体目标仍需根据任务与Spawn队列调整。
 
-## 失败时按返回值检查
+## 为什么Spawn忙碌时不能续命
 
-### ERR_BUSY
+官方API要求Spawn没有正在生成另一只Creep。续命与生成共享Spawn时间。
 
-Spawn 正在生产另一只 Creep。续命与生产会争用 Spawn，不能把两者当成同时完成的动作。
+如果生产队列已经需要紧急补员，应该先决定优先级：
 
-### ERR_NOT_ENOUGH_ENERGY
-
-当前 Spawn 的 Store 没有本次续命需要的 Energy。可读取：
-
-```javascript
-const spawn = Game.spawns['Spawn1'];
-
-if (spawn) {
-  const energy = spawn.store.getUsedCapacity(RESOURCE_ENERGY);
-  console.log('Spawn1 当前 Energy：' + energy);
-}
+```text
+续命现有Creep
+或
+生产替代Creep
 ```
 
-不要把房间其他建筑里的 Energy 直接当成这次续命已经可用。
+不能让两个独立模块在同一tick各自控制同一Spawn。
 
-### ERR_INVALID_TARGET
+## 续命与提前替代怎样选择
 
-目标不是有效 Creep，或者带有 `CLAIM` 身体部件。检查固定名称取得的对象与身体数组。
+续命更适合：
 
-### ERR_FULL
+- Creep长期靠近Spawn工作；
+- 身体配置仍符合当前需求；
+- Spawn空闲时间充足；
+- 没有需要保留的Boost；
+- 回到Spawn不会中断关键任务。
 
-目标 Creep 的 TTL 已经足够高，当前调用无法再增加。阈值设置过高时，可能过早进入续命流程。
+提前替代更适合：
 
-### ERR_NOT_IN_RANGE
+- Creep长期在远程房间；
+- 带CLAIM或重要Boost；
+- Spawn需要集中管理队列；
+- 新身体需要升级；
+- 任务要求平滑交接。
 
-Creep 没有站在 Spawn 相邻格。检查 `moveTo()` 返回值、路径，以及 Spawn 周围是否有可达位置。
+文章不把续命描述为默认最佳方案。
 
-### ERR_RCL_NOT_ENOUGH
+## 返回值排查
 
-当前 Controller 等级不足以使用这个 Spawn。确认 Spawn 是否处于可用状态。
+| 返回值 | 常见原因 | 处理方向 |
+|---|---|---|
+| `OK` | 续命命令已安排 | 下一tick读取TTL与Spawn Energy |
+| `ERR_NOT_OWNER` | Spawn或Creep不属于自己 | 检查对象来源 |
+| `ERR_BUSY` | Spawn正在生成另一只Creep | 检查统一队列 |
+| `ERR_NOT_ENOUGH_ENERGY` | Spawn自身Energy不足 | 读取Spawn Store |
+| `ERR_INVALID_TARGET` | 目标不是普通Creep或带CLAIM | 检查对象与身体 |
+| `ERR_FULL` | 当前TTL无法继续增加 | 降低目标TTL或停止 |
+| `ERR_NOT_IN_RANGE` | Creep不在相邻格 | 移动到范围1 |
+| `ERR_RCL_NOT_ENOUGH` | Spawn当前不可用 | 检查Controller等级 |
 
-### ERR_NOT_OWNER
+`OK`不代表当前tick的 `ticksToLive` 已经变化，下一tick重新读取。
 
-Spawn 或目标 Creep 不属于自己。也要确认名称与大小写没有写错。
+## 离线模拟结果
 
-这些常量可以在站内的[Screeps 错误码查询页](/screeps-errors)继续查询。
+构建检查覆盖：
 
-## 适用范围
+1. 目标缺失；
+2. Creep仍在生成；
+3. TTL高于阈值；
+4. body含CLAIM；
+5. Boost移除未确认；
+6. 需要移动到Spawn；
+7. Spawn忙碌；
+8. Spawn Energy不足；
+9. 合法续命；
+10. 身体成本、单次增加tick和单次Energy公式。
 
-示例没有解决：
+离线测试不能调用真实 `renewCreep()`，也不能模拟Boost移除、Spawn队列或TTL跨tick变化。
 
-- 续命与提前生产替代 Creep 的选择；
-- 多只 Creep 的续命排队；
-- Spawn 周围交通拥堵；
-- Boost 回收与重新强化；
-- 多 Spawn 的任务分配。
+## 适用边界
 
-先验证一个普通固定名称 Creep 的 TTL、距离和返回值，再决定是否把续命加入长期房间系统。
+本文不实现：
 
-## 官方参考资料
+- 多Creep续命排队；
+- 自动比较全部替代方案；
+- Spawn交通预约；
+- Boost重新补充；
+- 远程回城路线；
+- Power Creep续命；
+- 多Spawn分配；
+- 长期资源效率结论。
 
-- [Screeps API Reference：StructureSpawn.renewCreep](https://docs.screeps.com/api/#StructureSpawn.renewCreep)
-- [Screeps API Reference：RoomPosition.isNearTo](https://docs.screeps.com/api/#RoomPosition.isNearTo)
-- [Screeps Documentation：Creeps](https://docs.screeps.com/creeps.html)
+JavaScript语法和离线决策已检查，真实续命、Boost变化和多tick寿命仍待Screeps环境验证。
 
-资料核对日期：2026-07-18。代码仍需在 Screeps 环境验证。
+## 相关站内内容
 
+- [如何回收Creep](/blog/screeps-spawn-recycle-creep)
+- [spawnCreep()失败怎么查](/blog/screeps-spawncreep-return-codes)
+- [如何按Energy动态生成身体](/blog/screeps-dynamic-creep-body-energy)
+- [房间断代后怎样恢复采集者](/blog/screeps-spawn-emergency-recovery)
+- [Creep身体部件怎么看](/blog/screeps-creep-body-parts)
+- [进入Spawn与Creep生命周期专题](/knowledge/spawn-lifecycle)
+
+## 官方资料
+
+- [StructureSpawn.renewCreep API](https://docs.screeps.com/api/#StructureSpawn.renewCreep)
+- [Creep API](https://docs.screeps.com/api/#Creep)
+- [Creeps](https://docs.screeps.com/creeps.html)
+- [Understanding game loop, time and ticks](https://docs.screeps.com/game-loop.html)
+
+资料核对日期：2026-07-22。离线续命决策已通过；真实续命结果仍待环境验证。
