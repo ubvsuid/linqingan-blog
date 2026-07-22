@@ -137,6 +137,173 @@ record(
   },
 );
 
+record(
+  "screeps-rawmemory-segments",
+  "区分未加载、空字符串、合法对象 JSON、损坏 JSON 和非对象 JSON，损坏内容不会被覆盖。",
+  () => {
+    function parseSegment(raw) {
+      if (raw === undefined) return { status: "unavailable", value: null };
+      if (raw === "") return { status: "ok", value: {} };
+
+      try {
+        const value = JSON.parse(raw);
+        if (!value || Array.isArray(value) || typeof value !== "object") {
+          return { status: "invalid", value: null };
+        }
+        return { status: "ok", value };
+      } catch {
+        return { status: "invalid", value: null };
+      }
+    }
+
+    assert.deepEqual(parseSegment(undefined), { status: "unavailable", value: null });
+    assert.deepEqual(parseSegment(""), { status: "ok", value: {} });
+    assert.deepEqual(parseSegment('{"count":2}'), { status: "ok", value: { count: 2 } });
+    assert.deepEqual(parseSegment("{"), { status: "invalid", value: null });
+    assert.deepEqual(parseSegment("[]"), { status: "invalid", value: null });
+  },
+);
+
+record(
+  "screeps-global-cache",
+  "同房间缓存命中、到期重建、不同房间隔离，以及全局重置后空缓存重建场景通过。",
+  () => {
+    function readCache(cache, key, tick, ttl, loader) {
+      const current = cache.get(key);
+      if (current && current.expiresAt > tick) return current.value;
+      const value = loader();
+      cache.set(key, { value, expiresAt: tick + ttl });
+      return value;
+    }
+
+    const cache = new Map();
+    let loads = 0;
+    const loadA = () => {
+      loads += 1;
+      return ["source-a"];
+    };
+
+    assert.deepEqual(readCache(cache, "W1N1", 100, 10, loadA), ["source-a"]);
+    assert.deepEqual(readCache(cache, "W1N1", 105, 10, loadA), ["source-a"]);
+    assert.equal(loads, 1);
+    assert.deepEqual(readCache(cache, "W1N1", 110, 10, loadA), ["source-a"]);
+    assert.equal(loads, 2);
+    assert.deepEqual(readCache(cache, "W2N2", 110, 10, () => ["source-b"]), ["source-b"]);
+    assert.deepEqual(readCache(new Map(), "W1N1", 200, 10, loadA), ["source-a"]);
+    assert.equal(loads, 3);
+  },
+);
+
+record(
+  "screeps-cpu-getused-bucket",
+  "固定长度样本窗口会丢弃最旧数据，并正确计算样本数、平均值和最大值。",
+  () => {
+    function appendSample(samples, value, limit) {
+      samples.push(value);
+      while (samples.length > limit) samples.shift();
+    }
+
+    function summarize(samples) {
+      if (samples.length === 0) return { count: 0, average: 0, maximum: 0 };
+      const total = samples.reduce((sum, value) => sum + value, 0);
+      return {
+        count: samples.length,
+        average: total / samples.length,
+        maximum: Math.max(...samples),
+      };
+    }
+
+    const samples = [];
+    appendSample(samples, 1, 3);
+    appendSample(samples, 2, 3);
+    appendSample(samples, 3, 3);
+    appendSample(samples, 4, 3);
+    assert.deepEqual(samples, [2, 3, 4]);
+    assert.deepEqual(summarize(samples), { count: 3, average: 3, maximum: 4 });
+    assert.deepEqual(summarize([]), { count: 0, average: 0, maximum: 0 });
+  },
+);
+
+record(
+  "screeps-room-event-log",
+  "只保留攻击事件，忽略缺少 targetId 的损坏记录，并识别目标仍存在且属于自己的攻击。",
+  () => {
+    function selectOwnedAttacks(events, objectsById) {
+      return events
+        .filter((event) => event.event === 1)
+        .map((event) => {
+          const data = event.data && typeof event.data === "object" ? event.data : {};
+          const targetId = typeof data.targetId === "string" ? data.targetId : null;
+          const target = targetId ? objectsById[targetId] : null;
+          if (!target || target.my !== true) return null;
+          return {
+            attackerId: event.objectId ?? null,
+            targetId,
+            damage: Number.isFinite(data.damage) ? data.damage : 0,
+          };
+        })
+        .filter(Boolean);
+    }
+
+    const result = selectOwnedAttacks([
+      { event: 1, objectId: "enemy", data: { targetId: "mine", damage: 30 } },
+      { event: 1, objectId: "mine", data: { targetId: "enemy", damage: 10 } },
+      { event: 1, objectId: "broken", data: null },
+      { event: 4, objectId: "builder", data: { targetId: "site" } },
+    ], {
+      mine: { my: true },
+      enemy: { my: false },
+    });
+
+    assert.deepEqual(result, [
+      { attackerId: "enemy", targetId: "mine", damage: 30 },
+    ]);
+  },
+);
+
+record(
+  "screeps-market-create-order",
+  "覆盖参数校验、5% 挂单费用、Credits 不足、重复订单和可提交场景。",
+  () => {
+    function inspectOrderRequest(request, existingOrders, credits) {
+      if (!request || request.enabled !== true) return { status: "disabled" };
+      if (!["buy", "sell"].includes(request.type)) return { status: "invalid" };
+      if (typeof request.resourceType !== "string" || request.resourceType.length === 0) {
+        return { status: "invalid" };
+      }
+      if (!Number.isFinite(request.price) || request.price <= 0) return { status: "invalid" };
+      if (!Number.isInteger(request.totalAmount) || request.totalAmount <= 0) {
+        return { status: "invalid" };
+      }
+
+      const duplicate = existingOrders.some((order) =>
+        order.type === request.type
+        && order.resourceType === request.resourceType
+        && order.roomName === request.roomName,
+      );
+      if (duplicate) return { status: "duplicate" };
+
+      const fee = request.price * request.totalAmount * 0.05;
+      if (credits < fee) return { status: "insufficient-credits", fee };
+      return { status: "ready", fee };
+    }
+
+    const base = {
+      enabled: true,
+      type: "sell",
+      resourceType: "U",
+      price: 1,
+      totalAmount: 10000,
+      roomName: "W1N1",
+    };
+
+    assert.deepEqual(inspectOrderRequest({ ...base, price: 0 }, [], 1000), { status: "invalid" });
+    assert.deepEqual(inspectOrderRequest(base, [], 499), { status: "insufficient-credits", fee: 500 });
+    assert.deepEqual(inspectOrderRequest(base, [{ ...base }], 1000), { status: "duplicate" });
+    assert.deepEqual(inspectOrderRequest(base, [], 1000), { status: "ready", fee: 500 });
+  },
+);
+
 for (const result of results) {
   console.log(`模拟通过：${result.name} — ${result.detail}`);
 }
