@@ -1,8 +1,8 @@
 ---
-title: "Screeps Creep.withdraw 怎么用：从 Container 取出 Energy"
-description: "用最小 JavaScript 示例让 Creep 从 Container 取出 Energy，并按 ERR_NOT_IN_RANGE、ERR_FULL 等返回值排查失败原因。"
+title: "Creep.withdraw() 怎么从 Container 安全取出 Energy"
+description: "筛选有Energy的Container，按路径和库存选择目标，计算本次amount，并处理容量、敌对Rampart、多Creep竞争、移动与withdraw返回值。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -16,171 +16,392 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-19"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（Container类型、库存、Creep容量、路径距离和取用amount，不是Screeps官方服务器）"
+  testResult: "目标缺失、空Container、容量已满、非法库存、多个候选排序、amount上限和同分ID稳定场景通过。"
 featured: false
 ---
 
-运输 Creep 已经走到 Container 附近，却没有拿到 Energy，先保存 `creep.withdraw()` 的返回值。目标距离、Container 库存和 Creep 剩余容量都会直接影响结果。
+`creep.withdraw(target, RESOURCE_ENERGY, amount)` 用来从Structure、Tombstone或Ruin取出资源。本文只处理当前房间里的Container，并把目标选择、取用数量、移动和返回值分开。
 
-本文只解决一个问题：让 `Hauler1` 找到当前房间内有 Energy 的 Container，靠近后取出 Energy。Container 的建造位置、采集者投放和取能后的配送策略不在本文范围内。
+基础条件：
 
-## `withdraw()` 和 `transfer()` 的方向正好相反
+- Creep属于自己并且已经生成；
+- Creep有剩余Store容量；
+- 目标是当前仍存在的Container；
+- Container中有Energy；
+- Creep与目标相邻；
+- 目标没有被敌对Rampart阻挡。
 
-两种写法的资源流向不同：
+## `withdraw()` 与其他资源动作的方向
 
-- `creep.withdraw(container, RESOURCE_ENERGY)`：Creep 从目标取资源；
-- `creep.transfer(spawn, RESOURCE_ENERGY)`：Creep 把自己的资源交给目标。
+```js
+creep.withdraw(container, RESOURCE_ENERGY)
+```
 
-如果卡住的是后一个动作，先看[怎样让 Creep 把 Energy 送回 Spawn](/blog/screeps-creep-deliver-energy)。本文不重复采集和配送的完整循环。
+资源从Container进入Creep。
 
-## 先找到有 Energy 的 Container
+```js
+creep.transfer(spawn, RESOURCE_ENERGY)
+```
 
-`Room.find()` 返回数组。过滤时同时检查建筑类型和 Energy 库存：
+资源从Creep进入目标。
 
-```javascript
-const creep = Game.creeps['Hauler1'];
+```js
+creep.pickup(resource)
+```
 
-if (creep) {
-  const containers = creep.room.find(FIND_STRUCTURES, {
-    filter: function (structure) {
-      return structure.structureType === STRUCTURE_CONTAINER &&
-        structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-    }
-  });
-  const container = containers[0];
+目标是地面Resource，不是Container。
 
-  if (container) {
-    console.log('找到 Container：' + container.id);
+Creep之间传资源应由原持有者调用 `transfer()`，不能用 `withdraw()` 从另一只Creep取资源。
+
+## 先计算本次可取数量
+
+```js
+function getWithdrawAmount(input) {
+  const {
+    targetEnergy,
+    creepFreeCapacity,
+    requestedAmount
+  } = input;
+
+  if (
+    !Number.isFinite(targetEnergy)
+    || !Number.isFinite(creepFreeCapacity)
+    || targetEnergy <= 0
+    || creepFreeCapacity <= 0
+  ) {
+    return 0;
   }
+
+  const maximum = Math.min(
+    targetEnergy,
+    creepFreeCapacity
+  );
+
+  if (requestedAmount === undefined) {
+    return maximum;
+  }
+
+  if (
+    !Number.isFinite(requestedAmount)
+    || requestedAmount <= 0
+  ) {
+    return 0;
+  }
+
+  return Math.min(maximum, requestedAmount);
 }
 ```
 
-`containers[0]` 可能是 `undefined`。房间内没有 Container，或所有 Container 都是空的，都会得到这个结果，所以不能立即把它传给 `withdraw()`。
+显式传入amount可以控制单次取用量，但不能消除同tick竞争。其他Creep仍可能在动作结算阶段从同一Container取资源。
 
-## 最小调用：先取资源，再处理距离
+## 怎样选择Container
 
-```javascript
-const creep = Game.creeps['Hauler1'];
+只取数组第一项会依赖 `Room.find()` 的返回顺序。下面先过滤，再按路径长度、库存和ID稳定排序。
 
-if (creep) {
-  const containers = creep.room.find(FIND_STRUCTURES, {
-    filter: function (structure) {
-      return structure.structureType === STRUCTURE_CONTAINER &&
-        structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+```js
+function selectContainer(creep, containers) {
+  const candidates = [];
+
+  for (const container of containers) {
+    const energy = container.store.getUsedCapacity(
+      RESOURCE_ENERGY
+    );
+
+    if (!Number.isFinite(energy) || energy <= 0) {
+      continue;
     }
-  });
-  const container = containers[0];
 
-  if (container) {
-    const withdrawResult = creep.withdraw(container, RESOURCE_ENERGY);
+    const path = creep.pos.findPathTo(container, {
+      range: 1,
+      ignoreCreeps: true
+    });
 
-    if (withdrawResult === ERR_NOT_IN_RANGE) {
-      const moveResult = creep.moveTo(container);
-
-      if (moveResult !== OK) {
-        console.log(creep.name + ' moveTo 返回值：' + moveResult);
+    if (!Array.isArray(path) || path.length === 0) {
+      if (!creep.pos.isNearTo(container)) {
+        continue;
       }
     }
+
+    candidates.push({
+      container,
+      energy,
+      pathLength: path.length
+    });
   }
+
+  return candidates.sort((left, right) => {
+    if (left.pathLength !== right.pathLength) {
+      return left.pathLength - right.pathLength;
+    }
+
+    if (left.energy !== right.energy) {
+      return right.energy - left.energy;
+    }
+
+    return left.container.id.localeCompare(
+      right.container.id
+    );
+  })[0]?.container ?? null;
 }
 ```
 
-`withdraw()` 的目标要与 Creep 相邻。距离不足时会返回 `ERR_NOT_IN_RANGE`，这时才调用 `moveTo()`。分别保存两个方法的返回值，才能分清问题发生在取资源还是移动。
+`ignoreCreeps: true`让目标选择不因临时交通每tick剧烈变化。实际移动仍可能被其他Creep阻挡。
 
-## 可放进 `main` 的完整示例
+## 完整示例
 
-运行前提：当前房间存在 `Hauler1`；它有可用的 `CARRY` 和 `MOVE`；房间内至少有一个装着 Energy 的 Container。
+```js
+function getWithdrawAmount(input) {
+  const {
+    targetEnergy,
+    creepFreeCapacity,
+    requestedAmount
+  } = input;
 
-```javascript
-module.exports.loop = function () {
-  const creep = Game.creeps['Hauler1'];
-
-  if (!creep) {
-    console.log('没有找到 Hauler1');
-    return;
+  if (
+    !Number.isFinite(targetEnergy)
+    || !Number.isFinite(creepFreeCapacity)
+    || targetEnergy <= 0
+    || creepFreeCapacity <= 0
+  ) {
+    return 0;
   }
 
-  if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
-    return;
+  const maximum = Math.min(
+    targetEnergy,
+    creepFreeCapacity
+  );
+
+  if (requestedAmount === undefined) {
+    return maximum;
   }
 
+  if (
+    !Number.isFinite(requestedAmount)
+    || requestedAmount <= 0
+  ) {
+    return 0;
+  }
+
+  return Math.min(maximum, requestedAmount);
+}
+
+function selectContainer(creep) {
   const containers = creep.room.find(FIND_STRUCTURES, {
-    filter: function (structure) {
-      return structure.structureType === STRUCTURE_CONTAINER &&
-        structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-    }
+    filter: structure =>
+      structure.structureType === STRUCTURE_CONTAINER
+      && structure.store.getUsedCapacity(
+        RESOURCE_ENERGY
+      ) > 0
   });
-  const container = containers[0];
+
+  return creep.pos.findClosestByPath(containers, {
+    ignoreCreeps: true,
+    range: 1
+  });
+}
+
+function runContainerWithdraw(creep) {
+  if (creep.spawning === true) {
+    return {
+      status: 'creep-spawning'
+    };
+  }
+
+  const free = creep.store.getFreeCapacity(
+    RESOURCE_ENERGY
+  );
+
+  if (!Number.isFinite(free) || free <= 0) {
+    return {
+      status: 'creep-full'
+    };
+  }
+
+  const container = selectContainer(creep);
 
   if (!container) {
-    console.log('当前房间没有可取用 Energy 的 Container');
+    return {
+      status: 'container-not-found'
+    };
+  }
+
+  const available = container.store.getUsedCapacity(
+    RESOURCE_ENERGY
+  );
+  const amount = getWithdrawAmount({
+    targetEnergy: available,
+    creepFreeCapacity: free
+  });
+
+  if (amount <= 0) {
+    return {
+      status: 'nothing-to-withdraw',
+      containerId: container.id
+    };
+  }
+
+  const result = creep.withdraw(
+    container,
+    RESOURCE_ENERGY,
+    amount
+  );
+
+  if (result === ERR_NOT_IN_RANGE) {
+    const moveResult = creep.moveTo(container, {
+      range: 1,
+      reusePath: 10
+    });
+
+    return {
+      status: 'moving-to-container',
+      containerId: container.id,
+      amount,
+      result,
+      moveResult
+    };
+  }
+
+  return {
+    status: result === OK
+      ? 'withdraw-submitted'
+      : 'withdraw-failed',
+    containerId: container.id,
+    amount,
+    result
+  };
+}
+
+module.exports.loop = function () {
+  const creep = Game.creeps.Hauler1;
+
+  if (!creep) {
     return;
   }
 
-  const withdrawResult = creep.withdraw(container, RESOURCE_ENERGY);
+  const outcome = runContainerWithdraw(creep);
 
-  if (withdrawResult === ERR_NOT_IN_RANGE) {
-    const moveResult = creep.moveTo(container);
-
-    if (moveResult !== OK) {
-      console.log('Hauler1 moveTo 返回值：' + moveResult);
-    }
-    return;
-  }
-
-  if (withdrawResult !== OK) {
-    console.log('Hauler1 withdraw 返回值：' + withdrawResult);
+  if (outcome.status === 'withdraw-failed') {
+    console.log({
+      type: 'container-withdraw-failed',
+      creepName: creep.name,
+      ...outcome
+    });
   }
 };
 ```
 
-代码只负责取能。Creep 装满后会停止调用 `withdraw()`，你可以再接上配送逻辑。若还不清楚 `CARRY` 和 `MOVE` 为什么是前提，可先阅读[三种基础身体部件的作用](/blog/screeps-creep-body-parts)。
+## 多只Creep从同一Container取能
 
-## 按返回值排查 `withdraw()` 失败
+官方API允许多个Creep在同一tick对同一对象调用 `withdraw()`。这不代表每个Creep都能获得它检查时看到的完整数量。
 
-### `ERR_NOT_IN_RANGE`
+完整物流系统可以增加：
 
-目标距离太远。调用 `moveTo(container)`，同时检查它自己的返回值；只处理 `withdraw()` 的返回值，可能会漏掉没有路径或身体缺少可用 `MOVE` 等移动问题。
+- Container目标预订；
+- 预计取用量；
+- 每个目标最大运输者数量；
+- 下一tick根据真实Store重新分配。
 
-### `ERR_NOT_ENOUGH_RESOURCES`
+本文只保存API结果，不把预检库存当成最终结算。
 
-目标没有足够的指定资源。过滤器能排除检查时为空的 Container，但同一 tick 内其他 Creep 也可能先取走资源，因此调用结果仍需检查。
+## 敌对Container与Rampart
 
-### `ERR_FULL`
+官方API允许从敌对Structure、Tombstone或Ruin取资源，前提是目标上没有敌对Rampart。
 
-Creep 没有剩余携带空间。示例在调用前使用 `creep.store.getFreeCapacity(RESOURCE_ENERGY)` 拦截了这种情况。完整物流代码应在满载后切换到配送动作。
+本文搜索 `FIND_STRUCTURES`，可能找到非己方Container。只处理己方设施时，应增加：
 
-### `ERR_INVALID_TARGET`
+```js
+structure.my === true
+```
 
-传入对象不能作为 `withdraw()` 的目标。依次检查：目标是否存在、是否为可储存资源的有效对象、是否误把另一只 Creep 当成目标。Creep 之间传资源应由原持有者调用 `transfer()`。
+Container本身通常没有 `my` 属性时，项目应根据房间控制、位置或任务白名单判断，不要把“可调用”与“应该调用”混为一谈。
 
-### 其他返回值
+## 返回值排查
 
-`withdraw()` 还可能返回 `ERR_NOT_OWNER`、`ERR_BUSY` 或 `ERR_INVALID_ARGS`。完整示例会统一记录所有非 `OK` 结果，便于再对照官方 API。站内的 [Screeps 错误码页](/screeps-errors)也可以用于按常量名称检查。
+| 返回值 | 常见原因 | 处理方向 |
+|---|---|---|
+| `OK` | 取资源命令已安排 | 下一tick读取双方Store |
+| `ERR_NOT_OWNER` | Creep不属于自己，或敌对Rampart阻挡目标 | 检查对象与位置 |
+| `ERR_BUSY` | Creep仍在生成 | 等生成结束 |
+| `ERR_NOT_ENOUGH_RESOURCES` | 目标没有指定数量 | 检查同tick竞争与amount |
+| `ERR_INVALID_TARGET` | 目标不能保存该资源 | 检查对象类型 |
+| `ERR_FULL` | Creep没有剩余容量 | 切换到配送动作 |
+| `ERR_NOT_IN_RANGE` | 不相邻 | 移动到范围1 |
+| `ERR_INVALID_ARGS` | 资源常量或amount无效 | 检查参数 |
 
-### `OK`
+`OK`只表示命令已安排，不能在同一tick手动把Creep Store当作已经增加。
 
-`OK` 表示 API 已接受并安排本次动作。官方调试文档同时提醒，看似成功的命令仍可能没有最终执行；调试时还应观察后续 tick 中 Creep 与 Container 的 Store 变化。
+## 常见错误
 
-## 为什么这里不使用 `working` 状态
+### 直接使用 `containers[0]`
 
-`working` 是玩家保存在 Memory 里的自定义字段，并不是 `withdraw()` 的参数。本文先把“找目标—查容量—取资源—处理返回值”讲清楚。组合取能和配送时，再参考 [Screeps Memory 的基础用法](/blog/screeps-memory-basics)保存跨 tick 状态。
+返回顺序不是业务优先级，也可能没有任何候选。
 
-## 这个示例没有解决什么
+### 忽略Creep剩余容量
 
-- 多个 Container 的最近路径或优先级；
-- 多只运输 Creep 的目标预订；
-- 从 Tombstone、Ruin 或 Storage 取资源；
-- Container 的建造位置和采集者逻辑；
-- Spawn、Extension、Tower 的配送优先级。
+会持续得到 `ERR_FULL`。
 
-当前示例选择过滤结果中的第一个 Container。先确认单次 `withdraw()` 能返回预期结果，再把目标选择和配送拆成后续模块。
+### amount大于目标库存
 
-## 官方参考资料
+同tick其他Creep也可能先取走资源，正式结果仍需处理。
 
-- [Screeps API Reference：Creep.withdraw](https://docs.screeps.com/api/#Creep.withdraw)
-- [Screeps API Reference：Room.find](https://docs.screeps.com/api/#Room.find)
-- [Screeps API Reference：StructureContainer](https://docs.screeps.com/api/#StructureContainer)
-- [Screeps Documentation：Debugging](https://docs.screeps.com/debugging.html)
+### 把 `withdraw()` 用于Creep之间
 
-资料核对日期：2026-07-18。代码仍需在 Screeps 环境验证。
+应由持有资源的Creep调用 `transfer()`。
+
+### 保存完整Container对象到Memory
+
+保存ID，后续tick通过 `Game.getObjectById()` 恢复并判空。
+
+### 每tick打印“没有Container”
+
+正常等待不需要持续刷屏。只在状态变化或诊断模式下记录。
+
+## 离线模拟结果
+
+构建检查覆盖：
+
+1. Creep容量为0；
+2. Container库存为0；
+3. requestedAmount无效；
+4. amount不超过库存和容量；
+5. 多个Container按路径、库存和ID排序；
+6. 无可达目标；
+7. 同分选择稳定；
+8. 输入异常。
+
+离线测试不能模拟敌对Rampart、同tick结算、真实路径或Store变化。
+
+## 适用边界
+
+本文不覆盖：
+
+- Storage、Terminal、Tombstone与Ruin；
+- 多运输者预订；
+- 跨房间物流；
+- Container建设位置；
+- 取能后的配送优先级；
+- 道路与拥堵；
+- 多资源运输。
+
+JavaScript语法和离线目标决策已检查，真实 `withdraw()` 与多Creep结算仍待Screeps环境验证。
+
+## 相关站内内容
+
+- [如何捡取掉落Energy](/blog/screeps-creep-pickup-dropped-energy)
+- [Room.storage怎么使用](/blog/screeps-storage-energy-usage)
+- [如何向Spawn配送Energy](/blog/screeps-creep-deliver-energy)
+- [Creep如何切换工作状态](/blog/screeps-creep-working-state)
+- [Game.getObjectById()怎么恢复目标](/blog/screeps-game-get-object-by-id)
+- [进入资源采集与房间经济专题](/knowledge/room-economy)
+
+## 官方资料
+
+- [Creep.withdraw API](https://docs.screeps.com/api/#Creep.withdraw)
+- [StructureContainer API](https://docs.screeps.com/api/#StructureContainer)
+- [Store API](https://docs.screeps.com/api/#Store)
+- [RoomPosition.findClosestByPath API](https://docs.screeps.com/api/#RoomPosition.findClosestByPath)
+
+资料核对日期：2026-07-22。离线目标与amount计算已通过；真实资源结算仍待环境验证。
