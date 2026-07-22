@@ -16,7 +16,7 @@
     "routecheck": "node scripts/check-routes.mjs",
     "linkcheck": "node scripts/check-internal-links.mjs",
     "codecheck": "node scripts/check-code-blocks.mjs",
-    "simulationcheck": "node scripts/simulate-core-articles.mjs",
+    "simulationcheck": "node scripts/run-article-simulations.mjs",
     "articles:priority": "node scripts/article-priority.mjs",
     "changelog:add": "node scripts/add-changelog.mjs",
     "smoke": "node scripts/smoke-test.mjs",
