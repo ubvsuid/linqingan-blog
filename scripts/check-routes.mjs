@@ -73,6 +73,7 @@ const knownRoutes = new Set([
   "/search",
   "/sitemap.xml",
   "/tags",
+  "/verification",
 ]);
 
 for (const fileName of files) {
@@ -172,6 +173,7 @@ const routeFiles = new Map([
   ["/screeps-errors", "src/app/screeps-errors/page.tsx"],
   ["/search", "src/app/search/page.tsx"],
   ["/tags", "src/app/tags/page.tsx"],
+  ["/verification", "src/app/verification/page.tsx"],
 ]);
 for (const [route, relativePath] of routeFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) addError(`${route} 缺少页面文件 ${relativePath}`);
@@ -208,6 +210,14 @@ if (!tagPageSource.includes("noindex: record.count < 3")) {
   addError("薄标签页没有按文章数量设置 noindex");
 }
 
+const searchPageSource = fs.readFileSync(
+  path.join(root, "src", "app", "search", "page.tsx"),
+  "utf8",
+);
+if (!searchPageSource.includes("noindex: true")) {
+  addError("站内搜索页没有设置 noindex");
+}
+
 const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "sitemap.ts"), "utf8");
 for (const marker of [
   "getAllPosts()",
@@ -215,8 +225,12 @@ for (const marker of [
   ".filter((tag) => tag.count >= 3)",
   "knowledgeBaseSections.map",
   "/knowledge",
+  "/verification",
 ]) {
   if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
+}
+if (sitemapSource.includes("`${siteConfig.url}/search`")) {
+  addError("站内搜索页不应出现在 Sitemap");
 }
 
 if (errors.length > 0) {
