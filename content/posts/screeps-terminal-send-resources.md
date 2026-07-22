@@ -100,7 +100,7 @@ module.exports.loop = function () {
 
 - [认识 Room](/blog/screeps-first-room)
 - [Memory 基础用法](/blog/screeps-memory-basics)
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 
 ## 官方资料
 
