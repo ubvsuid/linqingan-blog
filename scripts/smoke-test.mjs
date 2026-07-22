@@ -30,7 +30,7 @@ const checks = [
   ["/blog/screeps-clean-dead-creep-memory", ["离线模拟结果", "删除 2 个死亡名称", "真实 Screeps Console 与主循环仍待环境验证"]],
   ["/blog/screeps-construction-site-progress", ["离线模拟结果", "超过总量保护", "仍为待环境验证"]],
   ["/blog/screeps-tower-repair-threshold", ["为什么要先检查敌人", "离线模拟结果", "真实 Tower 行为"]],
-  ["/blog/screeps-spawn-emergency-recovery", ["离线模拟结果", "Energy 为 200", "真实 `spawnCreep()` 返回值"]],
+  ["/blog/screeps-spawn-emergency-recovery", ["离线模拟结果", "Energy 为 200", "多 tick 恢复过程仍待环境验证"]],
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
   ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
