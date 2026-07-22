@@ -1,0 +1,100 @@
+name: Ensure article maintenance complete
+
+on:
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - .github/workflows/ensure-article-maintenance-complete.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ensure-article-maintenance-complete
+  cancel-in-progress: false
+
+jobs:
+  ensure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: clean-blog-v1
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure final report exists
+        run: |
+          if test -f docs/article-maintenance/2026-07-23-all-articles-final-report.md; then
+            echo "Final report already exists."
+          elif test -f scripts/finalize-article-maintenance.mjs; then
+            node scripts/finalize-article-maintenance.mjs
+          else
+            echo "Final report and generator are both missing."
+            exit 1
+          fi
+
+      - name: Ensure completion changelog exists
+        run: |
+          if grep -q "完成全站64篇文章维护" src/lib/changelog.ts; then
+            echo "Completion changelog already exists."
+          else
+            npm run changelog:add -- "内容" "完成全站64篇文章维护" "按批次重写并复核52篇非新手文章，同时按易懂优先原则维护12篇新手路线；全部文章重新检查事实、代码、返回值、适用边界、内链与验证说明。" "/blog" "查看全部文章"
+          fi
+
+      - name: Run complete production build
+        run: npm run build
+
+      - name: Write final production verification
+        run: |
+          mkdir -p docs/article-maintenance
+          cat > docs/article-maintenance/2026-07-23-final-production-verification.md <<EOF
+          # 全站文章维护最终生产验证
+
+          日期：2026-07-23
+
+          - 文章总数：64篇；
+          - 非新手文章：52篇；
+          - 新手路线：12篇；
+          - 执行环境：GitHub Actions，Node.js 24；
+          - 验证命令：\`npm run build\`；
+          - 验证结果：完整内容、路由、内链、JavaScript语法、离线模拟、TypeScript、ESLint、Next.js生产构建与冒烟测试通过后才生成本文件；
+          - 触发提交：\`${GITHUB_SHA}\`。
+
+          该验证不代表文章中的Screeps代码已经在官方服务器或真实房间连续多tick运行。真实Console与主循环证据仍以每篇文章的验证状态为准。
+          EOF
+
+      - name: Remove one-time maintenance files
+        run: |
+          rm -f .github/workflows/apply-maintenance-fixes.yml
+          rm -f .github/workflows/maintain-beginner-series.yml
+          rm -f .github/workflows/finalize-article-maintenance.yml
+          rm -f .github/workflows/publish-article-maintenance-completion.yml
+          rm -f .github/workflows/ensure-article-maintenance-complete.yml
+          rm -f scripts/apply-maintenance-fixes.mjs
+          rm -f scripts/maintain-beginner-batch.mjs
+          rm -f scripts/finalize-article-maintenance.mjs
+
+      - name: Commit verified completion
+        run: |
+          git config user.name "linqingan-maintenance-bot"
+          git config user.email "linqingan501@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "docs: verify production build after all article maintenance"
+          git push origin HEAD:clean-blog-v1
