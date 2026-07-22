@@ -68,18 +68,9 @@ export default function HomePage() {
                 个阶段。从认识游戏界面和 tick，一直到角色分工、Extension、建造维修与第一份房间基础代码。
               </p>
               <div className={styles.statRow} aria-label="入门学习路线数据">
-                <div>
-                  <strong>{beginnerSeriesSlugs.length}</strong>
-                  <span>篇文章</span>
-                </div>
-                <div>
-                  <strong>{beginnerStages.length}</strong>
-                  <span>个阶段</span>
-                </div>
-                <div>
-                  <strong>0</strong>
-                  <span>注册要求</span>
-                </div>
+                <div><strong>{beginnerSeriesSlugs.length}</strong><span>篇文章</span></div>
+                <div><strong>{beginnerStages.length}</strong><span>个阶段</span></div>
+                <div><strong>0</strong><span>注册要求</span></div>
               </div>
             </article>
 
@@ -87,10 +78,7 @@ export default function HomePage() {
               {beginnerStages.map((stage) => (
                 <li key={stage.id}>
                   <span>{String(stage.number).padStart(2, "0")}</span>
-                  <div>
-                    <strong>{stage.title}</strong>
-                    <p>{stage.description}</p>
-                  </div>
+                  <div><strong>{stage.title}</strong><p>{stage.description}</p></div>
                 </li>
               ))}
             </ol>
@@ -128,17 +116,11 @@ export default function HomePage() {
       <section className={styles.latestSection} aria-labelledby="latest-posts-title">
         <Container>
           <div className={styles.sectionHeading}>
-            <div>
-              <p className="eyebrow">LATEST WRITING</p>
-              <h2 id="latest-posts-title">最近更新</h2>
-            </div>
+            <div><p className="eyebrow">LATEST WRITING</p><h2 id="latest-posts-title">最近更新</h2></div>
             <Link href="/blog">浏览全部文章 →</Link>
           </div>
-
           <div className={styles.postGrid}>
-            {latestPosts.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
+            {latestPosts.map((post) => <PostCard key={post.slug} post={post} />)}
           </div>
         </Container>
       </section>
@@ -154,7 +136,7 @@ export default function HomePage() {
               </div>
               <div className={styles.projectActions}>
                 <span>{currentProject.status}</span>
-                <Link href="/projects">查看项目记录 →</Link>
+                <Link href="/about#public-projects">查看公开建设项目 →</Link>
               </div>
             </div>
           </Container>
