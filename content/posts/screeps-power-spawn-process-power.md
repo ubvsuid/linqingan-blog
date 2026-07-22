@@ -81,7 +81,7 @@ module.exports.loop = function () {
 
 ## 相关站内内容
 
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 - [认识第一个房间](/blog/screeps-first-room)
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
 
