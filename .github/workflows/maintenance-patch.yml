@@ -1,0 +1,66 @@
+name: Apply maintenance article patch
+
+on:
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - .github/workflows/maintenance-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.head_commit.message == 'chore: apply maintenance article patch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clean-blog-v1
+          fetch-depth: 0
+
+      - name: Apply precise replacements
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              "content/posts/screeps-pathfinder-costmatrix.md": [
+                  ("(/knowledge/movement-vision)", "(https://www.linqingan.com/knowledge/movement-vision)"),
+              ],
+              "content/posts/screeps-map-find-route.md": [
+                  ("(/knowledge/movement-vision)", "(https://www.linqingan.com/knowledge/movement-vision)"),
+              ],
+              "content/posts/screeps-observer-observe-room.md": [
+                  ("(/knowledge/movement-vision)", "(https://www.linqingan.com/knowledge/movement-vision)"),
+              ],
+              "content/posts/screeps-game-notify.md": [
+                  ("(/knowledge/operations-debugging)", "(https://www.linqingan.com/knowledge/operations-debugging)"),
+              ],
+              "content/posts/screeps-lab-run-reaction.md": [
+                  ("(/knowledge/market-advanced-resources)", "(https://www.linqingan.com/knowledge/market-advanced-resources)"),
+                  ("- 判断市场库存；\n", ""),
+                  ("- 市场采购；\n", ""),
+                  ("- [Game.market.deal() 怎么直接成交](/blog/screeps-market-deal)\n", ""),
+              ],
+          }
+
+          for file_name, pairs in replacements.items():
+              path = Path(file_name)
+              text = path.read_text(encoding="utf-8")
+              for old, new in pairs:
+                  if old not in text:
+                      raise SystemExit(f"missing expected text in {file_name}: {old!r}")
+                  text = text.replace(old, new)
+              path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Remove temporary workflow and commit
+        run: |
+          git rm .github/workflows/maintenance-patch.yml
+          git config user.name "linqingan"
+          git config user.email "linqingan501@gmail.com"
+          git add content/posts
+          git commit -m "fix: align maintenance article links and scope"
+          git push origin HEAD:clean-blog-v1
