@@ -1,8 +1,8 @@
 ---
-title: "Screeps Memory 是什么？新手为什么需要使用 Memory"
-description: "从 tick、Game 对象和固定 Creep 名称出发，解释 Screeps Memory 如何跨 tick 保存 role、working 等简单状态，以及哪些内容不应该放进 Memory。"
+title: "Screeps Memory 是什么：跨 tick 状态、JSON 边界与使用成本"
+description: "解释Game对象、模块全局变量和Memory的生命周期差异，演示Creep角色状态、版本迁移、对象ID保存和Memory体积控制。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-18"
+updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -16,416 +16,501 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-19"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（JSON兼容值、默认结构、版本迁移与对象ID字段，不是Screeps官方服务器）"
+  testResult: "缺失Memory、旧版本迁移、非法角色、布尔状态、JSON可序列化值和不应保存的对象形态场景通过。"
 featured: true
 ---
 
-> **Screeps 基础工程 · 第 1 篇**
-> 本文承接现有的新手路线，开始解释如何让代码在多个 tick 之间记住角色和工作状态。
+Screeps中的 `Memory` 是官方提供的跨tick持久数据入口。它适合保存角色、任务状态、对象ID、房间配置和少量统计，但不适合直接保存当前tick的完整游戏对象、函数或无限增长的日志。
 
-> **测试说明**
-> 本文最后测试于 2026 年 7 月，基于 Screeps: World 当前官方文档。
+本文只解决一个问题：哪些数据应该放进Memory，怎样初始化、读取和迁移，哪些状态应该在当前tick重新从 `Game` 对象取得。
 
-## 这篇文章解决什么问题
+## 先区分三种生命周期
 
-完成新手路线后，你可能已经能够：
+### `Game`：每个tick重新创建
 
-- 找到固定名称的 Creep；
-- 让它采集和运输 Energy；
-- 让不同 Creep 分别升级、建造或维修；
-- 把多个行为放进 `module.exports.loop`。
+官方文档说明，`Game` 对象会在每个tick从头创建并填入当前可见的游戏状态。
 
-但固定名称代码很快会遇到问题：
-
-```javascript
-const harvester = Game.creeps.Harvester1;
-const upgrader = Game.creeps.Upgrader1;
-const builder = Game.creeps.Builder1;
+```js
+Game.creeps
+Game.rooms
+Game.structures
+Game.time
 ```
 
-当 Creep 死亡、名称变化或数量增加时，这种写法会越来越难维护。
+不能通过直接修改普通属性来改变游戏状态：
 
-Memory 的第一个用途，就是把“这只 Creep 负责什么”和“它现在处于什么状态”保存下来。
-
-## 一、为什么普通变量不能跨 tick 保存状态
-
-Screeps 会在每个 tick 重新执行你的主循环。
-
-下面这个变量只属于当前一次代码执行：
-
-```javascript
-let working = false;
+```js
+Game.customValue = 10;
 ```
 
-进入下一个 tick 后，脚本会重新运行，这个变量也会重新变成 `false`。
+这个值不是持久数据，也不会替代游戏API命令。
 
-这就是为什么下面的代码不能长期记住状态：
+### 模块全局变量：可能跨多个tick复用，但不可靠持久
 
-```javascript
-module.exports.loop = function () {
-  let working = false;
+模块顶层变量可能在同一个global生命周期中继续存在：
 
-  if (working) {
-    console.log('正在工作');
-  }
+```js
+let cachedValue = null;
+```
+
+但global会在代码更新、运行环境重建或其他情况下重置。变量会回到初始值。
+
+因此它适合做可以随时重建的缓存，不适合保存不能丢失的任务状态。
+
+### `Memory`：官方持久JSON数据
+
+```js
+Memory.roomPlans ??= {};
+Memory.roomPlans.W1N1 = {
+  enabled: true,
+  stage: 2
 };
 ```
 
-如果还不熟悉 tick，可以先阅读[《Screeps 中的 tick 是什么？》](/blog/screeps-tick-and-game-loop)。
+Memory会经过JSON序列化并传到后续tick。官方文档给出的总容量限制为2MB。
 
-## 二、Memory 是什么
+## Memory不是数据库对象，而是JSON数据
 
-Screeps 提供了一个全局对象：
+Memory适合保存：
 
-```javascript
-Memory
-```
-
-可以先把它理解成：
-
-> **Memory 是可以在不同 tick 之间保存简单数据的地方。**
+- 字符串；
+- 有限数字；
+- 布尔值；
+- `null`；
+- 数组；
+- 只包含JSON值的普通对象。
 
 例如：
 
-```javascript
-Memory.testValue = 1;
+```js
+Memory.settings = {
+  homeRoom: 'W1N1',
+  enabled: true,
+  targetCount: 3,
+  roles: ['harvester', 'upgrader']
+};
 ```
 
-在后面的 tick 中再次读取：
+不应直接保存：
 
-```javascript
-console.log(Memory.testValue);
+- 函数；
+- `Map`、`Set`等需要特殊恢复的实例；
+- `undefined`字段；
+- `Infinity`、`NaN`等不能稳定表达的数字；
+- 完整Creep、Source、Structure等实时对象；
+- 不断追加且没有保留上限的日志。
+
+## 为什么不能保存完整游戏对象
+
+下面的写法不安全：
+
+```js
+const source = creep.pos.findClosestByRange(
+  FIND_SOURCES
+);
+
+creep.memory.source = source;
 ```
 
-仍然可以得到：
+Source对象属于当前tick。经过JSON序列化后，它不再是下一tick的实时Source，也没有原型方法和最新状态。
 
-```text
-1
+正确方式是保存ID：
+
+```js
+creep.memory.sourceId = source.id;
 ```
 
-官方文档说明，`Game` 对象会在每个 tick 中重新创建，而 Memory 中写入的 JSON 数据会被保存到后续 tick。
+后续tick重新取得对象：
 
-## 三、Creep 的 memory 属性是什么
+```js
+const source = Game.getObjectById(
+  creep.memory.sourceId
+);
+```
 
-每只 Creep 都有一个方便使用的属性：
+`Game.getObjectById()`可能返回 `null`，因此仍需检查对象是否存在和房间是否可见。
 
-```javascript
+## `creep.memory` 与 `Memory.creeps`
+
+Creep提供了便捷属性：
+
+```js
 creep.memory
 ```
 
-例如：
+它对应：
 
-```javascript
-const creep = Game.creeps.Harvester1;
-creep.memory.role = 'harvester';
-```
-
-这段代码会为这只 Creep 保存一个 `role` 字段。
-
-之后可以读取：
-
-```javascript
-console.log(creep.memory.role);
-```
-
-输出：
-
-```text
-harvester
-```
-
-`creep.memory` 实际上对应：
-
-```javascript
+```js
 Memory.creeps[creep.name]
 ```
 
-所以下面两种读取方式指向的是同一份 Creep Memory：
+例如：
 
-```javascript
-creep.memory.role
-Memory.creeps[creep.name].role
-```
-
-## 四、为什么要给 Creep 保存 role
-
-在前面的[角色分工文章](/blog/screeps-creep-roles)中，Harvester、Upgrader 和 Builder 只是玩家为工作职责起的名字。
-
-使用 Memory 后，可以把角色直接保存到 Creep 身上：
-
-```javascript
+```js
 creep.memory.role = 'harvester';
 ```
 
-然后遍历所有 Creep，根据 role 决定它们应该执行什么行为：
+与：
 
-```javascript
-for (const name in Game.creeps) {
-  const creep = Game.creeps[name];
-
-  if (creep.memory.role === 'harvester') {
-    console.log(creep.name + ' 负责采集');
-  }
-
-  if (creep.memory.role === 'upgrader') {
-    console.log(creep.name + ' 负责升级');
-  }
-}
+```js
+Memory.creeps[creep.name].role = 'harvester';
 ```
 
-这比只依赖 `Harvester1`、`Harvester2` 等固定名称更容易扩展。
+指向同一份Creep专属Memory。
 
-## 五、创建 Creep 时直接写入 Memory
+Creep死亡后，游戏对象会从 `Game.creeps` 消失，但名称对应的Memory可能继续存在，因此需要单独清理。
 
-`spawnCreep()` 的第三个参数可以接收选项对象，其中可以包含 `memory`。
+## 创建Creep时直接写入Memory
 
-例如：
+`spawnCreep()`可以在选项中设置初始Memory：
 
-```javascript
-Game.spawns.Spawn1.spawnCreep(
+```js
+const result = Game.spawns.Spawn1.spawnCreep(
   [WORK, CARRY, MOVE],
   'Harvester1',
   {
     memory: {
-      role: 'harvester'
+      role: 'harvester',
+      homeRoom: 'W1N1',
+      working: false,
+      memoryVersion: 1
     }
   }
 );
+
+console.log('spawn result:', result);
 ```
 
-创建完成后，这只 Creep 可以直接读取：
+仍然要保存并处理 `spawnCreep()` 的返回值。写入选项不代表Creep一定成功创建。
 
-```javascript
+## 自定义字段没有官方含义
+
+这些字段都来自玩家代码：
+
+```js
 creep.memory.role
+creep.memory.working
+creep.memory.task
+creep.memory.homeRoom
 ```
 
-这样就不需要在 Creep 出生以后再单独设置一次角色。
+Screeps不会因为：
 
-开始使用这段代码前，应先熟悉[《如何使用 spawnCreep() 创建 Creep》](/blog/screeps-spawn-create-creep)。
-
-## 六、creep.memory.working 是做什么的
-
-`working` 不是 Screeps 强制规定的字段，而是玩家自己保存的状态。
-
-它通常用于区分两种阶段：
-
-```text
-false：采集或获取 Energy
-true：消耗 Energy 工作
-```
-
-例如：
-
-```javascript
-if (creep.store.getFreeCapacity() === 0) {
-  creep.memory.working = true;
-}
-
-if (creep.store[RESOURCE_ENERGY] === 0) {
-  creep.memory.working = false;
-}
-```
-
-然后根据状态选择行为：
-
-```javascript
-if (creep.memory.working) {
-  console.log('开始工作');
-} else {
-  console.log('开始获取能量');
-}
-```
-
-完整逻辑可以理解为：
-
-> 没有 Energy → 获取 Energy → 装满后切换为 working → 消耗完后重新获取 Energy
-
-这个字段名也可以改成 `delivering`、`building` 或其他名称。重要的是代码中的含义保持一致。
-
-## 七、Memory 中适合保存什么
-
-新手阶段适合保存简单、能够转成 JSON 的数据。
-
-### 适合保存
-
-```javascript
+```js
 creep.memory.role = 'builder';
-creep.memory.working = true;
-creep.memory.targetId = '5bbcac...';
-creep.memory.homeRoom = 'E51S44';
 ```
 
-常见类型包括：
+就自动让Creep建造。主循环必须读取字段并调用对应动作。
 
-- 字符串；
-- 数字；
-- 布尔值；
-- 数组；
-- 只包含简单数据的对象；
-- 游戏对象的 ID。
+建议为自定义字段建立明确约定：
 
-### 不适合直接保存
+| 字段 | 类型 | 含义 |
+|---|---|---|
+| `role` | string | 长期职责 |
+| `working` | boolean | 当前在获取资源还是消耗资源 |
+| `targetId` | string/null | 需要重新恢复的游戏对象ID |
+| `homeRoom` | string | 所属房间名 |
+| `memoryVersion` | integer | 数据结构版本 |
 
-不要把完整的 Creep、Source 或 Structure 对象直接放进 Memory：
+## 安全初始化一个Creep的Memory
 
-```javascript
-// 不推荐
-creep.memory.source = source;
+```js
+const ALLOWED_ROLES = new Set([
+  'harvester',
+  'upgrader',
+  'builder'
+]);
+
+function normalizeCreepMemory(creep) {
+  const memory = creep.memory;
+
+  if (!Number.isInteger(memory.memoryVersion)) {
+    memory.memoryVersion = 1;
+  }
+
+  if (!ALLOWED_ROLES.has(memory.role)) {
+    memory.role = 'harvester';
+  }
+
+  if (typeof memory.working !== 'boolean') {
+    memory.working = false;
+  }
+
+  if (
+    memory.targetId !== undefined
+    && memory.targetId !== null
+    && typeof memory.targetId !== 'string'
+  ) {
+    delete memory.targetId;
+  }
+
+  if (
+    typeof memory.homeRoom !== 'string'
+    || memory.homeRoom.length === 0
+  ) {
+    memory.homeRoom = creep.room.name;
+  }
+
+  return memory;
+}
 ```
 
-游戏对象属于当前 tick。即使写进 Memory，后续也不能把它当成新的有效游戏对象继续使用。
+默认角色只是示例策略。真实项目可以选择停止该Creep并记录配置错误，而不是自动改成采集者。
 
-更合适的方法是保存 ID：
+## 用版本号迁移旧Memory
 
-```javascript
-creep.memory.sourceId = source.id;
+代码结构变化后，旧Creep可能仍保留旧字段。例如以前使用：
+
+```js
+creep.memory.job = 'harvest';
 ```
 
-需要使用时，再从当前 tick 的 `Game` 对象中取回：
+后来改成：
 
-```javascript
-const source = Game.getObjectById(creep.memory.sourceId);
+```js
+creep.memory.role = 'harvester';
 ```
 
-## 八、Creep 死亡后，Memory 为什么可能还在
+可以显式迁移：
 
-Creep 和 Memory 是两套不同的数据。
+```js
+function migrateCreepMemory(memory) {
+  const version = Number.isInteger(memory.memoryVersion)
+    ? memory.memoryVersion
+    : 0;
 
-Creep 死亡后：
+  if (version < 1) {
+    if (memory.job === 'harvest') {
+      memory.role = 'harvester';
+    }
 
-```javascript
-Game.creeps[name]
+    delete memory.job;
+    memory.memoryVersion = 1;
+  }
+
+  return memory;
+}
 ```
 
-会消失，但对应的：
+迁移应满足：
 
-```javascript
-Memory.creeps[name]
-```
+- 相同版本重复运行不会继续破坏数据；
+- 旧字段只在新字段已经确定后删除；
+- 未识别值不应静默转换成错误角色；
+- 大规模迁移前保留可恢复方案。
 
-不一定自动删除。
+## 完整主循环示例
 
-所以代码运行一段时间后，Memory 中可能留下已经死亡 Creep 的旧数据。
+```js
+const ALLOWED_ROLES = new Set([
+  'harvester',
+  'upgrader',
+  'builder'
+]);
 
-新手现在只需要知道这个现象。后续会单独介绍如何安全清理死亡 Creep 的 Memory，并避免误删仍然有效的数据。
+function migrateCreepMemory(memory) {
+  const version = Number.isInteger(memory.memoryVersion)
+    ? memory.memoryVersion
+    : 0;
 
-## 九、最小可运行示例
+  if (version < 1) {
+    if (memory.job === 'harvest') {
+      memory.role = 'harvester';
+    }
 
-下面的代码只做三件事：
+    delete memory.job;
+    memory.memoryVersion = 1;
+  }
 
-1. 找到一只固定名称的 Creep；
-2. 第一次运行时写入 role；
-3. 在 Console 输出保存的角色。
+  return memory;
+}
 
-```javascript
+function normalizeCreepMemory(creep) {
+  const memory = migrateCreepMemory(creep.memory);
+
+  if (!ALLOWED_ROLES.has(memory.role)) {
+    memory.role = 'harvester';
+  }
+
+  if (typeof memory.working !== 'boolean') {
+    memory.working = false;
+  }
+
+  if (
+    memory.targetId !== undefined
+    && memory.targetId !== null
+    && typeof memory.targetId !== 'string'
+  ) {
+    delete memory.targetId;
+  }
+
+  if (
+    typeof memory.homeRoom !== 'string'
+    || memory.homeRoom.length === 0
+  ) {
+    memory.homeRoom = creep.room.name;
+  }
+
+  return memory;
+}
+
 module.exports.loop = function () {
-  const creep = Game.creeps.Harvester1;
+  for (const creep of Object.values(Game.creeps)) {
+    const memory = normalizeCreepMemory(creep);
 
-  if (!creep) {
-    console.log('没有找到 Harvester1');
-    return;
+    if (Game.time % 100 === 0) {
+      console.log({
+        type: 'creep-memory-status',
+        creepName: creep.name,
+        role: memory.role,
+        working: memory.working,
+        homeRoom: memory.homeRoom,
+        memoryVersion: memory.memoryVersion
+      });
+    }
   }
-
-  if (!creep.memory.role) {
-    creep.memory.role = 'harvester';
-  }
-
-  console.log(creep.name + ' 的角色是 ' + creep.memory.role);
 };
 ```
 
-保存代码后，可以观察：
+日志降低为每100tick一次，避免正常状态长期刷屏。`100`是本站示例值，不是官方要求。
 
-```text
-Harvester1 的角色是 harvester
+## Memory的首次访问成本
+
+官方文档说明，Memory以字符串形式保存，脚本在一个tick中首次访问 `Memory` 时会进行JSON解析，CPU成本计入脚本消耗。
+
+这意味着：
+
+- Memory越大，解析与序列化成本通常越值得关注；
+- 无限制保存历史日志会同时增加空间和CPU压力；
+- 不要为了减少一次 `Game.getObjectById()` 而把完整对象快照塞入Memory；
+- 性能结论必须用真实环境的 `Game.cpu.getUsed()` 多次测量，不能只靠文章推断。
+
+## 控制Memory增长
+
+保存历史时应设置上限：
+
+```js
+function appendLimitedHistory(list, entry, limit) {
+  list.push(entry);
+
+  while (list.length > limit) {
+    list.shift();
+  }
+}
+
+Memory.cpuHistory ??= [];
+appendLimitedHistory(
+  Memory.cpuHistory,
+  {
+    tick: Game.time,
+    value: Game.cpu.getUsed()
+  },
+  100
+);
 ```
 
-之后即使进入新的 tick，`role` 仍然会保存在这只 Creep 的 Memory 中。
+更适合长期保存的是聚合数据，例如计数、平均值、最后发生tick，而不是每个tick的完整对象快照。
 
-## 十、常见错误
+## JSON兼容性怎样离线检查
 
-### 1. creep 是 undefined
-
-```javascript
-const creep = Game.creeps.Harvester1;
-creep.memory.role = 'harvester';
-```
-
-如果游戏中不存在 `Harvester1`，第二行就会报错。
-
-应先检查：
-
-```javascript
-if (!creep) {
-  return;
+```js
+function isJsonCompatible(value) {
+  try {
+    const serialized = JSON.stringify(value);
+    return serialized !== undefined;
+  } catch {
+    return false;
+  }
 }
 ```
 
-### 2. role 拼写不一致
+这个检查只能判断是否能序列化，不能证明数据结构适合长期保存，也不能发现所有语义问题。
 
-下面两个值不会被视为同一个角色：
+例如：
 
-```text
-harvester
-Harvester
+```js
+JSON.stringify({ value: undefined })
 ```
 
-建议统一使用小写字符串。
+虽然不会抛错，但字段会消失。因此重要字段仍应检查具体类型。
 
-### 3. 把完整游戏对象保存进 Memory
+## 常见错误
 
-应保存对象 ID，而不是对象本身。
+### 把模块全局变量当成永久存储
 
-### 4. 保存了状态，却没有使用状态
+它可能跨多个tick存在，但global reset后会丢失。只能保存可重建缓存。
 
-仅仅写入：
+### 把完整对象写入Memory
 
-```javascript
-creep.memory.working = true;
-```
+后续取到的不是当前tick实时对象。保存ID并重新恢复。
 
-不会自动让 Creep 开始工作。程序还需要读取该字段，并据此调用 `harvest()`、`transfer()`、`build()` 或其他方法。
+### 不限制数组长度
 
-## 当前方案的限制
+历史数组持续增长会消耗2MB容量并增加解析负担。
 
-本文仍然使用固定名称 `Harvester1` 来帮助理解 Memory。
+### 直接相信Memory中的类型
 
-它还没有解决：
+Memory可以被旧代码、Console或迁移过程修改。关键字段应验证字符串、数字、布尔值和版本。
 
-- 自动统计角色数量；
-- Creep 死亡后自动补员；
-- 提前生产替代 Creep；
-- 清理死亡 Creep 的旧 Memory；
-- 把不同角色拆成独立模块。
+### Creep死亡后不清理旧键
 
-这些内容属于下一阶段的基础工程，而不是一次全部塞进第一篇文章。
+`Memory.creeps[name]`可能在对象消失后继续存在，影响统计和补员逻辑。
 
-## 总结
+### 把状态字段当成动作
 
-Memory 的核心用途不是让代码变复杂，而是让程序能够记住跨 tick 的简单状态。
+`working = true`只记录决定，不会自动调用建造、运输或升级API。
 
-本篇最需要记住的是：
+### 每tick打印全部Memory
 
-```text
-Game：当前 tick 的游戏对象
-Memory：跨 tick 保存的简单数据
-creep.memory：当前 Creep 对应的 Memory 数据
-```
+大对象日志难以阅读，也不能证明长期运行稳定。只输出必要字段并控制频率。
 
-最常见的第一步是：
+## 离线模拟结果
 
-```javascript
-creep.memory.role = 'harvester';
-```
+构建检查覆盖：
 
-当你能够为 Creep 保存和读取 role 后，就可以继续学习角色数量统计、自动补员和模块拆分。
+1. 缺失版本字段；
+2. 旧 `job` 字段迁移；
+3. 非法角色回退；
+4. `working` 类型修正；
+5. 非字符串目标ID清理；
+6. JSON兼容普通对象；
+7. 函数和循环引用等不适合Memory的输入；
+8. 有上限的历史数组。
 
-## 官方参考资料
+离线测试不能模拟官方Memory首次解析成本、2MB限制触发、global reset或真实多tick序列化。
 
-1. [Screeps Documentation：Global Objects 与 Memory](https://docs.screeps.com/global-objects.html)
-2. [Screeps API Reference：Creep.memory](https://docs.screeps.com/api/#Creep.memory)
-3. [Screeps API Reference：StructureSpawn.spawnCreep](https://docs.screeps.com/api/#StructureSpawn.spawnCreep)
-4. [Screeps API Reference：Game.getObjectById](https://docs.screeps.com/api/#Game.getObjectById)
+## 适用边界
 
-> 本文只介绍 Memory 的基础用途。RawMemory、Memory 解析成本、缓存和性能优化会放到更后面的专业内容中。
+本文不覆盖：
 
+- RawMemory自定义序列化；
+- Memory segments；
+- InterShardMemory；
+- 大型数据库同步；
+- 完整任务系统；
+- 自动角色补员；
+- 性能优化结论；
+- Schema验证库。
+
+JavaScript语法和离线数据规范化已检查，真实Memory持久化、CPU消耗和global生命周期仍待Screeps环境验证。
+
+## 相关站内内容
+
+- [如何清理死亡Creep的Memory](/blog/screeps-clean-dead-creep-memory)
+- [Creep如何切换工作状态](/blog/screeps-creep-working-state)
+- [Game.getObjectById()怎么恢复目标](/blog/screeps-game-get-object-by-id)
+- [RawMemory segments怎么使用](/blog/screeps-rawmemory-segments)
+- [全局缓存为什么会失效](/blog/screeps-global-cache)
+- [进入Memory与代码工程专题](/knowledge/memory-engineering)
+
+## 官方资料
+
+- [Global Objects：Game与Memory](https://docs.screeps.com/global-objects.html)
+- [Game API](https://docs.screeps.com/api/#Game)
+- [Game.getObjectById API](https://docs.screeps.com/api/#Game.getObjectById)
+- [Understanding game loop, time and ticks](https://docs.screeps.com/game-loop.html)
+
+资料核对日期：2026-07-22。离线数据规范化模拟已通过；真实Memory环境仍待验证。
