@@ -85,6 +85,10 @@ export function SiteHeader() {
       );
     }
 
+    if (href === "/now") {
+      return pathname.startsWith("/now") || pathname.startsWith("/changelog");
+    }
+
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
