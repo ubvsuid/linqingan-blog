@@ -8,7 +8,6 @@ import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
 import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
-import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 
 import styles from "./home.module.css";
@@ -22,10 +21,35 @@ const baseMetadata = createPageMetadata({
 
 export const metadata: Metadata = {
   ...baseMetadata,
-  title: {
-    absolute: siteConfig.title,
-  },
+  title: { absolute: siteConfig.title },
 };
+
+const quickEntries = [
+  {
+    href: "/search",
+    eyebrow: "SEARCH",
+    title: "搜索网站",
+    description: "输入对象、方法、错误码或中文问题，搜索文章正文与知识模块。",
+  },
+  {
+    href: "/screeps-errors",
+    eyebrow: "ERROR CODES",
+    title: "查询错误码",
+    description: "根据 ERR_NOT_IN_RANGE、ERR_FULL 等返回值继续排查。",
+  },
+  {
+    href: "/glossary",
+    eyebrow: "GLOSSARY",
+    title: "查看术语表",
+    description: "快速理解 Creep、Spawn、Memory、RCL 等常见概念。",
+  },
+  {
+    href: "/tools/creep-body-calculator",
+    eyebrow: "BODY TOOL",
+    title: "计算 Creep 身体",
+    description: "计算部件成本、生成时间、携带容量和满载移动速度。",
+  },
+];
 
 export default function HomePage() {
   const allPosts = getAllPosts();
@@ -33,7 +57,6 @@ export default function HomePage() {
   const articleCount = allPosts.length;
   const knowledgeArticleCount = knowledgeBaseSlugs.length;
   const sectionCount = knowledgeBaseSections.length;
-  const currentProject = projects[0];
 
   return (
     <main className={styles.home}>
@@ -45,7 +68,7 @@ export default function HomePage() {
             从一套按顺序学习的 Screeps 中文入门路线开始，记录代码如何逐步变成可以持续运行的系统。
           </p>
           <p className={styles.heroStats}>
-            {articleCount} 篇文章 · {sectionCount} 个主题 · {beginnerSeriesSlugs.length} 篇新手路线
+            {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
           </p>
           <HomeLearningActions />
         </Container>
@@ -54,10 +77,7 @@ export default function HomePage() {
       <section className={styles.learningSection} aria-labelledby="home-learning-title">
         <Container>
           <div className={styles.sectionHeading}>
-            <div>
-              <p className="eyebrow">BEGINNER PATH</p>
-              <h2 id="home-learning-title">从第一只 Creep 开始</h2>
-            </div>
+            <div><p className="eyebrow">BEGINNER PATH</p><h2 id="home-learning-title">从第一只 Creep 开始</h2></div>
             <Link href="/beginner">查看完整路线 →</Link>
           </div>
 
@@ -92,9 +112,7 @@ export default function HomePage() {
             <div className={styles.knowledgeIntro}>
               <p className="eyebrow">SCREEPS KNOWLEDGE BASE</p>
               <h2 id="home-knowledge-title">Screeps 知识库</h2>
-              <p>
-                从基础操作到 Memory、Spawn、资源经济、寻路、防御、市场、高级资源与运行诊断。
-              </p>
+              <p>从基础操作到 Memory、Spawn、资源经济、寻路、防御、市场、高级资源与运行诊断。</p>
               <div className={styles.knowledgeStats} aria-label="知识库规模">
                 <span><strong>{knowledgeArticleCount}</strong> 篇专题文章</span>
                 <span><strong>{sectionCount}</strong> 个知识模块</span>
@@ -125,23 +143,24 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {currentProject ? (
-        <section className={styles.projectSection} aria-labelledby="home-project-title">
-          <Container>
-            <div className={styles.projectCard}>
-              <div>
-                <p className="eyebrow">CURRENT PROJECT</p>
-                <h2 id="home-project-title">{currentProject.title}</h2>
-                <p>{currentProject.summary}</p>
-              </div>
-              <div className={styles.projectActions}>
-                <span>{currentProject.status}</span>
-                <Link href="/about#public-projects">查看公开建设项目 →</Link>
-              </div>
-            </div>
-          </Container>
-        </section>
-      ) : null}
+      <section className={styles.quickSection} aria-labelledby="home-quick-title">
+        <Container>
+          <div className={styles.sectionHeading}>
+            <div><p className="eyebrow">QUICK LOOKUP</p><h2 id="home-quick-title">已经遇到问题？</h2></div>
+            <Link href="/knowledge#reference-tools">查看全部查询工具 →</Link>
+          </div>
+          <div className={styles.quickGrid}>
+            {quickEntries.map((entry) => (
+              <Link href={entry.href} key={entry.href}>
+                <span className="eyebrow">{entry.eyebrow}</span>
+                <strong>{entry.title}</strong>
+                <p>{entry.description}</p>
+                <span aria-hidden="true">→</span>
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </section>
     </main>
   );
 }
