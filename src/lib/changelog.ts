@@ -18,6 +18,42 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-22-creep-body-calculator",
+    date: "2026-07-22",
+    type: "工具",
+    title: "上线 Creep 身体计算器",
+    summary:
+      "支持身体部件组合、Energy 预算、生成时间、生命值、携带容量、满载移动估算、身体数组复制和网址参数分享。",
+    links: [{ label: "使用身体计算器", href: "/tools/creep-body-calculator" }],
+  },
+  {
+    id: "2026-07-22-core-article-simulations",
+    date: "2026-07-22",
+    type: "验证",
+    title: "为五篇核心文章补充离线模拟",
+    summary:
+      "覆盖动态身体、死亡 Memory 清理、工地进度、Tower 空闲维修和房间断代恢复。模拟结果与真实 Console、真实主循环继续分开标注。",
+    links: [{ label: "查看验证方法", href: "/verification" }],
+  },
+  {
+    id: "2026-07-22-maintenance-checks",
+    date: "2026-07-22",
+    type: "网站",
+    title: "增加维护优先级与站内链接检查",
+    summary:
+      "发布前新增组件和数据内链检查、核心文章离线模拟，并增加文章维护优先级报告与更新日志录入命令。",
+    links: [{ label: "查看更新日志", href: "/changelog" }],
+  },
+  {
+    id: "2026-07-22-home-quick-lookup",
+    date: "2026-07-22",
+    type: "网站",
+    title: "首页增加问题快速查询",
+    summary:
+      "将重复的项目介绍区改为搜索、错误码、术语表和 Creep 身体计算器入口，帮助访客更快进入实际问题。",
+    links: [{ label: "查看首页", href: "/" }],
+  },
+  {
     id: "2026-07-22-merge-resources-projects",
     date: "2026-07-22",
     type: "网站",
@@ -55,7 +91,7 @@ export const changelogEntries: ChangelogEntry[] = [
     type: "网站",
     title: "重新设计关于页面",
     summary:
-      "减少重复的网站功能说明，增加建站原因、内容处理方法、可信度边界和三条主要阅读入口。",
+      "减少重复的网站功能说明，增加建站原因、内容处理方法、可信度边界，并将公开项目压缩为摘要与相关入口。",
     links: [{ label: "查看关于页面", href: "/about" }],
   },
   {
@@ -64,7 +100,7 @@ export const changelogEntries: ChangelogEntry[] = [
     type: "工具",
     title: "升级站内搜索",
     summary:
-      "增加文章、术语、错误码和项目筛选，支持同义词匹配、关键词高亮、清空按钮以及键盘快捷操作。",
+      "增加文章、术语、错误码、工具和项目筛选，支持知识模块信息、同义词匹配、关键词高亮、无结果推荐和键盘操作。",
     links: [{ label: "使用站内搜索", href: "/search" }],
   },
   {
