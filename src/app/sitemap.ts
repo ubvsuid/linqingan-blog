@@ -13,6 +13,14 @@ type ChangeFrequency = NonNullable<
   MetadataRoute.Sitemap[number]["changeFrequency"]
 >;
 
+const staticPageDates = {
+  about: "2026-07-22",
+  glossary: "2026-07-18",
+  resources: "2026-07-22",
+  screepsErrors: "2026-07-18",
+  verification: "2026-07-22",
+};
+
 function createArchivePages(
   basePath: string,
   totalItems: number,
@@ -51,6 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const allPostsUpdatedAt = latestDate(
     allPosts.map((post) => post.updatedAt ?? post.publishedAt),
   );
+  const allPostsPublishedAt = latestDate(allPosts.map((post) => post.publishedAt));
   const beginnerUpdatedAt = latestDate(
     beginnerSeriesSlugs.flatMap((slug) => {
       const post = postsBySlug.get(slug);
@@ -59,6 +68,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
   const projectsUpdatedAt = latestDate(projects.map((project) => project.updatedAt));
   const nowUpdatedAt = latestDate(nowEntries.map((entry) => entry.date));
+  const resourcesUpdatedAt = latestDate([
+    staticPageDates.resources,
+    allPostsPublishedAt.toISOString(),
+  ]);
+  const aboutUpdatedAt = latestDate([
+    staticPageDates.about,
+    allPostsPublishedAt.toISOString(),
+  ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -87,27 +104,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${siteConfig.url}/resources`,
-      lastModified: allPostsUpdatedAt,
+      lastModified: resourcesUpdatedAt,
       changeFrequency: "monthly",
       priority: 0.85,
     },
     {
-      url: `${siteConfig.url}/search`,
-      lastModified: allPostsUpdatedAt,
-      changeFrequency: "weekly",
-      priority: 0.78,
-    },
-    {
       url: `${siteConfig.url}/glossary`,
-      lastModified: allPostsUpdatedAt,
+      lastModified: new Date(staticPageDates.glossary),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${siteConfig.url}/screeps-errors`,
-      lastModified: allPostsUpdatedAt,
+      lastModified: new Date(staticPageDates.screepsErrors),
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${siteConfig.url}/verification`,
+      lastModified: new Date(staticPageDates.verification),
+      changeFrequency: "monthly",
+      priority: 0.76,
     },
     {
       url: `${siteConfig.url}/tags`,
@@ -129,8 +146,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${siteConfig.url}/about`,
-      lastModified: nowUpdatedAt,
-      changeFrequency: "yearly",
+      lastModified: aboutUpdatedAt,
+      changeFrequency: "monthly",
       priority: 0.65,
     },
   ];
