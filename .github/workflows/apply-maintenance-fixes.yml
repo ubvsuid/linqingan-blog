@@ -1,0 +1,39 @@
+name: Apply maintenance fixes
+
+on:
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - scripts/apply-maintenance-fixes.mjs
+      - .github/workflows/apply-maintenance-fixes.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: clean-blog-v1
+          fetch-depth: 0
+
+      - name: Apply exact replacements
+        run: node scripts/apply-maintenance-fixes.mjs
+
+      - name: Commit changed articles
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "linqingan-maintenance-bot"
+          git config user.email "linqingan501@gmail.com"
+          git add content/posts/screeps-storage-energy-usage.md content/posts/screeps-mineral-extractor-harvest.md
+          git commit -m "fix: align maintained article links and terminology"
+          git push origin HEAD:clean-blog-v1
