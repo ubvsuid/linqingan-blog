@@ -7,12 +7,13 @@ const learningLinks = [
   { href: "/beginner", label: "新手入门" },
   { href: "/knowledge", label: "知识库" },
   { href: "/blog", label: "全部文章" },
-  { href: "/resources", label: "资料中心" },
+  { href: "/glossary", label: "术语表" },
 ];
 
 const siteLinks = [
+  { href: "/screeps-errors", label: "错误码" },
   { href: "/verification", label: "验证方法" },
-  { href: "/projects", label: "项目" },
+  { href: "/tags", label: "文章标签" },
   { href: "/now", label: "近况" },
   { href: "/changelog", label: "更新日志" },
   { href: "/about", label: "关于" },
