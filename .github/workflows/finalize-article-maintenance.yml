@@ -1,0 +1,60 @@
+name: Finalize article maintenance
+
+on:
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - scripts/finalize-article-maintenance.mjs
+      - .github/workflows/finalize-article-maintenance.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalize-article-maintenance
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: clean-blog-v1
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate final audit report
+        run: node scripts/finalize-article-maintenance.mjs
+
+      - name: Run complete production build
+        run: npm run build
+
+      - name: Remove one-time maintenance automation
+        run: |
+          rm -f .github/workflows/apply-maintenance-fixes.yml
+          rm -f .github/workflows/maintain-beginner-series.yml
+          rm -f .github/workflows/finalize-article-maintenance.yml
+          rm -f scripts/apply-maintenance-fixes.mjs
+          rm -f scripts/maintain-beginner-batch.mjs
+          rm -f scripts/finalize-article-maintenance.mjs
+
+      - name: Commit final report and cleanup
+        run: |
+          git config user.name "linqingan-maintenance-bot"
+          git config user.email "linqingan501@gmail.com"
+          git add -A
+          git commit -m "docs: complete maintenance audit for all 64 articles"
+          git push origin HEAD:clean-blog-v1
