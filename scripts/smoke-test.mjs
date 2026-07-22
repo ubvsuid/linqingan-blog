@@ -5,6 +5,7 @@ const checks = [
   ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "篇"]],
+  ["/changelog", ["更新日志", "新增独立更新日志", "重新设计关于页面"]],
   ["/knowledge", ["Screeps知识库", "选择你要解决的问题"]],
   ["/resources", ["资料中心", "站内搜索", "文章验证方法"]],
   ["/search", ["搜索整个网站", "筛选搜索结果"]],
@@ -19,7 +20,7 @@ const checks = [
   ["/tags/advanced-development", ["进阶开发", "当前共有"]],
   ["/projects", ["linqingan.com", "Screeps 中文新手学习路线"]],
   ["/projects/linqingan-com", ["当前成果", "建设时间线", "验证方法"]],
-  ["/now", ["知识库结构与网站维护机制升级"]],
+  ["/now", ["更新日志", "查看完整更新日志", "阶段性记录"]],
   ["/feed.xml", ["<rss", "linqingan.com"]],
   ["/blog/screeps-introduction", ["Screeps 是什么", "发布于", "验证状态"]],
   ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
@@ -31,7 +32,7 @@ const checks = [
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
   ["/blog/screeps-spawn-emergency-recovery", ["房间断代后如何自动恢复第一只采集者", "不会返回", "ERR_NOT_IN_RANGE"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/verification", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/blog/screeps-power-spawn-process-power", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
 ];
 
 const assetChecks = [
@@ -48,6 +49,7 @@ const redirectChecks = [
 
 const metadataPaths = [
   "/",
+  "/changelog",
   "/knowledge",
   "/tags/basic-engineering",
   "/blog/screeps-storage-energy-usage",
@@ -160,6 +162,9 @@ if (sitemapPaths.includes("/search")) {
 }
 if (!sitemapPaths.includes("/verification")) {
   failures.push("/verification: 应出现在 Sitemap");
+}
+if (!sitemapPaths.includes("/changelog")) {
+  failures.push("/changelog: 应出现在 Sitemap");
 }
 
 const sampledPaths = [
