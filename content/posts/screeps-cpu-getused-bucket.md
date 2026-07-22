@@ -285,11 +285,15 @@ function canRunOptionalWork() {
 }
 ```
 
-然后：
+调用时保留明确的业务函数，不要把示例中的占位名称直接复制到主循环：
 
 ```js
+function runOptionalWork() {
+  console.log('replace with optional analysis');
+}
+
 if (canRunOptionalWork()) {
-  runOptionalAnalysis();
+  runOptionalWork();
 }
 ```
 
@@ -310,7 +314,7 @@ if (canRunOptionalWork()) {
 
 ### 输入规模变化
 
-Creep、工地、敌人或市场订单数量变化，遍历成本自然不同。
+Creep、工地、敌人或目标数量变化，遍历成本自然不同。
 
 ### 第一次访问Memory
 
@@ -419,7 +423,7 @@ JavaScript语法和离线统计函数已经检查，真实CPU样本、bucket趋�
 - [Screeps 全局缓存为什么会失效](/blog/screeps-global-cache)
 - [RawMemory segments 怎么跨 tick 安全读取和写回](/blog/screeps-rawmemory-segments)
 - [RoomVisual 怎么画文字辅助调试](/blog/screeps-roomvisual-debug)
-- [工程配置与运行诊断模块](/knowledge/operations-debugging)
+- [进入 Screeps 知识库](/knowledge)
 
 ## 官方资料
 
