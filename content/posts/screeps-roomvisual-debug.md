@@ -1,6 +1,6 @@
 ---
 title: "RoomVisual 怎么画状态、目标和路径来辅助调试"
-description: "用RoomVisual绘制Creep状态、目标连线和任务标记，控制可视化开关与数据大小，并区分当前tick画面、历史记录和真实行为结果。"
+description: "用RoomVisual绘制Creep状态、目标连线和任务标记，控制可视化开关、对象数量与数据大小，并区分画面提示和真实行为结果。"
 publishedAt: "2026-07-18"
 updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
@@ -23,95 +23,92 @@ verification:
 featured: false
 ---
 
-`RoomVisual` 可以把代码中的状态、目标和路径关系直接画到房间视图。它特别适合回答这些问题：
+`RoomVisual` 可以把代码中的状态、目标和路径关系画到房间视图。它适合回答“代码当前选中了什么”，但不能单独证明动作已经执行成功。
 
-- Creep当前被分配了什么任务；
-- 代码选中了哪个目标；
-- Creep与目标之间的关系是否符合预期；
-- 某个坐标、区域或路径是不是选错了；
-- 房间中的多个任务是否互相冲突。
+本文建立一个可开关、可限制对象数量和数据大小的调试层，并明确RoomVisual、动作结果与长期历史之间的边界。
 
-本文只解决一个问题：怎样建立一个可开关、可控制大小、不会被误认为真实行为结果的RoomVisual调试层。
+## RoomVisual的生命周期
 
-## RoomVisual能证明什么，不能证明什么
-
-RoomVisual能显示**当前tick代码准备展示的信息**，但不能单独证明：
-
-- Creep已经执行成功；
-- `moveTo()`已经找到可行路径；
-- Tower已经攻击；
-- 目标会在下一tick仍然存在；
-- 当前选择长期稳定；
-- 历史上发生过同样行为。
-
-例如画出一条Creep到Controller的连线，只能说明代码把Controller当作当前目标。它不能替代：
+RoomVisual图形只属于当前tick。需要持续显示时，必须在**每个 tick**重新绘制，或者在需要时重新导入已保存的Visual字符串。
 
 ```js
-const result = creep.upgradeController(controller);
+module.exports.loop = function () {
+  const visual = new RoomVisual('W1N1');
+  visual.text('running', 25, 25);
+};
 ```
 
-的返回值，也不能替代下一tick的状态检查。
+下一tick不再调用绘图代码，上一tick图形不会继续保留。
 
-## 官方规则中的三个关键点
-
-### 图形只保留一个tick
-
-RoomVisual不会作为长期记录保存在游戏数据库中。当前tick不重新绘制，图形就会消失。
-
-因此持续调试必须把绘图代码放进主循环，或者每次需要时重新导入已经保存的可视化数据。
-
-### 可以为不可见房间创建RoomVisual
+## 可以画不可见房间，但不会获得视野
 
 ```js
 const visual = new RoomVisual('W10N10');
+visual.circle(25, 25);
 ```
 
-即使脚本当前没有该房间视野，也可以为这个房间创建Visual对象并绘图。
-
-但这不会让：
+这可以在指定房间创建图形，但不会让：
 
 ```js
 Game.rooms.W10N10
 ```
 
-自动出现，也不会让脚本读取该房间里的Creep、建筑和Controller。
+自动出现，也不能读取该房间的实时Creep、建筑或Controller。
 
-### 每个房间最多500KB序列化数据
+已知坐标可以绘制，实时对象仍然受视野限制。
 
-官方限制是每个房间当前tick的RoomVisual序列化数据不能超过512000字节，也就是500KB。
+## 500KB限制与 `getSize()`
 
-可以读取：
+官方API规定，每个房间当前tick的RoomVisual序列化数据最多512000字节，也就是500KB。
 
 ```js
-const size = visual.getSize();
+const bytes = visual.getSize();
 ```
 
-本文使用480000字节作为保守停止线，给后续少量绘图留出空间。它是本站策略，不是官方额外限制。
+`getSize()`衡量Visual数据大小，不是CPU消耗。CPU需要用：
 
-## 常用图形分别回答什么问题
+```js
+Game.cpu.getUsed()
+```
 
-| 方法 | 适合显示 |
+单独测量。
+
+本文使用480000字节作为保守停止线，为后续少量标记保留空间。该数值是本站策略，不是官方新增限制。
+
+## 常用方法分别表达什么
+
+| 方法 | 适合表达 |
 |---|---|
-| `text()` | 名称、角色、状态、Energy、返回值 |
-| `circle()` | 当前对象、危险位置、候选目标 |
-| `line()` | Creep与目标、输入与输出、运输关系 |
-| `rect()` | 施工区域、边界、房间布局格 |
-| `poly()` | 路径、巡逻线、多点区域 |
+| `text()` | 角色、任务、Energy、结果代码 |
+| `circle()` | Creep、目标、危险坐标 |
+| `line()` | Creep与目标的关系 |
+| `rect()` | 区域、布局格、施工范围 |
+| `poly()` | 路径、多点边界 |
 
-这些方法都返回当前RoomVisual对象，因此可以链式调用：
+示例：
 
 ```js
-new RoomVisual('W1N1')
-  .circle(20, 20)
-  .text('target', 20, 19.4)
-  .line(10, 10, 20, 20);
+const visual = new RoomVisual('W1N1');
+
+visual
+  .circle(10, 10, {
+    radius: 0.4,
+    stroke: '#00ff88',
+    fill: 'transparent'
+  })
+  .text('worker', 10, 9.3, {
+    color: '#ffffff',
+    font: 0.45
+  })
+  .line(10, 10, 20, 20, {
+    color: '#ffaa00',
+    lineStyle: 'dashed'
+  });
 ```
 
-链式调用只是写法更紧凑，不改变绘图规则。
+链式调用只是写法选择，不改变Visual生命周期。
 
-## 用配置控制调试范围
-
-不要默认对所有房间、所有Creep永久开启详细绘图。可以使用房间级配置：
+## 先建立房间级开关
 
 ```js
 Memory.visualDebug ??= {};
@@ -125,11 +122,15 @@ Memory.visualDebug.W1N1 = {
 };
 ```
 
-`maximumItems` 和 `maximumBytes` 都是本站策略，用来避免调试图无限增长。
+建议至少控制：
 
-## 先把对象关系变成纯数据计划
+- 是否启用；
+- 是否显示文字；
+- 是否显示目标；
+- 最多绘制多少对象；
+- 何时停止增加Visual数据。
 
-下面的函数不调用RoomVisual，只创建绘图计划，适合离线测试。
+## 用纯函数生成绘图计划
 
 ```js
 function buildCreepVisualPlan(input) {
@@ -143,26 +144,38 @@ function buildCreepVisualPlan(input) {
   } = input;
 
   if (enabled !== true) {
-    return { ready: false, reason: 'disabled', items: [] };
+    return {
+      ready: false,
+      reason: 'disabled',
+      items: []
+    };
   }
 
   if (!creep || !creep.pos) {
-    return { ready: false, reason: 'creep-missing', items: [] };
+    return {
+      ready: false,
+      reason: 'creep-missing',
+      items: []
+    };
   }
 
   const items = [];
-  const labelParts = [creep.name || 'creep'];
-
-  if (showEnergy === true && Number.isFinite(creep.energy)) {
-    labelParts.push(`${creep.energy}E`);
-  }
 
   if (showLabels === true) {
+    const parts = [creep.name || 'creep'];
+
+    if (
+      showEnergy === true
+      && Number.isFinite(creep.energy)
+    ) {
+      parts.push(`${creep.energy}E`);
+    }
+
     items.push({
       type: 'text',
+      text: parts.join(' '),
       x: creep.pos.x,
-      y: creep.pos.y - 0.75,
-      text: labelParts.join(' ')
+      y: creep.pos.y - 0.75
     });
   }
 
@@ -174,8 +187,7 @@ function buildCreepVisualPlan(input) {
 
   if (
     showTargets === true
-    && target
-    && target.pos
+    && target?.pos
     && target.pos.roomName === creep.pos.roomName
   ) {
     items.push({
@@ -195,17 +207,9 @@ function buildCreepVisualPlan(input) {
 }
 ```
 
-本文只在Creep与目标位于同一房间时绘制房间内连线。跨房间关系可以显示目标房间名，但不能用一条RoomVisual线跨越两个房间。
+跨房间目标不会生成房间内 `line`。可以改为显示目标房间名，但不能用一条RoomVisual线跨越两个房间。
 
-## 完整示例：显示Creep状态和目标关系
-
-下面示例假设Creep把目标ID保存在：
-
-```js
-creep.memory.targetId
-```
-
-完整代码：
+## 完整房间调试层
 
 ```js
 const VISUAL_BYTE_STOP = 480000;
@@ -289,13 +293,15 @@ function drawCreepDebug(visual, creep, config) {
     ? Game.getObjectById(targetId)
     : null;
 
-  if (!target || !target.pos) {
-    return targetId ? 'target-unavailable' : 'drawn';
+  if (!target?.pos) {
+    return targetId
+      ? 'target-unavailable'
+      : 'drawn';
   }
 
   if (target.pos.roomName !== creep.pos.roomName) {
     visual.text(
-      trimVisualLabel(`→ ${target.pos.roomName}`),
+      trimVisualLabel(`to ${target.pos.roomName}`),
       creep.pos.x,
       creep.pos.y + 0.8,
       {
@@ -381,145 +387,117 @@ module.exports.loop = function () {
 
 把 `W1N1` 换成真实房间名。
 
-## 为什么按Creep名称排序
+## 为什么按名称排序
 
-`room.find(FIND_MY_CREEPS)`返回的顺序不应被当作业务优先级。示例先按名称排序，再截取 `maximumItems`，可以让相同输入下的绘图对象更稳定。
+`room.find(FIND_MY_CREEPS)`的返回顺序不应被当成业务优先级。绘图前按名称排序，再截取 `maximumItems`，可以让相同输入下的显示对象更稳定。
 
-这不代表名称排序适合业务调度。它只用于调试显示的一致性。
+名称排序只服务于调试一致性，不代表角色调度顺序。
 
-## 目标ID恢复失败怎样理解
+## 目标恢复失败怎样解释
 
-```js
-Game.getObjectById(targetId)
-```
-
-返回 `null` 可能表示：
+`Game.getObjectById(targetId)` 返回 `null` 可能因为：
 
 - 目标已经消失；
-- ID写错；
-- 当前没有目标所在房间视野；
-- Memory保存了旧值；
-- 目标属于临时对象。
+- ID错误；
+- 当前没有目标房间视野；
+- Memory保留旧值。
 
-因此示例只把状态记为 `target-unavailable`，不立即删除全部任务Memory。
+调试层只标记 `target-unavailable`，不直接删除业务任务。是否失效应由目标管理模块判断。
 
-对于远程房间目标，ID恢复失败不一定代表目标不存在。
+## `export()` 和 `import()`
 
-## `getSize()`应该怎样使用
-
-`visual.getSize()`返回当前tick已经加入的RoomVisual序列化字节数。
-
-建议在两个位置检查：
-
-1. 开始绘图前；
-2. 批量循环中每绘制若干对象后。
-
-不要把 `getSize()` 当成CPU耗时。它衡量的是Visual序列化数据大小，不是 `Game.cpu.getUsed()`。
-
-## `export()` 和 `import()` 的边界
-
-可以导出当前Visual：
+导出当前Visual：
 
 ```js
 const exported = room.visual.export();
 ```
 
-以后在某个tick导入：
+导入已保存字符串：
 
 ```js
 new RoomVisual(room.name).import(exported);
 ```
 
-这适合重复显示静态布局，例如固定道路方案或房间规划。
+适合复用静态布局图，但要注意：
 
-但要注意：
+- 导入图形仍只显示当前tick；
+- 大字符串写入Memory会增加体积；
+- 旧图形不证明对象仍存在；
+- 动态Creep位置不适合长期复用。
 
-- 导出结果只是Visual数据字符串；
-- 导入后仍只属于当前tick；
-- 保存大量导出字符串会增加Memory体积；
-- 动态Creep位置不适合长期复用旧Visual；
-- 导入图形不代表对应建筑或对象仍然存在。
+## Visual与真实结果要分开
 
-## 不可见房间怎么画标记
+画出一条Creep到Controller的线，只说明代码当前把它们建立了关系。
+
+动作仍应独立读取返回值：
 
 ```js
-const visual = new RoomVisual('W10N10');
-
-visual.text('observe next', 25, 25, {
-  color: '#66ccff',
-  font: 0.7
-});
+const result = creep.upgradeController(
+  creep.room.controller
+);
 ```
 
-这可以在指定房间画出已知坐标信息，但脚本仍然不能读取该房间实时对象。
-
-如果位置来自旧Memory，应在标签中标明数据时间，避免把历史坐标误认为当前状态。
+RoomVisual不替代 `result`，也不替代下一tick的状态检查。
 
 ## 常见错误
 
-### 把Visual当成动作结果
+### 把Visual当成动作成功证据
 
-画出目标连线不等于Creep已经成功移动或执行任务。动作仍要保存返回值。
-
-### 只画图，不记录状态
-
-Visual消失后无法回看。需要长期分析时，应保存少量聚合字段或日志，而不是依赖截图记忆。
+显示目标不等于移动、攻击、升级或维修已经完成。
 
 ### 对所有对象无限绘制
 
-几十个Creep、路径和文字叠加后会难以阅读，也可能接近每房间500KB限制。
+文字、路径和标记会越来越难读，也可能接近500KB限制。
 
-### 使用不可见对象的 `room.visual`
+### 把 `getSize()` 当成CPU
 
-目标房间没有Room对象时，不能读取：
+前者是序列化字节数，CPU需要单独测量。
 
-```js
-Game.rooms.W10N10.visual
-```
+### 在不可见房间读取 `room.visual`
 
-应使用：
+没有Room对象时使用：
 
 ```js
-new RoomVisual('W10N10')
+new RoomVisual(roomName)
 ```
 
-### 坐标和房间不匹配
+### 坐标与房间不匹配
 
-RoomVisual的坐标只属于它创建时指定的房间。跨房间目标需要单独显示房间名或在目标房间建立另一份Visual。
+每份RoomVisual只属于指定房间。跨房间目标应显示房间名或在目标房间创建另一份Visual。
 
-### 把调试代码永久全量开启
+### 调试层永久全量开启
 
-调试层应有明确开关、对象上限和字节上限。问题解决后可以关闭详细标签，只保留少量关键状态。
+应有开关、对象上限和字节停止线，问题解决后关闭详细显示。
 
 ## 离线模拟结果
 
 构建检查覆盖：
 
-1. 调试配置关闭；
+1. 配置关闭；
 2. Creep对象缺失；
-3. 同房间目标生成连线；
+3. 同房间目标生成 `line`；
 4. 跨房间目标不生成房间内连线；
-5. 标签超过限制后被裁剪；
-6. Visual字节预算不足时停止；
-7. Creep名称排序稳定；
-8. 合法配置生成预期绘图计划。
+5. 标签裁剪；
+6. 字节预算不足；
+7. 名称排序稳定；
+8. 合法绘图计划。
 
-离线测试不能模拟浏览器实际画面、官方序列化字节、RoomVisual显示效果或多tick观察。
+离线测试不能模拟浏览器显示、官方Visual序列化、真实CPU或多tick画面。
 
 ## 适用边界
 
 本文不覆盖：
 
-- 完整房间布局规划器；
-- PathFinder路径算法；
+- 完整房间布局规划；
 - 地图级 `Game.map.visual`；
-- 外部可视化平台；
-- 历史轨迹数据库；
 - 自动截图；
+- 历史轨迹数据库；
 - 战斗热力图；
-- 多Shard可视化同步。
+- 多Shard可视化；
+- PathFinder算法；
+- 外部监控平台。
 
-JavaScript语法和离线绘图计划已检查，真实RoomVisual显示、大小和浏览器效果仍待Screeps环境验证。
+JavaScript语法和离线绘图计划已检查，真实RoomVisual显示与CPU表现仍待Screeps环境验证。
 
 ## 相关站内内容
 
