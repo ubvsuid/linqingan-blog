@@ -82,7 +82,7 @@ module.exports.loop = function () {
 
 ## 站内学习路径
 
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 - [Memory 基础用法](/blog/screeps-memory-basics)
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
 
