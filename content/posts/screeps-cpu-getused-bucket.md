@@ -74,7 +74,7 @@ module.exports.loop = function () {
 
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
 - [第一份房间代码](/blog/screeps-first-room-code)
-- [Screeps 资料页](https://www.linqingan.com/resources)
+- [知识库查询与工具](https://www.linqingan.com/knowledge#reference-tools)
 
 ## 官方资料
 
