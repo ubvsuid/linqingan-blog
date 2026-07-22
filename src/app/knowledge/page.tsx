@@ -9,7 +9,7 @@ import { getAllPosts } from "@/lib/posts";
 export const metadata = createPageMetadata({
   title: "Screeps知识库",
   description:
-    "先通过 12 篇 Screeps 新手路线建立基础，再按 Memory、Spawn、房间经济、寻路、Controller、建设防御、高级资源与运行诊断查找专题文章。",
+    "先通过 12 篇 Screeps 新手路线建立基础，再按 Memory、Spawn、房间经济、寻路、Controller、建设防御、高级资源与运行诊断进入 8 个独立专题模块。",
   path: "/knowledge",
 });
 
@@ -24,12 +24,12 @@ export default function KnowledgePage() {
           <p className="eyebrow">SCREEPS KNOWLEDGE BASE</p>
           <h1>Screeps知识库</h1>
           <p>
-            第一次接触 Screeps，先按顺序完成新手路线；已经遇到具体 API、报错或系统问题时，再进入下面对应的知识模块。
+            第一次接触 Screeps，先按顺序完成新手路线；已经遇到具体 API、报错或系统问题时，再进入下面对应的独立专题模块。
           </p>
           <div className="knowledge-stats" aria-label="知识库数据">
             <span><strong>{beginnerSeriesSlugs.length}</strong> 篇新手路线</span>
             <span><strong>{knowledgeBaseSlugs.length}</strong> 篇专题文章</span>
-            <span><strong>{knowledgeBaseSections.length}</strong> 个知识模块</span>
+            <span><strong>{knowledgeBaseSections.length}</strong> 个独立模块</span>
           </div>
           <Link className="knowledge-all-posts" href="/blog">
             浏览全部 {allPosts.length} 篇文章 →
@@ -63,14 +63,14 @@ export default function KnowledgePage() {
             <p className="eyebrow">TOPIC MODULES</p>
             <h2>按问题进入知识模块</h2>
           </div>
-          <p>下面的文章不要求按顺序阅读。找到当前问题所属模块，再进入对应文章。</p>
+          <p>每个模块现在都有独立页面、适合人群、学习目标、分阶段顺序和专题内文章导航。</p>
         </div>
 
         <nav className="knowledge-jump" aria-label="知识库主题导航">
           {knowledgeBaseSections.map((section) => (
-            <a key={section.id} href={`#${section.id}`}>
+            <Link key={section.id} href={`/knowledge/${section.id}`}>
               {String(section.number).padStart(2, "0")} · {section.title}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -81,10 +81,15 @@ export default function KnowledgePage() {
                 <span>{String(section.number).padStart(2, "0")}</span>
                 <div>
                   <div className="knowledge-section-title-row">
-                    <h2>{section.title}</h2>
-                    <small>{section.slugs.length} 篇</small>
+                    <h2>
+                      <Link href={`/knowledge/${section.id}`}>{section.title}</Link>
+                    </h2>
+                    <small>{section.slugs.length} 篇 · {section.stages.length} 个阶段</small>
                   </div>
                   <p>{section.description}</p>
+                  <Link className="knowledge-section-cta" href={`/knowledge/${section.id}`}>
+                    进入专题模块并按顺序学习 →
+                  </Link>
                 </div>
               </header>
               <ol>
@@ -136,7 +141,9 @@ export default function KnowledgePage() {
         .knowledge-section-title-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px; }
         .knowledge-section-title-row small { color: var(--muted); font-size: 13px; }
         .knowledge-section h2 { margin: 0; font-size: clamp(32px, 5vw, 52px); letter-spacing: -.045em; }
+        .knowledge-section h2 a:hover { text-decoration-thickness: 2px; text-underline-offset: 7px; }
         .knowledge-section header p { max-width: 780px; margin: 12px 0 0; color: var(--muted); line-height: 1.75; }
+        .knowledge-section-cta { display: inline-flex; margin-top: 15px; font-weight: 700; }
         .knowledge-section ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
         .knowledge-section li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; border-bottom: 1px solid var(--border); padding: 20px 18px 20px 0; }
         .knowledge-section li:nth-child(odd) { border-right: 1px solid var(--border); }
