@@ -21,7 +21,7 @@ const checks = [
   ["/projects/linqingan-com", ["当前成果", "建设时间线", "验证方法"]],
   ["/now", ["知识库结构与网站维护机制升级"]],
   ["/feed.xml", ["<rss", "linqingan.com"]],
-  ["/blog/screeps-introduction", ["发布于", "验证状态", "没有找到 Harvester1"]],
+  ["/blog/screeps-introduction", ["Screeps 是什么", "发布于", "验证状态"]],
   ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
   ["/blog/screeps-creep-withdraw-container-energy", ["Creep.withdraw 怎么用", "资料核对日期：2026-07-18"]],
   ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "资料核对日期：2026-07-18"]],
