@@ -2,7 +2,7 @@
 title: "Screeps 房间断代后如何自动恢复第一只采集者"
 description: "当房间没有采集者时，检查 Spawn、现存角色和可用能量，再生成最小 WORK/CARRY/MOVE 采集者。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-19"
+updatedAt: "2026-07-22"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -16,10 +16,12 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-19"
+  checkedAt: "2026-07-22"
+  testedAt: "2026-07-22"
+  testEnvironment: "Node.js 24 离线模拟（简化 Spawn、角色数量与 Energy 状态）"
+  testResult: "Spawn 缺失、忙碌、已有采集者和 Energy 不足时等待；零采集者且 200 Energy 时进入应急生成分支。"
 featured: false
 ---
-
 
 房间里最后一只采集者死亡后，普通的“按目标数量补员”逻辑可能因为顺序或能量预算不当而卡住。应急恢复代码只做一件事：当采集者数量为零时，优先尝试生成最小的 `[WORK, CARRY, MOVE]` 单位。
 
@@ -85,6 +87,22 @@ module.exports.loop = function () {
 
 如果一个房间有多个 Spawn，应该先确定由哪个 Spawn 负责应急恢复，避免多个 Spawn 同时根据同一份统计创建重复单位。
 
+## 离线模拟结果
+
+构建检查把应急判断拆成五种输入：
+
+| 输入状态 | 决策 |
+|---|---|
+| Spawn 不存在 | 不执行生成 |
+| Spawn 正在工作 | 等待 Spawn 空闲 |
+| 已有 1 个 Harvester | 不需要应急生成 |
+| Harvester 为 0，Energy 为 199 | 等待 Energy |
+| Harvester 为 0，Energy 为 200 | 进入最小采集者生成分支 |
+
+模拟确认判断顺序不会在已有采集者、Spawn 忙碌或 Energy 不足时错误调用生成分支。
+
+这属于 **Node.js 离线决策模拟**。它没有调用真实 `spawn.spawnCreep()`，也没有覆盖实际名称冲突、多个 Spawn 并发、Extension 能量分布或后续 Creep 是否成功采集。Console 与真实主循环仍然待环境验证。
+
 ## 按返回值排查
 
 - `ERR_NAME_EXISTS`：生成名称已被占用；检查命名规则。
@@ -99,8 +117,12 @@ module.exports.loop = function () {
 
 如果采集者已经全部死亡，而 Spawn 与 Extension 中的可用能量低于最小 body 成本，代码本身不能凭空补充能量。此时需要根据房间真实状态决定人工干预、其他房间支援或重生方案，不能把“等待能量”写成必然恢复的承诺。
 
+同时要注意：Screeps的新手初始Spawn可能获得特殊的缓慢补能机制，但不能把这一点泛化为所有房间、所有阶段都会自动恢复。应急代码必须以当前房间的真实能量和结构状态为准。
+
 ## 继续学习
 
+- [Creep 身体计算器](/tools/creep-body-calculator)
+- [按房间能量动态生成身体](/blog/screeps-dynamic-creep-body-energy)
 - [spawnCreep 入门](/blog/screeps-spawn-create-creep)
 - [Creep 角色分工](/blog/screeps-creep-roles)
 - [第一份房间基础代码](/blog/screeps-first-room-code)
@@ -109,3 +131,6 @@ module.exports.loop = function () {
 
 - [StructureSpawn.spawnCreep API](https://docs.screeps.com/api/#StructureSpawn.spawnCreep)
 - [Creep body 与 BODYPART_COST](https://docs.screeps.com/creeps.html)
+- [Respawning 与初始 Spawn](https://docs.screeps.com/respawn.html)
+
+资料核对日期：2026-07-22。代码语法与离线决策模拟已通过；真实 `spawnCreep()` 返回值和多 tick 恢复过程仍待环境验证。
