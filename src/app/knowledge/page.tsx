@@ -8,20 +8,28 @@ import { getAllPosts } from "@/lib/posts";
 import { getSearchDocuments } from "@/lib/search";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
+import { siteConfig } from "@/lib/site";
 import { getTagRecords } from "@/lib/tags";
 
 export const metadata = createPageMetadata({
-  title: "Screeps知识库",
+  title: "Screeps 知识库",
   description:
-    "从 12 篇 Screeps 新手路线进入 8 个专题模块，并查询术语、错误码、标签、验证方法和全部站内内容。",
+    "从 12 篇 Screeps 新手路线进入 8 个专题模块，并查询术语、错误码、标签、验证方法、Creep 身体计算器和全部站内内容。",
   path: "/knowledge",
 });
 
 const referenceTools = [
   {
+    eyebrow: "BODY CALCULATOR",
+    title: "Creep 身体计算器",
+    description: "组合身体部件，计算 Energy 成本、生成时间、携带容量和满载移动速度。",
+    href: "/tools/creep-body-calculator",
+    count: "已上线",
+  },
+  {
     eyebrow: "SEARCH",
     title: "站内搜索",
-    description: "同时搜索文章正文、术语、错误码、标签和公开项目说明。",
+    description: "同时搜索文章正文、知识模块、术语、错误码、工具和公开建设说明。",
     href: "/search",
     count: `${getSearchDocuments().length} 条内容`,
   },
@@ -61,25 +69,76 @@ const plannedTools = [
     description: "整理新手和基础工程阶段真正会使用的对象、方法、参数与返回值。",
   },
   {
-    title: "Creep 身体计算器",
-    description: "输入身体部件后计算能量成本、创建时间和基础移动比例。",
-  },
-  {
     title: "房间运行诊断清单",
     description: "按 Spawn、Creep、Energy、Controller、工地和 CPU 逐项检查常见问题。",
+  },
+  {
+    title: "身体方案与角色预设",
+    description: "在现有身体计算器基础上补充角色模板、预算比较和更多移动说明。",
   },
 ];
 
 export default function KnowledgePage() {
   const allPosts = getAllPosts();
   const postsBySlug = new Map(allPosts.map((post) => [post.slug, post]));
+  const pageUrl = `${siteConfig.url}/knowledge`;
+  const itemListEntries = [
+    {
+      name: "Screeps 新手入门",
+      url: `${siteConfig.url}/beginner`,
+    },
+    ...knowledgeBaseSections.map((section) => ({
+      name: section.title,
+      url: `${siteConfig.url}/knowledge/${section.id}`,
+    })),
+    ...referenceTools.map((tool) => ({
+      name: tool.title,
+      url: `${siteConfig.url}${tool.href}`,
+    })),
+  ];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: "Screeps 知识库",
+        description:
+          "Screeps 中文新手路线、专题模块、术语、错误码、验证方法和实用工具入口。",
+        url: pageUrl,
+        inLanguage: "zh-CN",
+        mainEntity: { "@id": `${pageUrl}#items` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#items`,
+        numberOfItems: itemListEntries.length,
+        itemListElement: itemListEntries.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          url: item.url,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "首页", item: siteConfig.url },
+          { "@type": "ListItem", position: 2, name: "知识库", item: pageUrl },
+        ],
+      },
+    ],
+  };
 
   return (
     <main className="page-shell knowledge-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <Container>
         <header className="page-header knowledge-header">
           <p className="eyebrow">SCREEPS KNOWLEDGE BASE</p>
-          <h1>Screeps知识库</h1>
+          <h1>Screeps 知识库</h1>
           <p>
             第一次接触 Screeps，先按顺序完成新手路线；已经遇到具体 API、报错或系统问题时，可以进入专题模块，或直接使用下面的查询工具。
           </p>
@@ -121,7 +180,7 @@ export default function KnowledgePage() {
               <p className="eyebrow">REFERENCE & TOOLS</p>
               <h2 id="knowledge-reference-title">查询与工具</h2>
             </div>
-            <p>文章用于连续学习；这些入口用于遇到具体名词、返回值或代码问题时快速定位。</p>
+            <p>文章用于连续学习；这些入口用于遇到具体名词、返回值、身体配置或代码问题时快速定位。</p>
           </div>
 
           <div className="knowledge-reference-grid">
@@ -222,7 +281,7 @@ export default function KnowledgePage() {
         .knowledge-reference-heading { display: grid; grid-template-columns: minmax(0, .9fr) minmax(280px, 1.1fr); gap: 40px; align-items: end; margin-bottom: 30px; }
         .knowledge-reference-heading h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 52px); letter-spacing: -.045em; }
         .knowledge-reference-heading > p { margin: 0; color: var(--muted); line-height: 1.75; }
-        .knowledge-reference-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .knowledge-reference-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
         .knowledge-reference-grid > a { display: grid; min-height: 245px; align-content: start; border: 1px solid var(--border); border-radius: 20px; padding: 25px; background: var(--surface); transition: transform 160ms ease, border-color 160ms ease; }
         .knowledge-reference-grid > a:hover { transform: translateY(-3px); border-color: var(--muted); text-decoration: none; }
         .knowledge-reference-grid h3 { margin: 20px 0 0; font-size: 24px; }
@@ -261,6 +320,7 @@ export default function KnowledgePage() {
         .knowledge-section li a:hover strong { text-decoration: underline; text-underline-offset: 4px; }
         .knowledge-section strong { line-height: 1.55; }
         .knowledge-section small { color: var(--muted); font-size: 12px; }
+        @media (max-width: 1020px) { .knowledge-reference-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 820px) { .knowledge-beginner, .knowledge-reference-heading, .knowledge-tool-roadmap, .knowledge-module-heading { grid-template-columns: 1fr; } }
         @media (max-width: 760px) { .knowledge-reference-grid, .knowledge-section ol { grid-template-columns: 1fr; } .knowledge-section li:nth-child(odd) { border-right: 0; } .knowledge-section li:nth-child(even) { padding-left: 0; } .knowledge-section > header { grid-template-columns: 36px minmax(0, 1fr); gap: 12px; } }
       `}</style>
