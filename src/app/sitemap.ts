@@ -20,7 +20,6 @@ type ChangeFrequency = NonNullable<
 const staticPageDates = {
   about: "2026-07-22",
   glossary: "2026-07-18",
-  resources: "2026-07-22",
   screepsErrors: "2026-07-18",
   verification: "2026-07-22",
 };
@@ -71,19 +70,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       return post ? [post.updatedAt ?? post.publishedAt] : [];
     }),
   );
-  const projectsUpdatedAt = latestDate(projects.map((project) => project.updatedAt));
   const changelogUpdatedAt = latestDate(changelogEntries.map((entry) => entry.date));
   const nowUpdatedAt = latestDate([
     ...nowEntries.map((entry) => entry.date),
     ...changelogEntries.map((entry) => entry.date),
   ]);
-  const resourcesUpdatedAt = latestDate([
-    staticPageDates.resources,
-    allPostsPublishedAt.toISOString(),
-  ]);
   const aboutUpdatedAt = latestDate([
     staticPageDates.about,
     allPostsPublishedAt.toISOString(),
+    ...projects.map((project) => project.updatedAt),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -109,13 +104,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteConfig.url}/knowledge`,
       lastModified: allPostsUpdatedAt,
       changeFrequency: "weekly",
-      priority: 0.92,
-    },
-    {
-      url: `${siteConfig.url}/resources`,
-      lastModified: resourcesUpdatedAt,
-      changeFrequency: "monthly",
-      priority: 0.85,
+      priority: 0.94,
     },
     {
       url: `${siteConfig.url}/glossary`,
@@ -142,12 +131,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.72,
     },
     {
-      url: `${siteConfig.url}/projects`,
-      lastModified: projectsUpdatedAt,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
       url: `${siteConfig.url}/now`,
       lastModified: nowUpdatedAt,
       changeFrequency: "weekly",
@@ -163,7 +146,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteConfig.url}/about`,
       lastModified: aboutUpdatedAt,
       changeFrequency: "monthly",
-      priority: 0.65,
+      priority: 0.7,
     },
   ];
 
@@ -188,13 +171,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       allPostsUpdatedAt,
       "weekly",
       0.65,
-    ),
-    ...createArchivePages(
-      "/projects",
-      projects.length,
-      projectsUpdatedAt,
-      "monthly",
-      0.6,
     ),
     ...createArchivePages(
       "/now",
@@ -229,19 +205,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.55,
     }));
 
-  const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
-    url: `${siteConfig.url}/projects/${project.id}`,
-    lastModified: new Date(project.updatedAt),
-    changeFrequency: "monthly",
-    priority: 0.68,
-  }));
-
   return [
     ...staticPages,
     ...knowledgeModulePages,
     ...archivePages,
     ...posts,
     ...tagPages,
-    ...projectPages,
   ];
 }
