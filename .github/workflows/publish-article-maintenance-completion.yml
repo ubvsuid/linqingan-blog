@@ -1,0 +1,72 @@
+name: Publish article maintenance completion
+
+on:
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - .github/workflows/publish-article-maintenance-completion.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-article-maintenance-completion
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: clean-blog-v1
+          fetch-depth: 0
+
+      - name: Verify final report exists
+        run: test -f docs/article-maintenance/2026-07-23-all-articles-final-report.md
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Add completion changelog entry
+        run: |
+          if grep -q "完成全站64篇文章维护" src/lib/changelog.ts; then
+            echo "Completion changelog already exists."
+          else
+            npm run changelog:add -- "内容" "完成全站64篇文章维护" "按批次重写并复核52篇非新手文章，同时按易懂优先原则维护12篇新手路线；全部文章重新检查事实、代码、返回值、适用边界、内链与验证说明。" "/blog" "查看全部文章"
+          fi
+
+      - name: Run complete production build
+        run: npm run build
+
+      - name: Remove one-time maintenance files
+        run: |
+          rm -f .github/workflows/apply-maintenance-fixes.yml
+          rm -f .github/workflows/maintain-beginner-series.yml
+          rm -f .github/workflows/finalize-article-maintenance.yml
+          rm -f .github/workflows/publish-article-maintenance-completion.yml
+          rm -f scripts/apply-maintenance-fixes.mjs
+          rm -f scripts/maintain-beginner-batch.mjs
+          rm -f scripts/finalize-article-maintenance.mjs
+
+      - name: Commit completion
+        run: |
+          git config user.name "linqingan-maintenance-bot"
+          git config user.email "linqingan501@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No completion changes to commit."
+            exit 0
+          fi
+          git commit -m "content: publish completion of all article maintenance"
+          git push origin HEAD:clean-blog-v1
