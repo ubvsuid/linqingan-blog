@@ -23,36 +23,47 @@ verification:
 featured: false
 ---
 
-己方 Creep 受伤后，Tower 不会自动治疗。代码需要在每个 tick 重新读取当前对象、选择目标并调用 `tower.heal(target)`。
+己方Creep受伤后，Tower不会自动治疗。代码需要在每个tick重新读取当前对象、选择目标并调用 `tower.heal(target)`。
 
-本文只解决一个问题：怎样让一座或多座可用 Tower 选择当前最需要治疗的己方普通 Creep，并正确处理距离衰减、Energy 和返回值。
+本文只解决一个问题：怎样让一座或多座可用Tower选择当前更需要治疗的己方普通Creep，并正确处理距离衰减、Energy、结构状态和返回值。
 
 ## Tower治疗覆盖整个房间
 
-Tower可以治疗同一房间里的有效 Creep 或 Power Creep。距离不会让 `heal()` 返回 `ERR_NOT_IN_RANGE`，但会影响实际治疗量。
+Tower可以治疗同一房间里的有效Creep或Power Creep。距离不会让 `heal()` 返回 `ERR_NOT_IN_RANGE`，但会影响实际治疗量。
 
-官方数值是：
+官方基础数值为：
 
-- 距离不超过5格时，基础治疗量为400 hits；
-- 距离达到20格及以上时，基础治疗量为100 hits；
+- 距离不超过5格时，治疗量为400 hits；
+- 距离达到20格及以上时，治疗量为100 hits；
 - 中间距离线性变化。
 
-本文使用 `FIND_MY_CREEPS`，所以只处理己方普通 Creep，不自动包含 Power Creep。
+本文使用 `FIND_MY_CREEPS`，因此只处理己方普通Creep，不自动包含Power Creep。
 
-## 为什么不只选择“最近的受伤者”
+## 为什么不能只选最近的受伤者
 
-最近目标不一定最危险。例如：
+最简单的最近目标写法是：
 
-- 距离2格的 Creep 只缺10 hits；
-- 距离8格的 Creep 已经只剩20%生命。
+```js
+const nearestInjured = tower.pos.findClosestByRange(
+  FIND_MY_CREEPS,
+  {
+    filter: creep =>
+      creep.hits > 0
+      && creep.hits < creep.hitsMax
+  }
+);
+```
 
-只按距离可能把治疗浪费在轻伤目标上。
+`findClosestByRange()`适合快速建立最小版本，但最近目标不一定最危险。例如：
 
-本文按三层排序：
+- 距离2格的Creep只缺10 hits；
+- 距离8格的Creep已经只剩20%生命。
+
+只按距离可能优先治疗轻伤目标。本文改为三层排序：
 
 1. `hits / hitsMax` 更低者优先；
-2. 比例相同，缺失 hits 更多者优先；
-3. 仍然相同，距离最近 Tower 更近者优先。
+2. 比例相同，缺失hits更多者优先；
+3. 仍然相同，距离最近Tower更近者优先。
 
 这是一种可解释的基础策略，不是所有战斗场景的唯一正确顺序。
 
@@ -61,7 +72,10 @@ Tower可以治疗同一房间里的有效 Creep 或 Power Creep。距离不会�
 ```js
 function selectHealTarget(towers, creeps) {
   const injured = creeps.filter(creep =>
-    creep.hits > 0
+    Number.isFinite(creep.hits)
+    && Number.isFinite(creep.hitsMax)
+    && creep.hits > 0
+    && creep.hitsMax > 0
     && creep.hits < creep.hitsMax
   );
 
@@ -85,10 +99,14 @@ function selectHealTarget(towers, creeps) {
     }
 
     const leftRange = Math.min(
-      ...towers.map(tower => tower.pos.getRangeTo(left))
+      ...towers.map(tower =>
+        tower.pos.getRangeTo(left)
+      )
     );
     const rightRange = Math.min(
-      ...towers.map(tower => tower.pos.getRangeTo(right))
+      ...towers.map(tower =>
+        tower.pos.getRangeTo(right)
+      )
     );
 
     if (leftRange !== rightRange) {
@@ -96,11 +114,11 @@ function selectHealTarget(towers, creeps) {
     }
 
     return left.name.localeCompare(right.name);
-  })[0];
+  })[0] ?? null;
 }
 ```
 
-名称只用于完全同分时保持结果稳定。
+名称只用于完全同分时保持结果稳定，不代表业务优先级。
 
 ## 完整示例
 
@@ -109,7 +127,10 @@ function selectHealTarget(towers, creeps) {
 ```js
 function selectHealTarget(towers, creeps) {
   const injured = creeps.filter(creep =>
-    creep.hits > 0
+    Number.isFinite(creep.hits)
+    && Number.isFinite(creep.hitsMax)
+    && creep.hits > 0
+    && creep.hitsMax > 0
     && creep.hits < creep.hitsMax
   );
 
@@ -133,10 +154,14 @@ function selectHealTarget(towers, creeps) {
     }
 
     const leftRange = Math.min(
-      ...towers.map(tower => tower.pos.getRangeTo(left))
+      ...towers.map(tower =>
+        tower.pos.getRangeTo(left)
+      )
     );
     const rightRange = Math.min(
-      ...towers.map(tower => tower.pos.getRangeTo(right))
+      ...towers.map(tower =>
+        tower.pos.getRangeTo(right)
+      )
     );
 
     if (leftRange !== rightRange) {
@@ -144,7 +169,7 @@ function selectHealTarget(towers, creeps) {
     }
 
     return left.name.localeCompare(right.name);
-  })[0];
+  })[0] ?? null;
 }
 
 function runTowerHealing(room) {
@@ -152,12 +177,15 @@ function runTowerHealing(room) {
     filter: structure =>
       structure.structureType === STRUCTURE_TOWER
       && structure.isActive()
-      && structure.store.getUsedCapacity(RESOURCE_ENERGY)
-        >= TOWER_ENERGY_COST
+      && structure.store.getUsedCapacity(
+        RESOURCE_ENERGY
+      ) >= TOWER_ENERGY_COST
   });
 
   if (towers.length === 0) {
-    return;
+    return {
+      status: 'no-available-tower'
+    };
   }
 
   const injured = room.find(FIND_MY_CREEPS, {
@@ -168,11 +196,20 @@ function runTowerHealing(room) {
   const target = selectHealTarget(towers, injured);
 
   if (!target) {
-    return;
+    return {
+      status: 'no-injured-creep'
+    };
   }
+
+  const results = [];
 
   for (const tower of towers) {
     const result = tower.heal(target);
+
+    results.push({
+      towerId: tower.id,
+      result
+    });
 
     if (result !== OK) {
       console.log({
@@ -187,6 +224,13 @@ function runTowerHealing(room) {
       });
     }
   }
+
+  return {
+    status: 'heal-submitted',
+    targetId: target.id,
+    targetName: target.name,
+    results
+  };
 }
 
 module.exports.loop = function () {
@@ -202,61 +246,43 @@ module.exports.loop = function () {
 
 ## 为什么检查 `TOWER_ENERGY_COST`
 
-Tower每次动作需要一次固定的Energy成本。本文使用官方常量：
+Tower每次动作需要固定Energy成本。本文使用官方常量：
 
 ```js
 TOWER_ENERGY_COST
 ```
 
-提前排除资源不足的Tower，可以减少无意义调用，但不能省略 `heal()` 返回值，因为同一 tick 的其他Tower逻辑仍可能竞争动作或改变策略。
+提前排除资源不足的Tower可以减少无意义调用，但不能省略 `heal()` 返回值，因为同一tick的其他Tower逻辑可能已经使用该Tower或改变资源状态。
 
 ## 多座Tower会不会过量治疗
 
 示例让所有可用Tower治疗同一个目标。这样简单、可预测，但可能出现：
 
 - 一座Tower已经足够补满；
-- 多座Tower仍然全部提交治疗；
-- 其他受伤Creep本 tick 没有获得治疗。
+- 多座Tower仍全部提交治疗；
+- 其他受伤Creep本tick没有获得治疗。
 
-更完整的系统需要估算：
+更完整的分配器需要估算：
 
-- 每座Tower到每个目标的实际治疗量；
-- 目标缺失 hits；
-- 其他Tower已经分配的治疗；
-- 本 tick 的攻击优先级；
-- 目标可能继续受到的伤害。
+- 每座Tower到目标的实际治疗量；
+- 目标缺失hits；
+- 已分配治疗量；
+- 当前攻击优先级；
+- 目标下一tick可能受到的伤害。
 
-本文不声称多Tower集火治疗是最省Energy的策略，只把它作为安全的基础版本。
-
-## 为什么不用角色名硬编码优先级
-
-可以把治疗者、运输者或防御单位设置为高优先级，但角色名称来自项目自己的Memory结构，不是官方字段。
-
-直接写：
-
-```js
-creep.memory.role === 'healer'
-```
-
-会把文章绑定到某一套命名。本文先使用通用生命比例。实际项目可以在排序第一层加入自己的任务权重，但应同时处理：
-
-- `creep.memory`不存在；
-- 角色名称迁移；
-- 临时任务覆盖；
-- 强化单位价值；
-- Power Creep。
+本文不声称多Tower集中治疗是最省Energy的方案，只把它作为安全的基础版本。
 
 ## `heal()` 返回值
 
 | 返回值 | 官方含义 | 优先检查 |
 |---|---|---|
-| `OK` | 治疗已安排 | 下一 tick 查看目标hits |
+| `OK` | 治疗命令已安排 | 下一tick查看目标hits |
 | `ERR_NOT_OWNER` | Tower不是自己的 | `FIND_MY_STRUCTURES`与所有权 |
 | `ERR_NOT_ENOUGH_ENERGY` | Tower Energy不足 | Store和其他Tower动作 |
 | `ERR_INVALID_TARGET` | 目标不是有效Creep或已经失效 | 当前tick重新查找目标 |
 | `ERR_RCL_NOT_ENOUGH` | Tower当前不可用 | Controller等级与 `isActive()` |
 
-距离不在错误表中。看到治疗量偏低时，应检查距离；看到错误码时，按所有权、资源、目标和RCL排查。
+距离不在错误表中。治疗量偏低时检查距离；出现错误码时按所有权、资源、目标和RCL排查。
 
 ## 为什么每tick重新查找目标
 
@@ -265,29 +291,29 @@ creep.memory.role === 'healer'
 - 被治疗到满生命；
 - 死亡；
 - 离开房间；
-- 受到新的伤害；
+- 受到新伤害；
 - 改变位置；
 - 失去或获得强化；
-- 变成不同任务优先级。
+- 改变任务优先级。
 
-不要把完整 Creep 对象长期写入Memory。需要保存时只保存名称或ID，并在当前tick重新取得对象。
+不要把完整Creep对象长期写入Memory。需要保存时只保存名称或ID，并在当前tick重新取得对象。
 
 ## Tower攻击、治疗和维修如何排列
 
 同一座Tower每tick只能提交一个主要动作。常见基础顺序是：
 
 ```text
-敌对目标
+有敌对目标
 → 攻击
 
-没有需要攻击的目标，但己方有人受伤
+没有攻击目标，但己方有人受伤
 → 治疗
 
 没有战斗与治疗需求，且Energy充足
 → 维修
 ```
 
-这是策略顺序，不是Tower API自动完成的行为。若项目把三篇文章合并成统一调度器，应确保同一Tower不会在同tick依次提交多个互相覆盖的动作。
+这是项目策略，不是Tower API自动完成的行为。把三类动作合并成统一调度器时，应保证同一Tower不会在同tick依次提交多个动作。
 
 ## 离线模拟结果
 
@@ -305,9 +331,9 @@ creep.memory.role === 'healer'
 
 ## 常见误区
 
-### 认为远距离会返回 `ERR_NOT_IN_RANGE`
+### 远距离不会产生范围不足错误
 
-Tower治疗覆盖整个房间，距离影响数值，不影响API是否能调用。
+Tower治疗覆盖整个房间，距离影响治疗数值，不会返回 `ERR_NOT_IN_RANGE`。
 
 ### 只按最近距离选择
 
@@ -323,11 +349,11 @@ Tower治疗覆盖整个房间，距离影响数值，不影响API是否能调用
 
 ### 多Tower同时治疗却声称最省资源
 
-没有伤害与治疗量模型时，不能做这种结论。
+没有伤害与治疗量模型时，不能得出这种结论。
 
 ### 返回 `OK` 后同tick读取新hits
 
-应在下一tick重新取得目标。
+应在下一tick重新取得目标并读取最新状态。
 
 ## 适用边界
 
@@ -336,8 +362,8 @@ Tower治疗覆盖整个房间，距离影响数值，不影响API是否能调用
 - Power Creep治疗；
 - 角色价值权重；
 - 精确距离治疗量计算；
-- 多Tower分配；
-- 预计下一tick伤害；
+- 多Tower治疗量分配；
+- 下一tick伤害预测；
 - 强化效果；
 - 防御Creep调度；
 - 跨房间治疗。
@@ -359,4 +385,4 @@ JavaScript语法和目标排序离线模拟已经通过。真实Tower治疗、En
 - [StructureTower API](https://docs.screeps.com/api/#StructureTower)
 - [Defending your room](https://docs.screeps.com/defense.html)
 
-资料核对日期：2026-07-22。离线目标排序已通过；真实治疗结果仍待Screeps环境验证。
+资料核对日期：2026-07-22。离线目标排序已通过；真实治疗结果仍待环境验证。
