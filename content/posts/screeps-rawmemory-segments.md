@@ -352,7 +352,7 @@ JavaScript语法和离线解析分支已经检查，真实Screeps Console、跨t
 - [Game.getObjectById() 怎么配合 Memory 保存目标](/blog/screeps-game-get-object-by-id)
 - [Screeps 全局缓存为什么会失效](/blog/screeps-global-cache)
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
-- [工程配置与运行诊断模块](/knowledge/operations-debugging)
+- [进入 Screeps 知识库](/knowledge)
 
 ## 官方资料
 
