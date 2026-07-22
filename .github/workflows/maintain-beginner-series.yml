@@ -1,0 +1,78 @@
+name: Maintain beginner series
+
+on:
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - scripts/maintain-beginner-batch.mjs
+      - .github/workflows/maintain-beginner-series.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maintain-beginner-series
+  cancel-in-progress: false
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: clean-blog-v1
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply pending exact fixes
+        run: node scripts/apply-maintenance-fixes.mjs
+
+      - name: Maintain beginner batch 12
+        run: node scripts/maintain-beginner-batch.mjs 0 5 12
+
+      - name: Validate batch 12
+        run: npm run prebuild
+
+      - name: Commit batch 12
+        run: |
+          git config user.name "linqingan-maintenance-bot"
+          git config user.email "linqingan501@gmail.com"
+          git add content/posts docs/article-maintenance scripts/apply-maintenance-fixes.mjs
+          git commit -m "content: maintain beginner articles batch 12"
+          git push origin HEAD:clean-blog-v1
+
+      - name: Maintain beginner batch 13
+        run: node scripts/maintain-beginner-batch.mjs 5 5 13
+
+      - name: Validate batch 13
+        run: npm run prebuild
+
+      - name: Commit batch 13
+        run: |
+          git add content/posts docs/article-maintenance
+          git commit -m "content: maintain beginner articles batch 13"
+          git push origin HEAD:clean-blog-v1
+
+      - name: Maintain beginner batch 14
+        run: node scripts/maintain-beginner-batch.mjs 10 2 14
+
+      - name: Validate complete site
+        run: npm run build
+
+      - name: Commit batch 14
+        run: |
+          git add content/posts docs/article-maintenance
+          git commit -m "content: complete beginner article maintenance"
+          git push origin HEAD:clean-blog-v1
