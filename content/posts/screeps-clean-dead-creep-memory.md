@@ -110,7 +110,7 @@ Game.creeps = {
 ## 继续学习
 
 - [Memory 基础用法](/blog/screeps-memory-basics)
-- [按角色统计 Creep](/blog/screeps-count-creeps-by-role)
+- [Creep 角色分工](/blog/screeps-creep-roles)
 - [房间断代后恢复采集者](/blog/screeps-spawn-emergency-recovery)
 - [tick 与主循环](/blog/screeps-tick-and-game-loop)
 - [第一份房间基础代码](/blog/screeps-first-room-code)
