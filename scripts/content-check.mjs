@@ -19,8 +19,6 @@ const descriptionTemplatePhrases = [
   "提供变量完整的最小示例",
 ];
 
-const descriptionRecords = [];
-
 const articleRules = {
   "screeps-storage-energy-usage": {
     forbidden: ["预测价格", "承诺收益", "订单", "市场操作", "交易 Energy"],
@@ -122,12 +120,12 @@ const articleRules = {
 
 const globalTemplateResidues = [
   "这段代码的重点不是架构，而是让每个可能为空的对象都有检查，并把关键调用结果保留下来。",
-  "返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和冷却条件。",
+  "返回其他错误常量时，回到官方 API 对照当前对象、资源、容量、所有权和等待条件。",
   "这类代码最容易出错的地方不是",
   "遇到这个问题时，先不要继续增加",
   "本文只解决一件事",
   "不搭建大型框架",
-  "先确认对象存在，再检查资源、容量、冷却和所有权",
+  "先确认对象存在，再检查资源、容量、等待状态和所有权",
   "提供变量完整的最小示例、边界和验证清单",
 ];
 
@@ -136,6 +134,21 @@ const marketSlugs = new Set([
   "screeps-market-deal",
   "screeps-terminal-send-resources",
 ]);
+
+const marketBoundarySlugs = new Set([
+  "screeps-lab-run-reaction",
+]);
+
+const knowledgeRoutes = [
+  "/knowledge/memory-engineering",
+  "/knowledge/spawn-lifecycle",
+  "/knowledge/room-economy",
+  "/knowledge/movement-vision",
+  "/knowledge/controller-control",
+  "/knowledge/construction-defense",
+  "/knowledge/market-advanced-resources",
+  "/knowledge/operations-debugging",
+];
 
 function addError(message) {
   errors.push(message);
@@ -149,8 +162,8 @@ function stripCodeAndLinks(markdown) {
   return markdown
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`[^`]+`/g, " ")
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 }
 
 function chineseCount(value) {
@@ -171,10 +184,12 @@ function normalizeDescription(value) {
     "Tower", "Creep", "RoomPosition", "PathFinder", "RawMemory", "Memory",
     "Energy", "Lab", "Wall", "Flag", "Game", "CPU",
   ];
+
   let normalized = String(value ?? "").normalize("NFKC").toLowerCase();
   for (const objectName of screepsObjects) {
     normalized = normalized.replaceAll(objectName.toLowerCase(), "");
   }
+
   return normalized
     .replace(/[a-z][a-z0-9_.]*(?:\(\))?/gi, "")
     .replace(/[0-9０-９]/g, "")
@@ -183,11 +198,13 @@ function normalizeDescription(value) {
 
 function bigramDice(left, right) {
   if (left.length < 2 || right.length < 2) return 0;
+
   const leftPairs = new Map();
   for (let index = 0; index < left.length - 1; index += 1) {
     const pair = left.slice(index, index + 2);
     leftPairs.set(pair, (leftPairs.get(pair) ?? 0) + 1);
   }
+
   let overlap = 0;
   for (let index = 0; index < right.length - 1; index += 1) {
     const pair = right.slice(index, index + 2);
@@ -197,6 +214,7 @@ function bigramDice(left, right) {
       leftPairs.set(pair, remaining - 1);
     }
   }
+
   return (2 * overlap) / (left.length + right.length - 2);
 }
 
@@ -209,19 +227,22 @@ const slugs = new Set();
 const titles = new Map();
 const sentenceOccurrences = new Map();
 const paragraphOccurrences = new Map();
+const descriptionRecords = [];
 const knownRoutes = new Set([
   "/",
   "/about",
   "/beginner",
   "/blog",
   "/knowledge",
-  "/resources",
+  ...knowledgeRoutes,
   "/search",
   "/glossary",
   "/screeps-errors",
   "/tags",
-  "/projects",
   "/now",
+  "/changelog",
+  "/verification",
+  "/tools/creep-body-calculator",
   "/feed.xml",
 ]);
 
@@ -252,14 +273,16 @@ for (const fileName of files) {
         .split("\n")
         .filter((line) => line.includes(forbidden));
       const onlyExplicitNegation =
-        slug === "screeps-tower-heal-creeps" &&
-        forbidden === "ERR_NOT_IN_RANGE" &&
-        matchingLines.length > 0 &&
-        matchingLines.every((line) => /不会|不返回|不在/.test(line));
+        slug === "screeps-tower-heal-creeps"
+        && forbidden === "ERR_NOT_IN_RANGE"
+        && matchingLines.length > 0
+        && matchingLines.every((line) => /不会|不返回|不在/.test(line));
+
       if (matchingLines.length > 0 && !onlyExplicitNegation) {
         addError(`${fileName}: 出现与主题不符的“${forbidden}”`);
       }
     }
+
     for (const required of rule.required ?? []) {
       if (!content.includes(required)) {
         addError(`${fileName}: 缺少主题必需内容“${required}”`);
@@ -268,7 +291,11 @@ for (const fileName of files) {
   }
 
   const marketScanText = plainContent.replace(/部件价格/g, "");
-  if (!marketSlugs.has(slug) && /预测价格|承诺收益|订单|成交|市场操作/.test(marketScanText)) {
+  if (
+    !marketSlugs.has(slug)
+    && !marketBoundarySlugs.has(slug)
+    && /预测价格|承诺收益|订单|成交|市场操作/.test(marketScanText)
+  ) {
     addWarning(`${fileName}: 非市场文章出现价格、订单、收益或成交词，请确认是否为主题残留`);
   }
 
@@ -277,16 +304,16 @@ for (const fileName of files) {
     .filter((line) => !/不会返回|不返回|不替代|区别/.test(line))
     .join("\n");
   if (/ERR_NOT_IN_RANGE/.test(rangeScanText)) {
-    const hasRelevantCreepAction = /\.(?:attack|build|claimController|dismantle|drop|harvest|heal|move|moveTo|pickup|rangedAttack|rangedHeal|repair|reserveController|transfer|upgradeController|withdraw|renewCreep|recycleCreep|boostCreep|runReaction|observeRoom)\s*\(/.test(code);
-    if (!hasRelevantCreepAction && slug !== "screeps-err-not-in-range") {
-      addWarning(`${fileName}: ERR_NOT_IN_RANGE 未与移动或 Creep 动作代码同时出现`);
+    const hasRelevantAction = /\.(?:attack|build|claimController|dismantle|drop|harvest|heal|move|moveTo|pickup|rangedAttack|rangedHeal|repair|reserveController|transfer|upgradeController|withdraw|renewCreep|recycleCreep|boostCreep|runReaction|observeRoom)\s*\(/.test(code);
+    if (!hasRelevantAction && slug !== "screeps-err-not-in-range") {
+      addWarning(`${fileName}: ERR_NOT_IN_RANGE 未与相关动作代码同时出现`);
     }
   }
 
-  if (/cooldown|冷却/.test(plainContent)) {
-    const hasCooldownObject = /\.cooldown|safeModeCooldown|STRUCTURE_(?:EXTRACTOR|FACTORY|LAB|LINK|NUKER|TERMINAL)/.test(content);
-    if (!hasCooldownObject) {
-      addWarning(`${fileName}: 提到冷却，但正文没有可核对的 cooldown 对象`);
+  if (/cooldown/.test(plainContent)) {
+    const hasWaitingObject = /\.cooldown|safeModeCooldown|STRUCTURE_(?:EXTRACTOR|FACTORY|LAB|LINK|NUKER|TERMINAL)/.test(content);
+    if (!hasWaitingObject) {
+      addWarning(`${fileName}: 提到 cooldown，但正文没有可核对的对应对象`);
     }
   }
 
@@ -319,9 +346,8 @@ for (const fileName of files) {
     }
   }
 
-  const levelTwoHeadings = [...content.matchAll(/^##\s+(.+)$/gm)].map((match) =>
-    match[1].trim(),
-  );
+  const levelTwoHeadings = [...content.matchAll(/^##\s+(.+)$/gm)]
+    .map((match) => match[1].trim());
   const duplicateHeadings = levelTwoHeadings.filter(
     (heading, index) => levelTwoHeadings.indexOf(heading) !== index,
   );
@@ -332,7 +358,6 @@ for (const fileName of files) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     addError(`${fileName}: slug 只能使用小写字母、数字和连字符`);
   }
-
   if (slugs.has(slug)) addError(`${fileName}: slug 重复`);
   slugs.add(slug);
   knownRoutes.add(`/blog/${slug}`);
@@ -384,9 +409,11 @@ for (const fileName of files) {
         addError(`${fileName}: verification.${field} 必须是布尔值`);
       }
     }
+
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data.verification.checkedAt ?? "")) {
       addError(`${fileName}: verification.checkedAt 必须使用 YYYY-MM-DD`);
     }
+
     const hasRuntimeEvidence = data.verification.consoleTested || data.verification.liveTested;
     if (hasRuntimeEvidence) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(data.verification.testedAt ?? "")) {
@@ -401,9 +428,9 @@ for (const fileName of files) {
   }
 
   if (
-    typeof data.updatedAt === "string" &&
-    typeof data.publishedAt === "string" &&
-    new Date(data.updatedAt).getTime() < new Date(data.publishedAt).getTime()
+    typeof data.updatedAt === "string"
+    && typeof data.publishedAt === "string"
+    && new Date(data.updatedAt).getTime() < new Date(data.publishedAt).getTime()
   ) {
     addError(`${fileName}: updatedAt 不能早于 publishedAt`);
   }
@@ -433,6 +460,7 @@ for (let leftIndex = 0; leftIndex < descriptionRecords.length; leftIndex += 1) {
     const left = descriptionRecords[leftIndex];
     const right = descriptionRecords[rightIndex];
     if (left.normalized.length < 12 || right.normalized.length < 12) continue;
+
     const similarity = bigramDice(left.normalized, right.normalized);
     const percent = Math.round(similarity * 100);
     if (similarity > 0.85) {
@@ -463,11 +491,10 @@ for (const fileName of files) {
   for (const match of internalLinks) {
     const href = match[1].replace(/\/$/, "") || "/";
     if (
-      !knownRoutes.has(href) &&
-      !href.startsWith("/tags/") &&
-      !href.startsWith("/projects/") &&
-      !href.startsWith("/beginner/page/") &&
-      !href.startsWith("/blog/page/")
+      !knownRoutes.has(href)
+      && !href.startsWith("/tags/")
+      && !href.startsWith("/beginner/page/")
+      && !href.startsWith("/blog/page/")
     ) {
       addError(`${fileName}: 内链可能不存在 ${href}`);
     }
@@ -485,7 +512,9 @@ if (stageSlugBlocks.length === 0) {
   const duplicates = beginnerSlugs.filter(
     (slug, index) => beginnerSlugs.indexOf(slug) !== index,
   );
-  if (duplicates.length > 0) addError(`入门系列存在重复 slug：${duplicates.join(", ")}`);
+  if (duplicates.length > 0) {
+    addError(`入门系列存在重复 slug：${duplicates.join(", ")}`);
+  }
   for (const slug of beginnerSlugs) {
     if (!slugs.has(slug)) addError(`入门系列文章不存在：${slug}`);
   }
