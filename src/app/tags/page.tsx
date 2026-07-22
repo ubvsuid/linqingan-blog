@@ -49,7 +49,7 @@ export default function TagsPage() {
     <main className="page-shell tags-page">
       <Container>
         <nav className="tags-breadcrumb" aria-label="面包屑">
-          <Link href="/resources">资料中心</Link>
+          <Link href="/knowledge">知识库</Link>
           <span aria-hidden="true">/</span>
           <span>文章标签</span>
         </nav>
