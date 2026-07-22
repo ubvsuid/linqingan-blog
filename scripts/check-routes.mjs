@@ -31,6 +31,12 @@ function extractConfiguredSlugs(source) {
   );
 }
 
+function extractKnowledgeSectionIds(source) {
+  return [...source.matchAll(/\bid:\s*["']([a-z0-9-]+)["']/g)].map(
+    (match) => match[1],
+  );
+}
+
 const requiredTagSlugs = {
   新手入门: "beginner",
   基础工程: "basic-engineering",
@@ -103,9 +109,12 @@ const beginnerSource = fs.readFileSync(
 );
 const knowledgeSlugs = extractConfiguredSlugs(knowledgeSource);
 const beginnerSlugs = extractConfiguredSlugs(beginnerSource);
+const knowledgeSectionIds = extractKnowledgeSectionIds(knowledgeSource);
 const knowledgeSet = new Set(knowledgeSlugs);
 const beginnerSet = new Set(beginnerSlugs);
 const classifiedSet = new Set([...knowledgeSlugs, ...beginnerSlugs]);
+
+for (const id of knowledgeSectionIds) knownRoutes.add(`/knowledge/${id}`);
 
 for (const slug of knowledgeSlugs) {
   if (!postSlugs.has(slug)) addError(`知识库引用了不存在的文章：${slug}`);
@@ -121,6 +130,9 @@ for (const slug of beginnerSet) {
 }
 if (knowledgeSet.size !== knowledgeSlugs.length) addError("知识模块中存在重复文章 slug");
 if (beginnerSet.size !== beginnerSlugs.length) addError("新手路线中存在重复文章 slug");
+if (new Set(knowledgeSectionIds).size !== knowledgeSectionIds.length) {
+  addError("知识模块中存在重复 id");
+}
 
 for (const fileName of files) {
   const { content } = matter(
@@ -167,12 +179,22 @@ for (const [route, relativePath] of routeFiles) {
 
 for (const relativePath of [
   "src/app/blog/[slug]/page.tsx",
+  "src/app/blog/[slug]/layout.tsx",
+  "src/app/knowledge/[section]/page.tsx",
   "src/app/tags/[tag]/page.tsx",
   "src/app/blog/page/[page]/page.tsx",
   "src/app/beginner/page/[page]/page.tsx",
   "src/app/sitemap.ts",
 ]) {
   if (!fs.existsSync(path.join(root, relativePath))) addError(`缺少动态路由文件 ${relativePath}`);
+}
+
+const knowledgePageSource = fs.readFileSync(
+  path.join(root, "src", "app", "knowledge", "[section]", "page.tsx"),
+  "utf8",
+);
+if (!knowledgePageSource.includes("knowledgeBaseSections.map")) {
+  addError("知识模块页没有从 knowledgeBaseSections 生成静态参数");
 }
 
 const tagPageSource = fs.readFileSync(
@@ -187,7 +209,13 @@ if (!tagPageSource.includes("noindex: record.count < 3")) {
 }
 
 const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "sitemap.ts"), "utf8");
-for (const marker of ["getAllPosts()", "getTagRecords()", ".filter((tag) => tag.count >= 3)", "/knowledge"]) {
+for (const marker of [
+  "getAllPosts()",
+  "getTagRecords()",
+  ".filter((tag) => tag.count >= 3)",
+  "knowledgeBaseSections.map",
+  "/knowledge",
+]) {
   if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
 }
 
@@ -198,5 +226,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章。`,
+  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章、${knowledgeSectionIds.length} 个专题页。`,
 );
