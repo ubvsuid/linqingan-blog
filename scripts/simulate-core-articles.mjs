@@ -304,6 +304,242 @@ record(
   },
 );
 
+record(
+  "screeps-pathfinder-costmatrix",
+  "道路、可穿越结构、不可穿越结构、自定义高成本格和坐标边界场景通过。",
+  () => {
+    function getStructureCost(structure) {
+      if (structure.structureType === "road") return 1;
+      if (structure.structureType === "container") return 0;
+      if (structure.structureType === "rampart" && structure.my === true) return 0;
+      return 255;
+    }
+
+    function isValidRoomCoordinate(value) {
+      return Number.isInteger(value) && value >= 0 && value <= 49;
+    }
+
+    function overlayAvoidCost(current, avoidCost) {
+      return current >= 255 ? 255 : Math.max(current, avoidCost);
+    }
+
+    assert.equal(getStructureCost({ structureType: "road" }), 1);
+    assert.equal(getStructureCost({ structureType: "container" }), 0);
+    assert.equal(getStructureCost({ structureType: "rampart", my: true }), 0);
+    assert.equal(getStructureCost({ structureType: "rampart", my: false }), 255);
+    assert.equal(getStructureCost({ structureType: "spawn", my: true }), 255);
+    assert.equal(overlayAvoidCost(0, 20), 20);
+    assert.equal(overlayAvoidCost(1, 20), 20);
+    assert.equal(overlayAvoidCost(255, 20), 255);
+    assert.equal(isValidRoomCoordinate(0), true);
+    assert.equal(isValidRoomCoordinate(49), true);
+    assert.equal(isValidRoomCoordinate(-1), false);
+    assert.equal(isValidRoomCoordinate(50), false);
+    assert.equal(isValidRoomCoordinate(1.5), false);
+  },
+);
+
+record(
+  "screeps-map-find-route",
+  "明确禁用房间、己方房间、高速公路、普通房间、空路线和当前步骤选择场景通过。",
+  () => {
+    function isHighwayRoom(roomName) {
+      const match = /^[WE](\d+)[NS](\d+)$/.exec(roomName);
+      if (!match) return false;
+      return Number(match[1]) % 10 === 0 || Number(match[2]) % 10 === 0;
+    }
+
+    function getRouteRoomCost(roomName, avoidedRooms, ownedRooms) {
+      if (avoidedRooms.has(roomName)) return Infinity;
+      if (ownedRooms.has(roomName) || isHighwayRoom(roomName)) return 1;
+      return 2.5;
+    }
+
+    function selectCurrentStep(roomName, steps, exits) {
+      if (!Array.isArray(steps) || steps.length === 0) return null;
+      return steps.find((step) => exits[roomName]?.[step.exit] === step.room) ?? null;
+    }
+
+    const avoided = new Set(["W5N5"]);
+    const owned = new Set(["W4N4"]);
+    assert.equal(getRouteRoomCost("W5N5", avoided, owned), Infinity);
+    assert.equal(getRouteRoomCost("W4N4", avoided, owned), 1);
+    assert.equal(getRouteRoomCost("W10N3", avoided, owned), 1);
+    assert.equal(getRouteRoomCost("W3N3", avoided, owned), 2.5);
+    assert.equal(isHighwayRoom("invalid"), false);
+    assert.equal(selectCurrentStep("W1N1", [], {}), null);
+    assert.deepEqual(
+      selectCurrentStep(
+        "W1N1",
+        [{ exit: 3, room: "W0N1" }, { exit: 5, room: "W1N0" }],
+        { W1N1: { 3: "W0N1", 5: "W1N0" } },
+      ),
+      { exit: 3, room: "W0N1" },
+    );
+  },
+);
+
+record(
+  "screeps-observer-observe-room",
+  "无请求、同tick、下一tick可见、下一tick不可见、过期请求和新请求记录场景通过。",
+  () => {
+    function getObservationStatus(state, currentTick, visibleRooms) {
+      if (!state || typeof state.requestedRoom !== "string") return "none";
+      if (state.requestedAt === currentTick) return "waiting";
+      if (state.requestedAt !== currentTick - 1) return "expired";
+      return visibleRooms.has(state.requestedRoom) ? "visible" : "missing";
+    }
+
+    function createRequestState(result, roomName, tick, observerId) {
+      if (result !== 0) return null;
+      return { requestedRoom: roomName, requestedAt: tick, observerId };
+    }
+
+    const visible = new Set(["W2N2"]);
+    assert.equal(getObservationStatus(null, 101, visible), "none");
+    assert.equal(getObservationStatus({ requestedRoom: "W2N2", requestedAt: 101 }, 101, visible), "waiting");
+    assert.equal(getObservationStatus({ requestedRoom: "W2N2", requestedAt: 100 }, 101, visible), "visible");
+    assert.equal(getObservationStatus({ requestedRoom: "W3N3", requestedAt: 100 }, 101, visible), "missing");
+    assert.equal(getObservationStatus({ requestedRoom: "W2N2", requestedAt: 99 }, 101, visible), "expired");
+    assert.equal(createRequestState(-9, "W20N20", 101, "observer"), null);
+    assert.deepEqual(createRequestState(0, "W2N2", 101, "observer"), {
+      requestedRoom: "W2N2",
+      requestedAt: 101,
+      observerId: "observer",
+    });
+  },
+);
+
+record(
+  "screeps-game-notify",
+  "首次进入风险、持续风险、恢复、再次进入、重复间隔和1000字符限制场景通过。",
+  () => {
+    function evaluateControllerAlert({ ticksToDowngrade, threshold, currentTick, previousState, repeatAfterTicks }) {
+      const previous = previousState || { active: false, lastSentTick: null };
+      const isRisk = Number.isFinite(ticksToDowngrade) && ticksToDowngrade < threshold;
+
+      if (!isRisk) {
+        return {
+          shouldNotify: false,
+          nextState: { active: false, lastSentTick: previous.lastSentTick },
+        };
+      }
+
+      const firstEntry = previous.active !== true;
+      const lastSentTick = Number.isInteger(previous.lastSentTick) ? previous.lastSentTick : null;
+      const repeatDue = lastSentTick !== null && currentTick - lastSentTick >= repeatAfterTicks;
+      const shouldNotify = firstEntry || repeatDue;
+
+      return {
+        shouldNotify,
+        nextState: {
+          active: true,
+          lastSentTick: shouldNotify ? currentTick : lastSentTick,
+        },
+      };
+    }
+
+    function normalizeNotificationMessage(message) {
+      const text = String(message);
+      return text.length <= 1000 ? text : `${text.slice(0, 997)}...`;
+    }
+
+    const entered = evaluateControllerAlert({
+      ticksToDowngrade: 4900,
+      threshold: 5000,
+      currentTick: 100,
+      previousState: null,
+      repeatAfterTicks: 5000,
+    });
+    assert.equal(entered.shouldNotify, true);
+
+    const active = evaluateControllerAlert({
+      ticksToDowngrade: 4800,
+      threshold: 5000,
+      currentTick: 101,
+      previousState: entered.nextState,
+      repeatAfterTicks: 5000,
+    });
+    assert.equal(active.shouldNotify, false);
+
+    const repeated = evaluateControllerAlert({
+      ticksToDowngrade: 3000,
+      threshold: 5000,
+      currentTick: 5100,
+      previousState: active.nextState,
+      repeatAfterTicks: 5000,
+    });
+    assert.equal(repeated.shouldNotify, true);
+
+    const recovered = evaluateControllerAlert({
+      ticksToDowngrade: 6000,
+      threshold: 5000,
+      currentTick: 5101,
+      previousState: repeated.nextState,
+      repeatAfterTicks: 5000,
+    });
+    assert.equal(recovered.shouldNotify, false);
+    assert.equal(recovered.nextState.active, false);
+
+    const enteredAgain = evaluateControllerAlert({
+      ticksToDowngrade: 4900,
+      threshold: 5000,
+      currentTick: 5102,
+      previousState: recovered.nextState,
+      repeatAfterTicks: 5000,
+    });
+    assert.equal(enteredAgain.shouldNotify, true);
+    assert.equal(normalizeNotificationMessage("a".repeat(999)).length, 999);
+    assert.equal(normalizeNotificationMessage("a".repeat(1200)).length, 1000);
+  },
+);
+
+record(
+  "screeps-lab-run-reaction",
+  "三座Lab缺失、配方无效、输入不足、输出不兼容、输出容量不足、距离超限、等待时间与可执行场景通过。",
+  () => {
+    const reactions = { H: { O: "OH" } };
+
+    function evaluateReactionPlan({ inputA, inputB, output, reactionAmount }) {
+      if (!inputA || !inputB || !output) return { ready: false, reason: "lab-missing" };
+      if (output.cooldown > 0) return { ready: false, reason: "output-waiting" };
+
+      const product = reactions[inputA.mineralType]?.[inputB.mineralType];
+      if (!product) return { ready: false, reason: "invalid-recipe" };
+      if (inputA.amount < reactionAmount || inputB.amount < reactionAmount) {
+        return { ready: false, reason: "reagent-shortage", product };
+      }
+      if (output.mineralType && output.mineralType !== product) {
+        return { ready: false, reason: "output-mineral-conflict", product };
+      }
+      if (output.freeCapacity < reactionAmount) {
+        return { ready: false, reason: "output-full", product };
+      }
+      if (inputA.range > 2 || inputB.range > 2) {
+        return { ready: false, reason: "input-out-of-range", product };
+      }
+      return { ready: true, reason: "ready", product };
+    }
+
+    const inputA = { mineralType: "H", amount: 100, range: 2 };
+    const inputB = { mineralType: "O", amount: 100, range: 2 };
+    const output = { mineralType: null, freeCapacity: 100, cooldown: 0 };
+
+    assert.equal(evaluateReactionPlan({ inputA: null, inputB, output, reactionAmount: 5 }).reason, "lab-missing");
+    assert.equal(evaluateReactionPlan({ inputA, inputB, output: { ...output, cooldown: 1 }, reactionAmount: 5 }).reason, "output-waiting");
+    assert.equal(evaluateReactionPlan({ inputA: { ...inputA, mineralType: "U" }, inputB, output, reactionAmount: 5 }).reason, "invalid-recipe");
+    assert.equal(evaluateReactionPlan({ inputA: { ...inputA, amount: 4 }, inputB, output, reactionAmount: 5 }).reason, "reagent-shortage");
+    assert.equal(evaluateReactionPlan({ inputA, inputB, output: { ...output, mineralType: "ZK" }, reactionAmount: 5 }).reason, "output-mineral-conflict");
+    assert.equal(evaluateReactionPlan({ inputA, inputB, output: { ...output, freeCapacity: 4 }, reactionAmount: 5 }).reason, "output-full");
+    assert.equal(evaluateReactionPlan({ inputA: { ...inputA, range: 3 }, inputB, output, reactionAmount: 5 }).reason, "input-out-of-range");
+    assert.deepEqual(evaluateReactionPlan({ inputA, inputB, output, reactionAmount: 5 }), {
+      ready: true,
+      reason: "ready",
+      product: "OH",
+    });
+  },
+);
+
 for (const result of results) {
   console.log(`模拟通过：${result.name} — ${result.detail}`);
 }
