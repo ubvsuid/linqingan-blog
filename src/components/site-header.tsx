@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { Container } from "@/components/container";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
+import { knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { siteConfig } from "@/lib/site";
 
 export function SiteHeader() {
@@ -17,6 +18,9 @@ export function SiteHeader() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
   const isBeginnerArticle = beginnerSeriesSlugs.some(
+    (slug) => pathname === `/blog/${slug}`,
+  );
+  const isKnowledgeArticle = knowledgeBaseSlugs.some(
     (slug) => pathname === `/blog/${slug}`,
   );
 
@@ -58,11 +62,16 @@ export function SiteHeader() {
     }
 
     if (href === "/blog") {
-      return pathname === "/blog" || (pathname.startsWith("/blog/") && !isBeginnerArticle);
+      return (
+        pathname === "/blog" ||
+        (pathname.startsWith("/blog/") &&
+          !isBeginnerArticle &&
+          !isKnowledgeArticle)
+      );
     }
 
     if (href === "/knowledge") {
-      return pathname === "/knowledge" || (pathname.startsWith("/blog/") && !isBeginnerArticle);
+      return pathname.startsWith("/knowledge") || isKnowledgeArticle;
     }
 
     if (href === "/resources") {
@@ -190,4 +199,3 @@ export function SiteHeader() {
     </header>
   );
 }
-
