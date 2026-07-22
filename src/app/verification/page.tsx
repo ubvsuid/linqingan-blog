@@ -28,9 +28,9 @@ const verificationLevels = [
   {
     number: "03",
     title: "离线模拟已通过",
-    status: "simulationChecked",
+    status: "offlineSimulation",
     description:
-      "使用简化的 Screeps Mock 对象模拟多个 tick、对象缺失、距离不足、Store 变化和常见返回码。它适合发现分支和状态问题，但不能替代官方服务器环境。",
+      "使用简化的 Screeps Mock 或普通对象模拟多个输入、对象缺失、距离不足、Store 变化和常见返回码。它适合发现分支和状态问题，但不能替代官方服务器环境。",
   },
   {
     number: "04",
@@ -60,7 +60,7 @@ export default function VerificationPage() {
     <main className="page-shell verification-page">
       <Container>
         <nav className="verification-breadcrumb" aria-label="面包屑">
-          <Link href="/resources">资料中心</Link>
+          <Link href="/knowledge">知识库</Link>
           <span aria-hidden="true">/</span>
           <span>验证方法</span>
         </nav>
@@ -98,9 +98,7 @@ export default function VerificationPage() {
             <h2 id="verification-principles-title">验证边界</h2>
           </div>
           <ul>
-            {principles.map((principle) => (
-              <li key={principle}>{principle}</li>
-            ))}
+            {principles.map((principle) => <li key={principle}>{principle}</li>)}
           </ul>
         </section>
 
@@ -108,12 +106,12 @@ export default function VerificationPage() {
           <div>
             <p className="eyebrow">CONTINUE</p>
             <h2 id="verification-next-title">继续查看</h2>
-            <p>阅读文章时，可以把验证状态和正文中的限制说明放在一起判断。</p>
+            <p>阅读文章时，可以把验证状态、测试环境和正文中的限制说明放在一起判断。</p>
           </div>
           <div>
             <Link href="/beginner">进入新手路线 →</Link>
             <Link href="/knowledge">浏览知识模块 →</Link>
-            <Link href="/resources">返回资料中心 →</Link>
+            <Link href="/tools/creep-body-calculator">使用已验证工具 →</Link>
           </div>
         </section>
       </Container>
