@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
+import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
 import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
 import { getAllPosts } from "@/lib/posts";
@@ -134,6 +135,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  const knowledgeModulePages: MetadataRoute.Sitemap = knowledgeBaseSections.map(
+    (section) => ({
+      url: `${siteConfig.url}/knowledge/${section.id}`,
+      lastModified: latestDate(
+        section.slugs.flatMap((slug) => {
+          const post = postsBySlug.get(slug);
+          return post ? [post.updatedAt ?? post.publishedAt] : [];
+        }),
+      ),
+      changeFrequency: "weekly",
+      priority: 0.86,
+    }),
+  );
+
   const archivePages: MetadataRoute.Sitemap = [
     ...createArchivePages(
       "/blog",
@@ -183,6 +198,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticPages,
+    ...knowledgeModulePages,
     ...archivePages,
     ...posts,
     ...tagPages,
