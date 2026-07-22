@@ -10,7 +10,7 @@ import { getTagRecords } from "@/lib/tags";
 
 export const metadata = createPageMetadata({
   title: "Screeps 资料中心",
-  description: "查询 Screeps 常见术语、API 返回值、文章标签和站内全部公开内容。",
+  description: "查询 Screeps 常见术语、API 返回值、文章标签、验证方法和站内公开内容。",
   path: "/resources",
 });
 
@@ -50,6 +50,13 @@ const resources = [
     href: "/tags",
     count: `${getTagRecords().length} 个标签`,
   },
+  {
+    eyebrow: "VERIFICATION",
+    title: "文章验证方法",
+    description: "了解文档核对、语法检查、离线模拟、Console 和真实主循环验证的区别。",
+    href: "/verification",
+    count: "5 种验证状态",
+  },
 ];
 
 export default function ResourcesPage() {
@@ -60,7 +67,7 @@ export default function ResourcesPage() {
           <p className="eyebrow">RESOURCES</p>
           <h1>资料中心</h1>
           <p>
-            文章负责连续学习，资料中心负责在遇到问题时快速查询。现在可以从一个入口搜索文章、术语、错误码、标签和项目。
+            文章负责连续学习，资料中心负责在遇到问题时快速查询。现在可以从一个入口搜索文章、术语、错误码、标签、项目和验证说明。
           </p>
         </header>
 
