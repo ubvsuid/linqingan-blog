@@ -7,6 +7,16 @@ const checks = [
     forbidden: ["<HomeLearningActions />"],
   },
   {
+    path: "src/components/home-task-hub.tsx",
+    required: ["你现在想完成什么", "linqingan:recent-articles", "最近阅读"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/home-maintenance-panel.tsx",
+    required: ["home-timeline", "维护时间流"],
+    forbidden: ["home-maintenance-grid", "home-change-strip"],
+  },
+  {
     path: "src/lib/site.ts",
     required: ["入门路线", "全部文章", "/knowledge#reference-tools"],
     forbidden: [],
@@ -18,7 +28,12 @@ const checks = [
   },
   {
     path: "src/app/blog/[slug]/page.tsx",
-    required: ["ArticleReadingExperience", "article-page-toc", "ArticleFeedback"],
+    required: ["ArticleReadingExperience", "ArticleLearningContext", "article-page-toc", "ArticleFeedback"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-learning-context.tsx",
+    required: ["难度", "适用阶段", "前置知识", "模块位置"],
     forbidden: [],
   },
   {
@@ -28,8 +43,13 @@ const checks = [
   },
   {
     path: "src/components/site-search.tsx",
-    required: ["site_search_no_results", "site_search_result_click", "handleSuggestionKeyDown"],
+    required: ["site_search_no_results", "site_search_result_click", "handleSuggestionKeyDown", "fullIndexRequested", "/api/search-index"],
     forbidden: ["useEffect(() => {\n    setActiveSuggestionIndex(-1);"],
+  },
+  {
+    path: "src/app/api/search-index/route.ts",
+    required: ["getSearchDocuments", "s-maxage=86400"],
+    forbidden: [],
   },
   {
     path: "src/app/tools/creep-body-calculator/page.tsx",
@@ -44,6 +64,16 @@ const checks = [
   {
     path: "src/app/globals.css",
     required: ["FINAL DESIGN OVERHAUL", "prefers-reduced-motion", "article-floating-toc"],
+    forbidden: [],
+  },
+  {
+    path: ".github/workflows/site-quality-audit.yml",
+    required: ["Lighthouse CI", "schedule"],
+    forbidden: [],
+  },
+  {
+    path: ".github/workflows/quarterly-content-review.yml",
+    required: ["articles:priority", "upload-artifact"],
     forbidden: [],
   },
 ];
