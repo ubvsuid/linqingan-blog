@@ -35,6 +35,40 @@ function patchInternalLinkCheck() {
   fs.writeFileSync(filePath, source);
 }
 
+function patchRouteCheck() {
+  const filePath = "scripts/check-routes.mjs";
+  let source = fs.readFileSync(filePath, "utf8");
+
+  source = source.replace(
+    `  "/tools/creep-body-calculator",\n  "/verification",`,
+    `  "/tools/creep-body-calculator",\n  "/tools/room-diagnostics",\n  "/verification",`,
+  );
+
+  const routeHelperAnchor = `]);\n\nfor (const fileName of files) {`;
+  const routeHelper = `]);\n\nfunction isExistingPublicDiagram(href) {\n  return /^\\/diagrams\\/[a-z0-9-]+\\.svg$/.test(href)\n    && fs.existsSync(path.join(root, "public", href.slice(1)));\n}\n\nfor (const fileName of files) {`;
+  if (source.includes(routeHelperAnchor)) {
+    source = source.replace(routeHelperAnchor, routeHelper);
+  } else if (!source.includes("function isExistingPublicDiagram")) {
+    throw new Error("Unable to add public diagram helper to route check");
+  }
+
+  const linkConditionBefore = `      !knownRoutes.has(href) &&\n      !href.startsWith("/blog/page/") &&`;
+  const linkConditionAfter = `      !knownRoutes.has(href) &&\n      !isExistingPublicDiagram(href) &&\n      !href.startsWith("/blog/page/") &&`;
+  if (source.includes(linkConditionBefore)) {
+    source = source.replace(linkConditionBefore, linkConditionAfter);
+  } else if (!source.includes("!isExistingPublicDiagram(href)")) {
+    throw new Error("Unable to add diagram validation to route links");
+  }
+
+  source = source.replace(
+    `  ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],\n  ["/verification",`,
+    `  ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],\n  ["/tools/room-diagnostics", "src/app/tools/room-diagnostics/page.tsx"],\n  ["/verification",`,
+  );
+
+  fs.writeFileSync(filePath, source);
+}
+
 patchContentCheck();
 patchInternalLinkCheck();
-console.log("P2 public diagram assets and diagnostics route registered with link checks.");
+patchRouteCheck();
+console.log("P2 public diagrams and diagnostics route registered with all link and route checks.");
