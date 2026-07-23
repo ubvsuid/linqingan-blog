@@ -1,16 +1,31 @@
 import fs from "node:fs";
 
-const filePath = "src/app/blog/[slug]/page.tsx";
-let source = fs.readFileSync(filePath, "utf8");
-const anchor = '  const articleUrl = `${siteConfig.url}/blog/${post.slug}`;';
-const replacement = `${anchor}\n  const socialImage = post.cover ?? \`\${siteConfig.url}/blog/\${post.slug}/opengraph-image\`;`;
+const articlePath = "src/app/blog/[slug]/page.tsx";
+let article = fs.readFileSync(articlePath, "utf8");
+const articleUrlAnchor = '  const articleUrl = `${siteConfig.url}/blog/${post.slug}`;';
+const articleUrlReplacement = `${articleUrlAnchor}\n  const socialImage = post.cover ?? \`\${siteConfig.url}/blog/\${post.slug}/opengraph-image\`;`;
 
-if (!source.includes(replacement)) {
-  if (!source.includes(anchor)) {
+if (!article.includes(articleUrlReplacement)) {
+  if (!article.includes(articleUrlAnchor)) {
     throw new Error("Unable to scope article social image");
   }
-  source = source.replace(anchor, replacement);
+  article = article.replace(articleUrlAnchor, articleUrlReplacement);
 }
 
-fs.writeFileSync(filePath, source);
-console.log("Article social image structured-data scope corrected.");
+article = article.replace(
+  `  const hasRuntimeVerification =
+    post.verification.consoleTested || post.verification.liveTested;
+`,
+  "",
+);
+fs.writeFileSync(articlePath, article);
+
+const smokePath = "scripts/smoke-test.mjs";
+let smoke = fs.readFileSync(smokePath, "utf8");
+smoke = smoke
+  .replace('"已经遇到问题？"', '"常用查询工具"')
+  .replaceAll('"验证状态"', '"查看验证详情"')
+  .replaceAll('"离线验证环境"', '"测试环境"');
+fs.writeFileSync(smokePath, smoke);
+
+console.log("Article image scope, obsolete verification flag and smoke expectations corrected.");
