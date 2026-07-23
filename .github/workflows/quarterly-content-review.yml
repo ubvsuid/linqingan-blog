@@ -1,0 +1,49 @@
+name: Quarterly content review
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 1 1,4,7,10 *"
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply content migrations and validate articles
+        run: npm run contentcheck
+
+      - name: Run design, route, link and code checks
+        run: |
+          npm run designcheck
+          npm run routecheck
+          npm run linkcheck
+          npm run codecheck
+          npm run simulationcheck
+          npm run typecheck
+          npm run lint
+
+      - name: Generate maintenance priority report
+        run: npm run articles:priority > article-priority-report.txt
+
+      - name: Upload maintenance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: article-priority-report
+          path: article-priority-report.txt
+          retention-days: 90
