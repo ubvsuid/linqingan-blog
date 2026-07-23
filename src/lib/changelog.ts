@@ -18,6 +18,18 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-23-room-diagnostics-indexing",
+    date: "2026-07-23",
+    type: "SEO",
+    title: "补齐房间诊断工具索引与发布检查",
+    summary:
+      "将房间运行诊断工具加入 Sitemap，并新增公开工具索引门禁。以后新增公开工具时，如果页面没有进入 Sitemap，生产构建会直接失败。",
+    links: [
+      { label: "使用房间诊断工具", href: "/tools/room-diagnostics" },
+      { label: "打开工具中心", href: "/knowledge#reference-tools" },
+    ],
+  },
+  {
     id: "2026-07-23-site-audit-checklist",
     date: "2026-07-23",
     type: "网站",
@@ -87,17 +99,5 @@ export const changelogEntries: ChangelogEntry[] = [
     summary:
       "将重复的项目介绍区改为搜索、错误码、术语表和 Creep 身体计算器入口，帮助访客更快进入实际问题。",
     links: [{ label: "查看首页", href: "/" }],
-  },
-  {
-    id: "2026-07-22-merge-resources-projects",
-    date: "2026-07-22",
-    type: "网站",
-    title: "合并资料中心与项目页面",
-    summary:
-      "把术语、错误码、标签、验证方法和工具规划并入知识库，把公开项目说明并入关于页面；旧地址保留永久重定向，减少重复页面。",
-    links: [
-      { label: "查看知识库", href: "/knowledge#reference-tools" },
-      { label: "查看公开项目", href: "/about#public-projects" },
-    ],
   },
 ];
