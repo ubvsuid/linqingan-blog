@@ -30,56 +30,57 @@ const popularQuestions = [
 export function HomeMaintenancePanel() {
   const posts = getAllPosts();
   const postsBySlug = new Map(posts.map((post) => [post.slug, post]));
-  const recentRevisions = getRecentArticleRevisions(3);
-  const latestChanges = changelogEntries.slice(0, 3);
+  const recentRevisions = getRecentArticleRevisions(4);
+  const latestChanges = changelogEntries.slice(0, 4);
+  const timelineItems = [
+    ...recentRevisions.map((revision) => ({
+      id: `revision-${revision.slug}-${revision.date}`,
+      date: revision.date,
+      type: "文章修订",
+      title: postsBySlug.get(revision.slug)?.title ?? revision.slug,
+      summary: revision.reason,
+      href: `/blog/${revision.slug}`,
+    })),
+    ...latestChanges.map((entry) => ({
+      id: entry.id,
+      date: entry.date,
+      type: entry.type,
+      title: entry.title,
+      summary: entry.summary,
+      href: entry.links?.[0]?.href ?? "/changelog",
+    })),
+  ]
+    .sort((left, right) => right.date.localeCompare(left.date))
+    .slice(0, 6);
 
   return (
     <section className="home-maintenance" aria-labelledby="home-maintenance-title">
       <div className="home-maintenance-heading">
         <div>
           <p className="eyebrow">POPULAR & RECENTLY FIXED</p>
-          <h2 id="home-maintenance-title">热门问题与最近修正</h2>
+          <h2 id="home-maintenance-title">热门问题与维护时间流</h2>
         </div>
         <Link href="/changelog">查看全部更新日志 →</Link>
       </div>
 
-      <div className="home-maintenance-grid">
-        <div className="home-maintenance-column">
-          <h3>常见问题</h3>
-          <div className="home-question-list">
-            {popularQuestions.map((item) => (
-              <Link href={item.href} key={item.href}>
-                <strong>{item.label}</strong>
-                <span>{item.description}</span>
-                <small aria-hidden="true">→</small>
-              </Link>
-            ))}
-          </div>
-        </div>
+      <nav className="home-question-strip" aria-label="热门问题">
+        {popularQuestions.map((item) => (
+          <Link href={item.href} key={item.href}>
+            <strong>{item.label}</strong>
+            <span>{item.description}</span>
+            <small aria-hidden="true">→</small>
+          </Link>
+        ))}
+      </nav>
 
-        <div className="home-maintenance-column">
-          <h3>文章修订</h3>
-          <div className="home-revision-list">
-            {recentRevisions.map((revision) => {
-              const post = postsBySlug.get(revision.slug);
-              return (
-                <Link href={`/blog/${revision.slug}`} key={revision.slug}>
-                  <time dateTime={revision.date}>{revision.date}</time>
-                  <strong>{post?.title ?? revision.slug}</strong>
-                  <span>{revision.reason}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className="home-change-strip" aria-label="最近网站更新">
-        {latestChanges.map((entry) => (
-          <article key={entry.id}>
-            <span>{entry.type}</span>
-            <strong>{entry.title}</strong>
-          </article>
+      <div className="home-timeline" aria-label="最近文章修订与网站更新">
+        {timelineItems.map((item) => (
+          <Link href={item.href} key={item.id}>
+            <time dateTime={item.date}>{item.date}</time>
+            <span>{item.type}</span>
+            <strong>{item.title}</strong>
+            <p>{item.summary}</p>
+          </Link>
         ))}
       </div>
 
@@ -88,20 +89,70 @@ export function HomeMaintenancePanel() {
         .home-maintenance-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
         .home-maintenance-heading h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 56px); letter-spacing: -.045em; }
         .home-maintenance-heading > a { font-weight: 700; }
-        .home-maintenance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-        .home-maintenance-column { border: 1px solid var(--border); border-radius: 24px; padding: clamp(24px, 4vw, 38px); background: var(--surface); }
-        .home-maintenance-column h3 { margin: 0 0 22px; font-size: 24px; }
-        .home-question-list, .home-revision-list { display: grid; border-top: 1px solid var(--border); }
-        .home-question-list a, .home-revision-list a { position: relative; display: grid; gap: 7px; border-bottom: 1px solid var(--border); padding: 18px 34px 18px 0; }
-        .home-question-list a:hover, .home-revision-list a:hover { text-decoration: none; }
-        .home-question-list span, .home-revision-list span { color: var(--muted); font-size: 13px; line-height: 1.55; }
-        .home-question-list small { position: absolute; top: 20px; right: 0; }
-        .home-revision-list time { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; }
-        .home-change-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
-        .home-change-strip article { display: grid; gap: 7px; border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; }
-        .home-change-strip span { color: var(--muted); font-size: 11px; }
-        @media (max-width: 820px) { .home-maintenance-grid, .home-change-strip { grid-template-columns: 1fr; } }
-        @media (max-width: 620px) { .home-maintenance-heading { align-items: start; flex-direction: column; } }
+        .home-question-strip {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+        }
+        .home-question-strip a {
+          position: relative;
+          display: grid;
+          gap: 7px;
+          padding: 20px 34px 20px 0;
+        }
+        .home-question-strip a + a {
+          border-left: 1px solid var(--border);
+          padding-left: 20px;
+        }
+        .home-question-strip a:hover { text-decoration: none; }
+        .home-question-strip span { color: var(--muted); font-size: 12px; line-height: 1.55; }
+        .home-question-strip small { position: absolute; top: 22px; right: 10px; }
+        .home-timeline {
+          position: relative;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0 42px;
+          margin-top: 42px;
+        }
+        .home-timeline::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 50%;
+          width: 1px;
+          background: var(--border);
+        }
+        .home-timeline a {
+          position: relative;
+          display: grid;
+          grid-template-columns: auto auto minmax(0, 1fr);
+          gap: 8px 12px;
+          border-top: 1px solid var(--border);
+          padding: 21px 0 24px;
+        }
+        .home-timeline a:hover { text-decoration: none; }
+        .home-timeline time,
+        .home-timeline > a > span {
+          color: var(--muted);
+          font-family: "SFMono-Regular", Consolas, monospace;
+          font-size: 10px;
+        }
+        .home-timeline strong { grid-column: 1 / -1; line-height: 1.45; }
+        .home-timeline p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+        @media (max-width: 900px) {
+          .home-question-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .home-question-strip a:nth-child(3) { border-left: 0; }
+          .home-question-strip a:nth-child(n + 3) { border-top: 1px solid var(--border); }
+          .home-timeline { grid-template-columns: 1fr; }
+          .home-timeline::before { display: none; }
+        }
+        @media (max-width: 620px) {
+          .home-maintenance-heading { align-items: start; flex-direction: column; }
+          .home-question-strip { grid-template-columns: 1fr; }
+          .home-question-strip a + a { border-top: 1px solid var(--border); border-left: 0; padding-left: 0; }
+        }
       `}</style>
     </section>
   );
