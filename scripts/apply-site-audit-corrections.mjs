@@ -58,7 +58,7 @@ if (!smoke.includes("const fullIndexResponse")) {
   ].join("\n");
   smoke = smoke.replace(
     'const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);',
-    `${auditChecks}\n\nconst sitemapResponse = await fetch(\`${baseUrl}/sitemap.xml\`);`,
+    auditChecks + '\n\nconst sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);',
   );
 }
 
