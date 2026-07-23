@@ -11,7 +11,10 @@ interface ArticleLearningContextProps {
   slug: string;
 }
 
-function getKnowledgeStage(index: number, stages: readonly { title: string; from: number; to: number }[]) {
+function getKnowledgeStage<T extends { title: string; from: number; to: number }>(
+  index: number,
+  stages: readonly T[],
+): T {
   return stages.find((stage) => index >= stage.from && index < stage.to) ?? stages[stages.length - 1];
 }
 
