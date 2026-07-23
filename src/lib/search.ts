@@ -17,6 +17,10 @@ export interface SearchDocument {
   text: string;
 }
 
+interface SearchDocumentOptions {
+  includeArticleText?: boolean;
+}
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:creep-body-calculator",
@@ -37,9 +41,20 @@ const toolDocuments: SearchDocument[] = [
     ],
     text: "Screeps 身体部件 成本 Spawn 生成时间 50 个部件 MOVE 比例 Road Plain Swamp",
   },
+  {
+    id: "tool:room-diagnostics",
+    type: "工具",
+    title: "Screeps 房间运行诊断",
+    description: "检查 Spawn、角色数量、Energy、Controller、工地和 CPU 风险。",
+    href: "/tools/room-diagnostics",
+    meta: "免费工具 · 支持配置分享",
+    keywords: ["房间诊断", "Spawn", "角色数量", "Controller", "CPU", "Energy"],
+    text: "Screeps 房间运行 检查 断代 Spawn Energy Controller 工地 CPU bucket",
+  },
 ];
 
-export function getSearchDocuments(): SearchDocument[] {
+export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchDocument[] {
+  const includeArticleText = options.includeArticleText ?? true;
   const posts: SearchDocument[] = getSearchablePosts().map((post) => {
     const section = getKnowledgeBaseSectionBySlug(post.slug);
     return {
@@ -54,7 +69,7 @@ export function getSearchDocuments(): SearchDocument[] {
         post.category,
         ...(section ? [section.title, section.description] : []),
       ],
-      text: post.text,
+      text: includeArticleText ? post.text : "",
     };
   });
 
