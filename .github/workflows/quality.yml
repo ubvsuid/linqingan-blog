@@ -34,7 +34,31 @@ jobs:
         run: npm ci
 
       - name: Run complete production quality gate
-        run: npm run build
+        id: quality-gate
+        shell: bash
+        run: |
+          set +e
+          npm run build > quality-build.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload quality build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-quality-build-log
+          path: quality-build.log
+          retention-days: 14
+
+      - name: Print failed build log tail
+        if: steps.quality-gate.outputs.status != '0'
+        run: tail -n 240 quality-build.log
+
+      - name: Fail when quality gate failed
+        if: steps.quality-gate.outputs.status != '0'
+        run: exit 1
 
       - name: Print verification backlog
+        if: steps.quality-gate.outputs.status == '0'
         run: npm run verification:report
