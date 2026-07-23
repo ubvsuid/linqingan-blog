@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Screeps Link Energy 流程</title>
+  <desc id="desc">Source Link 由采集点输入 Energy，经统一调度发送到 Controller Link 或 Storage Link，并检查 cooldown、同房间和目标容量。</desc>
+  <rect width="1200" height="620" fill="#0f172a"/>
+  <text x="600" y="62" text-anchor="middle" fill="#f8fafc" font-family="Arial, sans-serif" font-size="34" font-weight="700">Link Energy 流程</text>
+  <text x="600" y="101" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="18">固定 ID 识别身份，由一个模块统一安排每 tick 的发送</text>
+  <rect x="70" y="210" width="270" height="170" rx="22" fill="#172554" stroke="#60a5fa" stroke-width="3"/>
+  <text x="205" y="257" text-anchor="middle" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="23" font-weight="700">Source Link</text>
+  <text x="205" y="298" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="17">采集点附近</text>
+  <text x="205" y="332" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="16">检查库存与 cooldown</text>
+  <rect x="465" y="195" width="270" height="200" rx="22" fill="#3f1d0b" stroke="#fb923c" stroke-width="3"/>
+  <text x="600" y="242" text-anchor="middle" fill="#fed7aa" font-family="Arial, sans-serif" font-size="23" font-weight="700">Link 调度模块</text>
+  <text x="600" y="282" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="16">同房间 / 非同一对象</text>
+  <text x="600" y="312" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="16">目标空余 / minimumSend</text>
+  <text x="600" y="342" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="16">每 tick 最多安排一次</text>
+  <rect x="860" y="130" width="270" height="160" rx="22" fill="#052e16" stroke="#4ade80" stroke-width="3"/>
+  <text x="995" y="178" text-anchor="middle" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="23" font-weight="700">Controller Link</text>
+  <text x="995" y="218" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="16">为固定 Upgrader 供能</text>
+  <text x="995" y="250" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="15">保留目标空位配置</text>
+  <rect x="860" y="350" width="270" height="160" rx="22" fill="#312e81" stroke="#a78bfa" stroke-width="3"/>
+  <text x="995" y="398" text-anchor="middle" fill="#ddd6fe" font-family="Arial, sans-serif" font-size="23" font-weight="700">Storage Link</text>
+  <text x="995" y="438" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="16">集中回收多余 Energy</text>
+  <text x="995" y="470" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="15">按房间优先级选择</text>
+  <path d="M340 295 L465 295" stroke="#60a5fa" stroke-width="5" marker-end="url(#arrowBlue)"/>
+  <path d="M735 255 C790 255 805 210 860 210" fill="none" stroke="#4ade80" stroke-width="5" marker-end="url(#arrowGreen)"/>
+  <path d="M735 335 C790 335 805 430 860 430" fill="none" stroke="#a78bfa" stroke-width="5" marker-end="url(#arrowPurple)"/>
+  <rect x="292" y="510" width="616" height="68" rx="16" fill="#1e293b" stroke="#475569"/>
+  <text x="600" y="538" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="16">服务器按 LINK_LOSS_RATIO 结算损耗</text>
+  <text x="600" y="563" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="15">真实接收量应在下一 tick 重新读取 Store，而不是由本地估算替代</text>
+  <defs>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#60a5fa"/></marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#4ade80"/></marker>
+    <marker id="arrowPurple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#a78bfa"/></marker>
+  </defs>
+</svg>
