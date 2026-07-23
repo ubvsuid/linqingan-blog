@@ -8,7 +8,7 @@
   "scripts": {
     "predev": "npm run contentcheck",
     "dev": "next dev",
-    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run linkcheck && npm run codecheck && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
+    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run linkcheck && npm run codecheck && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
     "build": "next build && node scripts/run-smoke.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -17,6 +17,7 @@
     "contentcheck": "node scripts/content-check.mjs",
     "designcheck": "node scripts/check-final-design.mjs",
     "routecheck": "node scripts/check-routes.mjs",
+    "toolindexcheck": "node scripts/check-tool-indexing.mjs",
     "linkcheck": "node scripts/check-internal-links.mjs",
     "codecheck": "node scripts/check-code-blocks.mjs",
     "simulationcheck": "node scripts/run-article-simulations.mjs",

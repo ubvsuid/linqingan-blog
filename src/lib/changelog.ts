@@ -18,6 +18,18 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-23-room-diagnostics-indexing",
+    date: "2026-07-23",
+    type: "SEO",
+    title: "补齐房间诊断工具索引与发布检查",
+    summary:
+      "将房间运行诊断工具加入 Sitemap，并新增公开工具索引门禁。以后新增公开工具时，如果页面没有进入 Sitemap，生产构建会直接失败。",
+    links: [
+      { label: "使用房间诊断工具", href: "/tools/room-diagnostics" },
+      { label: "打开工具中心", href: "/knowledge#reference-tools" },
+    ],
+  },
+  {
     id: "2026-07-23-site-audit-checklist",
     date: "2026-07-23",
     type: "网站",
