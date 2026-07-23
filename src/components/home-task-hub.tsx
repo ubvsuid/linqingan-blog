@@ -1,13 +1,65 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useSyncExternalStore } from "react";
 
 import { useBeginnerProgress } from "@/hooks/use-beginner-progress";
 import { getBeginnerResumeSlug } from "@/lib/beginner-progress";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 
+interface RecentArticle {
+  slug: string;
+  title: string;
+  href: string;
+  visitedAt: string;
+}
+
+const RECENT_STORAGE_KEY = "linqingan:recent-articles";
+
+function parseRecentArticles(value: string | null): RecentArticle[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (item): item is RecentArticle =>
+        Boolean(
+          item &&
+          typeof item.slug === "string" &&
+          typeof item.title === "string" &&
+          typeof item.href === "string" &&
+          typeof item.visitedAt === "string",
+        ),
+    );
+  } catch {
+    return [];
+  }
+}
+
+function useRecentArticles() {
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === RECENT_STORAGE_KEY) onStoreChange();
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("site:recent-articles", onStoreChange);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("site:recent-articles", onStoreChange);
+    };
+  }, []);
+
+  const getSnapshot = useCallback(
+    () => window.localStorage.getItem(RECENT_STORAGE_KEY) ?? "[]",
+    [],
+  );
+  const rawValue = useSyncExternalStore(subscribe, getSnapshot, () => "[]");
+  return parseRecentArticles(rawValue);
+}
+
 export function HomeTaskHub() {
   const progress = useBeginnerProgress();
+  const recentArticles = useRecentArticles();
   const resumeSlug = getBeginnerResumeSlug(progress);
   const resumeIndex = beginnerSeriesSlugs.indexOf(resumeSlug) + 1;
   const hasProgress = Boolean(
@@ -67,6 +119,20 @@ export function HomeTaskHub() {
           </div>
         </article>
       </div>
+
+      {recentArticles.length > 0 ? (
+        <div className="home-recent-reading" aria-label="最近阅读">
+          <span>最近阅读</span>
+          <div>
+            {recentArticles.slice(0, 3).map((article) => (
+              <Link href={article.href} key={article.slug}>
+                <strong>{article.title}</strong>
+                <small>继续阅读 →</small>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <style>{`
         .home-task-hub {
@@ -175,9 +241,42 @@ export function HomeTaskHub() {
           font-weight: 700;
           cursor: pointer;
         }
+        .home-recent-reading {
+          display: grid;
+          grid-template-columns: 120px minmax(0, 1fr);
+          gap: 18px;
+          margin-top: 14px;
+          border-top: 1px solid var(--border);
+          padding-top: 18px;
+        }
+        .home-recent-reading > span {
+          color: var(--muted);
+          font-family: "SFMono-Regular", Consolas, monospace;
+          font-size: 11px;
+          letter-spacing: .08em;
+        }
+        .home-recent-reading > div {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .home-recent-reading a {
+          display: grid;
+          gap: 5px;
+          min-width: 0;
+        }
+        .home-recent-reading strong {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 13px;
+        }
+        .home-recent-reading small { color: var(--muted); }
         @media (max-width: 920px) {
           .home-task-grid { grid-template-columns: 1fr; }
           .home-task-card { min-height: 0; }
+          .home-recent-reading { grid-template-columns: 1fr; }
+          .home-recent-reading > div { grid-template-columns: 1fr; }
         }
         @media (max-width: 520px) {
           .home-task-hub { margin-top: 38px; }
