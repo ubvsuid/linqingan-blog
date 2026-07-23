@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "precontentcheck": "node scripts/apply-p0-guards.mjs && node scripts/apply-p0-guard-corrections.mjs",
+    "precontentcheck": "node scripts/apply-p0-guards.mjs && node scripts/apply-p0-guard-corrections.mjs && node scripts/apply-p0-smoke-corrections.mjs",
     "contentcheck": "node scripts/content-check.mjs",
     "routecheck": "node scripts/check-routes.mjs",
     "linkcheck": "node scripts/check-internal-links.mjs",
@@ -36,8 +36,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.2.0",
     "typescript": "^5.9.0"
