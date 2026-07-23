@@ -23,6 +23,7 @@ const staticPageDates = {
   screepsErrors: "2026-07-18",
   verification: "2026-07-22",
   creepBodyCalculator: "2026-07-22",
+  roomDiagnostics: "2026-07-23",
 };
 
 function createArchivePages(
@@ -112,6 +113,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(staticPageDates.creepBodyCalculator),
       changeFrequency: "monthly",
       priority: 0.86,
+    },
+    {
+      url: `${siteConfig.url}/tools/room-diagnostics`,
+      lastModified: new Date(staticPageDates.roomDiagnostics),
+      changeFrequency: "monthly",
+      priority: 0.84,
     },
     {
       url: `${siteConfig.url}/glossary`,
