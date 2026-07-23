@@ -18,6 +18,19 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-23-complete-experience-overhaul",
+    date: "2026-07-23",
+    type: "网站",
+    title: "完成网站设计、阅读、搜索与维护体验升级",
+    summary:
+      "首页改为任务分流并展示最近阅读；移动端保留搜索；文章增加难度、适用阶段、前置知识、阅读进度、悬浮目录、标题链接与图片放大；搜索增加行为记录、键盘联想和延迟全文索引；工具统一分享、重置和反馈入口，并加入月度 Lighthouse 与季度内容维护检查。",
+    links: [
+      { label: "查看首页", href: "/" },
+      { label: "使用站内搜索", href: "/search" },
+      { label: "打开工具中心", href: "/knowledge#reference-tools" },
+    ],
+  },
+  {
     id: "2026-07-22-creep-body-calculator",
     date: "2026-07-22",
     type: "工具",
