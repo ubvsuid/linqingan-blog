@@ -13,8 +13,10 @@ if (!source.includes("fullIndexRequested")) {
   );
 
   source = source.replace(
-    '  const normalizedQuery = normalize(query);',
-    `  const normalizedQuery = normalize(query);
+    `  const inputRef = useRef<HTMLInputElement>(null);
+  const normalizedQuery = normalize(query);`,
+    `  const inputRef = useRef<HTMLInputElement>(null);
+  const normalizedQuery = normalize(query);
   const searchableDocuments = expandedDocuments ?? documents;`,
   );
 
@@ -65,18 +67,35 @@ if (!source.includes("fullIndexRequested")) {
     const timeout = window.setTimeout(() => {`,
   );
 
-  source = source.replace(
-    `      </label>
-
-      <div className="site-search-filters"`,
-    `      </label>
-
-      <p className="search-index-status" aria-live="polite">
+  const statusBlock = `      <p className="search-index-status" aria-live="polite">
         {isLoadingFullIndex ? "正在加载文章正文索引…" : normalizedQuery && expandedDocuments ? "已启用全文搜索" : ""}
-      </p>
+      </p>`;
+  const suggestionAnchor = `      </label>
+
+      <div className="site-search-suggestions"`;
+  const filterAnchor = `      </label>
+
+      <div className="site-search-filters"`;
+
+  if (source.includes(suggestionAnchor)) {
+    source = source.replace(
+      suggestionAnchor,
+      `      </label>
+
+${statusBlock}
+
+      <div className="site-search-suggestions"`,
+    );
+  } else {
+    source = source.replace(
+      filterAnchor,
+      `      </label>
+
+${statusBlock}
 
       <div className="site-search-filters"`,
-  );
+    );
+  }
 
   source = source.replace(
     `        .site-search-filters {`,

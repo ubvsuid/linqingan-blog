@@ -27,33 +27,38 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Validate content
-        run: npm run contentcheck
-
-      - name: Validate routes
-        run: npm run routecheck
-
-      - name: Validate JavaScript examples
-        run: npm run codecheck
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Production build
-        run: npm run build
-
-      - name: Start production server and run route smoke tests
+      - name: Run complete production quality gate
+        id: quality-gate
+        shell: bash
         run: |
-          npm run start > /tmp/linqingan-site.log 2>&1 &
-          SITE_PID=$!
-          trap 'kill $SITE_PID || true' EXIT
-          npm run smoke
+          set +e
+          npm run build > quality-build.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload quality build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-quality-build-log
+          path: quality-build.log
+          retention-days: 14
+
+      - name: Print failed build log tail
+        if: steps.quality-gate.outputs.status != '0'
+        run: tail -n 240 quality-build.log
+
+      - name: Fail when quality gate failed
+        if: steps.quality-gate.outputs.status != '0'
+        run: exit 1
+
+      - name: Print verification backlog
+        if: steps.quality-gate.outputs.status == '0'
+        run: npm run verification:report

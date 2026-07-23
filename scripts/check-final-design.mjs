@@ -3,7 +3,7 @@ import fs from "node:fs";
 const checks = [
   {
     path: "src/app/page.tsx",
-    required: ["HomeTaskHub", "slice(0, 2)"],
+    required: ["HomeTaskHub", "slice(0, 2)", "screeps-room-grid"],
     forbidden: ["<HomeLearningActions />"],
   },
   {
@@ -28,7 +28,17 @@ const checks = [
   },
   {
     path: "src/app/blog/[slug]/page.tsx",
-    required: ["ArticleReadingExperience", "ArticleLearningContext", "article-page-toc", "ArticleFeedback"],
+    required: ["ArticleReadingExperience", "ArticleLearningContext", "ArticleToc", "ArticleVerificationSummary", "ArticleFeedback"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-toc.tsx",
+    required: ["article-page-toc", "toc-group-heading", "IntersectionObserver"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-verification-summary.tsx",
+    required: ["查看验证详情", "Screeps Console", "真实主循环"],
     forbidden: [],
   },
   {
@@ -38,17 +48,22 @@ const checks = [
   },
   {
     path: "src/components/article-feedback.tsx",
-    required: ["内容可能过时", "建议补充", "没解决"],
+    required: ["内容可能过时", "建议补充", "没解决", "article_feedback"],
     forbidden: ["needs-work"],
   },
   {
     path: "src/components/site-search.tsx",
-    required: ["site_search_no_results", "site_search_result_click", "handleSuggestionKeyDown", "fullIndexRequested", "/api/search-index"],
+    required: ["site_search_no_results", "site_search_result_click", "handleSuggestionKeyDown", "fullIndexRequested", "/api/search-index", "editDistance"],
     forbidden: ["useEffect(() => {\n    setActiveSuggestionIndex(-1);"],
   },
   {
     path: "src/app/api/search-index/route.ts",
     required: ["getSearchDocuments", "s-maxage=86400"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/blog/[slug]/opengraph-image.tsx",
+    required: ["ImageResponse", "SCREEPS · 中文知识库", "1200"],
     forbidden: [],
   },
   {
@@ -63,7 +78,7 @@ const checks = [
   },
   {
     path: "src/app/globals.css",
-    required: ["FINAL DESIGN OVERHAUL", "prefers-reduced-motion", "article-floating-toc"],
+    required: ["FINAL DESIGN OVERHAUL", "SITE AUDIT CHECKLIST FIXES", "prefers-reduced-motion", "article-floating-toc"],
     forbidden: [],
   },
   {
