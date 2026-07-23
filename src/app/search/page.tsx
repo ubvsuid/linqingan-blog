@@ -19,7 +19,7 @@ interface SearchPageProps {
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
-  const documents = getSearchDocuments();
+  const documents = getSearchDocuments({ includeArticleText: false });
 
   return (
     <main className="page-shell search-page">
