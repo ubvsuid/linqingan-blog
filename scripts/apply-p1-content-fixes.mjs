@@ -25,6 +25,21 @@ function patchPowerSpawnBoundaryWording() {
   fs.writeFileSync(filePath, source);
 }
 
+function patchRecycleHandoffWording() {
+  const filePath = "content/posts/screeps-spawn-recycle-creep.md";
+  let source = fs.readFileSync(filePath, "utf8");
+  const before = "- 只因为TTL较低但仍需完成交接。";
+  const after = "- 只因为TTL较低但仍需先完成任务移交。";
+
+  if (source.includes(before)) {
+    source = source.replace(before, after);
+  } else if (!source.includes(after)) {
+    throw new Error("Unable to update recycleCreep handoff wording");
+  }
+
+  fs.writeFileSync(filePath, source);
+}
+
 function patchContentWarnings() {
   const filePath = "scripts/content-check.mjs";
   let source = fs.readFileSync(filePath, "utf8");
@@ -78,5 +93,6 @@ function patchContentWarnings() {
 }
 
 patchPowerSpawnBoundaryWording();
+patchRecycleHandoffWording();
 patchContentWarnings();
 console.log("P1 content warning fixes applied.");
