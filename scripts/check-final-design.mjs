@@ -18,8 +18,8 @@ const checks = [
   },
   {
     path: "src/lib/site.ts",
-    required: ["入门路线", "全部文章", "/knowledge#reference-tools"],
-    forbidden: [],
+    required: ["入门", "文章", "/knowledge#reference-tools"],
+    forbidden: ["入门路线", "全部文章"],
   },
   {
     path: "src/components/site-header.tsx",
