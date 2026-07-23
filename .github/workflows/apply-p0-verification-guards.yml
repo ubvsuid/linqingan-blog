@@ -47,6 +47,15 @@ jobs:
             return source.replace(before, after);
           }
 
+          const emergencyPath = 'content/posts/screeps-spawn-emergency-recovery.md';
+          let emergency = fs.readFileSync(emergencyPath, 'utf8');
+          const invalidExample = /```js\n(for \(const spawn of Object\.values\(Game\.spawns\)\) \{\n  if \(harvesterCount === 0\) \{\n    spawn\.spawnCreep\(\.\.\.\);\n  \}\n\})\n```/;
+          if (!invalidExample.test(emergency)) {
+            throw new Error('Unable to patch emergency recovery pseudocode block');
+          }
+          emergency = emergency.replace(invalidExample, '```text\n$1\n```');
+          fs.writeFileSync(emergencyPath, emergency);
+
           const pagePath = 'src/app/blog/[slug]/page.tsx';
           let page = fs.readFileSync(pagePath, 'utf8');
 
@@ -105,7 +114,7 @@ jobs:
           check = replaceOnce(
             check,
             `    if (hasRuntimeEvidence) {\n      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(data.verification.testedAt ?? "")) {\n        addError(\`${'${fileName}'}: 已标记运行验证时必须填写 verification.testedAt\`);\n      }\n      for (const field of ["testEnvironment", "testResult"]) {\n        if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {\n          addError(\`${'${fileName}'}: 已标记运行验证时必须填写 verification.${'${field}'}\`);\n        }\n      }\n    }`,
-            `    if (hasRuntimeEvidence) {\n      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(data.verification.testedAt ?? "")) {\n        addError(\`${'${fileName}'}: 已标记运行验证时必须填写 verification.testedAt\`);\n      }\n      for (const field of ["testEnvironment", "testResult"]) {\n        if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {\n          addError(\`${'${fileName}'}: 已标记运行验证时必须填写 verification.${'${field}'}\`);\n        }\n      }\n      if (/离线模拟|不是\\s*Screeps\\s*官方服务器/i.test(data.verification.testEnvironment ?? "")) {\n        addError(\`${'${fileName}'}: 已标记 Console/真实主循环验证时，测试环境不能仍写成离线模拟\`);\n      }\n    } else {\n      const hasOfflineEvidence = Boolean(\n        data.verification.testedAt\n        || data.verification.testEnvironment\n        || data.verification.testResult,\n      );\n\n      if (hasOfflineEvidence) {\n        if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(data.verification.testedAt ?? "")) {\n          addError(\`${'${fileName}'}: 有离线验证记录时必须填写 verification.testedAt\`);\n        }\n        for (const field of ["testEnvironment", "testResult"]) {\n          if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {\n            addError(\`${'${fileName}'}: 有离线验证记录时必须填写 verification.${'${field}'}\`);\n          }\n        }\n\n        const environment = String(data.verification.testEnvironment ?? "");\n        if (!environment.includes("离线模拟") || !environment.includes("不是 Screeps 官方服务器")) {\n          addError(\`${'${fileName}'}: 未标记运行验证时，验证环境必须明确写出“离线模拟”和“不是 Screeps 官方服务器”\`);\n        }\n      }\n    }`,
+            `    if (hasRuntimeEvidence) {\n      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(data.verification.testedAt ?? "")) {\n        addError(\`${'${fileName}'}: 已标记运行验证时必须填写 verification.testedAt\`);\n      }\n      for (const field of ["testEnvironment", "testResult"]) {\n        if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {\n          addError(\`${'${fileName}'}: 已标记运行验证时必须填写 verification.${'${field}'}\`);\n        }\n      }\n      if (/离线模拟|不是\\s*Screeps\\s*官方服务器/i.test(data.verification.testEnvironment ?? "")) {\n        addError(\`${'${fileName}'}: 已标记 Console/真实主循环验证时，测试环境不能仍写成离线模拟\`);\n      }\n    } else {\n      const hasOfflineEvidence = Boolean(\n        data.verification.testedAt\n        || data.verification.testEnvironment\n        || data.verification.testResult,\n      );\n\n      if (hasOfflineEvidence) {\n        if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(data.verification.testedAt ?? "")) {\n          addError(\`${'${fileName}'}: 有离线验证记录时必须填写 verification.testedAt\`);\n        }\n        for (const field of ["testEnvironment", "testResult"]) {\n          if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {\n            addError(\`${'${fileName}'}: 有离线验证记录时必须填写 verification.${'${field}'}\`);\n          }\n        }\n\n        const environment = String(data.verification.testEnvironment ?? "");\n        if (!environment.includes("离线模拟") || !/不是\\s*Screeps\\s*官方服务器/i.test(environment)) {\n          addError(\`${'${fileName}'}: 未标记运行验证时，验证环境必须明确写出“离线模拟”和“不是 Screeps 官方服务器”\`);\n        }\n      }\n    }`,
             'verification evidence consistency',
           );
 
@@ -138,6 +147,7 @@ jobs:
           - Tower 维修必须先检查敌对单位再调用 repair；
           - Structure.destroy 与 Nuker 必须先关闭一次性请求再执行不可逆 API；
           - Observer 必须先读取上一 tick 结果，再提交新的观察请求；
+          - 将应急补员文章中的省略号伪代码改为纯文本示意，避免被误判为可运行 JavaScript；
           - 完整内容、路由、内链、代码、离线模拟、TypeScript、ESLint、生产构建和冒烟检查通过后提交。
 
           这些检查不能替代 Screeps 官方服务器 Console 或真实主循环验证。文章仍以各自 verification 状态为准。
