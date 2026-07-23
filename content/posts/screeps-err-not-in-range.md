@@ -10,7 +10,6 @@ tags:
   - "错误码"
   - "Creep API"
   - "moveTo"
-  - "距离"
 draft: false
 verification:
   docsChecked: true
@@ -19,7 +18,7 @@ verification:
   liveTested: false
   checkedAt: "2026-07-23"
   testedAt: "2026-07-23"
-  testEnvironment: "Node.js 22.16 离线语法检查（不是 Screeps Console 或官方服务器）"
+  testEnvironment: "Node.js 22.16 离线模拟环境（仅完成 JavaScript 语法检查，不是 Screeps 官方服务器）"
   testResult: "文中 JavaScript 示例通过语法检查；真实路径、移动结算和下一 tick 动作仍待 Screeps 环境验证。"
 featured: false
 ---
