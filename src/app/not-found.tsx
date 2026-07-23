@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+
+export const metadata: Metadata = {
+  title: { absolute: "页面不存在｜临清安" },
+  description: "这个页面不存在，可能已经移动、删除或网址输入有误。",
+  robots: { index: false, follow: false },
+  alternates: { canonical: null },
+};
 
 export default function NotFoundPage() {
   return (
