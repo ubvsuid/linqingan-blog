@@ -13,8 +13,10 @@ if (!source.includes("fullIndexRequested")) {
   );
 
   source = source.replace(
-    '  const normalizedQuery = normalize(query);',
-    `  const normalizedQuery = normalize(query);
+    `  const inputRef = useRef<HTMLInputElement>(null);
+  const normalizedQuery = normalize(query);`,
+    `  const inputRef = useRef<HTMLInputElement>(null);
+  const normalizedQuery = normalize(query);
   const searchableDocuments = expandedDocuments ?? documents;`,
   );
 
