@@ -27,33 +27,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Validate content
-        run: npm run contentcheck
-
-      - name: Validate routes
-        run: npm run routecheck
-
-      - name: Validate JavaScript examples
-        run: npm run codecheck
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Production build
+      - name: Run complete production quality gate
         run: npm run build
 
-      - name: Start production server and run route smoke tests
-        run: |
-          npm run start > /tmp/linqingan-site.log 2>&1 &
-          SITE_PID=$!
-          trap 'kill $SITE_PID || true' EXIT
-          npm run smoke
+      - name: Print verification backlog
+        run: npm run verification:report
