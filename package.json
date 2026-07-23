@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "precontentcheck": "node scripts/apply-p0-guards.mjs && node scripts/apply-p0-guard-corrections.mjs && node scripts/apply-p0-smoke-corrections.mjs && node scripts/apply-p1-content-fixes.mjs && node scripts/apply-p2-enhancements.mjs",
+    "precontentcheck": "node scripts/apply-p0-guards.mjs && node scripts/apply-p0-guard-corrections.mjs && node scripts/apply-p0-smoke-corrections.mjs && node scripts/apply-p1-content-fixes.mjs && node scripts/prepare-p2-layout.mjs && node scripts/apply-p2-enhancements.mjs",
     "contentcheck": "node scripts/content-check.mjs",
     "routecheck": "node scripts/check-routes.mjs",
     "linkcheck": "node scripts/check-internal-links.mjs",
