@@ -71,6 +71,15 @@ export const changelogEntries: ChangelogEntry[] = [
     links: [{ label: "查看更新日志", href: "/changelog" }],
   },
   {
+    id: "2026-07-22-changelog-launch",
+    date: "2026-07-22",
+    type: "网站",
+    title: "新增独立更新日志",
+    summary:
+      "集中记录网站结构、工具、验证、SEO 与内容修订，帮助读者判断页面最近发生了哪些实质变化。",
+    links: [{ label: "查看更新日志", href: "/changelog" }],
+  },
+  {
     id: "2026-07-22-home-quick-lookup",
     date: "2026-07-22",
     type: "网站",
