@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Creep 取能与工作状态转换</title>
+  <desc id="desc">空载时进入取能状态，满载时进入工作状态，中间容量保持当前状态。</desc>
+  <rect width="1200" height="560" fill="#0f172a"/>
+  <text x="600" y="66" text-anchor="middle" fill="#f8fafc" font-family="Arial, sans-serif" font-size="34" font-weight="700">Creep 工作状态转换</text>
+  <text x="600" y="105" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="18">只在空载和满载边界切换，中间容量保持当前状态</text>
+  <rect x="110" y="185" width="330" height="190" rx="24" fill="#172554" stroke="#60a5fa" stroke-width="3"/>
+  <text x="275" y="235" text-anchor="middle" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="24" font-weight="700">取能状态</text>
+  <text x="275" y="282" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="20">working = false</text>
+  <text x="275" y="325" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="17">harvest / withdraw / pickup</text>
+  <rect x="760" y="185" width="330" height="190" rx="24" fill="#052e16" stroke="#4ade80" stroke-width="3"/>
+  <text x="925" y="235" text-anchor="middle" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="24" font-weight="700">工作状态</text>
+  <text x="925" y="282" text-anchor="middle" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="20">working = true</text>
+  <text x="925" y="325" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="17">transfer / build / repair / upgrade</text>
+  <path d="M440 235 C560 140 640 140 760 235" fill="none" stroke="#4ade80" stroke-width="5" marker-end="url(#arrowGreen)"/>
+  <text x="600" y="155" text-anchor="middle" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="18">Store 已满 → 切换为工作</text>
+  <path d="M760 330 C640 425 560 425 440 330" fill="none" stroke="#60a5fa" stroke-width="5" marker-end="url(#arrowBlue)"/>
+  <text x="600" y="456" text-anchor="middle" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="18">Store 为空 → 切换为取能</text>
+  <rect x="415" y="476" width="370" height="54" rx="14" fill="#1e293b" stroke="#475569"/>
+  <text x="600" y="510" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="17">部分装载：不切换，继续当前状态</text>
+  <defs>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#4ade80"/></marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#60a5fa"/></marker>
+  </defs>
+</svg>
