@@ -18,6 +18,19 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-23-site-audit-checklist",
+    date: "2026-07-23",
+    type: "网站",
+    title: "完成网站审计清单修复",
+    summary:
+      "统一 Node 24 发布门禁，修复 404 元数据与搜索全文索引，精简首页和文章首屏，重做分组目录与验证摘要，加入文章独立分享图、搜索容错、匿名反馈分析、无障碍基线和更严格的 Lighthouse 性能预算。",
+    links: [
+      { label: "查看首页", href: "/" },
+      { label: "使用站内搜索", href: "/search" },
+      { label: "查看验证方法", href: "/verification" },
+    ],
+  },
+  {
     id: "2026-07-23-complete-experience-overhaul",
     date: "2026-07-23",
     type: "网站",
@@ -76,100 +89,6 @@ export const changelogEntries: ChangelogEntry[] = [
     links: [
       { label: "查看知识库", href: "/knowledge#reference-tools" },
       { label: "查看公开项目", href: "/about#public-projects" },
-    ],
-  },
-  {
-    id: "2026-07-22-primary-navigation-cleanup",
-    date: "2026-07-22",
-    type: "网站",
-    title: "精简顶部主导航",
-    summary:
-      "从顶部主导航移除与主要学习入口重合的“资料”和“项目”，让首页、入门、文章、知识库、近况与关于成为更清晰的主路径。",
-  },
-  {
-    id: "2026-07-22-changelog-page",
-    date: "2026-07-22",
-    type: "网站",
-    title: "新增独立更新日志",
-    summary:
-      "在近况页加入最近更新预览，并建立独立更新日志页面。以后网站、内容、工具和验证流程的变化只需要在同一份数据中记录。",
-    links: [
-      { label: "查看更新日志", href: "/changelog" },
-      { label: "查看近况", href: "/now" },
-    ],
-  },
-  {
-    id: "2026-07-22-about-page-redesign",
-    date: "2026-07-22",
-    type: "网站",
-    title: "重新设计关于页面",
-    summary:
-      "减少重复的网站功能说明，增加建站原因、内容处理方法、可信度边界，并将公开项目压缩为摘要与相关入口。",
-    links: [{ label: "查看关于页面", href: "/about" }],
-  },
-  {
-    id: "2026-07-22-search-upgrade",
-    date: "2026-07-22",
-    type: "工具",
-    title: "升级站内搜索",
-    summary:
-      "增加文章、术语、错误码、工具和项目筛选，支持知识模块信息、同义词匹配、关键词高亮、无结果推荐和键盘操作。",
-    links: [{ label: "使用站内搜索", href: "/search" }],
-  },
-  {
-    id: "2026-07-22-verification-guide",
-    date: "2026-07-22",
-    type: "验证",
-    title: "新增文章验证方法",
-    summary:
-      "公开区分官方文档核对、JavaScript 语法检查、离线模拟、Screeps Console 和真实主循环验证。",
-    links: [{ label: "查看验证方法", href: "/verification" }],
-  },
-  {
-    id: "2026-07-22-production-smoke-test",
-    date: "2026-07-22",
-    type: "验证",
-    title: "将生产冒烟测试接入构建",
-    summary:
-      "生产构建完成后会自动启动网站，检查关键页面、Canonical、noindex、标签重定向和全部 Sitemap URL。",
-  },
-  {
-    id: "2026-07-22-search-indexing",
-    date: "2026-07-22",
-    type: "SEO",
-    title: "调整站内搜索的索引策略",
-    summary:
-      "搜索页继续供站内访客使用，但设置为 noindex 并移出 Sitemap，避免搜索参数页面参与索引。",
-    links: [{ label: "打开搜索页面", href: "/search" }],
-  },
-  {
-    id: "2026-07-22-tag-center",
-    date: "2026-07-22",
-    type: "内容",
-    title: "整理文章标签中心",
-    summary:
-      "核心标签和至少包含两篇文章的标签获得优先展示，单篇文章标签继续保留在文章页和对应标签 URL 中。",
-    links: [{ label: "浏览文章标签", href: "/tags" }],
-  },
-  {
-    id: "2026-07-21-knowledge-modules",
-    date: "2026-07-21",
-    type: "内容",
-    title: "建立八个独立知识模块",
-    summary:
-      "为 52 篇专题文章补充模块归属、分阶段顺序、专题页面、面包屑、进度和前后文导航。",
-    links: [{ label: "浏览知识模块", href: "/knowledge" }],
-  },
-  {
-    id: "2026-07-21-dynamic-site-stats",
-    date: "2026-07-21",
-    type: "网站",
-    title: "站点内容统计改为自动计算",
-    summary:
-      "首页、知识库和关于页的文章数、模块数与项目数改为读取真实数据，新增内容后不再手工修改数字。",
-    links: [
-      { label: "查看首页", href: "/" },
-      { label: "查看知识库", href: "/knowledge" },
     ],
   },
 ];
