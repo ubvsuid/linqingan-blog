@@ -52,9 +52,8 @@ if (!smoke.includes("const fullIndexResponse")) {
     'const missingBody = await missingResponse.text();',
     'if (missingResponse.status !== 404) failures.push(`/404: 预期 404，实际 ${missingResponse.status}`);',
     'if (!missingBody.includes("页面不存在｜临清安")) failures.push("/404: 缺少独立页面标题");',
-    'if (/<link[^>]+rel="canonical"[^>]+href="https:\/\/www\.linqingan\.com\/?"/i.test(missingBody)) {',
-    '  failures.push("/404: 不应把不存在页面 canonical 到首页");',
-    '}',
+    'const hasHomeCanonical = missingBody.includes(`rel="canonical" href="https://www.linqingan.com"`) || missingBody.includes(`rel="canonical" href="https://www.linqingan.com/"`);',
+    'if (hasHomeCanonical) failures.push("/404: 不应把不存在页面 canonical 到首页");',
   ].join("\n");
   smoke = smoke.replace(
     'const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);',
