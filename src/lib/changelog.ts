@@ -18,6 +18,19 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-23-audit-completion-navigation-security",
+    date: "2026-07-23",
+    type: "网站",
+    title: "完成知识库导航、标签治理与安全观察升级",
+    summary:
+      "将已上线的房间诊断移入正式工具区，压缩知识库模块长列表，为文章归档增加内容类型入口，建立核心标签配置和增长门禁，并加入 CSP Report-Only 与房间诊断独立分享图。",
+    links: [
+      { label: "查看知识库", href: "/knowledge" },
+      { label: "浏览文章标签", href: "/tags" },
+      { label: "使用房间诊断工具", href: "/tools/room-diagnostics" },
+    ],
+  },
+  {
     id: "2026-07-23-room-diagnostics-indexing",
     date: "2026-07-23",
     type: "SEO",

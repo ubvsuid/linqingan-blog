@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import coreTagSlugs from "@/lib/core-tag-slugs.json";
 import { createPageMetadata } from "@/lib/metadata";
 import { getTagRecords } from "@/lib/tags";
 
@@ -10,19 +11,7 @@ export const metadata = createPageMetadata({
   path: "/tags",
 });
 
-const featuredTagSlugs = new Set([
-  "screeps",
-  "javascript",
-  "creep",
-  "spawn",
-  "memory",
-  "controller",
-  "construction-site",
-  "room-api",
-  "basic-engineering",
-  "common-questions",
-  "operations-diagnostics",
-]);
+const featuredTagSlugs = new Set(coreTagSlugs);
 
 function TagLinks({ tags }: { tags: ReturnType<typeof getTagRecords> }) {
   return (
