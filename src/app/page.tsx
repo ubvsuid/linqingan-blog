@@ -2,35 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { HomeLearningActions } from "@/components/home-learning-actions";
+import { HomeTaskHub } from "@/components/home-task-hub";
 import { PostCard } from "@/components/post-card";
 import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
 import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
-import { siteConfig } from "@/lib/site";
 
 import styles from "./home.module.css";
 
 const baseMetadata = createPageMetadata({
-  title: siteConfig.title,
+  title: "Screeps 中文教程、知识库与实用工具｜临清安",
   description:
-    "从 Screeps 中文新手学习路线开始，继续阅读自动化系统、JavaScript 工程实践与真实开发记录。",
+    "面向中文玩家的 Screeps 新手教程、错误排查、知识库与实用工具，覆盖 Creep、Spawn、Memory、寻路、经济与自动化系统。",
   path: "/",
 });
 
 export const metadata: Metadata = {
   ...baseMetadata,
-  title: { absolute: siteConfig.title },
+  title: { absolute: "Screeps 中文教程、知识库与实用工具｜临清安" },
 };
 
 const quickEntries = [
-  {
-    href: "/search",
-    eyebrow: "SEARCH",
-    title: "搜索网站",
-    description: "输入对象、方法、错误码或中文问题，搜索文章正文与知识模块。",
-  },
   {
     href: "/screeps-errors",
     eyebrow: "ERROR CODES",
@@ -53,14 +46,14 @@ const quickEntries = [
 
 export default function HomePage() {
   const allPosts = getAllPosts();
-  const latestPosts = allPosts.slice(0, 3);
+  const latestPosts = allPosts.slice(0, 2);
   const articleCount = allPosts.length;
   const knowledgeArticleCount = knowledgeBaseSlugs.length;
   const sectionCount = knowledgeBaseSections.length;
 
   return (
     <main className={styles.home}>
-      <section className={styles.hero}>
+      <section className={`${styles.hero} screeps-room-grid`}>
         <Container className={styles.heroInner}>
           <p className="eyebrow">SCREEPS · JAVASCRIPT · SYSTEMS</p>
           <h1>构建，运行，迭代</h1>
@@ -70,7 +63,7 @@ export default function HomePage() {
           <p className={styles.heroStats}>
             {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
           </p>
-          <HomeLearningActions />
+          <HomeTaskHub />
         </Container>
       </section>
 
@@ -146,7 +139,7 @@ export default function HomePage() {
       <section className={styles.quickSection} aria-labelledby="home-quick-title">
         <Container>
           <div className={styles.sectionHeading}>
-            <div><p className="eyebrow">QUICK LOOKUP</p><h2 id="home-quick-title">已经遇到问题？</h2></div>
+            <div><p className="eyebrow">QUICK LOOKUP</p><h2 id="home-quick-title">常用查询工具</h2></div>
             <Link href="/knowledge#reference-tools">查看全部查询工具 →</Link>
           </div>
           <div className={styles.quickGrid}>
