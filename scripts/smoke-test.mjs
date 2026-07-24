@@ -33,7 +33,21 @@ const checks = [
   ["/blog/screeps-spawn-emergency-recovery", ["离线模拟结果", "Energy 为 200", "多 tick 恢复过程仍待环境验证"]],
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about"]],
+  ["/en/beginner", ["Learn Screeps in twelve focused lessons", "LESSON 01", "LESSON 12", "Complete beginner sequence published"]],
+  ["/en/blog", ["Practical Screeps articles", "What Is Screeps and What Do You Actually Do in It?", "How to Combine Your First Screeps Room Loop"]],
+  ["/en/blog/screeps-introduction", ["What Is Screeps and What Do You Actually Do in It?", "Chinese source", "Read in full", "Publication status", "Ready"]],
+  ["/en/blog/screeps-first-room", ["How to Find Your First Screeps Room and Its Core Objects", "State impact", "Read-only", "Screeps Console", "Pending"]],
+  ["/en/blog/screeps-tick-game-loop", ["What Is a Screeps Tick", "Game-loop model", "Checked", "Tick interval", "Server-dependent"]],
+  ["/en/blog/screeps-creep-harvest-energy", ["How to Make Your First Screeps Creep Harvest Energy", "Chinese source", "Read in full", "Screeps Console", "Pending"]],
+  ["/en/blog/screeps-transfer-energy-to-spawn", ["How to Make a Screeps Creep Deliver Energy to a Spawn", "Offline state logic", "Passed", "Live multi-tick test", "Pending"]],
+  ["/en/blog/screeps-creep-body-parts", ["Why Your Screeps Creep Cannot Harvest, Carry, or Move", "Offline calculation", "Passed", "Live room inspection", "Pending"]],
+  ["/en/blog/screeps-spawn-creep", ["How to Make a Screeps Spawn Create a New Creep", "Offline branch review", "Passed", "Live spawn cycle", "Pending"]],
+  ["/en/blog/screeps-creep-roles", ["Why Multiple Screeps Creeps Need Simple Roles", "Role terminology", "Player-defined", "Live role behavior", "Pending"]],
+  ["/en/blog/screeps-upgrade-controller", ["How to Make a Screeps Creep Upgrade the Room Controller", "API range and codes", "Checked", "Live multi-tick test", "Pending"]],
+  ["/en/blog/screeps-first-extension", ["How to Build Your First Screeps Extension", "RCL and constants", "Checked", "Live construction test", "Pending"]],
+  ["/en/blog/screeps-build-repair", ["How to Make a Screeps Creep Build and Repair Automatically", "Offline priority review", "Passed", "Live multi-tick test", "Pending"]],
+  ["/en/blog/screeps-first-room-code", ["How to Combine Your First Screeps Room Loop", "Offline branch review", "Passed", "Live room test", "Pending"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about", "https://www.linqingan.com/en/blog/screeps-introduction", "https://www.linqingan.com/en/blog/screeps-first-room-code"]],
 ];
 
 const assetChecks = [
@@ -64,6 +78,25 @@ const metadataPaths = [
   "/blog/screeps-storage-energy-usage",
   "/about",
   "/verification",
+  "/en/beginner",
+  "/en/blog/screeps-introduction",
+  "/en/blog/screeps-spawn-creep",
+  "/en/blog/screeps-first-room-code",
+];
+
+const requiredEnglishBeginnerPaths = [
+  "/en/blog/screeps-introduction",
+  "/en/blog/screeps-first-room",
+  "/en/blog/screeps-tick-game-loop",
+  "/en/blog/screeps-creep-harvest-energy",
+  "/en/blog/screeps-transfer-energy-to-spawn",
+  "/en/blog/screeps-creep-body-parts",
+  "/en/blog/screeps-spawn-creep",
+  "/en/blog/screeps-creep-roles",
+  "/en/blog/screeps-upgrade-controller",
+  "/en/blog/screeps-first-extension",
+  "/en/blog/screeps-build-repair",
+  "/en/blog/screeps-first-room-code",
 ];
 
 async function waitForServer() {
@@ -170,13 +203,21 @@ if (sitemapPaths.includes("/resources")) failures.push("/resources: 已合并，
 if (sitemapPaths.some((pathname) => pathname === "/projects" || pathname.startsWith("/projects/"))) {
   failures.push("/projects: 已合并，不应出现在 Sitemap");
 }
-for (const requiredPath of ["/verification", "/changelog", "/tools/creep-body-calculator"]) {
+for (const requiredPath of [
+  "/verification",
+  "/changelog",
+  "/tools/creep-body-calculator",
+  "/en/beginner",
+  "/en/blog",
+  ...requiredEnglishBeginnerPaths,
+]) {
   if (!sitemapPaths.includes(requiredPath)) failures.push(`${requiredPath}: 应出现在 Sitemap`);
 }
 
 const sampledPaths = [
   ...evenlySample(sitemapPaths.filter((pathname) => pathname.startsWith("/blog/")), 5),
   ...evenlySample(sitemapPaths.filter((pathname) => pathname.startsWith("/tags/")), 5),
+  ...evenlySample(sitemapPaths.filter((pathname) => pathname.startsWith("/en/blog/")), 5),
 ];
 
 for (const pathname of sampledPaths) {
