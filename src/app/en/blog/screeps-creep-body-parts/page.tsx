@@ -15,7 +15,7 @@ const articleUrl = `${siteConfig.url}${article.path}`;
 export const metadata: Metadata = {
   title: { absolute: `${article.title} | Linqingan` },
   description: article.description,
-  keywords: [...article.keywords],
+  keywords: article.keywords,
   alternates: {
     canonical: article.path,
     languages: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     description: article.description,
     publishedTime: article.publishedAt,
     modifiedTime: article.publishedAt,
-    tags: [...article.tags],
+    tags: article.tags,
     images: [{
       url: `${siteConfig.url}/opengraph-image`,
       width: 1200,
@@ -115,9 +115,9 @@ export default function EnglishCreepBodyPartsPage() {
       publishedAt={article.publishedAt}
       publishedLabel={article.publishedLabel}
       readingTime={article.readingTime}
-      tags={[...article.tags]}
-      verification={article.verification.map((item) => ({ ...item }))}
-      toc={article.toc.map(([label, id]) => [label, id])}
+      tags={article.tags}
+      verification={article.verification}
+      toc={article.toc}
       articleHtml={article.articleHtml}
       jsonLd={jsonLd}
       previous={article.previous ?? undefined}
