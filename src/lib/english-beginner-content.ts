@@ -1,3 +1,4 @@
+// Production publication marker: complete English beginner sequence.
 import { gunzipSync } from "node:zlib";
 
 import part1 from "@/lib/english-beginner-data/part-1";
