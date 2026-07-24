@@ -1,6 +1,7 @@
 export const englishNavigation = [
   { label: "Home", href: "/en" },
   { label: "Beginner", href: "/en/beginner" },
+  { label: "Articles", href: "/en/blog" },
   { label: "Knowledge", href: "/en/knowledge" },
   { label: "Tools", href: "/en/tools" },
   { label: "About", href: "/en/about" },
@@ -9,6 +10,8 @@ export const englishNavigation = [
 export const languageRoutePairs = {
   "/": "/en",
   "/beginner": "/en/beginner",
+  "/blog": "/en/blog",
+  "/blog/screeps-construction-site-remove": "/en/blog/screeps-remove-construction-site",
   "/knowledge": "/en/knowledge",
   "/knowledge#reference-tools": "/en/tools",
   "/tools/creep-body-calculator": "/en/tools/creep-body-calculator",
