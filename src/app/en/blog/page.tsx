@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { publishedEnglishArticles } from "@/lib/english-articles";
 
 import styles from "../english.module.css";
 
@@ -12,18 +13,6 @@ export const metadata = createEnglishPageMetadata({
   path: "/en/blog",
   chinesePath: "/blog",
 });
-
-const articles = [
-  {
-    href: "/en/blog/screeps-remove-construction-site",
-    category: "API SAFETY · CONSTRUCTION",
-    title: "How to Remove a Construction Site Safely in Screeps",
-    description:
-      "Inspect a misplaced Construction Site, validate its identity, submit remove() once, handle return codes, and verify the result on the next tick.",
-    publishedAt: "July 24, 2026",
-    readingTime: "12 min read",
-  },
-] as const;
 
 export default function EnglishBlogPage() {
   return (
@@ -45,13 +34,15 @@ export default function EnglishBlogPage() {
         </header>
 
         <section className={styles.grid} aria-label="English Screeps articles">
-          {articles.map((article) => (
+          {publishedEnglishArticles.map((article) => (
             <article className={`${styles.card} ${styles.full}`} key={article.href}>
               <p className="eyebrow">{article.category}</p>
               <h2>{article.title}</h2>
               <p>{article.description}</p>
               <p>
-                <small>{article.publishedAt} · {article.readingTime}</small>
+                <small>
+                  {article.publishedLabel} · {article.readingTime} · Score {article.finalScore}
+                </small>
               </p>
               <Link href={article.href}>Read the guide →</Link>
             </article>
