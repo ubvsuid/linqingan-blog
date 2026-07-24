@@ -32,6 +32,27 @@ const stages = [
   },
 ];
 
+const beginnerArticles = [
+  {
+    href: "/en/blog/screeps-creep-harvest-energy",
+    number: "01",
+    title: "Harvest Energy with the first Creep",
+    description: "Find a named Creep and Source, call harvest(), and move only when the return code reports insufficient range.",
+  },
+  {
+    href: "/en/blog/screeps-transfer-energy-to-spawn",
+    number: "02",
+    title: "Deliver Energy to a Spawn",
+    description: "Add a delivery state, use transfer(), handle a full Spawn, and complete the first round trip.",
+  },
+  {
+    href: "/en/blog/screeps-creep-body-parts",
+    number: "03",
+    title: "Understand WORK, CARRY, and MOVE",
+    description: "Connect active body parts to harvesting, Store capacity, movement, fatigue, and common failure symptoms.",
+  },
+] as const;
+
 export default function EnglishBeginnerPage() {
   return (
     <main className={styles.page} lang="en">
@@ -43,7 +64,8 @@ export default function EnglishBeginnerPage() {
           <p className="eyebrow">BEGINNER ROADMAP</p>
           <h1>Learn Screeps in a stable order</h1>
           <p>
-            This page defines the English learning sequence while focused lessons are published in verified batches. It keeps each article centered on one beginner question.
+            Follow focused lessons in sequence. Each article answers one beginner question,
+            uses checked APIs, and states which live-game verification remains pending.
           </p>
         </header>
 
@@ -57,29 +79,32 @@ export default function EnglishBeginnerPage() {
         </ol>
 
         <div className={styles.notice}>
-          <strong>Article status</strong>
+          <strong>Published beginner sequence</strong>
           <p>
-            The first verified English article is live. It covers safe Construction Site removal and next-tick verification. Beginner movement, spawning, harvesting, delivery, Memory, and CPU lessons remain planned as separate articles.
+            The first English Creep sequence is live: harvest Energy, deliver it to a Spawn,
+            then connect WORK, CARRY, and MOVE to the abilities used by that loop.
           </p>
         </div>
 
-        <section className={styles.grid} aria-label="Beginner resources" style={{ marginTop: 48 }}>
-          <article className={styles.card}>
-            <p className="eyebrow">FIRST ARTICLE</p>
-            <h2>Remove a Construction Site safely</h2>
-            <p>Learn the inspect, validate, submit-once, and next-tick verification workflow.</p>
-            <Link href="/en/blog/screeps-remove-construction-site">Read the guide →</Link>
-          </article>
+        <section className={styles.grid} aria-label="Published beginner articles" style={{ marginTop: 48 }}>
+          {beginnerArticles.map((article) => (
+            <article className={styles.card} key={article.href}>
+              <p className="eyebrow">LESSON {article.number}</p>
+              <h2>{article.title}</h2>
+              <p>{article.description}</p>
+              <Link href={article.href}>Read the lesson →</Link>
+            </article>
+          ))}
           <article className={styles.card}>
             <p className="eyebrow">REFERENCE</p>
             <h2>Check common error codes</h2>
-            <p>Use the English return-code reference while testing simple actions in the Console.</p>
+            <p>Use the English return-code reference while testing actions and movement.</p>
             <Link href="/en/screeps-errors">Open error codes →</Link>
           </article>
           <article className={styles.card}>
             <p className="eyebrow">TOOL</p>
             <h2>Build a valid Creep body</h2>
-            <p>Calculate Energy cost and movement before calling spawnCreep.</p>
+            <p>Calculate Energy cost, capacity, spawn time, and loaded movement.</p>
             <Link href="/en/tools/creep-body-calculator">Open the body calculator →</Link>
           </article>
         </section>
