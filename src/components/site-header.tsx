@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { Container } from "@/components/container";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
+import { englishNavigation, getLanguageSwitchTarget, isEnglishPath } from "@/lib/i18n";
 import { knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { siteConfig } from "@/lib/site";
 
@@ -17,12 +18,19 @@ export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
+  const english = isEnglishPath(pathname);
+  const navigation = english ? englishNavigation : siteConfig.navigation;
+  const languageTarget = getLanguageSwitchTarget(pathname);
   const isBeginnerArticle = beginnerSeriesSlugs.some(
     (slug) => pathname === `/blog/${slug}`,
   );
   const isKnowledgeArticle = knowledgeBaseSlugs.some(
     (slug) => pathname === `/blog/${slug}`,
   );
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -55,6 +63,11 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   function isActive(href: string): boolean {
+    if (english) {
+      if (href === "/en") return pathname === "/en";
+      return pathname === href || pathname.startsWith(`${href}/`);
+    }
+
     if (href === "/") return pathname === "/";
 
     if (href === "/beginner") {
@@ -92,13 +105,17 @@ export function SiteHeader() {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
+  const homeHref = english ? "/en" : "/";
+  const searchHref = english ? "/en/search" : "/search";
+  const aboutHref = english ? "/en/about" : "/about";
+
   return (
     <header ref={headerRef} className="site-header">
       <Container className="header-inner">
         <Link
-          href="/"
+          href={homeHref}
           className="brand"
-          aria-label="返回首页"
+          aria-label={english ? "Return to English home" : "返回首页"}
           onClick={() => setMenuOpen(false)}
         >
           <Image className="brand-logo" src="/brand-logo.svg" alt="" width={80} height={72} priority />
@@ -108,9 +125,9 @@ export function SiteHeader() {
           <nav
             id="site-navigation"
             className={menuOpen ? "site-nav site-nav-open" : "site-nav"}
-            aria-label="主导航"
+            aria-label={english ? "Primary navigation" : "主导航"}
           >
-            {siteConfig.navigation.map((item, index) => {
+            {navigation.map((item, index) => {
               const active = isActive(item.href);
               return (
                 <Link
@@ -128,7 +145,22 @@ export function SiteHeader() {
           </nav>
 
           <div className="header-controls">
-            <Link className="header-icon-link" href="/search" aria-label="搜索网站" title="搜索网站">
+            <Link
+              className="language-switch"
+              href={languageTarget}
+              hrefLang={english ? "zh-CN" : "en"}
+              lang={english ? "zh-CN" : "en"}
+              aria-label={english ? "切换到中文" : "Switch to English"}
+              title={english ? "切换到中文" : "Switch to English"}
+            >
+              {english ? "中文" : "EN"}
+            </Link>
+            <Link
+              className="header-icon-link"
+              href={searchHref}
+              aria-label={english ? "Search the English site" : "搜索网站"}
+              title={english ? "Search" : "搜索网站"}
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="11" cy="11" r="6.5" />
                 <path d="m16 16 4 4" />
@@ -137,9 +169,9 @@ export function SiteHeader() {
             <ThemeToggle />
             <Link
               className="profile-shortcut"
-              href="/about"
-              aria-label="查看临清安的个人主页"
-              title="个人主页"
+              href={aboutHref}
+              aria-label={english ? "About Linqingan" : "查看临清安的个人主页"}
+              title={english ? "About" : "个人主页"}
             >
               <Image src="/profile-avatar.webp" alt="" width={36} height={36} />
             </Link>
@@ -149,7 +181,11 @@ export function SiteHeader() {
               className={menuOpen ? "menu-toggle menu-toggle-open" : "menu-toggle"}
               aria-controls="site-navigation"
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "关闭导航菜单" : "打开导航菜单"}
+              aria-label={
+                english
+                  ? menuOpen ? "Close navigation menu" : "Open navigation menu"
+                  : menuOpen ? "关闭导航菜单" : "打开导航菜单"
+              }
               onClick={() => setMenuOpen((open) => !open)}
             >
               <span aria-hidden="true" />
@@ -172,10 +208,12 @@ export function SiteHeader() {
         .site-nav a.nav-link-active { color: var(--foreground); }
         .site-nav a.nav-link-active::after { transform: scaleX(1); }
         .header-controls { display: flex; grid-column: 3; align-items: center; justify-self: end; gap: 8px; }
-        .header-icon-link, .profile-shortcut { display: inline-grid; width: 42px; height: 42px; place-items: center; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--foreground); transition: border-color 160ms ease, transform 160ms ease; }
-        .header-icon-link:hover, .profile-shortcut:hover { transform: translateY(-1px); border-color: var(--muted); text-decoration: none; }
+        .header-icon-link, .profile-shortcut, .language-switch { display: inline-grid; min-width: 42px; height: 42px; place-items: center; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--foreground); transition: border-color 160ms ease, transform 160ms ease; }
+        .language-switch { padding: 0 11px; font-size: 12px; font-weight: 750; letter-spacing: .04em; }
+        .header-icon-link:hover, .profile-shortcut:hover, .language-switch:hover { transform: translateY(-1px); border-color: var(--muted); text-decoration: none; }
+        .header-icon-link { width: 42px; }
         .header-icon-link svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
-        .profile-shortcut { overflow: hidden; }
+        .profile-shortcut { width: 42px; overflow: hidden; }
         .profile-shortcut img { width: 100%; height: 100%; object-fit: cover; }
         .menu-toggle { display: none; width: 42px; height: 42px; align-items: center; justify-content: center; flex-direction: column; gap: 4px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--foreground); cursor: pointer; }
         .menu-toggle span { width: 15px; height: 1px; background: currentColor; transition: transform 160ms ease, opacity 160ms ease; }
@@ -196,8 +234,10 @@ export function SiteHeader() {
           .site-nav a::after { right: 18px; bottom: 7px; left: 18px; }
         }
         @media (max-width: 430px) {
-          .header-icon-link { display: none; }
+          .profile-shortcut { display: none; }
           .header-controls { gap: 6px; }
+          .header-icon-link { width: 40px; height: 40px; }
+          .language-switch { min-width: 40px; height: 40px; padding: 0 9px; }
         }
       `}</style>
     </header>
