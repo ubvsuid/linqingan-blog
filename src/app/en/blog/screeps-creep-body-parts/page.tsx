@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
-import { getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import {
+  getEnglishBeginnerArticle,
+  type EnglishBeginnerArticle,
+} from "@/lib/english-beginner-content";
 import { siteConfig } from "@/lib/site";
 
-const article = getEnglishBeginnerArticle("screeps-creep-body-parts");
+function requireBodyPartsArticle(): EnglishBeginnerArticle {
+  const value = getEnglishBeginnerArticle("screeps-creep-body-parts");
 
-if (!article) {
-  throw new Error("Missing English beginner article: screeps-creep-body-parts");
+  if (!value) {
+    throw new Error("Missing English beginner article: screeps-creep-body-parts");
+  }
+
+  return value;
 }
 
+const article = requireBodyPartsArticle();
 const articleUrl = `${siteConfig.url}${article.path}`;
 
 export const metadata: Metadata = {
