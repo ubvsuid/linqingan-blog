@@ -124,7 +124,7 @@ export default function EnglishCreepBodyPartsPage() {
       publishedLabel={article.publishedLabel}
       readingTime={article.readingTime}
       tags={article.tags}
-      verification={article.verification}
+      verification={article.verification.map(([term, value]) => ({ term, value }))}
       toc={article.toc}
       articleHtml={article.articleHtml}
       jsonLd={jsonLd}
