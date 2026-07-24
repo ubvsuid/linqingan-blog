@@ -22,6 +22,14 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.author.name, url: `${siteConfig.url}/about` }],
   creator: siteConfig.author.name,
   applicationName: siteConfig.title,
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+    ],
+    shortcut: ["/favicon.ico"],
+  },
   alternates: {
     canonical: "/",
     types: {
