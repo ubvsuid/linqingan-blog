@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { languageRoutePairs } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
 
 interface PageMetadataOptions {
@@ -30,12 +31,20 @@ export function createPageMetadata({
       ? selectedImage
       : `${siteConfig.url}${selectedImage.startsWith("/") ? selectedImage : `/${selectedImage}`}`
     : `${siteConfig.url}/opengraph-image`;
+  const englishPath = languageRoutePairs[path as keyof typeof languageRoutePairs];
 
   return {
     title,
     description,
     alternates: {
       canonical: path,
+      languages: englishPath
+        ? {
+            "zh-CN": path,
+            en: englishPath,
+            "x-default": englishPath,
+          }
+        : undefined,
     },
     robots: noindex
       ? {
@@ -46,6 +55,7 @@ export function createPageMetadata({
     openGraph: {
       type: "website",
       locale: siteConfig.locale,
+      alternateLocale: englishPath ? ["en_US"] : undefined,
       url,
       siteName: siteConfig.title,
       title,

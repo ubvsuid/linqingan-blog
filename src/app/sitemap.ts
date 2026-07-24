@@ -24,6 +24,7 @@ const staticPageDates = {
   verification: "2026-07-22",
   creepBodyCalculator: "2026-07-22",
   roomDiagnostics: "2026-07-23",
+  englishFoundation: "2026-07-24",
 };
 
 function createArchivePages(
@@ -164,6 +165,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  const englishUpdatedAt = new Date(staticPageDates.englishFoundation);
+  const englishStaticPages: MetadataRoute.Sitemap = [
+    { url: `${siteConfig.url}/en`, lastModified: englishUpdatedAt, changeFrequency: "weekly", priority: 0.92 },
+    { url: `${siteConfig.url}/en/beginner`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
+    { url: `${siteConfig.url}/en/knowledge`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
+    { url: `${siteConfig.url}/en/tools`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${siteConfig.url}/en/tools/creep-body-calculator`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.84 },
+    { url: `${siteConfig.url}/en/tools/room-diagnostics`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
+    { url: `${siteConfig.url}/en/screeps-errors`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.76 },
+    { url: `${siteConfig.url}/en/glossary`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.74 },
+    { url: `${siteConfig.url}/en/verification`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.68 },
+    { url: `${siteConfig.url}/en/about`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.65 },
+  ];
+
   const knowledgeModulePages: MetadataRoute.Sitemap = knowledgeBaseSections.map(
     (section) => ({
       url: `${siteConfig.url}/knowledge/${section.id}`,
@@ -221,6 +236,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticPages,
+    ...englishStaticPages,
     ...knowledgeModulePages,
     ...archivePages,
     ...posts,

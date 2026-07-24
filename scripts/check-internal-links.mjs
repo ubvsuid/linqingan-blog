@@ -23,7 +23,19 @@ const exactRoutes = new Set([
   "/search",
   "/tags",
   "/tools/creep-body-calculator",
+  "/tools/room-diagnostics",
   "/verification",
+  "/en",
+  "/en/about",
+  "/en/beginner",
+  "/en/glossary",
+  "/en/knowledge",
+  "/en/screeps-errors",
+  "/en/search",
+  "/en/tools",
+  "/en/tools/creep-body-calculator",
+  "/en/tools/room-diagnostics",
+  "/en/verification",
 ]);
 
 function walk(directory) {
@@ -50,6 +62,14 @@ function routeExists(href) {
 }
 
 const errors = [];
+for (const route of exactRoutes) {
+  if (route === "/" || route === "/feed.xml") continue;
+  const pagePath = path.join(root, "src", "app", ...route.slice(1).split("/"), "page.tsx");
+  if (!fs.existsSync(pagePath)) {
+    errors.push(`已登记路由缺少页面文件 ${route}: ${path.relative(root, pagePath)}`);
+  }
+}
+
 for (const scanRoot of scanRoots) {
   const directory = path.join(root, scanRoot);
   if (!fs.existsSync(directory)) continue;
@@ -80,4 +100,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("组件与数据内链检查通过：未发现旧页面链接或未知站内目标。");
+console.log(`组件与数据内链检查通过：${exactRoutes.size} 个静态路由已登记，未发现旧页面链接或未知站内目标。`);
