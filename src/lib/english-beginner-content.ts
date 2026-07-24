@@ -13,11 +13,6 @@ export interface EnglishArticleNavigation {
   title: string;
 }
 
-export interface EnglishArticleVerification {
-  term: string;
-  value: string;
-}
-
 export interface EnglishBeginnerArticle {
   slug: string;
   path: string;
@@ -35,9 +30,9 @@ export interface EnglishBeginnerArticle {
   primaryKeyword: string;
   searchIntent: string;
   finalScore: number;
-  verification: EnglishArticleVerification[];
-  toc: [string, string][];
-  faq: [string, string][];
+  verification: Array<[string, string]>;
+  toc: Array<[string, string]>;
+  faq: Array<[string, string]>;
   previous: EnglishArticleNavigation | null;
   next: EnglishArticleNavigation | null;
   articleHtml: string;
