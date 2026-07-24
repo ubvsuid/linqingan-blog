@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { DocumentLanguage } from "@/components/document-language";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
@@ -84,7 +85,7 @@ const structuredData = {
       url: siteConfig.url,
       name: siteConfig.title,
       description: siteConfig.description,
-      inLanguage: siteConfig.language,
+      inLanguage: ["zh-CN", "en"],
       author: {
         "@id": `${siteConfig.url}/#person`,
       },
@@ -114,8 +115,9 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <DocumentLanguage />
         <a className="skip-link" href="#main-content">
-          跳到正文
+          跳到正文 / Skip to content
         </a>
         <SiteHeader />
         <div id="main-content" className="site-content">
