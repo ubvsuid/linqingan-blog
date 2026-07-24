@@ -1,3 +1,5 @@
+import { englishBeginnerArticles } from "@/lib/english-beginner-content";
+
 export interface EnglishArticleRecord {
   href: string;
   chinesePath: string;
@@ -14,27 +16,44 @@ export interface EnglishArticleRecord {
   keywords: string[];
 }
 
-export const publishedEnglishArticles: EnglishArticleRecord[] = [
+const generatedBeginnerRecords: EnglishArticleRecord[] =
+  englishBeginnerArticles.map((article) => ({
+    href: article.path,
+    chinesePath: article.chinesePath,
+    category: article.category,
+    title: article.headline,
+    description: article.description,
+    publishedAt: article.publishedAt,
+    publishedLabel: article.publishedLabel,
+    readingTime: article.readingTime,
+    primaryKeyword: article.primaryKeyword,
+    searchIntent: article.searchIntent,
+    status: "published",
+    finalScore: article.finalScore,
+    keywords: [...article.keywords],
+  }));
+
+const fixedRecords: EnglishArticleRecord[] = [
   {
-    href: "/en/blog/screeps-creep-body-parts",
-    chinesePath: "/blog/screeps-creep-body-parts",
-    category: "BEGINNER · CREEP BODY",
-    title: "Why Your Screeps Creep Cannot Harvest, Carry, or Move",
+    href: "/en/blog/screeps-creep-harvest-energy",
+    chinesePath: "/blog/screeps-first-creep-harvest",
+    category: "BEGINNER · ENERGY HARVESTING",
+    title: "How to Make Your First Screeps Creep Harvest Energy",
     description:
-      "Connect WORK, CARRY, and MOVE to real Creep actions, inspect active body parts, calculate a basic body, and diagnose missing abilities.",
+      "Find a named Creep and Source, call harvest(), move only when range is insufficient, and inspect the action results across ticks.",
     publishedAt: "2026-07-24",
     publishedLabel: "July 24, 2026",
-    readingTime: "10 min read",
-    primaryKeyword: "Screeps Creep body parts",
-    searchIntent: "Beginner explanation and ability diagnosis",
+    readingTime: "11 min read",
+    primaryKeyword: "Screeps Creep harvest Energy",
+    searchIntent: "Beginner tutorial and first action debugging",
     status: "published",
     finalScore: 98,
     keywords: [
-      "Screeps Creep body parts",
-      "Screeps WORK CARRY MOVE",
-      "getActiveBodyparts",
-      "BODYPART_COST",
-      "CARRY_CAPACITY",
+      "Screeps Creep harvest Energy",
+      "Creep.harvest",
+      "FIND_SOURCES",
+      "ERR_NOT_IN_RANGE",
+      "Creep.moveTo",
     ],
   },
   {
@@ -60,28 +79,6 @@ export const publishedEnglishArticles: EnglishArticleRecord[] = [
     ],
   },
   {
-    href: "/en/blog/screeps-creep-harvest-energy",
-    chinesePath: "/blog/screeps-first-creep-harvest",
-    category: "BEGINNER · ENERGY HARVESTING",
-    title: "How to Make Your First Screeps Creep Harvest Energy",
-    description:
-      "Find a named Creep and Source, call harvest(), move only when range is insufficient, and inspect the action results across ticks.",
-    publishedAt: "2026-07-24",
-    publishedLabel: "July 24, 2026",
-    readingTime: "11 min read",
-    primaryKeyword: "Screeps Creep harvest Energy",
-    searchIntent: "Beginner tutorial and first action debugging",
-    status: "published",
-    finalScore: 98,
-    keywords: [
-      "Screeps Creep harvest Energy",
-      "Creep.harvest",
-      "FIND_SOURCES",
-      "ERR_NOT_IN_RANGE",
-      "Creep.moveTo",
-    ],
-  },
-  {
     href: "/en/blog/screeps-remove-construction-site",
     chinesePath: "/blog/screeps-construction-site-remove",
     category: "API SAFETY · CONSTRUCTION",
@@ -103,6 +100,32 @@ export const publishedEnglishArticles: EnglishArticleRecord[] = [
       "ERR_NOT_OWNER",
     ],
   },
+];
+
+const beginnerPaths = [
+  "/en/blog/screeps-introduction",
+  "/en/blog/screeps-first-room",
+  "/en/blog/screeps-tick-game-loop",
+  "/en/blog/screeps-creep-harvest-energy",
+  "/en/blog/screeps-transfer-energy-to-spawn",
+  "/en/blog/screeps-creep-body-parts",
+  "/en/blog/screeps-spawn-creep",
+  "/en/blog/screeps-creep-roles",
+  "/en/blog/screeps-upgrade-controller",
+  "/en/blog/screeps-first-extension",
+  "/en/blog/screeps-build-repair",
+  "/en/blog/screeps-first-room-code",
+] as const;
+
+const allRecords = [...generatedBeginnerRecords, ...fixedRecords];
+
+export const publishedEnglishArticles: EnglishArticleRecord[] = [
+  ...beginnerPaths.map((href) => {
+    const record = allRecords.find((article) => article.href === href);
+    if (!record) throw new Error(`Missing English article record: ${href}`);
+    return record;
+  }),
+  fixedRecords[2],
 ];
 
 export const englishArticleRoutePairs = Object.fromEntries(
