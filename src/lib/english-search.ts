@@ -1,13 +1,15 @@
+import { publishedEnglishArticles } from "@/lib/english-articles";
+
 export interface EnglishSearchDocument {
   id: string;
   title: string;
   description: string;
   href: string;
-  type: "Page" | "Reference" | "Tool";
+  type: "Page" | "Reference" | "Tool" | "Article";
   keywords: string[];
 }
 
-export const englishSearchDocuments: EnglishSearchDocument[] = [
+const foundationDocuments: EnglishSearchDocument[] = [
   {
     id: "english-home",
     title: "Screeps Tutorials, Debugging Guides and Tools",
@@ -88,4 +90,24 @@ export const englishSearchDocuments: EnglishSearchDocument[] = [
     type: "Page",
     keywords: ["linqingan", "about", "github", "project"],
   },
+];
+
+const articleDocuments: EnglishSearchDocument[] = publishedEnglishArticles.map(
+  (article) => ({
+    id: article.href.replace(/^\//, "").replaceAll("/", "-"),
+    title: article.title,
+    description: article.description,
+    href: article.href,
+    type: "Article",
+    keywords: [
+      article.primaryKeyword,
+      article.searchIntent,
+      ...article.keywords,
+    ],
+  }),
+);
+
+export const englishSearchDocuments: EnglishSearchDocument[] = [
+  ...articleDocuments,
+  ...foundationDocuments,
 ];
