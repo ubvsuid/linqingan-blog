@@ -28,6 +28,8 @@ const exactRoutes = new Set([
   "/en",
   "/en/about",
   "/en/beginner",
+  "/en/blog",
+  "/en/blog/screeps-remove-construction-site",
   "/en/glossary",
   "/en/knowledge",
   "/en/screeps-errors",
