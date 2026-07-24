@@ -43,7 +43,7 @@ export default function EnglishBeginnerPage() {
           <p className="eyebrow">BEGINNER ROADMAP</p>
           <h1>Learn Screeps in a stable order</h1>
           <p>
-            This page defines the English learning sequence before the individual lessons are published. It keeps the future article series focused on one beginner question at a time.
+            This page defines the English learning sequence while focused lessons are published in verified batches. It keeps each article centered on one beginner question.
           </p>
         </header>
 
@@ -59,11 +59,17 @@ export default function EnglishBeginnerPage() {
         <div className={styles.notice}>
           <strong>Article status</strong>
           <p>
-            The English articles are intentionally not published yet. The first batch will focus on Creep movement, ERR_NOT_IN_RANGE, spawnCreep return codes, harvesting, delivery, Memory state, and CPU basics.
+            The first verified English article is live. It covers safe Construction Site removal and next-tick verification. Beginner movement, spawning, harvesting, delivery, Memory, and CPU lessons remain planned as separate articles.
           </p>
         </div>
 
         <section className={styles.grid} aria-label="Beginner resources" style={{ marginTop: 48 }}>
+          <article className={styles.card}>
+            <p className="eyebrow">FIRST ARTICLE</p>
+            <h2>Remove a Construction Site safely</h2>
+            <p>Learn the inspect, validate, submit-once, and next-tick verification workflow.</p>
+            <Link href="/en/blog/screeps-remove-construction-site">Read the guide →</Link>
+          </article>
           <article className={styles.card}>
             <p className="eyebrow">REFERENCE</p>
             <h2>Check common error codes</h2>
