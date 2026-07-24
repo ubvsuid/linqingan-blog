@@ -1,63 +1,93 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
 import {
+  englishBeginnerArticles,
   getEnglishBeginnerArticle,
-  type EnglishBeginnerArticle,
 } from "@/lib/english-beginner-content";
 import { siteConfig } from "@/lib/site";
 
-function requireBodyPartsArticle(): EnglishBeginnerArticle {
-  const value = getEnglishBeginnerArticle("screeps-creep-body-parts");
-
-  if (!value) {
-    throw new Error("Missing English beginner article: screeps-creep-body-parts");
-  }
-
-  return value;
+interface EnglishBeginnerArticlePageProps {
+  params: Promise<{
+    slug: string;
+  }>;
 }
 
-const article = requireBodyPartsArticle();
-const articleUrl = `${siteConfig.url}${article.path}`;
+const staticBeginnerSlugs = new Set(["screeps-creep-body-parts"]);
 
-export const metadata: Metadata = {
-  title: { absolute: `${article.title} | Linqingan` },
-  description: article.description,
-  keywords: article.keywords,
-  alternates: {
-    canonical: article.path,
-    languages: {
-      en: article.path,
-      "zh-CN": article.chinesePath,
-      "x-default": article.path,
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return englishBeginnerArticles
+    .filter((article) => !staticBeginnerSlugs.has(article.slug))
+    .map((article) => ({ slug: article.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: EnglishBeginnerArticlePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const article = getEnglishBeginnerArticle(slug);
+
+  if (!article || staticBeginnerSlugs.has(slug)) {
+    return {
+      title: "Article not found",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const articleUrl = `${siteConfig.url}${article.path}`;
+
+  return {
+    title: { absolute: `${article.title} | Linqingan` },
+    description: article.description,
+    keywords: article.keywords,
+    alternates: {
+      canonical: article.path,
+      languages: {
+        en: article.path,
+        "zh-CN": article.chinesePath,
+        "x-default": article.path,
+      },
     },
-  },
-  openGraph: {
-    type: "article",
-    locale: "en_US",
-    alternateLocale: ["zh_CN"],
-    url: articleUrl,
-    siteName: "Linqingan",
-    title: `${article.title} | Linqingan`,
-    description: article.description,
-    publishedTime: article.publishedAt,
-    modifiedTime: article.publishedAt,
-    tags: article.tags,
-    images: [{
-      url: `${siteConfig.url}/opengraph-image`,
-      width: 1200,
-      height: 630,
-    }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${article.title} | Linqingan`,
-    description: article.description,
-    images: [`${siteConfig.url}/opengraph-image`],
-  },
-};
+    openGraph: {
+      type: "article",
+      locale: "en_US",
+      alternateLocale: ["zh_CN"],
+      url: articleUrl,
+      siteName: "Linqingan",
+      title: `${article.title} | Linqingan`,
+      description: article.description,
+      publishedTime: article.publishedAt,
+      modifiedTime: article.publishedAt,
+      tags: article.tags,
+      images: [{
+        url: `${siteConfig.url}/opengraph-image`,
+        width: 1200,
+        height: 630,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${article.title} | Linqingan`,
+      description: article.description,
+      images: [`${siteConfig.url}/opengraph-image`],
+    },
+  };
+}
 
-export default function EnglishCreepBodyPartsPage() {
+export default async function EnglishBeginnerArticlePage({
+  params,
+}: EnglishBeginnerArticlePageProps) {
+  const { slug } = await params;
+  const article = getEnglishBeginnerArticle(slug);
+
+  if (!article || staticBeginnerSlugs.has(slug)) {
+    notFound();
+  }
+
+  const articleUrl = `${siteConfig.url}${article.path}`;
   const jsonLd = [
     {
       "@context": "https://schema.org",

@@ -29,10 +29,19 @@ const exactRoutes = new Set([
   "/en/about",
   "/en/beginner",
   "/en/blog",
-  "/en/blog/screeps-creep-body-parts",
+  "/en/blog/screeps-introduction",
+  "/en/blog/screeps-first-room",
+  "/en/blog/screeps-tick-game-loop",
   "/en/blog/screeps-creep-harvest-energy",
-  "/en/blog/screeps-remove-construction-site",
   "/en/blog/screeps-transfer-energy-to-spawn",
+  "/en/blog/screeps-creep-body-parts",
+  "/en/blog/screeps-spawn-creep",
+  "/en/blog/screeps-creep-roles",
+  "/en/blog/screeps-upgrade-controller",
+  "/en/blog/screeps-first-extension",
+  "/en/blog/screeps-build-repair",
+  "/en/blog/screeps-first-room-code",
+  "/en/blog/screeps-remove-construction-site",
   "/en/glossary",
   "/en/knowledge",
   "/en/screeps-errors",
@@ -66,12 +75,24 @@ function routeExists(href) {
   return false;
 }
 
+function hasPageForRoute(route) {
+  const pagePath = path.join(root, "src", "app", ...route.slice(1).split("/"), "page.tsx");
+  if (fs.existsSync(pagePath)) return true;
+
+  if (/^\/en\/blog\/[a-z0-9-]+$/.test(route)) {
+    return fs.existsSync(
+      path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx"),
+    );
+  }
+
+  return false;
+}
+
 const errors = [];
 for (const route of exactRoutes) {
   if (route === "/" || route === "/feed.xml") continue;
-  const pagePath = path.join(root, "src", "app", ...route.slice(1).split("/"), "page.tsx");
-  if (!fs.existsSync(pagePath)) {
-    errors.push(`已登记路由缺少页面文件 ${route}: ${path.relative(root, pagePath)}`);
+  if (!hasPageForRoute(route)) {
+    errors.push(`已登记路由缺少页面文件 ${route}`);
   }
 }
 
@@ -105,4 +126,6 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`组件与数据内链检查通过：${exactRoutes.size} 个静态路由已登记，未发现旧页面链接或未知站内目标。`);
+console.log(
+  `组件与数据内链检查通过：${exactRoutes.size} 个静态或动态路由已登记，未发现旧页面链接或未知站内目标。`,
+);
