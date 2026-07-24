@@ -13,7 +13,7 @@ jobs:
   export:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Package source tree
