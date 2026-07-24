@@ -9,7 +9,7 @@ import styles from "../english.module.css";
 
 export const metadata = createEnglishPageMetadata({
   title: "Search the English Screeps Section",
-  description: "Search English Screeps references, tools, roadmap pages, and knowledge topics on Linqingan.",
+  description: "Search English Screeps articles, references, tools, roadmap pages, and knowledge topics on Linqingan.",
   path: "/en/search",
   chinesePath: "/search",
   noindex: true,
@@ -31,8 +31,8 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
         </nav>
         <header className={styles.header}>
           <p className="eyebrow">SEARCH</p>
-          <h1>Search the English foundation</h1>
-          <p>Search the current English roadmap, knowledge map, glossary, error codes, verification method, and working tools. Article results will appear after the English article batches are published.</p>
+          <h1>Search the English section</h1>
+          <p>Search published English articles, the beginner roadmap, knowledge topics, glossary, error codes, verification method, and working tools.</p>
         </header>
         <EnglishSiteSearch documents={englishSearchDocuments} initialQuery={initialQuery} />
       </Container>

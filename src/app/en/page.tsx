@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { publishedEnglishArticles } from "@/lib/english-articles";
 import { englishKnowledgeModules } from "@/lib/i18n";
 
 import styles from "../home.module.css";
@@ -57,7 +58,7 @@ export default function EnglishHomePage() {
           <p className={styles.heroDescription}>
             Learn the game step by step, debug code that does not behave as expected, and use focused tools for bodies, rooms, CPU, Memory, movement, and automation.
           </p>
-          <p className={styles.heroStats}>English foundation live · First verified article published</p>
+          <p className={styles.heroStats}>English foundation live · Beginner Creep sequence published</p>
 
           <section className="english-task-hub" aria-labelledby="english-task-title">
             <div className="english-task-heading">
@@ -68,15 +69,15 @@ export default function EnglishHomePage() {
               <article>
                 <span>01</span>
                 <p className="eyebrow">START LEARNING</p>
-                <h3>Understand Screeps from the beginning</h3>
-                <p>Follow a clear roadmap from ticks and the game loop to your first working room economy.</p>
+                <h3>Control your first Creep</h3>
+                <p>Harvest Energy, deliver it to a Spawn, and understand the body parts that make the loop possible.</p>
                 <Link href="/en/beginner">Open the beginner roadmap →</Link>
               </article>
               <article>
                 <span>02</span>
                 <p className="eyebrow">FIX A PROBLEM</p>
                 <h3>Search an API, error code, or symptom</h3>
-                <p>Search the English foundation for terms, return codes, tools, and common debugging questions.</p>
+                <p>Search published articles, terms, return codes, tools, and common debugging questions.</p>
                 <form role="search" action="/en/search">
                   <label htmlFor="english-home-search">Describe the problem</label>
                   <div>
@@ -100,7 +101,7 @@ export default function EnglishHomePage() {
       <section className={styles.learningSection} aria-labelledby="english-foundation-title">
         <Container>
           <div className={styles.sectionHeading}>
-            <div><p className="eyebrow">ENGLISH FOUNDATION</p><h2 id="english-foundation-title">Useful from the first published guide</h2></div>
+            <div><p className="eyebrow">ENGLISH FOUNDATION</p><h2 id="english-foundation-title">Verified beginner lessons and API safety guides</h2></div>
             <Link href="/en/blog">Read the articles →</Link>
           </div>
           <div className={styles.learningGrid}>
@@ -109,16 +110,16 @@ export default function EnglishHomePage() {
                 The English section combines navigation, reference pages, search, verification rules, functional tools, and focused articles. Each article is rewritten for a clear English search intent rather than translated sentence by sentence.
               </p>
               <div className={styles.statRow} aria-label="English foundation status">
-                <div><strong>1</strong><span>verified article</span></div>
+                <div><strong>{publishedEnglishArticles.length}</strong><span>verified articles</span></div>
                 <div><strong>2</strong><span>working tools</span></div>
                 <div><strong>8</strong><span>knowledge modules</span></div>
               </div>
             </article>
             <ol className={styles.stageList}>
-              <li><span>01</span><div><strong>Beginner roadmap</strong><p>A sequence for learning ticks, creeps, spawning, roles, upgrading, construction, and the first room loop.</p></div></li>
+              <li><span>01</span><div><strong>First Creep sequence</strong><p>Harvest Energy, deliver it to a Spawn, and understand WORK, CARRY, and MOVE.</p></div></li>
               <li><span>02</span><div><strong>Reference pages</strong><p>English error-code and glossary pages for quick lookup while reading code or the official API.</p></div></li>
               <li><span>03</span><div><strong>Practical tools</strong><p>Interactive body calculations and room snapshot diagnostics with explicit boundaries.</p></div></li>
-              <li><span>04</span><div><strong>Verified article batches</strong><p>The first API-safety guide is live, with further articles added only after source, code, and duplicate-intent checks.</p></div></li>
+              <li><span>04</span><div><strong>Verified publication batches</strong><p>New articles are added only after source, official API, code, and duplicate-intent checks.</p></div></li>
             </ol>
           </div>
         </Container>

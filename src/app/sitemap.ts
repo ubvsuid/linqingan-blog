@@ -5,6 +5,7 @@ import {
   CHANGELOG_ITEMS_PER_PAGE,
   changelogEntries,
 } from "@/lib/changelog";
+import { publishedEnglishArticles } from "@/lib/english-articles";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
 import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
@@ -25,7 +26,6 @@ const staticPageDates = {
   creepBodyCalculator: "2026-07-22",
   roomDiagnostics: "2026-07-23",
   englishFoundation: "2026-07-24",
-  englishConstructionSiteGuide: "2026-07-24",
 };
 
 function createArchivePages(
@@ -167,12 +167,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const englishUpdatedAt = new Date(staticPageDates.englishFoundation);
-  const englishArticleUpdatedAt = new Date(staticPageDates.englishConstructionSiteGuide);
+  const englishArticleUpdatedAt = latestDate(
+    publishedEnglishArticles.map((article) => article.publishedAt),
+    staticPageDates.englishFoundation,
+  );
   const englishStaticPages: MetadataRoute.Sitemap = [
     { url: `${siteConfig.url}/en`, lastModified: englishUpdatedAt, changeFrequency: "weekly", priority: 0.92 },
-    { url: `${siteConfig.url}/en/beginner`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
+    { url: `${siteConfig.url}/en/beginner`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.86 },
     { url: `${siteConfig.url}/en/blog`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.88 },
-    { url: `${siteConfig.url}/en/blog/screeps-remove-construction-site`, lastModified: englishArticleUpdatedAt, changeFrequency: "monthly", priority: 0.84 },
     { url: `${siteConfig.url}/en/knowledge`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
     { url: `${siteConfig.url}/en/tools`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteConfig.url}/en/tools/creep-body-calculator`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.84 },
@@ -181,6 +183,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/en/glossary`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.74 },
     { url: `${siteConfig.url}/en/verification`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.68 },
     { url: `${siteConfig.url}/en/about`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.65 },
+    ...publishedEnglishArticles.map((article) => ({
+      url: `${siteConfig.url}${article.href}`,
+      lastModified: new Date(article.publishedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.84,
+    })),
   ];
 
   const knowledgeModulePages: MetadataRoute.Sitemap = knowledgeBaseSections.map(

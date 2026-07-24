@@ -1,3 +1,5 @@
+import { englishArticleRoutePairs } from "@/lib/english-articles";
+
 export const englishNavigation = [
   { label: "Home", href: "/en" },
   { label: "Beginner", href: "/en/beginner" },
@@ -11,7 +13,7 @@ export const languageRoutePairs = {
   "/": "/en",
   "/beginner": "/en/beginner",
   "/blog": "/en/blog",
-  "/blog/screeps-construction-site-remove": "/en/blog/screeps-remove-construction-site",
+  ...englishArticleRoutePairs,
   "/knowledge": "/en/knowledge",
   "/knowledge#reference-tools": "/en/tools",
   "/tools/creep-body-calculator": "/en/tools/creep-body-calculator",
