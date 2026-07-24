@@ -29,10 +29,6 @@ export function SiteHeader() {
   );
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (!menuOpen) return;
 
     firstNavigationLinkRef.current?.focus();
@@ -152,6 +148,7 @@ export function SiteHeader() {
               lang={english ? "zh-CN" : "en"}
               aria-label={english ? "切换到中文" : "Switch to English"}
               title={english ? "切换到中文" : "Switch to English"}
+              onClick={() => setMenuOpen(false)}
             >
               {english ? "中文" : "EN"}
             </Link>
@@ -160,6 +157,7 @@ export function SiteHeader() {
               href={searchHref}
               aria-label={english ? "Search the English site" : "搜索网站"}
               title={english ? "Search" : "搜索网站"}
+              onClick={() => setMenuOpen(false)}
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="11" cy="11" r="6.5" />
@@ -172,6 +170,7 @@ export function SiteHeader() {
               href={aboutHref}
               aria-label={english ? "About Linqingan" : "查看临清安的个人主页"}
               title={english ? "About" : "个人主页"}
+              onClick={() => setMenuOpen(false)}
             >
               <Image src="/profile-avatar.webp" alt="" width={36} height={36} />
             </Link>
