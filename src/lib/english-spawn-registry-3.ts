@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishSpawnBatchThreeRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-spawncreep-return-codes",
+    chinesePath: "/blog/screeps-spawncreep-return-codes",
+    category: "SPAWNING · RETURN-CODE DEBUGGING",
+    title: "How to Debug spawnCreep() Return Codes in Screeps",
+    description:
+      "Validate the Spawn, Creep name, body, Energy, Memory, and optional structures; run dryRun first; preserve the real spawnCreep() result; and map each error code to a concrete fix.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps spawnCreep return codes",
+    searchIntent: "Focused spawn request diagnosis after a failed spawnCreep call",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps spawnCreep return codes",
+      "spawnCreep dryRun",
+      "ERR_NOT_ENOUGH_ENERGY spawnCreep",
+      "ERR_NAME_EXISTS Screeps",
+      "Screeps Spawn debugging",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-dynamic-creep-body",
+    chinesePath: "/blog/screeps-dynamic-creep-body-energy",
+    category: "SPAWNING · DYNAMIC BODY DESIGN",
+    title: "How to Build a Screeps Creep Body from Available Energy",
+    description:
+      "Distinguish current Energy from room capacity, repeat a role-specific body unit, enforce the 50-part limit, calculate cost and spawn time, and decide when to spawn a smaller emergency body.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "15 min read",
+    primaryKeyword: "Screeps dynamic Creep body",
+    searchIntent: "Body-generation algorithm and current-Energy strategy",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps dynamic Creep body",
+      "build Creep body from energyAvailable",
+      "Screeps 50 body part limit",
+      "CREEP_SPAWN_TIME",
+      "Screeps body cost calculator code",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-emergency-harvester-recovery",
+    chinesePath: "/blog/screeps-spawn-emergency-recovery",
+    category: "SPAWNING · EMERGENCY RECOVERY",
+    title: "How to Recover a Screeps Room with No Harvesters",
+    description:
+      "Count current live harvesters, choose one idle active Spawn, require a minimum WORK-CARRY-MOVE body, use a unique name and dryRun, and prevent multiple Spawns from submitting duplicate recovery requests.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps no harvester recovery",
+    searchIntent: "Emergency room recovery after the last harvester dies",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps no harvester recovery",
+      "Screeps emergency harvester",
+      "recover room with no creeps",
+      "Screeps Spawn 200 energy recovery",
+      "Screeps colony collapse code",
+    ],
+  },
+];
