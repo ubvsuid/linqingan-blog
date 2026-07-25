@@ -45,26 +45,4 @@ export const englishConfigCodeBatchSixteenRegistry: EnglishArticleRecord[] = [
       "Screeps stale game objects",
     ],
   },
-  {
-    href: "/en/blog/screeps-memory-write-safety",
-    chinesePath: "/blog/screeps-memory-basics",
-    category: "PERSISTENCE · MEMORY WRITE SAFETY",
-    title: "How to Write Screeps Memory Without Losing Data or Saving Live Objects",
-    description:
-      "Initialize Memory namespaces, store JSON-safe values and stable IDs, understand serialization edge cases, validate replacement objects before assignment, version schemas, migrate explicitly, and rate-limit RawMemory inspection.",
-    publishedAt: "2026-07-26",
-    publishedLabel: "July 26, 2026",
-    readingTime: "19 min read",
-    primaryKeyword: "Screeps Memory write safety",
-    searchIntent: "Persist validated JSON-safe Screeps state without saving live game objects or corrupting a schema",
-    status: "published",
-    finalScore: 98,
-    keywords: [
-      "Screeps Memory write safety",
-      "Screeps Memory JSON serialization",
-      "Screeps store object ID in Memory",
-      "Screeps Memory schema migration",
-      "Screeps RawMemory get size",
-    ],
-  },
 ];
