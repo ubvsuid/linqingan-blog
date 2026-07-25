@@ -5,7 +5,7 @@ import {
   CHANGELOG_ITEMS_PER_PAGE,
   changelogEntries,
 } from "@/lib/changelog";
-import { publishedEnglishArticles } from "@/lib/english-articles";
+import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
 import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
@@ -25,7 +25,7 @@ const staticPageDates = {
   verification: "2026-07-22",
   creepBodyCalculator: "2026-07-22",
   roomDiagnostics: "2026-07-23",
-  englishFoundation: "2026-07-24",
+  englishFoundation: "2026-07-25",
 };
 
 function createArchivePages(
