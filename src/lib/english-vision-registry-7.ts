@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishVisionBatchSevenRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-room-visibility",
+    chinesePath: "/blog/screeps-room-visibility",
+    category: "VISION · GAME.ROOMS AND LIVE OBJECTS",
+    title: "Why Is Game.rooms[roomName] Undefined in Screeps?",
+    description:
+      "Understand when a Room exists in Game.rooms, separate current-tick visibility from historical Memory, guard Controller and structure reads, and build a safe visibility-first inspection helper.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "13 min read",
+    primaryKeyword: "Screeps Game.rooms undefined",
+    searchIntent: "Explain why a Room object is missing and inspect visible rooms safely",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.rooms undefined",
+      "Screeps room visibility",
+      "Game.rooms roomName",
+      "Screeps Memory rooms vs Game rooms",
+      "Screeps visible room object",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-observer-observe-room",
+    chinesePath: "/blog/screeps-observer-observe-room",
+    category: "VISION · OBSERVER REQUEST LIFECYCLE",
+    title: "How to Use StructureObserver.observeRoom() Safely",
+    description:
+      "Schedule Observer vision, store the accepted request, read the target Room on the next tick, preserve bounded intel, handle return codes, and avoid claiming that current visibility proves the new request completed.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps StructureObserver observeRoom",
+    searchIntent: "Build a correct next-tick Observer request and room-intel workflow",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps StructureObserver observeRoom",
+      "Screeps Observer next tick",
+      "Screeps room intel Observer",
+      "OBSERVER_RANGE Screeps",
+      "observeRoom return codes",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-pathfinder-costmatrix",
+    chinesePath: "/blog/screeps-pathfinder-costmatrix",
+    category: "PATHFINDING · COSTMATRIX AND ROOM CALLBACKS",
+    title: "How to Build a Safe PathFinder CostMatrix in Screeps",
+    description:
+      "Use CostMatrix values 0–255 correctly, classify roads and structures, separate invisible rooms from blocked rooms, layer dynamic Creep costs, validate coordinates, and reject incomplete PathFinder results.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "19 min read",
+    primaryKeyword: "Screeps PathFinder CostMatrix",
+    searchIntent: "Build and debug a room CostMatrix for structures, traffic, and custom avoidance",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps PathFinder CostMatrix",
+      "Screeps roomCallback false undefined",
+      "CostMatrix road cost 255",
+      "Screeps PathFinder incomplete",
+      "Screeps obstacle pathfinding",
+    ],
+  },
+];
