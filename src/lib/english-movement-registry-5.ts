@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishMovementBatchFiveRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-err-not-in-range",
+    chinesePath: "/blog/screeps-err-not-in-range",
+    category: "MOVEMENT · ACTION RANGE DEBUGGING",
+    title: "How to Fix ERR_NOT_IN_RANGE in Screeps",
+    description:
+      "Identify which action returned ERR_NOT_IN_RANGE, use its real range, save the moveTo() result separately, and retry the original action on a later tick instead of assuming movement is immediate.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "15 min read",
+    primaryKeyword: "Screeps ERR_NOT_IN_RANGE",
+    searchIntent: "Action-range diagnosis and correct move-then-retry pattern",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps ERR_NOT_IN_RANGE",
+      "Screeps action range",
+      "Creep moveTo after ERR_NOT_IN_RANGE",
+      "upgradeController range 3",
+      "Screeps move result debugging",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-moveto-not-moving",
+    chinesePath: "/blog/screeps-moveto-not-moving",
+    category: "MOVEMENT · NO-PROGRESS DEBUGGING",
+    title: "Why moveTo() Returns OK but Your Screeps Creep Does Not Move",
+    description:
+      "Distinguish an accepted movement order from later position change, validate the target and active MOVE parts, inspect fatigue and range, track roomName:x:y across ticks, and diagnose traffic, cached paths, and overwritten movement orders.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps moveTo OK not moving",
+    searchIntent: "Multi-tick movement progress diagnosis after moveTo returned OK",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps moveTo OK not moving",
+      "Screeps Creep stuck",
+      "Creep fatigue movement",
+      "moveTo reusePath debugging",
+      "Screeps movement overwritten",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-err-no-path",
+    chinesePath: "/blog/screeps-err-no-path",
+    category: "MOVEMENT · PATHFINDING DEBUGGING",
+    title: "How to Debug ERR_NO_PATH in Screeps",
+    description:
+      "Distinguish ERR_NO_PATH, ERR_NOT_FOUND and PathFinder incomplete results; validate target range; correct CostMatrix walkability; inspect callbacks, maxOps, maxRooms and cross-room routes; and separate temporary traffic from a failed search.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps ERR_NO_PATH",
+    searchIntent: "Path search, callback and cross-room route diagnosis",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps ERR_NO_PATH",
+      "Screeps PathFinder incomplete",
+      "CostMatrix 255 Screeps",
+      "roomCallback false Screeps",
+      "Game.map.findRoute ERR_NO_PATH",
+    ],
+  },
+];
