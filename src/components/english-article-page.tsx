@@ -30,6 +30,16 @@ interface EnglishArticlePageProps {
   next?: ArticleNavigationItem;
 }
 
+const headingIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function normalizeTocItem([first, second]: [string, string]) {
+  if (headingIdPattern.test(first) && !headingIdPattern.test(second)) {
+    return { id: first, label: second };
+  }
+
+  return { id: second, label: first };
+}
+
 export function EnglishArticlePage({
   headline,
   description,
@@ -93,9 +103,11 @@ export function EnglishArticlePage({
           <nav className="article-toc english-toc" aria-label="Table of contents">
             <p className="article-toc-title">Table of contents</p>
             <ol>
-              {toc.map(([label, id]) => (
-                <li key={id}><a href={`#${id}`}>{label}</a></li>
-              ))}
+              {toc.map((item) => {
+                const { id, label } = normalizeTocItem(item);
+
+                return <li key={id}><a href={`#${id}`}>{label}</a></li>;
+              })}
             </ol>
           </nav>
 
