@@ -12,11 +12,19 @@ const source = fs.readFileSync(filePath, "utf8");
 const corrections = [
   [
     "/en/blog/screeps-storage-energy-usage",
+    "/en/blog/screeps-withdraw-container-energy",
+  ],
+  [
     "/en/blog/screeps-link-transfer-energy",
+    "/en/blog/screeps-withdraw-container-energy",
   ],
   [
     "Use Storage Energy Safely",
+    "Withdraw Energy from a Container",
+  ],
+  [
     "Transfer Energy Between Links",
+    "Withdraw Energy from a Container",
   ],
 ];
 
@@ -27,8 +35,8 @@ for (const [from, to] of corrections) {
 
 if (next === source) {
   if (
-    source.includes("/en/blog/screeps-link-transfer-energy")
-    && source.includes("Transfer Energy Between Links")
+    source.includes("/en/blog/screeps-withdraw-container-energy")
+    && source.includes("Withdraw Energy from a Container")
   ) {
     console.log("Market batch ten link correction already applied.");
     process.exit(0);
