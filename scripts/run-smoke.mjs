@@ -30,7 +30,7 @@ function stopServer() {
   }
 }
 
-const smoke = spawn(process.execPath, ["scripts/smoke-test.mjs"], {
+const smoke = spawn(process.execPath, ["scripts/smoke-all.mjs"], {
   env: { ...process.env, BASE_URL: baseUrl },
   stdio: "inherit",
 });
@@ -59,6 +59,7 @@ process.on("SIGINT", () => {
   stopServer();
   process.exit(130);
 });
+
 process.on("SIGTERM", () => {
   stopServer();
   process.exit(143);

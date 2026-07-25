@@ -52,6 +52,16 @@ const exactRoutes = new Set([
   "/en/verification",
 ]);
 
+const englishRegistryPath = path.join(root, "src", "lib", "english-articles.ts");
+if (fs.existsSync(englishRegistryPath)) {
+  const registrySource = fs.readFileSync(englishRegistryPath, "utf8");
+  for (const match of registrySource.matchAll(
+    /["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g,
+  )) {
+    exactRoutes.add(match[1]);
+  }
+}
+
 function walk(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const fullPath = path.join(directory, entry.name);
