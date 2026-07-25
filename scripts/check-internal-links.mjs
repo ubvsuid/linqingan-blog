@@ -42,6 +42,7 @@ const exactRoutes = new Set([
   "/en/blog/screeps-build-repair",
   "/en/blog/screeps-first-room-code",
   "/en/blog/screeps-remove-construction-site",
+  "/en/blog/screeps-memory-write-safety",
   "/en/glossary",
   "/en/knowledge",
   "/en/screeps-errors",
@@ -145,5 +146,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `组件与数据内链检查通过：${exactRoutes.size} 个静态或动态路由已登记，自动发现 ${englishRegistryPaths.length} 个英文登记文件，未发现旧页面链接或未知站内目标。`,
+  `组件与数据内链检查通过：${exactRoutes.size} 个静态、重定向或动态路由已登记，自动发现 ${englishRegistryPaths.length} 个英文登记文件，未发现旧页面链接或未知站内目标。`,
 );
