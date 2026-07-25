@@ -42,29 +42,9 @@ const publishedScreepsSlugs = fs.readdirSync(postsDirectory)
   .map((name) => name.replace(/\.md$/, ""))
   .sort();
 
-const exclusions = new Map([
-  [
-    "screeps-construction-site-remove",
-    "主题由 /en/blog/screeps-remove-construction-site 覆盖；保留为中文重复来源，不创建英文重复页面",
-  ],
-]);
-
 for (const slug of publishedScreepsSlugs) {
-  if (mappedSlugs.has(slug) || exclusions.has(slug)) {
-    continue;
-  }
-
-  failures.push(`未映射中文文章 /blog/${slug}`);
-}
-
-for (const [slug, reason] of exclusions) {
-  const exists = publishedScreepsSlugs.includes(slug);
-  if (!exists) {
-    failures.push(`覆盖排除项不存在 /blog/${slug}`);
-  }
-
-  if (typeof reason !== "string" || reason.length < 20) {
-    failures.push(`覆盖排除项缺少充分理由 /blog/${slug}`);
+  if (!mappedSlugs.has(slug)) {
+    failures.push(`未映射中文文章 /blog/${slug}`);
   }
 }
 
@@ -94,5 +74,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `英文来源覆盖检查通过：${publishedScreepsSlugs.length} 篇已发布中文 Screeps 文章，${mappedSlugs.size} 个英文来源映射，${exclusions.size} 个有理由的重复来源排除项。`,
+  `英文来源覆盖检查通过：${publishedScreepsSlugs.length} 篇已发布中文 Screeps 文章全部具有唯一英文来源映射；当前共 ${mappedSlugs.size} 个映射。`,
 );
