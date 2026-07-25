@@ -1,4 +1,4 @@
-import { publishedEnglishArticles } from "@/lib/english-articles";
+import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 
 export interface EnglishSearchDocument {
   id: string;
