@@ -18,6 +18,11 @@ const replacements = [
     from: "  !rampartBody.includes(\"SET_RAMPART_${state}_${roomName}_${x}_${y}\")",
     to: "  !rampartBody.includes(\"'SET_RAMPART_' + state + '_' + roomName + '_' + x + '_' + y\")",
   },
+  {
+    file: "src/lib/english-nuker-launch-17.ts",
+    from: "/en/blog/screeps-memory-write-safety",
+    to: "/en/blog/screeps-memory-basics",
+  },
 ];
 
 let changed = 0;
@@ -31,7 +36,7 @@ for (const replacement of replacements) {
 
   if (!source.includes(replacement.from)) {
     throw new Error(
-      `Expected template snippet missing in ${replacement.file}`,
+      `Expected correction source missing in ${replacement.file}: ${replacement.from}`,
     );
   }
 
@@ -42,6 +47,6 @@ for (const replacement of replacements) {
 
 console.log(
   changed > 0
-    ? `Applied ${changed} defense batch template-string corrections.`
-    : "Defense batch template-string corrections already applied.",
+    ? `Applied ${changed} defense batch source corrections.`
+    : "Defense batch source corrections already applied.",
 );
