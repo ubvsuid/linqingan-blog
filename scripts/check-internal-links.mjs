@@ -52,24 +52,16 @@ const exactRoutes = new Set([
   "/en/verification",
 ]);
 
-const englishRegistryPaths = [
-  path.join(root, "src", "lib", "english-articles.ts"),
-  path.join(root, "src", "lib", "english-foundation-registry-2.ts"),
-  path.join(root, "src", "lib", "english-spawn-registry-3.ts"),
-  path.join(root, "src", "lib", "english-lifecycle-registry-4.ts"),
-  path.join(root, "src", "lib", "english-movement-registry-5.ts"),
-  path.join(root, "src", "lib", "english-movement-registry-6.ts"),
-  path.join(root, "src", "lib", "english-vision-registry-7.ts"),
-  path.join(root, "src", "lib", "english-runtime-registry-8.ts"),
-  path.join(root, "src", "lib", "english-observability-registry-9.ts"),
-  path.join(root, "src", "lib", "english-market-registry-10.ts"),
-  path.join(root, "src", "lib", "english-lab-factory-registry-11.ts"),
-  path.join(root, "src", "lib", "english-mineral-storage-power-registry-12.ts"),
-  path.join(root, "src", "lib", "english-tower-registry-13.ts"),
-  path.join(root, "src", "lib", "english-controller-registry-14.ts"),
-];
+const englishLibDirectory = path.join(root, "src", "lib");
+const englishRegistryPaths = fs.readdirSync(englishLibDirectory)
+  .filter((name) =>
+    name === "english-articles.ts"
+    || /^english-[a-z0-9-]+-registry-\d+\.ts$/.test(name)
+  )
+  .sort()
+  .map((name) => path.join(englishLibDirectory, name));
+
 for (const englishRegistryPath of englishRegistryPaths) {
-  if (!fs.existsSync(englishRegistryPath)) continue;
   const registrySource = fs.readFileSync(englishRegistryPath, "utf8");
   for (const match of registrySource.matchAll(
     /["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g,
@@ -153,5 +145,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `组件与数据内链检查通过：${exactRoutes.size} 个静态或动态路由已登记，未发现旧页面链接或未知站内目标。`,
+  `组件与数据内链检查通过：${exactRoutes.size} 个静态或动态路由已登记，自动发现 ${englishRegistryPaths.length} 个英文登记文件，未发现旧页面链接或未知站内目标。`,
 );
