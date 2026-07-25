@@ -17,3 +17,4 @@ await import("./smoke-english-construction-15.mjs");
 await import("./smoke-english-config-16.mjs");
 await import("./smoke-english-defense-17.mjs");
 await import("./smoke-english-link-source-18.mjs");
+await import("./smoke-english-library-release.mjs");
