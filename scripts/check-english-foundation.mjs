@@ -9,7 +9,14 @@ const sourcePath = path.join(
   "lib",
   "english-foundation-content.ts",
 );
+const componentPath = path.join(
+  process.cwd(),
+  "src",
+  "components",
+  "english-article-page.tsx",
+);
 const source = fs.readFileSync(sourcePath, "utf8");
+const componentSource = fs.readFileSync(componentPath, "utf8");
 
 const requiredSlugs = [
   "screeps-memory-basics",
@@ -85,6 +92,27 @@ for (const match of source.matchAll(/href="(\/en\/[^"#?]+)"/g)) {
   }
 }
 
+const tocPairs = [
+  ...source.matchAll(/\["([a-z0-9]+(?:-[a-z0-9]+)*)", "([^"]+)"\],/g),
+].map((match) => ({ id: match[1], label: match[2] }));
+
+if (tocPairs.length < 30) {
+  failures.push(`目录条目只有 ${tocPairs.length} 个，预期至少 30 个`);
+}
+
+for (const { id, label } of tocPairs) {
+  if (!source.includes(`<h2 id="${id}">`) && !source.includes(`<h3 id="${id}">`)) {
+    failures.push(`目录“${label}”找不到正文锚点：${id}`);
+  }
+}
+
+if (
+  !componentSource.includes("normalizeTocItem")
+  || !componentSource.includes("headingIdPattern")
+) {
+  failures.push("英文文章组件缺少目录元组规范化逻辑");
+}
+
 const codeBlocks = [
   ...source.matchAll(
     /<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g,
@@ -125,5 +153,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `英文专题质量检查通过：${requiredSlugs.length} 篇文章，${codeBlocks.length} 个 JavaScript 代码块。`,
+  `英文专题质量检查通过：${requiredSlugs.length} 篇文章，${tocPairs.length} 个目录锚点，${codeBlocks.length} 个 JavaScript 代码块。`,
 );
