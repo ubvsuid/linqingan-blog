@@ -8,7 +8,7 @@
   "scripts": {
     "predev": "npm run contentcheck",
     "dev": "next dev",
-    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run englishobservability9check && npm run englishmarket10check && npm run englishlabfactory11check && npm run englishresources12check && npm run englishtower13check && npm run englishcontroller14check && npm run englishconstruction15check && npm run englishconfig16check && npm run englishdefense17check && npm run englishlinksource18check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
+    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run englishmappingcheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run englishobservability9check && npm run englishmarket10check && npm run englishlabfactory11check && npm run englishresources12check && npm run englishtower13check && npm run englishcontroller14check && npm run englishconstruction15check && npm run englishconfig16check && npm run englishdefense17check && npm run englishlinksource18check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
     "build": "next build && node scripts/run-smoke.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -20,6 +20,7 @@
     "toolindexcheck": "node scripts/check-tool-indexing.mjs",
     "taggovernancecheck": "node scripts/check-tag-governance.mjs",
     "linkcheck": "node scripts/check-internal-links.mjs",
+    "englishmappingcheck": "node scripts/check-english-article-mapping.mjs",
     "codecheck": "node scripts/check-code-blocks.mjs",
     "englishfoundationcheck": "node scripts/check-english-foundation.mjs",
     "englishfoundation2check": "node scripts/check-english-foundation-2.mjs",
