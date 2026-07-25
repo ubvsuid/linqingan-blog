@@ -29,21 +29,6 @@ const articles = [
       "Pending",
     ],
   },
-  {
-    path: "/en/blog/screeps-memory-write-safety",
-    chinesePath: "/blog/screeps-memory-basics",
-    headline: "How to Write Screeps Memory Without Losing Data or Saving Live Objects",
-    query: "Memory schema",
-    signals: [
-      "isJsonSafe",
-      "typeof value === 'bigint'",
-      "CURRENT_MEMORY_SCHEMA",
-      "RawMemory.get()",
-      "2 MB",
-      "Live Memory serialization, global reset, size limit, migration and object-recovery test",
-      "Pending",
-    ],
-  },
 ];
 
 const failures = [];
@@ -109,14 +94,12 @@ if (
   failures.push("模块页面缺少单一 loop、角色契约或 tick 快照边界");
 }
 
-const memoryBody = await (await fetch(`${baseUrl}/en/blog/screeps-memory-write-safety`)).text();
-if (
-  !memoryBody.includes("typeof value === 'bigint'")
-  || !memoryBody.includes("Game.getObjectById(record.id)")
-  || !memoryBody.includes("CURRENT_MEMORY_SCHEMA")
-  || !memoryBody.includes("RawMemory.get()")
-) {
-  failures.push("Memory 页面缺少 JSON 类型、ID 恢复、版本或 RawMemory 边界");
+const duplicateResponse = await fetch(
+  `${baseUrl}/en/blog/screeps-memory-write-safety`,
+  { redirect: "manual" },
+);
+if (duplicateResponse.status !== 404) {
+  failures.push(`/en/blog/screeps-memory-write-safety: 预期撤下后 404，实际 ${duplicateResponse.status}`);
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog`, { redirect: "manual" });
@@ -126,6 +109,9 @@ if (blogResponse.status !== 200) {
 } else {
   for (const article of articles) {
     if (!blogBody.includes(article.headline)) failures.push(`/en/blog: 缺少 “${article.headline}”`);
+  }
+  if (blogBody.includes("How to Write Screeps Memory Without Losing Data or Saving Live Objects")) {
+    failures.push("/en/blog: 仍展示重复 Memory 页面");
   }
 }
 
@@ -138,12 +124,15 @@ if (sitemapResponse.status !== 200) {
     const expected = `https://www.linqingan.com${article.path}`;
     if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: 缺少 ${expected}`);
   }
+  if (sitemapBody.includes("https://www.linqingan.com/en/blog/screeps-memory-write-safety")) {
+    failures.push("/sitemap.xml: 仍包含重复 Memory 页面");
+  }
 }
 
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
-  console.error(`\n第十六批英文配置与代码生产冒烟测试失败：${failures.length} 项。`);
+  console.error(`\n第十六批英文配置与模块生产冒烟测试失败：${failures.length} 项。`);
   process.exit(1);
 }
 
-console.log(`第十六批英文配置与代码生产冒烟测试通过：${articles.length} 篇文章、Flags、模块与 Memory 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十六批英文配置与模块生产冒烟测试通过：${articles.length} 篇唯一来源文章、重复 Memory 页撤下、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
