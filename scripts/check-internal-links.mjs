@@ -52,8 +52,12 @@ const exactRoutes = new Set([
   "/en/verification",
 ]);
 
-const englishRegistryPath = path.join(root, "src", "lib", "english-articles.ts");
-if (fs.existsSync(englishRegistryPath)) {
+const englishRegistryPaths = [
+  path.join(root, "src", "lib", "english-articles.ts"),
+  path.join(root, "src", "lib", "english-foundation-registry-2.ts"),
+];
+for (const englishRegistryPath of englishRegistryPaths) {
+  if (!fs.existsSync(englishRegistryPath)) continue;
   const registrySource = fs.readFileSync(englishRegistryPath, "utf8");
   for (const match of registrySource.matchAll(
     /["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g,

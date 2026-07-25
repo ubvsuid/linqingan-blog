@@ -10,6 +10,10 @@ import {
   englishFoundationArticles,
   getEnglishFoundationArticle,
 } from "@/lib/english-foundation-content";
+import {
+  englishFoundationBatchTwoArticles,
+  getEnglishFoundationBatchTwoArticle,
+} from "@/lib/english-foundation-content-2";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -22,10 +26,13 @@ const staticBeginnerSlugs = new Set(["screeps-creep-body-parts"]);
 const dynamicEnglishArticles = [
   ...englishBeginnerArticles,
   ...englishFoundationArticles,
+  ...englishFoundationBatchTwoArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
-  return getEnglishBeginnerArticle(slug) ?? getEnglishFoundationArticle(slug);
+  return getEnglishBeginnerArticle(slug)
+    ?? getEnglishFoundationArticle(slug)
+    ?? getEnglishFoundationBatchTwoArticle(slug);
 }
 
 export const dynamicParams = false;

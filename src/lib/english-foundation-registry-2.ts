@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishFoundationBatchTwoRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-working-state",
+    chinesePath: "/blog/screeps-creep-working-state",
+    category: "FOUNDATION · WORKING STATE",
+    title: "How to Switch a Screeps Creep Between Getting Energy and Working",
+    description:
+      "Build a stable two-phase working state from Store boundaries, keep the previous state at partial Energy, handle initialization and invalid capacity, and separate harvesting from Controller upgrading.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "15 min read",
+    primaryKeyword: "Screeps working state",
+    searchIntent: "State-switching tutorial and task-flapping troubleshooting",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps working state",
+      "creep.memory.working",
+      "Screeps switch harvesting and working",
+      "Screeps Creep state machine",
+      "Store getUsedCapacity getFreeCapacity",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-get-object-by-id",
+    chinesePath: "/blog/screeps-game-get-object-by-id",
+    category: "FOUNDATION · TARGET RESTORATION",
+    title: "How to Restore a Screeps Target from Memory with Game.getObjectById()",
+    description:
+      "Store an object ID and room name, recover the current object every tick, distinguish missing vision from a destroyed target, validate the restored type, and define an explicit invalidation policy.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps Game.getObjectById",
+    searchIntent: "Target-restoration tutorial and null-result troubleshooting",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.getObjectById",
+      "Screeps save target ID Memory",
+      "Game.getObjectById null",
+      "Screeps restore Source target",
+      "Screeps room vision target",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-clean-dead-creep-memory",
+    chinesePath: "/blog/screeps-clean-dead-creep-memory",
+    category: "FOUNDATION · MEMORY CLEANUP",
+    title: "How to Clean Dead Creep Memory Safely in Screeps",
+    description:
+      "Compare Memory.creeps with Game.creeps, remove only confirmed dead-name entries, synchronize explicitly managed task indexes, summarize logs, and avoid TTL-based or global deletion mistakes.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "14 min read",
+    primaryKeyword: "Screeps clean dead Creep Memory",
+    searchIntent: "Safe cleanup tutorial and stale-Memory troubleshooting",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps clean dead Creep Memory",
+      "delete Memory.creeps dead Creep",
+      "Game.creeps Memory.creeps cleanup",
+      "Screeps stale Creep memory",
+      "Screeps memory cleanup code",
+    ],
+  },
+];
