@@ -18,6 +18,10 @@ import {
   englishSpawnBatchThreeArticles,
   getEnglishSpawnBatchThreeArticle,
 } from "@/lib/english-spawn-content-3-published";
+import {
+  englishLifecycleBatchFourArticles,
+  getEnglishLifecycleBatchFourArticle,
+} from "@/lib/english-lifecycle-content-4-published";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -32,13 +36,15 @@ const dynamicEnglishArticles = [
   ...englishFoundationArticles,
   ...englishFoundationBatchTwoArticles,
   ...englishSpawnBatchThreeArticles,
+  ...englishLifecycleBatchFourArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
   return getEnglishBeginnerArticle(slug)
     ?? getEnglishFoundationArticle(slug)
     ?? getEnglishFoundationBatchTwoArticle(slug)
-    ?? getEnglishSpawnBatchThreeArticle(slug);
+    ?? getEnglishSpawnBatchThreeArticle(slug)
+    ?? getEnglishLifecycleBatchFourArticle(slug);
 }
 
 export const dynamicParams = false;
