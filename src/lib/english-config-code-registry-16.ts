@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishConfigCodeBatchSixteenRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-flags-configuration",
+    chinesePath: "/blog/screeps-flags-config",
+    category: "CONFIGURATION · FLAGS AND OBJECT REFERENCES",
+    title: "How to Use Flags as Reviewed Configuration Instead of Hidden Automation",
+    description:
+      "Resolve exact Flag names from Game.flags, validate flag.memory fields, recover configured targets by ID before a deterministic local fallback, and report missing or stale configuration without mutating Flags.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps Game.flags configuration",
+    searchIntent: "Use named Flags as explicit reviewed configuration without silently mutating the game world",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.flags configuration",
+      "Screeps Flag memory",
+      "Screeps Flag target ID",
+      "Screeps Game.getObjectById flag",
+      "Screeps missing Flag diagnostics",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-require-modules",
+    chinesePath: "/blog/screeps-modules-require",
+    category: "CODE ORGANIZATION · COMMONJS MODULES",
+    title: "How to Split Screeps Code into Modules Without Caching Stale Game Objects",
+    description:
+      "Keep one module.exports.loop, export small role functions, validate module shapes, read current Game objects inside each tick, avoid module-scope world snapshots, and preserve diagnostics for missing roles and load failures.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps require modules",
+    searchIntent: "Organize one Screeps game loop into reusable role modules without preserving tick-bound objects",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps require modules",
+      "Screeps module.exports loop",
+      "Screeps role modules",
+      "Screeps CommonJS",
+      "Screeps stale game objects",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-memory-write-safety",
+    chinesePath: "/blog/screeps-memory-basics",
+    category: "PERSISTENCE · MEMORY WRITE SAFETY",
+    title: "How to Write Screeps Memory Without Losing Data or Saving Live Objects",
+    description:
+      "Initialize Memory namespaces, store JSON-safe values and stable IDs, understand serialization edge cases, validate replacement objects before assignment, version schemas, migrate explicitly, and rate-limit RawMemory inspection.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "19 min read",
+    primaryKeyword: "Screeps Memory write safety",
+    searchIntent: "Persist validated JSON-safe Screeps state without saving live game objects or corrupting a schema",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Memory write safety",
+      "Screeps Memory JSON serialization",
+      "Screeps store object ID in Memory",
+      "Screeps Memory schema migration",
+      "Screeps RawMemory get size",
+    ],
+  },
+];
