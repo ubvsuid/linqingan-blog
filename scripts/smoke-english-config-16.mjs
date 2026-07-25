@@ -98,8 +98,12 @@ const duplicateResponse = await fetch(
   `${baseUrl}/en/blog/screeps-memory-write-safety`,
   { redirect: "manual" },
 );
-if (duplicateResponse.status !== 404) {
-  failures.push(`/en/blog/screeps-memory-write-safety: 预期撤下后 404，实际 ${duplicateResponse.status}`);
+const redirectLocation = duplicateResponse.headers.get("location");
+if (duplicateResponse.status !== 308) {
+  failures.push(`/en/blog/screeps-memory-write-safety: 预期永久跳转 308，实际 ${duplicateResponse.status}`);
+}
+if (redirectLocation !== "/en/blog/screeps-memory-basics") {
+  failures.push(`/en/blog/screeps-memory-write-safety: 跳转目标错误 ${redirectLocation}`);
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog`, { redirect: "manual" });
@@ -135,4 +139,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十六批英文配置与模块生产冒烟测试通过：${articles.length} 篇唯一来源文章、重复 Memory 页撤下、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十六批英文配置与模块生产冒烟测试通过：${articles.length} 篇唯一来源文章、Memory 旧 URL 永久跳转、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
