@@ -14,3 +14,4 @@ await import("./smoke-english-resources-12.mjs");
 await import("./smoke-english-tower-13.mjs");
 await import("./smoke-english-controller-14.mjs");
 await import("./smoke-english-construction-15.mjs");
+await import("./smoke-english-config-16.mjs");
