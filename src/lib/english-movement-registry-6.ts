@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishMovementBatchSixRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-move-fatigue-body-ratio",
+    chinesePath: "/blog/screeps-move-fatigue-body-ratio",
+    category: "MOVEMENT · FATIGUE AND BODY DESIGN",
+    title: "How to Calculate Screeps Creep Movement Speed",
+    description:
+      "Calculate unboosted Creep movement from MOVE recovery, loaded body weight, road, plain, and swamp costs; account for empty CARRY parts; and separate a static body estimate from live multi-tick movement proof.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps MOVE parts ratio",
+    searchIntent: "Calculate Creep movement speed and choose an unboosted MOVE ratio",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps MOVE parts ratio",
+      "Screeps fatigue calculation",
+      "Creep movement speed",
+      "Screeps road plain swamp cost",
+      "empty CARRY fatigue",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-roomposition-distance",
+    chinesePath: "/blog/screeps-roomposition-distance",
+    category: "MOVEMENT · ROOMPOSITION DISTANCE",
+    title: "Which Screeps RoomPosition Distance Method Should You Use?",
+    description:
+      "Choose between getRangeTo(), inRangeTo(), isNearTo(), isEqualTo(), findClosestByRange(), findClosestByPath(), and findInRange() without confusing linear range with route reachability.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "15 min read",
+    primaryKeyword: "Screeps RoomPosition distance",
+    searchIntent: "Select the correct range, equality, adjacency, filtering, or path method",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps RoomPosition distance",
+      "getRangeTo vs findClosestByPath",
+      "Screeps isNearTo same tile",
+      "findClosestByRange Screeps",
+      "Screeps action range",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-map-find-route",
+    chinesePath: "/blog/screeps-map-find-route",
+    category: "MOVEMENT · CROSS-ROOM ROUTING",
+    title: "How to Plan and Execute a Cross-Room Route in Screeps",
+    description:
+      "Use Game.map.findRoute() as a room-level plan, assign routeCallback costs, reject rooms deliberately, validate the first exit step, rebuild after room transitions, and keep route preference separate from live safety intel.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps Game.map.findRoute",
+    searchIntent: "Build, validate, and execute an explainable room-level route",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.map.findRoute",
+      "Screeps cross room movement",
+      "routeCallback Infinity Screeps",
+      "Screeps highway room route",
+      "Screeps route cache",
+    ],
+  },
+];
