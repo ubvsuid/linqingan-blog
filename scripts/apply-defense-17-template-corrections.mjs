@@ -13,6 +13,11 @@ const replacements = [
     from: "  return `SET_RAMPART_${state}_${roomName}_${x}_${y}`;",
     to: "  return 'SET_RAMPART_' + state + '_' + roomName + '_' + x + '_' + y;",
   },
+  {
+    file: "scripts/smoke-english-defense-17.mjs",
+    from: "  !rampartBody.includes(\"SET_RAMPART_${state}_${roomName}_${x}_${y}\")",
+    to: "  !rampartBody.includes(\"'SET_RAMPART_' + state + '_' + roomName + '_' + x + '_' + y\")",
+  },
 ];
 
 let changed = 0;
