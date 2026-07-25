@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishTowerBatchThirteenRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-tower-auto-attack-hostiles",
+    chinesePath: "/blog/screeps-tower-auto-attack-hostiles",
+    category: "DEFENSE · TOWER ATTACK PRIORITY",
+    title: "How to Make Towers Attack Hostiles with Explainable Priorities",
+    description:
+      "Filter FIND_HOSTILE_CREEPS through an explicit allowed-user policy, score active combat parts, use range and name as deterministic tie-breakers, require active owned Towers with TOWER_ENERGY_COST, save attack() results, and re-evaluate targets every tick.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps Tower attack hostiles",
+    searchIntent: "Attack non-allowed hostile Creeps with deterministic and reviewable Tower priorities",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Tower attack hostiles",
+      "Screeps FIND_HOSTILE_CREEPS filter",
+      "Screeps Tower threat score",
+      "Screeps TOWER_ENERGY_COST",
+      "Screeps Tower attack return codes",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-tower-heal-creeps",
+    chinesePath: "/blog/screeps-tower-heal-creeps",
+    category: "DEFENSE · TOWER HEAL PRIORITY",
+    title: "How to Make Towers Heal the Creep That Needs It Most",
+    description:
+      "Find injured owned Creeps, rank lower hit ratios before missing hits and nearest-Tower range, require active owned Towers with TOWER_ENERGY_COST, save heal() results, avoid caching stale targets, and leave over-heal optimization to a later dispatcher.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps Tower heal Creeps",
+    searchIntent: "Heal the most urgent owned injured Creep with deterministic Tower priorities",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Tower heal Creeps",
+      "Screeps StructureTower heal",
+      "Screeps injured Creep priority",
+      "Screeps Tower heal range falloff",
+      "Screeps TOWER_ENERGY_COST",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-tower-repair-threshold",
+    chinesePath: "/blog/screeps-tower-repair-threshold",
+    category: "DEFENSE · TOWER REPAIR RESERVE",
+    title: "How to Repair Structures with Towers Without Spending Defense Energy",
+    description:
+      "Run Tower repair only after attack and healing are clear, preserve a configurable Energy reserve plus TOWER_ENERGY_COST, exclude Walls and Ramparts, rank ordinary structures by hit ratio and range, save repair() results, and verify later hits.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps Tower repair threshold",
+    searchIntent: "Repair ordinary room structures only when combat and Energy reserves allow it",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Tower repair threshold",
+      "Screeps Tower Energy reserve",
+      "Screeps StructureTower repair",
+      "Screeps structure hits ratio",
+      "Screeps Tower repair priority",
+    ],
+  },
+];
