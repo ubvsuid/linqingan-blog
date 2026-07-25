@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishRuntimeBatchEightRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-cpu-getused-bucket",
+    chinesePath: "/blog/screeps-cpu-getused-bucket",
+    category: "RUNTIME · CPU MEASUREMENT AND BUDGETING",
+    title: "How to Measure and Control CPU Usage in Screeps",
+    description:
+      "Measure CPU with Game.cpu.getUsed() deltas, understand limit, tickLimit, and bucket, avoid Simulation-only conclusions, collect bounded samples, and gate optional work without hiding essential room logic.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps Game.cpu.getUsed",
+    searchIntent: "Measure real Screeps CPU and design safe bucket-aware work budgets",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.cpu.getUsed",
+      "Screeps CPU bucket",
+      "Screeps tickLimit",
+      "Screeps CPU profiling",
+      "Screeps Simulation getUsed zero",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-global-cache",
+    chinesePath: "/blog/screeps-global-cache",
+    category: "RUNTIME · GLOBAL CACHE AND RESET RECOVERY",
+    title: "How to Build a Safe Global Cache in Screeps",
+    description:
+      "Use the global object as a disposable runtime cache, rebuild after global resets, version and expire entries, cache IDs and derived data instead of live game objects, and return cloned values to prevent accidental mutation.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps global cache",
+    searchIntent: "Design a fast cache that remains correct after global resets and state changes",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps global cache",
+      "Screeps global reset",
+      "Screeps cache invalidation",
+      "Screeps cache object IDs",
+      "Screeps global vs Memory",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-rawmemory-segments",
+    chinesePath: "/blog/screeps-rawmemory-segments",
+    category: "STORAGE · RAWMEMORY SEGMENT LIFECYCLE",
+    title: "How to Use RawMemory Segments Safely in Screeps",
+    description:
+      "Validate segment IDs, activate one consolidated set for the next tick, distinguish unavailable from empty data, parse versioned string payloads safely, merge updates, and avoid multiple setActiveSegments calls overwriting each other.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "20 min read",
+    primaryKeyword: "Screeps RawMemory segments",
+    searchIntent: "Build a correct next-tick activation, read, merge, and write workflow for Segments",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps RawMemory segments",
+      "setActiveSegments next tick",
+      "Screeps segment 100 KB",
+      "RawMemory.segments undefined",
+      "Screeps segment manager",
+    ],
+  },
+];
