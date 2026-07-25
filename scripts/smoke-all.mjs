@@ -11,3 +11,4 @@ await import("./smoke-english-observability-9.mjs");
 await import("./smoke-english-market-10.mjs");
 await import("./smoke-english-lab-factory-11.mjs");
 await import("./smoke-english-resources-12.mjs");
+await import("./smoke-english-tower-13.mjs");
