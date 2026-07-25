@@ -42,6 +42,10 @@ import {
   englishObservabilityBatchNineArticles,
   getEnglishObservabilityBatchNineArticle,
 } from "@/lib/english-observability-content-9";
+import {
+  englishMarketBatchTenArticles,
+  getEnglishMarketBatchTenArticle,
+} from "@/lib/english-market-content-10";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -62,6 +66,7 @@ const dynamicEnglishArticles = [
   ...englishVisionBatchSevenArticles,
   ...englishRuntimeBatchEightArticles,
   ...englishObservabilityBatchNineArticles,
+  ...englishMarketBatchTenArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
@@ -74,7 +79,8 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishMovementBatchSixArticle(slug)
     ?? getEnglishVisionBatchSevenArticle(slug)
     ?? getEnglishRuntimeBatchEightArticle(slug)
-    ?? getEnglishObservabilityBatchNineArticle(slug);
+    ?? getEnglishObservabilityBatchNineArticle(slug)
+    ?? getEnglishMarketBatchTenArticle(slug);
 }
 
 export const dynamicParams = false;
