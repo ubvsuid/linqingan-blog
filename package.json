@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "24.x"
+    "node": "22.x"
   },
   "scripts": {
     "predev": "npm run contentcheck",
@@ -56,13 +56,13 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "remark": "^15.0.1",
-    "remark-gfm": "^4.0.3",
+    "remark-gfm": "^4.0.1",
     "remark-html": "^16.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.2.0",
     "typescript": "^5.9.0"
