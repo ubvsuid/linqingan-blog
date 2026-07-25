@@ -1,4 +1,4 @@
-import type { EnglishArticleRecord } from "@/lib/english-articles";
+import type { EnglishArticleRecord } from "./english-articles";
 
 export const englishFoundationBatchTwoRegistry: EnglishArticleRecord[] = [
   {
