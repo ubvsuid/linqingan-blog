@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
-import { publishedEnglishArticles } from "@/lib/english-articles";
+import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 
 import styles from "../english.module.css";
 
