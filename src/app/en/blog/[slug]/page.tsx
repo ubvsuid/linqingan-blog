@@ -26,6 +26,10 @@ import {
   englishMovementBatchFiveArticles,
   getEnglishMovementBatchFiveArticle,
 } from "@/lib/english-movement-content-5";
+import {
+  englishMovementBatchSixArticles,
+  getEnglishMovementBatchSixArticle,
+} from "@/lib/english-movement-content-6-published";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -42,6 +46,7 @@ const dynamicEnglishArticles = [
   ...englishSpawnBatchThreeArticles,
   ...englishLifecycleBatchFourArticles,
   ...englishMovementBatchFiveArticles,
+  ...englishMovementBatchSixArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
@@ -50,7 +55,8 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishFoundationBatchTwoArticle(slug)
     ?? getEnglishSpawnBatchThreeArticle(slug)
     ?? getEnglishLifecycleBatchFourArticle(slug)
-    ?? getEnglishMovementBatchFiveArticle(slug);
+    ?? getEnglishMovementBatchFiveArticle(slug)
+    ?? getEnglishMovementBatchSixArticle(slug);
 }
 
 export const dynamicParams = false;
