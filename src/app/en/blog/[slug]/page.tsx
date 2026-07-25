@@ -6,29 +6,41 @@ import {
   englishBeginnerArticles,
   getEnglishBeginnerArticle,
 } from "@/lib/english-beginner-content";
+import {
+  englishFoundationArticles,
+  getEnglishFoundationArticle,
+} from "@/lib/english-foundation-content";
 import { siteConfig } from "@/lib/site";
 
-interface EnglishBeginnerArticlePageProps {
+interface EnglishArticlePageProps {
   params: Promise<{
     slug: string;
   }>;
 }
 
 const staticBeginnerSlugs = new Set(["screeps-creep-body-parts"]);
+const dynamicEnglishArticles = [
+  ...englishBeginnerArticles,
+  ...englishFoundationArticles,
+];
+
+function getDynamicEnglishArticle(slug: string) {
+  return getEnglishBeginnerArticle(slug) ?? getEnglishFoundationArticle(slug);
+}
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return englishBeginnerArticles
+  return dynamicEnglishArticles
     .filter((article) => !staticBeginnerSlugs.has(article.slug))
     .map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({
   params,
-}: EnglishBeginnerArticlePageProps): Promise<Metadata> {
+}: EnglishArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = getEnglishBeginnerArticle(slug);
+  const article = getDynamicEnglishArticle(slug);
 
   if (!article || staticBeginnerSlugs.has(slug)) {
     return {
@@ -77,11 +89,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function EnglishBeginnerArticlePage({
+export default async function EnglishArticleRoute({
   params,
-}: EnglishBeginnerArticlePageProps) {
+}: EnglishArticlePageProps) {
   const { slug } = await params;
-  const article = getEnglishBeginnerArticle(slug);
+  const article = getDynamicEnglishArticle(slug);
 
   if (!article || staticBeginnerSlugs.has(slug)) {
     notFound();
