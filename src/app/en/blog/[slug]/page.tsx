@@ -50,6 +50,10 @@ import {
   englishLabFactoryBatchElevenArticles,
   getEnglishLabFactoryBatchElevenArticle,
 } from "@/lib/english-lab-factory-content-11";
+import {
+  englishMineralStoragePowerBatchTwelveArticles,
+  getEnglishMineralStoragePowerBatchTwelveArticle,
+} from "@/lib/english-mineral-storage-power-content-12";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -72,6 +76,7 @@ const dynamicEnglishArticles = [
   ...englishObservabilityBatchNineArticles,
   ...englishMarketBatchTenArticles,
   ...englishLabFactoryBatchElevenArticles,
+  ...englishMineralStoragePowerBatchTwelveArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
@@ -86,7 +91,8 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishRuntimeBatchEightArticle(slug)
     ?? getEnglishObservabilityBatchNineArticle(slug)
     ?? getEnglishMarketBatchTenArticle(slug)
-    ?? getEnglishLabFactoryBatchElevenArticle(slug);
+    ?? getEnglishLabFactoryBatchElevenArticle(slug)
+    ?? getEnglishMineralStoragePowerBatchTwelveArticle(slug);
 }
 
 export const dynamicParams = false;
