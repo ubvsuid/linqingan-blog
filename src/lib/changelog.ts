@@ -18,6 +18,18 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-26-complete-english-screeps-library",
+    date: "2026-07-26",
+    type: "内容",
+    title: "完成 64 篇 Screeps 英文文章库与来源覆盖",
+    summary:
+      "新增并验证 28 篇唯一中文来源的英文文章，使英文库扩展到 64 篇；同时加入中英文路径唯一性、全部已发布中文 Screeps 文章覆盖、依赖清单同步、批次专项检查与生产冒烟门禁，并将重复的 Memory 安全旧网址永久跳转到唯一规范页面。",
+    links: [
+      { label: "浏览英文文章库", href: "/en/blog" },
+      { label: "查看英文验证说明", href: "/en/verification" },
+    ],
+  },
+  {
     id: "2026-07-23-audit-completion-navigation-security",
     date: "2026-07-23",
     type: "网站",
@@ -119,10 +131,10 @@ export const changelogEntries: ChangelogEntry[] = [
     type: "网站",
     title: "合并资料中心与项目页面",
     summary:
-      "把术语、错误码、标签、验证方法和工具规划并入知识库，把公开项目说明并入关于页面；旧地址保留永久重定向，减少重复页面。",
+      "将原资料中心和项目页的核心内容并入知识库与关于页面，减少重复入口，并保留兼容跳转。",
     links: [
-      { label: "查看知识库", href: "/knowledge#reference-tools" },
-      { label: "查看公开项目", href: "/about#public-projects" },
+      { label: "查看知识库", href: "/knowledge" },
+      { label: "查看关于页面", href: "/about" },
     ],
   },
 ];
