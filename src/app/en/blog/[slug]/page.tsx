@@ -62,6 +62,10 @@ import {
   englishControllerBatchFourteenArticles,
   getEnglishControllerBatchFourteenArticle,
 } from "@/lib/english-controller-content-14";
+import {
+  englishConstructionSafetyBatchFifteenArticles,
+  getEnglishConstructionSafetyBatchFifteenArticle,
+} from "@/lib/english-construction-safety-content-15";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -87,6 +91,7 @@ const dynamicEnglishArticles = [
   ...englishMineralStoragePowerBatchTwelveArticles,
   ...englishTowerBatchThirteenArticles,
   ...englishControllerBatchFourteenArticles,
+  ...englishConstructionSafetyBatchFifteenArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
@@ -104,7 +109,8 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishLabFactoryBatchElevenArticle(slug)
     ?? getEnglishMineralStoragePowerBatchTwelveArticle(slug)
     ?? getEnglishTowerBatchThirteenArticle(slug)
-    ?? getEnglishControllerBatchFourteenArticle(slug);
+    ?? getEnglishControllerBatchFourteenArticle(slug)
+    ?? getEnglishConstructionSafetyBatchFifteenArticle(slug);
 }
 
 export const dynamicParams = false;
