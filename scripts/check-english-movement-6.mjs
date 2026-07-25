@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const source = fs.readFileSync(path.join(root, "src/lib/english-movement-content-6.ts"), "utf8");
+const published = fs.readFileSync(path.join(root, "src/lib/english-movement-content-6-published.ts"), "utf8");
 const registry = fs.readFileSync(path.join(root, "src/lib/english-movement-registry-6.ts"), "utf8");
 const route = fs.readFileSync(path.join(root, "src/app/en/blog/[slug]/page.tsx"), "utf8");
 const failures = [];
@@ -45,11 +46,19 @@ for (const input of [source, registry]) {
 
 if (!route.includes("englishMovementBatchSixArticles")) failures.push("动态路由未载入第六批数组");
 if (!route.includes("getEnglishMovementBatchSixArticle")) failures.push("动态路由未载入第六批查询函数");
+if (!route.includes("english-movement-content-6-published")) failures.push("动态路由未使用第六批发布修正版");
+if (!published.includes("const completeRouteOptions")) failures.push("发布修正版缺少完整 routeOptions 代码块");
+if (!published.includes("article.articleHtml.replace(")) failures.push("发布修正版未执行代码块替换");
 if ((source.match(/[\u3400-\u9fff]/g) ?? []).length > 0) failures.push("英文正文包含中文字符");
 if (source.includes("currentPlan.steps.find(")) failures.push("路线仍遍历整条旧步骤数组");
 if (!source.includes("const step = currentPlan.steps[0]")) failures.push("路线未使用首步");
 if (!source.includes("exits[step.exit] !== step.room")) failures.push("首步缺少出口校验");
 if (!source.includes("estimateCreepMovement(creep, terrain)")) failures.push("MOVE 估算缺少显式地形输入");
+
+const incompleteRouteCallback = `routeCallback(roomName, fromRoomName) {\n  if (Memory.routeAvoid?.includes(roomName)) {\n    return Infinity;\n  }\n\n  if (isPreferredRoom(roomName)) {\n    return 1;\n  }\n\n  return 2.5;\n}`;
+const completeRouteOptions = `const routeOptions = {\n  routeCallback(roomName, fromRoomName) {\n    if (Memory.routeAvoid?.includes(roomName)) {\n      return Infinity;\n    }\n\n    if (isPreferredRoom(roomName)) {\n      return 1;\n    }\n\n    return 2.5;\n  }\n};`;
+const publishedSource = source.replace(incompleteRouteCallback, completeRouteOptions);
+if (publishedSource === source) failures.push("无法生成发布修正版源码");
 
 const toc = [...source.matchAll(/\["([a-z0-9-]+)", "([^"]+)"\],/g)];
 if (toc.length < 40) failures.push(`目录条目不足：${toc.length}`);
@@ -60,7 +69,7 @@ for (const match of toc) {
   }
 }
 
-const blocks = [...source.matchAll(/<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g)]
+const blocks = [...publishedSource.matchAll(/<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g)]
   .map((match) => match[1].replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&"));
 if (blocks.length < 15) failures.push(`JavaScript 代码块不足：${blocks.length}`);
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), "en-move-6-"));
