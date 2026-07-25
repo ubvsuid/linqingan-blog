@@ -21,7 +21,8 @@ const articles = [
     query: "RoomPosition",
     signals: [
       "isNearTo() includes the same tile",
-      "strictlyAdjacent = withinOne &amp;&amp; !sameTile",
+      "const strictlyAdjacent = withinOne",
+      "!sameTile",
       "Do not compare local coordinates across rooms",
       "Live path and target-selection test",
       "Pending",
