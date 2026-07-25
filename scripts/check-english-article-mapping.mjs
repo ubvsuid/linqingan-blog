@@ -23,10 +23,10 @@ for (const fileName of registryFiles) {
     "utf8",
   );
   const hrefMatches = [...source.matchAll(
-    /href:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g,
+    /["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g,
   )];
   const chineseMatches = [...source.matchAll(
-    /chinesePath:\s*["'](\/blog\/[a-z0-9-]+)["']/g,
+    /["']?chinesePath["']?\s*:\s*["'](\/blog\/[a-z0-9-]+)["']/g,
   )];
 
   if (hrefMatches.length !== chineseMatches.length) {
