@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishObservabilityBatchNineRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-game-notify",
+    chinesePath: "/blog/screeps-game-notify",
+    category: "OBSERVABILITY · RATE-LIMITED ALERTS",
+    title: "How to Send Reliable Alerts with Game.notify()",
+    description:
+      "Use state transitions, per-room Memory, repeat intervals, message truncation, priorities, and a 20-notification queue without confusing groupInterval minutes with game ticks or claiming external delivery success.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps Game.notify",
+    searchIntent: "Build stateful, rate-limited alerts without notification spam",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.notify",
+      "Screeps notification rate limit",
+      "Game.notify groupInterval minutes",
+      "Screeps controller downgrade alert",
+      "Screeps alert queue",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-room-event-log",
+    chinesePath: "/blog/screeps-room-event-log",
+    category: "OBSERVABILITY · PREVIOUS-TICK EVENT LOGS",
+    title: "How to Read Room.getEventLog() Safely in Screeps",
+    description:
+      "Read previous-tick room events, distinguish parsed arrays from raw JSON strings, validate event-specific data, preserve IDs when objects disappear, filter attacks on owned targets, and store bounded aggregates instead of unlimited history.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps Room.getEventLog",
+    searchIntent: "Read and normalize previous-tick events without misattributing current commands",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Room.getEventLog",
+      "Screeps previous tick events",
+      "Screeps EVENT_ATTACK",
+      "Room.getEventLog raw",
+      "Screeps event history",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-roomvisual-debug",
+    chinesePath: "/blog/screeps-roomvisual-debug",
+    category: "OBSERVABILITY · ROOMVISUAL DEBUG LAYER",
+    title: "How to Build a Safe RoomVisual Debug Layer in Screeps",
+    description:
+      "Draw current Creep state, target relationships, and task labels with RoomVisual while enforcing per-room switches, stable ordering, item limits, the 512,000-byte ceiling, cross-room boundaries, and a strict separation between visuals and action results.",
+    publishedAt: "2026-07-25",
+    publishedLabel: "July 25, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps RoomVisual debugging",
+    searchIntent: "Build bounded current-tick visual diagnostics without confusing drawings with game outcomes",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps RoomVisual debugging",
+      "RoomVisual getSize 512000",
+      "Screeps draw creep target",
+      "RoomVisual export import",
+      "Screeps visual CPU",
+    ],
+  },
+];

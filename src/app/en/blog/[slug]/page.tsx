@@ -38,6 +38,46 @@ import {
   englishRuntimeBatchEightArticles,
   getEnglishRuntimeBatchEightArticle,
 } from "@/lib/english-runtime-content-8";
+import {
+  englishObservabilityBatchNineArticles,
+  getEnglishObservabilityBatchNineArticle,
+} from "@/lib/english-observability-content-9";
+import {
+  englishMarketBatchTenArticles,
+  getEnglishMarketBatchTenArticle,
+} from "@/lib/english-market-content-10";
+import {
+  englishLabFactoryBatchElevenArticles,
+  getEnglishLabFactoryBatchElevenArticle,
+} from "@/lib/english-lab-factory-content-11";
+import {
+  englishMineralStoragePowerBatchTwelveArticles,
+  getEnglishMineralStoragePowerBatchTwelveArticle,
+} from "@/lib/english-mineral-storage-power-content-12";
+import {
+  englishTowerBatchThirteenArticles,
+  getEnglishTowerBatchThirteenArticle,
+} from "@/lib/english-tower-content-13";
+import {
+  englishControllerBatchFourteenArticles,
+  getEnglishControllerBatchFourteenArticle,
+} from "@/lib/english-controller-content-14";
+import {
+  englishConstructionSafetyBatchFifteenArticles,
+  getEnglishConstructionSafetyBatchFifteenArticle,
+} from "@/lib/english-construction-safety-content-15";
+import {
+  englishConfigCodeBatchSixteenArticles,
+  getEnglishConfigCodeBatchSixteenArticle,
+} from "@/lib/english-config-code-content-16";
+import {
+  englishDefenseOperationsBatchSeventeenArticles,
+  getEnglishDefenseOperationsBatchSeventeenArticle,
+} from "@/lib/english-defense-operations-content-17";
+import {
+  englishLinkSourceBatchEighteenArticles,
+  getEnglishLinkSourceBatchEighteenArticle,
+} from "@/lib/english-link-source-content-18";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -57,6 +97,16 @@ const dynamicEnglishArticles = [
   ...englishMovementBatchSixArticles,
   ...englishVisionBatchSevenArticles,
   ...englishRuntimeBatchEightArticles,
+  ...englishObservabilityBatchNineArticles,
+  ...englishMarketBatchTenArticles,
+  ...englishLabFactoryBatchElevenArticles,
+  ...englishMineralStoragePowerBatchTwelveArticles,
+  ...englishTowerBatchThirteenArticles,
+  ...englishControllerBatchFourteenArticles,
+  ...englishConstructionSafetyBatchFifteenArticles,
+  ...englishConfigCodeBatchSixteenArticles,
+  ...englishDefenseOperationsBatchSeventeenArticles,
+  ...englishLinkSourceBatchEighteenArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
@@ -68,7 +118,17 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishMovementBatchFiveArticle(slug)
     ?? getEnglishMovementBatchSixArticle(slug)
     ?? getEnglishVisionBatchSevenArticle(slug)
-    ?? getEnglishRuntimeBatchEightArticle(slug);
+    ?? getEnglishRuntimeBatchEightArticle(slug)
+    ?? getEnglishObservabilityBatchNineArticle(slug)
+    ?? getEnglishMarketBatchTenArticle(slug)
+    ?? getEnglishLabFactoryBatchElevenArticle(slug)
+    ?? getEnglishMineralStoragePowerBatchTwelveArticle(slug)
+    ?? getEnglishTowerBatchThirteenArticle(slug)
+    ?? getEnglishControllerBatchFourteenArticle(slug)
+    ?? getEnglishConstructionSafetyBatchFifteenArticle(slug)
+    ?? getEnglishConfigCodeBatchSixteenArticle(slug)
+    ?? getEnglishDefenseOperationsBatchSeventeenArticle(slug)
+    ?? getEnglishLinkSourceBatchEighteenArticle(slug);
 }
 
 export const dynamicParams = false;

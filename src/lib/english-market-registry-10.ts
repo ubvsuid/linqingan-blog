@@ -1,0 +1,70 @@
+import type { EnglishArticleRecord } from "./english-articles";
+
+export const englishMarketBatchTenRegistry: EnglishArticleRecord[] = [
+  {
+    href: "/en/blog/screeps-market-create-order",
+    chinesePath: "/blog/screeps-market-create-order",
+    category: "MARKET · SAFE ORDER CREATION",
+    title: "How to Create a Market Order Safely in Screeps",
+    description:
+      "Create one reviewed market order with a one-time Memory request, validate Terminal ownership, calculate the 5% fee and Credit reserve, reject duplicates, snapshot the request, handle ERR_FULL without hard-coding a disputed order limit, and verify the order afterward.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps Game.market.createOrder",
+    searchIntent: "Create one market order with explicit fee, duplicate, and retry safeguards",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.market.createOrder",
+      "Screeps market order fee",
+      "Screeps ERR_FULL order limit",
+      "Screeps duplicate market order",
+      "Screeps market order Memory request",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-market-deal",
+    chinesePath: "/blog/screeps-market-deal",
+    category: "MARKET · REVIEWED ONE-TIME DEAL",
+    title: "How to Execute a Reviewed Market Deal Safely",
+    description:
+      "Execute one specified sell order with a one-time request, refresh the current order snapshot, use amount rather than remainingAmount, enforce a price ceiling, Credit and Terminal Energy reserves, estimate transaction cost, disable before deal(), and verify the transaction afterward.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "19 min read",
+    primaryKeyword: "Screeps Game.market.deal",
+    searchIntent: "Execute one reviewed market order with current price, amount, Credit, and Energy safeguards",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Game.market.deal",
+      "Screeps market transaction energy",
+      "Screeps order amount remainingAmount",
+      "Screeps market price ceiling",
+      "Screeps market deal ERR_FULL",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-terminal-send-resources",
+    chinesePath: "/blog/screeps-terminal-send-resources",
+    category: "LOGISTICS · DIRECT TERMINAL TRANSFER",
+    title: "How to Send Resources Between Terminals Safely",
+    description:
+      "Plan one direct Terminal transfer with a one-time request, validate TERMINAL_MIN_SEND and the 100-character description, separate ordinary-resource and Energy budgets, preserve reserves, disable before send(), and verify outgoing transactions and Store changes afterward.",
+    publishedAt: "2026-07-26",
+    publishedLabel: "July 26, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps StructureTerminal.send",
+    searchIntent: "Send one resource transfer with correct inventory, Energy, cooldown, and verification checks",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps StructureTerminal.send",
+      "Screeps Terminal transaction cost",
+      "TERMINAL_MIN_SEND Screeps",
+      "Screeps send Energy amount cost",
+      "Screeps outgoingTransactions",
+    ],
+  },
+];

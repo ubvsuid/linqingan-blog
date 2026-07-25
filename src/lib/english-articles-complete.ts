@@ -10,6 +10,16 @@ import { englishMovementBatchFiveRegistry } from "./english-movement-registry-5"
 import { englishMovementBatchSixRegistry } from "./english-movement-registry-6";
 import { englishVisionBatchSevenRegistry } from "./english-vision-registry-7";
 import { englishRuntimeBatchEightRegistry } from "./english-runtime-registry-8";
+import { englishObservabilityBatchNineRegistry } from "./english-observability-registry-9";
+import { englishMarketBatchTenRegistry } from "./english-market-registry-10";
+import { englishLabFactoryBatchElevenRegistry } from "./english-lab-factory-registry-11";
+import { englishMineralStoragePowerBatchTwelveRegistry } from "./english-mineral-storage-power-registry-12";
+import { englishTowerBatchThirteenRegistry } from "./english-tower-registry-13";
+import { englishControllerBatchFourteenRegistry } from "./english-controller-registry-14";
+import { englishConstructionSafetyBatchFifteenRegistry } from "./english-construction-safety-registry-15";
+import { englishConfigCodeBatchSixteenRegistry } from "./english-config-code-registry-16";
+import { englishDefenseOperationsBatchSeventeenRegistry } from "./english-defense-operations-registry-17";
+import { englishLinkSourceBatchEighteenRegistry } from "./english-link-source-registry-18";
 
 export type { EnglishArticleRecord };
 
@@ -22,6 +32,16 @@ export const publishedEnglishArticles: EnglishArticleRecord[] = [
   ...englishMovementBatchSixRegistry,
   ...englishVisionBatchSevenRegistry,
   ...englishRuntimeBatchEightRegistry,
+  ...englishObservabilityBatchNineRegistry,
+  ...englishMarketBatchTenRegistry,
+  ...englishLabFactoryBatchElevenRegistry,
+  ...englishMineralStoragePowerBatchTwelveRegistry,
+  ...englishTowerBatchThirteenRegistry,
+  ...englishControllerBatchFourteenRegistry,
+  ...englishConstructionSafetyBatchFifteenRegistry,
+  ...englishConfigCodeBatchSixteenRegistry,
+  ...englishDefenseOperationsBatchSeventeenRegistry,
+  ...englishLinkSourceBatchEighteenRegistry,
 ];
 
 export const englishArticleRoutePairs = {
@@ -35,6 +55,16 @@ export const englishArticleRoutePairs = {
       ...englishMovementBatchSixRegistry,
       ...englishVisionBatchSevenRegistry,
       ...englishRuntimeBatchEightRegistry,
+      ...englishObservabilityBatchNineRegistry,
+      ...englishMarketBatchTenRegistry,
+      ...englishLabFactoryBatchElevenRegistry,
+      ...englishMineralStoragePowerBatchTwelveRegistry,
+      ...englishTowerBatchThirteenRegistry,
+      ...englishControllerBatchFourteenRegistry,
+      ...englishConstructionSafetyBatchFifteenRegistry,
+      ...englishConfigCodeBatchSixteenRegistry,
+      ...englishDefenseOperationsBatchSeventeenRegistry,
+      ...englishLinkSourceBatchEighteenRegistry,
     ].map((article) => [article.chinesePath, article.href]),
   ),
 } as Record<string, string>;
