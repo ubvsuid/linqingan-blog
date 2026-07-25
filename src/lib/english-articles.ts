@@ -1,9 +1,3 @@
-import {
-  englishBeginnerArticles,
-  type EnglishBeginnerArticle,
-} from "@/lib/english-beginner-content";
-import { englishFoundationArticles } from "@/lib/english-foundation-content";
-
 export interface EnglishArticleRecord {
   href: string;
   chinesePath: string;
@@ -20,55 +14,341 @@ export interface EnglishArticleRecord {
   keywords: string[];
 }
 
-function toPublishedRecord(
-  article: EnglishBeginnerArticle,
-): EnglishArticleRecord {
-  return {
-    href: article.path,
-    chinesePath: article.chinesePath,
-    category: article.category,
-    title: article.headline,
-    description: article.description,
-    publishedAt: article.publishedAt,
-    publishedLabel: article.publishedLabel,
-    readingTime: article.readingTime,
-    primaryKeyword: article.primaryKeyword,
-    searchIntent: article.searchIntent,
-    status: "published",
-    finalScore: article.finalScore,
-    keywords: article.keywords,
-  };
-}
-
-const standaloneEnglishArticles: EnglishArticleRecord[] = [
+export const publishedEnglishArticles: EnglishArticleRecord[] = [
   {
-    href: "/en/blog/screeps-remove-construction-site",
-    chinesePath: "/blog/screeps-construction-site-remove",
-    category: "API SAFETY · CONSTRUCTION",
-    title: "How to Remove a Construction Site Safely in Screeps",
-    description:
-      "Inspect a misplaced Construction Site, validate its identity, submit remove() once, handle return codes, and verify the result on the next tick.",
-    publishedAt: "2026-07-24",
-    publishedLabel: "July 24, 2026",
-    readingTime: "12 min read",
-    primaryKeyword: "Screeps remove construction site",
-    searchIntent: "Safe API operation and troubleshooting",
-    finalScore: 100,
-    keywords: [
+    "href": "/en/blog/screeps-introduction",
+    "chinesePath": "/blog/screeps-introduction",
+    "category": "BEGINNER · GAME INTRODUCTION",
+    "title": "What Is Screeps and What Do You Actually Do in It?",
+    "description": "Understand how Screeps differs from a normal strategy game and how Room, Source, Creep, Spawn, and Controller form the first Energy loop.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "9 min read",
+    "primaryKeyword": "what is Screeps",
+    "searchIntent": "Beginner definition and game overview",
+    "finalScore": 98,
+    "keywords": [
+      "what is Screeps",
+      "Screeps beginner guide",
+      "Screeps programming game",
+      "Room Creep Spawn Source Controller"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-first-room",
+    "chinesePath": "/blog/screeps-first-room",
+    "category": "BEGINNER · FIRST ROOM",
+    "title": "How to Find Your First Screeps Room and Its Core Objects",
+    "description": "Locate the room view, code editor, and Console, then use read-only commands to confirm visible Rooms, Spawns, Creeps, Sources, and the Controller.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "10 min read",
+    "primaryKeyword": "Screeps first room",
+    "searchIntent": "Beginner interface orientation and read-only inspection",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps first room",
+      "Screeps Console beginner",
+      "Game.rooms",
+      "Game.spawns",
+      "Room.find FIND_SOURCES"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-tick-game-loop",
+    "chinesePath": "/blog/screeps-tick-and-game-loop",
+    "category": "BEGINNER · TICKS AND GAME LOOP",
+    "title": "What Is a Screeps Tick and Why Does module.exports.loop Keep Running?",
+    "description": "Learn how Game.time, ticks, the main loop, delayed action effects, and current-tick Game objects shape every beginner Screeps script.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "10 min read",
+    "primaryKeyword": "Screeps tick",
+    "searchIntent": "Beginner explanation of repeated execution and tick timing",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps tick",
+      "Screeps game loop",
+      "Game.time",
+      "module.exports.loop",
+      "Screeps commands next tick"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-creep-harvest-energy",
+    "chinesePath": "/blog/screeps-first-creep-harvest",
+    "category": "BEGINNER · ENERGY HARVESTING",
+    "title": "How to Make Your First Screeps Creep Harvest Energy",
+    "description": "Find a named Creep and Source, call harvest(), move only when range is insufficient, and inspect the action results across ticks.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "11 min read",
+    "primaryKeyword": "Screeps Creep harvest Energy",
+    "searchIntent": "Beginner tutorial and first action debugging",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps Creep harvest Energy",
+      "Creep.harvest",
+      "FIND_SOURCES",
+      "ERR_NOT_IN_RANGE",
+      "Creep.moveTo"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-transfer-energy-to-spawn",
+    "chinesePath": "/blog/screeps-creep-deliver-energy",
+    "category": "BEGINNER · ENERGY DELIVERY",
+    "title": "How to Make a Screeps Creep Deliver Energy to a Spawn",
+    "description": "Switch from harvesting to delivery, move to a named Spawn, handle transfer() results, and keep unloading after a partial transfer.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "13 min read",
+    "primaryKeyword": "Screeps transfer energy to Spawn",
+    "searchIntent": "Beginner tutorial and task completion",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps transfer energy to Spawn",
+      "Creep.transfer",
+      "Game.spawns",
+      "ERR_FULL",
+      "RESOURCE_ENERGY"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-creep-body-parts",
+    "chinesePath": "/blog/screeps-creep-body-parts",
+    "category": "BEGINNER · CREEP BODY",
+    "title": "Why Your Screeps Creep Cannot Harvest, Carry, or Move",
+    "description": "Connect WORK, CARRY, and MOVE to real Screeps actions, inspect active body parts, calculate a basic worker, and diagnose missing abilities.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "10 min read",
+    "primaryKeyword": "Screeps Creep body parts",
+    "searchIntent": "Beginner explanation and ability diagnosis",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps Creep body parts",
+      "Screeps WORK CARRY MOVE",
+      "Creep.getActiveBodyparts()",
+      "BODYPART_COST",
+      "CARRY_CAPACITY"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-spawn-creep",
+    "chinesePath": "/blog/screeps-spawn-create-creep",
+    "category": "BEGINNER · SPAWNING",
+    "title": "How to Make a Screeps Spawn Create a New Creep",
+    "description": "Find the real Spawn, validate a WORK-CARRY-MOVE body with dryRun, start spawnCreep(), and understand the return codes and multi-tick spawning process.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "12 min read",
+    "primaryKeyword": "Screeps spawnCreep",
+    "searchIntent": "Beginner spawning tutorial and return-code troubleshooting",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps spawnCreep",
+      "create Creep Screeps",
+      "StructureSpawn.spawnCreep",
+      "ERR_NOT_ENOUGH_ENERGY",
+      "dryRun"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-creep-roles",
+    "chinesePath": "/blog/screeps-creep-roles",
+    "category": "BEGINNER · CREEP ROLES",
+    "title": "Why Multiple Screeps Creeps Need Simple Roles",
+    "description": "Separate body abilities from player-defined jobs and use fixed beginner names for a Harvester, Upgrader, and Builder without introducing a full role architecture.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "8 min read",
+    "primaryKeyword": "Screeps Creep roles",
+    "searchIntent": "Beginner role explanation and task organization",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps Creep roles",
+      "Screeps harvester upgrader builder",
+      "Creep role beginner",
+      "fixed Creep names"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-upgrade-controller",
+    "chinesePath": "/blog/screeps-upgrade-controller",
+    "category": "BEGINNER · CONTROLLER UPGRADING",
+    "title": "How to Make a Screeps Creep Upgrade the Room Controller",
+    "description": "Create or find Upgrader1, switch between harvesting and upgrading with one Memory flag, handle range and return codes, and observe Controller progress.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "13 min read",
+    "primaryKeyword": "Screeps upgrade controller",
+    "searchIntent": "Beginner upgrader tutorial and Controller progress troubleshooting",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps upgrade controller",
+      "Creep.upgradeController",
+      "Screeps Upgrader code",
+      "creep.memory.upgrading",
+      "Room Controller Level"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-first-extension",
+    "chinesePath": "/blog/screeps-first-extension",
+    "category": "BEGINNER · FIRST EXTENSION",
+    "title": "How to Build Your First Screeps Extension",
+    "description": "Confirm RCL 2, place one Extension Construction Site, make Builder1 harvest and build it, and understand progress, capacity, and common failure states.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "12 min read",
+    "primaryKeyword": "Screeps first Extension",
+    "searchIntent": "Beginner construction tutorial and Extension troubleshooting",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps first Extension",
+      "Screeps RCL 2 Extension",
+      "FIND_MY_CONSTRUCTION_SITES",
+      "Creep.build",
+      "Extension construction cost"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-build-repair",
+    "chinesePath": "/blog/screeps-build-and-repair",
+    "category": "BEGINNER · BUILD AND REPAIR",
+    "title": "How to Make a Screeps Creep Build and Repair Automatically",
+    "description": "Give Builder1 a clear priority: build owned sites, repair selected damaged structures, and upgrade the Controller when no higher task exists.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "14 min read",
+    "primaryKeyword": "Screeps Builder code",
+    "searchIntent": "Beginner build-repair automation and task-priority troubleshooting",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps Builder code",
+      "Creep.build repair",
+      "FIND_MY_CONSTRUCTION_SITES",
+      "FIND_STRUCTURES repair",
+      "Builder task priority"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-first-room-code",
+    "chinesePath": "/blog/screeps-first-room-code",
+    "category": "BEGINNER · FIRST ROOM LOOP",
+    "title": "How to Combine Your First Screeps Room Loop",
+    "description": "Combine fixed-name Harvester1, Upgrader1, and Builder1 logic with spawning, safe target checks, state switches, return-code logging, and explicit beginner limits.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "20 min read",
+    "primaryKeyword": "Screeps beginner room code",
+    "searchIntent": "Beginner integrated room script and troubleshooting",
+    "finalScore": 97,
+    "keywords": [
+      "Screeps beginner room code",
+      "Screeps main loop code",
+      "Harvester Upgrader Builder code",
+      "Screeps spawn harvest upgrade build",
+      "module.exports.loop room"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-remove-construction-site",
+    "chinesePath": "/blog/screeps-construction-site-remove",
+    "category": "API SAFETY · CONSTRUCTION",
+    "title": "How to Remove a Construction Site Safely in Screeps",
+    "description": "Inspect a misplaced Construction Site, validate its identity, submit remove() once, handle return codes, and verify the result on the next tick.",
+    "publishedAt": "2026-07-24",
+    "publishedLabel": "July 24, 2026",
+    "readingTime": "12 min read",
+    "primaryKeyword": "Screeps remove construction site",
+    "searchIntent": "Safe API operation and troubleshooting",
+    "finalScore": 100,
+    "keywords": [
       "Screeps remove construction site",
       "ConstructionSite.remove",
       "LOOK_CONSTRUCTION_SITES",
       "Game.getObjectById",
-      "ERR_NOT_OWNER",
+      "ERR_NOT_OWNER"
     ],
-    status: "published",
+    "status": "published"
   },
-];
-
-export const publishedEnglishArticles: EnglishArticleRecord[] = [
-  ...englishBeginnerArticles.map(toPublishedRecord),
-  ...standaloneEnglishArticles,
-  ...englishFoundationArticles.map(toPublishedRecord),
+  {
+    "href": "/en/blog/screeps-memory-basics",
+    "chinesePath": "/blog/screeps-memory-basics",
+    "category": "FOUNDATION · MEMORY",
+    "title": "How Screeps Memory Saves Creep Roles and Working State",
+    "description": "Learn why ordinary variables do not preserve Screeps state, how creep.memory maps to Memory.creeps, what data belongs in Memory, and why object IDs are safer than live game objects.",
+    "publishedAt": "2026-07-25",
+    "publishedLabel": "July 25, 2026",
+    "readingTime": "12 min read",
+    "primaryKeyword": "Screeps Memory tutorial",
+    "searchIntent": "Beginner explanation of persistent state and creep memory",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps Memory tutorial",
+      "Screeps creep.memory",
+      "Screeps save role",
+      "Memory.creeps",
+      "Screeps state across ticks"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-withdraw-container-energy",
+    "chinesePath": "/blog/screeps-creep-withdraw-container-energy",
+    "category": "FOUNDATION · CONTAINER WITHDRAWAL",
+    "title": "How to Make a Screeps Creep Withdraw Energy from a Container",
+    "description": "Find a Container that currently holds Energy, check the Creep's free capacity, call withdraw(), handle range and return codes, and keep the delivery task outside this focused guide.",
+    "publishedAt": "2026-07-25",
+    "publishedLabel": "July 25, 2026",
+    "readingTime": "11 min read",
+    "primaryKeyword": "Screeps withdraw Energy Container",
+    "searchIntent": "Focused API tutorial and withdrawal troubleshooting",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps withdraw Energy Container",
+      "Creep.withdraw tutorial",
+      "Screeps Hauler code",
+      "ERR_NOT_IN_RANGE withdraw",
+      "STRUCTURE_CONTAINER"
+    ],
+    "status": "published"
+  },
+  {
+    "href": "/en/blog/screeps-pickup-dropped-energy",
+    "chinesePath": "/blog/screeps-creep-pickup-dropped-energy",
+    "category": "RESOURCE RECOVERY · DROPPED ENERGY",
+    "title": "How to Make a Screeps Creep Pick Up Dropped Energy",
+    "description": "Filter FIND_DROPPED_RESOURCES for Energy, rank valid piles by collectible amount and path length, handle decay and changing targets, and inspect pickup() and movement results.",
+    "publishedAt": "2026-07-25",
+    "publishedLabel": "July 25, 2026",
+    "readingTime": "14 min read",
+    "primaryKeyword": "Screeps pickup dropped Energy",
+    "searchIntent": "Resource-recovery tutorial and pickup troubleshooting",
+    "finalScore": 98,
+    "keywords": [
+      "Screeps pickup dropped Energy",
+      "Creep.pickup tutorial",
+      "FIND_DROPPED_RESOURCES",
+      "Screeps Resource decay",
+      "ERR_INVALID_TARGET pickup"
+    ],
+    "status": "published"
+  }
 ];
 
 export const englishArticleRoutePairs = Object.fromEntries(
