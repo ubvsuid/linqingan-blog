@@ -1,4 +1,4 @@
-import { englishArticleRoutePairs } from "@/lib/english-articles";
+import { englishArticleRoutePairs } from "@/lib/english-articles-complete";
 
 export const englishNavigation = [
   { label: "Home", href: "/en" },
