@@ -8,7 +8,7 @@
   "scripts": {
     "predev": "npm run contentcheck",
     "dev": "next dev",
-    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run englishobservability9check && npm run englishmarket10check && npm run englishlabfactory11check && npm run englishresources12check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
+    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run englishobservability9check && npm run englishmarket10check && npm run englishlabfactory11check && npm run englishresources12check && npm run englishtower13check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
     "build": "next build && node scripts/run-smoke.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -33,6 +33,7 @@
     "englishmarket10check": "node scripts/check-english-market-10.mjs",
     "englishlabfactory11check": "node scripts/check-english-lab-factory-11.mjs",
     "englishresources12check": "node scripts/check-english-resources-12.mjs",
+    "englishtower13check": "node scripts/check-english-tower-13.mjs",
     "simulationcheck": "node scripts/run-article-simulations.mjs",
     "accessibilitycheck": "node scripts/check-accessibility-basics.mjs",
     "verification:report": "node scripts/verification-report.mjs",
