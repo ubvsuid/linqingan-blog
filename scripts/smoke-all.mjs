@@ -3,3 +3,4 @@ await import("./smoke-english-foundation.mjs");
 await import("./smoke-english-foundation-2.mjs");
 await import("./smoke-english-spawn-3.mjs");
 await import("./smoke-english-lifecycle-4.mjs");
+await import("./smoke-english-movement-5.mjs");
