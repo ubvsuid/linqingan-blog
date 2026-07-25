@@ -63,9 +63,9 @@ export const englishRequireModulesArticle = {
     title: "Use Flags as Configuration",
   },
   next: {
-    href: "/en/blog/screeps-memory-write-safety",
-    label: "Next persistence guide",
-    title: "Write Memory Safely",
+    href: "/en/blog/screeps-nuker-launch",
+    label: "Next operations guide",
+    title: "Launch a Nuke Safely",
   },
   articleHtml: String.raw`
 <h2 id="quick-answer">Quick answer</h2>
@@ -271,7 +271,7 @@ module.exports.loop = function () {
 </ul>
 
 <h2 id="scope">Scope and next steps</h2>
-<p>This guide does not provide a bundler, process manager, dependency injection framework or complete role AI. Continue with <a href="/en/blog/screeps-memory-write-safety">safe Memory writes</a>.</p>
+<p>This guide does not provide a bundler, process manager, dependency injection framework or complete role AI. Continue with <a href="/en/blog/screeps-nuker-launch">the next reviewed operations guide</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 <h3>Can one module export several functions?</h3>
