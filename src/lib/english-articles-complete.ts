@@ -19,6 +19,7 @@ import { englishControllerBatchFourteenRegistry } from "./english-controller-reg
 import { englishConstructionSafetyBatchFifteenRegistry } from "./english-construction-safety-registry-15";
 import { englishConfigCodeBatchSixteenRegistry } from "./english-config-code-registry-16";
 import { englishDefenseOperationsBatchSeventeenRegistry } from "./english-defense-operations-registry-17";
+import { englishLinkSourceBatchEighteenRegistry } from "./english-link-source-registry-18";
 
 export type { EnglishArticleRecord };
 
@@ -40,6 +41,7 @@ export const publishedEnglishArticles: EnglishArticleRecord[] = [
   ...englishConstructionSafetyBatchFifteenRegistry,
   ...englishConfigCodeBatchSixteenRegistry,
   ...englishDefenseOperationsBatchSeventeenRegistry,
+  ...englishLinkSourceBatchEighteenRegistry,
 ];
 
 export const englishArticleRoutePairs = {
@@ -62,6 +64,7 @@ export const englishArticleRoutePairs = {
       ...englishConstructionSafetyBatchFifteenRegistry,
       ...englishConfigCodeBatchSixteenRegistry,
       ...englishDefenseOperationsBatchSeventeenRegistry,
+      ...englishLinkSourceBatchEighteenRegistry,
     ].map((article) => [article.chinesePath, article.href]),
   ),
 } as Record<string, string>;
