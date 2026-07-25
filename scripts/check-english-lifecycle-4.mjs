@@ -196,7 +196,7 @@ function getRenewStep(body) {
 
 const renewStepCases = [
   [["work", "carry", "move"], { addedTicks: 200, energyCost: 27, bodyCost: 200 }],
-  [["work", "work", "carry", "move", "move"], { addedTicks: 120, energyCost: 24, bodyCost: 300 }],
+  [["work", "work", "carry", "move", "move"], { addedTicks: 120, energyCost: 28, bodyCost: 350 }],
   [["claim", "move"], { addedTicks: 300, energyCost: 130, bodyCost: 650 }],
 ];
 for (const [body, expected] of renewStepCases) {
@@ -318,10 +318,14 @@ for (const [input, expected] of recycleCases) {
   }
 }
 
-if (rawSource.includes("if (spawn.spawning)")) {
-  failures.push("回收与续命合并源码中出现未限定的 spawn.spawning 条件；应只存在于续命命名空间内");
+const recycleArticleStart = rawSource.indexOf('slug: "screeps-recycle-creep"');
+const recycleSource = recycleArticleStart >= 0
+  ? rawSource.slice(recycleArticleStart)
+  : "";
+if (recycleSource.includes("if (spawn.spawning)")) {
+  failures.push("回收文章不应套用 renewCreep() 的 Spawn 忙碌前置条件");
 }
-if (rawSource.includes("creep.suicide();")) {
+if (recycleSource.includes("creep.suicide();")) {
   failures.push("回收文章不应自动调用 creep.suicide()" );
 }
 
