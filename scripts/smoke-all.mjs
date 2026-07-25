@@ -7,3 +7,4 @@ await import("./smoke-english-movement-5.mjs");
 await import("./smoke-english-movement-6.mjs");
 await import("./smoke-english-vision-7.mjs");
 await import("./smoke-english-runtime-8.mjs");
+await import("./smoke-english-observability-9.mjs");
