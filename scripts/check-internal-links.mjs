@@ -64,6 +64,7 @@ const englishRegistryPaths = [
   path.join(root, "src", "lib", "english-observability-registry-9.ts"),
   path.join(root, "src", "lib", "english-market-registry-10.ts"),
   path.join(root, "src", "lib", "english-lab-factory-registry-11.ts"),
+  path.join(root, "src", "lib", "english-mineral-storage-power-registry-12.ts"),
 ];
 for (const englishRegistryPath of englishRegistryPaths) {
   if (!fs.existsSync(englishRegistryPath)) continue;
