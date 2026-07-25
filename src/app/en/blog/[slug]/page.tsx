@@ -29,7 +29,7 @@ import {
 import {
   englishMovementBatchSixArticles,
   getEnglishMovementBatchSixArticle,
-} from "@/lib/english-movement-content-6";
+} from "@/lib/english-movement-content-6-published";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
