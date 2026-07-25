@@ -50,7 +50,7 @@ for (const text of [
   "request.enabled = false",
   "order.amount",
   "order.remainingAmount",
-  "cannot execute more than 10 deals",
+  "10-deal account limit",
   "TERMINAL_MIN_SEND",
   "description.length > 100",
   "input.amount + input.transactionEnergy",
