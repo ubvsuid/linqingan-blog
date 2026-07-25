@@ -8,7 +8,7 @@
   "scripts": {
     "predev": "npm run contentcheck",
     "dev": "next dev",
-    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englishmovement6check && npm run englishvision7check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
+    "prebuild": "npm run contentcheck && npm run designcheck && npm run routecheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint",
     "build": "next build && node scripts/run-smoke.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -28,6 +28,7 @@
     "englishmovement5check": "node scripts/check-english-movement-5.mjs",
     "englishmovement6check": "node scripts/check-english-movement-6.mjs",
     "englishvision7check": "node scripts/check-english-vision-7.mjs",
+    "englishruntime8check": "node scripts/check-english-runtime-8.mjs",
     "simulationcheck": "node scripts/run-article-simulations.mjs",
     "accessibilitycheck": "node scripts/check-accessibility-basics.mjs",
     "verification:report": "node scripts/verification-report.mjs",
