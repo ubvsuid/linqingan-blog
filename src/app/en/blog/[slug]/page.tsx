@@ -74,6 +74,10 @@ import {
   englishDefenseOperationsBatchSeventeenArticles,
   getEnglishDefenseOperationsBatchSeventeenArticle,
 } from "@/lib/english-defense-operations-content-17";
+import {
+  englishLinkSourceBatchEighteenArticles,
+  getEnglishLinkSourceBatchEighteenArticle,
+} from "@/lib/english-link-source-content-18";
 import { siteConfig } from "@/lib/site";
 
 interface EnglishArticlePageProps {
@@ -102,6 +106,7 @@ const dynamicEnglishArticles = [
   ...englishConstructionSafetyBatchFifteenArticles,
   ...englishConfigCodeBatchSixteenArticles,
   ...englishDefenseOperationsBatchSeventeenArticles,
+  ...englishLinkSourceBatchEighteenArticles,
 ];
 
 function getDynamicEnglishArticle(slug: string) {
@@ -122,7 +127,8 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishControllerBatchFourteenArticle(slug)
     ?? getEnglishConstructionSafetyBatchFifteenArticle(slug)
     ?? getEnglishConfigCodeBatchSixteenArticle(slug)
-    ?? getEnglishDefenseOperationsBatchSeventeenArticle(slug);
+    ?? getEnglishDefenseOperationsBatchSeventeenArticle(slug)
+    ?? getEnglishLinkSourceBatchEighteenArticle(slug);
 }
 
 export const dynamicParams = false;
