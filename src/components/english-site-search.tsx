@@ -62,6 +62,10 @@ function normalize(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("en");
 }
 
+function tokenizeQuery(value: string): string[] {
+  return normalize(value).split(/[^a-z0-9_]+/).filter(Boolean);
+}
+
 function editDistance(left: string, right: string): number {
   const rows = Array.from({ length: left.length + 1 }, () => Array(right.length + 1).fill(0));
   for (let index = 0; index <= left.length; index += 1) rows[index][0] = index;
@@ -84,7 +88,7 @@ function fuzzyTokenMatch(token: string, words: string[]): boolean {
 }
 
 function Highlight({ text, query }: { text: string; query: string }) {
-  const token = query.trim().split(/\s+/).filter(Boolean)[0];
+  const token = tokenizeQuery(query)[0];
   if (!token) return text;
   const expression = new RegExp(`(${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig");
   return text.split(expression).map((part, index) =>
@@ -157,7 +161,7 @@ export function EnglishSiteSearch({
   }, [loadSearchIndex, normalizedQuery, type]);
 
   const results = useMemo(() => {
-    const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
+    const tokens = tokenizeQuery(query);
     const sourceDocuments = normalizedQuery || type ? documents : featuredResources;
     const filteredByType = type ? sourceDocuments.filter((document) => document.type === type) : sourceDocuments;
 
@@ -184,7 +188,7 @@ export function EnglishSiteSearch({
       .filter((item) => item.score > 0)
       .sort((left, right) => right.score - left.score)
       .map((item) => item.document);
-  }, [documents, normalizedQuery, type]);
+  }, [documents, normalizedQuery, query, type]);
 
   function updateQuery(value: string) {
     setQuery(value);
