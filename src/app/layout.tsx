@@ -117,7 +117,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={siteConfig.language} suppressHydrationWarning>
+    <html lang={siteConfig.language} data-site-language={siteConfig.language} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: documentBootScript }} />
         <script
@@ -129,8 +129,9 @@ export default function RootLayout({
       </head>
       <body>
         <a className="skip-link" href="#main-content">
-          <span className="skip-link-zh">跳到正文</span>
-          <span className="skip-link-en">Skip to content</span>
+          <span lang="zh-CN">跳到正文</span>
+          <span aria-hidden="true"> / </span>
+          <span lang="en">Skip to content</span>
         </a>
         <SiteHeader />
         <div id="main-content" className="site-content">
