@@ -17,6 +17,7 @@ function requireBodyPartsArticle(): EnglishBeginnerArticle {
 const article = requireBodyPartsArticle();
 const discovery = getEnglishDiscoveryArticle(article.path);
 const articleUrl = `${siteConfig.url}${article.path}`;
+const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
 const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
 
 export const metadata: Metadata = {
@@ -25,11 +26,8 @@ export const metadata: Metadata = {
   keywords: article.keywords,
   alternates: {
     canonical: article.path,
-    languages: {
-      en: article.path,
-      "zh-CN": article.chinesePath,
-      "x-default": article.path,
-    },
+    languages: { en: article.path, "zh-CN": article.chinesePath, "x-default": article.path },
+    types: { "application/rss+xml": "/en/feed.xml" },
   },
   openGraph: {
     type: "article",
@@ -42,13 +40,13 @@ export const metadata: Metadata = {
     publishedTime: article.publishedAt,
     modifiedTime,
     tags: discovery?.tags ?? article.tags,
-    images: [{ url: `${siteConfig.url}/opengraph-image`, width: 1200, height: 630 }],
+    images: [{ url: socialImage, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${article.title} | Linqingan`,
     description: article.description,
-    images: [`${siteConfig.url}/opengraph-image`],
+    images: [socialImage],
   },
 };
 
