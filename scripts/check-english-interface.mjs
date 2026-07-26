@@ -27,10 +27,10 @@ const requiredFiles = [
   "src/app/en/layout.tsx",
   "src/app/en/not-found.tsx",
   "src/app/en/error.tsx",
-  "src/app/en/loading.tsx",
   "src/app/en/changelog/page.tsx",
   "src/app/en/roadmap/page.tsx",
   "src/app/en/license/page.tsx",
+  "src/app/en/blog/screeps-memory-write-safety/page.tsx",
 ];
 for (const relativePath of requiredFiles) read(relativePath);
 
@@ -38,7 +38,7 @@ requireText("next.config.ts", 'key: "Content-Language", value: "en"', "English C
 requireText("src/app/layout.tsx", 'document.documentElement.lang = english ? "en" : "zh-CN"', "pre-content document language selection");
 requireText("src/app/layout.tsx", "skip-link-en", "localized English skip link");
 forbidText("src/app/layout.tsx", "DocumentLanguage", "post-hydration language component");
-requireText("src/app/en/layout.tsx", `${"/en/search?q={search_term_string}"}`, "English SearchAction");
+requireText("src/app/en/layout.tsx", "/en/search?q={search_term_string}", "English SearchAction");
 requireText("src/lib/english-metadata.ts", 'applicationName: "Linqingan Screeps Guides & Tools"', "English application metadata");
 requireText("src/components/theme-toggle.tsx", "Switch to ${nextTheme} mode", "English theme-toggle label");
 requireText("src/app/en/page.tsx", "published English guides", "accurate English publication wording");
@@ -54,6 +54,8 @@ requireText("src/components/site-footer.tsx", "/en/license", "English content-us
 requireText("src/app/sitemap.ts", "/en/changelog", "English changelog Sitemap entry");
 requireText("src/app/sitemap.ts", "/en/roadmap", "English roadmap Sitemap entry");
 requireText("src/app/sitemap.ts", "/en/license", "English content-use Sitemap entry");
+requireText("src/app/en/blog/screeps-memory-write-safety/page.tsx", "permanentRedirect", "legacy English permanent redirect");
+if (fs.existsSync(path.join(root, "src/app/en/loading.tsx"))) failures.push("Global English loading.tsx must remain absent because it turns permanent 308 redirects into streamed 200 responses.");
 
 const navigation = read("src/lib/i18n.ts");
 if (navigation.includes('{ label: "Home", href: "/en" }')) failures.push("English navigation still duplicates the home logo link.");
@@ -67,7 +69,6 @@ if (taskIndex < 0 || diagramIndex < 0 || taskIndex > diagramIndex) failures.push
 for (const relativePath of [
   "src/app/en/not-found.tsx",
   "src/app/en/error.tsx",
-  "src/app/en/loading.tsx",
   "src/app/en/changelog/page.tsx",
   "src/app/en/roadmap/page.tsx",
   "src/app/en/license/page.tsx",
@@ -82,4 +83,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("English interface check passed: language, metadata, error states, hierarchy, navigation, search, tool previews, knowledge metadata, trust pages, and Sitemap entries are present.");
+console.log("English interface check passed: language, metadata, error states, hierarchy, navigation, search, tool previews, knowledge metadata, trust pages, permanent redirects, and Sitemap entries are present.");
