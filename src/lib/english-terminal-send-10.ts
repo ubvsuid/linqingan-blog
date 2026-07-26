@@ -76,9 +76,9 @@ export const englishTerminalSendArticle = {
     title: "Execute a Reviewed Market Deal",
   },
   next: {
-    href: "/en/blog/screeps-storage-energy-usage",
+    href: "/en/blog/screeps-withdraw-container-energy",
     label: "Related logistics guide",
-    title: "Use Storage Energy Safely",
+    title: "Withdraw Energy from a Container",
   },
   articleHtml: String.raw`
 <h2 id="quick-answer">Quick answer</h2>

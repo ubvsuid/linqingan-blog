@@ -254,7 +254,7 @@ function getCachedValue(key, options, builder) {
 <p>A common safe pattern is to cache a sorted list of object IDs, then resolve and filter them in the current tick.</p>
 <pre><code class="language-javascript">function getSourceIds(room) {
   const result = getCachedValue(
-    `source-ids:${room.name}`,
+    'source-ids:' + room.name,
     {
       version: 1,
       maxAge: 1000

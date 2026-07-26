@@ -111,7 +111,7 @@ export const englishRampartPublicArticle = {
     ? 'PUBLIC'
     : 'PRIVATE';
 
-  return `SET_RAMPART_${state}_${roomName}_${x}_${y}`;
+  return 'SET_RAMPART_' + state + '_' + roomName + '_' + x + '_' + y;
 }</code></pre>
 <pre><code class="language-javascript">Memory.rampartPublicRequest = {
   enabled: true,

@@ -29,12 +29,20 @@ const emptyCounts: BodyCounts = {
   TOUGH: 0,
 };
 
-const presets: Array<{ label: string; counts: Partial<BodyCounts> }> = [
-  { label: "基础工人", counts: { WORK: 1, CARRY: 1, MOVE: 1 } },
-  { label: "运输者", counts: { CARRY: 4, MOVE: 2 } },
-  { label: "升级者", counts: { WORK: 5, CARRY: 1, MOVE: 3 } },
-  { label: "侦察者", counts: { MOVE: 1 } },
-  { label: "近战单位", counts: { TOUGH: 2, ATTACK: 2, MOVE: 2 } },
+const presets: Array<{
+  label: string;
+  description: string;
+  energy: number;
+  counts: Partial<BodyCounts>;
+}> = [
+  { label: "200 基础工人", description: "采集、运输、建造的最低通用身体", energy: 200, counts: { WORK: 1, CARRY: 1, MOVE: 1 } },
+  { label: "300 采集者", description: "两个 WORK，适合早期固定采集", energy: 300, counts: { WORK: 2, CARRY: 1, MOVE: 1 } },
+  { label: "300 运输者", description: "4 CARRY + 2 MOVE，平地满载较均衡", energy: 300, counts: { CARRY: 4, MOVE: 2 } },
+  { label: "550 建设者", description: "3 WORK + 2 CARRY + 3 MOVE", energy: 550, counts: { WORK: 3, CARRY: 2, MOVE: 3 } },
+  { label: "650 升级者", description: "5 WORK，适合稳定供能的 Controller", energy: 650, counts: { WORK: 5, CARRY: 1, MOVE: 2 } },
+  { label: "800 道路运输", description: "10 CARRY + 6 MOVE，满载道路运输", energy: 800, counts: { CARRY: 10, MOVE: 6 } },
+  { label: "560 近战守卫", description: "4 TOUGH + 4 ATTACK + 4 MOVE", energy: 560, counts: { TOUGH: 4, ATTACK: 4, MOVE: 4 } },
+  { label: "侦察者", description: "只用于获取视野，不承担战斗", energy: 50, counts: { MOVE: 1 } },
 ];
 
 function createCounts(partial: Partial<BodyCounts> = {}): BodyCounts {
@@ -132,8 +140,9 @@ export function CreepBodyCalculator() {
     });
   }
 
-  function applyPreset(partial: Partial<BodyCounts>) {
-    setCounts(createCounts(partial));
+  function applyPreset(preset: (typeof presets)[number]) {
+    setCounts(createCounts(preset.counts));
+    setEnergyBudget(preset.energy);
   }
 
   async function copyBody() {
@@ -162,8 +171,9 @@ export function CreepBodyCalculator() {
 
         <div className="body-presets" aria-label="常用身体预设">
           {presets.map((preset) => (
-            <button key={preset.label} type="button" onClick={() => applyPreset(preset.counts)}>
-              {preset.label}
+            <button key={preset.label} type="button" onClick={() => applyPreset(preset)} title={preset.description}>
+              <strong>{preset.label}</strong>
+              <small>{preset.description}</small>
             </button>
           ))}
           <button type="button" onClick={() => setCounts(createCounts())}>清空</button>
@@ -243,8 +253,11 @@ export function CreepBodyCalculator() {
         .body-builder h2, .body-results h2 { margin: 8px 0 0; font-size: clamp(30px, 4vw, 44px); letter-spacing: -.045em; }
         .body-limit { display: flex; align-items: baseline; gap: 5px; color: var(--muted); white-space: nowrap; }
         .body-limit strong { color: var(--foreground); font-size: 34px; }
-        .body-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
-        .body-presets button, .body-stepper button, .body-code button { min-height: 42px; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
+        .body-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 28px; }
+        .body-presets button { display: grid; gap: 5px; min-height: 72px; align-content: center; border: 1px solid var(--border); border-radius: 15px; padding: 11px 14px; background: var(--background); color: var(--foreground); text-align: left; cursor: pointer; }
+        .body-presets button strong { font-size: 13px; }
+        .body-presets button small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+        .body-stepper button, .body-code button { min-height: 42px; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
         .body-presets button:hover, .body-stepper button:hover:not(:disabled), .body-code button:hover:not(:disabled) { border-color: var(--foreground); }
         .body-part-grid { display: grid; margin-top: 28px; border-top: 1px solid var(--border); }
         .body-part-grid article { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px; align-items: center; border-bottom: 1px solid var(--border); padding: 21px 0; }
@@ -275,6 +288,7 @@ export function CreepBodyCalculator() {
         .body-code code { overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: 14px; padding: 16px; background: var(--background); line-height: 1.65; }
         .body-code button { justify-self: start; }
         @media (max-width: 900px) { .body-calculator { grid-template-columns: 1fr; } .body-results { position: static; } }
+        @media (max-width: 560px) { .body-presets { grid-template-columns: 1fr; } }
         @media (max-width: 560px) { .body-builder-heading { align-items: flex-start; flex-direction: column; } .body-part-grid article { grid-template-columns: 1fr; } .body-stepper { justify-self: start; } .body-metrics { grid-template-columns: 1fr; } .body-metrics div:nth-child(even) { border-left: 0; padding-left: 0; } }
       `}</style>
     </div>

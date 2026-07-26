@@ -3,7 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArticleEnhancements } from "@/components/article-enhancements";
+import { ArticleReadingExperience } from "@/components/article-reading-experience";
+import { ArticleRevisionCard } from "@/components/article-revision-card";
 import { ArticleFeedback } from "@/components/article-feedback";
+import { ArticleToc } from "@/components/article-toc";
+import { ArticleVerificationSummary } from "@/components/article-verification-summary";
+import { ArticleLearningContext } from "@/components/article-learning-context";
 import { Container } from "@/components/container";
 import {
   beginnerSeriesSlugs,
@@ -50,7 +55,7 @@ export async function generateMetadata({
   }
 
   const path = `/blog/${post.slug}`;
-  const socialImage = post.cover ?? `${siteConfig.url}/opengraph-image`;
+  const socialImage = post.cover ?? `${siteConfig.url}/blog/${post.slug}/opengraph-image`;
 
   return {
     title: post.title,
@@ -67,7 +72,7 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
       tags: post.tags,
-      images: [{ url: socialImage }],
+      images: [{ url: socialImage, width: 1200, height: 630, alt: `${post.title}｜临清安` }],
     },
     twitter: {
       card: "summary_large_image",
@@ -87,6 +92,7 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const articleUrl = `${siteConfig.url}/blog/${post.slug}`;
+  const socialImage = post.cover ?? `${siteConfig.url}/blog/${post.slug}/opengraph-image`;
   const beginnerIndex = getBeginnerSeriesIndex(post.slug);
   const isBeginnerPost = beginnerIndex >= 0;
   const allPosts = getAllPosts();
@@ -132,6 +138,7 @@ export default async function PostPage({ params }: PostPageProps) {
         "@type": "BlogPosting",
         headline: post.title,
         description: post.description,
+        image: socialImage,
         datePublished: post.publishedAt,
         dateModified: post.updatedAt ?? post.publishedAt,
         mainEntityOfPage: articleUrl,
@@ -220,52 +227,20 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
           </header>
 
-          <section className="verification-status" aria-labelledby="verification-status-title">
-            <div>
-              <p className="eyebrow">VERIFICATION</p>
-              <h2 id="verification-status-title">验证状态</h2>
-            </div>
-            <dl>
-              <div>
-                <dt>官方文档</dt>
-                <dd>{post.verification.docsChecked ? "已核对" : "待核对"}</dd>
-              </div>
-              <div>
-                <dt>JavaScript 语法</dt>
-                <dd>{post.verification.syntaxChecked ? "已检查" : "待检查"}</dd>
-              </div>
-              <div>
-                <dt>Screeps Console</dt>
-                <dd>{post.verification.consoleTested ? "已测试" : "待测试"}</dd>
-              </div>
-              <div>
-                <dt>真实主循环</dt>
-                <dd>{post.verification.liveTested ? "已验证" : "待验证"}</dd>
-              </div>
-              <div>
-                <dt>最后核对</dt>
-                <dd>{formatDate(post.verification.checkedAt)}</dd>
-              </div>
-              {post.verification.testEnvironment ? (
-                <div>
-                  <dt>测试环境</dt>
-                  <dd>{post.verification.testEnvironment}</dd>
-                </div>
-              ) : null}
-              {post.verification.testedAt ? (
-                <div>
-                  <dt>测试日期</dt>
-                  <dd>{formatDate(post.verification.testedAt)}</dd>
-                </div>
-              ) : null}
-              {post.verification.testResult ? (
-                <div>
-                  <dt>测试结果</dt>
-                  <dd>{post.verification.testResult}</dd>
-                </div>
-              ) : null}
-            </dl>
-          </section>
+          <ArticleLearningContext slug={post.slug} />
+
+          <ArticleVerificationSummary
+            docsChecked={post.verification.docsChecked}
+            syntaxChecked={post.verification.syntaxChecked}
+            consoleTested={post.verification.consoleTested}
+            liveTested={post.verification.liveTested}
+            checkedAt={post.verification.checkedAt}
+            testEnvironment={post.verification.testEnvironment}
+            testedAt={post.verification.testedAt}
+            testResult={post.verification.testResult}
+          />
+
+          <ArticleRevisionCard slug={post.slug} />
 
           {isBeginnerPost ? (
             <section className="series-status" aria-label="系列阅读进度">
@@ -291,21 +266,7 @@ export default async function PostPage({ params }: PostPageProps) {
             </section>
           ) : null}
 
-          {post.tableOfContents.length > 1 ? (
-            <nav className="article-toc" aria-label="本文目录">
-              <p className="article-toc-title">本文目录</p>
-              <ol>
-                {post.tableOfContents.map((item) => (
-                  <li
-                    className={item.level === 3 ? "toc-level-three" : undefined}
-                    key={item.id}
-                  >
-                    <a href={`#${item.id}`}>{item.text}</a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          ) : null}
+          <ArticleToc items={post.tableOfContents} />
 
           <div
             id={articleId}
@@ -313,6 +274,12 @@ export default async function PostPage({ params }: PostPageProps) {
             dangerouslySetInnerHTML={{ __html: post.html }}
           />
           <ArticleEnhancements articleId={articleId} />
+          <ArticleReadingExperience
+            articleId={articleId}
+            slug={post.slug}
+            title={post.title}
+            toc={post.tableOfContents}
+          />
 
           <ArticleFeedback
             slug={post.slug}

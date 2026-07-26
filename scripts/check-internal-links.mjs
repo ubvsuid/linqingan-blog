@@ -91,6 +91,9 @@ function routeExists(href) {
   if (/^\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/tags\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/(blog|now|changelog)\/page\/[2-9][0-9]*$/.test(href)) return true;
+  if (/^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)) {
+    return fs.existsSync(path.join(root, "public", href.slice(1)));
+  }
   return false;
 }
 

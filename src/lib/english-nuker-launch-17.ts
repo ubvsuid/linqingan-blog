@@ -59,7 +59,7 @@ export const englishNukerLaunchArticle = {
     ["Does OK prove a Nuke object is visible in the target room?", "No. Save the result, inspect the Nuker later, and check FIND_NUKES only when target-room visibility exists."],
   ],
   previous: {
-    href: "/en/blog/screeps-memory-write-safety",
+    href: "/en/blog/screeps-memory-basics",
     label: "Previous operations guide",
     title: "Write Memory Safely",
   },
@@ -97,7 +97,7 @@ export const englishNukerLaunchArticle = {
 
 <h2 id="confirmation">Bind confirmation to the exact target</h2>
 <pre><code class="language-javascript">function buildNukeConfirmation(roomName, x, y) {
-  return `LAUNCH_NUKE_${roomName}_${x}_${y}`;
+  return 'LAUNCH_NUKE_' + roomName + '_' + x + '_' + y;
 }</code></pre>
 <p>A generic value such as <code>LAUNCH</code> does not prove that the player reviewed the current target. A target-bound phrase becomes invalid whenever the room or coordinate changes.</p>
 

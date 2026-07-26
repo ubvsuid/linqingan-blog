@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { HomeTaskHub } from "@/components/home-task-hub";
+import { HomeMaintenancePanel } from "@/components/home-maintenance-panel";
 import { PostCard } from "@/components/post-card";
 import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
 import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
@@ -35,6 +36,12 @@ const quickEntries = [
     eyebrow: "GLOSSARY",
     title: "查看术语表",
     description: "快速理解 Creep、Spawn、Memory、RCL 等常见概念。",
+  },
+  {
+    href: "/tools/room-diagnostics",
+    eyebrow: "ROOM CHECK",
+    title: "诊断房间运行",
+    description: "检查 Spawn、角色、Energy、Controller、工地和 CPU 风险。",
   },
   {
     href: "/tools/creep-body-calculator",
@@ -135,6 +142,10 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
+
+      <Container>
+        <HomeMaintenancePanel />
+      </Container>
 
       <section className={styles.quickSection} aria-labelledby="home-quick-title">
         <Container>

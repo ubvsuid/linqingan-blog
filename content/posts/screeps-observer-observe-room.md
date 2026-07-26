@@ -2,7 +2,7 @@
 title: "StructureObserver.observeRoom() 怎么安全获取远方房间视野"
 description: "解释 Observer 的10房间范围、请求与下一tick读取时序、返回码和Memory状态，并提供不会把当前视野误判为观察结果的完整示例。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-22"
+updatedAt: "2026-07-23"
 category: "Screeps 进阶开发"
 tags:
   - "Screeps"
@@ -336,6 +336,12 @@ Memory.observerState = {
 ```
 
 若返回错误却仍然记录“已请求”，下一 tick 会把不存在的观察结果误当成一次有效任务。
+
+## 两 tick 时序图
+
+![Observer 在 tick N 提交观察请求，并在 tick N 加 1 从 Game.rooms 读取目标房间的时序图](/diagrams/observer-two-tick.svg)
+
+这张图解释 API 时序，不冒充真实房间画面。正式验证仍需要保存实际 requestedAt、目标房间和后续 tick 结果。
 
 ## 离线模拟结果
 

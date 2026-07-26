@@ -21,10 +21,10 @@ type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequenc
 
 const staticPageDates = {
   about: "2026-07-22",
-  glossary: "2026-07-18",
-  screepsErrors: "2026-07-18",
+  glossary: "2026-07-23",
+  screepsErrors: "2026-07-23",
   verification: "2026-07-22",
-  creepBodyCalculator: "2026-07-22",
+  creepBodyCalculator: "2026-07-23",
   roomDiagnostics: "2026-07-23",
   englishFoundation: "2026-07-26",
 };

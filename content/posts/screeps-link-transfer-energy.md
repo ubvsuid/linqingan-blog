@@ -2,7 +2,7 @@
 title: "StructureLink.transferEnergy() 怎么安全传输 Energy"
 description: "通过固定ID区分源Link和目标Link，检查同房间、Store、isActive与cooldown，保守计算amount并处理3%损耗和全部返回值。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-22"
+updatedAt: "2026-07-23"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -381,6 +381,12 @@ targetReserve: 100
 Link可以远程发送，但目标必须在**同一房间**。
 
 跨房间Link会返回 `ERR_NOT_IN_RANGE`。因此“远程”不等于跨房间。
+
+## Link 网络流程图
+
+![Source Link 经过统一调度模块向 Controller Link 或 Storage Link 发送 Energy 的流程图](/diagrams/link-energy-flow.svg)
+
+流程图强调固定 ID、同房间、cooldown、目标容量和每 tick 统一调度。它不是具体房间截图，真实 Link 位置仍以自己的房间布局为准。
 
 ## 返回值排查
 
