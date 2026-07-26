@@ -36,8 +36,11 @@ for (const relativePath of requiredFiles) read(relativePath);
 
 requireText("next.config.ts", 'key: "Content-Language", value: "en"', "English Content-Language header");
 requireText("src/app/layout.tsx", 'document.documentElement.lang = english ? "en" : "zh-CN"', "pre-content document language selection");
-requireText("src/app/layout.tsx", "skip-link-en", "localized English skip link");
+requireText("src/app/layout.tsx", '<span lang="en">Skip to content</span>', "no-JavaScript English skip-link fallback");
 forbidText("src/app/layout.tsx", "DocumentLanguage", "post-hydration language component");
+requireText("src/app/en/layout.tsx", 'className="english-root" lang="en"', "server-rendered English content language");
+requireText("src/components/site-header.tsx", 'lang={english ? "en" : "zh-CN"}', "localized header language");
+requireText("src/components/site-footer.tsx", 'lang={english ? "en" : "zh-CN"}', "localized footer language");
 requireText("src/app/en/layout.tsx", "/en/search?q={search_term_string}", "English SearchAction");
 requireText("src/lib/english-metadata.ts", 'applicationName: "Linqingan Screeps Guides & Tools"', "English application metadata");
 requireText("src/components/theme-toggle.tsx", "Switch to ${nextTheme} mode", "English theme-toggle label");
@@ -67,6 +70,7 @@ const diagramIndex = home.indexOf('className="english-system-visual"');
 if (taskIndex < 0 || diagramIndex < 0 || taskIndex > diagramIndex) failures.push("English task navigation must appear before the system diagram.");
 
 for (const relativePath of [
+  "src/app/en/layout.tsx",
   "src/app/en/not-found.tsx",
   "src/app/en/error.tsx",
   "src/app/en/changelog/page.tsx",
@@ -83,4 +87,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("English interface check passed: language, metadata, error states, hierarchy, navigation, search, tool previews, knowledge metadata, trust pages, permanent redirects, and Sitemap entries are present.");
+console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, search, tool previews, knowledge metadata, trust pages, permanent redirects, and Sitemap entries are present.");
