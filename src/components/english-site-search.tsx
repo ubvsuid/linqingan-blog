@@ -1,14 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EnglishSearchDocument } from "@/lib/english-search";
 
 const popularQueries = ["ERR_NOT_IN_RANGE", "creep not moving", "CPU bucket", "body calculator", "Memory cleanup"];
 
+const featuredResources: EnglishSearchDocument[] = [
+  {
+    id: "featured-beginner",
+    title: "Screeps Beginner Roadmap",
+    description: "Follow a guided sequence from the first Creep to roles, upgrading, construction, and a complete first-room loop.",
+    href: "/en/beginner",
+    type: "Page",
+    keywords: ["beginner", "first Creep", "learning path"],
+  },
+  {
+    id: "featured-errors",
+    title: "Screeps Error Codes and Return Values",
+    description: "Look up common return codes before changing movement, spawning, market, construction, or Controller logic.",
+    href: "/en/screeps-errors",
+    type: "Reference",
+    keywords: ["return code", "ERR_NOT_IN_RANGE", "ERR_NO_PATH"],
+  },
+  {
+    id: "featured-knowledge",
+    title: "Screeps Knowledge Base",
+    description: "Browse curated modules for Memory, spawning, economy, movement, Controllers, defense, resources, and debugging.",
+    href: "/en/knowledge",
+    type: "Page",
+    keywords: ["knowledge", "modules", "systems"],
+  },
+  {
+    id: "featured-body-calculator",
+    title: "Screeps Creep Body Calculator",
+    description: "Calculate Energy cost, spawn time, hits, carry capacity, and loaded movement speed in the browser.",
+    href: "/en/tools/creep-body-calculator",
+    type: "Tool",
+    keywords: ["body calculator", "creep cost", "MOVE ratio"],
+  },
+  {
+    id: "featured-room-diagnostics",
+    title: "Screeps Room Snapshot Diagnostic",
+    description: "Check Spawn, workforce, Energy, Controller, construction, CPU, and bucket risks from a static room snapshot.",
+    href: "/en/tools/room-diagnostics",
+    type: "Tool",
+    keywords: ["room diagnostics", "CPU bucket", "Controller downgrade"],
+  },
+  {
+    id: "featured-guides",
+    title: "English Screeps Guide Library",
+    description: "Browse all published English guides with filters for system, difficulty, content type, and topic.",
+    href: "/en/blog",
+    type: "Page",
+    keywords: ["guides", "articles", "Screeps tutorials"],
+  },
+];
+
 function normalize(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("en");
+}
+
+function tokenizeQuery(value: string): string[] {
+  return normalize(value).split(/[^a-z0-9_]+/).filter(Boolean);
 }
 
 function editDistance(left: string, right: string): number {
@@ -33,7 +88,7 @@ function fuzzyTokenMatch(token: string, words: string[]): boolean {
 }
 
 function Highlight({ text, query }: { text: string; query: string }) {
-  const token = query.trim().split(/\s+/).filter(Boolean)[0];
+  const token = tokenizeQuery(query)[0];
   if (!token) return text;
   const expression = new RegExp(`(${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig");
   return text.split(expression).map((part, index) =>
@@ -44,16 +99,45 @@ function Highlight({ text, query }: { text: string; query: string }) {
 }
 
 export function EnglishSiteSearch({
-  documents,
   initialQuery = "",
+  initialDocuments = [],
 }: {
-  documents: EnglishSearchDocument[];
   initialQuery?: string;
+  initialDocuments?: EnglishSearchDocument[];
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [type, setType] = useState("");
+  const [documents, setDocuments] = useState<EnglishSearchDocument[]>(initialDocuments);
+  const [fullIndexLoaded, setFullIndexLoaded] = useState(false);
+  const [loadState, setLoadState] = useState<"idle" | "loading" | "ready" | "error">(
+    initialDocuments.length > 0 ? "ready" : "idle",
+  );
   const inputRef = useRef<HTMLInputElement>(null);
+  const loadingRef = useRef(false);
   const normalizedQuery = normalize(query);
+
+  const loadSearchIndex = useCallback(async () => {
+    if (fullIndexLoaded || loadingRef.current) return;
+
+    loadingRef.current = true;
+    setLoadState("loading");
+
+    try {
+      const response = await fetch("/en/search-index.json", {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Search index request failed with ${response.status}`);
+      const payload: unknown = await response.json();
+      if (!Array.isArray(payload)) throw new Error("Search index response is not an array");
+      setDocuments(payload as EnglishSearchDocument[]);
+      setFullIndexLoaded(true);
+      setLoadState("ready");
+    } catch {
+      setLoadState("error");
+    } finally {
+      loadingRef.current = false;
+    }
+  }, [fullIndexLoaded]);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -62,24 +146,26 @@ export function EnglishSiteSearch({
       if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
       event.preventDefault();
       inputRef.current?.focus();
+      void loadSearchIndex();
     };
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, []);
+  }, [loadSearchIndex]);
+
+  useEffect(() => {
+    const delay = normalizedQuery || type ? 0 : 1200;
+    const timer = window.setTimeout(() => {
+      void loadSearchIndex();
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [loadSearchIndex, normalizedQuery, type]);
 
   const results = useMemo(() => {
-    const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
-    const filteredByType = type ? documents.filter((document) => document.type === type) : documents;
+    const tokens = tokenizeQuery(query);
+    const sourceDocuments = normalizedQuery || type ? documents : featuredResources;
+    const filteredByType = type ? sourceDocuments.filter((document) => document.type === type) : sourceDocuments;
 
-    if (!normalizedQuery) {
-      return filteredByType
-        .slice()
-        .sort((left, right) => {
-          const typePriority = { Page: 4, Tool: 3, Reference: 2, Article: 1 };
-          return typePriority[right.type] - typePriority[left.type];
-        })
-        .slice(0, 12);
-    }
+    if (!normalizedQuery) return filteredByType.slice(0, 12);
 
     return filteredByType
       .map((document) => {
@@ -102,7 +188,7 @@ export function EnglishSiteSearch({
       .filter((item) => item.score > 0)
       .sort((left, right) => right.score - left.score)
       .map((item) => item.document);
-  }, [documents, normalizedQuery, type]);
+  }, [documents, normalizedQuery, query, type]);
 
   function updateQuery(value: string) {
     setQuery(value);
@@ -111,6 +197,10 @@ export function EnglishSiteSearch({
     else url.searchParams.delete("q");
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }
+
+  const waitingForIndex = Boolean(normalizedQuery || type)
+    && documents.length === 0
+    && (loadState === "idle" || loadState === "loading");
 
   return (
     <div className="english-site-search">
@@ -122,6 +212,7 @@ export function EnglishSiteSearch({
               ref={inputRef}
               type="search"
               value={query}
+              onFocus={() => void loadSearchIndex()}
               onChange={(event) => updateQuery(event.target.value)}
               placeholder="Try: ERR_NOT_IN_RANGE, body calculator, CPU bucket"
             />
@@ -130,7 +221,11 @@ export function EnglishSiteSearch({
         </label>
         <label className="english-search-type">
           <span>Resource type</span>
-          <select value={type} onChange={(event) => setType(event.target.value)}>
+          <select
+            value={type}
+            onFocus={() => void loadSearchIndex()}
+            onChange={(event) => setType(event.target.value)}
+          >
             <option value="">All resources</option>
             <option value="Article">Articles</option>
             <option value="Tool">Tools</option>
@@ -143,15 +238,27 @@ export function EnglishSiteSearch({
       {!normalizedQuery ? (
         <div className="english-popular-searches" aria-label="Popular English searches">
           <span>Popular searches</span>
-          {popularQueries.map((item) => <button type="button" key={item} onClick={() => updateQuery(item)}>{item}</button>)}
+          {popularQueries.map((item) => <button type="button" key={item} onClick={() => { void loadSearchIndex(); updateQuery(item); }}>{item}</button>)}
         </div>
       ) : null}
 
       <p className="english-search-summary" aria-live="polite">
-        {normalizedQuery ? `${results.length} matching result${results.length === 1 ? "" : "s"}` : "Popular English resources"}
+        {waitingForIndex
+          ? "Loading the English search index…"
+          : normalizedQuery
+            ? `${results.length} matching result${results.length === 1 ? "" : "s"}`
+            : "Recommended English resources"}
       </p>
 
-      {results.length > 0 ? (
+      {loadState === "error" && (normalizedQuery || type) && documents.length === 0 ? (
+        <div className="english-search-empty">
+          <strong>The search index could not load.</strong>
+          <p>Retry the index request, or continue with the roadmap, knowledge modules, references, and tools below.</p>
+          <div><button type="button" onClick={() => { setLoadState("idle"); void loadSearchIndex(); }}>Retry search</button><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link></div>
+        </div>
+      ) : waitingForIndex ? (
+        <div className="english-search-loading" role="status">Preparing searchable guides, tools, references, and topic pages…</div>
+      ) : results.length > 0 ? (
         <div className="english-search-results">
           {results.map((result) => (
             <article key={result.id}>
@@ -166,7 +273,7 @@ export function EnglishSiteSearch({
         <div className="english-search-empty">
           <strong>No resource matches “{query.trim()}”.</strong>
           <p>Try an API method, return code, object name, symptom, or a broader knowledge topic.</p>
-          <div><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link><Link href="/en/screeps-errors">Error codes</Link><Link href="/en/blog">All articles</Link></div>
+          <div><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link><Link href="/en/screeps-errors">Error codes</Link><Link href="/en/blog">All guides</Link></div>
         </div>
       )}
 
@@ -186,6 +293,7 @@ export function EnglishSiteSearch({
         .english-popular-searches button { border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; background: var(--surface); color: var(--foreground); cursor: pointer; }
         .english-popular-searches button:hover { border-color: var(--screeps-controller); }
         .english-search-summary { margin: 0; color: var(--muted); font-size: 13px; }
+        .english-search-loading { border: 1px dashed var(--border); border-radius: 20px; padding: clamp(28px, 5vw, 48px); color: var(--muted); text-align: center; }
         .english-search-results { display: grid; border-top: 1px solid var(--border); }
         .english-search-results article { border-bottom: 1px solid var(--border); padding: 28px 0; }
         .english-search-results article > span { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 4px 9px; font-size: 11px; }
@@ -197,7 +305,7 @@ export function EnglishSiteSearch({
         .english-search-empty { border: 1px dashed var(--border); border-radius: 20px; padding: clamp(28px, 5vw, 48px); text-align: center; }
         .english-search-empty p { max-width: 660px; margin: 12px auto 20px; color: var(--muted); line-height: 1.75; }
         .english-search-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
-        .english-search-empty a { border: 1px solid var(--border); border-radius: 999px; padding: 9px 13px; text-decoration: none; }
+        .english-search-empty a, .english-search-empty button { border: 1px solid var(--border); border-radius: 999px; padding: 9px 13px; background: var(--surface); color: var(--foreground); text-decoration: none; cursor: pointer; }
         @media (max-width: 760px) { .english-search-toolbar { grid-template-columns: 1fr; } }
         @media (max-width: 560px) { .english-search-field > div { grid-template-columns: 1fr; } .english-search-field button { justify-self: start; } }
       `}</style>

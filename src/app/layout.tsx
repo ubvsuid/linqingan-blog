@@ -83,21 +83,21 @@ const structuredData = {
     {
       "@type": "Person",
       "@id": `${siteConfig.url}/#person`,
-      name: siteConfig.author.name,
-      alternateName: [siteConfig.author.handle, "Linqingan"],
+      name: "Linqingan",
+      alternateName: [siteConfig.author.name, siteConfig.author.handle],
       url: `${siteConfig.url}/about`,
       image: `${siteConfig.url}/profile-avatar.webp`,
       email: `mailto:${siteConfig.author.email}`,
       sameAs: [siteConfig.links.github],
-      knowsAbout: ["Screeps", "JavaScript", "系统设计", "内容建设"],
+      knowsAbout: ["Screeps", "JavaScript", "system design", "debugging", "technical documentation"],
     },
     {
       "@type": "WebSite",
       "@id": `${siteConfig.url}/#website`,
       url: siteConfig.url,
-      name: siteConfig.title,
-      alternateName: "Linqingan",
-      description: siteConfig.description,
+      name: "Linqingan",
+      alternateName: [siteConfig.title, "Linqingan Screeps Guides & Tools"],
+      description: "Screeps learning, debugging, engineering notes, and practical tools in Chinese and English.",
       inLanguage: ["zh-CN", "en"],
       author: {
         "@id": `${siteConfig.url}/#person`,
@@ -129,9 +129,8 @@ export default function RootLayout({
       </head>
       <body>
         <a className="skip-link" href="#main-content">
-          <span lang="zh-CN">跳到正文</span>
-          <span aria-hidden="true"> / </span>
-          <span lang="en">Skip to content</span>
+          <span className="skip-link-zh" lang="zh-CN">跳到正文</span>
+          <span className="skip-link-en" lang="en">Skip to content</span>
         </a>
         <SiteHeader />
         <div id="main-content" className="site-content">

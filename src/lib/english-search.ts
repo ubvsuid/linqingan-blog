@@ -1,5 +1,4 @@
-import { publishedEnglishArticles } from "@/lib/english-articles-complete";
-import { englishTags } from "@/lib/english-discovery";
+import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
 
 export interface EnglishSearchDocument {
   id: string;
@@ -9,6 +8,17 @@ export interface EnglishSearchDocument {
   type: "Page" | "Reference" | "Tool" | "Article";
   keywords: string[];
 }
+
+const knowledgeModuleSearchTerms: Record<number, string[]> = {
+  1: ["memory", "code", "module", "state", "configuration", "javascript", "cache"],
+  2: ["spawn", "creep", "body", "lifecycle", "renew", "recycle", "replacement"],
+  3: ["energy", "economy", "source", "container", "storage", "link", "hauling", "delivery"],
+  4: ["move", "movement", "path", "pathfinding", "route", "vision", "roomposition", "observer"],
+  5: ["controller", "upgrade", "reserve", "claim", "expansion", "downgrade", "safe mode"],
+  6: ["construction", "build", "repair", "defense", "defence", "tower", "wall", "rampart"],
+  7: ["market", "resource", "terminal", "lab", "boost", "factory", "mineral", "power"],
+  8: ["operation", "debug", "debugging", "diagnostic", "cpu", "bucket", "event", "notify", "visual"],
+};
 
 const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-home", title: "Screeps Tutorials, Debugging Guides and Tools", description: "The English home for practical Screeps learning, debugging, references, and tools.", href: "/en", type: "Page", keywords: ["screeps", "tutorial", "debugging", "javascript", "automation"] },
@@ -36,13 +46,20 @@ const topicDocuments: EnglishSearchDocument[] = englishTags.map((tag) => ({
   keywords: [tag.label, ...tag.terms],
 }));
 
-const articleDocuments: EnglishSearchDocument[] = publishedEnglishArticles.map((article) => ({
+const articleDocuments: EnglishSearchDocument[] = englishDiscoveryArticles.map((article) => ({
   id: article.href.replace(/^\//, "").replaceAll("/", "-"),
   title: article.title,
   description: article.description,
   href: article.href,
   type: "Article",
-  keywords: [article.primaryKeyword, article.searchIntent, ...article.keywords],
+  keywords: [
+    article.primaryKeyword,
+    article.searchIntent,
+    article.moduleTitle,
+    ...knowledgeModuleSearchTerms[article.moduleNumber],
+    ...article.tags,
+    ...article.keywords,
+  ],
 }));
 
 export const englishSearchDocuments: EnglishSearchDocument[] = [
@@ -50,3 +67,40 @@ export const englishSearchDocuments: EnglishSearchDocument[] = [
   ...topicDocuments,
   ...foundationDocuments,
 ];
+
+function normalizeSearchValue(value: string): string {
+  return value.normalize("NFKC").trim().toLocaleLowerCase("en");
+}
+
+function tokenizeSearchQuery(value: string): string[] {
+  return normalizeSearchValue(value).split(/[^a-z0-9_]+/).filter(Boolean);
+}
+
+export function getEnglishInitialSearchDocuments(
+  query: string,
+  limit = 80,
+): EnglishSearchDocument[] {
+  const tokens = tokenizeSearchQuery(query);
+  if (tokens.length === 0) return [];
+
+  return englishSearchDocuments
+    .map((document) => {
+      const title = normalizeSearchValue(document.title);
+      const description = normalizeSearchValue(document.description);
+      const keywords = normalizeSearchValue(document.keywords.join(" "));
+      let score = 0;
+
+      for (const token of tokens) {
+        if (title === token) score += 25;
+        else if (title.includes(token)) score += 10;
+        if (keywords.includes(token)) score += 6;
+        if (description.includes(token)) score += 3;
+      }
+
+      return { document, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((left, right) => right.score - left.score)
+    .slice(0, limit)
+    .map((item) => item.document);
+}

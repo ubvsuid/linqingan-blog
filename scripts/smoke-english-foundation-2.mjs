@@ -101,7 +101,28 @@ if (searchResponse.status !== 200) {
 } else {
   for (const article of articles) {
     if (!searchBody.includes(article.headline)) {
-      failures.push(`/en/search: 缺少新文章 “${article.headline}”`);
+      failures.push(`/en/search: 缺少服务端相关结果 “${article.headline}”`);
+    }
+  }
+  if (searchBody.includes("How to Launch a Nuke Without Reusing a Stale Target Request")) {
+    failures.push("/en/search: 首屏仍嵌入与 Memory 查询无关的完整文章索引");
+  }
+}
+
+const searchIndexResponse = await fetch(`${baseUrl}/en/search-index.json`, {
+  redirect: "manual",
+});
+const searchIndexBody = await searchIndexResponse.text();
+if (searchIndexResponse.status !== 200) {
+  failures.push(`/en/search-index.json: 预期 200，实际 ${searchIndexResponse.status}`);
+} else {
+  const contentType = searchIndexResponse.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    failures.push(`/en/search-index.json: Content-Type 不是 application/json`);
+  }
+  for (const article of articles) {
+    if (!searchIndexBody.includes(article.headline)) {
+      failures.push(`/en/search-index.json: 缺少新文章 “${article.headline}”`);
     }
   }
 }
@@ -128,5 +149,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、搜索与 Sitemap。`,
+  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
 );
