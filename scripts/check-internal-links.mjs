@@ -29,6 +29,7 @@ const exactRoutes = new Set([
   "/en/about",
   "/en/beginner",
   "/en/blog",
+  "/en/feed.xml",
   "/en/blog/screeps-introduction",
   "/en/blog/screeps-first-room",
   "/en/blog/screeps-tick-game-loop",
@@ -47,6 +48,7 @@ const exactRoutes = new Set([
   "/en/knowledge",
   "/en/screeps-errors",
   "/en/search",
+  "/en/tags",
   "/en/tools",
   "/en/tools/creep-body-calculator",
   "/en/tools/room-diagnostics",
@@ -90,6 +92,7 @@ function routeExists(href) {
   }
   if (/^\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/tags\/[a-z0-9-]+$/.test(href)) return true;
+  if (/^\/en\/tags\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/(blog|now|changelog)\/page\/[2-9][0-9]*$/.test(href)) return true;
   if (/^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)) {
     return fs.existsSync(path.join(root, "public", href.slice(1)));
@@ -98,13 +101,15 @@ function routeExists(href) {
 }
 
 function hasPageForRoute(route) {
-  const pagePath = path.join(root, "src", "app", ...route.slice(1).split("/"), "page.tsx");
+  const routeParts = route.slice(1).split("/");
+  const pagePath = path.join(root, "src", "app", ...routeParts, "page.tsx");
   if (fs.existsSync(pagePath)) return true;
 
+  const routePath = path.join(root, "src", "app", ...routeParts, "route.ts");
+  if (fs.existsSync(routePath)) return true;
+
   if (/^\/en\/blog\/[a-z0-9-]+$/.test(route)) {
-    return fs.existsSync(
-      path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx"),
-    );
+    return fs.existsSync(path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx"));
   }
 
   return false;
@@ -112,7 +117,7 @@ function hasPageForRoute(route) {
 
 const errors = [];
 for (const route of exactRoutes) {
-  if (route === "/" || route === "/feed.xml") continue;
+  if (route === "/") continue;
   if (!hasPageForRoute(route)) {
     errors.push(`已登记路由缺少页面文件 ${route}`);
   }
