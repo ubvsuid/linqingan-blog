@@ -70,7 +70,7 @@ export function SiteHeader() {
   const aboutHref = english ? "/en/about" : "/about";
 
   return (
-    <header ref={headerRef} className="site-header">
+    <header ref={headerRef} className="site-header" lang={english ? "en" : "zh-CN"}>
       <Container className="header-inner">
         <Link
           href={homeHref}
