@@ -3,30 +3,53 @@ import path from "node:path";
 
 const root = process.cwd();
 const libDirectory = path.join(root, "src", "lib");
+const postsDirectory = path.join(root, "content", "posts");
 const failures = [];
 
 const registryFiles = fs.readdirSync(libDirectory)
   .filter((name) => name === "english-articles.ts" || /^english-[a-z0-9-]+-registry-\d+\.ts$/.test(name))
   .sort();
 
-const hrefs = [];
-const chinesePaths = [];
+const records = [];
 for (const fileName of registryFiles) {
   const source = fs.readFileSync(path.join(libDirectory, fileName), "utf8");
-  for (const match of source.matchAll(/["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g)) hrefs.push(match[1]);
-  for (const match of source.matchAll(/["']?chinesePath["']?\s*:\s*["'](\/blog\/[a-z0-9-]+)["']/g)) chinesePaths.push(match[1]);
+  for (const match of source.matchAll(
+    /\{[\s\S]*?["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["'][\s\S]*?["']?chinesePath["']?\s*:\s*["'](\/blog\/[a-z0-9-]+)["'][\s\S]*?\}/g,
+  )) {
+    records.push({ href: match[1], chinesePath: match[2], fileName });
+  }
 }
 
-function duplicates(values) {
+function duplicateValues(values) {
   const counts = new Map();
   for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
   return [...counts.entries()].filter(([, count]) => count > 1).map(([value]) => value);
 }
 
-for (const href of duplicates(hrefs)) failures.push(`Duplicate English article href: ${href}`);
-for (const chinesePath of duplicates(chinesePaths)) failures.push(`Duplicate Chinese source mapping: ${chinesePath}`);
-if (hrefs.length === 0) failures.push("No published English article hrefs were discovered.");
-if (hrefs.length !== chinesePaths.length) failures.push(`English href/source count mismatch: ${hrefs.length} hrefs vs ${chinesePaths.length} Chinese paths.`);
+const hrefs = records.map((record) => record.href);
+const chinesePaths = records.map((record) => record.chinesePath);
+
+for (const href of duplicateValues(hrefs)) failures.push(`Duplicate English article href: ${href}`);
+for (const chinesePath of duplicateValues(chinesePaths)) failures.push(`Duplicate Chinese source mapping: ${chinesePath}`);
+if (records.length === 0) failures.push("No paired English article records were discovered.");
+
+for (const record of records) {
+  const chineseSlug = record.chinesePath.slice("/blog/".length);
+  const chinesePost = path.join(postsDirectory, `${chineseSlug}.md`);
+  const chineseStaticPage = path.join(root, "src", "app", "blog", chineseSlug, "page.tsx");
+  if (!fs.existsSync(chinesePost) && !fs.existsSync(chineseStaticPage)) {
+    failures.push(
+      `English pair ${record.href} points to missing Chinese source ${record.chinesePath} in ${record.fileName}`,
+    );
+  }
+
+  const englishSlug = record.href.slice("/en/blog/".length);
+  const englishStaticPage = path.join(root, "src", "app", "en", "blog", englishSlug, "page.tsx");
+  const englishDynamicPage = path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx");
+  if (!fs.existsSync(englishStaticPage) && !fs.existsSync(englishDynamicPage)) {
+    failures.push(`English pair lacks a route for ${record.href} in ${record.fileName}`);
+  }
+}
 
 const requiredFiles = [
   "src/lib/english-discovery.ts",
@@ -35,6 +58,7 @@ const requiredFiles = [
   "src/app/en/tags/[tag]/page.tsx",
   "src/app/en/feed.xml/route.ts",
   "src/app/en/blog/[slug]/opengraph-image.tsx",
+  "src/app/en/blog/screeps-creep-body-parts/opengraph-image.tsx",
 ];
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) failures.push(`Missing English discovery file: ${relativePath}`);
@@ -67,4 +91,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`English discovery check passed: ${hrefs.length} unique English article mappings, topic archives, RSS, reciprocal hreflang, related guides, and article share images are present.`);
+console.log(
+  `English discovery check passed: ${records.length} paired English/Chinese records, topic archives, RSS, reciprocal hreflang, related guides, and article share images are present. Semantic registry/content pairing is additionally enforced by englishmappingcheck.`,
+);
