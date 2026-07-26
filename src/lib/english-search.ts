@@ -50,3 +50,36 @@ export const englishSearchDocuments: EnglishSearchDocument[] = [
   ...topicDocuments,
   ...foundationDocuments,
 ];
+
+function normalizeSearchValue(value: string): string {
+  return value.normalize("NFKC").trim().toLocaleLowerCase("en");
+}
+
+export function getEnglishInitialSearchDocuments(
+  query: string,
+  limit = 80,
+): EnglishSearchDocument[] {
+  const tokens = normalizeSearchValue(query).split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return [];
+
+  return englishSearchDocuments
+    .map((document) => {
+      const title = normalizeSearchValue(document.title);
+      const description = normalizeSearchValue(document.description);
+      const keywords = normalizeSearchValue(document.keywords.join(" "));
+      let score = 0;
+
+      for (const token of tokens) {
+        if (title === token) score += 25;
+        else if (title.includes(token)) score += 10;
+        if (keywords.includes(token)) score += 6;
+        if (description.includes(token)) score += 3;
+      }
+
+      return { document, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((left, right) => right.score - left.score)
+    .slice(0, limit)
+    .map((item) => item.document);
+}
