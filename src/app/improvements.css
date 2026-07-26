@@ -38,6 +38,7 @@ html[data-site-language="en"] .skip-link-en {
   --screeps-success: #2f7d54;
   --screeps-warning: #ad5f22;
   --screeps-danger: #a53e3e;
+
   min-height: 100%;
 }
 
@@ -65,11 +66,11 @@ html[data-theme="dark"] .english-root {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
   border-radius: 999px;
   padding: 5px 10px;
   color: var(--screeps-controller);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
   font-size: 10px;
   font-weight: 750;
   letter-spacing: .09em;
