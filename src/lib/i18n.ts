@@ -5,6 +5,7 @@ export const englishNavigation = [
   { label: "Beginner", href: "/en/beginner" },
   { label: "Articles", href: "/en/blog" },
   { label: "Knowledge", href: "/en/knowledge" },
+  { label: "Topics", href: "/en/tags" },
   { label: "Tools", href: "/en/tools" },
   { label: "About", href: "/en/about" },
 ] as const;
@@ -21,6 +22,7 @@ export const languageRoutePairs = {
   "/screeps-errors": "/en/screeps-errors",
   "/glossary": "/en/glossary",
   "/verification": "/en/verification",
+  "/tags": "/en/tags",
   "/about": "/en/about",
   "/search": "/en/search",
 } as const;
