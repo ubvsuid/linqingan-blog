@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { EnglishSiteSearch } from "@/components/english-site-search";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { getEnglishInitialSearchDocuments } from "@/lib/english-search";
 
 import styles from "../english.module.css";
 
@@ -21,6 +22,7 @@ interface EnglishSearchPageProps {
 export default async function EnglishSearchPage({ searchParams }: EnglishSearchPageProps) {
   const params = await searchParams;
   const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
+  const initialDocuments = getEnglishInitialSearchDocuments(initialQuery);
 
   return (
     <main className={styles.page} lang="en">
@@ -33,7 +35,7 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
           <h1>Search the English section</h1>
           <p>Search published English guides, the beginner roadmap, knowledge topics, glossary, error codes, verification method, and working tools.</p>
         </header>
-        <EnglishSiteSearch initialQuery={initialQuery} />
+        <EnglishSiteSearch initialQuery={initialQuery} initialDocuments={initialDocuments} />
       </Container>
     </main>
   );
