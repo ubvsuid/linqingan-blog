@@ -1,20 +1,37 @@
 import Link from "next/link";
 
+import { EnglishArticleBrowser } from "@/components/english-article-browser";
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
-import { publishedEnglishArticles } from "@/lib/english-articles-complete";
+import { englishDiscoveryArticles } from "@/lib/english-discovery";
 
 import styles from "../english.module.css";
 
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Articles and Debugging Guides",
   description:
-    "Practical English Screeps articles with checked APIs, runnable JavaScript examples, debugging steps, safety boundaries, and transparent verification status.",
+    "Search and filter practical English Screeps articles by system, difficulty, content type, and topic. Every guide includes checked APIs, debugging steps, and transparent verification status.",
   path: "/en/blog",
   chinesePath: "/blog",
 });
 
-export default function EnglishBlogPage() {
+interface EnglishBlogPageProps {
+  searchParams: Promise<{
+    q?: string | string[];
+    module?: string | string[];
+    difficulty?: string | string[];
+    type?: string | string[];
+    tag?: string | string[];
+  }>;
+}
+
+function readParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+
+export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageProps) {
+  const params = await searchParams;
+
   return (
     <main className={styles.page} lang="en">
       <Container>
@@ -25,29 +42,22 @@ export default function EnglishBlogPage() {
         </nav>
 
         <header className={styles.header}>
-          <p className="eyebrow">VERIFIED ARTICLES</p>
-          <h1>Practical Screeps articles</h1>
+          <p className="eyebrow">ARTICLE LIBRARY</p>
+          <h1>Find the Screeps guide you need</h1>
           <p>
-            Focused guides for a single task or debugging problem. Each article separates
-            official API facts, offline checks, and live-game verification status.
+            Browse {englishDiscoveryArticles.length} published guides by system, difficulty,
+            content type, or topic. Search by an API method, object, return code, or symptom.
           </p>
         </header>
 
-        <section className={styles.grid} aria-label="English Screeps articles">
-          {publishedEnglishArticles.map((article) => (
-            <article className={`${styles.card} ${styles.full}`} key={article.href}>
-              <p className="eyebrow">{article.category}</p>
-              <h2>{article.title}</h2>
-              <p>{article.description}</p>
-              <p>
-                <small>
-                  {article.publishedLabel} · {article.readingTime} · Score {article.finalScore}
-                </small>
-              </p>
-              <Link href={article.href}>Read the guide →</Link>
-            </article>
-          ))}
-        </section>
+        <EnglishArticleBrowser
+          articles={englishDiscoveryArticles}
+          initialQuery={readParam(params.q)}
+          initialModule={readParam(params.module)}
+          initialDifficulty={readParam(params.difficulty)}
+          initialType={readParam(params.type)}
+          initialTag={readParam(params.tag)}
+        />
 
         <div className={styles.notice}>
           <strong>Publication standard</strong>
