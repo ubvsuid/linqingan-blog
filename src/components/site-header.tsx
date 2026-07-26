@@ -104,7 +104,7 @@ export function SiteHeader() {
           </nav>
 
           <div className="header-controls">
-            <Link className="language-switch" href={languageTarget} hrefLang={english ? "zh-CN" : "en"} lang={english ? "zh-CN" : "en"} aria-label={english ? "切换到中文" : "Switch to English"} title={english ? "切换到中文" : "Switch to English"} onClick={() => setMenuOpen(false)}>
+            <Link className="language-switch" href={languageTarget} hrefLang={english ? "zh-CN" : "en"} lang={english ? "zh-CN" : "en"} aria-label={english ? "Switch to Chinese" : "Switch to English"} title={english ? "Switch to Chinese" : "Switch to English"} onClick={() => setMenuOpen(false)}>
               {english ? "中文" : "EN"}
             </Link>
             <Link className="header-icon-link" href={searchHref} aria-label={english ? "Search the English site" : "搜索网站"} title={english ? "Search" : "搜索网站"} onClick={() => setMenuOpen(false)}>
