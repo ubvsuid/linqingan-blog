@@ -84,7 +84,7 @@ const articleRegistrySource = registryFileNames
   .map((fileName) => fs.readFileSync(path.join(libraryDirectory, fileName), "utf8"))
   .join("\n");
 const knowledgeMapping = read("src/lib/english-knowledge.ts");
-const articleHrefs = new Set([...articleRegistrySource.matchAll(/href:\s*"(\/en\/blog\/[^"]+)"/g)].map((match) => match[1]));
+const articleHrefs = new Set([...articleRegistrySource.matchAll(/"?href"?\s*:\s*"(\/en\/blog\/[^"]+)"/g)].map((match) => match[1]));
 const mappedHrefs = new Set([...knowledgeMapping.matchAll(/"(\/en\/blog\/[^"]+)":\s*[1-8]/g)].map((match) => match[1]));
 for (const href of articleHrefs) {
   if (!mappedHrefs.has(href)) failures.push(`English knowledge mapping is missing ${href}`);
