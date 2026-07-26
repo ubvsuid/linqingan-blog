@@ -1,20 +1,32 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 interface ToolUtilityBarProps {
   title: string;
   issueUrl: string;
 }
 
+function subscribeToLocation() {
+  return () => {};
+}
+
+function getLocationSnapshot() {
+  return window.location.href;
+}
+
+function getServerLocationSnapshot() {
+  return "";
+}
+
 export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
   const [status, setStatus] = useState("");
-  const [currentUrl, setCurrentUrl] = useState("");
+  const currentUrl = useSyncExternalStore(
+    subscribeToLocation,
+    getLocationSnapshot,
+    getServerLocationSnapshot,
+  );
   const hydrated = currentUrl.length > 0;
-
-  useEffect(() => {
-    setCurrentUrl(window.location.href);
-  }, []);
 
   const issueHref = useMemo(() => {
     const params = new URLSearchParams({
