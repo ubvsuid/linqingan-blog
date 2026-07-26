@@ -99,17 +99,16 @@ const searchBody = await searchResponse.text();
 if (searchResponse.status !== 200) {
   failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
 } else {
-  for (const expected of [
-    "Search the English section",
-    "/en/search-index.json",
-    "Loading the English search index",
-  ]) {
-    if (!searchBody.includes(expected)) {
-      failures.push(`/en/search: 缺少延迟搜索信号 “${expected}”`);
+  for (const article of articles) {
+    if (!searchBody.includes(article.headline)) {
+      failures.push(`/en/search: 缺少服务端相关结果 “${article.headline}”`);
     }
   }
-  if (searchBody.includes(articles[0].headline)) {
-    failures.push("/en/search: 首屏仍嵌入完整文章索引，延迟加载未生效");
+  if (!searchBody.includes("/en/search-index.json")) {
+    failures.push("/en/search: 缺少延迟搜索索引地址");
+  }
+  if (searchBody.includes("How to Launch a Nuke Without Reusing a Stale Target Request")) {
+    failures.push("/en/search: 首屏仍嵌入与 Memory 查询无关的完整文章索引");
   }
 }
 
@@ -153,5 +152,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、延迟搜索索引与 Sitemap。`,
+  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
 );
