@@ -72,11 +72,15 @@ function normalizeSearchValue(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("en");
 }
 
+function tokenizeSearchQuery(value: string): string[] {
+  return normalizeSearchValue(value).split(/[^a-z0-9_]+/).filter(Boolean);
+}
+
 export function getEnglishInitialSearchDocuments(
   query: string,
   limit = 80,
 ): EnglishSearchDocument[] {
-  const tokens = normalizeSearchValue(query).split(/\s+/).filter(Boolean);
+  const tokens = tokenizeSearchQuery(query);
   if (tokens.length === 0) return [];
 
   return englishSearchDocuments
