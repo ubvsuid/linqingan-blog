@@ -17,7 +17,7 @@ import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 import { getTagRecords } from "@/lib/tags";
 
-type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number>["changeFrequency"]>;
+type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
 const staticPageDates = {
   about: "2026-07-22",
