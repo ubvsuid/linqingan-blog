@@ -50,7 +50,6 @@ export function SiteHeader() {
 
   function isActive(href: string): boolean {
     if (english) {
-      if (href === "/en") return pathname === "/en";
       return pathname === href || pathname.startsWith(`${href}/`);
     }
     if (href === "/") return pathname === "/";
@@ -112,9 +111,11 @@ export function SiteHeader() {
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
             </Link>
             <ThemeToggle />
-            <Link className="profile-shortcut" href={aboutHref} aria-label={english ? "About Linqingan" : "查看临清安的个人主页"} title={english ? "About" : "个人主页"} onClick={() => setMenuOpen(false)}>
-              <Image src="/profile-avatar.webp" alt="" width={36} height={36} />
-            </Link>
+            {!english ? (
+              <Link className="profile-shortcut" href={aboutHref} aria-label="查看临清安的个人主页" title="个人主页" onClick={() => setMenuOpen(false)}>
+                <Image src="/profile-avatar.webp" alt="" width={36} height={36} />
+              </Link>
+            ) : null}
             <button
               ref={menuButtonRef}
               type="button"
@@ -139,7 +140,7 @@ export function SiteHeader() {
         .brand-copy strong { font-size: 19px; letter-spacing: -.035em; }
         .brand-copy small { color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .035em; white-space: nowrap; }
         .header-actions { display: contents; }
-        .site-nav { display: flex; grid-column: 2; justify-self: center; gap: clamp(11px, 1.25vw, 22px); font-size: clamp(13px, 1vw, 15px); }
+        .site-nav { display: flex; grid-column: 2; justify-self: center; gap: clamp(14px, 1.5vw, 26px); font-size: clamp(13px, 1vw, 15px); }
         .site-nav a { position: relative; padding-block: 8px; white-space: nowrap; }
         .site-nav a::after { content: ""; position: absolute; right: 0; bottom: 2px; left: 0; height: 1px; transform: scaleX(0); transform-origin: center; background: var(--foreground); transition: transform 160ms ease; }
         .site-nav a.nav-link-active { color: var(--foreground); }
@@ -158,7 +159,7 @@ export function SiteHeader() {
         .menu-toggle-open span:nth-child(2) { opacity: 0; }
         .menu-toggle-open span:last-child { transform: translateY(-5px) rotate(-45deg); }
         html[data-theme="dark"] .brand-logo { filter: invert(1) brightness(1.15); }
-        @media (max-width: 1180px) {
+        @media (max-width: 980px) {
           .header-inner { grid-template-columns: 1fr auto; gap: 10px 16px; min-height: 88px; padding: 12px 0; }
           .brand { grid-column: 1; grid-row: 1; }
           .brand-logo { width: 56px; height: 56px; }
