@@ -1,13 +1,14 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
-  ["/", ["构建，运行，迭代", "Screeps 知识库", "篇文章", "个知识模块", "已经遇到问题？", "计算 Creep 身体"]],
+  ["/", ["构建，运行，迭代", "Screeps 知识库", "篇文章", "个知识模块", "常用查询工具", "计算 Creep 身体"]],
   ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章", "公开建设项目", "查看建设日志"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "篇"]],
   ["/changelog", ["更新日志", "新增独立更新日志", "合并资料中心与项目页面"]],
   ["/knowledge", ["Screeps 知识库", "查询与工具", "Creep 身体计算器", "选择你要解决的问题"]],
   ["/tools/creep-body-calculator", ["Creep 身体计算器", "选择身体部件", "计算结果", "复制身体数组"]],
+  ["/tools/room-diagnostics", ["房间运行诊断", "使用边界", "CPU 风险"]],
   ["/search", ["搜索整个网站", "筛选搜索结果", "身体计算器"]],
   ["/glossary", ["Screeps 术语表", "Memory"]],
   ["/screeps-errors", ["ERR_NOT_IN_RANGE", "建议排查顺序"]],
@@ -20,19 +21,19 @@ const checks = [
   ["/tags/advanced-development", ["进阶开发", "当前共有"]],
   ["/now", ["更新日志", "查看完整更新日志", "阶段性记录"]],
   ["/feed.xml", ["<rss", "linqingan.com"]],
-  ["/blog/screeps-introduction", ["Screeps 是什么", "发布于", "验证状态"]],
-  ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "本文最后测试于 2026 年 7 月"]],
-  ["/blog/screeps-creep-withdraw-container-energy", ["Creep.withdraw 怎么用", "资料核对日期：2026-07-18"]],
-  ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "资料核对日期：2026-07-18"]],
-  ["/blog/screeps-controller-activate-safe-mode", ["Safe Mode 怎么开启", "资料核对日期：2026-07-18"]],
-  ["/blog/screeps-spawn-renew-creep", ["renewCreep() 怎么用", "资料核对日期：2026-07-18"]],
-  ["/blog/screeps-dynamic-creep-body-energy", ["离线模拟结果", "Node.js 24 离线模拟", "真实 Screeps Console 与主循环仍待环境验证"]],
-  ["/blog/screeps-clean-dead-creep-memory", ["离线模拟结果", "删除 2 个死亡名称", "真实 Screeps Console 与主循环仍待环境验证"]],
-  ["/blog/screeps-construction-site-progress", ["离线模拟结果", "超过总量保护", "仍为待环境验证"]],
-  ["/blog/screeps-tower-repair-threshold", ["为什么要先检查敌人", "离线模拟结果", "真实 Tower 行为"]],
-  ["/blog/screeps-spawn-emergency-recovery", ["离线模拟结果", "Energy 为 200", "多 tick 恢复过程仍待环境验证"]],
-  ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById() 怎么配合 Memory 保存目标", "Game.getObjectById API", "null"]],
-  ["/blog/screeps-power-spawn-process-power", ["processPower() 怎么处理 Power", "Screeps Console", "待测试"]],
+  ["/blog/screeps-introduction", ["Screeps 是什么", "发布于", "查看验证详情"]],
+  ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "测试环境", "Screeps Console", "待测试"]],
+  ["/blog/screeps-creep-withdraw-container-energy", ["withdraw()", "查看验证详情", "测试环境"]],
+  ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "FIND_HOSTILE_CREEPS", "测试环境"]],
+  ["/blog/screeps-controller-activate-safe-mode", ["activateSafeMode()", "查看验证详情", "测试环境"]],
+  ["/blog/screeps-spawn-renew-creep", ["renewCreep()", "查看验证详情", "测试环境"]],
+  ["/blog/screeps-dynamic-creep-body-energy", ["离线模拟结果", "Node.js 24 离线模拟", "Screeps Console", "待测试"]],
+  ["/blog/screeps-clean-dead-creep-memory", ["离线模拟结果", "Memory.creeps", "Screeps Console", "待测试"]],
+  ["/blog/screeps-construction-site-progress", ["离线模拟结果", "progressTotal", "测试环境"]],
+  ["/blog/screeps-tower-repair-threshold", ["FIND_HOSTILE_CREEPS", "离线模拟结果", "Tower Energy"]],
+  ["/blog/screeps-spawn-emergency-recovery", ["离线模拟结果", "200 Energy", "dryRun"]],
+  ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById()", "Memory", "null"]],
+  ["/blog/screeps-power-spawn-process-power", ["processPower()", "Screeps Console", "待测试"]],
   ["/en/beginner", ["Learn Screeps in twelve focused lessons", "LESSON 01", "LESSON 12", "Complete beginner sequence published"]],
   ["/en/blog", ["Practical Screeps articles", "What Is Screeps and What Do You Actually Do in It?", "How to Combine Your First Screeps Room Loop"]],
   ["/en/blog/screeps-introduction", ["What Is Screeps and What Do You Actually Do in It?", "Chinese source", "Read in full", "Publication status", "Ready"]],
@@ -55,6 +56,8 @@ const assetChecks = [
   ["/knowledge/opengraph-image", "image/"],
   ["/beginner/opengraph-image", "image/"],
   ["/tools/creep-body-calculator/opengraph-image", "image/"],
+  ["/tools/room-diagnostics/opengraph-image", "image/"],
+  ["/blog/screeps-memory-basics/opengraph-image", "image/"],
 ];
 
 const redirectChecks = [
@@ -74,6 +77,7 @@ const metadataPaths = [
   "/changelog",
   "/knowledge",
   "/tools/creep-body-calculator",
+  "/tools/room-diagnostics",
   "/tags/basic-engineering",
   "/blog/screeps-storage-energy-usage",
   "/about",
@@ -136,6 +140,10 @@ for (const [pathname, expectedTexts] of checks) {
     failures.push(`${pathname}: 仍然出现旧姓名“林清安”`);
   }
 
+  if (pathname.startsWith("/blog/") && body.includes("本文最后测试于")) {
+    failures.push(`${pathname}: 仍然使用可能误导的“本文最后测试于”表述`);
+  }
+
   if (pathname !== "/sitemap.xml" && !body.includes("https://www.linqingan.com")) {
     failures.push(`${pathname}: 未找到统一主域名信号`);
   }
@@ -174,11 +182,36 @@ for (const pathname of metadataPaths) {
   }
 }
 
+const securityResponse = await fetch(baseUrl);
+const cspReportOnly = securityResponse.headers.get("content-security-policy-report-only") ?? "";
+if (!cspReportOnly.includes("default-src 'self'") || !cspReportOnly.includes("object-src 'none'")) {
+  failures.push("安全响应头: 缺少有效的 Content-Security-Policy-Report-Only");
+}
+
 const searchResponse = await fetch(`${baseUrl}/search`);
 const searchBody = await searchResponse.text();
 if (!/<meta[^>]+name="robots"[^>]+content="[^"]*noindex[^"]*"/i.test(searchBody)) {
   failures.push("/search: 缺少 noindex");
 }
+
+const fullIndexResponse = await fetch(`${baseUrl}/api/search-index`);
+if (fullIndexResponse.status !== 200) {
+  failures.push(`/api/search-index: 预期 200，实际 ${fullIndexResponse.status}`);
+} else {
+  try {
+    const payload = await fullIndexResponse.json();
+    if (!Array.isArray(payload) || payload.length === 0) failures.push("/api/search-index: 应返回非空搜索文档数组");
+  } catch {
+    failures.push("/api/search-index: 返回内容不是有效 JSON");
+  }
+}
+
+const missingResponse = await fetch(`${baseUrl}/audit-page-that-does-not-exist`, { redirect: "manual" });
+const missingBody = await missingResponse.text();
+if (missingResponse.status !== 404) failures.push(`/404: 预期 404，实际 ${missingResponse.status}`);
+if (!missingBody.includes("页面不存在｜临清安")) failures.push("/404: 缺少独立页面标题");
+const hasHomeCanonical = missingBody.includes(`rel="canonical" href="https://www.linqingan.com"`) || missingBody.includes(`rel="canonical" href="https://www.linqingan.com/"`);
+if (hasHomeCanonical) failures.push("/404: 不应把不存在页面 canonical 到首页");
 
 const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
 const sitemapBody = await sitemapResponse.text();

@@ -100,7 +100,7 @@ function getBodyCost(body) {
 
 错误结构：
 
-```js
+```text
 for (const spawn of Object.values(Game.spawns)) {
   if (harvesterCount === 0) {
     spawn.spawnCreep(...);

@@ -32,6 +32,7 @@ export function ArticleReadingExperience({
   const [progress, setProgress] = useState(0);
   const [lightbox, setLightbox] = useState<LightboxState | null>(null);
   const tocItems = useMemo(() => toc.filter((item) => item.id), [toc]);
+  const primaryTocItems = useMemo(() => tocItems.filter((item) => item.level === 2), [tocItems]);
 
   useEffect(() => {
     try {
@@ -176,12 +177,12 @@ export function ArticleReadingExperience({
         <span style={{ width: `${progress}%` }} />
       </div>
 
-      {tocItems.length > 1 ? (
+      {primaryTocItems.length > 1 ? (
         <aside className="article-floating-toc" aria-label="悬浮文章目录">
           <span>当前章节</span>
           <ol>
-            {tocItems.map((item) => (
-              <li className={item.level === 3 ? "toc-level-three" : undefined} key={item.id}>
+            {primaryTocItems.map((item) => (
+              <li key={item.id}>
                 <a className={activeId === item.id ? "toc-link-active" : undefined} href={`#${item.id}`}>
                   {item.text}
                 </a>
@@ -191,7 +192,7 @@ export function ArticleReadingExperience({
         </aside>
       ) : null}
 
-      {tocItems.length > 1 ? (
+      {primaryTocItems.length > 1 ? (
         <a className="article-back-to-toc" href="#article-page-toc">
           返回目录
         </a>

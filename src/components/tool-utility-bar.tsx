@@ -1,30 +1,53 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 interface ToolUtilityBarProps {
   title: string;
   issueUrl: string;
 }
 
+function subscribeToLocation() {
+  return () => {};
+}
+
+function getLocationSnapshot() {
+  return window.location.href;
+}
+
+function getServerLocationSnapshot() {
+  return "";
+}
+
 export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
   const [status, setStatus] = useState("");
+  const currentUrl = useSyncExternalStore(
+    subscribeToLocation,
+    getLocationSnapshot,
+    getServerLocationSnapshot,
+  );
+  const hydrated = currentUrl.length > 0;
+
   const issueHref = useMemo(() => {
     const params = new URLSearchParams({
       title: `工具反馈：${title}`,
-      body: `工具：${title}\n地址：${typeof window === "undefined" ? "" : window.location.href}\n\n问题描述：\n\n期望结果：`,
+      body: `工具：${title}\n地址：${currentUrl}\n\n问题描述：\n\n期望结果：`,
     });
     return `${issueUrl}?${params.toString()}`;
-  }, [issueUrl, title]);
+  }, [currentUrl, issueUrl, title]);
 
   async function shareCurrentState() {
-    const url = window.location.href;
+    if (!hydrated) {
+      setStatus("工具仍在初始化，请稍后重试");
+      return;
+    }
+
     try {
       if (navigator.share) {
-        await navigator.share({ title, url });
+        await navigator.share({ title, url: currentUrl });
         setStatus("已打开系统分享面板");
       } else {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(currentUrl);
         setStatus("当前配置链接已复制");
       }
     } catch {
@@ -33,6 +56,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
   }
 
   function resetTool() {
+    if (!hydrated) return;
     window.location.assign(window.location.pathname);
   }
 
@@ -45,9 +69,20 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
         <span><strong>4</strong> 分享配置</span>
       </div>
       <div className="tool-utility-actions">
-        <button type="button" onClick={shareCurrentState}>分享当前配置</button>
-        <button type="button" onClick={resetTool}>重置工具</button>
-        <a href={issueHref} target="_blank" rel="noreferrer">报告问题 ↗</a>
+        <button type="button" disabled={!hydrated} onClick={shareCurrentState}>分享当前配置</button>
+        <button type="button" disabled={!hydrated} onClick={resetTool}>重置工具</button>
+        <a
+          href={hydrated ? issueHref : undefined}
+          aria-disabled={!hydrated}
+          tabIndex={hydrated ? undefined : -1}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(event) => {
+            if (!hydrated) event.preventDefault();
+          }}
+        >
+          报告问题 ↗
+        </a>
       </div>
       <p aria-live="polite">{status}</p>
       <style>{`
@@ -96,6 +131,8 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
         }
         .tool-utility-actions button:hover,
         .tool-utility-actions a:hover { border-color: var(--muted); text-decoration: none; }
+        .tool-utility-actions button:disabled,
+        .tool-utility-actions a[aria-disabled="true"] { cursor: not-allowed; opacity: .5; }
         .tool-utility-bar > p { min-height: 20px; margin: 0; color: var(--muted); font-size: 12px; }
       `}</style>
     </section>

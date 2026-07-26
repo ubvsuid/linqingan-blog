@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -39,6 +40,15 @@ const emptyRecommendations = [
   },
 ];
 
+const popularSearches = [
+  "Creep 不移动",
+  "ERR_NOT_IN_RANGE",
+  "Spawn 失败",
+  "Memory 保存目标",
+  "CPU bucket",
+  "Link transferEnergy",
+];
+
 function normalize(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("zh-CN");
 }
@@ -56,6 +66,25 @@ function getSearchTokens(query: string): string[] {
   return [...tokens];
 }
 
+function editDistance(left: string, right: string): number {
+  const rows = Array.from({ length: left.length + 1 }, (_, index) => index);
+  for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+    let diagonal = rows[0];
+    rows[0] = rightIndex;
+    for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+      const previous = rows[leftIndex];
+      rows[leftIndex] = Math.min(rows[leftIndex] + 1, rows[leftIndex - 1] + 1, diagonal + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1));
+      diagonal = previous;
+    }
+  }
+  return rows[left.length];
+}
+
+function isNearMatch(token: string, candidate: string): boolean {
+  if (token.length < 4 || candidate.length < 4) return false;
+  const threshold = token.length >= 8 ? 2 : 1;
+  return Math.abs(token.length - candidate.length) <= threshold && editDistance(token, candidate) <= threshold;
+}
 function scoreDocument(document: SearchDocument, query: string): number {
   const normalizedTitle = normalize(document.title);
   const normalizedDescription = normalize(document.description);
@@ -76,6 +105,16 @@ function scoreDocument(document: SearchDocument, query: string): number {
     if (normalizedDescription.includes(token)) score += 4;
     if (normalizedMeta.includes(token)) score += 3;
     if (normalizedText.includes(token)) score += 1;
+  }
+
+  if (score === 0) {
+    const candidates = [
+      ...normalizedTitle.split(/[^a-z0-9_\u4e00-\u9fff]+/).filter(Boolean),
+      ...normalizedKeywords.split(/[^a-z0-9_\u4e00-\u9fff]+/).filter(Boolean),
+    ];
+    for (const token of tokens) {
+      if (candidates.some((candidate) => isNearMatch(token, candidate))) score += 2;
+    }
   }
 
   return score;
@@ -120,13 +159,18 @@ export function SiteSearch({
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [activeType, setActiveType] = useState<SearchFilter>("全部");
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [expandedDocuments, setExpandedDocuments] = useState<SearchDocument[] | null>(null);
+  const [isLoadingFullIndex, setIsLoadingFullIndex] = useState(false);
+  const fullIndexRequested = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const normalizedQuery = normalize(query);
+  const searchableDocuments = expandedDocuments ?? documents;
 
   const rankedResults = useMemo(() => {
-    if (!normalizedQuery) return documents;
+    if (!normalizedQuery) return searchableDocuments;
 
-    return documents
+    return searchableDocuments
       .map((document) => ({ document, score: scoreDocument(document, normalizedQuery) }))
       .filter((item) => item.score > 0)
       .sort(
@@ -135,7 +179,7 @@ export function SiteSearch({
           typeOrder.indexOf(left.document.type) - typeOrder.indexOf(right.document.type),
       )
       .map((item) => item.document);
-  }, [documents, normalizedQuery]);
+  }, [normalizedQuery, searchableDocuments]);
 
   const resultCounts = useMemo(() => {
     const counts = new Map<SearchDocumentType, number>(typeOrder.map((type) => [type, 0]));
@@ -152,6 +196,50 @@ export function SiteSearch({
         : rankedResults.filter((document) => document.type === activeType);
     return filtered.slice(0, normalizedQuery ? 40 : 12);
   }, [activeType, normalizedQuery, rankedResults]);
+
+  const suggestions = useMemo(
+    () => normalizedQuery ? rankedResults.slice(0, 6) : [],
+    [normalizedQuery, rankedResults],
+  );
+
+  useEffect(() => {
+    if (!normalizedQuery || fullIndexRequested.current) return;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      fullIndexRequested.current = true;
+      setIsLoadingFullIndex(true);
+      fetch("/api/search-index", { signal: controller.signal })
+        .then((response) => {
+          if (!response.ok) throw new Error(`Search index request failed: ${response.status}`);
+          return response.json();
+        })
+        .then((payload) => {
+          if (Array.isArray(payload)) setExpandedDocuments(payload);
+        })
+        .catch(() => {
+          fullIndexRequested.current = false;
+        })
+        .finally(() => setIsLoadingFullIndex(false));
+    }, 220);
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [normalizedQuery]);
+
+  useEffect(() => {
+    if (!normalizedQuery) return;
+    const timeout = window.setTimeout(() => {
+      const payload = { query: query.trim().slice(0, 80), results: rankedResults.length, type: activeType };
+      track(rankedResults.length > 0 ? "site_search" : "site_search_no_results", payload);
+      try {
+        const history = JSON.parse(window.localStorage.getItem("linqingan:search-history") ?? "[]");
+        const next = [payload, ...(Array.isArray(history) ? history : [])].slice(0, 50);
+        window.localStorage.setItem("linqingan:search-history", JSON.stringify(next));
+      } catch {}
+    }, 900);
+    return () => window.clearTimeout(timeout);
+  }, [activeType, normalizedQuery, query, rankedResults.length]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -177,7 +265,31 @@ export function SiteSearch({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [query]);
 
+  function handleSuggestionKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (suggestions.length === 0) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveSuggestionIndex((index) => (index + 1) % suggestions.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveSuggestionIndex((index) => (index <= 0 ? suggestions.length - 1 : index - 1));
+    } else if (event.key === "Enter" && activeSuggestionIndex >= 0) {
+      event.preventDefault();
+      updateQuery(suggestions[activeSuggestionIndex].title.replace(/｜.*$/, "").replace(/（.*$/, ""));
+      setActiveSuggestionIndex(-1);
+    }
+  }
+
+  function handleResultClick(result: SearchDocument) {
+    track("site_search_result_click", {
+      query: query.trim().slice(0, 80),
+      result: result.id.slice(0, 80),
+      type: result.type,
+    });
+  }
+
   function updateQuery(value: string) {
+    setActiveSuggestionIndex(-1);
     setQuery(value);
     const url = new URL(window.location.href);
     if (value.trim()) url.searchParams.set("q", value.trim());
@@ -197,6 +309,8 @@ export function SiteSearch({
             type="search"
             value={query}
             onChange={(event) => updateQuery(event.target.value)}
+            onKeyDown={handleSuggestionKeyDown}
+            aria-activedescendant={activeSuggestionIndex >= 0 ? `search-suggestion-${activeSuggestionIndex}` : undefined}
             placeholder="输入 Creep、Memory、ERR_NOT_IN_RANGE、身体计算器……"
           />
           {query ? (
@@ -206,6 +320,27 @@ export function SiteSearch({
           )}
         </div>
       </label>
+
+      <p className="search-index-status" aria-live="polite">
+        {isLoadingFullIndex ? "正在加载文章正文索引…" : normalizedQuery && expandedDocuments ? "已启用全文搜索" : ""}
+      </p>
+
+      <div className="site-search-suggestions" aria-label={normalizedQuery ? "搜索联想" : "热门搜索"}>
+        <span>{normalizedQuery ? "联想" : "热门"}</span>
+        <div>
+          {(normalizedQuery ? suggestions : popularSearches).map((item, itemIndex) => {
+            const label = typeof item === "string"
+              ? item
+              : item.title.replace(/｜.*$/, "").replace(/（.*$/, "");
+            const key = typeof item === "string" ? item : item.id;
+            return (
+              <button id={`search-suggestion-${itemIndex}`} className={typeof item !== "string" && suggestions.indexOf(item) === activeSuggestionIndex ? "suggestion-active" : undefined} key={key} type="button" onMouseEnter={() => typeof item !== "string" && setActiveSuggestionIndex(suggestions.indexOf(item))} onClick={() => updateQuery(label)}>
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="site-search-filters" aria-label="筛选搜索结果">
         {filters.map((type) => {
@@ -242,7 +377,7 @@ export function SiteSearch({
                 <small>{result.meta}</small>
               </div>
               <h2>
-                <Link href={result.href}>
+                <Link href={result.href} onClick={() => handleResultClick(result)}>
                   <HighlightedText text={result.title} query={query} />
                 </Link>
               </h2>
@@ -285,6 +420,12 @@ export function SiteSearch({
         .site-search-field input:focus { border-color: var(--foreground); box-shadow: 0 0 0 3px color-mix(in srgb, var(--foreground) 10%, transparent); }
         .site-search-field button { min-height: 42px; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
         .site-search-field small { white-space: nowrap; color: var(--muted); }
+        .site-search-suggestions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; color: var(--muted); font-size: 12px; }
+        .site-search-suggestions > span { padding-top: 10px; font-weight: 700; }
+        .site-search-suggestions > div { display: flex; flex-wrap: wrap; gap: 8px; }
+        .site-search-suggestions button { min-height: 36px; border: 1px solid var(--border); border-radius: 999px; padding: 0 12px; background: var(--surface); color: var(--foreground); cursor: pointer; }
+        .site-search-suggestions button:hover, .site-search-suggestions button.suggestion-active { border-color: var(--foreground); background: var(--foreground); color: var(--background); }
+        .search-index-status { min-height: 20px; margin: -8px 0 12px; color: var(--muted); font-size: 12px; }
         .site-search-filters { display: flex; flex-wrap: wrap; gap: 8px; }
         .site-search-filters button { display: inline-flex; min-height: 42px; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 999px; padding: 0 12px 0 15px; background: var(--surface); color: var(--muted); cursor: pointer; }
         .site-search-filters button[aria-pressed="true"] { border-color: var(--foreground); background: var(--foreground); color: var(--background); }

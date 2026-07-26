@@ -18,7 +18,7 @@ verification:
   liveTested: false
   checkedAt: "2026-07-22"
   testedAt: "2026-07-22"
-  testEnvironment: "Node.js 24 离线模拟（普通对象模拟 ConstructionSite 数值）"
+  testEnvironment: "Node.js 24 离线模拟（普通对象模拟 ConstructionSite 数值，不是 Screeps 官方服务器）"
   testResult: "正常进度、超过总量保护、总量为 0 和按剩余量排序场景通过。"
 featured: false
 ---

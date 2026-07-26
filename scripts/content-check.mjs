@@ -53,7 +53,49 @@ const articleRules = {
   },
   "screeps-rawmemory-segments": {
     forbidden: ["本 tick 写入后立即从目标 Segment 读取"],
-    required: ["RawMemory.segments", "setActiveSegments", "下一 tick", "JSON"],
+    required: [
+      "RawMemory.segments",
+      "setActiveSegments",
+      "下一 tick",
+      "`0` 到 `99`",
+      "最多请求 10",
+      "undefined",
+      "空字符串",
+      "离线模拟",
+      "JSON",
+    ],
+  },
+  "screeps-pathfinder-costmatrix": {
+    required: [
+      "PathFinder.CostMatrix",
+      "roomCallback",
+      "return false",
+      "return undefined",
+      "search.incomplete",
+      "255",
+      "离线模拟",
+    ],
+  },
+  "screeps-tower-repair-threshold": {
+    required: [
+      "FIND_HOSTILE_CREEPS",
+      "FIND_MY_CREEPS",
+      "TOWER_REPAIR_ENERGY_RESERVE",
+      "TOWER_ENERGY_COST",
+      "tower.repair",
+      "Wall和Rampart",
+      "离线模拟",
+    ],
+  },
+  "screeps-structure-destroy": {
+    required: [
+      "ALLOWED_DESTROY_TYPES",
+      "DESTROY_EXTENSION",
+      "request.enabled = false",
+      "structure.destroy",
+      "ERR_BUSY",
+      "离线模拟",
+    ],
   },
   "screeps-lab-run-reaction": {
     required: ["runReaction", "REACTIONS", "cooldown", "ERR_RCL_NOT_ENOUGH"],
@@ -68,7 +110,15 @@ const articleRules = {
     required: ["processPower", "RESOURCE_POWER", "RESOURCE_ENERGY", "ERR_RCL_NOT_ENOUGH"],
   },
   "screeps-observer-observe-room": {
-    required: ["observeRoom", "下一 tick", "Game.rooms", "ERR_RCL_NOT_ENOUGH"],
+    required: [
+      "observeRoom",
+      "下一 tick",
+      "Game.rooms",
+      "Memory.observerState",
+      "requestedAt",
+      "ERR_RCL_NOT_ENOUGH",
+      "离线模拟",
+    ],
   },
   "screeps-market-deal": {
     required: [
@@ -110,10 +160,15 @@ const articleRules = {
   "screeps-nuker-launch-checklist": {
     required: [
       "Memory.nuker",
+      "buildNukeConfirmation",
+      "request.enabled = false",
+      "NUKER_RANGE",
+      "ERR_INVALID_TARGET",
       "result === OK",
       "失败后必须人工",
       "不可逆",
       "RESOURCE_GHODIUM",
+      "离线模拟",
     ],
   },
 };
@@ -243,6 +298,7 @@ const knownRoutes = new Set([
   "/changelog",
   "/verification",
   "/tools/creep-body-calculator",
+  "/tools/room-diagnostics",
   "/feed.xml",
 ]);
 
@@ -267,6 +323,24 @@ for (const fileName of files) {
   }
 
   const rule = articleRules[slug];
+
+  const p0OrderChecks = {
+    "screeps-tower-repair-threshold": ["FIND_HOSTILE_CREEPS", "tower.repair"],
+    "screeps-structure-destroy": ["request.enabled = false", "structure.destroy"],
+    "screeps-nuker-launch-checklist": ["request.enabled = false", "nuker.launchNuke"],
+    "screeps-observer-observe-room": ["Game.rooms[state.requestedRoom]", "observer.observeRoom"],
+  };
+
+  const orderCheck = p0OrderChecks[slug];
+  if (orderCheck) {
+    const [guardText, actionText] = orderCheck;
+    const guardIndex = code.indexOf(guardText);
+    const actionIndex = code.indexOf(actionText);
+    if (guardIndex < 0 || actionIndex < 0 || guardIndex > actionIndex) {
+      addError(`${fileName}: P0 安全顺序不正确，必须先出现“${guardText}”，再执行“${actionText}”`);
+    }
+  }
+
   if (rule) {
     for (const forbidden of rule.forbidden ?? []) {
       const matchingLines = content
@@ -291,12 +365,20 @@ for (const fileName of files) {
   }
 
   const marketScanText = plainContent.replace(/部件价格/g, "");
+  const marketResidueLines = marketScanText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => /预测价格|承诺收益|订单|成交|市场操作/.test(line))
+    .filter((line) => !/(?:与市场成交不同|不(?:属于|是|涉及|执行|包含).*市场操作|不(?:涉及|创建|提交|处理).*订单|不(?:进行|执行|涉及).*成交)/.test(line));
+
   if (
     !marketSlugs.has(slug)
     && !marketBoundarySlugs.has(slug)
-    && /预测价格|承诺收益|订单|成交|市场操作/.test(marketScanText)
+    && marketResidueLines.length > 0
   ) {
-    addWarning(`${fileName}: 非市场文章出现价格、订单、收益或成交词，请确认是否为主题残留`);
+    const excerpts = marketResidueLines.slice(0, 3).join("｜");
+    addWarning(`${fileName}: 非市场文章出现疑似市场残留：${excerpts}`);
   }
 
   const rangeScanText = content
@@ -304,7 +386,7 @@ for (const fileName of files) {
     .filter((line) => !/不会返回|不返回|不替代|区别/.test(line))
     .join("\n");
   if (/ERR_NOT_IN_RANGE/.test(rangeScanText)) {
-    const hasRelevantAction = /\.(?:attack|build|claimController|dismantle|drop|harvest|heal|move|moveTo|pickup|rangedAttack|rangedHeal|repair|reserveController|transfer|upgradeController|withdraw|renewCreep|recycleCreep|boostCreep|runReaction|observeRoom)\s*\(/.test(code);
+    const hasRelevantAction = /\.(?:attack|build|claimController|dismantle|drop|harvest|heal|move|moveTo|pickup|rangedAttack|rangedHeal|repair|reserveController|transfer|transferEnergy|upgradeController|withdraw|renewCreep|recycleCreep|boostCreep|runReaction|observeRoom|launchNuke)\s*\(/.test(code);
     if (!hasRelevantAction && slug !== "screeps-err-not-in-range") {
       addWarning(`${fileName}: ERR_NOT_IN_RANGE 未与相关动作代码同时出现`);
     }
@@ -424,6 +506,31 @@ for (const fileName of files) {
           addError(`${fileName}: 已标记运行验证时必须填写 verification.${field}`);
         }
       }
+      if (/离线模拟|不是\s*Screeps\s*官方服务器/i.test(data.verification.testEnvironment ?? "")) {
+        addError(`${fileName}: 已标记 Console/真实主循环验证时，测试环境不能仍写成离线模拟`);
+      }
+    } else {
+      const hasOfflineEvidence = Boolean(
+        data.verification.testedAt
+        || data.verification.testEnvironment
+        || data.verification.testResult,
+      );
+
+      if (hasOfflineEvidence) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(data.verification.testedAt ?? "")) {
+          addError(`${fileName}: 有离线验证记录时必须填写 verification.testedAt`);
+        }
+        for (const field of ["testEnvironment", "testResult"]) {
+          if (typeof data.verification[field] !== "string" || data.verification[field].trim() === "") {
+            addError(`${fileName}: 有离线验证记录时必须填写 verification.${field}`);
+          }
+        }
+
+        const environment = String(data.verification.testEnvironment ?? "");
+        if (!environment.includes("离线模拟") || !/不是\s*Screeps\s*官方服务器/i.test(environment)) {
+          addError(`${fileName}: 未标记运行验证时，验证环境必须明确写出“离线模拟”和“不是 Screeps 官方服务器”`);
+        }
+      }
     }
   }
 
@@ -495,6 +602,7 @@ for (const fileName of files) {
       && !href.startsWith("/tags/")
       && !href.startsWith("/beginner/page/")
       && !href.startsWith("/blog/page/")
+      && !href.startsWith("/diagrams/")
     ) {
       addError(`${fileName}: 内链可能不存在 ${href}`);
     }

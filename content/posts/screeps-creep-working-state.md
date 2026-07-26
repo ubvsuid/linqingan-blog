@@ -2,7 +2,7 @@
 title: "Creep 如何在取能和工作之间稳定切换状态"
 description: "用Creep.store边界和memory.working建立两阶段状态，处理首次初始化、部分Energy、无容量、目标缺失、动作结果和移动结果。"
 publishedAt: "2026-07-18"
-updatedAt: "2026-07-22"
+updatedAt: "2026-07-23"
 category: "Screeps 基础工程"
 tags:
   - "Screeps"
@@ -403,6 +403,12 @@ module.exports.loop = function () {
 8. 状态原因字段。
 
 离线测试不能模拟真实Store更新、动作结算、路径、Source恢复或Controller进度。
+
+## 状态转换图
+
+![Creep 在取能状态与工作状态之间切换的流程图：空载转为取能，满载转为工作，部分装载保持当前状态](/diagrams/creep-working-state.svg)
+
+图中只表达本文的两阶段状态边界，不代表完整任务调度系统。
 
 ## 适用边界
 

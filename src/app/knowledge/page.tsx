@@ -14,11 +14,18 @@ import { getTagRecords } from "@/lib/tags";
 export const metadata = createPageMetadata({
   title: "Screeps 知识库",
   description:
-    "从 12 篇 Screeps 新手路线进入 8 个专题模块，并查询术语、错误码、标签、验证方法、Creep 身体计算器和全部站内内容。",
+    "从 12 篇 Screeps 新手路线进入 8 个专题模块，并查询术语、错误码、标签、验证方法、房间诊断、Creep 身体计算器和全部站内内容。",
   path: "/knowledge",
 });
 
 const referenceTools = [
+  {
+    eyebrow: "ROOM DIAGNOSTICS",
+    title: "房间运行诊断",
+    description: "按 Spawn、角色、Energy、Controller、工地和 CPU 快照定位常见风险。",
+    href: "/tools/room-diagnostics",
+    count: "已上线",
+  },
   {
     eyebrow: "BODY CALCULATOR",
     title: "Creep 身体计算器",
@@ -69,12 +76,8 @@ const plannedTools = [
     description: "整理新手和基础工程阶段真正会使用的对象、方法、参数与返回值。",
   },
   {
-    title: "房间运行诊断清单",
-    description: "按 Spawn、Creep、Energy、Controller、工地和 CPU 逐项检查常见问题。",
-  },
-  {
-    title: "身体方案与角色预设",
-    description: "在现有身体计算器基础上补充角色模板、预算比较和更多移动说明。",
+    title: "真实房间截图证据",
+    description: "只使用实际 Screeps 房间、Console 或主循环记录，不用生成图冒充真实运行画面。",
   },
 ];
 
@@ -242,8 +245,10 @@ export default function KnowledgePage() {
                   </Link>
                 </div>
               </header>
-              <ol>
-                {section.slugs.map((slug, index) => {
+              <details className="knowledge-article-list" open={section.number <= 2}>
+                <summary>查看本模块全部 {section.slugs.length} 篇文章</summary>
+                <ol>
+                  {section.slugs.map((slug, index) => {
                   const post = postsBySlug.get(slug);
                   if (!post) return null;
                   return (
@@ -255,8 +260,9 @@ export default function KnowledgePage() {
                       </Link>
                     </li>
                   );
-                })}
-              </ol>
+                  })}
+                </ol>
+              </details>
             </section>
           ))}
         </div>
@@ -310,6 +316,12 @@ export default function KnowledgePage() {
         .knowledge-section h2 a:hover { text-decoration-thickness: 2px; text-underline-offset: 7px; }
         .knowledge-section header p { max-width: 780px; margin: 12px 0 0; color: var(--muted); line-height: 1.75; }
         .knowledge-section-cta { display: inline-flex; margin-top: 15px; font-weight: 700; }
+        .knowledge-article-list { border-top: 1px solid var(--border); }
+        .knowledge-article-list > summary { display: flex; min-height: 48px; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; color: var(--muted); font-size: 13px; font-weight: 680; }
+        .knowledge-article-list > summary::-webkit-details-marker { display: none; }
+        .knowledge-article-list > summary::after { content: "展开"; border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; background: var(--surface); font-size: 11px; font-weight: 600; }
+        .knowledge-article-list[open] > summary::after { content: "收起"; }
+        .knowledge-article-list ol { border-top: 1px solid var(--border); }
         .knowledge-section ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
         .knowledge-section li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; border-bottom: 1px solid var(--border); padding: 20px 18px 20px 0; }
         .knowledge-section li:nth-child(odd) { border-right: 1px solid var(--border); }

@@ -73,8 +73,14 @@ const knownRoutes = new Set([
   "/sitemap.xml",
   "/tags",
   "/tools/creep-body-calculator",
+  "/tools/room-diagnostics",
   "/verification",
 ]);
+
+function isExistingPublicDiagram(href) {
+  return /^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)
+    && fs.existsSync(path.join(root, "public", href.slice(1)));
+}
 
 for (const fileName of files) {
   const slug = fileName.replace(/\.md$/, "");
@@ -149,6 +155,7 @@ for (const fileName of files) {
     const href = match[1].replace(/\/$/, "") || "/";
     if (
       !knownRoutes.has(href) &&
+      !isExistingPublicDiagram(href) &&
       !href.startsWith("/blog/page/") &&
       !href.startsWith("/beginner/page/") &&
       !href.startsWith("/now/page/") &&
@@ -172,6 +179,7 @@ const routeFiles = new Map([
   ["/search", "src/app/search/page.tsx"],
   ["/tags", "src/app/tags/page.tsx"],
   ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],
+  ["/tools/room-diagnostics", "src/app/tools/room-diagnostics/page.tsx"],
   ["/verification", "src/app/verification/page.tsx"],
 ]);
 for (const [route, relativePath] of routeFiles) {

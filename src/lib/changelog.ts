@@ -18,6 +18,28 @@ export const CHANGELOG_ITEMS_PER_PAGE = 12;
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    id: "2026-07-23-p2-discovery-tools",
+    date: "2026-07-23",
+    type: "网站",
+    title: "完成 P2 内容发现、图示与诊断工具升级",
+    summary:
+      "增加搜索联想、热门问题与最近修正、文章级修订原因、房间运行诊断、更多术语和错误码文章入口、角色身体预设，以及三张可维护的技术流程图。真实游戏截图仍只接受实际房间或 Console 证据。",
+    links: [
+      { label: "使用房间诊断", href: "/tools/room-diagnostics" },
+      { label: "使用站内搜索", href: "/search" },
+      { label: "查看术语表", href: "/glossary" },
+    ],
+  },
+  {
+    id: "2026-07-23-article-revision-reasons",
+    date: "2026-07-23",
+    type: "内容",
+    title: "重点文章开始公开修订原因",
+    summary:
+      "高风险与近期修正文章会显示本次修改原因、具体变化和日期，帮助读者区分普通更新时间与实质技术修订。",
+    links: [{ label: "查看 Tower 维修文章", href: "/blog/screeps-tower-repair-threshold" }],
+  },
+  {
     id: "2026-07-23-audit-completion-navigation-security",
     date: "2026-07-23",
     type: "网站",

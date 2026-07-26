@@ -103,7 +103,7 @@ if (
 
 const rampartBody = await (await fetch(`${baseUrl}/en/blog/screeps-rampart-set-public`)).text();
 if (
-  !rampartBody.includes("SET_RAMPART_${state}_${roomName}_${x}_${y}")
+  !rampartBody.includes("'SET_RAMPART_' + state + '_' + roomName + '_' + x + '_' + y")
   || !rampartBody.includes("Game.structures[rampart.id]")
   || !rampartBody.includes("request.enabled = false")
   || !rampartBody.includes("rampart.setPublic(request.public)")

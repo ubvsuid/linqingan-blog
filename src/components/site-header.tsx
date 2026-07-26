@@ -21,16 +21,11 @@ export function SiteHeader() {
   const english = isEnglishPath(pathname);
   const navigation = english ? englishNavigation : siteConfig.navigation;
   const languageTarget = getLanguageSwitchTarget(pathname);
-  const isBeginnerArticle = beginnerSeriesSlugs.some(
-    (slug) => pathname === `/blog/${slug}`,
-  );
-  const isKnowledgeArticle = knowledgeBaseSlugs.some(
-    (slug) => pathname === `/blog/${slug}`,
-  );
+  const isBeginnerArticle = beginnerSeriesSlugs.some((slug) => pathname === `/blog/${slug}`);
+  const isKnowledgeArticle = knowledgeBaseSlugs.some((slug) => pathname === `/blog/${slug}`);
 
   useEffect(() => {
     if (!menuOpen) return;
-
     firstNavigationLinkRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -39,13 +34,8 @@ export function SiteHeader() {
         menuButtonRef.current?.focus();
       }
     };
-
     const handlePointerDown = (event: PointerEvent) => {
-      if (
-        headerRef.current &&
-        event.target instanceof Node &&
-        !headerRef.current.contains(event.target)
-      ) {
+      if (headerRef.current && event.target instanceof Node && !headerRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
     };
@@ -63,41 +53,16 @@ export function SiteHeader() {
       if (href === "/en") return pathname === "/en";
       return pathname === href || pathname.startsWith(`${href}/`);
     }
-
     if (href === "/") return pathname === "/";
-
-    if (href === "/beginner") {
-      return pathname.startsWith("/beginner") || isBeginnerArticle;
-    }
-
+    if (href === "/beginner") return pathname.startsWith("/beginner") || isBeginnerArticle;
     if (href === "/blog") {
-      return (
-        pathname === "/blog" ||
-        (pathname.startsWith("/blog/") &&
-          !isBeginnerArticle &&
-          !isKnowledgeArticle)
-      );
+      return pathname === "/blog" || (pathname.startsWith("/blog/") && !isBeginnerArticle && !isKnowledgeArticle);
     }
-
-    if (href === "/knowledge") {
-      return pathname.startsWith("/knowledge") || isKnowledgeArticle;
-    }
-
+    if (href === "/knowledge") return pathname.startsWith("/knowledge") || isKnowledgeArticle;
     if (href === "/resources") {
-      return (
-        pathname === "/resources" ||
-        pathname.startsWith("/resources/") ||
-        pathname === "/glossary" ||
-        pathname === "/screeps-errors" ||
-        pathname.startsWith("/tags") ||
-        pathname === "/search"
-      );
+      return pathname === "/resources" || pathname.startsWith("/resources/") || pathname === "/glossary" || pathname === "/screeps-errors" || pathname.startsWith("/tags") || pathname === "/search";
     }
-
-    if (href === "/now") {
-      return pathname.startsWith("/now") || pathname.startsWith("/changelog");
-    }
-
+    if (href === "/now") return pathname.startsWith("/now") || pathname.startsWith("/changelog");
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
@@ -110,19 +75,18 @@ export function SiteHeader() {
       <Container className="header-inner">
         <Link
           href={homeHref}
-          className="brand"
-          aria-label={english ? "Return to English home" : "返回首页"}
+          className={english ? "brand brand-english" : "brand"}
+          aria-label={english ? "Linqingan English Screeps home" : "返回首页"}
           onClick={() => setMenuOpen(false)}
         >
           <Image className="brand-logo" src="/brand-logo.svg" alt="" width={80} height={72} priority />
+          {english ? (
+            <span className="brand-copy"><strong>Linqingan</strong><small>Screeps Guides &amp; Tools</small></span>
+          ) : null}
         </Link>
 
         <div className="header-actions">
-          <nav
-            id="site-navigation"
-            className={menuOpen ? "site-nav site-nav-open" : "site-nav"}
-            aria-label={english ? "Primary navigation" : "主导航"}
-          >
+          <nav id="site-navigation" className={menuOpen ? "site-nav site-nav-open" : "site-nav"} aria-label={english ? "Primary navigation" : "主导航"}>
             {navigation.map((item, index) => {
               const active = isActive(item.href);
               return (
@@ -141,37 +105,14 @@ export function SiteHeader() {
           </nav>
 
           <div className="header-controls">
-            <Link
-              className="language-switch"
-              href={languageTarget}
-              hrefLang={english ? "zh-CN" : "en"}
-              lang={english ? "zh-CN" : "en"}
-              aria-label={english ? "切换到中文" : "Switch to English"}
-              title={english ? "切换到中文" : "Switch to English"}
-              onClick={() => setMenuOpen(false)}
-            >
+            <Link className="language-switch" href={languageTarget} hrefLang={english ? "zh-CN" : "en"} lang={english ? "zh-CN" : "en"} aria-label={english ? "切换到中文" : "Switch to English"} title={english ? "切换到中文" : "Switch to English"} onClick={() => setMenuOpen(false)}>
               {english ? "中文" : "EN"}
             </Link>
-            <Link
-              className="header-icon-link"
-              href={searchHref}
-              aria-label={english ? "Search the English site" : "搜索网站"}
-              title={english ? "Search" : "搜索网站"}
-              onClick={() => setMenuOpen(false)}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="11" cy="11" r="6.5" />
-                <path d="m16 16 4 4" />
-              </svg>
+            <Link className="header-icon-link" href={searchHref} aria-label={english ? "Search the English site" : "搜索网站"} title={english ? "Search" : "搜索网站"} onClick={() => setMenuOpen(false)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
             </Link>
             <ThemeToggle />
-            <Link
-              className="profile-shortcut"
-              href={aboutHref}
-              aria-label={english ? "About Linqingan" : "查看临清安的个人主页"}
-              title={english ? "About" : "个人主页"}
-              onClick={() => setMenuOpen(false)}
-            >
+            <Link className="profile-shortcut" href={aboutHref} aria-label={english ? "About Linqingan" : "查看临清安的个人主页"} title={english ? "About" : "个人主页"} onClick={() => setMenuOpen(false)}>
               <Image src="/profile-avatar.webp" alt="" width={36} height={36} />
             </Link>
             <button
@@ -180,28 +121,25 @@ export function SiteHeader() {
               className={menuOpen ? "menu-toggle menu-toggle-open" : "menu-toggle"}
               aria-controls="site-navigation"
               aria-expanded={menuOpen}
-              aria-label={
-                english
-                  ? menuOpen ? "Close navigation menu" : "Open navigation menu"
-                  : menuOpen ? "关闭导航菜单" : "打开导航菜单"
-              }
+              aria-label={english ? (menuOpen ? "Close navigation menu" : "Open navigation menu") : (menuOpen ? "关闭导航菜单" : "打开导航菜单")}
               onClick={() => setMenuOpen((open) => !open)}
             >
-              <span aria-hidden="true" />
-              <span aria-hidden="true" />
-              <span aria-hidden="true" />
+              <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
             </button>
           </div>
         </div>
       </Container>
 
       <style>{`
-        .header-inner { display: grid; grid-template-columns: 1fr auto 1fr; min-height: 92px; align-items: center; gap: 24px; }
-        .brand { justify-self: start; }
+        .header-inner { display: grid; grid-template-columns: 1fr auto 1fr; min-height: 92px; align-items: center; gap: 20px; }
+        .brand { display: inline-flex; align-items: center; justify-self: start; gap: 11px; text-decoration: none; }
         .brand-logo { width: 68px; height: 68px; object-fit: contain; transition: opacity 160ms ease; }
         .brand:hover .brand-logo { opacity: .72; }
+        .brand-copy { display: grid; gap: 2px; line-height: 1; }
+        .brand-copy strong { font-size: 19px; letter-spacing: -.035em; }
+        .brand-copy small { color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .035em; white-space: nowrap; }
         .header-actions { display: contents; }
-        .site-nav { display: flex; grid-column: 2; justify-self: center; gap: clamp(15px, 1.7vw, 27px); font-size: clamp(14px, 1.15vw, 16px); }
+        .site-nav { display: flex; grid-column: 2; justify-self: center; gap: clamp(11px, 1.25vw, 22px); font-size: clamp(13px, 1vw, 15px); }
         .site-nav a { position: relative; padding-block: 8px; white-space: nowrap; }
         .site-nav a::after { content: ""; position: absolute; right: 0; bottom: 2px; left: 0; height: 1px; transform: scaleX(0); transform-origin: center; background: var(--foreground); transition: transform 160ms ease; }
         .site-nav a.nav-link-active { color: var(--foreground); }
@@ -220,8 +158,8 @@ export function SiteHeader() {
         .menu-toggle-open span:nth-child(2) { opacity: 0; }
         .menu-toggle-open span:last-child { transform: translateY(-5px) rotate(-45deg); }
         html[data-theme="dark"] .brand-logo { filter: invert(1) brightness(1.15); }
-        @media (max-width: 1080px) {
-          .header-inner { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; min-height: 88px; padding: 12px 0; }
+        @media (max-width: 1180px) {
+          .header-inner { grid-template-columns: 1fr auto; gap: 10px 16px; min-height: 88px; padding: 12px 0; }
           .brand { grid-column: 1; grid-row: 1; }
           .brand-logo { width: 56px; height: 56px; }
           .header-controls { grid-column: 2; grid-row: 1; }
@@ -232,7 +170,9 @@ export function SiteHeader() {
           .site-nav a + a { border-top: 1px solid var(--border); }
           .site-nav a::after { right: 18px; bottom: 7px; left: 18px; }
         }
+        @media (max-width: 520px) { .brand-copy small { display: none; } }
         @media (max-width: 430px) {
+          .brand-copy { display: none; }
           .profile-shortcut { display: none; }
           .header-controls { gap: 6px; }
           .header-icon-link { width: 40px; height: 40px; }

@@ -38,6 +38,16 @@ export function BlogArchive({ currentPage }: BlogArchiveProps) {
           <Link href="/beginner">按学习顺序浏览入门路线 →</Link>
         </section>
 
+        <nav className="archive-topic-links" aria-label="按内容类型浏览">
+          <span>按类型浏览</span>
+          <Link href="/beginner">新手路线</Link>
+          <Link href="/tags/basic-engineering">基础工程</Link>
+          <Link href="/tags/common-questions">常见问题</Link>
+          <Link href="/tags/debugging">错误排查</Link>
+          <Link href="/tags/advanced-development">进阶开发</Link>
+          <Link href="/knowledge">专题知识库</Link>
+        </nav>
+
         <div className="post-list" aria-label={`文章第 ${currentPage} 页`}>
           {pagination.posts.map((post) => (
             <PostCard key={post.slug} post={post} />
@@ -101,6 +111,11 @@ export function BlogArchive({ currentPage }: BlogArchiveProps) {
           border-color: var(--muted);
           text-decoration: none;
         }
+
+        .archive-topic-links { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; margin: -14px 0 36px; }
+        .archive-topic-links > span { margin-right: 4px; color: var(--muted); font-size: 12px; }
+        .archive-topic-links a { border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; background: var(--surface); font-size: 12px; }
+        .archive-topic-links a:hover { border-color: var(--muted); text-decoration: none; }
 
         @media (max-width: 700px) {
           .archive-overview {

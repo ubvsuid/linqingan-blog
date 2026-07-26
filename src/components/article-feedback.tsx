@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 interface ArticleFeedbackProps {
@@ -10,10 +11,10 @@ interface ArticleFeedbackProps {
   issueUrl: string;
 }
 
-type FeedbackValue = "helpful" | "needs-work";
+type FeedbackValue = "helpful" | "not-solved" | "outdated" | "suggestion";
 
 function parseFeedback(value: string | null): FeedbackValue | null {
-  return value === "helpful" || value === "needs-work" ? value : null;
+  return value === "helpful" || value === "not-solved" || value === "outdated" || value === "suggestion" ? value : null;
 }
 
 export function ArticleFeedback({
@@ -83,6 +84,7 @@ export function ArticleFeedback({
         detail: { slug, value },
       }),
     );
+    track("article_feedback", { slug: slug.slice(0, 80), feedback: value });
   }
 
   return (
@@ -90,7 +92,7 @@ export function ArticleFeedback({
       <div>
         <p className="eyebrow">FEEDBACK</p>
         <h2 id="article-feedback-title">这篇文章解决了你的问题吗？</h2>
-        <p>反馈保存在当前浏览器中。发现代码或表述有错误时，也可以直接提交具体问题。</p>
+        <p>反馈会匿名汇总到站点分析中，同时保存在当前浏览器。具体错误仍可通过 GitHub 或邮箱提交。</p>
       </div>
 
       <div className="article-feedback-actions">
@@ -105,20 +107,40 @@ export function ArticleFeedback({
           </button>
           <button
             type="button"
-            className={feedback === "needs-work" ? "feedback-active" : undefined}
-            aria-pressed={feedback === "needs-work"}
-            onClick={() => saveFeedback("needs-work")}
+            className={feedback === "not-solved" ? "feedback-active" : undefined}
+            aria-pressed={feedback === "not-solved"}
+            onClick={() => saveFeedback("not-solved")}
           >
-            需要改进
+            没解决
+          </button>
+          <button
+            type="button"
+            className={feedback === "outdated" ? "feedback-active" : undefined}
+            aria-pressed={feedback === "outdated"}
+            onClick={() => saveFeedback("outdated")}
+          >
+            内容可能过时
+          </button>
+          <button
+            type="button"
+            className={feedback === "suggestion" ? "feedback-active" : undefined}
+            aria-pressed={feedback === "suggestion"}
+            onClick={() => saveFeedback("suggestion")}
+          >
+            建议补充
           </button>
         </div>
 
         <p className="article-feedback-status" aria-live="polite">
           {feedback === "helpful"
             ? "感谢反馈，我会继续保持这种写法。"
-            : feedback === "needs-work"
-              ? "已经记录。可以继续告诉我具体卡住的位置。"
-              : "选择一个选项即可完成反馈。"}
+            : feedback === "not-solved"
+              ? "已经记录。可以继续提交具体卡住的位置。"
+              : feedback === "outdated"
+                ? "已经标记为可能过时，建议同时提交对应 API 或版本信息。"
+                : feedback === "suggestion"
+                  ? "已经记录补充建议，可以继续说明希望增加的示例。"
+                  : "选择一个选项即可完成反馈。"}
         </p>
 
         <div className="article-feedback-links">

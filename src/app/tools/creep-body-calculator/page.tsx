@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { CreepBodyCalculator } from "@/components/creep-body-calculator";
+import { ToolUtilityBar } from "@/components/tool-utility-bar";
 import { createPageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
@@ -62,6 +63,8 @@ export default function CreepBodyCalculatorPage() {
             组合身体部件，立即查看 Energy 成本、Spawn 生成时间、基础生命值、携带容量与满载移动估算。配置会同步到网址参数，复制链接即可分享当前方案。
           </p>
         </header>
+
+        <ToolUtilityBar title="Creep 身体计算器" issueUrl={siteConfig.links.issues} />
 
         <CreepBodyCalculator />
 

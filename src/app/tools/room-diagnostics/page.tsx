@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { RoomDiagnostics } from "@/components/room-diagnostics";
+import { ToolUtilityBar } from "@/components/tool-utility-bar";
 import { createPageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
@@ -58,6 +59,8 @@ export default function RoomDiagnosticsPage() {
             根据一份房间静态快照，检查断代、Energy 输入、Controller 降级、工地规模和 CPU 风险。工具不会连接账号，也不会执行任何游戏动作。
           </p>
         </header>
+
+        <ToolUtilityBar title="房间运行诊断" issueUrl={siteConfig.links.issues} />
 
         <RoomDiagnostics />
 

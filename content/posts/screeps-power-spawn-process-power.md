@@ -93,7 +93,7 @@ Memory.powerProcessing = {
 };
 ```
 
-这与市场成交不同，不需要每 tick 人工确认同一笔处理；但仍应保留：
+Power 处理属于持续资源行为，不需要每 tick 人工确认同一轮调用；但仍应保留：
 
 - 可关闭的 `enabled`；
 - Power Spawn ID；
