@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
-import { publishedEnglishArticles } from "@/lib/english-articles";
+import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 import { englishKnowledgeModules } from "@/lib/i18n";
 
 import styles from "../home.module.css";
@@ -58,7 +58,9 @@ export default function EnglishHomePage() {
           <p className={styles.heroDescription}>
             Learn the game step by step, debug code that does not behave as expected, and use focused tools for bodies, rooms, CPU, Memory, movement, and automation.
           </p>
-          <p className={styles.heroStats}>English foundation live · Beginner Creep sequence published</p>
+          <p className={styles.heroStats}>
+            {publishedEnglishArticles.length} verified articles · 8 knowledge modules · 2 working tools
+          </p>
 
           <section className="english-task-hub" aria-labelledby="english-task-title">
             <div className="english-task-heading">
@@ -134,7 +136,7 @@ export default function EnglishHomePage() {
               <p>Browse the subjects the English section covers without mixing beginner lessons and advanced engineering into one list.</p>
               <div className={styles.knowledgeStats} aria-label="Knowledge map size">
                 <span><strong>8</strong> subject modules</span>
-                <span><strong>2</strong> live tools</span>
+                <span><strong>{publishedEnglishArticles.length}</strong> published guides</span>
               </div>
               <Link href="/en/knowledge">Open the knowledge map →</Link>
             </div>

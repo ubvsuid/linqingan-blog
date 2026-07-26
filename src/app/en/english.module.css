@@ -103,6 +103,98 @@
   line-height: 1.65;
 }
 
+.knowledgeModules {
+  display: grid;
+  gap: 24px;
+}
+
+.knowledgeModule {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: clamp(24px, 4vw, 36px);
+  background: var(--surface);
+  scroll-margin-top: 110px;
+}
+
+.knowledgeModuleHeader {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.knowledgeModuleHeader > span {
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+}
+
+.knowledgeModuleHeader h2 {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -.04em;
+}
+
+.knowledgeModuleHeader p {
+  max-width: 780px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.knowledgeModuleHeader small {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.knowledgeArticleList {
+  display: grid;
+  gap: 10px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.knowledgeArticleList a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 18px;
+  border-top: 1px solid var(--border);
+  padding: 18px 0 8px;
+  text-decoration: none;
+}
+
+.knowledgeArticleList a:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.knowledgeArticleList span,
+.knowledgeArticleList small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.knowledgeArticleList strong {
+  grid-column: 1;
+  line-height: 1.45;
+}
+
+.knowledgeArticleList small {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.knowledgeEmpty {
+  margin: 28px 0 0;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  color: var(--muted);
+}
+
 .notice {
   margin-top: 48px;
   border: 1px solid var(--border);
@@ -124,5 +216,11 @@
 @media (max-width: 760px) {
   .grid { grid-template-columns: 1fr; }
   .full { grid-column: auto; }
-  .list li { grid-template-columns: 38px minmax(0, 1fr); }
+  .list li,
+  .knowledgeModuleHeader { grid-template-columns: 38px minmax(0, 1fr); }
+  .knowledgeArticleList a { grid-template-columns: 1fr; }
+  .knowledgeArticleList small {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
