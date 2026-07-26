@@ -94,17 +94,26 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
-export function EnglishSiteSearch({ initialQuery = "" }: { initialQuery?: string }) {
+export function EnglishSiteSearch({
+  initialQuery = "",
+  initialDocuments = [],
+}: {
+  initialQuery?: string;
+  initialDocuments?: EnglishSearchDocument[];
+}) {
   const [query, setQuery] = useState(initialQuery);
   const [type, setType] = useState("");
-  const [documents, setDocuments] = useState<EnglishSearchDocument[] | null>(null);
-  const [loadState, setLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [documents, setDocuments] = useState<EnglishSearchDocument[]>(initialDocuments);
+  const [fullIndexLoaded, setFullIndexLoaded] = useState(false);
+  const [loadState, setLoadState] = useState<"idle" | "loading" | "ready" | "error">(
+    initialDocuments.length > 0 ? "ready" : "idle",
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const loadingRef = useRef(false);
   const normalizedQuery = normalize(query);
 
   const loadSearchIndex = useCallback(async () => {
-    if (documents || loadingRef.current) return;
+    if (fullIndexLoaded || loadingRef.current) return;
 
     loadingRef.current = true;
     setLoadState("loading");
@@ -117,13 +126,14 @@ export function EnglishSiteSearch({ initialQuery = "" }: { initialQuery?: string
       const payload: unknown = await response.json();
       if (!Array.isArray(payload)) throw new Error("Search index response is not an array");
       setDocuments(payload as EnglishSearchDocument[]);
+      setFullIndexLoaded(true);
       setLoadState("ready");
     } catch {
       setLoadState("error");
     } finally {
       loadingRef.current = false;
     }
-  }, [documents]);
+  }, [fullIndexLoaded]);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -148,7 +158,7 @@ export function EnglishSiteSearch({ initialQuery = "" }: { initialQuery?: string
 
   const results = useMemo(() => {
     const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
-    const sourceDocuments = normalizedQuery || type ? documents ?? [] : featuredResources;
+    const sourceDocuments = normalizedQuery || type ? documents : featuredResources;
     const filteredByType = type ? sourceDocuments.filter((document) => document.type === type) : sourceDocuments;
 
     if (!normalizedQuery) return filteredByType.slice(0, 12);
@@ -184,7 +194,9 @@ export function EnglishSiteSearch({ initialQuery = "" }: { initialQuery?: string
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
-  const waitingForIndex = Boolean(normalizedQuery || type) && (loadState === "idle" || loadState === "loading");
+  const waitingForIndex = Boolean(normalizedQuery || type)
+    && documents.length === 0
+    && (loadState === "idle" || loadState === "loading");
 
   return (
     <div className="english-site-search">
@@ -234,7 +246,7 @@ export function EnglishSiteSearch({ initialQuery = "" }: { initialQuery?: string
             : "Recommended English resources"}
       </p>
 
-      {loadState === "error" && (normalizedQuery || type) ? (
+      {loadState === "error" && (normalizedQuery || type) && documents.length === 0 ? (
         <div className="english-search-empty">
           <strong>The search index could not load.</strong>
           <p>Retry the index request, or continue with the roadmap, knowledge modules, references, and tools below.</p>
