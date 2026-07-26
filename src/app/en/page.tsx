@@ -36,7 +36,7 @@ export default function EnglishHomePage() {
           </p>
           <p className={styles.heroStats}>{publishedEnglishArticles.length} verified articles · 8 knowledge modules · 2 working tools</p>
 
-          <div className="english-system-visual" aria-label="Screeps Energy loop and debugging workflow diagram">
+          <div className="english-system-visual" role="img" aria-label="Screeps Energy loop and debugging workflow diagram">
             <div className="system-loop">
               <div><span>01</span><small>INPUT</small><strong>Source</strong><p>Energy enters the room economy.</p></div>
               <i aria-hidden="true">→</i>
