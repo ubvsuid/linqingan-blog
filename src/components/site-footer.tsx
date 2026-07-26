@@ -51,7 +51,7 @@ export function SiteFooter() {
   const languageTarget = getLanguageSwitchTarget(pathname);
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" lang={english ? "en" : "zh-CN"}>
       <Container className="footer-inner">
         <div className="footer-brand">
           <strong>{english ? "Linqingan" : siteConfig.name}</strong>
