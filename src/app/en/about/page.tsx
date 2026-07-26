@@ -33,7 +33,7 @@ export default function EnglishAboutPage() {
         <section className="about-profile-panel" aria-labelledby="about-profile-title">
           <div className="about-profile-identity">
             <Image src="/profile-avatar.webp" alt="Linqingan profile" width={116} height={116} />
-            <div><p className="eyebrow">AUTHOR AND MAINTAINER</p><h2 id="about-profile-title">Linqingan</h2><p>The site documents Screeps learning, automation systems, code maintenance, and the process of turning isolated snippets into systems that keep running.</p></div>
+            <div><p className="eyebrow">AUTHOR AND MAINTAINER</p><h2 id="about-profile-title">Linqingan</h2><p>The site documents Screeps learning, automation systems, code maintenance, and the process of turning isolated snippets into systems that keep running. The project has been maintained publicly since July 2026.</p></div>
           </div>
           <dl>
             <div><dt>English guides</dt><dd>{englishDiscoveryArticles.length}</dd></div>
@@ -43,21 +43,32 @@ export default function EnglishAboutPage() {
           </dl>
         </section>
 
+        <section className="project-timeline" aria-labelledby="project-timeline-title">
+          <div><p className="eyebrow">PUBLIC PROJECT HISTORY</p><h2 id="project-timeline-title">What can be checked independently</h2><p>The site avoids unverifiable experience claims. Its public repository, production branch, quality checks, change history, and issue tracker provide the evidence that visitors can inspect.</p></div>
+          <ol>
+            <li><span>JUL 2026</span><div><strong>Public English section established</strong><p>English navigation, roadmap, knowledge modules, references, search, tools, and content registries were published as a connected system.</p></div></li>
+            <li><span>CONTINUOUS</span><div><strong>Read-only production checks</strong><p>Content, routes, links, types, lint, accessibility basics, simulations, and production builds run before changes are merged.</p></div></li>
+            <li><span>PUBLIC</span><div><strong>Changes and limitations remain visible</strong><p>Pull requests, repository history, issue reports, evidence boundaries, and known limitations are kept open for review.</p></div></li>
+          </ol>
+        </section>
+
         <section className="evidence-ladder" aria-labelledby="evidence-ladder-title">
           <div className="evidence-heading"><p className="eyebrow">EVIDENCE LADDER</p><h2 id="evidence-ladder-title">Every technical claim has a visible boundary</h2><p>The site does not present syntax checks, offline simulations, Console tests, and live multi-tick behavior as equivalent evidence.</p></div>
           <ol>
             <li><span>01</span><div><strong>Source review</strong><p>Read the Chinese source, identify the intended task, and separate confirmed facts from assumptions.</p></div></li>
             <li><span>02</span><div><strong>Official API check</strong><p>Verify methods, constants, return codes, ownership rules, and timing behavior against official documentation.</p></div></li>
             <li><span>03</span><div><strong>Syntax and offline checks</strong><p>Check JavaScript structure, calculations, state transitions, and deterministic examples without claiming live-room proof.</p></div></li>
-            <li><span>04</span><div><strong>Console and live-room evidence</strong><p>Mark real Console or multi-tick tests only when that evidence actually exists; otherwise the article says it is pending.</p></div></li>
+            <li><span>04</span><div><strong>Console and live-room evidence</strong><p>Mark real Console, screenshot, or multi-tick tests only when that evidence actually exists; otherwise the site says it is pending.</p></div></li>
           </ol>
         </section>
 
         <section className={styles.grid} style={{ marginTop: 52 }}>
           <article className={styles.card}><p className="eyebrow">ENGLISH DIRECTION</p><h2>Not a copy of the official API</h2><p>The English section is designed around practical questions: why an action fails, how to inspect the state, which return value matters, and how to validate the fix across ticks.</p><Link href="/en/knowledge">View the knowledge map →</Link></article>
           <article className={styles.card}><p className="eyebrow">OPEN DEVELOPMENT</p><h2>Issues and changes stay public</h2><p>The website repository, change history, pull requests, and issue tracker are public so technical claims and implementation decisions can be reviewed.</p><a href={siteConfig.links.repository} rel="noreferrer" target="_blank">Open the repository ↗</a></article>
-          <article className={styles.card}><p className="eyebrow">LIMITATIONS</p><h2>No hidden live-game claim</h2><p>Tool results remain calculations or static snapshot assessments. Articles identify when live-room testing, screenshots, or longer observation are still missing.</p><Link href="/en/verification">Read the verification method →</Link></article>
-          <article className={styles.card}><p className="eyebrow">CONTACT</p><h2>Report a technical problem</h2><p>Provide the affected URL, Screeps API or return code, expected behavior, actual result, and any relevant Console output.</p><a href={`mailto:${siteConfig.author.email}`}>Send an email →</a></article>
+          <article className={styles.card}><p className="eyebrow">LIMITATIONS</p><h2>No hidden live-game claim</h2><p>Tool results remain calculations or static snapshot assessments. Real screenshots and live-room evidence are added only when the underlying session evidence exists.</p><Link href="/en/verification">Read the verification method →</Link></article>
+          <article className={styles.card}><p className="eyebrow">ROADMAP</p><h2>See what changes next</h2><p>The public roadmap separates interface work, tool improvements, content verification, and evidence collection.</p><Link href="/en/roadmap">Open the roadmap →</Link></article>
+          <article className={styles.card}><p className="eyebrow">CHANGELOG</p><h2>Review completed changes</h2><p>The English changelog summarizes meaningful interface, navigation, tool, search, and SEO updates.</p><Link href="/en/changelog">Open the changelog →</Link></article>
+          <article className={styles.card}><p className="eyebrow">CONTACT</p><h2>Report a technical problem</h2><p>Provide the affected URL, Screeps API or return code, expected behavior, actual result, and any relevant Console output.</p><a href={siteConfig.links.issues} rel="noreferrer" target="_blank">Open an issue ↗</a></article>
         </section>
       </Container>
 
@@ -71,16 +82,17 @@ export default function EnglishAboutPage() {
         .about-profile-panel dl > div { display: grid; align-content: end; min-height: 120px; border: 1px solid var(--border); border-radius: 17px; padding: 18px; background: var(--background); }
         .about-profile-panel dt { color: var(--muted); font-size: 12px; }
         .about-profile-panel dd { margin: 8px 0 0; font-size: 30px; font-weight: 760; }
-        .evidence-ladder { display: grid; grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr); gap: 48px; margin-top: 70px; }
-        .evidence-heading h2 { margin: 7px 0 0; font-size: clamp(31px, 5vw, 52px); letter-spacing: -.05em; }
-        .evidence-heading > p:last-child { margin: 16px 0 0; color: var(--muted); line-height: 1.75; }
-        .evidence-ladder ol { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
-        .evidence-ladder li { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 18px; border-bottom: 1px solid var(--border); padding: 22px 0; }
-        .evidence-ladder li > span { color: var(--muted); font-family: monospace; font-size: 12px; }
-        .evidence-ladder strong { font-size: 20px; }
-        .evidence-ladder li p { margin: 8px 0 0; color: var(--muted); line-height: 1.65; }
-        @media (max-width: 820px) { .about-profile-panel, .evidence-ladder { grid-template-columns: 1fr; } }
-        @media (max-width: 560px) { .about-profile-identity { grid-template-columns: 1fr; } .about-profile-panel dl { grid-template-columns: 1fr; } }
+        .project-timeline, .evidence-ladder { display: grid; grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr); gap: 48px; margin-top: 70px; }
+        .project-timeline h2, .evidence-heading h2 { margin: 7px 0 0; font-size: clamp(31px, 5vw, 52px); letter-spacing: -.05em; }
+        .project-timeline > div > p:last-child, .evidence-heading > p:last-child { margin: 16px 0 0; color: var(--muted); line-height: 1.75; }
+        .project-timeline ol, .evidence-ladder ol { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+        .project-timeline li, .evidence-ladder li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 18px; border-bottom: 1px solid var(--border); padding: 22px 0; }
+        .evidence-ladder li { grid-template-columns: 54px minmax(0, 1fr); }
+        .project-timeline li > span, .evidence-ladder li > span { color: var(--screeps-controller); font-family: monospace; font-size: 12px; }
+        .project-timeline strong, .evidence-ladder strong { font-size: 20px; }
+        .project-timeline li p, .evidence-ladder li p { margin: 8px 0 0; color: var(--muted); line-height: 1.65; }
+        @media (max-width: 820px) { .about-profile-panel, .project-timeline, .evidence-ladder { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) { .about-profile-identity { grid-template-columns: 1fr; } .about-profile-panel dl { grid-template-columns: 1fr; } .project-timeline li { grid-template-columns: 1fr; gap: 8px; } }
       `}</style>
     </main>
   );

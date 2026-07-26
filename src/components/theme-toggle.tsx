@@ -1,6 +1,9 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
+
+import { isEnglishPath } from "@/lib/i18n";
 
 type Theme = "light" | "dark";
 
@@ -27,13 +30,17 @@ function subscribeToTheme(callback: () => void): () => void {
 }
 
 export function ThemeToggle() {
+  const pathname = usePathname();
+  const english = isEnglishPath(pathname);
   const currentTheme = useSyncExternalStore(
     subscribeToTheme,
     getThemeSnapshot,
     () => "light",
   );
   const nextTheme = currentTheme === "dark" ? "light" : "dark";
-  const nextThemeLabel = nextTheme === "dark" ? "深色" : "浅色";
+  const label = english
+    ? `Switch to ${nextTheme} mode`
+    : `切换到${nextTheme === "dark" ? "深色" : "浅色"}模式`;
 
   function toggleTheme(): void {
     const root = document.documentElement;
@@ -48,9 +55,9 @@ export function ThemeToggle() {
       type="button"
       className="theme-toggle"
       onClick={toggleTheme}
-      aria-label={`切换到${nextThemeLabel}模式`}
+      aria-label={label}
       aria-pressed={currentTheme === "dark"}
-      title={`切换到${nextThemeLabel}模式`}
+      title={label}
     >
       <span aria-hidden="true">◐</span>
     </button>

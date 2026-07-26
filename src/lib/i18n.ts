@@ -1,11 +1,9 @@
 import { englishArticleRoutePairs } from "@/lib/english-articles-complete";
 
 export const englishNavigation = [
-  { label: "Home", href: "/en" },
   { label: "Beginner", href: "/en/beginner" },
   { label: "Articles", href: "/en/blog" },
   { label: "Knowledge", href: "/en/knowledge" },
-  { label: "Topics", href: "/en/tags" },
   { label: "Tools", href: "/en/tools" },
   { label: "About", href: "/en/about" },
 ] as const;
@@ -25,6 +23,8 @@ export const languageRoutePairs = {
   "/tags": "/en/tags",
   "/about": "/en/about",
   "/search": "/en/search",
+  "/changelog": "/en/changelog",
+  "/now": "/en/roadmap",
 } as const;
 
 export const englishKnowledgeModules = [

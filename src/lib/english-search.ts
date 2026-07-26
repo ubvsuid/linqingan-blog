@@ -21,13 +21,16 @@ const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-tools", title: "Free Screeps Tools", description: "Browser-based tools that do not request a Screeps token or connect to an account.", href: "/en/tools", type: "Page", keywords: ["tools", "calculator", "diagnostics", "free"] },
   { id: "english-body-calculator", title: "Screeps Creep Body Calculator", description: "Calculate Energy cost, spawn time, hits, carry capacity, and loaded movement speed.", href: "/en/tools/creep-body-calculator", type: "Tool", keywords: ["body calculator", "creep cost", "move ratio", "spawn time", "carry capacity"] },
   { id: "english-room-diagnostics", title: "Screeps Room Snapshot Diagnostic", description: "Check Spawn, workforce, Energy, Controller, construction, CPU, and bucket risks from a static snapshot.", href: "/en/tools/room-diagnostics", type: "Tool", keywords: ["room diagnostics", "spawn count", "harvester", "controller downgrade", "cpu bucket"] },
-  { id: "english-about", title: "About Linqingan and the Screeps Knowledge Project", description: "Project purpose, verification approach, evidence boundaries, open development, repository, and contact information.", href: "/en/about", type: "Page", keywords: ["linqingan", "about", "github", "project", "evidence"] },
+  { id: "english-about", title: "About Linqingan and the Screeps Knowledge Project", description: "Project purpose, verification approach, evidence boundaries, public development history, repository, and contact information.", href: "/en/about", type: "Page", keywords: ["linqingan", "about", "github", "project", "evidence", "public history"] },
+  { id: "english-changelog", title: "English Site Changelog", description: "Meaningful changes to the English interface, navigation, search, tools, accessibility, and technical SEO.", href: "/en/changelog", type: "Page", keywords: ["changelog", "updates", "release notes", "site changes"] },
+  { id: "english-roadmap", title: "English Site Roadmap", description: "Completed work, next improvements, evidence-dependent tasks, tool development, accessibility, and performance checks.", href: "/en/roadmap", type: "Page", keywords: ["roadmap", "next", "planned", "evidence", "performance"] },
+  { id: "english-license", title: "Content and Code Use", description: "Current boundaries for reusing site content, code examples, third-party names, and commercial material.", href: "/en/license", type: "Reference", keywords: ["license", "copyright", "reuse", "permission", "code examples"] },
 ];
 
 const topicDocuments: EnglishSearchDocument[] = englishTags.map((tag) => ({
   id: `english-topic-${tag.slug}`,
   title: `${tag.label} Screeps Guides`,
-  description: `Browse ${tag.count} verified English guides related to ${tag.label}.`,
+  description: `Browse ${tag.count} published English guides related to ${tag.label}.`,
   href: `/en/tags/${tag.slug}`,
   type: "Page",
   keywords: [tag.label, ...tag.terms],
