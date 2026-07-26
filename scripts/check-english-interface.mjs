@@ -76,12 +76,21 @@ const taskIndex = home.indexOf('className="english-task-hub"');
 const diagramIndex = home.indexOf('className="english-system-visual"');
 if (taskIndex < 0 || diagramIndex < 0 || taskIndex > diagramIndex) failures.push("English task navigation must appear before the system diagram.");
 
-const articleRegistry = read("src/lib/english-articles-complete.ts");
+const libraryDirectory = path.join(root, "src/lib");
+const registryFileNames = fs.readdirSync(libraryDirectory).filter((fileName) =>
+  fileName === "english-articles.ts" || /^english-.*-registry(?:-\d+)?\.ts$/.test(fileName),
+);
+const articleRegistrySource = registryFileNames
+  .map((fileName) => fs.readFileSync(path.join(libraryDirectory, fileName), "utf8"))
+  .join("\n");
 const knowledgeMapping = read("src/lib/english-knowledge.ts");
-const articleHrefs = new Set([...articleRegistry.matchAll(/href:\s*"(\/en\/blog\/[^"]+)"/g)].map((match) => match[1]));
+const articleHrefs = new Set([...articleRegistrySource.matchAll(/href:\s*"(\/en\/blog\/[^"]+)"/g)].map((match) => match[1]));
 const mappedHrefs = new Set([...knowledgeMapping.matchAll(/"(\/en\/blog\/[^"]+)":\s*[1-8]/g)].map((match) => match[1]));
 for (const href of articleHrefs) {
   if (!mappedHrefs.has(href)) failures.push(`English knowledge mapping is missing ${href}`);
+}
+for (const href of mappedHrefs) {
+  if (!articleHrefs.has(href)) failures.push(`English knowledge mapping contains an unpublished route ${href}`);
 }
 if (mappedHrefs.size !== articleHrefs.size) {
   failures.push(`English knowledge mapping count ${mappedHrefs.size} does not match published article count ${articleHrefs.size}`);
