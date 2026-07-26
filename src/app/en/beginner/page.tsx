@@ -60,13 +60,13 @@ export default function EnglishBeginnerPage() {
           <p>Follow the sequence from the first room and tick loop to one combined room script. Each lesson answers one beginner question, uses checked APIs, and states which Console or live-room verification remains pending.</p>
         </header>
 
-        <div className="beginner-roadmap-visual" aria-label="Four-stage Screeps beginner learning path">
+        <nav className="beginner-roadmap-visual" aria-label="Four-stage Screeps beginner learning path">
           {stageGroups.map((stage) => (
             <a href={`#stage-${stage.number}`} key={stage.number}>
               <span>{stage.number}</span><strong>{stage.title}</strong><small>Lessons {Number(stage.number) * 3 - 2}–{Number(stage.number) * 3}</small>
             </a>
           ))}
-        </div>
+        </nav>
 
         <div className="beginner-stage-groups">
           {stageGroups.map((stage) => (
@@ -104,7 +104,7 @@ export default function EnglishBeginnerPage() {
 
       <style>{`
         .beginner-roadmap-visual { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-bottom: 64px; border: 1px solid var(--border); border-radius: 22px; overflow: hidden; background: var(--surface); }
-        .beginner-roadmap-visual a { position: relative; display: grid; min-height: 170px; align-content: start; gap: 8px; padding: 24px; text-decoration: none; }
+        .beginner-roadmap-visual a { position: relative; display: grid; min-height: 170px; align-content: start; padding: 24px; text-decoration: none; }
         .beginner-roadmap-visual a + a { border-left: 1px solid var(--border); }
         .beginner-roadmap-visual a::after { content: "→"; position: absolute; top: 50%; right: -9px; z-index: 2; width: 18px; height: 18px; border-radius: 999px; background: var(--foreground); color: var(--background); text-align: center; line-height: 17px; }
         .beginner-roadmap-visual a:last-child::after { display: none; }
