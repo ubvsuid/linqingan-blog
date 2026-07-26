@@ -20,6 +20,61 @@
   text-decoration: none;
 }
 
+.skip-link-en {
+  display: none;
+}
+
+html[data-site-language="en"] .skip-link-zh {
+  display: none;
+}
+
+html[data-site-language="en"] .skip-link-en {
+  display: inline;
+}
+
+.english-root {
+  --screeps-energy: #bd8215;
+  --screeps-controller: #3275a8;
+  --screeps-success: #2f7d54;
+  --screeps-warning: #ad5f22;
+  --screeps-danger: #a53e3e;
+  min-height: 100%;
+}
+
+html[data-theme="dark"] .english-root {
+  --screeps-energy: #efbd55;
+  --screeps-controller: #70b5e8;
+  --screeps-success: #70c99a;
+  --screeps-warning: #ed9b58;
+  --screeps-danger: #e47a7a;
+}
+
+.english-accent-energy {
+  color: var(--screeps-energy);
+}
+
+.english-accent-controller {
+  color: var(--screeps-controller);
+}
+
+.english-accent-success {
+  color: var(--screeps-success);
+}
+
+.english-sample-label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: var(--screeps-controller);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .09em;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tag-list .tag,
   .header-icon-link,
