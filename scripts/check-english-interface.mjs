@@ -30,16 +30,18 @@ const requiredFiles = [
   "src/app/en/changelog/page.tsx",
   "src/app/en/roadmap/page.tsx",
   "src/app/en/license/page.tsx",
+  "src/app/en/search-index.json/route.ts",
   "src/app/en/blog/screeps-memory-write-safety/page.tsx",
 ];
 for (const relativePath of requiredFiles) read(relativePath);
 
 requireText("next.config.ts", 'key: "Content-Language", value: "en"', "English Content-Language header");
 requireText("src/app/layout.tsx", 'document.documentElement.lang = english ? "en" : "zh-CN"', "pre-content document language selection");
-requireText("src/app/layout.tsx", '<span lang="en">Skip to content</span>', "no-JavaScript English skip-link fallback");
+requireText("src/app/layout.tsx", 'className="skip-link-en" lang="en"', "English-only skip-link label");
 forbidText("src/app/layout.tsx", "DocumentLanguage", "post-hydration language component");
 requireText("src/app/en/layout.tsx", 'className="english-root" lang="en"', "server-rendered English content language");
 requireText("src/components/site-header.tsx", 'lang={english ? "en" : "zh-CN"}', "localized header language");
+requireText("src/components/site-header.tsx", 'english ? "Switch to Chinese"', "English language-switch label");
 requireText("src/components/site-footer.tsx", 'lang={english ? "en" : "zh-CN"}', "localized footer language");
 requireText("src/app/en/layout.tsx", "/en/search?q={search_term_string}", "English SearchAction");
 requireText("src/lib/english-metadata.ts", 'applicationName: "Linqingan Screeps Guides & Tools"', "English application metadata");
@@ -49,8 +51,13 @@ forbidText("src/app/en/page.tsx", "verified articles", "ambiguous verified-artic
 requireText("src/app/en/tools/page.tsx", "SAMPLE OUTPUT", "tool sample-output label");
 forbidText("src/app/en/knowledge/page.tsx", "Score {", "public internal article score");
 requireText("src/app/en/knowledge/page.tsx", "discovery.difficulty", "knowledge difficulty metadata");
+requireText("src/lib/english-knowledge.ts", "articleModuleOverrides", "curated knowledge-module mapping");
+requireText("src/components/english-site-search.tsx", "featuredResources", "curated default English search resources");
 requireText("src/components/english-site-search.tsx", "popularQueries", "popular English searches");
 requireText("src/components/english-site-search.tsx", 'event.key !== "/"', "English search keyboard shortcut");
+requireText("src/components/english-site-search.tsx", '/en/search-index.json', "lazy English search-index request");
+requireText("src/app/en/search-index.json/route.ts", 'dynamic = "force-static"', "static English search-index route");
+forbidText("src/app/en/search/page.tsx", "englishSearchDocuments", "full search index in initial page payload");
 requireText("src/components/site-footer.tsx", "/en/changelog", "English changelog footer link");
 requireText("src/components/site-footer.tsx", "/en/roadmap", "English roadmap footer link");
 requireText("src/components/site-footer.tsx", "/en/license", "English content-use footer link");
@@ -68,6 +75,17 @@ const home = read("src/app/en/page.tsx");
 const taskIndex = home.indexOf('className="english-task-hub"');
 const diagramIndex = home.indexOf('className="english-system-visual"');
 if (taskIndex < 0 || diagramIndex < 0 || taskIndex > diagramIndex) failures.push("English task navigation must appear before the system diagram.");
+
+const articleRegistry = read("src/lib/english-articles-complete.ts");
+const knowledgeMapping = read("src/lib/english-knowledge.ts");
+const articleHrefs = new Set([...articleRegistry.matchAll(/href:\s*"(\/en\/blog\/[^"]+)"/g)].map((match) => match[1]));
+const mappedHrefs = new Set([...knowledgeMapping.matchAll(/"(\/en\/blog\/[^"]+)":\s*[1-8]/g)].map((match) => match[1]));
+for (const href of articleHrefs) {
+  if (!mappedHrefs.has(href)) failures.push(`English knowledge mapping is missing ${href}`);
+}
+if (mappedHrefs.size !== articleHrefs.size) {
+  failures.push(`English knowledge mapping count ${mappedHrefs.size} does not match published article count ${articleHrefs.size}`);
+}
 
 for (const relativePath of [
   "src/app/en/layout.tsx",
@@ -87,4 +105,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, search, tool previews, knowledge metadata, trust pages, permanent redirects, and Sitemap entries are present.");
+console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, lazy search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and Sitemap entries are present.");
