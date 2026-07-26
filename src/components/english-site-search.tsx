@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EnglishSearchDocument } from "@/lib/english-search";
+
+const popularQueries = ["ERR_NOT_IN_RANGE", "creep not moving", "CPU bucket", "body calculator", "Memory cleanup"];
 
 function normalize(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("en");
@@ -50,7 +52,20 @@ export function EnglishSiteSearch({
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [type, setType] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const normalizedQuery = normalize(query);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
+      event.preventDefault();
+      inputRef.current?.focus();
+    };
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
 
   const results = useMemo(() => {
     const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
@@ -101,9 +116,10 @@ export function EnglishSiteSearch({
     <div className="english-site-search">
       <div className="english-search-toolbar">
         <label className="english-search-field">
-          <span>Search the English section</span>
+          <span>Search the English section <small>Press <kbd>/</kbd> to focus</small></span>
           <div>
             <input
+              ref={inputRef}
               type="search"
               value={query}
               onChange={(event) => updateQuery(event.target.value)}
@@ -123,6 +139,13 @@ export function EnglishSiteSearch({
           </select>
         </label>
       </div>
+
+      {!normalizedQuery ? (
+        <div className="english-popular-searches" aria-label="Popular English searches">
+          <span>Popular searches</span>
+          {popularQueries.map((item) => <button type="button" key={item} onClick={() => updateQuery(item)}>{item}</button>)}
+        </div>
+      ) : null}
 
       <p className="english-search-summary" aria-live="polite">
         {normalizedQuery ? `${results.length} matching result${results.length === 1 ? "" : "s"}` : "Popular English resources"}
@@ -151,15 +174,23 @@ export function EnglishSiteSearch({
         .english-site-search { display: grid; gap: 24px; }
         .english-search-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; }
         .english-search-field, .english-search-type { display: grid; gap: 9px; border: 1px solid var(--border); border-radius: 22px; padding: 22px; background: var(--surface); color: var(--muted); font-size: 13px; }
+        .english-search-field > span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+        .english-search-field > span small { color: var(--muted); font-size: 11px; }
+        .english-search-field kbd { border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; background: var(--background); color: var(--foreground); font-family: monospace; }
         .english-search-field > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
         .english-search-field input, .english-search-type select { min-height: 56px; border: 1px solid var(--border); border-radius: 15px; padding: 0 17px; background: var(--background); color: var(--foreground); font: inherit; font-size: 16px; }
+        .english-search-field input:focus { border-color: var(--screeps-controller); }
         .english-search-field button { min-height: 42px; align-self: center; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
+        .english-popular-searches { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .english-popular-searches > span { margin-right: 4px; color: var(--muted); font-size: 12px; }
+        .english-popular-searches button { border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; background: var(--surface); color: var(--foreground); cursor: pointer; }
+        .english-popular-searches button:hover { border-color: var(--screeps-controller); }
         .english-search-summary { margin: 0; color: var(--muted); font-size: 13px; }
         .english-search-results { display: grid; border-top: 1px solid var(--border); }
         .english-search-results article { border-bottom: 1px solid var(--border); padding: 28px 0; }
         .english-search-results article > span { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 4px 9px; font-size: 11px; }
         .english-search-results h2 { margin: 12px 0 0; font-size: clamp(23px, 3vw, 32px); }
-        .english-search-results h2 mark { border-radius: 4px; padding: 0 .08em; background: color-mix(in srgb, var(--foreground) 16%, transparent); color: inherit; }
+        .english-search-results h2 mark { border-radius: 4px; padding: 0 .08em; background: color-mix(in srgb, var(--screeps-energy) 25%, transparent); color: inherit; }
         .english-search-results p { max-width: 780px; margin: 10px 0 0; color: var(--muted); line-height: 1.7; }
         .english-search-results article > div { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
         .english-search-results small { border: 1px solid var(--border); border-radius: 999px; padding: 5px 9px; color: var(--muted); }
