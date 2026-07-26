@@ -27,7 +27,7 @@ const chineseSiteLinks = [
 const englishLearningLinks = [
   { href: "/en/beginner", label: "Beginner Roadmap" },
   { href: "/en/knowledge", label: "Knowledge Base" },
-  { href: "/en/blog", label: "All Articles" },
+  { href: "/en/blog", label: "Guide Library" },
   { href: "/en/tools", label: "Tools" },
   { href: "/en/glossary", label: "Glossary" },
 ];
@@ -36,6 +36,9 @@ const englishSiteLinks = [
   { href: "/en/tags", label: "Topics" },
   { href: "/en/screeps-errors", label: "Error Codes" },
   { href: "/en/verification", label: "Verification Method" },
+  { href: "/en/changelog", label: "Changelog" },
+  { href: "/en/roadmap", label: "Roadmap" },
+  { href: "/en/license", label: "Content and Code Use" },
   { href: "/en/about", label: "About" },
   { href: "/en/search", label: "Site Search" },
 ];
@@ -52,7 +55,8 @@ export function SiteFooter() {
       <Container className="footer-inner">
         <div className="footer-brand">
           <strong>{english ? "Linqingan" : siteConfig.name}</strong>
-          <p>{english ? "Verified Screeps guides, debugging workflows, and practical tools." : "构建，运行，迭代。"}</p>
+          <p>{english ? "Practical Screeps guides, transparent verification, debugging workflows, and browser-based tools." : "构建，运行，迭代。"}</p>
+          {english ? <p className="footer-status"><span aria-hidden="true" /> Public project · See the changelog for current interface updates</p> : null}
           <p className="copyright">© {new Date().getFullYear()} {english ? "Linqingan" : siteConfig.name}</p>
         </div>
 
@@ -78,6 +82,7 @@ export function SiteFooter() {
           <Link href={english ? "/en/feed.xml" : "/feed.xml"}>{english ? "English RSS" : "RSS"}</Link>
           {english ? <Link href="/feed.xml">Chinese RSS</Link> : null}
           <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub ↗</a>
+          {english ? <a href={siteConfig.links.issues} rel="noreferrer" target="_blank">Report an issue ↗</a> : null}
           <a href={`mailto:${siteConfig.author.email}`}>Email</a>
         </div>
       </Container>
@@ -95,7 +100,9 @@ export function SiteFooter() {
         }
         .footer-brand { display: grid; align-content: start; gap: 7px; }
         .footer-brand > strong { color: var(--foreground); font-size: 22px; letter-spacing: -.03em; }
-        .footer-brand p { max-width: 310px; margin: 0; line-height: 1.65; }
+        .footer-brand p { max-width: 330px; margin: 0; line-height: 1.65; }
+        .footer-brand .footer-status { display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; font-size: 12px; }
+        .footer-status > span { width: 8px; height: 8px; flex: 0 0 auto; margin-top: 6px; border-radius: 999px; background: var(--screeps-success, var(--foreground)); }
         .footer-brand .copyright { margin-top: 24px; white-space: normal; font-size: 12px; }
         .footer-column { display: grid; align-content: start; gap: 9px; }
         .footer-column > strong { margin-bottom: 5px; color: var(--foreground); font-size: 13px; }
