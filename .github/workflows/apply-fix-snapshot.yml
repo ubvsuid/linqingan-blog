@@ -1,0 +1,36 @@
+name: Apply fix snapshot
+
+on:
+  push:
+    branches:
+      - upgrade/english-site-complete
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: upgrade/english-site-complete
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run fix
+      - name: Commit generated source snapshot
+        run: |
+          if git diff --quiet; then
+            echo "No generated source changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Commit generated maintenance fixes"
+          git push origin HEAD:upgrade/english-site-complete
