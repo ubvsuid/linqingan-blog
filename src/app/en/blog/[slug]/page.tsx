@@ -2,82 +2,25 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
-import {
-  englishBeginnerArticles,
-  getEnglishBeginnerArticle,
-} from "@/lib/english-beginner-content";
-import {
-  englishFoundationArticles,
-  getEnglishFoundationArticle,
-} from "@/lib/english-foundation-content";
-import {
-  englishFoundationBatchTwoArticles,
-  getEnglishFoundationBatchTwoArticle,
-} from "@/lib/english-foundation-content-2";
-import {
-  englishSpawnBatchThreeArticles,
-  getEnglishSpawnBatchThreeArticle,
-} from "@/lib/english-spawn-content-3-published";
-import {
-  englishLifecycleBatchFourArticles,
-  getEnglishLifecycleBatchFourArticle,
-} from "@/lib/english-lifecycle-content-4-published";
-import {
-  englishMovementBatchFiveArticles,
-  getEnglishMovementBatchFiveArticle,
-} from "@/lib/english-movement-content-5";
-import {
-  englishMovementBatchSixArticles,
-  getEnglishMovementBatchSixArticle,
-} from "@/lib/english-movement-content-6-published";
-import {
-  englishVisionBatchSevenArticles,
-  getEnglishVisionBatchSevenArticle,
-} from "@/lib/english-vision-content-7";
-import {
-  englishRuntimeBatchEightArticles,
-  getEnglishRuntimeBatchEightArticle,
-} from "@/lib/english-runtime-content-8";
-import {
-  englishObservabilityBatchNineArticles,
-  getEnglishObservabilityBatchNineArticle,
-} from "@/lib/english-observability-content-9";
-import {
-  englishMarketBatchTenArticles,
-  getEnglishMarketBatchTenArticle,
-} from "@/lib/english-market-content-10";
-import {
-  englishLabFactoryBatchElevenArticles,
-  getEnglishLabFactoryBatchElevenArticle,
-} from "@/lib/english-lab-factory-content-11";
-import {
-  englishMineralStoragePowerBatchTwelveArticles,
-  getEnglishMineralStoragePowerBatchTwelveArticle,
-} from "@/lib/english-mineral-storage-power-content-12";
-import {
-  englishTowerBatchThirteenArticles,
-  getEnglishTowerBatchThirteenArticle,
-} from "@/lib/english-tower-content-13";
-import {
-  englishControllerBatchFourteenArticles,
-  getEnglishControllerBatchFourteenArticle,
-} from "@/lib/english-controller-content-14";
-import {
-  englishConstructionSafetyBatchFifteenArticles,
-  getEnglishConstructionSafetyBatchFifteenArticle,
-} from "@/lib/english-construction-safety-content-15";
-import {
-  englishConfigCodeBatchSixteenArticles,
-  getEnglishConfigCodeBatchSixteenArticle,
-} from "@/lib/english-config-code-content-16";
-import {
-  englishDefenseOperationsBatchSeventeenArticles,
-  getEnglishDefenseOperationsBatchSeventeenArticle,
-} from "@/lib/english-defense-operations-content-17";
-import {
-  englishLinkSourceBatchEighteenArticles,
-  getEnglishLinkSourceBatchEighteenArticle,
-} from "@/lib/english-link-source-content-18";
+import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { englishFoundationArticles, getEnglishFoundationArticle } from "@/lib/english-foundation-content";
+import { englishFoundationBatchTwoArticles, getEnglishFoundationBatchTwoArticle } from "@/lib/english-foundation-content-2";
+import { englishSpawnBatchThreeArticles, getEnglishSpawnBatchThreeArticle } from "@/lib/english-spawn-content-3-published";
+import { englishLifecycleBatchFourArticles, getEnglishLifecycleBatchFourArticle } from "@/lib/english-lifecycle-content-4-published";
+import { englishMovementBatchFiveArticles, getEnglishMovementBatchFiveArticle } from "@/lib/english-movement-content-5";
+import { englishMovementBatchSixArticles, getEnglishMovementBatchSixArticle } from "@/lib/english-movement-content-6-published";
+import { englishVisionBatchSevenArticles, getEnglishVisionBatchSevenArticle } from "@/lib/english-vision-content-7";
+import { englishRuntimeBatchEightArticles, getEnglishRuntimeBatchEightArticle } from "@/lib/english-runtime-content-8";
+import { englishObservabilityBatchNineArticles, getEnglishObservabilityBatchNineArticle } from "@/lib/english-observability-content-9";
+import { englishMarketBatchTenArticles, getEnglishMarketBatchTenArticle } from "@/lib/english-market-content-10";
+import { englishLabFactoryBatchElevenArticles, getEnglishLabFactoryBatchElevenArticle } from "@/lib/english-lab-factory-content-11";
+import { englishMineralStoragePowerBatchTwelveArticles, getEnglishMineralStoragePowerBatchTwelveArticle } from "@/lib/english-mineral-storage-power-content-12";
+import { englishTowerBatchThirteenArticles, getEnglishTowerBatchThirteenArticle } from "@/lib/english-tower-content-13";
+import { englishControllerBatchFourteenArticles, getEnglishControllerBatchFourteenArticle } from "@/lib/english-controller-content-14";
+import { englishConstructionSafetyBatchFifteenArticles, getEnglishConstructionSafetyBatchFifteenArticle } from "@/lib/english-construction-safety-content-15";
+import { englishConfigCodeBatchSixteenArticles, getEnglishConfigCodeBatchSixteenArticle } from "@/lib/english-config-code-content-16";
+import { englishDefenseOperationsBatchSeventeenArticles, getEnglishDefenseOperationsBatchSeventeenArticle } from "@/lib/english-defense-operations-content-17";
+import { englishLinkSourceBatchEighteenArticles, getEnglishLinkSourceBatchEighteenArticle } from "@/lib/english-link-source-content-18";
 import { getEnglishDiscoveryArticle } from "@/lib/english-discovery";
 import { siteConfig } from "@/lib/site";
 
@@ -141,12 +84,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: EnglishArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = getDynamicEnglishArticle(slug);
-
-  if (!article || staticBeginnerSlugs.has(slug)) {
-    return { title: "Article not found", robots: { index: false, follow: false } };
-  }
+  if (!article || staticBeginnerSlugs.has(slug)) return { title: "Article not found", robots: { index: false, follow: false } };
 
   const articleUrl = `${siteConfig.url}${article.path}`;
+  const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
   const discovery = getEnglishDiscoveryArticle(article.path);
   const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
 
@@ -156,11 +97,8 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
     keywords: article.keywords,
     alternates: {
       canonical: article.path,
-      languages: {
-        en: article.path,
-        "zh-CN": article.chinesePath,
-        "x-default": article.path,
-      },
+      languages: { en: article.path, "zh-CN": article.chinesePath, "x-default": article.path },
+      types: { "application/rss+xml": "/en/feed.xml" },
     },
     openGraph: {
       type: "article",
@@ -173,13 +111,13 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
       publishedTime: article.publishedAt,
       modifiedTime,
       tags: discovery?.tags ?? article.tags,
-      images: [{ url: `${siteConfig.url}/opengraph-image`, width: 1200, height: 630 }],
+      images: [{ url: socialImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${article.title} | Linqingan`,
       description: article.description,
-      images: [`${siteConfig.url}/opengraph-image`],
+      images: [socialImage],
     },
   };
 }
@@ -187,7 +125,6 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
 export default async function EnglishArticleRoute({ params }: EnglishArticlePageProps) {
   const { slug } = await params;
   const article = getDynamicEnglishArticle(slug);
-
   if (!article || staticBeginnerSlugs.has(slug)) notFound();
 
   const articleUrl = `${siteConfig.url}${article.path}`;
