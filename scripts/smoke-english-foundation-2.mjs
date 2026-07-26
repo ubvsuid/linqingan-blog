@@ -99,9 +99,34 @@ const searchBody = await searchResponse.text();
 if (searchResponse.status !== 200) {
   failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
 } else {
+  for (const expected of [
+    "Search the English section",
+    "/en/search-index.json",
+    "Loading the English search index",
+  ]) {
+    if (!searchBody.includes(expected)) {
+      failures.push(`/en/search: 缺少延迟搜索信号 “${expected}”`);
+    }
+  }
+  if (searchBody.includes(articles[0].headline)) {
+    failures.push("/en/search: 首屏仍嵌入完整文章索引，延迟加载未生效");
+  }
+}
+
+const searchIndexResponse = await fetch(`${baseUrl}/en/search-index.json`, {
+  redirect: "manual",
+});
+const searchIndexBody = await searchIndexResponse.text();
+if (searchIndexResponse.status !== 200) {
+  failures.push(`/en/search-index.json: 预期 200，实际 ${searchIndexResponse.status}`);
+} else {
+  const contentType = searchIndexResponse.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    failures.push(`/en/search-index.json: Content-Type 不是 application/json`);
+  }
   for (const article of articles) {
-    if (!searchBody.includes(article.headline)) {
-      failures.push(`/en/search: 缺少新文章 “${article.headline}”`);
+    if (!searchIndexBody.includes(article.headline)) {
+      failures.push(`/en/search-index.json: 缺少新文章 “${article.headline}”`);
     }
   }
 }
@@ -128,5 +153,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、搜索与 Sitemap。`,
+  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、延迟搜索索引与 Sitemap。`,
 );
