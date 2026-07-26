@@ -15,9 +15,10 @@ export const metadata = createEnglishPageMetadata({
 const releases = [
   {
     date: "July 26, 2026",
+    dateTime: "2026-07-26",
     title: "English interface and internationalization refinement",
     items: [
-      "Added English-specific document language handling, response headers, metadata ownership, structured data, error states, and loading states.",
+      "Added English-specific document language handling, response headers, metadata ownership, structured data, and English error states.",
       "Moved the task-first navigation above the system diagram and clarified publication versus live-room verification.",
       "Simplified the desktop navigation and delayed the mobile menu breakpoint.",
       "Added Screeps status accents, sample labels for tool previews, useful knowledge metadata, popular searches, and a keyboard search shortcut.",
@@ -26,6 +27,7 @@ const releases = [
   },
   {
     date: "July 26, 2026",
+    dateTime: "2026-07-26",
     title: "English discovery and platform upgrade",
     items: [
       "Added a searchable and filterable guide library, topic archives, English RSS, related guides, and article-specific share images.",
@@ -43,8 +45,8 @@ export default function EnglishChangelogPage() {
         <header className={styles.header}><p className="eyebrow">CHANGELOG</p><h1>Meaningful English site changes</h1><p>This page records interface, navigation, search, tool, accessibility, and technical SEO changes. Individual article revisions are tracked separately.</p></header>
         <div className="english-changelog-list">
           {releases.map((release) => (
-            <article key={`${release.date}-${release.title}`}>
-              <time>{release.date}</time>
+            <article key={`${release.dateTime}-${release.title}`}>
+              <time dateTime={release.dateTime}>{release.date}</time>
               <div><h2>{release.title}</h2><ul>{release.items.map((item) => <li key={item}>{item}</li>)}</ul></div>
             </article>
           ))}
