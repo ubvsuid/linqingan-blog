@@ -13,8 +13,8 @@ const hrefs = [];
 const chinesePaths = [];
 for (const fileName of registryFiles) {
   const source = fs.readFileSync(path.join(libDirectory, fileName), "utf8");
-  for (const match of source.matchAll(/\bhref\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g)) hrefs.push(match[1]);
-  for (const match of source.matchAll(/\bchinesePath\s*:\s*["'](\/blog\/[a-z0-9-]+)["']/g)) chinesePaths.push(match[1]);
+  for (const match of source.matchAll(/["']?href["']?\s*:\s*["'](\/en\/blog\/[a-z0-9-]+)["']/g)) hrefs.push(match[1]);
+  for (const match of source.matchAll(/["']?chinesePath["']?\s*:\s*["'](\/blog\/[a-z0-9-]+)["']/g)) chinesePaths.push(match[1]);
 }
 
 function duplicates(values) {
