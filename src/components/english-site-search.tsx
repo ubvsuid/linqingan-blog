@@ -139,14 +139,10 @@ export function EnglishSiteSearch({ initialQuery = "" }: { initialQuery?: string
   }, [loadSearchIndex]);
 
   useEffect(() => {
-    if (normalizedQuery || type) {
-      void loadSearchIndex();
-      return;
-    }
-
+    const delay = normalizedQuery || type ? 0 : 1200;
     const timer = window.setTimeout(() => {
       void loadSearchIndex();
-    }, 1200);
+    }, delay);
     return () => window.clearTimeout(timer);
   }, [loadSearchIndex, normalizedQuery, type]);
 
