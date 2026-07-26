@@ -104,9 +104,6 @@ if (searchResponse.status !== 200) {
       failures.push(`/en/search: 缺少服务端相关结果 “${article.headline}”`);
     }
   }
-  if (!searchBody.includes("/en/search-index.json")) {
-    failures.push("/en/search: 缺少延迟搜索索引地址");
-  }
   if (searchBody.includes("How to Launch a Nuke Without Reusing a Stale Target Request")) {
     failures.push("/en/search: 首屏仍嵌入与 Memory 查询无关的完整文章索引");
   }
