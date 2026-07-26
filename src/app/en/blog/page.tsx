@@ -43,10 +43,17 @@ export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageP
 
         <header className={styles.header}>
           <p className="eyebrow">ARTICLE LIBRARY</p>
-          <h1>Find the Screeps guide you need</h1>
+          <h1>Practical Screeps articles for the problem you need to solve</h1>
           <p>
             Browse {englishDiscoveryArticles.length} published guides by system, difficulty,
-            content type, or topic. Search by an API method, object, return code, or symptom.
+            content type, or topic. Start with{" "}
+            <Link href="/en/blog/screeps-introduction">
+              What Is Screeps and What Do You Actually Do in It?
+            </Link>{" "}
+            or follow the beginner sequence through{" "}
+            <Link href="/en/blog/screeps-first-room-code">
+              How to Combine Your First Screeps Room Loop
+            </Link>.
           </p>
         </header>
 
