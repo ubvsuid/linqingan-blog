@@ -1,5 +1,4 @@
-import { publishedEnglishArticles } from "@/lib/english-articles-complete";
-import { englishTags } from "@/lib/english-discovery";
+import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
 
 export interface EnglishSearchDocument {
   id: string;
@@ -9,6 +8,17 @@ export interface EnglishSearchDocument {
   type: "Page" | "Reference" | "Tool" | "Article";
   keywords: string[];
 }
+
+const knowledgeModuleSearchTerms: Record<number, string[]> = {
+  1: ["memory", "code", "module", "state", "configuration", "javascript", "cache"],
+  2: ["spawn", "creep", "body", "lifecycle", "renew", "recycle", "replacement"],
+  3: ["energy", "economy", "source", "container", "storage", "link", "hauling", "delivery"],
+  4: ["move", "movement", "path", "pathfinding", "route", "vision", "roomposition", "observer"],
+  5: ["controller", "upgrade", "reserve", "claim", "expansion", "downgrade", "safe mode"],
+  6: ["construction", "build", "repair", "defense", "defence", "tower", "wall", "rampart"],
+  7: ["market", "resource", "terminal", "lab", "boost", "factory", "mineral", "power"],
+  8: ["operation", "debug", "debugging", "diagnostic", "cpu", "bucket", "event", "notify", "visual"],
+};
 
 const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-home", title: "Screeps Tutorials, Debugging Guides and Tools", description: "The English home for practical Screeps learning, debugging, references, and tools.", href: "/en", type: "Page", keywords: ["screeps", "tutorial", "debugging", "javascript", "automation"] },
@@ -36,13 +46,20 @@ const topicDocuments: EnglishSearchDocument[] = englishTags.map((tag) => ({
   keywords: [tag.label, ...tag.terms],
 }));
 
-const articleDocuments: EnglishSearchDocument[] = publishedEnglishArticles.map((article) => ({
+const articleDocuments: EnglishSearchDocument[] = englishDiscoveryArticles.map((article) => ({
   id: article.href.replace(/^\//, "").replaceAll("/", "-"),
   title: article.title,
   description: article.description,
   href: article.href,
   type: "Article",
-  keywords: [article.primaryKeyword, article.searchIntent, ...article.keywords],
+  keywords: [
+    article.primaryKeyword,
+    article.searchIntent,
+    article.moduleTitle,
+    ...knowledgeModuleSearchTerms[article.moduleNumber],
+    ...article.tags,
+    ...article.keywords,
+  ],
 }));
 
 export const englishSearchDocuments: EnglishSearchDocument[] = [
