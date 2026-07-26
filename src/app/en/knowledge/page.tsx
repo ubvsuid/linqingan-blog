@@ -2,7 +2,10 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
-import { englishKnowledgeModules } from "@/lib/i18n";
+import {
+  englishKnowledgeArticleCount,
+  englishKnowledgeSections,
+} from "@/lib/english-knowledge";
 
 import styles from "../english.module.css";
 
@@ -19,24 +22,59 @@ export default function EnglishKnowledgePage() {
     <main className={styles.page} lang="en">
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Knowledge Base</span>
+          <Link href="/en">Home</Link>
+          <span aria-hidden="true">/</span>
+          <span>Knowledge Base</span>
         </nav>
         <header className={styles.header}>
           <p className="eyebrow">SCREEPS KNOWLEDGE BASE</p>
           <h1>Browse Screeps by system</h1>
           <p>
-            The English knowledge base is organized around the systems you operate in a live colony. Article links will appear only after each English guide is rewritten, checked, and published.
+            Browse {englishKnowledgeArticleCount} published English guides through eight
+            practical systems. Each section is generated from the complete article registry,
+            so newly published guides appear here automatically.
           </p>
         </header>
 
-        <ol className={styles.list}>
-          {englishKnowledgeModules.map((module) => (
-            <li key={module.number}>
-              <span>{String(module.number).padStart(2, "0")}</span>
-              <div><strong>{module.title}</strong><p>{module.description}</p></div>
-            </li>
+        <div className={styles.knowledgeModules}>
+          {englishKnowledgeSections.map((module) => (
+            <section
+              className={styles.knowledgeModule}
+              id={`module-${module.number}`}
+              key={module.number}
+              aria-labelledby={`module-${module.number}-title`}
+            >
+              <div className={styles.knowledgeModuleHeader}>
+                <span>{String(module.number).padStart(2, "0")}</span>
+                <div>
+                  <h2 id={`module-${module.number}-title`}>{module.title}</h2>
+                  <p>{module.description}</p>
+                  <small>
+                    {module.articles.length} published {module.articles.length === 1 ? "guide" : "guides"}
+                  </small>
+                </div>
+              </div>
+
+              {module.articles.length > 0 ? (
+                <ol className={styles.knowledgeArticleList}>
+                  {module.articles.map((article) => (
+                    <li key={article.href}>
+                      <Link href={article.href}>
+                        <span>{article.category}</span>
+                        <strong>{article.title}</strong>
+                        <small>
+                          {article.readingTime} · Score {article.finalScore}
+                        </small>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className={styles.knowledgeEmpty}>No published guide is assigned to this module yet.</p>
+              )}
+            </section>
           ))}
-        </ol>
+        </div>
 
         <section className={styles.grid} aria-label="Available English resources" style={{ marginTop: 52 }}>
           <article className={styles.card}>
