@@ -48,7 +48,11 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      { source: "/en", headers: [{ key: "Content-Language", value: "en" }] },
+      { source: "/en/:path*", headers: [{ key: "Content-Language", value: "en" }] },
+    ];
   },
 };
 
