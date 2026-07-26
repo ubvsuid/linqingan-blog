@@ -17,7 +17,7 @@ import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 import { getTagRecords } from "@/lib/tags";
 
-type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
+type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number>["changeFrequency"]>;
 
 const staticPageDates = {
   about: "2026-07-22",
@@ -27,6 +27,7 @@ const staticPageDates = {
   creepBodyCalculator: "2026-07-23",
   roomDiagnostics: "2026-07-23",
   englishFoundation: "2026-07-26",
+  englishInterface: "2026-07-26",
 };
 
 function createArchivePages(
@@ -93,23 +94,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const englishUpdatedAt = new Date(staticPageDates.englishFoundation);
+  const englishInterfaceUpdatedAt = new Date(staticPageDates.englishInterface);
   const englishArticleUpdatedAt = latestDate(
     englishDiscoveryArticles.map((article) => article.updatedAt),
     staticPageDates.englishFoundation,
   );
   const englishStaticPages: MetadataRoute.Sitemap = [
-    { url: `${siteConfig.url}/en`, lastModified: englishUpdatedAt, changeFrequency: "weekly", priority: 0.92 },
+    { url: `${siteConfig.url}/en`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.92 },
     { url: `${siteConfig.url}/en/beginner`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.86 },
     { url: `${siteConfig.url}/en/blog`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.88 },
     { url: `${siteConfig.url}/en/knowledge`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.84 },
     { url: `${siteConfig.url}/en/tags`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${siteConfig.url}/en/tools`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${siteConfig.url}/en/tools`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteConfig.url}/en/tools/creep-body-calculator`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.84 },
     { url: `${siteConfig.url}/en/tools/room-diagnostics`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
     { url: `${siteConfig.url}/en/screeps-errors`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.76 },
     { url: `${siteConfig.url}/en/glossary`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.74 },
     { url: `${siteConfig.url}/en/verification`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.68 },
-    { url: `${siteConfig.url}/en/about`, lastModified: englishUpdatedAt, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteConfig.url}/en/about`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteConfig.url}/en/changelog`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.62 },
+    { url: `${siteConfig.url}/en/roadmap`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.58 },
+    { url: `${siteConfig.url}/en/license`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "yearly", priority: 0.36 },
     ...englishDiscoveryArticles.map((article) => ({
       url: `${siteConfig.url}${article.href}`,
       lastModified: new Date(article.updatedAt),
