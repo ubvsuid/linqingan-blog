@@ -33,7 +33,7 @@ export default function EnglishKnowledgePage() {
             <a href={`#module-${module.number}`} key={module.number}>
               <span>{String(module.number).padStart(2, "0")}</span>
               <strong>{module.title}</strong>
-              <small>{module.articles.length} guides</small>
+              <small>{module.articles.length} {module.articles.length === 1 ? "guide" : "guides"}</small>
               {index < englishKnowledgeSections.length - 1 ? <i aria-hidden="true">→</i> : null}
             </a>
           ))}
