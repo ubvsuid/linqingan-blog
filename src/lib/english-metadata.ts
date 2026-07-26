@@ -27,6 +27,10 @@ export function createEnglishPageMetadata({
   return {
     title: { absolute: absoluteTitle },
     description,
+    applicationName: "Linqingan Screeps Guides & Tools",
+    authors: [{ name: "Linqingan", url: `${siteConfig.url}/en/about` }],
+    creator: "Linqingan",
+    publisher: "Linqingan",
     alternates: {
       canonical: path,
       languages: {
