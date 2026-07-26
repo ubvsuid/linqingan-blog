@@ -129,8 +129,8 @@ export default function RootLayout({
       </head>
       <body>
         <a className="skip-link" href="#main-content">
-          <span className="skip-label skip-label-zh" lang="zh-CN">跳到正文</span>
-          <span className="skip-label skip-label-en" lang="en">Skip to content</span>
+          <span className="skip-link-zh" lang="zh-CN">跳到正文</span>
+          <span className="skip-link-en" lang="en">Skip to content</span>
         </a>
         <SiteHeader />
         <div id="main-content" className="site-content">
