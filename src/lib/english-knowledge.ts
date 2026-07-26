@@ -124,13 +124,23 @@ function articleSearchText(article: EnglishArticleRecord): string {
     .toLowerCase();
 }
 
+function matchesTerm(text: string, term: string): boolean {
+  const escaped = term
+    .toLowerCase()
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\s+/g, "\\s+");
+  const expression = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`);
+
+  return expression.test(text);
+}
+
 export function getEnglishKnowledgeModuleNumber(
   article: EnglishArticleRecord,
 ): number {
   const text = articleSearchText(article);
 
   for (const rule of categoryRules) {
-    if (rule.terms.some((term) => text.includes(term))) {
+    if (rule.terms.some((term) => matchesTerm(text, term))) {
       return rule.moduleNumber;
     }
   }
