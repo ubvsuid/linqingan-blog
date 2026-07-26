@@ -34,6 +34,9 @@ export function createEnglishPageMetadata({
         "zh-CN": chinesePath,
         "x-default": "/en",
       },
+      types: {
+        "application/rss+xml": "/en/feed.xml",
+      },
     },
     robots: noindex ? { index: false, follow: true } : undefined,
     openGraph: {
