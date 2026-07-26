@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { siteConfig } from "@/lib/site";
+
 export default function EnglishErrorPage({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <main className="not-found" lang="en">
@@ -12,7 +14,7 @@ export default function EnglishErrorPage({ reset }: { error: Error & { digest?: 
         <div className="button-row">
           <button type="button" className="button button-primary" onClick={reset}>Try again</button>
           <Link href="/en/search" className="button button-secondary">Search the site</Link>
-          <Link href="/en/about" className="button button-secondary">Report a problem</Link>
+          <a href={siteConfig.links.issues} className="button button-secondary" rel="noreferrer" target="_blank">Report a problem ↗</a>
         </div>
       </div>
     </main>
