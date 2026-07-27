@@ -1,0 +1,26 @@
+name: Export current source for audit fixes
+
+on:
+  push:
+    branches:
+      - fix/audit-priority-1-4
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Package source tree
+        run: |
+          tar --exclude=.git --exclude=node_modules --exclude=.next -czf /tmp/linqingan-source.tar.gz .
+      - name: Upload source tree
+        uses: actions/upload-artifact@v4
+        with:
+          name: linqingan-source-audit
+          path: /tmp/linqingan-source.tar.gz
+          retention-days: 1
