@@ -78,25 +78,27 @@ export function EnglishArticlePage({
     .slice(0, 3)
     .map((item) => `${item.term}: ${item.value}`)
     .join(" · ");
-  const toolRecommendation = discovery?.tagSlugs.some(
-    (tag) => tag === "creeps" || tag === "energy",
-  )
-    ? {
-        href: "/en/tools/creep-body-calculator",
-        title: "Creep Body Calculator",
-        description:
-          "Check body cost, spawn time, capacity, hits, and loaded movement before changing a worker design.",
-      }
+  const toolRecommendation = discovery?.suppressToolRecommendation
+    ? null
     : discovery?.tagSlugs.some(
-          (tag) => tag === "cpu" || tag === "debugging" || tag === "controllers",
+          (tag) => tag === "creeps" || tag === "energy",
         )
       ? {
-          href: "/en/tools/room-diagnostics",
-          title: "Room Snapshot Diagnostic",
+          href: "/en/tools/creep-body-calculator",
+          title: "Creep Body Calculator",
           description:
-            "Review room, Controller, workforce, Energy, CPU, and bucket risks from a read-only snapshot.",
+            "Check body cost, spawn time, capacity, hits, and loaded movement before changing a worker design.",
         }
-      : null;
+      : discovery?.tagSlugs.some(
+            (tag) => tag === "cpu" || tag === "debugging" || tag === "controllers",
+          )
+        ? {
+            href: "/en/tools/room-diagnostics",
+            title: "Room Snapshot Diagnostic",
+            description:
+              "Review room, Controller, workforce, Energy, CPU, and bucket risks from a read-only snapshot.",
+          }
+        : null;
 
   return (
     <main className="article-shell" lang="en">
@@ -131,9 +133,7 @@ export function EnglishArticlePage({
                 className="english-discovery-strip"
                 aria-label="Article classification"
               >
-                <Link
-                  href={`/en/blog?module=${encodeURIComponent(discovery.moduleTitle)}`}
-                >
+                <Link href={discovery.moduleHref}>
                   {discovery.moduleTitle}
                 </Link>
                 <Link href={`/en/blog?difficulty=${discovery.difficulty}`}>
@@ -229,7 +229,7 @@ export function EnglishArticlePage({
                 Open the Chinese source →
               </Link>
               {discovery ? (
-                <Link href={`/en/knowledge#module-${discovery.moduleNumber}`}>
+                <Link href={discovery.moduleHref}>
                   Continue in {discovery.moduleTitle} →
                 </Link>
               ) : null}
