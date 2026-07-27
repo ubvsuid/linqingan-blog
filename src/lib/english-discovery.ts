@@ -44,6 +44,9 @@ const tagRules: TagRule[] = [
 ];
 
 const gettingStartedIntroductionHref = "/en/blog/screeps-introduction";
+const articleTagSlugOverrides: Record<string, string[]> = {
+  [gettingStartedIntroductionHref]: ["creeps", "energy", "javascript"],
+};
 const curatedRelatedArticleHrefs: Record<string, string[]> = {
   [gettingStartedIntroductionHref]: [
     "/en/blog/screeps-first-room",
@@ -92,6 +95,13 @@ function getContentType(article: EnglishArticleRecord): EnglishContentType {
 }
 
 function getTags(article: EnglishArticleRecord): TagRule[] {
+  const overrideSlugs = articleTagSlugOverrides[article.href];
+  if (overrideSlugs) {
+    return overrideSlugs
+      .map((slug) => tagRules.find((rule) => rule.slug === slug))
+      .filter((rule): rule is TagRule => Boolean(rule));
+  }
+
   const text = articleText(article);
   const matches = tagRules.filter((rule) => rule.terms.some((term) => matchesTerm(text, term)));
   if (matches.length > 0) return matches.slice(0, 5);
