@@ -3,6 +3,7 @@ import { gunzipSync } from "node:zlib";
 
 import { englishBeginnerArticleOverrides } from "./english-beginner-overrides";
 import { englishBeginnerBodyPartsArticleOverrides } from "./english-beginner-body-parts-override";
+import { englishBeginnerCreepRolesArticleOverrides } from "./english-beginner-creep-roles-override";
 import { englishBeginnerSpawnCreepArticleOverrides } from "./english-beginner-spawn-creep-override";
 import { englishBeginnerTickArticleOverrides } from "./english-beginner-tick-override";
 import part1 from "@/lib/english-beginner-data/part-1";
@@ -118,6 +119,7 @@ const articleOverrides = {
   ...englishBeginnerTickArticleOverrides,
   ...englishBeginnerBodyPartsArticleOverrides,
   ...englishBeginnerSpawnCreepArticleOverrides,
+  ...englishBeginnerCreepRolesArticleOverrides,
 } as unknown as Record<string, Partial<EnglishBeginnerArticle>>;
 
 export const englishBeginnerArticles: EnglishBeginnerArticle[] =
