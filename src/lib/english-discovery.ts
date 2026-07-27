@@ -31,6 +31,8 @@ const tagRules: TagRule[] = [
   { label: "Spawn", slug: "spawn", terms: ["spawn", "spawncreep"] },
   { label: "Creeps", slug: "creeps", terms: ["creep", "body part", "ticks to live", "renew", "recycle"] },
   { label: "Energy", slug: "energy", terms: ["energy", "harvest", "source", "delivery", "transfer"] },
+  { label: "Rooms", slug: "rooms", terms: ["room", "game.rooms", "room view", "visibility"] },
+  { label: "Console", slug: "console", terms: ["console", "console.log"] },
   { label: "Movement", slug: "movement", terms: ["movement", "moveto", "move", "fatigue", "roomposition"] },
   { label: "Pathfinding", slug: "pathfinding", terms: ["pathfinder", "pathfinding", "findroute", "route"] },
   { label: "Controllers", slug: "controllers", terms: ["controller", "upgrade", "reserve", "claim", "downgrade"] },
@@ -43,16 +45,26 @@ const tagRules: TagRule[] = [
   { label: "JavaScript", slug: "javascript", terms: ["javascript", "module", "constant", "configuration", "global cache"] },
 ];
 
-const gettingStartedIntroductionHref = "/en/blog/screeps-introduction";
+const gettingStartedArticleHrefs = new Set([
+  "/en/blog/screeps-introduction",
+  "/en/blog/screeps-first-room",
+]);
 const articleTagSlugOverrides: Record<string, string[]> = {
-  [gettingStartedIntroductionHref]: ["creeps", "energy", "javascript"],
+  "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
+  "/en/blog/screeps-first-room": ["rooms", "console", "javascript"],
 };
 const curatedRelatedArticleHrefs: Record<string, string[]> = {
-  [gettingStartedIntroductionHref]: [
+  "/en/blog/screeps-introduction": [
     "/en/blog/screeps-first-room",
     "/en/blog/screeps-tick-game-loop",
     "/en/blog/screeps-creep-harvest-energy",
     "/en/blog/screeps-creep-body-parts",
+  ],
+  "/en/blog/screeps-first-room": [
+    "/en/blog/screeps-introduction",
+    "/en/blog/screeps-tick-game-loop",
+    "/en/blog/screeps-room-visibility",
+    "/en/blog/screeps-creep-harvest-energy",
   ],
 };
 
@@ -111,9 +123,9 @@ function getTags(article: EnglishArticleRecord): TagRule[] {
 export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEnglishArticles.map((article) => {
   const moduleNumber = getEnglishKnowledgeModuleNumber(article);
   const knowledgeModuleTitle = englishKnowledgeModules.find((module) => module.number === moduleNumber)?.title ?? "Operations and Debugging";
-  const isGettingStartedIntroduction = article.href === gettingStartedIntroductionHref;
-  const moduleTitle = isGettingStartedIntroduction ? "Getting Started" : knowledgeModuleTitle;
-  const moduleHref = isGettingStartedIntroduction
+  const isGettingStartedArticle = gettingStartedArticleHrefs.has(article.href);
+  const moduleTitle = isGettingStartedArticle ? "Getting Started" : knowledgeModuleTitle;
+  const moduleHref = isGettingStartedArticle
     ? "/en/beginner"
     : `/en/blog?module=${encodeURIComponent(moduleTitle)}`;
   const tags = getTags(article);
@@ -129,7 +141,7 @@ export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEngl
     tags: tags.map((tag) => tag.label),
     tagSlugs: tags.map((tag) => tag.slug),
     updatedAt,
-    suppressToolRecommendation: isGettingStartedIntroduction,
+    suppressToolRecommendation: isGettingStartedArticle,
   };
 });
 
