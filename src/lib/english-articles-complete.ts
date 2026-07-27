@@ -23,7 +23,11 @@ import { englishLinkSourceBatchEighteenRegistry } from "./english-link-source-re
 
 export type { EnglishArticleRecord };
 
-const articleRecordOverrides: Record<string, Partial<EnglishArticleRecord>> = {
+type EnglishArticleRecordOverride = Partial<EnglishArticleRecord> & {
+  updatedAt?: string;
+};
+
+const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
   "/en/blog/screeps-introduction": {
     category: "GETTING STARTED · BEGINNER LESSON 1 OF 12",
     title: "What Is Screeps? A Programming Strategy Game",
@@ -34,6 +38,7 @@ const articleRecordOverrides: Record<string, Partial<EnglishArticleRecord>> = {
     searchIntent:
       "Beginner concept explanation of what Screeps is and how its persistent JavaScript-controlled world works",
     finalScore: 98,
+    updatedAt: "2026-07-26",
     keywords: [
       "what is Screeps",
       "Screeps programming game",
