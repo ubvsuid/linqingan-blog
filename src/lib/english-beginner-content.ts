@@ -6,6 +6,7 @@ import { englishBeginnerBodyPartsArticleOverrides } from "./english-beginner-bod
 import { englishBeginnerCreepRolesArticleOverrides } from "./english-beginner-creep-roles-override";
 import { englishBeginnerSpawnCreepArticleOverrides } from "./english-beginner-spawn-creep-override";
 import { englishBeginnerTickArticleOverrides } from "./english-beginner-tick-override";
+import { englishBeginnerUpgradeControllerArticleOverrides } from "./english-beginner-upgrade-controller-override";
 import part1 from "@/lib/english-beginner-data/part-1";
 import part2 from "@/lib/english-beginner-data/part-2";
 import part3 from "@/lib/english-beginner-data/part-3";
@@ -120,6 +121,7 @@ const articleOverrides = {
   ...englishBeginnerBodyPartsArticleOverrides,
   ...englishBeginnerSpawnCreepArticleOverrides,
   ...englishBeginnerCreepRolesArticleOverrides,
+  ...englishBeginnerUpgradeControllerArticleOverrides,
 } as unknown as Record<string, Partial<EnglishBeginnerArticle>>;
 
 export const englishBeginnerArticles: EnglishBeginnerArticle[] =
