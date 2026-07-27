@@ -169,6 +169,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Screeps first Creep",
     ],
   },
+  "/en/blog/screeps-creep-roles": {
+    category: "GETTING STARTED · BEGINNER LESSON 8 OF 12",
+    title: "Screeps Creep Roles: Harvester, Upgrader, and Builder",
+    description:
+      "Learn why Harvester, Upgrader, and Builder are player-defined responsibilities, how roles differ from body parts, and why a Creep name does not create behavior.",
+    readingTime: "8 min read",
+    primaryKeyword: "Screeps Creep roles",
+    searchIntent:
+      "Beginner concept lesson explaining player-defined Creep responsibilities, fixed-name teaching roles, and the difference between body ability, role, and current action",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps Creep roles",
+      "Screeps Harvester Upgrader Builder",
+      "Screeps role vs body parts",
+      "player-defined Creep roles",
+      "Game.creeps names",
+      "Screeps beginner roles",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
