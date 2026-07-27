@@ -112,7 +112,7 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
     "/en/blog/screeps-spawn-creep",
     "/en/blog/screeps-upgrade-controller",
     "/en/blog/screeps-memory-basics",
-    "/en/blog/screeps-modules-require",
+    "/en/blog/screeps-require-modules",
   ],
 };
 
