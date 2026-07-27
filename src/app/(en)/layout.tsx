@@ -13,7 +13,7 @@ const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.tri
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: { default: "Linqingan Screeps Guides & Tools" },
+  title: "Linqingan Screeps Guides & Tools",
   description: "Practical English Screeps guides, debugging workflows, references, and browser-based tools.",
   authors: [{ name: "Linqingan", url: `${siteConfig.url}/en/about` }],
   creator: "Linqingan",
