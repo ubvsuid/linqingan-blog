@@ -7,7 +7,7 @@ const root = process.cwd();
 const contentPath = path.join(root, "src", "lib", "english-spawn-content-3.ts");
 const publishedPath = path.join(root, "src", "lib", "english-spawn-content-3-published.ts");
 const registryPath = path.join(root, "src", "lib", "english-spawn-registry-3.ts");
-const routePath = path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx");
+const routePath = path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx");
 
 const rawSource = fs.readFileSync(contentPath, "utf8");
 const publishedSource = fs.readFileSync(publishedPath, "utf8");

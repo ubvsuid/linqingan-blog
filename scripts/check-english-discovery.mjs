@@ -36,7 +36,7 @@ if (records.length === 0) failures.push("No paired English article records were 
 for (const record of records) {
   const chineseSlug = record.chinesePath.slice("/blog/".length);
   const chinesePost = path.join(postsDirectory, `${chineseSlug}.md`);
-  const chineseStaticPage = path.join(root, "src", "app", "blog", chineseSlug, "page.tsx");
+  const chineseStaticPage = path.join(root, "src", "app", "(zh)", "blog", chineseSlug, "page.tsx");
   if (!fs.existsSync(chinesePost) && !fs.existsSync(chineseStaticPage)) {
     failures.push(
       `English pair ${record.href} points to missing Chinese source ${record.chinesePath} in ${record.fileName}`,
@@ -44,8 +44,8 @@ for (const record of records) {
   }
 
   const englishSlug = record.href.slice("/en/blog/".length);
-  const englishStaticPage = path.join(root, "src", "app", "en", "blog", englishSlug, "page.tsx");
-  const englishDynamicPage = path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx");
+  const englishStaticPage = path.join(root, "src", "app", "(en)", "en", "blog", englishSlug, "page.tsx");
+  const englishDynamicPage = path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx");
   if (!fs.existsSync(englishStaticPage) && !fs.existsSync(englishDynamicPage)) {
     failures.push(`English pair lacks a route for ${record.href} in ${record.fileName}`);
   }
@@ -54,11 +54,11 @@ for (const record of records) {
 const requiredFiles = [
   "src/lib/english-discovery.ts",
   "src/components/english-article-browser.tsx",
-  "src/app/en/tags/page.tsx",
-  "src/app/en/tags/[tag]/page.tsx",
-  "src/app/en/feed.xml/route.ts",
-  "src/app/en/blog/[slug]/opengraph-image.tsx",
-  "src/app/en/blog/screeps-creep-body-parts/opengraph-image.tsx",
+  "src/app/(en)/en/tags/page.tsx",
+  "src/app/(en)/en/tags/[tag]/page.tsx",
+  "src/app/(en)/en/feed.xml/route.ts",
+  "src/app/(en)/en/blog/[slug]/opengraph-image.tsx",
+  "src/app/(en)/en/blog/screeps-creep-body-parts/opengraph-image.tsx",
 ];
 for (const relativePath of requiredFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) failures.push(`Missing English discovery file: ${relativePath}`);
@@ -67,10 +67,10 @@ for (const relativePath of requiredFiles) {
 const assertions = [
   ["src/components/site-footer.tsx", "/en/feed.xml", "English footer RSS link"],
   ["src/components/site-footer.tsx", "/en/tags", "English footer topic link"],
-  ["src/app/sitemap.ts", "englishTags", "English topic Sitemap entries"],
-  ["src/app/blog/[slug]/layout.tsx", "hrefLang=\"en\"", "reciprocal English hreflang"],
-  ["src/app/blog/[slug]/layout.tsx", "hrefLang=\"zh-CN\"", "reciprocal Chinese hreflang"],
-  ["src/app/en/blog/[slug]/page.tsx", "/opengraph-image", "article-specific Open Graph image"],
+  ["src/app/(zh)/sitemap.ts", "englishTags", "English topic Sitemap entries"],
+  ["src/app/(zh)/blog/[slug]/layout.tsx", "hrefLang=\"en\"", "reciprocal English hreflang"],
+  ["src/app/(zh)/blog/[slug]/layout.tsx", "hrefLang=\"zh-CN\"", "reciprocal Chinese hreflang"],
+  ["src/app/(en)/en/blog/[slug]/page.tsx", "/opengraph-image", "article-specific Open Graph image"],
   ["src/components/english-article-page.tsx", "getRelatedEnglishArticles", "related English guides"],
   ["src/components/english-article-page.tsx", "/en/tags/", "clickable English topic links"],
 ];
@@ -84,6 +84,36 @@ for (const [relativePath, expected, label] of assertions) {
   const source = fs.readFileSync(absolutePath, "utf8");
   if (!source.includes(expected)) failures.push(`Missing ${label} in ${relativePath}`);
 }
+
+
+const discoverySource = fs.readFileSync(path.join(root, "src/lib/english-discovery.ts"), "utf8");
+const overrideBlock = discoverySource.match(/const articleTagSlugOverrides:[\s\S]*?= \{([\s\S]*?)\n\};/);
+if (!overrideBlock) {
+  failures.push("English article topic override map is missing.");
+} else {
+  const topicCounts = new Map(
+    [...overrideBlock[1].matchAll(/"(\/en\/blog\/[^"]+)": \[([^\]]*)\]/g)].map((match) => [
+      match[1],
+      [...match[2].matchAll(/"([^"]+)"/g)].map((topic) => topic[1]),
+    ]),
+  );
+  for (const href of hrefs) {
+    const topics = topicCounts.get(href);
+    if (!topics) {
+      failures.push(`English article lacks an explicit topic mapping: ${href}`);
+      continue;
+    }
+    if (topics.length < 2 || topics.length > 4) {
+      failures.push(`English article must have 2-4 curated topics: ${href} has ${topics.length}`);
+    }
+    if (new Set(topics).size !== topics.length) {
+      failures.push(`English article has duplicate curated topics: ${href}`);
+    }
+  }
+}
+if (discoverySource.includes("tagRules.filter((rule) => rule.terms.some")) failures.push("English topics still depend on broad keyword matching.");
+const browserSource = fs.readFileSync(path.join(root, "src/components/english-article-browser.tsx"), "utf8");
+if (browserSource.includes("Score {article.finalScore}")) failures.push("English article browser still exposes internal scores.");
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`ERROR: ${failure}`);

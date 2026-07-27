@@ -80,7 +80,6 @@ export function EnglishArticleBrowser({
     });
 
     return result.sort((left, right) => {
-      if (sort === "recommended") return right.finalScore - left.finalScore || right.publishedAt.localeCompare(left.publishedAt);
       if (sort === "shortest") return Number.parseInt(left.readingTime, 10) - Number.parseInt(right.readingTime, 10);
       return right.updatedAt.localeCompare(left.updatedAt);
     });
@@ -125,7 +124,7 @@ export function EnglishArticleBrowser({
           <label><span>Difficulty</span><select value={difficulty} onChange={(event) => changeFilter("difficulty", event.target.value, setDifficulty)}><option value="">All levels</option>{(["Beginner", "Intermediate", "Advanced"] satisfies EnglishDifficulty[]).map((value) => <option key={value}>{value}</option>)}</select></label>
           <label><span>Type</span><select value={contentType} onChange={(event) => changeFilter("type", event.target.value, setContentType)}><option value="">All types</option>{(["Lesson", "Guide", "Debugging", "Safety", "Reference"] satisfies EnglishContentType[]).map((value) => <option key={value}>{value}</option>)}</select></label>
           <label><span>Topic</span><select value={tag} onChange={(event) => changeFilter("tag", event.target.value, setTag)}><option value="">All topics</option>{tags.map((value) => <option key={value}>{value}</option>)}</select></label>
-          <label><span>Sort</span><select value={sort} onChange={(event) => { setSort(event.target.value); setPage(1); }}><option value="newest">Newest</option><option value="recommended">Recommended</option><option value="shortest">Shortest read</option></select></label>
+          <label><span>Sort</span><select value={sort} onChange={(event) => { setSort(event.target.value); setPage(1); }}><option value="newest">Newest</option><option value="shortest">Shortest read</option></select></label>
         </div>
 
         <div className="article-browser-summary" aria-live="polite">
@@ -142,7 +141,7 @@ export function EnglishArticleBrowser({
               <h2><Link href={article.href}>{article.title}</Link></h2>
               <p>{article.description}</p>
               <div className="article-browser-footer">
-                <small>{article.readingTime} · Score {article.finalScore}</small>
+                <small>{article.readingTime}</small>
                 <div>{article.tags.slice(0, 3).map((value, index) => <Link href={`/en/tags/${article.tagSlugs[index]}`} key={value}>{value}</Link>)}</div>
               </div>
             </article>

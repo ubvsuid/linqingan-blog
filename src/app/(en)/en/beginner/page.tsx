@@ -82,7 +82,7 @@ export default function EnglishBeginnerPage() {
                       <span>LESSON {article.number}</span>
                       <strong>{article.title}</strong>
                       <p>{article.description}</p>
-                      <small>{article.readingTime} · Score {article.finalScore}</small>
+                      <small>{article.readingTime}</small>
                     </Link>
                   </li>
                 ))}

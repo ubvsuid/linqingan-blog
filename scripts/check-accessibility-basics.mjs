@@ -3,10 +3,13 @@ import path from "node:path";
 
 const failures = [];
 const root = process.cwd();
-const layout = fs.readFileSync(path.join(root, "src/app/layout.tsx"), "utf8");
+const layouts = [
+  fs.readFileSync(path.join(root, "src/app/(zh)/layout.tsx"), "utf8"),
+  fs.readFileSync(path.join(root, "src/app/(en)/layout.tsx"), "utf8"),
+];
 const globals = fs.readFileSync(path.join(root, "src/app/globals.css"), "utf8");
 
-if (!layout.includes('className="skip-link"')) failures.push("Root layout is missing a skip link.");
+if (layouts.some((layout) => !layout.includes('className="skip-link"'))) failures.push("A root layout is missing a skip link.");
 if (!globals.includes(":focus-visible")) failures.push("Global focus-visible styles are missing.");
 if (!globals.includes("prefers-reduced-motion")) failures.push("Reduced-motion handling is missing.");
 

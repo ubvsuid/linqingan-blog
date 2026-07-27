@@ -17,7 +17,7 @@ function replaceOnce(source, before, after, marker, label) {
 }
 
 function patchHomePage() {
-  const path = "src/app/page.tsx";
+  const path = "src/app/(zh)/page.tsx";
   let source = read(path);
   source = source.replace(
     'import { HomeLearningActions } from "@/components/home-learning-actions";',
@@ -52,7 +52,7 @@ function patchNavigation() {
 }
 
 function patchArticlePage() {
-  const path = "src/app/blog/[slug]/page.tsx";
+  const path = "src/app/(zh)/blog/[slug]/page.tsx";
   let source = read(path);
   source = replaceOnce(
     source,
@@ -78,7 +78,7 @@ function patchArticlePage() {
 function patchToolPages() {
   const pages = [
     {
-      path: "src/app/tools/creep-body-calculator/page.tsx",
+      path: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
       importAnchor: 'import { CreepBodyCalculator } from "@/components/creep-body-calculator";',
       importLine: 'import { ToolUtilityBar } from "@/components/tool-utility-bar";',
       marker: '<ToolUtilityBar title="Creep 身体计算器"',
@@ -86,7 +86,7 @@ function patchToolPages() {
       component: '        <ToolUtilityBar title="Creep 身体计算器" issueUrl={siteConfig.links.issues} />\n\n        <CreepBodyCalculator />',
     },
     {
-      path: "src/app/tools/room-diagnostics/page.tsx",
+      path: "src/app/(zh)/tools/room-diagnostics/page.tsx",
       importAnchor: 'import { RoomDiagnostics } from "@/components/room-diagnostics";',
       importLine: 'import { ToolUtilityBar } from "@/components/tool-utility-bar";',
       marker: '<ToolUtilityBar title="房间运行诊断"',

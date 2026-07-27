@@ -7,7 +7,7 @@ const root = process.cwd();
 const rawPath = path.join(root, "src", "lib", "english-lifecycle-content-4.ts");
 const publishedPath = path.join(root, "src", "lib", "english-lifecycle-content-4-published.ts");
 const registryPath = path.join(root, "src", "lib", "english-lifecycle-registry-4.ts");
-const routePath = path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx");
+const routePath = path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx");
 
 const rawSource = fs.readFileSync(rawPath, "utf8");
 const publishedSource = fs.readFileSync(publishedPath, "utf8");

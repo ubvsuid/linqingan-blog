@@ -21,7 +21,7 @@ const aggregate = fs.readFileSync(
   "utf8",
 );
 const route = fs.readFileSync(
-  path.join(root, "src/app/en/blog/[slug]/page.tsx"),
+  path.join(root, "src/app/(en)/en/blog/[slug]/page.tsx"),
   "utf8",
 );
 const failures = [];

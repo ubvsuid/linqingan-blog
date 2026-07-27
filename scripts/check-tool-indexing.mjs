@@ -2,17 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const sitemapPath = path.join(root, "src/app/sitemap.ts");
+const sitemapPath = path.join(root, "src/app/(zh)/sitemap.ts");
 const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
 
 const publicTools = [
   {
     route: "/tools/creep-body-calculator",
-    page: "src/app/tools/creep-body-calculator/page.tsx",
+    page: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
   },
   {
     route: "/tools/room-diagnostics",
-    page: "src/app/tools/room-diagnostics/page.tsx",
+    page: "src/app/(zh)/tools/room-diagnostics/page.tsx",
   },
 ];
 
@@ -24,7 +24,7 @@ for (const tool of publicTools) {
   }
 
   if (!sitemapSource.includes(tool.route)) {
-    failures.push(`${tool.route}: 公开工具未加入 src/app/sitemap.ts`);
+    failures.push(`${tool.route}: 公开工具未加入 src/app/(zh)/sitemap.ts`);
   }
 }
 

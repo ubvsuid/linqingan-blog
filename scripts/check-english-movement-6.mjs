@@ -7,7 +7,7 @@ const root = process.cwd();
 const source = fs.readFileSync(path.join(root, "src/lib/english-movement-content-6.ts"), "utf8");
 const published = fs.readFileSync(path.join(root, "src/lib/english-movement-content-6-published.ts"), "utf8");
 const registry = fs.readFileSync(path.join(root, "src/lib/english-movement-registry-6.ts"), "utf8");
-const route = fs.readFileSync(path.join(root, "src/app/en/blog/[slug]/page.tsx"), "utf8");
+const route = fs.readFileSync(path.join(root, "src/app/(en)/en/blog/[slug]/page.tsx"), "utf8");
 const failures = [];
 const slugs = [
   "screeps-move-fatigue-body-ratio",

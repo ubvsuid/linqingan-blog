@@ -167,34 +167,34 @@ for (const fileName of files) {
 }
 
 const routeFiles = new Map([
-  ["/", "src/app/page.tsx"],
-  ["/about", "src/app/about/page.tsx"],
-  ["/beginner", "src/app/beginner/page.tsx"],
-  ["/blog", "src/app/blog/page.tsx"],
-  ["/changelog", "src/app/changelog/page.tsx"],
-  ["/glossary", "src/app/glossary/page.tsx"],
-  ["/knowledge", "src/app/knowledge/page.tsx"],
-  ["/now", "src/app/now/page.tsx"],
-  ["/screeps-errors", "src/app/screeps-errors/page.tsx"],
-  ["/search", "src/app/search/page.tsx"],
-  ["/tags", "src/app/tags/page.tsx"],
-  ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],
-  ["/tools/room-diagnostics", "src/app/tools/room-diagnostics/page.tsx"],
-  ["/verification", "src/app/verification/page.tsx"],
+  ["/", "src/app/(zh)/page.tsx"],
+  ["/about", "src/app/(zh)/about/page.tsx"],
+  ["/beginner", "src/app/(zh)/beginner/page.tsx"],
+  ["/blog", "src/app/(zh)/blog/page.tsx"],
+  ["/changelog", "src/app/(zh)/changelog/page.tsx"],
+  ["/glossary", "src/app/(zh)/glossary/page.tsx"],
+  ["/knowledge", "src/app/(zh)/knowledge/page.tsx"],
+  ["/now", "src/app/(zh)/now/page.tsx"],
+  ["/screeps-errors", "src/app/(zh)/screeps-errors/page.tsx"],
+  ["/search", "src/app/(zh)/search/page.tsx"],
+  ["/tags", "src/app/(zh)/tags/page.tsx"],
+  ["/tools/creep-body-calculator", "src/app/(zh)/tools/creep-body-calculator/page.tsx"],
+  ["/tools/room-diagnostics", "src/app/(zh)/tools/room-diagnostics/page.tsx"],
+  ["/verification", "src/app/(zh)/verification/page.tsx"],
 ]);
 for (const [route, relativePath] of routeFiles) {
   if (!fs.existsSync(path.join(root, relativePath))) addError(`${route} 缺少页面文件 ${relativePath}`);
 }
 
 for (const relativePath of [
-  "src/app/blog/[slug]/page.tsx",
-  "src/app/blog/[slug]/layout.tsx",
-  "src/app/knowledge/[section]/page.tsx",
-  "src/app/tags/[tag]/page.tsx",
-  "src/app/blog/page/[page]/page.tsx",
-  "src/app/beginner/page/[page]/page.tsx",
-  "src/app/changelog/page/[page]/page.tsx",
-  "src/app/sitemap.ts",
+  "src/app/(zh)/blog/[slug]/page.tsx",
+  "src/app/(zh)/blog/[slug]/layout.tsx",
+  "src/app/(zh)/knowledge/[section]/page.tsx",
+  "src/app/(zh)/tags/[tag]/page.tsx",
+  "src/app/(zh)/blog/page/[page]/page.tsx",
+  "src/app/(zh)/beginner/page/[page]/page.tsx",
+  "src/app/(zh)/changelog/page/[page]/page.tsx",
+  "src/app/(zh)/sitemap.ts",
 ]) {
   if (!fs.existsSync(path.join(root, relativePath))) addError(`缺少动态路由文件 ${relativePath}`);
 }
@@ -209,7 +209,7 @@ for (const retiredPath of [
 }
 
 const knowledgePageSource = fs.readFileSync(
-  path.join(root, "src", "app", "knowledge", "page.tsx"),
+  path.join(root, "src", "app", "(zh)", "knowledge", "page.tsx"),
   "utf8",
 );
 if (!knowledgePageSource.includes('id="reference-tools"')) {
@@ -223,7 +223,7 @@ if (!knowledgePageSource.includes("/tools/creep-body-calculator")) {
 }
 
 const knowledgeModulePageSource = fs.readFileSync(
-  path.join(root, "src", "app", "knowledge", "[section]", "page.tsx"),
+  path.join(root, "src", "app", "(zh)", "knowledge", "[section]", "page.tsx"),
   "utf8",
 );
 if (!knowledgeModulePageSource.includes("knowledgeBaseSections.map")) {
@@ -231,7 +231,7 @@ if (!knowledgeModulePageSource.includes("knowledgeBaseSections.map")) {
 }
 
 const aboutPageSource = fs.readFileSync(
-  path.join(root, "src", "app", "about", "page.tsx"),
+  path.join(root, "src", "app", "(zh)", "about", "page.tsx"),
   "utf8",
 );
 if (!aboutPageSource.includes('id="public-projects"') || !aboutPageSource.includes("projects.map")) {
@@ -242,7 +242,7 @@ if (aboutPageSource.includes("profile-project-columns")) {
 }
 
 const tagPageSource = fs.readFileSync(
-  path.join(root, "src", "app", "tags", "[tag]", "page.tsx"),
+  path.join(root, "src", "app", "(zh)", "tags", "[tag]", "page.tsx"),
   "utf8",
 );
 if (!tagPageSource.includes("getTagRecords().map")) {
@@ -253,7 +253,7 @@ if (!tagPageSource.includes("noindex: record.count < 3")) {
 }
 
 const searchPageSource = fs.readFileSync(
-  path.join(root, "src", "app", "search", "page.tsx"),
+  path.join(root, "src", "app", "(zh)", "search", "page.tsx"),
   "utf8",
 );
 if (!searchPageSource.includes("noindex: true")) {
@@ -286,7 +286,7 @@ for (const marker of [
   if (!nextConfigSource.includes(marker)) addError(`缺少旧页面重定向：${marker}`);
 }
 
-const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "sitemap.ts"), "utf8");
+const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "(zh)", "sitemap.ts"), "utf8");
 for (const marker of [
   "getAllPosts()",
   "getTagRecords()",

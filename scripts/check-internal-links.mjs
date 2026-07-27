@@ -5,7 +5,7 @@ const root = process.cwd();
 const scanRoots = ["src", "content"];
 const allowedExtensions = new Set([".ts", ".tsx", ".md", ".mjs"]);
 const ignoredFiles = new Set([
-  path.join("src", "app", "sitemap.ts"),
+  path.join("src", "app", "(zh)", "sitemap.ts"),
   "next.config.ts",
 ]);
 const retiredPaths = ["/resources", "/projects"];
@@ -104,15 +104,18 @@ function routeExists(href) {
 }
 
 function hasPageForRoute(route) {
-  const routeParts = route.slice(1).split("/");
-  const pagePath = path.join(root, "src", "app", ...routeParts, "page.tsx");
+  const routeParts = route.slice(1).split("/").filter(Boolean);
+  const routeRoot = routeParts[0] === "en"
+    ? path.join(root, "src", "app", "(en)")
+    : path.join(root, "src", "app", "(zh)");
+  const pagePath = path.join(routeRoot, ...routeParts, "page.tsx");
   if (fs.existsSync(pagePath)) return true;
 
-  const routePath = path.join(root, "src", "app", ...routeParts, "route.ts");
+  const routePath = path.join(routeRoot, ...routeParts, "route.ts");
   if (fs.existsSync(routePath)) return true;
 
   if (/^\/en\/blog\/[a-z0-9-]+$/.test(route)) {
-    return fs.existsSync(path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx"));
+    return fs.existsSync(path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx"));
   }
 
   return false;

@@ -63,7 +63,7 @@ function patchSearchSuggestions() {
 }
 
 function patchArticleRevisionCard() {
-  const filePath = "src/app/blog/[slug]/page.tsx";
+  const filePath = "src/app/(zh)/blog/[slug]/page.tsx";
   let source = read(filePath);
 
   source = replaceOnce(
@@ -86,7 +86,7 @@ function patchArticleRevisionCard() {
 }
 
 function patchHomeDiscovery() {
-  const filePath = "src/app/page.tsx";
+  const filePath = "src/app/(zh)/page.tsx";
   let source = read(filePath);
 
   source = replaceOnce(
@@ -117,7 +117,7 @@ function patchHomeDiscovery() {
 }
 
 function patchKnowledgeTools() {
-  const filePath = "src/app/knowledge/page.tsx";
+  const filePath = "src/app/(zh)/knowledge/page.tsx";
   let source = read(filePath);
 
   source = replaceOnce(
@@ -218,7 +218,7 @@ function patchRoutesAndSitemap() {
   );
   write(checkPath, check);
 
-  const sitemapPath = "src/app/sitemap.ts";
+  const sitemapPath = "src/app/(zh)/sitemap.ts";
   let sitemap = read(sitemapPath);
   sitemap = sitemap.replace('glossary: "2026-07-18"', 'glossary: "2026-07-23"');
   sitemap = sitemap.replace('screepsErrors: "2026-07-18"', 'screepsErrors: "2026-07-23"');

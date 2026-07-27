@@ -95,7 +95,7 @@ for (const record of records) {
 }
 
 const routeSource = fs.readFileSync(
-  path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx"),
+  path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx"),
   "utf8",
 );
 const completeRegistrySource = fs.readFileSync(

@@ -9,7 +9,7 @@ function write(filePath, value) {
 }
 
 function patchArticlePage() {
-  const filePath = "src/app/blog/[slug]/page.tsx";
+  const filePath = "src/app/(zh)/blog/[slug]/page.tsx";
   let source = read(filePath);
 
   if (!source.includes('import { ArticleToc } from "@/components/article-toc";')) {

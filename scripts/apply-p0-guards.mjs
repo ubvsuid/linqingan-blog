@@ -27,7 +27,7 @@ function patchEmergencyPseudocode() {
 }
 
 function patchVerificationLabels() {
-  const filePath = "src/app/blog/[slug]/page.tsx";
+  const filePath = "src/app/(zh)/blog/[slug]/page.tsx";
   let source = fs.readFileSync(filePath, "utf8");
 
   source = replaceIfNeeded(
