@@ -410,7 +410,7 @@ export default function TransferEnergyPage() {
         { term: "Official documentation", value: "Checked" },
         { term: "API and constants", value: "Checked" },
         { term: "JavaScript syntax", value: "Checked" },
-        { term: "Offline logic review", value: "Passed" },
+        { term: "Offline state logic", value: "Passed" },
         { term: "Screeps Console", value: "Pending — replace both example names with live objects" },
         { term: "Live multi-tick test", value: "Pending — no live round-trip result is claimed" },
         { term: "Last verified", value: modifiedLabel },
