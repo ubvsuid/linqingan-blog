@@ -116,7 +116,7 @@ function parseEnglishBeginnerArticles(encoded: string): EnglishBeginnerArticle[]
 
 const parsedEnglishBeginnerArticles = parseEnglishBeginnerArticles(encodedArticleData);
 
-// Keep focused lesson rewrites readable instead of editing the compressed payload.
+// Keep focused lesson rewrites readable; Lesson 9 loads after the earlier overrides.
 const articleOverrides = {
   ...englishBeginnerArticleOverrides,
   ...englishBeginnerTickArticleOverrides,
