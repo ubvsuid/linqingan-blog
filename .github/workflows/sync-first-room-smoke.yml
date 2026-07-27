@@ -1,0 +1,37 @@
+name: Sync first-room smoke assertion
+
+on:
+  push:
+    branches:
+      - agent/revise-screeps-first-room
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/revise-screeps-first-room
+      - name: Update the first-room H1 assertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/smoke-test.mjs')
+          text = path.read_text()
+          old = 'How to Find Your First Screeps Room and Its Core Objects'
+          new = 'How to Find Your First Screeps Room, Editor, and Console'
+          if old not in text:
+              raise SystemExit('Old first-room smoke assertion not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Commit the synchronized assertion
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/smoke-test.mjs
+          git commit -m "Update first-room smoke expectation"
+          git push
