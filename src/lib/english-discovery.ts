@@ -64,7 +64,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-global-cache": ["javascript", "cpu", "debugging"],
   "/en/blog/screeps-rawmemory-segments": ["memory", "javascript", "cpu"],
   "/en/blog/screeps-flags-configuration": ["javascript", "rooms"],
-  "/en/blog/screeps-require-modules": ["javascript"],
+  "/en/blog/screeps-require-modules": ["javascript", "debugging"],
   "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
 
   "/en/blog/screeps-creep-body-parts": ["creeps", "movement", "debugging"],
@@ -102,7 +102,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
 
   "/en/blog/screeps-first-extension": ["construction", "energy"],
   "/en/blog/screeps-build-repair": ["construction", "creeps", "energy"],
-  "/en/blog/screeps-remove-construction-site": ["construction"],
+  "/en/blog/screeps-remove-construction-site": ["construction", "rooms"],
   "/en/blog/screeps-tower-auto-attack-hostiles": ["defense", "debugging"],
   "/en/blog/screeps-tower-heal-creeps": ["defense", "creeps"],
   "/en/blog/screeps-tower-repair-threshold": ["defense", "construction"],
@@ -116,9 +116,9 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-market-create-order": ["market", "resources"],
   "/en/blog/screeps-market-deal": ["market", "resources"],
   "/en/blog/screeps-terminal-send-resources": ["market", "resources"],
-  "/en/blog/screeps-lab-run-reaction": ["resources"],
+  "/en/blog/screeps-lab-run-reaction": ["resources", "market"],
   "/en/blog/screeps-lab-boost-creep": ["resources", "creeps"],
-  "/en/blog/screeps-factory-produce": ["resources"],
+  "/en/blog/screeps-factory-produce": ["resources", "market"],
   "/en/blog/screeps-mineral-extractor-harvest": ["resources", "energy"],
   "/en/blog/screeps-power-spawn-process-power": ["resources", "energy"],
 

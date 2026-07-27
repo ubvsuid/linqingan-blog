@@ -87,6 +87,30 @@ for (const [relativePath, expected, label] of assertions) {
 
 
 const discoverySource = fs.readFileSync(path.join(root, "src/lib/english-discovery.ts"), "utf8");
+const overrideBlock = discoverySource.match(/const articleTagSlugOverrides:[\s\S]*?= \{([\s\S]*?)\n\};/);
+if (!overrideBlock) {
+  failures.push("English article topic override map is missing.");
+} else {
+  const topicCounts = new Map(
+    [...overrideBlock[1].matchAll(/"(\/en\/blog\/[^"]+)": \[([^\]]*)\]/g)].map((match) => [
+      match[1],
+      [...match[2].matchAll(/"([^"]+)"/g)].map((topic) => topic[1]),
+    ]),
+  );
+  for (const href of hrefs) {
+    const topics = topicCounts.get(href);
+    if (!topics) {
+      failures.push(`English article lacks an explicit topic mapping: ${href}`);
+      continue;
+    }
+    if (topics.length < 2 || topics.length > 4) {
+      failures.push(`English article must have 2-4 curated topics: ${href} has ${topics.length}`);
+    }
+    if (new Set(topics).size !== topics.length) {
+      failures.push(`English article has duplicate curated topics: ${href}`);
+    }
+  }
+}
 if (discoverySource.includes("tagRules.filter((rule) => rule.terms.some")) failures.push("English topics still depend on broad keyword matching.");
 const browserSource = fs.readFileSync(path.join(root, "src/components/english-article-browser.tsx"), "utf8");
 if (browserSource.includes("Score {article.finalScore}")) failures.push("English article browser still exposes internal scores.");
