@@ -149,6 +149,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "creep.fatigue",
     ],
   },
+  "/en/blog/screeps-spawn-creep": {
+    category: "GETTING STARTED · BEGINNER LESSON 7 OF 12",
+    title: "Screeps spawnCreep(): Create Your First Creep",
+    description:
+      "Use dryRun to validate a WORK-CARRY-MOVE body, submit one safe spawnCreep() request, read its return code, and verify the new Creep across later ticks.",
+    readingTime: "8 min read",
+    primaryKeyword: "Screeps spawnCreep",
+    searchIntent:
+      "Beginner action tutorial for validating and submitting one fixed-name spawnCreep request, then verifying the result across later ticks",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps spawnCreep",
+      "create Creep Screeps",
+      "StructureSpawn.spawnCreep()",
+      "spawnCreep dryRun",
+      "ERR_NOT_ENOUGH_ENERGY",
+      "Screeps first Creep",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
