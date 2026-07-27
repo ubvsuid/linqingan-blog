@@ -54,6 +54,7 @@ const gettingStartedArticleHrefs = new Set([
   "/en/blog/screeps-creep-body-parts",
   "/en/blog/screeps-spawn-creep",
   "/en/blog/screeps-creep-roles",
+  "/en/blog/screeps-upgrade-controller",
 ]);
 const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-tick-game-loop": ["javascript", "console"],
@@ -188,6 +189,12 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
     "/en/blog/screeps-upgrade-controller",
     "/en/blog/screeps-memory-basics",
     "/en/blog/screeps-require-modules",
+  ],
+  "/en/blog/screeps-upgrade-controller": [
+    "/en/blog/screeps-creep-roles",
+    "/en/blog/screeps-first-extension",
+    "/en/blog/screeps-memory-basics",
+    "/en/blog/screeps-err-not-in-range",
   ],
 };
 
