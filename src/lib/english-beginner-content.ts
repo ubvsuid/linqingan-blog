@@ -110,7 +110,7 @@ function parseEnglishBeginnerArticles(encoded: string): EnglishBeginnerArticle[]
 }
 
 const parsedEnglishBeginnerArticles = parseEnglishBeginnerArticles(encodedArticleData);
-const articleOverrides = englishBeginnerArticleOverrides as Record<
+const articleOverrides = englishBeginnerArticleOverrides as unknown as Record<
   string,
   Partial<EnglishBeginnerArticle>
 >;
