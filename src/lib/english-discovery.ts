@@ -49,11 +49,13 @@ const gettingStartedArticleHrefs = new Set([
   "/en/blog/screeps-introduction",
   "/en/blog/screeps-first-room",
   "/en/blog/screeps-tick-game-loop",
+  "/en/blog/screeps-creep-harvest-energy",
 ]);
 const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
   "/en/blog/screeps-first-room": ["rooms", "console", "javascript"],
   "/en/blog/screeps-tick-game-loop": ["javascript", "console"],
+  "/en/blog/screeps-creep-harvest-energy": ["creeps", "energy", "movement"],
 };
 const curatedRelatedArticleHrefs: Record<string, string[]> = {
   "/en/blog/screeps-introduction": [
@@ -73,6 +75,12 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
     "/en/blog/screeps-creep-harvest-energy",
     "/en/blog/screeps-memory-basics",
     "/en/blog/screeps-first-room-code",
+  ],
+  "/en/blog/screeps-creep-harvest-energy": [
+    "/en/blog/screeps-tick-game-loop",
+    "/en/blog/screeps-transfer-energy-to-spawn",
+    "/en/blog/screeps-creep-body-parts",
+    "/en/blog/screeps-err-not-in-range",
   ],
 };
 
