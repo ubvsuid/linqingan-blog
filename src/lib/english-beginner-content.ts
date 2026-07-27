@@ -2,6 +2,7 @@
 import { gunzipSync } from "node:zlib";
 
 import { englishBeginnerArticleOverrides } from "./english-beginner-overrides";
+import { englishBeginnerBodyPartsArticleOverrides } from "./english-beginner-body-parts-override";
 import { englishBeginnerTickArticleOverrides } from "./english-beginner-tick-override";
 import part1 from "@/lib/english-beginner-data/part-1";
 import part2 from "@/lib/english-beginner-data/part-2";
@@ -114,6 +115,7 @@ const parsedEnglishBeginnerArticles = parseEnglishBeginnerArticles(encodedArticl
 const articleOverrides = {
   ...englishBeginnerArticleOverrides,
   ...englishBeginnerTickArticleOverrides,
+  ...englishBeginnerBodyPartsArticleOverrides,
 } as unknown as Record<string, Partial<EnglishBeginnerArticle>>;
 
 export const englishBeginnerArticles: EnglishBeginnerArticle[] =
