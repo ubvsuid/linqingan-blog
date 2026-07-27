@@ -1,9 +1,13 @@
 name: Export current source for audit fixes
 
 on:
-  push:
+  pull_request:
     branches:
-      - fix/audit-priority-1-4
+      - clean-blog-v1
+    types:
+      - opened
+      - synchronize
+      - reopened
   workflow_dispatch:
 
 permissions:
