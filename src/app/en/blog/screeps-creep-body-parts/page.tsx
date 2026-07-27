@@ -76,15 +76,6 @@ export default function EnglishCreepBodyPartsPage() {
         { "@type": "ListItem", position: 3, name: article.headline, item: articleUrl },
       ],
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: article.faq.map(([question, answer]) => ({
-        "@type": "Question",
-        name: question,
-        acceptedAnswer: { "@type": "Answer", text: answer },
-      })),
-    },
   ];
 
   return (
