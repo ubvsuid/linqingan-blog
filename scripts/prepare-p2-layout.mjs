@@ -13,7 +13,7 @@ if (!calculator.includes(marker)) {
   fs.writeFileSync(calculatorPath, calculator);
 }
 
-const homepagePath = "src/app/page.tsx";
+const homepagePath = "src/app/(zh)/page.tsx";
 let homepage = fs.readFileSync(homepagePath, "utf8");
 if (
   homepage.includes('import { HomeTaskHub } from "@/components/home-task-hub";') &&

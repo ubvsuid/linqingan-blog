@@ -56,15 +56,90 @@ const gettingStartedArticleHrefs = new Set([
   "/en/blog/screeps-creep-roles",
 ]);
 const articleTagSlugOverrides: Record<string, string[]> = {
-  "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
-  "/en/blog/screeps-first-room": ["rooms", "console", "javascript"],
   "/en/blog/screeps-tick-game-loop": ["javascript", "console"],
-  "/en/blog/screeps-creep-harvest-energy": ["creeps", "energy", "movement"],
-  "/en/blog/screeps-transfer-energy-to-spawn": ["creeps", "energy", "spawn"],
+  "/en/blog/screeps-memory-basics": ["memory", "javascript"],
+  "/en/blog/screeps-working-state": ["memory", "creeps", "energy", "javascript"],
+  "/en/blog/screeps-get-object-by-id": ["javascript", "memory", "rooms"],
+  "/en/blog/screeps-clean-dead-creep-memory": ["memory", "creeps", "javascript"],
+  "/en/blog/screeps-global-cache": ["javascript", "cpu", "debugging"],
+  "/en/blog/screeps-rawmemory-segments": ["memory", "javascript", "cpu"],
+  "/en/blog/screeps-flags-configuration": ["javascript", "rooms"],
+  "/en/blog/screeps-require-modules": ["javascript"],
+  "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
+
   "/en/blog/screeps-creep-body-parts": ["creeps", "movement", "debugging"],
   "/en/blog/screeps-spawn-creep": ["spawn", "creeps", "javascript"],
   "/en/blog/screeps-creep-roles": ["creeps", "javascript"],
+  "/en/blog/screeps-spawncreep-return-codes": ["spawn", "debugging"],
+  "/en/blog/screeps-dynamic-creep-body": ["spawn", "creeps", "energy"],
+  "/en/blog/screeps-emergency-harvester-recovery": ["spawn", "creeps", "energy"],
+  "/en/blog/screeps-renew-creep": ["spawn", "creeps"],
+  "/en/blog/screeps-recycle-creep": ["spawn", "creeps"],
+
+  "/en/blog/screeps-creep-harvest-energy": ["creeps", "energy", "movement"],
+  "/en/blog/screeps-transfer-energy-to-spawn": ["creeps", "energy", "spawn"],
+  "/en/blog/screeps-withdraw-container-energy": ["creeps", "energy", "resources"],
+  "/en/blog/screeps-pickup-dropped-energy": ["creeps", "energy", "resources"],
+  "/en/blog/screeps-storage-energy-usage": ["energy", "resources"],
+  "/en/blog/screeps-link-transfer-energy": ["energy", "resources"],
+  "/en/blog/screeps-select-source-by-path": ["energy", "pathfinding", "movement"],
+
+  "/en/blog/screeps-err-not-in-range": ["movement", "debugging"],
+  "/en/blog/screeps-moveto-not-moving": ["movement", "debugging", "pathfinding"],
+  "/en/blog/screeps-err-no-path": ["movement", "pathfinding", "debugging"],
+  "/en/blog/screeps-move-fatigue-body-ratio": ["movement", "creeps"],
+  "/en/blog/screeps-roomposition-distance": ["movement", "pathfinding"],
+  "/en/blog/screeps-map-find-route": ["movement", "pathfinding", "rooms"],
+  "/en/blog/screeps-room-visibility": ["rooms", "debugging"],
+  "/en/blog/screeps-observer-observe-room": ["rooms", "debugging"],
+  "/en/blog/screeps-pathfinder-costmatrix": ["pathfinding", "movement"],
+  "/en/blog/screeps-first-room": ["rooms", "console", "javascript"],
+
+  "/en/blog/screeps-upgrade-controller": ["controllers", "creeps", "energy"],
+  "/en/blog/screeps-controller-activate-safe-mode": ["controllers", "defense"],
+  "/en/blog/screeps-controller-downgrade": ["controllers", "debugging"],
+  "/en/blog/screeps-reserve-vs-claim-controller": ["controllers", "rooms"],
+
+  "/en/blog/screeps-first-extension": ["construction", "energy"],
+  "/en/blog/screeps-build-repair": ["construction", "creeps", "energy"],
+  "/en/blog/screeps-remove-construction-site": ["construction"],
+  "/en/blog/screeps-tower-auto-attack-hostiles": ["defense", "debugging"],
+  "/en/blog/screeps-tower-heal-creeps": ["defense", "creeps"],
+  "/en/blog/screeps-tower-repair-threshold": ["defense", "construction"],
+  "/en/blog/screeps-room-create-construction-site": ["construction", "rooms"],
+  "/en/blog/screeps-construction-site-progress": ["construction", "debugging"],
+  "/en/blog/screeps-structure-destroy": ["construction", "defense"],
+  "/en/blog/screeps-nuker-launch": ["defense", "resources"],
+  "/en/blog/screeps-rampart-set-public": ["defense", "construction"],
+  "/en/blog/screeps-wall-rampart-repair-limit": ["defense", "construction"],
+
+  "/en/blog/screeps-market-create-order": ["market", "resources"],
+  "/en/blog/screeps-market-deal": ["market", "resources"],
+  "/en/blog/screeps-terminal-send-resources": ["market", "resources"],
+  "/en/blog/screeps-lab-run-reaction": ["resources"],
+  "/en/blog/screeps-lab-boost-creep": ["resources", "creeps"],
+  "/en/blog/screeps-factory-produce": ["resources"],
+  "/en/blog/screeps-mineral-extractor-harvest": ["resources", "energy"],
+  "/en/blog/screeps-power-spawn-process-power": ["resources", "energy"],
+
+  "/en/blog/screeps-first-room-code": ["javascript", "debugging", "rooms"],
+  "/en/blog/screeps-cpu-getused-bucket": ["cpu", "debugging"],
+  "/en/blog/screeps-game-notify": ["debugging", "javascript"],
+  "/en/blog/screeps-room-event-log": ["debugging", "rooms"],
+  "/en/blog/screeps-roomvisual-debug": ["debugging", "rooms", "javascript"],
 };
+
+const moduleDefaultTagSlugs: Record<number, string[]> = {
+  1: ["javascript", "memory"],
+  2: ["spawn", "creeps"],
+  3: ["energy", "resources"],
+  4: ["movement", "pathfinding"],
+  5: ["controllers", "rooms"],
+  6: ["construction", "defense"],
+  7: ["market", "resources"],
+  8: ["debugging", "javascript"],
+};
+
 const curatedRelatedArticleHrefs: Record<string, string[]> = {
   "/en/blog/screeps-introduction": [
     "/en/blog/screeps-first-room",
@@ -155,17 +230,14 @@ function getContentType(article: EnglishArticleRecord): EnglishContentType {
 }
 
 function getTags(article: EnglishArticleRecord): TagRule[] {
-  const overrideSlugs = articleTagSlugOverrides[article.href];
-  if (overrideSlugs) {
-    return overrideSlugs
-      .map((slug) => tagRules.find((rule) => rule.slug === slug))
-      .filter((rule): rule is TagRule => Boolean(rule));
-  }
+  const moduleNumber = getEnglishKnowledgeModuleNumber(article);
+  const slugs = articleTagSlugOverrides[article.href]
+    ?? moduleDefaultTagSlugs[moduleNumber]
+    ?? ["debugging"];
 
-  const text = articleText(article);
-  const matches = tagRules.filter((rule) => rule.terms.some((term) => matchesTerm(text, term)));
-  if (matches.length > 0) return matches.slice(0, 5);
-  return [tagRules.find((rule) => rule.slug === "debugging")!];
+  return slugs
+    .map((slug) => tagRules.find((rule) => rule.slug === slug))
+    .filter((rule): rule is TagRule => Boolean(rule));
 }
 
 export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEnglishArticles.map((article) => {

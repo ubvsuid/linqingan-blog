@@ -10,7 +10,7 @@ import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base"
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
 
-import styles from "./home.module.css";
+import styles from "../home.module.css";
 
 const baseMetadata = createPageMetadata({
   title: "Screeps 中文教程、知识库与实用工具｜临清安",

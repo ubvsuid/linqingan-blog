@@ -2,7 +2,7 @@ import fs from "node:fs";
 
 const checks = [
   {
-    path: "src/app/page.tsx",
+    path: "src/app/(zh)/page.tsx",
     required: ["HomeTaskHub", "slice(0, 2)", "screeps-room-grid"],
     forbidden: ["<HomeLearningActions />"],
   },
@@ -27,7 +27,7 @@ const checks = [
     forbidden: [".header-icon-link { display: none; }"],
   },
   {
-    path: "src/app/blog/[slug]/page.tsx",
+    path: "src/app/(zh)/blog/[slug]/page.tsx",
     required: ["ArticleReadingExperience", "ArticleLearningContext", "ArticleToc", "ArticleVerificationSummary", "ArticleFeedback"],
     forbidden: [],
   },
@@ -57,22 +57,22 @@ const checks = [
     forbidden: ["useEffect(() => {\n    setActiveSuggestionIndex(-1);"],
   },
   {
-    path: "src/app/api/search-index/route.ts",
+    path: "src/app/(zh)/api/search-index/route.ts",
     required: ["getSearchDocuments", "s-maxage=86400"],
     forbidden: [],
   },
   {
-    path: "src/app/blog/[slug]/opengraph-image.tsx",
+    path: "src/app/(zh)/blog/[slug]/opengraph-image.tsx",
     required: ["ImageResponse", "SCREEPS · 中文知识库", "1200"],
     forbidden: [],
   },
   {
-    path: "src/app/tools/creep-body-calculator/page.tsx",
+    path: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
     required: ["ToolUtilityBar"],
     forbidden: [],
   },
   {
-    path: "src/app/tools/room-diagnostics/page.tsx",
+    path: "src/app/(zh)/tools/room-diagnostics/page.tsx",
     required: ["ToolUtilityBar"],
     forbidden: [],
   },

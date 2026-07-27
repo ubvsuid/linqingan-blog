@@ -13,7 +13,7 @@ const sources = articlePaths.map((file) => fs.readFileSync(path.join(root, file)
 const source = sources.join("\n");
 const registry = fs.readFileSync(path.join(root, "src/lib/english-runtime-registry-8.ts"), "utf8");
 const aggregate = fs.readFileSync(path.join(root, "src/lib/english-runtime-content-8.ts"), "utf8");
-const route = fs.readFileSync(path.join(root, "src/app/en/blog/[slug]/page.tsx"), "utf8");
+const route = fs.readFileSync(path.join(root, "src/app/(en)/en/blog/[slug]/page.tsx"), "utf8");
 const failures = [];
 const slugs = [
   "screeps-cpu-getused-bucket",

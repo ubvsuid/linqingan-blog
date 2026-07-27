@@ -5,7 +5,7 @@ import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 import { englishKnowledgeModules } from "@/lib/i18n";
 
-import styles from "../home.module.css";
+import styles from "../../home.module.css";
 
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Tutorials, Debugging Guides and Tools | Linqingan",

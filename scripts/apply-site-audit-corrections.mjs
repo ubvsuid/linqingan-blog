@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const articlePath = "src/app/blog/[slug]/page.tsx";
+const articlePath = "src/app/(zh)/blog/[slug]/page.tsx";
 let article = fs.readFileSync(articlePath, "utf8");
 const articleUrlAnchor = '  const articleUrl = `${siteConfig.url}/blog/${post.slug}`;';
 const articleUrlReplacement = `${articleUrlAnchor}\n  const socialImage = post.cover ?? \`\${siteConfig.url}/blog/\${post.slug}/opengraph-image\`;`;

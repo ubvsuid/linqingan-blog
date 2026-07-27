@@ -322,7 +322,7 @@ export function SiteSearch({
       </label>
 
       <p className="search-index-status" aria-live="polite">
-        {isLoadingFullIndex ? "正在加载文章正文索引…" : normalizedQuery && expandedDocuments ? "已启用全文搜索" : ""}
+        {isLoadingFullIndex ? "正在加载精简全文索引…" : normalizedQuery && expandedDocuments ? "已启用精简全文搜索" : ""}
       </p>
 
       <div className="site-search-suggestions" aria-label={normalizedQuery ? "搜索联想" : "热门搜索"}>

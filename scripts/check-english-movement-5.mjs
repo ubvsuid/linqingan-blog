@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 const root = process.cwd();
 const contentPath = path.join(root, "src", "lib", "english-movement-content-5.ts");
 const registryPath = path.join(root, "src", "lib", "english-movement-registry-5.ts");
-const routePath = path.join(root, "src", "app", "en", "blog", "[slug]", "page.tsx");
+const routePath = path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx");
 
 const source = fs.readFileSync(contentPath, "utf8");
 const registry = fs.readFileSync(registryPath, "utf8");

@@ -6,8 +6,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
 
-import "./globals.css";
-import "./improvements.css";
+import "../globals.css";
+import "../improvements.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
@@ -31,15 +31,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
-    types: {
-      "application/rss+xml": "/feed.xml",
-    },
+    types: { "application/rss+xml": "/feed.xml" },
   },
-  verification: googleVerification
-    ? {
-        google: googleVerification,
-      }
-    : undefined,
+  verification: googleVerification ? { google: googleVerification } : undefined,
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
@@ -61,14 +55,9 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
-const documentBootScript = `
+const themeBootScript = `
 (function () {
   try {
-    var path = window.location.pathname;
-    var english = path === "/en" || path.indexOf("/en/") === 0;
-    document.documentElement.lang = english ? "en" : "zh-CN";
-    document.documentElement.dataset.siteLanguage = english ? "en" : "zh-CN";
-
     var saved = localStorage.getItem("theme");
     var systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.dataset.theme =
@@ -99,9 +88,7 @@ const structuredData = {
       alternateName: [siteConfig.title, "Linqingan Screeps Guides & Tools"],
       description: "Screeps learning, debugging, engineering notes, and practical tools in Chinese and English.",
       inLanguage: ["zh-CN", "en"],
-      author: {
-        "@id": `${siteConfig.url}/#person`,
-      },
+      author: { "@id": `${siteConfig.url}/#person` },
       potentialAction: {
         "@type": "SearchAction",
         target: `${siteConfig.url}/search?q={search_term_string}`,
@@ -111,31 +98,20 @@ const structuredData = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function ChineseRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang={siteConfig.language} data-site-language={siteConfig.language} suppressHydrationWarning>
+    <html lang="zh-CN" data-site-language="zh-CN" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: documentBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
         />
       </head>
       <body>
-        <a className="skip-link" href="#main-content">
-          <span className="skip-link-zh" lang="zh-CN">跳到正文</span>
-          <span className="skip-link-en" lang="en">Skip to content</span>
-        </a>
+        <a className="skip-link" href="#main-content">跳到正文</a>
         <SiteHeader />
-        <div id="main-content" className="site-content">
-          {children}
-        </div>
+        <div id="main-content" className="site-content">{children}</div>
         <SiteFooter />
         <Analytics />
         <SpeedInsights />

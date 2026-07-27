@@ -21,6 +21,31 @@ interface SearchDocumentOptions {
   includeArticleText?: boolean;
 }
 
+const MAX_ARTICLE_SEARCH_TOKENS = 220;
+const MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400;
+
+function compactArticleSearchText(value: string): string {
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const tokens = normalized.match(/[A-Za-z_][A-Za-z0-9_.:-]*|[\u3400-\u9fff]{1,8}|\d+(?:\.\d+)?/g) ?? [];
+  const seen = new Set<string>();
+  const uniqueTokens: string[] = [];
+
+  for (const token of tokens) {
+    const key = token.toLocaleLowerCase("zh-CN");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    uniqueTokens.push(token);
+    if (uniqueTokens.length >= MAX_ARTICLE_SEARCH_TOKENS) break;
+  }
+
+  return uniqueTokens.join(" ").slice(0, MAX_ARTICLE_SEARCH_TEXT_LENGTH);
+}
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:creep-body-calculator",
@@ -69,7 +94,7 @@ export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchD
         post.category,
         ...(section ? [section.title, section.description] : []),
       ],
-      text: includeArticleText ? post.text : "",
+      text: includeArticleText ? compactArticleSearchText(post.text) : "",
     };
   });
 

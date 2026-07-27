@@ -16,7 +16,7 @@ function replaceRequired(source, before, after, label) {
 }
 
 function patchKnowledgePage() {
-  const filePath = "src/app/knowledge/page.tsx";
+  const filePath = "src/app/(zh)/knowledge/page.tsx";
   let source = read(filePath);
 
   if (!source.includes('href: "/tools/room-diagnostics"')) {

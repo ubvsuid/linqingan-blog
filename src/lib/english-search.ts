@@ -37,6 +37,24 @@ const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-license", title: "Content and Code Use", description: "Current boundaries for reusing site content, code examples, third-party names, and commercial material.", href: "/en/license", type: "Reference", keywords: ["license", "copyright", "reuse", "permission", "code examples"] },
 ];
 
+
+function compactKeywords(values: string[], limit = 24): string[] {
+  const seen = new Set<string>();
+  const compact: string[] = [];
+
+  for (const value of values) {
+    const normalized = value.normalize("NFKC").trim();
+    if (!normalized) continue;
+    const key = normalized.toLocaleLowerCase("en");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    compact.push(normalized.slice(0, 120));
+    if (compact.length >= limit) break;
+  }
+
+  return compact;
+}
+
 const topicDocuments: EnglishSearchDocument[] = englishTags.map((tag) => ({
   id: `english-topic-${tag.slug}`,
   title: `${tag.label} Screeps Guides`,
@@ -52,14 +70,13 @@ const articleDocuments: EnglishSearchDocument[] = englishDiscoveryArticles.map((
   description: article.description,
   href: article.href,
   type: "Article",
-  keywords: [
+  keywords: compactKeywords([
     article.primaryKeyword,
-    article.searchIntent,
     article.moduleTitle,
     ...knowledgeModuleSearchTerms[article.moduleNumber],
     ...article.tags,
     ...article.keywords,
-  ],
+  ]),
 }));
 
 export const englishSearchDocuments: EnglishSearchDocument[] = [

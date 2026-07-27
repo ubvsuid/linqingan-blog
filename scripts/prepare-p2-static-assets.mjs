@@ -61,8 +61,8 @@ function patchRouteCheck() {
   }
 
   source = source.replace(
-    `  ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],\n  ["/verification",`,
-    `  ["/tools/creep-body-calculator", "src/app/tools/creep-body-calculator/page.tsx"],\n  ["/tools/room-diagnostics", "src/app/tools/room-diagnostics/page.tsx"],\n  ["/verification",`,
+    `  ["/tools/creep-body-calculator", "src/app/(zh)/tools/creep-body-calculator/page.tsx"],\n  ["/verification",`,
+    `  ["/tools/creep-body-calculator", "src/app/(zh)/tools/creep-body-calculator/page.tsx"],\n  ["/tools/room-diagnostics", "src/app/(zh)/tools/room-diagnostics/page.tsx"],\n  ["/verification",`,
   );
 
   fs.writeFileSync(filePath, source);
