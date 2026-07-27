@@ -18,95 +18,35 @@ const checks = [
   },
   {
     path: "src/lib/site.ts",
-    required: ["å…¥é—¨", "æ–‡ç« ", "/knowledge#reference-tools"],
-    forbidden: ["å…¥é—¨è·¯çº¿", "å…¨éƒ¨æ–‡ç« "],
-  },
-  {
-    path: "src/components/site-header.tsx",
-    required: [".profile-shortcut { display: none; }", ".header-icon-link { width: 40px; height: 40px; }"],
-    forbidden: [".header-icon-link { display: none; }"],
-  },
-  {
-    path: "src/app/(zh)/blog/[slug]/page.tsx",
-    required: ["ArticleReadingExperience", "ArticleLearningContext", "ArticleToc", "ArticleVerificationSummary", "ArticleFeedback"],
-    forbidden: [],
-  },
-  {
-    path: "src/components/article-toc.tsx",
-    required: ["article-page-toc", "toc-group-heading", "IntersectionObserver"],
-    forbidden: [],
-  },
-  {
-    path: "src/components/article-verification-summary.tsx",
-    required: ["æŸ¥çœ‹éªŒè¯è¯¦æƒ…", "Screeps Console", "çœŸå®žä¸»å¾ªçŽ¯"],
-    forbidden: [],
-  },
-  {
-    path: "src/components/article-learning-context.tsx",
-    required: ["éš¾åº¦", "é€‚ç”¨é˜¶æ®µ", "å‰ç½®çŸ¥è¯†", "æ¨¡å—ä½ç½®"],
-    forbidden: [],
-  },
-  {
-    path: "src/components/article-feedback.tsx",
-    required: ["å†…å®¹å¯èƒ½è¿‡æ—¶", "å»ºè®®è¡¥å……", "æ²¡è§£å†³", "article_feedback"],
-    forbidden: ["needs-work"],
-  },
-  {
-    path: "src/components/site-search.tsx",
-    required: ["site_search_no_results", "site_search_result_click", "handleSuggestionKeyDown", "fullIndexRequested", "/api/search-index", "editDistance"],
-    forbidden: ["useEffect(() => {\n    setActiveSuggestionIndex(-1);"],
-  },
-  {
-    path: "src/app/(zh)/api/search-index/route.ts",
-    required: ["getSearchDocuments", "s-maxage=86400"],
-    forbidden: [],
-  },
-  {
-    path: "src/app/(zh)/blog/[slug]/opengraph-image.tsx",
-    required: ["ImageResponse", "SCREEPS Â· ä¸­æ–‡çŸ¥è¯†åº“", "1200"],
-    forbidden: [],
-  },
-  {
-    path: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
-    required: ["ToolUtilityBar"],
-    forbidden: [],
-  },
-  {
-    path: "src/app/(zh)/tools/room-diagnostics/page.tsx",
-    required: ["ToolUtilityBar"],
-    forbidden: [],
-  },
-  {
-    path: "src/app/globals.css",
-    required: ["FINAL DESIGN OVERHAUL", "SITE AUDIT CHECKLIST FIXES", "prefers-reduced-motion", "article-floating-toc"],
-    forbidden: [],
-  },
-  {
-    path: ".github/workflows/site-quality-audit.yml",
-    required: ["Lighthouse CI", "schedule"],
-    forbidden: [],
-  },
-  {
-    path: ".github/workflows/quarterly-content-review.yml",
-    required: ["articles:priority", "upload-artifact"],
-    forbidden: [],
-  },
-];
+    required: ["å…¥óx¥¸œ, "æ–‡ç« ", "/Knowledge#reference-tools"],
+    forbidden: ["å…¥æ–‡ç« è¥¿çº¿", "å…¨éƒ¨æ–‡9êè—KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËÜÚ]KZXY\‹Þ‹ˆ™\]Z\™YˆÈ‹œ›Ùš[K\ÚÜÝ]È\Ü^Nˆ›Û™NÈH‹‹šXY\‹ZXÛÛ‹[[šÈÈÚYˆÈZYÚˆÈH—Kˆ›Ü˜šY[ŽˆÈ‹šXY\‹ZXÛÛ‹[[šÈÈ\Ü^Nˆ›Û™NÈH—KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
+KØ›ÙËÖÜÛY×KÜYÙKÞ‹ˆ™\]Z\™YˆÈ\XÛT™XY[™Ñ^\šY[˜ÙH‹\XÛSX\›š[™ÐÛÛ^‹\XÛUØÈ‹\XÛU™\šYšXØ][Û”Ý[[X\žH‹\XÛQ™YY˜XÚÈ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛK]ØËÞ‹ˆ™\]Z\™YˆÈ˜\XÛK\YÙK]ØÈ‹ØËYÜ›Ý\ZXY[™È‹’[\œÙXÝ[Û“ØœÙ\™\ˆ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛK]™\šYšXØ][Û‹\Ý[[X\žKÞ‹ˆ™\]Z\™YˆÈ¹§éyç"új£:+àz+é¹ áH‹”ØÜ™Y\ÈÛÛœÛÛH‹¹ç'ùk§¹..ùoªyã«È—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛK[X\›š[™ËXÛÛ^Þ‹ˆ™\]Z\™YˆÈºf¯¹n©ˆ‹º` ¹å*:f-¹«­H‹¹bcyïk¹géú+áˆ‹¹ª(ygeù/cyïkˆ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛKY™YY˜XÚËÞ‹ˆ™\]Z\™YˆÈ¹a¡yk®ycëú ïy.£¹¥íˆ‹¹nîº+«º(iyaaH‹¹¬¨y.®¹i*H‹˜\XÛWÙ™YY˜XÚÈ—Kˆ›Ü˜šY[ŽˆÈ›™YYË]ÛÜšÈ—KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËÜÚ]K\ÙX\˜ÚÞ‹ˆ™\]Z\™YˆÈœÚ]WÜÙX\˜ÚÛ›×Ü™\Ý[È‹œÚ]WÜÙX\˜ÚÜ™\Ý[ØÛXÚÈ‹š[™TÝYÙÙ\Ý[Û’Ù^QÝÛˆ‹™[[™^™\]Y\ÝY‹‹Ø\KÜÙX\˜ÚZ[™^‹™Y]\Ý[˜ÙH—Kˆ›Ü˜šY[ŽˆÈ\ÙQY™™XÝ
 
-const failures = [];
-for (const check of checks) {
-  const source = fs.readFileSync(check.path, "utf8");
-  for (const text of check.required) {
-    if (!source.includes(text)) failures.push(`${check.path}: missing ${JSON.stringify(text)}`);
-  }
-  for (const text of check.forbidden) {
-    if (source.includes(text)) failures.push(`${check.path}: forbidden ${JSON.stringify(text)}`);
-  }
-}
 
-if (failures.length > 0) {
-  console.error("Final design regression checks failed:\n" + failures.map((item) => `- ${item}`).join("\n"));
-  process.exit(1);
-}
+HOˆ×ˆÙ]XÝ]™TÝYÙÙ\Ý[Û’[™^
+LJNÈ—KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
+KØ\KÜÙX\˜ÚZ[™^Ü›Ý]KÈ‹ˆ™\]Z\™YˆÈ™Ù]ÙX\˜ÚØÝ[Y[È‹œË[X^YÙON—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\Ø›ÙËÖÜÛY×KÛÜ[™Ü˜\Z[XYÙKÞ‹ˆ™\]Z\™YˆÈ’[XYÙT™\ÜÛœÙH‹”ÐÔ‘QTÈ0­È9.+y¥¡Îyn¤È‹ŒLŒ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
+KÝÛÛËØÜ™Y\X›ÙKXØ[Ý[]Ü‹ÜYÙKÞ‹ˆ™\]Z\™YˆÈ•ÛÛ][]P˜\ˆ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
+KÝÛÛËÜ›ÛÛKYXYÛ›ÜÝXÜËÜYÙKÞ‹ˆ™\]Z\™YˆÈ•ÛÛ][]P˜\ˆ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\ÙÛØ˜[Ë˜ÜÜÈ‹ˆ™\]Z\™YˆÈ‘’SSTÒQÓˆÕ‘T’US‹”ÒUHUQUÒPÒÓTÕ’VTÈ‹œ™Y™\œË\™YXÙY[[Ý[Ûˆ‹˜\XÛKY›Ø][™Ë]ØÈ—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆ‹™Ú]X‹ÝÛÜšÙ›ÝÜËÜÚ]K\]X[]KX]Y]ž[[‹ˆ™\]Z\™YˆÈ“YÚÝ\ÙHÒH‹œØÚY[H—Kˆ›Ü˜šY[Žˆ×KˆKˆÂˆ]ˆ‹™Ú]X‹ÝÛÜšÙ›ÝÜËÜ]X\\›KXÛÛ[\™]šY]Ëž[[‹ˆ™\]Z\™YˆÈ˜\XÛ\Îœš[Üš]H‹\ØYX\Y˜XÝ—Kˆ›Ü˜šY[Žˆ×KˆK—NÂ‚˜ÛÛœÝ˜Z[\™\ÈH×NÂ™›Üˆ
+ÛÛœÝÚXÚÈÙˆÚXÚÜÊHÂˆÛÛœÝÛÝ\˜ÙHHœËœ™XYš[TÞ[˜ÊÚXÚËœ]]ŽŠNÂˆ›Üˆ
+ÛÛœÝ^ÙˆÚXÚËœ™\]Z\™Y
+HÂˆYˆ
+\ÛÝ\˜ÙKš[˜ÛY\Ê^
+JH˜Z[\™\Ëœ\Ú
+	ØÚXÚËœ]NˆZ\ÜÚ[™È	Ò”ÓÓ‹œÝš[™ÚYžJ^
+_X
+NÂˆBˆ›Üˆ
+ÛÛœÝ^ÙˆÚXÚË™›Ü˜šY[ŠHÂˆYˆ
+ÛÝ\˜ÙKš[˜ÛY\Ê^
+JH˜Z[\™\Ëœ\Ú
+	ØÚXÚËœ]Nˆ›Ü˜šY[ˆ	Ò”ÓÓ‹œÝš[™ÚYžJ^
+_X
+NÂˆBŸB‚šYˆ
+˜Z[\™\Ë›[™Ýˆ
+HÂˆÛÛœÛÛK™\œ›ÜŠ‘š[˜[\ÚYÛˆ™YÜ™\ÜÚ[ÛˆÚXÚÜÈ˜Z[Y—ˆˆ
+È˜Z[\™\Ë›X\
 
-console.log(`Final design regression checks passed: ${checks.length} files.`);
+][JHOˆH	Ú][_X
+Kš›Ú[Š—ˆŠJNÂˆ›ØÙ\ÜË™^]
+JNÂŸB‚˜ÛÛœÛÛK›ÙÊš[˜[\ÚYÛˆ™YÜ™\ÜÚ[ÛˆÚXÚÜÈ\ÜÙYˆ	ØÚXÚÜË›[™ÝHš[\Ë˜
+NÂ
