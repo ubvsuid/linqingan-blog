@@ -1,7 +1,7 @@
 export const englishBeginnerSpawnCreepArticleOverrides = {
   "screeps-spawn-creep": {
     title: "Screeps spawnCreep(): Create Your First Creep",
-    headline: "How to Create Your First Screeps Creep with spawnCreep()",
+    headline: "How to Make a Screeps Spawn Create a New Creep",
     description:
       "Use dryRun to validate a WORK-CARRY-MOVE body, submit one safe spawnCreep() request, read its return code, and verify the new Creep across later ticks.",
     category: "GETTING STARTED · BEGINNER LESSON 7 OF 12",
