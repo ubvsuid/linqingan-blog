@@ -115,4 +115,183 @@ export const englishBeginnerArticleOverrides = {
 <li><a href="https://docs.screeps.com/control.html" rel="nofollow noopener noreferrer">Screeps Documentation: Control</a></li>
 </ul>`,
   },
+  "screeps-first-room": {
+    title: "Screeps First Room: Find the Editor and Console",
+    headline: "How to Find Your First Screeps Room, Editor, and Console",
+    description:
+      "Find your first Screeps Room, code editor, and Console, then use read-only commands to identify visible Rooms, Spawns, Creeps, Sources, and the Controller.",
+    category: "GETTING STARTED · BEGINNER LESSON 2 OF 12",
+    readingTime: "8 min read",
+    breadcrumbLabel: "First room and tools",
+    tags: ["Screeps", "Rooms", "Console", "JavaScript"],
+    keywords: [
+      "Screeps first room",
+      "Screeps code editor",
+      "Screeps Console",
+      "Game.rooms",
+      "Game.spawns",
+      "Game.creeps",
+      "Screeps beginner interface",
+    ],
+    primaryKeyword: "Screeps first room",
+    searchIntent:
+      "Beginner interface orientation and read-only inspection of the first visible Screeps room and owned game objects",
+    finalScore: 98,
+    verification: [
+      ["Chinese source", "Read in full"],
+      ["Official documentation", "Checked"],
+      ["Game collections and constants", "Checked"],
+      ["JavaScript syntax", "Checked"],
+      ["Offline logic review", "Passed"],
+      ["Screeps Console", "Pending — replace names with your live account values"],
+      ["Current client layout", "Pending — interface placement may change"],
+      ["Last verified", "July 27, 2026"],
+      ["Publication status", "Ready"],
+    ],
+    toc: [
+      ["lesson-goal", "Lesson goal"],
+      ["three-work-areas", "Three work areas"],
+      ["objects-in-the-room", "Objects in the room"],
+      ["read-only-inventory", "Read-only account inventory"],
+      ["inspect-one-room", "Inspect one visible Room"],
+      ["read-the-result", "Read the result"],
+      ["common-results", "Common results"],
+      ["completion-check", "Completion check"],
+      ["next-lesson", "Next lesson"],
+      ["official-sources", "Official sources"],
+    ],
+    faq: [],
+    articleHtml: `
+<h2 id="lesson-goal">What you will complete in this lesson</h2>
+<p>This lesson has one practical goal: locate the room view, code editor, and Console, then connect the objects you see on screen with the names your JavaScript can read.</p>
+<p>You will not move a Creep, change Memory, create a unit, or submit any other game action. Every Console example below is read-only.</p>
+<p>The Screeps client can change over time, so this guide focuses on what each area does rather than promising that a button will always remain in one exact position.</p>
+
+<h2 id="three-work-areas">Find the three work areas</h2>
+<h3>The room view</h3>
+<p>The room view shows terrain, resources, Creeps, structures, Construction Sites, and the Room Controller. Use it to observe what is happening: whether a Creep is moving, whether a Spawn is producing a unit, and which objects are present in the current Room.</p>
+<p>The room view displays results. It does not replace the script that decides what your units and structures should attempt.</p>
+
+<h3>The code editor</h3>
+<p>The in-game code editor is where you write and save JavaScript. Screeps executes the active script during each game tick. Later lessons will use <code>module.exports.loop</code> here, but this lesson does not require you to replace or edit existing code.</p>
+<p>For now, confirm that you can open the editor and identify the active code branch or module.</p>
+
+<h3>The Console</h3>
+<p>The Console is the fastest place to inspect live game objects, read <code>console.log()</code> output, and see runtime errors. It is useful for temporary checks that do not belong in your permanent main loop.</p>
+<p><strong>Simple distinction:</strong> the room view shows what the colony looks like, while the Console helps you inspect what the current JavaScript state contains.</p>
+
+<h2 id="objects-in-the-room">Find the core objects in your first Room</h2>
+<p>Open a Room that you currently control or can see through your game objects. Look for these four object types.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Object</th><th>What to check in the room view</th><th>How code usually finds it</th></tr></thead>
+<tbody>
+<tr><td><code>Spawn</code></td><td>Its real name and whether it is idle or spawning.</td><td><code>Game.spawns</code> or <code>FIND_MY_SPAWNS</code>.</td></tr>
+<tr><td><code>Source</code></td><td>Where the Energy deposit is located.</td><td><code>room.find(FIND_SOURCES)</code>.</td></tr>
+<tr><td><code>Controller</code></td><td>Its ownership, level, and position.</td><td><code>room.controller</code>.</td></tr>
+<tr><td><code>Creep</code></td><td>Its exact name, body, Store, and remaining life.</td><td><code>Game.creeps</code> or <code>FIND_MY_CREEPS</code>.</td></tr>
+</tbody></table></div>
+<p>Do not assume that your Spawn is named <code>Spawn1</code> or that a Creep has a name used by an example article. Names are case-sensitive and must match the values in your own account.</p>
+<p>If you do not currently own a Creep, do not invent a name and continue. This lesson can still identify the Room, Spawn, Sources, and Controller.</p>
+
+<h2 id="read-only-inventory">Run one read-only account inventory</h2>
+<p><strong>State impact:</strong> read-only. This Console snippet reads the current tick and lists object names. It does not move a Creep, create a Creep, submit a structure action, or write to Memory.</p>
+<pre><code>const inventory = {
+  tick: Game.time,
+  visibleRooms: Object.keys(Game.rooms),
+  ownedSpawns: Object.keys(Game.spawns),
+  ownedCreeps: Object.keys(Game.creeps)
+};
+
+console.log(JSON.stringify(inventory, null, 2));</code></pre>
+<p><code>Game.spawns</code> is keyed by the names of your Spawns, and <code>Game.creeps</code> is keyed by the names of your Creeps. <code>Game.rooms</code> contains Room objects that are visible to your script during the current tick.</p>
+<p>Copy one real Room name from <code>visibleRooms</code>. Do not continue with a placeholder such as <code>W1N1</code> unless that is actually your Room.</p>
+
+<h2 id="inspect-one-room">Inspect one visible Room safely</h2>
+<p>Replace the example value with a Room name returned by the first check.</p>
+<pre><code>const ROOM_NAME = 'W1N1';
+const room = Game.rooms[ROOM_NAME];
+
+if (!room) {
+  console.log(
+    ROOM_NAME +
+    ' is not visible to your script on tick ' +
+    Game.time +
+    '.'
+  );
+} else {
+  const sources = room.find(FIND_SOURCES);
+  const ownedSpawns = room.find(FIND_MY_SPAWNS);
+  const ownedCreeps = room.find(FIND_MY_CREEPS);
+  const controller = room.controller;
+
+  console.log(JSON.stringify({
+    tick: Game.time,
+    roomName: room.name,
+    sourceCount: sources.length,
+    spawnNames: ownedSpawns.map(function (spawn) {
+      return spawn.name;
+    }),
+    creepNames: ownedCreeps.map(function (creep) {
+      return creep.name;
+    }),
+    controller: controller ? {
+      id: controller.id,
+      my: Boolean(controller.my),
+      level: controller.level,
+      x: controller.pos.x,
+      y: controller.pos.y
+    } : null
+  }, null, 2));
+}</code></pre>
+<p>This snippet checks that the Room exists before reading <code>room.controller</code> or calling <code>room.find()</code>. It uses arrays returned by <code>Room.find()</code> and converts owned object references into simple names that are easier to compare with the room view.</p>
+<p>The example does not claim a particular Source count, Spawn name, Creep name, Controller level, or Console output. Those values must come from your own current game state.</p>
+
+<h2 id="read-the-result">Connect the Console result to the room view</h2>
+<ol>
+<li>Match <code>roomName</code> with the Room displayed in the client.</li>
+<li>Click each owned Spawn and compare its name with <code>spawnNames</code>.</li>
+<li>Count the visible Sources and compare the result with <code>sourceCount</code>.</li>
+<li>Compare the owned Creep names with <code>creepNames</code>.</li>
+<li>Click the Controller and compare its level and coordinates with the <code>controller</code> object.</li>
+</ol>
+<p>The purpose is not to memorize property names. It is to understand that the picture in the client and the objects available to JavaScript describe the same current game state.</p>
+
+<h2 id="common-results">How to interpret common results</h2>
+<h3>The Room is missing from <code>Game.rooms</code></h3>
+<p><code>Game.rooms</code> only contains Rooms currently visible to your script. A Room name stored in Memory or remembered from an earlier visit is not proof that a live <code>Room</code> object exists now. Use the dedicated <a href="/en/blog/screeps-room-visibility">Room visibility guide</a> when this becomes a recurring problem.</p>
+
+<h3><code>Object.keys(Game.spawns)</code> is empty</h3>
+<p>The current shard and tick contain no Spawn owned by your account. Confirm that you are viewing the intended shard and account state before running code that assumes a Spawn name.</p>
+
+<h3><code>Object.keys(Game.creeps)</code> is empty</h3>
+<p>This is a valid empty result, not a JavaScript error. It means the current tick contains no Creep owned by you. Continue only with checks that do not depend on a named Creep.</p>
+
+<h3>The Console shows <code>undefined</code></h3>
+<p>Some Console statements do not return a value. For example, <code>console.log()</code> can print the requested data while the overall expression still evaluates to <code>undefined</code>. Check the printed log and any error message before deciding that the inspection failed.</p>
+
+<h2 id="completion-check">Completion check</h2>
+<p>You have completed this lesson when you can do all of the following:</p>
+<ul>
+<li>explain the difference between the room view, code editor, and Console;</li>
+<li>identify a Spawn, Source, Controller, and owned Creep in the room view;</li>
+<li>list current visible Rooms, owned Spawns, and owned Creeps;</li>
+<li>replace example names with real values from your account;</li>
+<li>explain why a missing Room or empty object list must be handled before reading deeper properties.</li>
+</ul>
+
+<h2 id="next-lesson">Continue to ticks and the game loop</h2>
+<p>The next lesson explains <code>Game.time</code>, <code>module.exports.loop</code>, and why Screeps actions and movement should be observed across later ticks:</p>
+<p><a href="/en/blog/screeps-tick-game-loop">Understand Screeps ticks and the game loop →</a></p>
+<p>Return to the <a href="/en/beginner">English beginner roadmap</a> to see all twelve lessons, or use the <a href="/en/glossary">glossary</a> for short definitions of Room, Spawn, Source, Controller, Creep, and tick.</p>
+
+<h2 id="official-sources">Official sources</h2>
+<ul>
+<li><a href="https://docs.screeps.com/introduction.html" rel="nofollow noopener noreferrer">Screeps Documentation: Introduction</a></li>
+<li><a href="https://docs.screeps.com/scripting-basics.html" rel="nofollow noopener noreferrer">Screeps Documentation: Scripting Basics</a></li>
+<li><a href="https://docs.screeps.com/api/#Game.rooms" rel="nofollow noopener noreferrer">Screeps API: Game.rooms</a></li>
+<li><a href="https://docs.screeps.com/api/#Game.spawns" rel="nofollow noopener noreferrer">Screeps API: Game.spawns</a></li>
+<li><a href="https://docs.screeps.com/api/#Game.creeps" rel="nofollow noopener noreferrer">Screeps API: Game.creeps</a></li>
+<li><a href="https://docs.screeps.com/api/#Room.find" rel="nofollow noopener noreferrer">Screeps API: Room.find()</a></li>
+</ul>`,
+  },
 } as const;
