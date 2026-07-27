@@ -11,11 +11,13 @@ export type EnglishContentType = "Lesson" | "Guide" | "Debugging" | "Safety" | "
 export interface EnglishDiscoveryArticle extends EnglishArticleRecord {
   moduleNumber: number;
   moduleTitle: string;
+  moduleHref: string;
   difficulty: EnglishDifficulty;
   contentType: EnglishContentType;
   tags: string[];
   tagSlugs: string[];
   updatedAt: string;
+  suppressToolRecommendation: boolean;
 }
 
 interface TagRule {
@@ -40,6 +42,16 @@ const tagRules: TagRule[] = [
   { label: "Debugging", slug: "debugging", terms: ["debug", "diagnostic", "return code", "error", "event log", "notification"] },
   { label: "JavaScript", slug: "javascript", terms: ["javascript", "module", "constant", "configuration", "global cache"] },
 ];
+
+const gettingStartedIntroductionHref = "/en/blog/screeps-introduction";
+const curatedRelatedArticleHrefs: Record<string, string[]> = {
+  [gettingStartedIntroductionHref]: [
+    "/en/blog/screeps-first-room",
+    "/en/blog/screeps-tick-game-loop",
+    "/en/blog/screeps-creep-harvest-energy",
+    "/en/blog/screeps-creep-body-parts",
+  ],
+};
 
 function articleText(article: EnglishArticleRecord): string {
   return [
@@ -88,7 +100,12 @@ function getTags(article: EnglishArticleRecord): TagRule[] {
 
 export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEnglishArticles.map((article) => {
   const moduleNumber = getEnglishKnowledgeModuleNumber(article);
-  const moduleTitle = englishKnowledgeModules.find((module) => module.number === moduleNumber)?.title ?? "Operations and Debugging";
+  const knowledgeModuleTitle = englishKnowledgeModules.find((module) => module.number === moduleNumber)?.title ?? "Operations and Debugging";
+  const isGettingStartedIntroduction = article.href === gettingStartedIntroductionHref;
+  const moduleTitle = isGettingStartedIntroduction ? "Getting Started" : knowledgeModuleTitle;
+  const moduleHref = isGettingStartedIntroduction
+    ? "/en/beginner"
+    : `/en/blog?module=${encodeURIComponent(moduleTitle)}`;
   const tags = getTags(article);
   const updatedAt = (article as EnglishArticleRecord & { updatedAt?: string }).updatedAt ?? article.publishedAt;
 
@@ -96,11 +113,13 @@ export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEngl
     ...article,
     moduleNumber,
     moduleTitle,
+    moduleHref,
     difficulty: getDifficulty(article),
     contentType: getContentType(article),
     tags: tags.map((tag) => tag.label),
     tagSlugs: tags.map((tag) => tag.slug),
     updatedAt,
+    suppressToolRecommendation: isGettingStartedIntroduction,
   };
 });
 
@@ -126,6 +145,14 @@ export function getEnglishDiscoveryArticle(href: string): EnglishDiscoveryArticl
 export function getRelatedEnglishArticles(href: string, limit = 4): EnglishDiscoveryArticle[] {
   const current = getEnglishDiscoveryArticle(href);
   if (!current) return [];
+
+  const curatedHrefs = curatedRelatedArticleHrefs[href];
+  if (curatedHrefs) {
+    return curatedHrefs
+      .map((relatedHref) => getEnglishDiscoveryArticle(relatedHref))
+      .filter((article): article is EnglishDiscoveryArticle => Boolean(article))
+      .slice(0, limit);
+  }
 
   return englishDiscoveryArticles
     .filter((article) => article.href !== href)
