@@ -10,7 +10,7 @@ import styles from "../english.module.css";
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Articles and Debugging Guides",
   description:
-    "Search and filter practical English Screeps articles by system, difficulty, content type, and topic. Every guide includes checked APIs, debugging steps, and transparent verification status.",
+    "Search and filter practical English Screeps articles by system, difficulty, content type, and topic. Every page includes source review, clear scope, and transparent verification status.",
   path: "/en/blog",
   chinesePath: "/blog",
 });
@@ -48,7 +48,7 @@ export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageP
             Browse {englishDiscoveryArticles.length} published guides by system, difficulty,
             content type, or topic. Start with{" "}
             <Link href="/en/blog/screeps-introduction">
-              What Is Screeps and What Do You Actually Do in It?
+              What Is Screeps? A Programming Strategy Game
             </Link>{" "}
             or follow the beginner sequence through{" "}
             <Link href="/en/blog/screeps-first-room-code">
@@ -69,8 +69,9 @@ export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageP
         <div className={styles.notice}>
           <strong>Publication standard</strong>
           <p>
-            English articles are published only after source review, official API checks,
-            JavaScript syntax review, duplicate-intent checks, and a final score of at least 96.
+            English articles are published only after source review, official API checks where
+            applicable, JavaScript syntax review where code is present, duplicate-intent checks,
+            and a final score of at least 96.
           </p>
         </div>
       </Container>
