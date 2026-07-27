@@ -48,10 +48,12 @@ const tagRules: TagRule[] = [
 const gettingStartedArticleHrefs = new Set([
   "/en/blog/screeps-introduction",
   "/en/blog/screeps-first-room",
+  "/en/blog/screeps-tick-game-loop",
 ]);
 const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
   "/en/blog/screeps-first-room": ["rooms", "console", "javascript"],
+  "/en/blog/screeps-tick-game-loop": ["javascript", "console"],
 };
 const curatedRelatedArticleHrefs: Record<string, string[]> = {
   "/en/blog/screeps-introduction": [
@@ -65,6 +67,12 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
     "/en/blog/screeps-tick-game-loop",
     "/en/blog/screeps-room-visibility",
     "/en/blog/screeps-creep-harvest-energy",
+  ],
+  "/en/blog/screeps-tick-game-loop": [
+    "/en/blog/screeps-first-room",
+    "/en/blog/screeps-creep-harvest-energy",
+    "/en/blog/screeps-memory-basics",
+    "/en/blog/screeps-first-room-code",
   ],
 };
 

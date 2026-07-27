@@ -69,6 +69,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Screeps beginner interface",
     ],
   },
+  "/en/blog/screeps-tick-game-loop": {
+    category: "GETTING STARTED · BEGINNER LESSON 3 OF 12",
+    title: "Screeps Ticks and Game Loop: Why Your Code Runs Repeatedly",
+    description:
+      "Understand a Screeps tick, Game.time, and module.exports.loop, then run safe observations that show why actions and state changes appear across later ticks.",
+    readingTime: "8 min read",
+    primaryKeyword: "Screeps tick",
+    searchIntent:
+      "Beginner explanation of Screeps tick timing, repeated main-loop execution, and safe observation across later ticks",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps tick",
+      "Screeps game loop",
+      "Game.time",
+      "module.exports.loop",
+      "Screeps action next tick",
+      "Screeps beginner",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
