@@ -129,6 +129,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Screeps Energy loop",
     ],
   },
+  "/en/blog/screeps-creep-body-parts": {
+    category: "GETTING STARTED · BEGINNER LESSON 6 OF 12",
+    title: "Screeps Creep Body Parts: WORK, CARRY, and MOVE",
+    description:
+      "Inspect one Creep's active WORK, CARRY, and MOVE parts, then use its action result, Store, fatigue, and damage to diagnose missing abilities.",
+    readingTime: "8 min read",
+    primaryKeyword: "Screeps Creep body parts",
+    searchIntent:
+      "Beginner diagnostic lesson for matching harvest, Store, and movement failures to active WORK, CARRY, and MOVE parts",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps Creep body parts",
+      "Screeps WORK CARRY MOVE",
+      "Creep.getActiveBodyparts()",
+      "ERR_NO_BODYPART",
+      "creep.body",
+      "creep.fatigue",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
