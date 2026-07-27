@@ -1,6 +1,7 @@
 // Published: complete English beginner sequence.
 import { gunzipSync } from "node:zlib";
 
+import { englishBeginnerArticleOverrides } from "./english-beginner-overrides";
 import part1 from "@/lib/english-beginner-data/part-1";
 import part2 from "@/lib/english-beginner-data/part-2";
 import part3 from "@/lib/english-beginner-data/part-3";
@@ -108,7 +109,17 @@ function parseEnglishBeginnerArticles(encoded: string): EnglishBeginnerArticle[]
   return parsed as EnglishBeginnerArticle[];
 }
 
-export const englishBeginnerArticles = parseEnglishBeginnerArticles(encodedArticleData);
+const parsedEnglishBeginnerArticles = parseEnglishBeginnerArticles(encodedArticleData);
+const articleOverrides = englishBeginnerArticleOverrides as Record<
+  string,
+  Partial<EnglishBeginnerArticle>
+>;
+
+export const englishBeginnerArticles: EnglishBeginnerArticle[] =
+  parsedEnglishBeginnerArticles.map((article) => ({
+    ...article,
+    ...(articleOverrides[article.slug] ?? {}),
+  }));
 
 export const englishBeginnerArticleBySlug = Object.fromEntries(
   englishBeginnerArticles.map((article) => [article.slug, article]),
