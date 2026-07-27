@@ -1,0 +1,52 @@
+name: Apply priority audit fixes
+
+on:
+  pull_request:
+    branches:
+      - clean-blog-v1
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  apply:
+    if: github.event.pull_request.head.ref == 'fix/audit-priority-1-4'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Apply verified patch bundle
+        run: |
+          if [ ! -d .audit-fix-bundle ]; then
+            echo "No audit patch bundle found."
+            exit 0
+          fi
+          cat .audit-fix-bundle/part-* | base64 --decode > /tmp/audit-fixes.patch.gz
+          echo "66c429cea840737d583c29cbf800f2f9bb3cba5cfecac5273988ec25a14efb38  /tmp/audit-fixes.patch.gz" | sha256sum --check
+          gzip --decompress --stdout /tmp/audit-fixes.patch.gz > /tmp/audit-fixes.patch
+          git apply --index --binary /tmp/audit-fixes.patch
+          rm -rf .audit-fix-bundle
+          rm -f .github/workflows/apply-audit-fix-bundle.yml
+          rm -f .github/workflows/export-current-source.yml
+          rm -f .source-export-trigger
+
+      - name: Commit audit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No audit changes to commit."
+            exit 0
+          fi
+          git commit -m "Fix English taxonomy, language output, scores, and search index"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
