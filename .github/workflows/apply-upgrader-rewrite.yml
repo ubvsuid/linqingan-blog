@@ -1,0 +1,34 @@
+name: Apply Upgrader lesson rewrite
+
+on:
+  push:
+    branches:
+      - agent/revise-screeps-upgrade-controller
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/revise-screeps-upgrade-controller
+          fetch-depth: 0
+
+      - name: Apply patches and remove temporary files
+        run: |
+          node scripts/apply-upgrader-lesson-rewrite.mjs
+          rm scripts/apply-upgrader-lesson-rewrite.mjs
+          rm .github/workflows/apply-upgrader-rewrite.yml
+
+      - name: Commit rewrite
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/english-articles-complete.ts src/lib/english-discovery.ts scripts/apply-upgrader-lesson-rewrite.mjs .github/workflows/apply-upgrader-rewrite.yml
+          git commit -m "Synchronize the beginner Upgrader lesson metadata"
+          git push origin HEAD:agent/revise-screeps-upgrade-controller
