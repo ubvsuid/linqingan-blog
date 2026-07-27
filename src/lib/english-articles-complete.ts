@@ -48,6 +48,27 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "JavaScript strategy game",
     ],
   },
+  "/en/blog/screeps-first-room": {
+    category: "GETTING STARTED · BEGINNER LESSON 2 OF 12",
+    title: "Screeps First Room: Find the Editor and Console",
+    description:
+      "Find your first Screeps Room, code editor, and Console, then use read-only commands to identify visible Rooms, Spawns, Creeps, Sources, and the Controller.",
+    readingTime: "8 min read",
+    primaryKeyword: "Screeps first room",
+    searchIntent:
+      "Beginner interface orientation and read-only inspection of the first visible Screeps room and owned game objects",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps first room",
+      "Screeps code editor",
+      "Screeps Console",
+      "Game.rooms",
+      "Game.spawns",
+      "Game.creeps",
+      "Screeps beginner interface",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
