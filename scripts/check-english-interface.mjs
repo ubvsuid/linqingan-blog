@@ -63,6 +63,11 @@ requireText("src/components/english-site-search.tsx", 'event.key !== "/"', "Engl
 requireText("src/components/english-site-search.tsx", '/en/search-index.json', "lazy English search-index request");
 requireText("src/app/(en)/en/search-index.json/route.ts", 'dynamic = "force-static"', "static English search-index route");
 forbidText("src/app/(en)/en/search/page.tsx", "englishSearchDocuments", "full search index in initial page payload");
+requireText("src/lib/search.ts", "compactArticleSearchText", "compact Chinese article search text");
+requireText("src/lib/search.ts", "MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400", "Chinese search payload limit");
+requireText("src/lib/english-search.ts", "compactKeywords", "compact English search keywords");
+requireText("src/app/(zh)/api/search-index/route.ts", '"X-Robots-Tag": "noindex, nofollow"', "Chinese search-index robots header");
+forbidText("src/components/english-article-browser.tsx", "article.finalScore", "public internal score usage");
 requireText("src/components/site-footer.tsx", "/en/changelog", "English changelog footer link");
 requireText("src/components/site-footer.tsx", "/en/roadmap", "English roadmap footer link");
 requireText("src/components/site-footer.tsx", "/en/license", "English content-use footer link");
