@@ -31,7 +31,7 @@ const tagRules: TagRule[] = [
   { label: "Spawn", slug: "spawn", terms: ["spawn", "spawncreep"] },
   { label: "Creeps", slug: "creeps", terms: ["creep", "body part", "ticks to live", "renew", "recycle"] },
   { label: "Energy", slug: "energy", terms: ["energy", "harvest", "source", "delivery", "transfer"] },
-  { label: "Rooms", slug: "rooms", terms: ["room", "game.rooms", "room view", "visibility"] },
+  { label: "Rooms", slug: "rooms", terms: ["game.rooms", "room visibility", "room view", "visible room"] },
   { label: "Console", slug: "console", terms: ["console", "console.log"] },
   { label: "Movement", slug: "movement", terms: ["movement", "moveto", "move", "fatigue", "roomposition"] },
   { label: "Pathfinding", slug: "pathfinding", terms: ["pathfinder", "pathfinding", "findroute", "route"] },
