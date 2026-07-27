@@ -53,6 +53,7 @@ const gettingStartedArticleHrefs = new Set([
   "/en/blog/screeps-transfer-energy-to-spawn",
   "/en/blog/screeps-creep-body-parts",
   "/en/blog/screeps-spawn-creep",
+  "/en/blog/screeps-creep-roles",
 ]);
 const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-introduction": ["creeps", "energy", "javascript"],
@@ -62,6 +63,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-transfer-energy-to-spawn": ["creeps", "energy", "spawn"],
   "/en/blog/screeps-creep-body-parts": ["creeps", "movement", "debugging"],
   "/en/blog/screeps-spawn-creep": ["spawn", "creeps", "javascript"],
+  "/en/blog/screeps-creep-roles": ["creeps", "javascript"],
 };
 const curatedRelatedArticleHrefs: Record<string, string[]> = {
   "/en/blog/screeps-introduction": [
@@ -105,6 +107,12 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
     "/en/blog/screeps-creep-roles",
     "/en/blog/screeps-spawncreep-return-codes",
     "/en/blog/screeps-dynamic-creep-body",
+  ],
+  "/en/blog/screeps-creep-roles": [
+    "/en/blog/screeps-spawn-creep",
+    "/en/blog/screeps-upgrade-controller",
+    "/en/blog/screeps-memory-basics",
+    "/en/blog/screeps-modules-require",
   ],
 };
 
