@@ -89,6 +89,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Screeps beginner",
     ],
   },
+  "/en/blog/screeps-creep-harvest-energy": {
+    category: "GETTING STARTED · BEGINNER LESSON 4 OF 12",
+    title: "Screeps Harvest Energy: Your First Creep Script",
+    description:
+      "Make one named Screeps Creep find a Source, move into range, and harvest Energy with a small script you can verify across later ticks.",
+    readingTime: "9 min read",
+    primaryKeyword: "Screeps harvest Energy",
+    searchIntent:
+      "Beginner action tutorial for moving one named Creep into range and harvesting Energy from a visible Source",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps harvest Energy",
+      "Creep.harvest()",
+      "FIND_SOURCES",
+      "ERR_NOT_IN_RANGE",
+      "Creep.moveTo()",
+      "Screeps beginner code",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
