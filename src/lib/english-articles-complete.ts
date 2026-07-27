@@ -109,6 +109,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Screeps beginner code",
     ],
   },
+  "/en/blog/screeps-transfer-energy-to-spawn": {
+    category: "GETTING STARTED · BEGINNER LESSON 5 OF 12",
+    title: "Screeps Energy Delivery: Creep to Spawn",
+    description:
+      "Make one Creep transfer Energy to a named Spawn, preserve delivery mode across ticks, and complete its first Source-to-Spawn round trip.",
+    readingTime: "10 min read",
+    primaryKeyword: "Screeps transfer Energy to Spawn",
+    searchIntent:
+      "Beginner action tutorial for transferring carried Energy to a named Spawn and preserving the harvest-deliver state across ticks",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps transfer Energy to Spawn",
+      "Creep.transfer()",
+      "creep.memory.delivering",
+      "Game.spawns",
+      "RESOURCE_ENERGY",
+      "Screeps Energy loop",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
