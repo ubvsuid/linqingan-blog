@@ -42,8 +42,8 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-room-visibility": 4,
   "/en/blog/screeps-observer-observe-room": 4,
   "/en/blog/screeps-pathfinder-costmatrix": 4,
+  "/en/blog/screeps-first-room": 4,
 
-  "/en/blog/screeps-first-room": 5,
   "/en/blog/screeps-upgrade-controller": 5,
   "/en/blog/screeps-controller-activate-safe-mode": 5,
   "/en/blog/screeps-controller-downgrade": 5,
