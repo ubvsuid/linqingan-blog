@@ -189,6 +189,26 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Screeps beginner roles",
     ],
   },
+  "/en/blog/screeps-upgrade-controller": {
+    category: "GETTING STARTED · BEGINNER LESSON 9 OF 12",
+    title: "Screeps upgradeController(): Build Your First Upgrader Loop",
+    description:
+      "Build one Upgrader1 loop that harvests from an active Source, moves within Controller range 3, spends Energy with upgradeController(), and switches state across ticks.",
+    readingTime: "10 min read",
+    primaryKeyword: "Screeps upgradeController",
+    searchIntent:
+      "Beginner action tutorial for running one fixed-name Upgrader between an active Source and an owned Room Controller across repeated ticks",
+    finalScore: 98,
+    updatedAt: "2026-07-27",
+    keywords: [
+      "Screeps upgradeController",
+      "Creep.upgradeController()",
+      "Screeps Upgrader code",
+      "creep.memory.upgrading",
+      "FIND_SOURCES_ACTIVE",
+      "Room Controller range 3",
+    ],
+  },
 };
 
 const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
