@@ -35,7 +35,7 @@ const checks = [
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById()", "Memory", "null"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower()", "Screeps Console", "待测试"]],
   ["/en/beginner", ["Learn Screeps in twelve focused lessons", "LESSON 01", "LESSON 12", "Complete beginner sequence published"]],
-  ["/en/blog", ["Practical Screeps articles", "What Is Screeps? How the Programming Strategy Game Works", "How to Combine Your First Screeps Room Loop"]],
+  ["/en/blog", ["Practical Screeps articles", "What Is Screeps? A Programming Strategy Game", "How to Combine Your First Screeps Room Loop"]],
   ["/en/blog/screeps-introduction", ["What Is Screeps? How the Programming Strategy Game Works", "Chinese source", "Read in full", "Publication status", "Ready"]],
   ["/en/blog/screeps-first-room", ["How to Find Your First Screeps Room and Its Core Objects", "State impact", "Read-only", "Screeps Console", "Pending"]],
   ["/en/blog/screeps-tick-game-loop", ["What Is a Screeps Tick", "Game-loop model", "Checked", "Tick interval", "Server-dependent"]],
