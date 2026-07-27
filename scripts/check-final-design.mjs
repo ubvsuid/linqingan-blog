@@ -8,45 +8,105 @@ const checks = [
   },
   {
     path: "src/components/home-task-hub.tsx",
-    required: ["ä½ ç°åœ¨æƒ³å®Œæˆä»€ä¹ˆ", "linqingan:recent-articles", "æœ€è¿‘é˜…è¯»"],
+    required: ["\u4f60\u73b0\u5728\u60f3\u5b8c\u6210\u4ec0\u4e48", "linqingan:recent-articles", "\u6700\u8fd1\u9605\u8bfb"],
     forbidden: [],
   },
   {
     path: "src/components/home-maintenance-panel.tsx",
-    required: ["home-timeline", "ç»´æŠ¤æ—¶é—´æµ"],
+    required: ["home-timeline", "\u7ef4\u62a4\u65f6\u95f4\u6d41"],
     forbidden: ["home-maintenance-grid", "home-change-strip"],
   },
   {
     path: "src/lib/site.ts",
-    required: ["å…¥óx¥¸œ, "æ–‡ç« ", "/Knowledge#reference-tools"],
-    forbidden: ["å…¥æ–‡ç« è¥¿çº¿", "å…¨éƒ¨æ–‡9êè—KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËÜÚ]KZXY\‹Ş‹ˆ™\]Z\™YˆÈ‹œ›Ùš[K\ÚÜİ]È\Ü^Nˆ›Û™NÈH‹‹šXY\‹ZXÛÛ‹[[šÈÈÚYˆÈZYÚˆÈH—Kˆ›Ü˜šY[ˆÈ‹šXY\‹ZXÛÛ‹[[šÈÈ\Ü^Nˆ›Û™NÈH—KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
-KØ›ÙËÖÜÛY×KÜYÙKŞ‹ˆ™\]Z\™YˆÈ\XÛT™XY[™Ñ^\šY[˜ÙH‹\XÛSX\›š[™ĞÛÛ^‹\XÛUØÈ‹\XÛU™\šYšXØ][Û”İ[[X\H‹\XÛQ™YY˜XÚÈ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛK]ØËŞ‹ˆ™\]Z\™YˆÈ˜\XÛK\YÙK]ØÈ‹ØËYÜ›İ\ZXY[™È‹’[\œÙXİ[Û“ØœÙ\™\ˆ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛK]™\šYšXØ][Û‹\İ[[X\KŞ‹ˆ™\]Z\™YˆÈ¹§éyç"új£:+àz+é¹ áH‹”ØÜ™Y\ÈÛÛœÛÛH‹¹ç'ùk§¹..ùoªyã«È—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛK[X\›š[™ËXÛÛ^Ş‹ˆ™\]Z\™YˆÈºf¯¹n©ˆ‹º` ¹å*:f-¹«­H‹¹bcyïk¹géú+áˆ‹¹ª(ygeù/cyïkˆ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËØ\XÛKY™YY˜XÚËŞ‹ˆ™\]Z\™YˆÈ¹a¡yk®ycëú ïy.£¹¥íˆ‹¹nîº+«º(iyaaH‹¹¬¨y.®¹i*H‹˜\XÛWÙ™YY˜XÚÈ—Kˆ›Ü˜šY[ˆÈ›™YYË]ÛÜšÈ—KˆKˆÂˆ]ˆœÜ˜ËØÛÛ\Û™[ËÜÚ]K\ÙX\˜ÚŞ‹ˆ™\]Z\™YˆÈœÚ]WÜÙX\˜ÚÛ›×Ü™\İ[È‹œÚ]WÜÙX\˜ÚÜ™\İ[ØÛXÚÈ‹š[™TİYÙÙ\İ[Û’Ù^QİÛˆ‹™[[™^™\]Y\İY‹‹Ø\KÜÙX\˜ÚZ[™^‹™Y]\İ[˜ÙH—Kˆ›Ü˜šY[ˆÈ\ÙQY™™Xİ
+    required: ["\u5165\u95e8", "\u6587\u7ae0", "/knowledge#reference-tools"],
+    forbidden: ["\u5165\u95e8\u8def\u7ebf", "\u5168\u90e8\u6587\u7ae0"],
+  },
+  {
+    path: "src/components/site-header.tsx",
+    required: [".profile-shortcut { display: none; }", ".header-icon-link { width: 40px; height: 40px; }"],
+    forbidden: [".header-icon-link { display: none; }"],
+  },
+  {
+    path: "src/app/(zh)/blog/[slug]/page.tsx",
+    required: ["ArticleReadingExperience", "ArticleLearningContext", "ArticleToc", "ArticleVerificationSummary", "ArticleFeedback"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-toc.tsx",
+    required: ["article-page-toc", "toc-group-heading", "IntersectionObserver"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-verification-summary.tsx",
+    required: ["\u67e5\u770b\u9a8c\u8bc1\u8be6\u60c5", "Screeps Console", "\u771f\u5b9e\u4e3b\u5faa\u73af"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-learning-context.tsx",
+    required: ["\u96be\u5ea6", "\u9002\u7528\u9636\u6bb5", "\u524d\u7f6e\u77e5\u8bc6", "\u6a21\u5757\u4f4d\u7f6e"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-feedback.tsx",
+    required: ["\u5185\u5bb9\u53ef\u80fd\u8fc7\u65f6", "\u5efa\u8bae\u8865\u5145", "\u6ca1\u89e3\u51b3", "article_feedback"],
+    forbidden: ["needs-work"],
+  },
+  {
+    path: "src/components/site-search.tsx",
+    required: ["site_search_no_results", "site_search_result_click", "handleSuggestionKeyDown", "fullIndexRequested", "/api/search-index", "editDistance"],
+    forbidden: ["useEffect(() => {\n    setActiveSuggestionIndex(-1);"],
+  },
+  {
+    path: "src/app/(zh)/api/search-index/route.ts",
+    required: ["getSearchDocuments", "s-maxage=86400"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/blog/[slug]/opengraph-image.tsx",
+    required: ["ImageResponse", "SCREEPS \u00b7 \u4e2d\u6587\u77e5\u8bc6\u5e93", "1200"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
+    required: ["ToolUtilityBar"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/room-diagnostics/page.tsx",
+    required: ["ToolUtilityBar"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/globals.css",
+    required: ["FINAL DESIGN OVERHAUL", "SITE AUDIT CHECKLIST FIXES", "prefers-reduced-motion", "article-floating-toc"],
+    forbidden: [],
+  },
+  {
+    path: ".github/workflows/site-quality-audit.yml",
+    required: ["Lighthouse CI", "schedule"],
+    forbidden: [],
+  },
+  {
+    path: ".github/workflows/quarterly-content-review.yml",
+    required: ["articles:priority", "upload-artifact"],
+    forbidden: [],
+  },
+];
 
+const failures = [];
+for (const check of checks) {
+  const source = fs.readFileSync(check.path, "utf8");
+  for (const text of check.required) {
+    if (!source.includes(text)) failures.push(`${check.path}: missing ${JSON.stringify(text)}`);
+  }
+  for (const text of check.forbidden) {
+    if (source.includes(text)) failures.push(`${check.path}: forbidden ${JSON.stringify(text)}`);
+  }
+}
 
-HOˆ×ˆÙ]Xİ]™TİYÙÙ\İ[Û’[™^
-LJNÈ—KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
-KØ\KÜÙX\˜ÚZ[™^Ü›İ]KÈ‹ˆ™\]Z\™YˆÈ™Ù]ÙX\˜ÚØİ[Y[È‹œË[X^YÙON—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\Ø›ÙËÖÜÛY×KÛÜ[™Ü˜\Z[XYÙKŞ‹ˆ™\]Z\™YˆÈ’[XYÙT™\ÜÛœÙH‹”ĞÔ‘QTÈ0­È9.+y¥¡Îyn¤È‹ŒLŒ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
-KİÛÛËØÜ™Y\X›ÙKXØ[İ[]Ü‹ÜYÙKŞ‹ˆ™\]Z\™YˆÈ•ÛÛ][]P˜\ˆ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\Êš
-KİÛÛËÜ›ÛÛKYXYÛ›ÜİXÜËÜYÙKŞ‹ˆ™\]Z\™YˆÈ•ÛÛ][]P˜\ˆ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆœÜ˜ËØ\ÙÛØ˜[Ë˜ÜÜÈ‹ˆ™\]Z\™YˆÈ‘’SSTÒQÓˆÕ‘T’US‹”ÒUHUQUÒPÒÓTÕ’VTÈ‹œ™Y™\œË\™YXÙY[[İ[Ûˆ‹˜\XÛKY›Ø][™Ë]ØÈ—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆ‹™Ú]X‹İÛÜšÙ›İÜËÜÚ]K\]X[]KX]Y][[‹ˆ™\]Z\™YˆÈ“YÚİ\ÙHÒH‹œØÚY[H—Kˆ›Ü˜šY[ˆ×KˆKˆÂˆ]ˆ‹™Ú]X‹İÛÜšÙ›İÜËÜ]X\\›KXÛÛ[\™]šY]Ë[[‹ˆ™\]Z\™YˆÈ˜\XÛ\Îœš[Üš]H‹\ØYX\Y˜Xİ—Kˆ›Ü˜šY[ˆ×KˆK—NÂ‚˜ÛÛœİ˜Z[\™\ÈH×NÂ™›Üˆ
-ÛÛœİÚXÚÈÙˆÚXÚÜÊHÂˆÛÛœİÛİ\˜ÙHHœËœ™XYš[TŞ[˜ÊÚXÚËœ]]ŠNÂˆ›Üˆ
-ÛÛœİ^ÙˆÚXÚËœ™\]Z\™Y
-HÂˆYˆ
-\Ûİ\˜ÙKš[˜ÛY\Ê^
-JH˜Z[\™\Ëœ\Ú
-	ØÚXÚËœ]NˆZ\ÜÚ[™È	Ò”ÓÓ‹œİš[™ÚYJ^
-_X
-NÂˆBˆ›Üˆ
-ÛÛœİ^ÙˆÚXÚË™›Ü˜šY[ŠHÂˆYˆ
-Ûİ\˜ÙKš[˜ÛY\Ê^
-JH˜Z[\™\Ëœ\Ú
-	ØÚXÚËœ]Nˆ›Ü˜šY[ˆ	Ò”ÓÓ‹œİš[™ÚYJ^
-_X
-NÂˆBŸB‚šYˆ
-˜Z[\™\Ë›[™İˆ
-HÂˆÛÛœÛÛK™\œ›ÜŠ‘š[˜[\ÚYÛˆ™YÜ™\ÜÚ[ÛˆÚXÚÜÈ˜Z[Y—ˆˆ
-È˜Z[\™\Ë›X\
+if (failures.length > 0) {
+  console.error("Final design regression checks failed:\n" + failures.map((item) => `- ${item}`).join("\n"));
+  process.exit(1);
+}
 
-][JHOˆH	Ú][_X
-Kš›Ú[Š—ˆŠJNÂˆ›ØÙ\ÜË™^]
-JNÂŸB‚˜ÛÛœÛÛK›ÙÊš[˜[\ÚYÛˆ™YÜ™\ÜÚ[ÛˆÚXÚÜÈ\ÜÙYˆ	ØÚXÚÜË›[™İHš[\Ë˜
-NÂ
+console.log(`Final design regression checks passed: ${checks.length} files.`);
