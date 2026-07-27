@@ -14,6 +14,7 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-rawmemory-segments": 1,
   "/en/blog/screeps-flags-configuration": 1,
   "/en/blog/screeps-require-modules": 1,
+  "/en/blog/screeps-introduction": 1,
 
   "/en/blog/screeps-creep-body-parts": 2,
   "/en/blog/screeps-spawn-creep": 2,
@@ -42,7 +43,6 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-observer-observe-room": 4,
   "/en/blog/screeps-pathfinder-costmatrix": 4,
 
-  "/en/blog/screeps-introduction": 5,
   "/en/blog/screeps-first-room": 5,
   "/en/blog/screeps-upgrade-controller": 5,
   "/en/blog/screeps-controller-activate-safe-mode": 5,
