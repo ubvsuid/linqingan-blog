@@ -35,6 +35,10 @@ export async function generateMetadata({ params }: EnglishTagPageProps): Promise
   return {
     title: { absolute: title },
     description,
+    robots: {
+      index: tag.count >= 3,
+      follow: true,
+    },
     alternates: { canonical: path },
     openGraph: {
       type: "website",
