@@ -71,6 +71,8 @@ const knownRoutes = new Set([
   "/screeps-errors",
   "/search",
   "/sitemap.xml",
+  "/sitemap-zh.xml",
+  "/sitemap-en.xml",
   "/tags",
   "/tools/creep-body-calculator",
   "/tools/room-diagnostics",
@@ -194,9 +196,16 @@ for (const relativePath of [
   "src/app/(zh)/blog/page/[page]/page.tsx",
   "src/app/(zh)/beginner/page/[page]/page.tsx",
   "src/app/(zh)/changelog/page/[page]/page.tsx",
-  "src/app/(zh)/sitemap.ts",
+  "src/app/(zh)/sitemap.xml/route.ts",
+  "src/app/(zh)/sitemap-zh.xml/route.ts",
+  "src/app/(zh)/sitemap-en.xml/route.ts",
+  "src/lib/sitemaps.ts",
 ]) {
   if (!fs.existsSync(path.join(root, relativePath))) addError(`缺少动态路由文件 ${relativePath}`);
+}
+
+if (fs.existsSync(path.join(root, "src/app/(zh)/sitemap.ts"))) {
+  addError("旧的单一 Sitemap 元数据路由仍然存在，会与 Sitemap 索引冲突");
 }
 
 for (const retiredPath of [
@@ -252,6 +261,14 @@ if (!tagPageSource.includes("noindex: record.count < 3")) {
   addError("薄标签页没有按文章数量设置 noindex");
 }
 
+const englishTagPageSource = fs.readFileSync(
+  path.join(root, "src", "app", "(en)", "en", "tags", "[tag]", "page.tsx"),
+  "utf8",
+);
+if (!englishTagPageSource.includes("index: tag.count >= 3")) {
+  addError("英文薄标签页没有按文章数量设置 noindex");
+}
+
 const searchPageSource = fs.readFileSync(
   path.join(root, "src", "app", "(zh)", "search", "page.tsx"),
   "utf8",
@@ -278,6 +295,8 @@ if (!nowPageSource.includes("changelogEntries.slice(0, 3)")) {
 
 const nextConfigSource = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
 for (const marker of [
+  'source: "/changelog/page/2"',
+  'destination: "/changelog"',
   'source: "/resources"',
   'destination: "/knowledge#reference-tools"',
   'source: "/projects/:path*"',
@@ -286,7 +305,7 @@ for (const marker of [
   if (!nextConfigSource.includes(marker)) addError(`缺少旧页面重定向：${marker}`);
 }
 
-const sitemapSource = fs.readFileSync(path.join(root, "src", "app", "(zh)", "sitemap.ts"), "utf8");
+const sitemapSource = fs.readFileSync(path.join(root, "src", "lib", "sitemaps.ts"), "utf8");
 for (const marker of [
   "getAllPosts()",
   "getTagRecords()",
@@ -297,6 +316,7 @@ for (const marker of [
   "/verification",
   "/changelog",
   "/tools/creep-body-calculator",
+  "/en/blog",
 ]) {
   if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
 }
@@ -306,6 +326,33 @@ if (sitemapSource.includes("`${siteConfig.url}/search`")) {
 if (sitemapSource.includes("`${siteConfig.url}/resources`") || sitemapSource.includes("`${siteConfig.url}/projects`")) {
   addError("已合并的资料或项目页面不应出现在 Sitemap");
 }
+if (sitemapSource.includes("/blog/page/") || sitemapSource.includes("createArchivePages")) {
+  addError("文章深层分页不应进入 Sitemap");
+}
+
+const sitemapIndexSource = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "sitemap.xml", "route.ts"),
+  "utf8",
+);
+for (const marker of ["/sitemap-zh.xml", "/sitemap-en.xml", "renderSitemapIndexXml"]) {
+  if (!sitemapIndexSource.includes(marker)) addError(`Sitemap 索引缺少：${marker}`);
+}
+
+const chineseSitemapRoute = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "sitemap-zh.xml", "route.ts"),
+  "utf8",
+);
+if (!chineseSitemapRoute.includes("getChineseSitemapEntries")) {
+  addError("中文 Sitemap 路由没有使用中文 URL 构建器");
+}
+
+const englishSitemapRoute = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "sitemap-en.xml", "route.ts"),
+  "utf8",
+);
+if (!englishSitemapRoute.includes("getEnglishSitemapEntries")) {
+  addError("英文 Sitemap 路由没有使用英文 URL 构建器");
+}
 
 if (errors.length > 0) {
   for (const error of errors) console.error(`ERROR: ${error}`);
@@ -314,5 +361,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章、${knowledgeSectionIds.length} 个专题页。`,
+  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章、${knowledgeSectionIds.length} 个专题页，并已启用双语 Sitemap 索引。`,
 );
