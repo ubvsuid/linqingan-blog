@@ -53,6 +53,7 @@ for (const record of records) {
 
 const requiredFiles = [
   "src/lib/english-discovery.ts",
+  "src/lib/sitemaps.ts",
   "src/components/english-article-browser.tsx",
   "src/app/(en)/en/tags/page.tsx",
   "src/app/(en)/en/tags/[tag]/page.tsx",
@@ -67,7 +68,9 @@ for (const relativePath of requiredFiles) {
 const assertions = [
   ["src/components/site-footer.tsx", "/en/feed.xml", "English footer RSS link"],
   ["src/components/site-footer.tsx", "/en/tags", "English footer topic link"],
-  ["src/app/(zh)/sitemap.ts", "englishTags", "English topic Sitemap entries"],
+  ["src/lib/sitemaps.ts", "englishTags", "English topic Sitemap entries"],
+  ["src/lib/sitemaps.ts", ".filter((tag) => tag.count >= 3)", "English topic Sitemap threshold"],
+  ["src/app/(en)/en/tags/[tag]/page.tsx", "index: tag.count >= 3", "English thin-topic noindex threshold"],
   ["src/app/(zh)/blog/[slug]/layout.tsx", "hrefLang=\"en\"", "reciprocal English hreflang"],
   ["src/app/(zh)/blog/[slug]/layout.tsx", "hrefLang=\"zh-CN\"", "reciprocal Chinese hreflang"],
   ["src/app/(en)/en/blog/[slug]/page.tsx", "/opengraph-image", "article-specific Open Graph image"],
@@ -84,7 +87,6 @@ for (const [relativePath, expected, label] of assertions) {
   const source = fs.readFileSync(absolutePath, "utf8");
   if (!source.includes(expected)) failures.push(`Missing ${label} in ${relativePath}`);
 }
-
 
 const discoverySource = fs.readFileSync(path.join(root, "src/lib/english-discovery.ts"), "utf8");
 const overrideBlock = discoverySource.match(/const articleTagSlugOverrides:[\s\S]*?= \{([\s\S]*?)\n\};/);
@@ -122,5 +124,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `English discovery check passed: ${records.length} paired English/Chinese records, topic archives, RSS, reciprocal hreflang, related guides, and article share images are present. Semantic registry/content pairing is additionally enforced by englishmappingcheck.`,
+  `English discovery check passed: ${records.length} paired English/Chinese records, curated topic archives, thin-topic index thresholds, RSS, reciprocal hreflang, related guides, and article share images are present. Semantic registry/content pairing is additionally enforced by englishmappingcheck.`,
 );
