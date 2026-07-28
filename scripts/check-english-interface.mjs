@@ -32,6 +32,8 @@ const requiredFiles = [
   "src/app/(en)/en/license/page.tsx",
   "src/app/(en)/en/search-index.json/route.ts",
   "src/app/(en)/en/blog/screeps-memory-write-safety/page.tsx",
+  "src/app/(zh)/sitemap.xml/route.ts",
+  "src/app/(zh)/sitemap-en.xml/route.ts",
 ];
 for (const relativePath of requiredFiles) read(relativePath);
 
@@ -60,7 +62,7 @@ requireText("src/lib/english-discovery.ts", "moduleDefaultTagSlugs", "safe modul
 requireText("src/components/english-site-search.tsx", "featuredResources", "curated default English search resources");
 requireText("src/components/english-site-search.tsx", "popularQueries", "popular English searches");
 requireText("src/components/english-site-search.tsx", 'event.key !== "/"', "English search keyboard shortcut");
-requireText("src/components/english-site-search.tsx", '/en/search-index.json', "lazy English search-index request");
+requireText("src/components/english-site-search.tsx", "/en/search-index.json", "lazy English search-index request");
 requireText("src/app/(en)/en/search-index.json/route.ts", 'dynamic = "force-static"', "static English search-index route");
 forbidText("src/app/(en)/en/search/page.tsx", "englishSearchDocuments", "full search index in initial page payload");
 requireText("src/lib/search.ts", "compactArticleSearchText", "compact Chinese article search text");
@@ -71,9 +73,11 @@ forbidText("src/components/english-article-browser.tsx", "article.finalScore", "
 requireText("src/components/site-footer.tsx", "/en/changelog", "English changelog footer link");
 requireText("src/components/site-footer.tsx", "/en/roadmap", "English roadmap footer link");
 requireText("src/components/site-footer.tsx", "/en/license", "English content-use footer link");
-requireText("src/app/(zh)/sitemap.ts", "/en/changelog", "English changelog Sitemap entry");
-requireText("src/app/(zh)/sitemap.ts", "/en/roadmap", "English roadmap Sitemap entry");
-requireText("src/app/(zh)/sitemap.ts", "/en/license", "English content-use Sitemap entry");
+requireText("src/lib/sitemaps.ts", "/en/changelog", "English changelog Sitemap entry");
+requireText("src/lib/sitemaps.ts", "/en/roadmap", "English roadmap Sitemap entry");
+requireText("src/lib/sitemaps.ts", "/en/license", "English content-use Sitemap entry");
+requireText("src/lib/sitemaps.ts", ".filter((tag) => tag.count >= 3)", "thin English topic Sitemap threshold");
+requireText("src/app/(en)/en/tags/[tag]/page.tsx", "index: tag.count >= 3", "thin English topic noindex threshold");
 requireText("src/app/(en)/en/blog/screeps-memory-write-safety/page.tsx", "permanentRedirect", "legacy English permanent redirect");
 if (fs.existsSync(path.join(root, "src/app/(en)/en/loading.tsx"))) failures.push("Global English loading.tsx must remain absent because it turns permanent 308 redirects into streamed 200 responses.");
 
@@ -124,4 +128,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, lazy search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and Sitemap entries are present.");
+console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, lazy search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and bilingual Sitemap entries are present.");

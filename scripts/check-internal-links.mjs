@@ -5,7 +5,6 @@ const root = process.cwd();
 const scanRoots = ["src", "content"];
 const allowedExtensions = new Set([".ts", ".tsx", ".md", ".mjs"]);
 const ignoredFiles = new Set([
-  path.join("src", "app", "(zh)", "sitemap.ts"),
   "next.config.ts",
 ]);
 const retiredPaths = ["/resources", "/projects"];
@@ -21,6 +20,9 @@ const exactRoutes = new Set([
   "/now",
   "/screeps-errors",
   "/search",
+  "/sitemap.xml",
+  "/sitemap-zh.xml",
+  "/sitemap-en.xml",
   "/tags",
   "/tools/creep-body-calculator",
   "/tools/room-diagnostics",

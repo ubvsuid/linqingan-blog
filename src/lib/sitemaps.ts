@@ -1,23 +1,36 @@
-import type { MetadataRoute } from "next";
-
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
-import {
-  CHANGELOG_ITEMS_PER_PAGE,
-  changelogEntries,
-} from "@/lib/changelog";
+import { changelogEntries } from "@/lib/changelog";
 import {
   englishDiscoveryArticles,
   englishTags,
 } from "@/lib/english-discovery";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
-import { getCollectionPageHref, getTotalPages } from "@/lib/pagination";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 import { getTagRecords } from "@/lib/tags";
 
-type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
+export type SitemapChangeFrequency =
+  | "always"
+  | "hourly"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "yearly"
+  | "never";
+
+export interface SitemapEntry {
+  url: string;
+  lastModified: Date;
+  changeFrequency: SitemapChangeFrequency;
+  priority: number;
+}
+
+export interface SitemapIndexEntry {
+  url: string;
+  lastModified: Date;
+}
 
 const staticPageDates = {
   about: "2026-07-22",
@@ -30,43 +43,41 @@ const staticPageDates = {
   englishInterface: "2026-07-26",
 };
 
-function createArchivePages(
-  basePath: string,
-  totalItems: number,
-  lastModified: Date,
-  changeFrequency: ChangeFrequency,
-  priority: number,
-  itemsPerPage?: number,
-): MetadataRoute.Sitemap {
-  const totalPages = getTotalPages(totalItems, itemsPerPage);
-  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
-    const page = index + 2;
-    return {
-      url: `${siteConfig.url}${getCollectionPageHref(basePath, page)}`,
-      lastModified,
-      changeFrequency,
-      priority,
-    };
-  });
-}
-
 function latestDate(values: string[], fallback = "2026-07-17"): Date {
-  const latest = values.filter(Boolean).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0];
+  const latest = values
+    .filter(Boolean)
+    .sort((left, right) => new Date(right).getTime() - new Date(left).getTime())[0];
+
   return new Date(latest || fallback);
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+function escapeXml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+export function getChineseSitemapEntries(): SitemapEntry[] {
   const allPosts = getAllPosts();
   const postsBySlug = new Map(allPosts.map((post) => [post.slug, post]));
-  const allPostsUpdatedAt = latestDate(allPosts.map((post) => post.updatedAt ?? post.publishedAt));
-  const allPostsPublishedAt = latestDate(allPosts.map((post) => post.publishedAt));
+  const allPostsUpdatedAt = latestDate(
+    allPosts.map((post) => post.updatedAt ?? post.publishedAt),
+  );
+  const allPostsPublishedAt = latestDate(
+    allPosts.map((post) => post.publishedAt),
+  );
   const beginnerUpdatedAt = latestDate(
     beginnerSeriesSlugs.flatMap((slug) => {
       const post = postsBySlug.get(slug);
       return post ? [post.updatedAt ?? post.publishedAt] : [];
     }),
   );
-  const changelogUpdatedAt = latestDate(changelogEntries.map((entry) => entry.date));
+  const changelogUpdatedAt = latestDate(
+    changelogEntries.map((entry) => entry.date),
+  );
   const nowUpdatedAt = latestDate([
     ...nowEntries.map((entry) => entry.date),
     ...changelogEntries.map((entry) => entry.date),
@@ -77,7 +88,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...projects.map((project) => project.updatedAt),
   ]);
 
-  const staticPages: MetadataRoute.Sitemap = [
+  const staticPages: SitemapEntry[] = [
     { url: siteConfig.url, lastModified: allPostsUpdatedAt, changeFrequency: "weekly", priority: 1 },
     { url: `${siteConfig.url}/beginner`, lastModified: beginnerUpdatedAt, changeFrequency: "weekly", priority: 0.95 },
     { url: `${siteConfig.url}/blog`, lastModified: allPostsUpdatedAt, changeFrequency: "weekly", priority: 0.9 },
@@ -93,13 +104,53 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/about`, lastModified: aboutUpdatedAt, changeFrequency: "monthly", priority: 0.7 },
   ];
 
+  const knowledgeModulePages: SitemapEntry[] = knowledgeBaseSections.map(
+    (section) => ({
+      url: `${siteConfig.url}/knowledge/${section.id}`,
+      lastModified: latestDate(
+        section.slugs.flatMap((slug) => {
+          const post = postsBySlug.get(slug);
+          return post ? [post.updatedAt ?? post.publishedAt] : [];
+        }),
+      ),
+      changeFrequency: "weekly",
+      priority: 0.86,
+    }),
+  );
+
+  const posts: SitemapEntry[] = allPosts.map((post) => ({
+    url: `${siteConfig.url}/blog/${post.slug}`,
+    lastModified: new Date(post.updatedAt ?? post.publishedAt),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  const tagPages: SitemapEntry[] = getTagRecords()
+    .filter((tag) => tag.count >= 3)
+    .map((tag) => ({
+      url: `${siteConfig.url}/tags/${tag.slug}`,
+      lastModified: allPostsUpdatedAt,
+      changeFrequency: "weekly",
+      priority: 0.55,
+    }));
+
+  return [
+    ...staticPages,
+    ...knowledgeModulePages,
+    ...posts,
+    ...tagPages,
+  ];
+}
+
+export function getEnglishSitemapEntries(): SitemapEntry[] {
   const englishUpdatedAt = new Date(staticPageDates.englishFoundation);
   const englishInterfaceUpdatedAt = new Date(staticPageDates.englishInterface);
   const englishArticleUpdatedAt = latestDate(
     englishDiscoveryArticles.map((article) => article.updatedAt),
     staticPageDates.englishFoundation,
   );
-  const englishStaticPages: MetadataRoute.Sitemap = [
+
+  const staticPages: SitemapEntry[] = [
     { url: `${siteConfig.url}/en`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.92 },
     { url: `${siteConfig.url}/en/beginner`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.86 },
     { url: `${siteConfig.url}/en/blog`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.88 },
@@ -115,60 +166,59 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/en/changelog`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.62 },
     { url: `${siteConfig.url}/en/roadmap`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.58 },
     { url: `${siteConfig.url}/en/license`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "yearly", priority: 0.36 },
-    ...englishDiscoveryArticles.map((article) => ({
-      url: `${siteConfig.url}${article.href}`,
-      lastModified: new Date(article.updatedAt),
-      changeFrequency: "monthly" as const,
-      priority: 0.84,
-    })),
-    ...englishTags.map((tag) => ({
-      url: `${siteConfig.url}/en/tags/${tag.slug}`,
-      lastModified: englishArticleUpdatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.66,
-    })),
   ];
 
-  const knowledgeModulePages: MetadataRoute.Sitemap = knowledgeBaseSections.map((section) => ({
-    url: `${siteConfig.url}/knowledge/${section.id}`,
-    lastModified: latestDate(
-      section.slugs.flatMap((slug) => {
-        const post = postsBySlug.get(slug);
-        return post ? [post.updatedAt ?? post.publishedAt] : [];
-      }),
-    ),
-    changeFrequency: "weekly",
-    priority: 0.86,
-  }));
-
-  const archivePages: MetadataRoute.Sitemap = [
-    ...createArchivePages("/blog", allPosts.length, allPostsUpdatedAt, "weekly", 0.65),
-    ...createArchivePages("/now", nowEntries.length, nowUpdatedAt, "monthly", 0.55),
-    ...createArchivePages("/changelog", changelogEntries.length, changelogUpdatedAt, "weekly", 0.58, CHANGELOG_ITEMS_PER_PAGE),
-  ];
-
-  const posts: MetadataRoute.Sitemap = allPosts.map((post) => ({
-    url: `${siteConfig.url}/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt ?? post.publishedAt),
+  const articles: SitemapEntry[] = englishDiscoveryArticles.map((article) => ({
+    url: `${siteConfig.url}${article.href}`,
+    lastModified: new Date(article.updatedAt),
     changeFrequency: "monthly",
-    priority: 0.8,
+    priority: 0.84,
   }));
 
-  const tagPages: MetadataRoute.Sitemap = getTagRecords()
+  const tagPages: SitemapEntry[] = englishTags
     .filter((tag) => tag.count >= 3)
     .map((tag) => ({
-      url: `${siteConfig.url}/tags/${tag.slug}`,
-      lastModified: allPostsUpdatedAt,
+      url: `${siteConfig.url}/en/tags/${tag.slug}`,
+      lastModified: englishArticleUpdatedAt,
       changeFrequency: "weekly",
-      priority: 0.55,
+      priority: 0.66,
     }));
 
   return [
     ...staticPages,
-    ...englishStaticPages,
-    ...knowledgeModulePages,
-    ...archivePages,
-    ...posts,
+    ...articles,
     ...tagPages,
   ];
+}
+
+export function getLatestSitemapDate(entries: SitemapEntry[]): Date {
+  const latest = entries.reduce(
+    (current, entry) =>
+      entry.lastModified.getTime() > current.getTime()
+        ? entry.lastModified
+        : current,
+    new Date(0),
+  );
+
+  return latest.getTime() > 0 ? latest : new Date();
+}
+
+export function renderSitemapXml(entries: SitemapEntry[]): string {
+  const urls = entries
+    .map(
+      (entry) => `  <url>\n    <loc>${escapeXml(entry.url)}</loc>\n    <lastmod>${entry.lastModified.toISOString()}</lastmod>\n    <changefreq>${entry.changeFrequency}</changefreq>\n    <priority>${entry.priority}</priority>\n  </url>`,
+    )
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+export function renderSitemapIndexXml(entries: SitemapIndexEntry[]): string {
+  const sitemaps = entries
+    .map(
+      (entry) => `  <sitemap>\n    <loc>${escapeXml(entry.url)}</loc>\n    <lastmod>${entry.lastModified.toISOString()}</lastmod>\n  </sitemap>`,
+    )
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps}\n</sitemapindex>\n`;
 }
