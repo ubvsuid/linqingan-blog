@@ -48,7 +48,9 @@ const checks = [
   ["/en/blog/screeps-first-extension", ["How to Build Your First Screeps Extension", "RCL and constants", "Checked", "Live construction test", "Pending"]],
   ["/en/blog/screeps-build-repair", ["How to Make a Screeps Creep Build and Repair Automatically", "Offline priority review", "Passed", "Live multi-tick test", "Pending"]],
   ["/en/blog/screeps-first-room-code", ["How to Combine Your First Screeps Room Loop", "Offline branch review", "Passed", "Live room test", "Pending"]],
-  ["/sitemap.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/verification", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/blog/screeps-clean-dead-creep-memory", "https://www.linqingan.com/tags/basic-engineering", "https://www.linqingan.com/about", "https://www.linqingan.com/en/blog/screeps-introduction", "https://www.linqingan.com/en/blog/screeps-first-room-code"]],
+  ["/sitemap.xml", ["https://www.linqingan.com/sitemap-zh.xml", "https://www.linqingan.com/sitemap-en.xml", "<sitemapindex"]],
+  ["/sitemap-zh.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/tags/basic-engineering"]],
+  ["/sitemap-en.xml", ["https://www.linqingan.com/en", "https://www.linqingan.com/en/beginner", "https://www.linqingan.com/en/blog/screeps-introduction", "https://www.linqingan.com/en/blog/screeps-first-room-code"]],
 ];
 
 const assetChecks = [
@@ -61,6 +63,7 @@ const assetChecks = [
 ];
 
 const redirectChecks = [
+  ["/changelog/page/2", "/changelog"],
   ["/tags/新手入门", "/tags/beginner"],
   ["/tags/基础工程", "/tags/basic-engineering"],
   ["/tags/常见问题", "/tags/common-questions"],
@@ -116,6 +119,23 @@ async function waitForServer() {
   throw new Error(`服务器未在预期时间内启动：${baseUrl}`);
 }
 
+function extractLocs(xml) {
+  return [
+    ...new Set(
+      [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
+        match[1].replaceAll("&amp;", "&"),
+      ),
+    ),
+  ];
+}
+
+function evenlySample(values, limit) {
+  if (values.length <= limit) return values;
+  return Array.from({ length: limit }, (_, index) =>
+    values[Math.floor(index * values.length / limit)],
+  );
+}
+
 await waitForServer();
 
 const failures = [];
@@ -144,7 +164,7 @@ for (const [pathname, expectedTexts] of checks) {
     failures.push(`${pathname}: 仍然使用可能误导的“本文最后测试于”表述`);
   }
 
-  if (pathname !== "/sitemap.xml" && !body.includes("https://www.linqingan.com")) {
+  if (!pathname.endsWith(".xml") && !body.includes("https://www.linqingan.com")) {
     failures.push(`${pathname}: 未找到统一主域名信号`);
   }
 }
@@ -213,29 +233,66 @@ if (!missingBody.includes("页面不存在｜临清安")) failures.push("/404: �
 const hasHomeCanonical = missingBody.includes(`rel="canonical" href="https://www.linqingan.com"`) || missingBody.includes(`rel="canonical" href="https://www.linqingan.com/"`);
 if (hasHomeCanonical) failures.push("/404: 不应把不存在页面 canonical 到首页");
 
-const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
-const sitemapBody = await sitemapResponse.text();
-const sitemapUrls = [
-  ...new Set(
-    [...sitemapBody.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) =>
-      match[1].replaceAll("&amp;", "&"),
-    ),
-  ),
-];
-
-function evenlySample(values, limit) {
-  if (values.length <= limit) return values;
-  return Array.from({ length: limit }, (_, index) =>
-    values[Math.floor(index * values.length / limit)],
-  );
+const robotsResponse = await fetch(`${baseUrl}/robots.txt`);
+const robotsBody = await robotsResponse.text();
+if (!robotsBody.includes("Sitemap: https://www.linqingan.com/sitemap.xml")) {
+  failures.push("/robots.txt: 应声明 Sitemap 索引");
 }
 
-const sitemapPaths = sitemapUrls.map((url) => new URL(url).pathname);
+const sitemapIndexResponse = await fetch(`${baseUrl}/sitemap.xml`);
+const sitemapIndexBody = await sitemapIndexResponse.text();
+const sitemapDocumentUrls = extractLocs(sitemapIndexBody);
+const expectedSitemapDocuments = [
+  "https://www.linqingan.com/sitemap-zh.xml",
+  "https://www.linqingan.com/sitemap-en.xml",
+];
+for (const requiredSitemap of expectedSitemapDocuments) {
+  if (!sitemapDocumentUrls.includes(requiredSitemap)) {
+    failures.push(`/sitemap.xml: 缺少 ${requiredSitemap}`);
+  }
+}
+if (!sitemapIndexBody.includes("<sitemapindex")) {
+  failures.push("/sitemap.xml: 根文档不是 Sitemap 索引");
+}
+
+const sitemapUrls = [];
+const sitemapUrlGroups = new Map();
+for (const sitemapDocumentUrl of expectedSitemapDocuments) {
+  const pathname = new URL(sitemapDocumentUrl).pathname;
+  const response = await fetch(`${baseUrl}${pathname}`);
+  const body = await response.text();
+  if (response.status !== 200) {
+    failures.push(`${pathname}: 预期 200，实际 ${response.status}`);
+    continue;
+  }
+  const urls = extractLocs(body);
+  sitemapUrlGroups.set(pathname, urls);
+  sitemapUrls.push(...urls);
+}
+
+const uniqueSitemapUrls = [...new Set(sitemapUrls)];
+const sitemapPaths = uniqueSitemapUrls.map((url) => new URL(url).pathname);
+const chineseSitemapPaths = (sitemapUrlGroups.get("/sitemap-zh.xml") ?? []).map((url) => new URL(url).pathname);
+const englishSitemapPaths = (sitemapUrlGroups.get("/sitemap-en.xml") ?? []).map((url) => new URL(url).pathname);
+
 if (sitemapPaths.includes("/search")) failures.push("/search: 不应出现在 Sitemap");
 if (sitemapPaths.includes("/resources")) failures.push("/resources: 已合并，不应出现在 Sitemap");
 if (sitemapPaths.some((pathname) => pathname === "/projects" || pathname.startsWith("/projects/"))) {
   failures.push("/projects: 已合并，不应出现在 Sitemap");
 }
+if (sitemapPaths.some((pathname) => pathname.startsWith("/blog/page/"))) {
+  failures.push("/blog/page/*: 文章深层分页不应出现在 Sitemap");
+}
+if (sitemapPaths.some((pathname) => pathname.startsWith("/changelog/page/"))) {
+  failures.push("/changelog/page/*: 更新日志分页不应出现在 Sitemap");
+}
+if (chineseSitemapPaths.some((pathname) => pathname === "/en" || pathname.startsWith("/en/"))) {
+  failures.push("/sitemap-zh.xml: 不应包含英文 URL");
+}
+if (englishSitemapPaths.some((pathname) => pathname !== "/en" && !pathname.startsWith("/en/"))) {
+  failures.push("/sitemap-en.xml: 不应包含中文 URL");
+}
+
 for (const requiredPath of [
   "/verification",
   "/changelog",
@@ -276,8 +333,8 @@ if (sitemapPaths.includes(thinTagPath)) {
   failures.push(`${thinTagPath}: 薄标签页不应出现在 Sitemap`);
 }
 
-for (let index = 0; index < sitemapUrls.length; index += 10) {
-  const batch = sitemapUrls.slice(index, index + 10);
+for (let index = 0; index < uniqueSitemapUrls.length; index += 10) {
+  const batch = uniqueSitemapUrls.slice(index, index + 10);
   const results = await Promise.all(
     batch.map(async (url) => {
       const parsed = new URL(url);
@@ -301,4 +358,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`冒烟测试通过：${checks.length} 个关键页面，${sitemapUrls.length} 个 Sitemap URL。`);
+console.log(`冒烟测试通过：${checks.length} 个关键页面，2 个子 Sitemap，${uniqueSitemapUrls.length} 个可索引 URL。`);
