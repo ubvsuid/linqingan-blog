@@ -4,6 +4,7 @@ import {
   englishDiscoveryArticles,
   englishTags,
 } from "@/lib/english-discovery";
+import { englishKnowledgeSections } from "@/lib/english-knowledge";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
 import { getAllPosts } from "@/lib/posts";
@@ -162,11 +163,24 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     { url: `${siteConfig.url}/en/screeps-errors`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.76 },
     { url: `${siteConfig.url}/en/glossary`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.74 },
     { url: `${siteConfig.url}/en/verification`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.68 },
+    { url: `${siteConfig.url}/en/evidence`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.64 },
     { url: `${siteConfig.url}/en/about`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/en/changelog`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.62 },
     { url: `${siteConfig.url}/en/roadmap`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.58 },
     { url: `${siteConfig.url}/en/license`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "yearly", priority: 0.36 },
   ];
+
+  const knowledgePillars: SitemapEntry[] = englishKnowledgeSections.map((section) => ({
+    url: `${siteConfig.url}/en/knowledge/${section.slug}`,
+    lastModified: latestDate(
+      section.articles.map((article) => {
+        const discovery = englishDiscoveryArticles.find((item) => item.href === article.href);
+        return discovery?.updatedAt ?? article.publishedAt;
+      }),
+    ),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
 
   const articles: SitemapEntry[] = englishDiscoveryArticles.map((article) => ({
     url: `${siteConfig.url}${article.href}`,
@@ -186,6 +200,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
 
   return [
     ...staticPages,
+    ...knowledgePillars,
     ...articles,
     ...tagPages,
   ];
