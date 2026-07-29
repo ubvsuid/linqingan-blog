@@ -28,7 +28,6 @@ export async function generateMetadata({ params }: EnglishTagPageProps): Promise
   const tag = getEnglishTag(slug);
   if (!tag) return { title: "Topic not found", robots: { index: false, follow: false } };
 
-  const count = getEnglishArticlesByTag(slug).length;
   const path = `/en/tags/${tag.slug}`;
   const title = `${tag.label} Screeps Guides | Linqingan`;
   const description = `Browse focused English Screeps guides related to ${tag.label}, with checked APIs, debugging steps, and transparent verification status.`;
@@ -37,7 +36,7 @@ export async function generateMetadata({ params }: EnglishTagPageProps): Promise
     title: { absolute: title },
     description,
     robots: {
-      index: count >= 3,
+      index: tag.count >= 3,
       follow: true,
     },
     alternates: { canonical: path },
