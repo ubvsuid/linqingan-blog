@@ -13,6 +13,27 @@ export const metadata = createEnglishPageMetadata({
   chinesePath: "/tools/room-diagnostics",
 });
 
+const relatedGuides = [
+  {
+    href: "/en/blog/screeps-cpu-getused-bucket",
+    label: "CPU",
+    title: "Inspect CPU Usage and the Bucket",
+    description: "Interpret CPU pressure and decide whether the snapshot reflects a temporary spike or a sustained risk.",
+  },
+  {
+    href: "/en/blog/screeps-controller-downgrade",
+    label: "CONTROLLER",
+    title: "Monitor Controller Downgrade Pressure",
+    description: "Turn a low ticksToDowngrade reading into an observable recovery workflow.",
+  },
+  {
+    href: "/en/blog/screeps-emergency-harvester-recovery",
+    label: "RECOVERY",
+    title: "Recover from a Broken Room Economy",
+    description: "Restore a minimal worker when the room no longer has a reliable Energy loop.",
+  },
+];
+
 export default function EnglishRoomDiagnosticsPage() {
   const pageUrl = `${siteConfig.url}/en/tools/room-diagnostics`;
   const jsonLd = {
@@ -64,19 +85,21 @@ export default function EnglishRoomDiagnosticsPage() {
             </div>
           </div>
         </section>
+
+        <section className="tool-related-guides" aria-labelledby="diagnostic-related-title">
+          <p className="eyebrow">FOLLOW THE FINDING</p>
+          <h2 id="diagnostic-related-title">Continue from snapshot to root cause</h2>
+          <div className="tool-related-grid">
+            {relatedGuides.map((guide) => (
+              <Link href={guide.href} key={guide.href}>
+                <span>{guide.label}</span>
+                <strong>{guide.title}</strong>
+                <small>{guide.description}</small>
+              </Link>
+            ))}
+          </div>
+        </section>
       </Container>
-      <style>{`
-        .diagnostic-breadcrumb { display: flex; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 13px; }
-        .diagnostic-header { max-width: 980px; }
-        .diagnostic-header > p:last-child { max-width: 840px; }
-        .diagnostic-boundaries { display: grid; grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); gap: 58px; margin-top: 78px; border-top: 1px solid var(--border); padding: 68px 0 30px; }
-        .diagnostic-boundaries h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 50px); letter-spacing: -.045em; }
-        .diagnostic-boundaries > div:last-child > p { margin: 0; color: var(--muted); line-height: 1.8; }
-        .diagnostic-boundaries > div:last-child > p + p { margin-top: 16px; }
-        .diagnostic-links { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 26px; }
-        .diagnostic-links a { font-weight: 680; }
-        @media (max-width: 800px) { .diagnostic-boundaries { grid-template-columns: 1fr; gap: 32px; } }
-      `}</style>
     </main>
   );
 }
