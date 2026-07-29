@@ -1,0 +1,74 @@
+[
+  {
+    "href": "/en/blog/screeps-creep-harvest-energy",
+    "title": "Screeps Harvest Energy",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["Console return code", "three-or-more tick log", "room screenshot"]
+  },
+  {
+    "href": "/en/blog/screeps-transfer-energy-to-spawn",
+    "title": "Transfer Energy to a Spawn",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["multi-tick delivery log", "Spawn store before and after", "edge case when Spawn is full"]
+  },
+  {
+    "href": "/en/blog/screeps-spawn-creep",
+    "title": "Spawn a Creep",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["dryRun result", "spawnCreep result", "completed Creep on a later tick"]
+  },
+  {
+    "href": "/en/blog/screeps-upgrade-controller",
+    "title": "Upgrade a Controller",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["upgrading state transition", "Controller progress before and after", "Energy exhaustion transition"]
+  },
+  {
+    "href": "/en/blog/screeps-err-not-in-range",
+    "title": "Fix ERR_NOT_IN_RANGE",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["failing return code", "movement response", "successful later-tick action"]
+  },
+  {
+    "href": "/en/blog/screeps-moveto-not-moving",
+    "title": "Debug moveTo When a Creep Does Not Move",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["fatigue or path state", "moveTo return code", "position changes across ticks"]
+  },
+  {
+    "href": "/en/blog/screeps-memory-basics",
+    "title": "Screeps Memory Basics",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["Memory value before write", "later-tick persistence", "cleanup or reset observation"]
+  },
+  {
+    "href": "/en/blog/screeps-cpu-getused-bucket",
+    "title": "Inspect CPU Usage and Bucket",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["Game.cpu.getUsed sample", "bucket observations across ticks", "test workload description"]
+  },
+  {
+    "href": "/en/blog/screeps-market-create-order",
+    "title": "Create a Market Order Safely",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["dry validation inputs", "market return code", "order visibility after creation"]
+  },
+  {
+    "href": "/en/blog/screeps-controller-activate-safe-mode",
+    "title": "Activate Controller Safe Mode",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["precondition snapshot", "activation return code", "safeMode state on a later tick"]
+  },
+  {
+    "href": "/en/blog/screeps-tower-auto-attack-hostiles",
+    "title": "Automate Tower Hostile Targeting",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["hostile selection snapshot", "Tower action return code", "hits change after resolution"]
+  },
+  {
+    "href": "/en/blog/screeps-emergency-harvester-recovery",
+    "title": "Recover an Emergency Harvester",
+    "status": "needs-live-evidence",
+    "requestedEvidence": ["collapsed economy snapshot", "emergency spawn decision", "restored Energy flow across ticks"]
+  }
+]
