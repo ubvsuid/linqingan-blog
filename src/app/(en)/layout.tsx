@@ -8,6 +8,12 @@ import { siteConfig } from "@/lib/site";
 
 import "../globals.css";
 import "../improvements.css";
+import "./english-home.css";
+import "./english-article.css";
+import "./english-about.css";
+import "./english-search.css";
+import "./english-tools.css";
+import "./english-knowledge.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 

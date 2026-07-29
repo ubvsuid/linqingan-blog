@@ -1,0 +1,45 @@
+name: Lighthouse quality gate
+
+on:
+  pull_request:
+    branches: [clean-blog-v1]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "next.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "lighthouserc.json"
+      - ".github/workflows/lighthouse.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production site
+        run: npm run build
+
+      - name: Audit Chinese and English routes
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json

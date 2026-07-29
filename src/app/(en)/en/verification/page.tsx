@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { siteConfig } from "@/lib/site";
 
 import styles from "../english.module.css";
 
@@ -22,6 +23,10 @@ const levels = [
 ] as const;
 
 export default function EnglishVerificationPage() {
+  const contributionParams = new URLSearchParams({
+    template: "live-evidence.yml",
+  });
+
   return (
     <main className={styles.page} lang="en">
       <Container>
@@ -45,16 +50,28 @@ export default function EnglishVerificationPage() {
           ))}
         </ol>
 
-        <section className={styles.grid} style={{ marginTop: 48 }}>
+        <section className={`${styles.grid} about-detail-grid`}>
           <article className={styles.card}>
             <p className="eyebrow">TRANSPARENCY</p>
             <h2>Pending tests remain visible</h2>
-            <p>If a guide has not been tested in the Console or in a live room, that status should remain pending rather than being inferred from documentation alone.</p>
+            <p>If a guide has not been tested in the Console or in a live room, that status remains pending rather than being inferred from documentation alone.</p>
+            <Link href="/en/evidence">Review the 12 priority evidence gaps →</Link>
+          </article>
+          <article className={styles.card}>
+            <p className="eyebrow">CONTRIBUTE EVIDENCE</p>
+            <h2>Submit a reproducible observation</h2>
+            <p>A useful report includes the server or shard, room state, tick range, exact code or action, return values, later-tick state, and limitations. Credentials and unrelated player data must be removed.</p>
+            <a href={`${siteConfig.links.issues}?${contributionParams.toString()}`} rel="noreferrer" target="_blank">Open the live-evidence form ↗</a>
           </article>
           <article className={styles.card}>
             <p className="eyebrow">SAFETY</p>
             <h2>Read-only probes come first</h2>
             <p>Diagnostics should begin with object reads, return-code logging, and state snapshots before spawning, moving, trading, destroying, or modifying Memory.</p>
+          </article>
+          <article className={styles.card}>
+            <p className="eyebrow">ACCEPTANCE RULE</p>
+            <h2>One screenshot is not always enough</h2>
+            <p>Stateful behavior normally needs a starting state, the action return code, and one or more later ticks. Accepted evidence is added with its environment and limitations, not generalized beyond what it proves.</p>
           </article>
         </section>
       </Container>

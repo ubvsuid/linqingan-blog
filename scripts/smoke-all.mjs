@@ -1,5 +1,6 @@
 await import("./smoke-test.mjs");
 await import("./smoke-audit-priority.mjs");
+await import("./smoke-search-indexing.mjs");
 
 const originalFetch = globalThis.fetch;
 

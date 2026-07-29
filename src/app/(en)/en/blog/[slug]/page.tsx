@@ -95,6 +95,7 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
     title: { absolute: `${article.title} | Linqingan` },
     description: article.description,
     keywords: article.keywords,
+    authors: [{ name: "Linqingan", url: `${siteConfig.url}/en/about` }],
     alternates: {
       canonical: article.path,
       languages: { en: article.path, "zh-CN": article.chinesePath, "x-default": article.path },
@@ -110,6 +111,7 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
       description: article.description,
       publishedTime: article.publishedAt,
       modifiedTime,
+      authors: ["Linqingan"],
       tags: discovery?.tags ?? article.tags,
       images: [{ url: socialImage, width: 1200, height: 630 }],
     },
@@ -140,8 +142,9 @@ export default async function EnglishArticleRoute({ params }: EnglishArticlePage
       dateModified: modifiedTime,
       inLanguage: "en-US",
       mainEntityOfPage: articleUrl,
-      author: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about` },
-      publisher: { "@type": "Organization", name: "Linqingan", url: siteConfig.url },
+      url: articleUrl,
+      author: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about`, sameAs: [siteConfig.links.github] },
+      publisher: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about` },
       isBasedOn: `${siteConfig.url}${article.chinesePath}`,
       about: discovery?.tags,
       articleSection: discovery?.moduleTitle,
@@ -151,7 +154,7 @@ export default async function EnglishArticleRoute({ params }: EnglishArticlePage
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${siteConfig.url}/en` },
-        { "@type": "ListItem", position: 2, name: "Articles", item: `${siteConfig.url}/en/blog` },
+        { "@type": "ListItem", position: 2, name: "Guides", item: `${siteConfig.url}/en/blog` },
         { "@type": "ListItem", position: 3, name: article.headline, item: articleUrl },
       ],
     },
@@ -180,6 +183,7 @@ export default async function EnglishArticleRoute({ params }: EnglishArticlePage
       category={article.category}
       publishedAt={article.publishedAt}
       publishedLabel={article.publishedLabel}
+      modifiedAt={modifiedTime}
       readingTime={article.readingTime}
       tags={article.tags}
       verification={article.verification.map(([term, value]) => ({ term, value }))}

@@ -8,9 +8,9 @@ import { englishKnowledgeModules } from "@/lib/i18n";
 import styles from "../../home.module.css";
 
 export const metadata = createEnglishPageMetadata({
-  title: "Screeps Tutorials, Debugging Guides and Tools | Linqingan",
+  title: "Verified Screeps Tutorials, Debugging Guides and Tools | Linqingan",
   description:
-    "Learn Screeps with practical JavaScript guides, debugging checklists, error-code references, and free tools for creeps, rooms, CPU, Memory, pathfinding, and automation.",
+    "Learn Screeps with observable JavaScript examples, return-code debugging workflows, clearly stated test boundaries, and free tools for creeps, rooms, CPU, Memory, pathfinding, and automation.",
   path: "/en",
   chinesePath: "/",
 });
@@ -29,11 +29,15 @@ export default function EnglishHomePage() {
     <main className={styles.home} lang="en">
       <section className={`${styles.hero} screeps-room-grid`}>
         <Container className={styles.heroInner}>
-          <p className="eyebrow">SCREEPS · JAVASCRIPT · SYSTEMS</p>
-          <h1>Practical Screeps guides and tools</h1>
+          <p className="eyebrow">SCREEPS · JAVASCRIPT · VERIFIED BOUNDARIES</p>
+          <h1>Verified Screeps guides for safer automation and debugging</h1>
           <p className={styles.heroDescription}>
-            Learn the game step by step, debug code that does not behave as expected, and use focused tools for bodies, rooms, CPU, Memory, movement, and automation.
+            Learn with observable examples, return-code diagnostics, practical tools, and a clear record of what has been checked in documentation, offline tests, the Console, or a live room.
           </p>
+          <div className="english-hero-actions" aria-label="Primary English actions">
+            <Link className="english-primary-action" href="/en/beginner">Start the beginner roadmap</Link>
+            <Link href="/en/search">Search a problem</Link>
+          </div>
           <p className={styles.heroStats}>{publishedEnglishArticles.length} published English guides · 8 knowledge modules · 2 working tools</p>
           <p className="english-verification-note">Every guide states its own verification level. Publication does not imply hidden live-room testing.</p>
 
@@ -97,47 +101,6 @@ export default function EnglishHomePage() {
           <div className={styles.quickGrid}>{quickEntries.map((entry) => <Link href={entry.href} key={entry.href}><span className="eyebrow">{entry.eyebrow}</span><strong>{entry.title}</strong><p>{entry.description}</p><span aria-hidden="true">→</span></Link>)}</div>
         </Container>
       </section>
-
-      <style>{`
-        .english-verification-note { max-width: 700px; margin: 12px auto 0; color: var(--muted); font-size: 13px; }
-        .english-system-visual { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); width: min(100%, 1120px); margin: 30px auto 0; border: 1px solid var(--border); border-radius: 26px; overflow: hidden; background: var(--surface); text-align: left; }
-        .system-loop { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 14px; align-items: center; padding: 30px; }
-        .system-loop > div { display: grid; min-height: 176px; align-content: start; border: 1px solid var(--border); border-radius: 18px; padding: 20px; background: var(--background); }
-        .system-loop > div > span { justify-self: end; color: var(--muted); font-family: monospace; font-size: 11px; }
-        .system-loop small { margin-top: 20px; color: var(--muted); font-size: 10px; letter-spacing: .09em; }
-        .system-loop strong { margin-top: 7px; font-size: 21px; letter-spacing: -.03em; }
-        .system-loop p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
-        .system-loop i { color: var(--muted); font-style: normal; }
-        .system-console { display: grid; align-content: center; gap: 13px; border-left: 1px solid var(--border); padding: 30px; background: #101216; color: #ecedf0; }
-        .system-console > div { display: flex; justify-content: space-between; color: #969da8; font-family: monospace; font-size: 11px; }
-        .system-console code { white-space: normal; color: #d9dce1; font-family: monospace; font-size: 13px; line-height: 1.65; }
-        .system-console code b { color: #ffffff; }
-        .system-console p { display: flex; flex-wrap: wrap; gap: 7px 12px; margin: 10px 0 0; color: #aeb4bd; font-size: 11px; }
-        .system-console p span { color: #70c99a; }
-        .english-task-hub { width: min(100%, 1120px); margin: 42px auto 0; text-align: left; }
-        .english-task-heading { max-width: 720px; margin: 0 auto 24px; text-align: center; }
-        .english-task-heading h2 { margin: 0; font-size: clamp(30px, 4.5vw, 48px); line-height: 1.08; letter-spacing: -.045em; }
-        .english-task-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-        .english-task-grid article { display: flex; min-height: 292px; flex-direction: column; border: 1px solid var(--border); border-radius: 22px; padding: 28px; background: color-mix(in srgb, var(--surface) 92%, transparent); text-align: left; }
-        .english-task-grid article:nth-child(1) { box-shadow: inset 0 3px 0 var(--screeps-energy); }
-        .english-task-grid article:nth-child(2) { box-shadow: inset 0 3px 0 var(--screeps-controller); }
-        .english-task-grid article:nth-child(3) { box-shadow: inset 0 3px 0 var(--screeps-success); }
-        .english-task-grid article > span:first-child { align-self: flex-end; color: var(--muted); font-family: monospace; font-size: 12px; }
-        .english-task-grid article .eyebrow { margin-top: 22px; }
-        .english-task-grid h3 { margin: 0; font-size: clamp(23px, 2.6vw, 30px); line-height: 1.2; letter-spacing: -.035em; }
-        .english-task-grid article > p:not(.eyebrow) { margin: 14px 0 24px; color: var(--muted); font-size: 14px; line-height: 1.7; }
-        .english-task-grid article > a, .english-task-grid form { margin-top: auto; font-weight: 720; }
-        .english-task-grid form { display: grid; gap: 8px; }
-        .english-task-grid form label { color: var(--muted); font-size: 12px; }
-        .english-task-grid form > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
-        .english-task-grid input, .english-task-grid button { min-height: 46px; border: 1px solid var(--border); border-radius: 12px; background: var(--background); color: var(--foreground); }
-        .english-task-grid input { min-width: 0; padding: 0 13px; }
-        .english-task-grid button { border-color: var(--screeps-controller); padding: 0 15px; background: var(--screeps-controller); color: #ffffff; font-weight: 700; cursor: pointer; }
-        @media (max-width: 980px) { .english-system-visual { grid-template-columns: 1fr; } .system-console { border-top: 1px solid var(--border); border-left: 0; } }
-        @media (max-width: 920px) { .english-task-grid { grid-template-columns: 1fr; } .english-task-grid article { min-height: 0; } }
-        @media (max-width: 720px) { .system-loop { grid-template-columns: 1fr; } .system-loop i { transform: rotate(90deg); justify-self: center; } .system-loop > div { min-height: 0; } }
-        @media (max-width: 520px) { .english-system-visual { border-radius: 20px; } .system-loop, .system-console { padding: 20px; } .english-task-hub { margin-top: 34px; } .english-task-grid article { border-radius: 18px; padding: 22px; } }
-      `}</style>
     </main>
   );
 }

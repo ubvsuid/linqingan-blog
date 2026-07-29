@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const contentSecurityPolicyReportOnly = [
+const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -9,9 +9,14 @@ const contentSecurityPolicyReportOnly = [
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+  "script-src-attr 'none'",
   "connect-src 'self' https://vitals.vercel-insights.com https://*.vercel-insights.com",
   "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "media-src 'self'",
+  "upgrade-insecure-requests",
+  "report-uri /api/csp-report",
 ].join("; ");
 
 const securityHeaders = [
@@ -23,7 +28,8 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
-  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicyReportOnly },
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {

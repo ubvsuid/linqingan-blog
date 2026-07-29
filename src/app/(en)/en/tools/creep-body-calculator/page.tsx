@@ -13,6 +13,27 @@ export const metadata = createEnglishPageMetadata({
   chinesePath: "/tools/creep-body-calculator",
 });
 
+const relatedGuides = [
+  {
+    href: "/en/blog/screeps-dynamic-creep-body",
+    label: "BODY DESIGN",
+    title: "Build a Dynamic Screeps Creep Body Safely",
+    description: "Turn an Energy budget into a bounded body without exceeding the 50-part limit.",
+  },
+  {
+    href: "/en/blog/screeps-move-fatigue-body-ratio",
+    label: "MOVEMENT",
+    title: "Understand MOVE Parts, Fatigue, and Body Ratios",
+    description: "Connect the calculator estimate to terrain cost and real movement behavior.",
+  },
+  {
+    href: "/en/blog/screeps-spawncreep-return-codes",
+    label: "DEBUGGING",
+    title: "Debug spawnCreep Return Codes",
+    description: "Check name, Energy, body, ownership, and Spawn state before changing production logic.",
+  },
+];
+
 export default function EnglishCreepBodyCalculatorPage() {
   const pageUrl = `${siteConfig.url}/en/tools/creep-body-calculator`;
   const jsonLd = {
@@ -64,19 +85,21 @@ export default function EnglishCreepBodyCalculatorPage() {
             </div>
           </div>
         </section>
+
+        <section className="tool-related-guides" aria-labelledby="body-tool-related-title">
+          <p className="eyebrow">APPLY THE RESULT</p>
+          <h2 id="body-tool-related-title">Continue from calculation to working code</h2>
+          <div className="tool-related-grid">
+            {relatedGuides.map((guide) => (
+              <Link href={guide.href} key={guide.href}>
+                <span>{guide.label}</span>
+                <strong>{guide.title}</strong>
+                <small>{guide.description}</small>
+              </Link>
+            ))}
+          </div>
+        </section>
       </Container>
-      <style>{`
-        .body-tool-breadcrumb { display: flex; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 13px; }
-        .body-tool-header { max-width: 980px; }
-        .body-tool-header > p:last-child { max-width: 820px; }
-        .body-tool-notes { display: grid; grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); gap: 58px; margin-top: 78px; border-top: 1px solid var(--border); padding: 68px 0 30px; }
-        .body-tool-notes h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 50px); letter-spacing: -.045em; }
-        .body-tool-notes > div:last-child > p { margin: 0; color: var(--muted); line-height: 1.8; }
-        .body-tool-notes > div:last-child > p + p { margin-top: 16px; }
-        .body-tool-links { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 26px; }
-        .body-tool-links a { font-weight: 680; }
-        @media (max-width: 800px) { .body-tool-notes { grid-template-columns: 1fr; gap: 32px; } }
-      `}</style>
     </main>
   );
 }

@@ -32,6 +32,7 @@ const exactRoutes = new Set([
   "/en/beginner",
   "/en/blog",
   "/en/changelog",
+  "/en/evidence",
   "/en/feed.xml",
   "/en/license",
   "/en/roadmap",
@@ -96,6 +97,7 @@ function routeExists(href) {
     return fs.existsSync(path.join(root, "content", "posts", `${href.slice(6)}.md`));
   }
   if (/^\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
+  if (/^\/en\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/tags\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/en\/tags\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/(blog|now|changelog)\/page\/[2-9][0-9]*$/.test(href)) return true;
@@ -118,6 +120,9 @@ function hasPageForRoute(route) {
 
   if (/^\/en\/blog\/[a-z0-9-]+$/.test(route)) {
     return fs.existsSync(path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx"));
+  }
+  if (/^\/en\/knowledge\/[a-z0-9-]+$/.test(route)) {
+    return fs.existsSync(path.join(root, "src", "app", "(en)", "en", "knowledge", "[module]", "page.tsx"));
   }
 
   return false;

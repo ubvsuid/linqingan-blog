@@ -1,0 +1,45 @@
+name: Accessibility and mobile review
+description: Record a manual keyboard, screen-reader, touch, and mobile viewport review.
+title: "Accessibility review: "
+body:
+  - type: input
+    id: routes
+    attributes:
+      label: Routes reviewed
+      placeholder: /en, /en/blog/..., /en/tools/...
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, device, and assistive technology
+      placeholder: Chrome 150, Windows 11, NVDA; Safari, iPhone
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Manual checks
+      options:
+        - label: Keyboard focus order is logical and all controls are reachable.
+          required: true
+        - label: Focus indicators remain visible.
+          required: true
+        - label: Headings and landmarks make sense in a screen reader.
+          required: true
+        - label: Forms expose labels, errors, status messages, and button purpose.
+          required: true
+        - label: Touch targets and horizontal layouts work at mobile widths.
+          required: true
+        - label: Zoom to 200% does not hide required content or controls.
+          required: true
+  - type: textarea
+    id: findings
+    attributes:
+      label: Findings and reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or recordings

@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -114,6 +115,7 @@ export function EnglishSiteSearch({
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const loadingRef = useRef(false);
+  const lastTrackedZeroQueryRef = useRef("");
   const normalizedQuery = normalize(query);
 
   const loadSearchIndex = useCallback(async () => {
@@ -202,6 +204,31 @@ export function EnglishSiteSearch({
     && documents.length === 0
     && (loadState === "idle" || loadState === "loading");
 
+  useEffect(() => {
+    if (!fullIndexLoaded || waitingForIndex || !normalizedQuery || results.length > 0) return;
+    const eventKey = `${normalizedQuery}:${type || "all"}`;
+    if (lastTrackedZeroQueryRef.current === eventKey) return;
+    lastTrackedZeroQueryRef.current = eventKey;
+    track("english_search_zero_results", {
+      query: normalizedQuery.slice(0, 80),
+      resourceType: type || "all",
+    });
+  }, [fullIndexLoaded, normalizedQuery, results.length, type, waitingForIndex]);
+
+  const missingResourceHref = useMemo(() => {
+    const params = new URLSearchParams({
+      title: `Missing English search result: ${query.trim().slice(0, 80)}`,
+      body: [
+        "## Search query",
+        query.trim(),
+        "",
+        "## Expected resource",
+        "Describe the Screeps API, return code, symptom, or guide you expected to find.",
+      ].join("\n"),
+    });
+    return `https://github.com/ubvsuid/linqingan-blog/issues/new?${params.toString()}`;
+  }, [query]);
+
   return (
     <div className="english-site-search">
       <div className="english-search-toolbar">
@@ -221,11 +248,7 @@ export function EnglishSiteSearch({
         </label>
         <label className="english-search-type">
           <span>Resource type</span>
-          <select
-            value={type}
-            onFocus={() => void loadSearchIndex()}
-            onChange={(event) => setType(event.target.value)}
-          >
+          <select value={type} onFocus={() => void loadSearchIndex()} onChange={(event) => setType(event.target.value)}>
             <option value="">All resources</option>
             <option value="Article">Articles</option>
             <option value="Tool">Tools</option>
@@ -272,43 +295,10 @@ export function EnglishSiteSearch({
       ) : (
         <div className="english-search-empty">
           <strong>No resource matches “{query.trim()}”.</strong>
-          <p>Try an API method, return code, object name, symptom, or a broader knowledge topic.</p>
-          <div><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link><Link href="/en/screeps-errors">Error codes</Link><Link href="/en/blog">All guides</Link></div>
+          <p>This zero-result query has been anonymously recorded. Try an API method, return code, object name, symptom, or broader knowledge topic.</p>
+          <div><a href={missingResourceHref} target="_blank" rel="noreferrer">Request this guide ↗</a><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link><Link href="/en/screeps-errors">Error codes</Link><Link href="/en/blog">All guides</Link></div>
         </div>
       )}
-
-      <style>{`
-        .english-site-search { display: grid; gap: 24px; }
-        .english-search-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; }
-        .english-search-field, .english-search-type { display: grid; gap: 9px; border: 1px solid var(--border); border-radius: 22px; padding: 22px; background: var(--surface); color: var(--muted); font-size: 13px; }
-        .english-search-field > span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
-        .english-search-field > span small { color: var(--muted); font-size: 11px; }
-        .english-search-field kbd { border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; background: var(--background); color: var(--foreground); font-family: monospace; }
-        .english-search-field > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
-        .english-search-field input, .english-search-type select { min-height: 56px; border: 1px solid var(--border); border-radius: 15px; padding: 0 17px; background: var(--background); color: var(--foreground); font: inherit; font-size: 16px; }
-        .english-search-field input:focus { border-color: var(--screeps-controller); }
-        .english-search-field button { min-height: 42px; align-self: center; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
-        .english-popular-searches { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-        .english-popular-searches > span { margin-right: 4px; color: var(--muted); font-size: 12px; }
-        .english-popular-searches button { border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; background: var(--surface); color: var(--foreground); cursor: pointer; }
-        .english-popular-searches button:hover { border-color: var(--screeps-controller); }
-        .english-search-summary { margin: 0; color: var(--muted); font-size: 13px; }
-        .english-search-loading { border: 1px dashed var(--border); border-radius: 20px; padding: clamp(28px, 5vw, 48px); color: var(--muted); text-align: center; }
-        .english-search-results { display: grid; border-top: 1px solid var(--border); }
-        .english-search-results article { border-bottom: 1px solid var(--border); padding: 28px 0; }
-        .english-search-results article > span { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 4px 9px; font-size: 11px; }
-        .english-search-results h2 { margin: 12px 0 0; font-size: clamp(23px, 3vw, 32px); }
-        .english-search-results h2 mark { border-radius: 4px; padding: 0 .08em; background: color-mix(in srgb, var(--screeps-energy) 25%, transparent); color: inherit; }
-        .english-search-results p { max-width: 780px; margin: 10px 0 0; color: var(--muted); line-height: 1.7; }
-        .english-search-results article > div { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
-        .english-search-results small { border: 1px solid var(--border); border-radius: 999px; padding: 5px 9px; color: var(--muted); }
-        .english-search-empty { border: 1px dashed var(--border); border-radius: 20px; padding: clamp(28px, 5vw, 48px); text-align: center; }
-        .english-search-empty p { max-width: 660px; margin: 12px auto 20px; color: var(--muted); line-height: 1.75; }
-        .english-search-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
-        .english-search-empty a, .english-search-empty button { border: 1px solid var(--border); border-radius: 999px; padding: 9px 13px; background: var(--surface); color: var(--foreground); text-decoration: none; cursor: pointer; }
-        @media (max-width: 760px) { .english-search-toolbar { grid-template-columns: 1fr; } }
-        @media (max-width: 560px) { .english-search-field > div { grid-template-columns: 1fr; } .english-search-field button { justify-self: start; } }
-      `}</style>
     </div>
   );
 }

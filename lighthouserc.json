@@ -1,13 +1,26 @@
 {
   "ci": {
     "collect": {
+      "startServerCommand": "npm run start",
+      "startServerReadyPattern": "ready",
+      "startServerReadyTimeout": 30000,
       "url": [
-        "https://www.linqingan.com/",
-        "https://www.linqingan.com/beginner",
-        "https://www.linqingan.com/knowledge",
-        "https://www.linqingan.com/search",
-        "https://www.linqingan.com/blog/screeps-memory-basics",
-        "https://www.linqingan.com/tools/room-diagnostics"
+        "http://localhost:3000/",
+        "http://localhost:3000/beginner",
+        "http://localhost:3000/knowledge",
+        "http://localhost:3000/search?q=creep",
+        "http://localhost:3000/blog/screeps-memory-basics",
+        "http://localhost:3000/tools/room-diagnostics",
+        "http://localhost:3000/en",
+        "http://localhost:3000/en/beginner",
+        "http://localhost:3000/en/blog",
+        "http://localhost:3000/en/blog/screeps-creep-harvest-energy",
+        "http://localhost:3000/en/knowledge/movement-vision",
+        "http://localhost:3000/en/evidence",
+        "http://localhost:3000/en/tags/debugging",
+        "http://localhost:3000/en/search?q=creep%20not%20moving",
+        "http://localhost:3000/en/tools/creep-body-calculator",
+        "http://localhost:3000/en/tools/room-diagnostics"
       ],
       "numberOfRuns": 2,
       "settings": {
@@ -15,16 +28,26 @@
       }
     },
     "assert": {
-      "assertions": {
-        "categories:performance": ["warn", { "minScore": 0.8 }],
-        "categories:accessibility": ["error", { "minScore": 0.95 }],
-        "categories:best-practices": ["warn", { "minScore": 0.9 }],
-        "categories:seo": ["error", { "minScore": 0.95 }],
-        "largest-contentful-paint": ["warn", { "maxNumericValue": 2500 }],
-        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
-        "total-blocking-time": ["warn", { "maxNumericValue": 300 }],
-        "speed-index": ["warn", { "maxNumericValue": 3400 }]
-      }
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": ".*",
+          "assertions": {
+            "categories:performance": ["warn", { "minScore": 0.8 }],
+            "categories:accessibility": ["error", { "minScore": 0.95 }],
+            "categories:best-practices": ["warn", { "minScore": 0.9 }],
+            "largest-contentful-paint": ["warn", { "maxNumericValue": 2500 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+            "total-blocking-time": ["warn", { "maxNumericValue": 300 }],
+            "speed-index": ["warn", { "maxNumericValue": 3400 }]
+          }
+        },
+        {
+          "matchingUrlPattern": "^http://localhost:3000/(?!search(?:\\?|$)|en/search(?:\\?|$)).*",
+          "assertions": {
+            "categories:seo": ["error", { "minScore": 0.95 }]
+          }
+        }
+      ]
     },
     "upload": {
       "target": "temporary-public-storage"
