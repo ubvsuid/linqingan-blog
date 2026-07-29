@@ -1,0 +1,105 @@
+.body-tool-breadcrumb,
+.diagnostic-breadcrumb {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.body-tool-header,
+.diagnostic-header { max-width: 980px; }
+.body-tool-header > p:last-child { max-width: 820px; }
+.diagnostic-header > p:last-child { max-width: 840px; }
+
+.body-tool-notes,
+.diagnostic-boundaries {
+  display: grid;
+  grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr);
+  gap: 58px;
+  margin-top: 78px;
+  border-top: 1px solid var(--border);
+  padding: 68px 0 30px;
+}
+
+.body-tool-notes h2,
+.diagnostic-boundaries h2 {
+  margin: 8px 0 0;
+  font-size: clamp(34px, 5vw, 50px);
+  letter-spacing: -.045em;
+}
+
+.body-tool-notes > div:last-child > p,
+.diagnostic-boundaries > div:last-child > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.body-tool-notes > div:last-child > p + p,
+.diagnostic-boundaries > div:last-child > p + p { margin-top: 16px; }
+
+.body-tool-links,
+.diagnostic-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-top: 26px;
+}
+
+.body-tool-links a,
+.diagnostic-links a { font-weight: 680; }
+
+.tool-related-guides {
+  margin-top: 54px;
+  border-top: 1px solid var(--border);
+  padding-top: 48px;
+}
+
+.tool-related-guides h2 {
+  margin: 8px 0 0;
+  font-size: clamp(30px, 4vw, 44px);
+  letter-spacing: -.04em;
+}
+
+.tool-related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tool-related-grid a {
+  display: grid;
+  gap: 8px;
+  min-height: 170px;
+  align-content: start;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  background: var(--surface);
+  text-decoration: none;
+}
+
+.tool-related-grid span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tool-related-grid strong {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.tool-related-grid small {
+  margin-top: auto;
+  padding-top: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 800px) {
+  .body-tool-notes,
+  .diagnostic-boundaries { grid-template-columns: 1fr; gap: 32px; }
+  .tool-related-grid { grid-template-columns: 1fr; }
+}
