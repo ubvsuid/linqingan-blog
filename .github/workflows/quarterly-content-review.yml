@@ -3,10 +3,11 @@ name: Quarterly content review
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 1 1,4,7,10 *"
+    - cron: "0 2 1 1,4,7,10 *"
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   review:
@@ -19,20 +20,24 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Apply content migrations and validate articles
-        run: npm run contentcheck
+      - name: Validate content and live-evidence priorities
+        run: |
+          npm run contentcheck
+          npm run englishevidencecheck
 
       - name: Run design, route, link and code checks
         run: |
           npm run designcheck
           npm run routecheck
           npm run linkcheck
+          npm run englishinterfacecheck
+          npm run accessibilitycheck
           npm run codecheck
           npm run simulationcheck
           npm run typecheck
@@ -47,3 +52,43 @@ jobs:
           name: article-priority-report
           path: article-priority-report.txt
           retention-days: 90
+
+      - name: Open quarterly review checklist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const quarter = Math.floor(new Date().getUTCMonth() / 3) + 1;
+            const year = new Date().getUTCFullYear();
+            const title = `English content review: ${year} Q${quarter}`;
+            const existing = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            if (existing.some((issue) => issue.title === title && !issue.pull_request)) {
+              core.info(`Open issue already exists: ${title}`);
+              return;
+            }
+            const body = [
+              '## Required review',
+              '',
+              '- [ ] Export Google Search Console page and query data for the previous quarter',
+              '- [ ] Run `npm run searchconsole:report -- <export.csv>` and review priority groups',
+              '- [ ] Review all 12 items in `/en/evidence` and attach accepted live evidence where available',
+              '- [ ] Check English pages with impressions but low CTR',
+              '- [ ] Check pages with overlapping search intent before merging or redirecting',
+              '- [ ] Review API references, meaningful update dates, and verification status',
+              '- [ ] Run keyboard, screen-reader, touch, and mobile viewport checks',
+              '- [ ] Review zero-result English search events',
+              '- [ ] Confirm Lighthouse and production smoke checks pass',
+              '- [ ] Record completed changes in the English changelog',
+              '',
+              'Do not mark Console or live-room evidence complete without reproducible logs, screenshots, and a stated test environment.',
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+            });
