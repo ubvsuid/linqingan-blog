@@ -8,23 +8,28 @@ const checks = [
   },
   {
     path: "src/components/home-task-hub.tsx",
-    required: ["\u4f60\u73b0\u5728\u60f3\u5b8c\u6210\u4ec0\u4e48", "linqingan:recent-articles", "\u6700\u8fd1\u9605\u8bfb"],
+    required: ["你现在想完成什么", "linqingan:recent-articles", "最近阅读"],
     forbidden: [],
   },
   {
     path: "src/components/home-maintenance-panel.tsx",
-    required: ["home-timeline", "\u7ef4\u62a4\u65f6\u95f4\u6d41"],
+    required: ["home-timeline", "维护时间流"],
     forbidden: ["home-maintenance-grid", "home-change-strip"],
   },
   {
     path: "src/lib/site.ts",
-    required: ["\u5165\u95e8", "\u6587\u7ae0", "/knowledge#reference-tools"],
-    forbidden: ["\u5165\u95e8\u8def\u7ebf", "\u5168\u90e8\u6587\u7ae0"],
+    required: ["入门", "文章", "/knowledge#reference-tools"],
+    forbidden: ["入门路线", "全部文章"],
   },
   {
     path: "src/components/site-header.tsx",
-    required: [".profile-shortcut { display: none; }", ".header-icon-link { width: 40px; height: 40px; }"],
-    forbidden: [".header-icon-link { display: none; }"],
+    required: ["profile-shortcut", "header-icon-link"],
+    forbidden: ["<style>", ".header-icon-link { display: none; }"],
+  },
+  {
+    path: "src/app/site-shell.css",
+    required: [".profile-shortcut {", "display: none;", ".header-icon-link {", "width: 40px;", "height: 40px;"],
+    forbidden: [],
   },
   {
     path: "src/app/(zh)/blog/[slug]/page.tsx",
@@ -38,17 +43,17 @@ const checks = [
   },
   {
     path: "src/components/article-verification-summary.tsx",
-    required: ["\u67e5\u770b\u9a8c\u8bc1\u8be6\u60c5", "Screeps Console", "\u771f\u5b9e\u4e3b\u5faa\u73af"],
+    required: ["查看验证详情", "Screeps Console", "真实主循环"],
     forbidden: [],
   },
   {
     path: "src/components/article-learning-context.tsx",
-    required: ["\u96be\u5ea6", "\u9002\u7528\u9636\u6bb5", "\u524d\u7f6e\u77e5\u8bc6", "\u6a21\u5757\u4f4d\u7f6e"],
+    required: ["难度", "适用阶段", "前置知识", "模块位置"],
     forbidden: [],
   },
   {
     path: "src/components/article-feedback.tsx",
-    required: ["\u5185\u5bb9\u53ef\u80fd\u8fc7\u65f6", "\u5efa\u8bae\u8865\u5145", "\u6ca1\u89e3\u51b3", "article_feedback"],
+    required: ["内容可能过时", "建议补充", "没解决", "article_feedback"],
     forbidden: ["needs-work"],
   },
   {
@@ -63,7 +68,7 @@ const checks = [
   },
   {
     path: "src/app/blog/[slug]/opengraph-image.tsx",
-    required: ["ImageResponse", "SCREEPS \u00b7 \u4e2d\u6587\u77e5\u8bc6\u5e93", "1200"],
+    required: ["ImageResponse", "SCREEPS · 中文知识库", "1200"],
     forbidden: [],
   },
   {

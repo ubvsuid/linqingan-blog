@@ -1,0 +1,5 @@
+Contact: mailto:linqingan501@gmail.com
+Expires: 2027-07-29T00:00:00.000Z
+Preferred-Languages: en, zh-CN
+Canonical: https://www.linqingan.com/.well-known/security.txt
+Policy: https://www.linqingan.com/en/about

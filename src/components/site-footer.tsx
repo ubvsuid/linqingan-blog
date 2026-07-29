@@ -86,43 +86,6 @@ export function SiteFooter() {
           <a href={`mailto:${siteConfig.author.email}`}>Email</a>
         </div>
       </Container>
-
-      <style>{`
-        .site-footer .footer-inner {
-          display: grid;
-          grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(120px, .6fr));
-          gap: clamp(34px, 6vw, 76px);
-          align-items: start;
-          min-height: 0;
-          padding: 58px 0 54px;
-          color: var(--muted);
-          font-size: 14px;
-        }
-        .footer-brand { display: grid; align-content: start; gap: 7px; }
-        .footer-brand > strong { color: var(--foreground); font-size: 22px; letter-spacing: -.03em; }
-        .footer-brand p { max-width: 330px; margin: 0; line-height: 1.65; }
-        .footer-brand .footer-status { display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; font-size: 12px; }
-        .footer-status > span { width: 8px; height: 8px; flex: 0 0 auto; margin-top: 6px; border-radius: 999px; background: var(--screeps-success, var(--foreground)); }
-        .footer-brand .copyright { margin-top: 24px; white-space: normal; font-size: 12px; }
-        .footer-column { display: grid; align-content: start; gap: 9px; }
-        .footer-column > strong { margin-bottom: 5px; color: var(--foreground); font-size: 13px; }
-        .footer-column a { width: fit-content; }
-        @media (max-width: 880px) {
-          .site-footer .footer-inner {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 34px 24px;
-          }
-          .footer-brand { grid-column: 1 / -1; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
-          .footer-brand .copyright { margin-top: 12px; }
-        }
-        @media (max-width: 560px) {
-          .site-footer .footer-inner {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            padding: 42px 0;
-          }
-          .footer-column:last-child { grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 28px; }
-        }
-      `}</style>
     </footer>
   );
 }
