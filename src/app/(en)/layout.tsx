@@ -11,6 +11,7 @@ import "../improvements.css";
 import "./english-home.css";
 import "./english-article.css";
 import "./english-about.css";
+import "./english-search.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
