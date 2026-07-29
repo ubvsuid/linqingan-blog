@@ -10,6 +10,7 @@ import "../globals.css";
 import "../improvements.css";
 import "./english-home.css";
 import "./english-article.css";
+import "./english-about.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
