@@ -1,17 +1,29 @@
 {
   "ci": {
     "collect": {
+      "startServerCommand": "npm run start",
+      "startServerReadyPattern": "ready",
+      "startServerReadyTimeout": 30000,
       "url": [
-        "https://www.linqingan.com/",
-        "https://www.linqingan.com/beginner",
-        "https://www.linqingan.com/knowledge",
-        "https://www.linqingan.com/search",
-        "https://www.linqingan.com/blog/screeps-memory-basics",
-        "https://www.linqingan.com/tools/room-diagnostics"
+        "http://localhost:3000/",
+        "http://localhost:3000/beginner",
+        "http://localhost:3000/knowledge",
+        "http://localhost:3000/search?q=creep",
+        "http://localhost:3000/blog/screeps-memory-basics",
+        "http://localhost:3000/tools/room-diagnostics",
+        "http://localhost:3000/en",
+        "http://localhost:3000/en/beginner",
+        "http://localhost:3000/en/blog",
+        "http://localhost:3000/en/blog/screeps-creep-harvest-energy",
+        "http://localhost:3000/en/tags/debugging",
+        "http://localhost:3000/en/search?q=creep%20not%20moving",
+        "http://localhost:3000/en/tools/creep-body-calculator",
+        "http://localhost:3000/en/tools/room-diagnostics"
       ],
       "numberOfRuns": 2,
       "settings": {
-        "chromeFlags": "--no-sandbox --headless"
+        "chromeFlags": "--no-sandbox --headless",
+        "preset": "desktop"
       }
     },
     "assert": {
