@@ -15,6 +15,8 @@
         "http://localhost:3000/en/beginner",
         "http://localhost:3000/en/blog",
         "http://localhost:3000/en/blog/screeps-creep-harvest-energy",
+        "http://localhost:3000/en/knowledge/movement-vision",
+        "http://localhost:3000/en/evidence",
         "http://localhost:3000/en/tags/debugging",
         "http://localhost:3000/en/search?q=creep%20not%20moving",
         "http://localhost:3000/en/tools/creep-body-calculator",
@@ -22,8 +24,7 @@
       ],
       "numberOfRuns": 2,
       "settings": {
-        "chromeFlags": "--no-sandbox --headless",
-        "preset": "desktop"
+        "chromeFlags": "--no-sandbox --headless"
       }
     },
     "assert": {
