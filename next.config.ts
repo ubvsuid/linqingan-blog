@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
 
-const contentSecurityPolicy = [
+const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
+  "frame-src 'none'",
+  "child-src 'none'",
   "object-src 'none'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
@@ -17,19 +19,32 @@ const contentSecurityPolicy = [
   "media-src 'self'",
   "upgrade-insecure-requests",
   "report-uri /api/csp-report",
+  "report-to csp-endpoint",
+];
+
+const contentSecurityPolicy = cspDirectives.join("; ");
+const candidateContentSecurityPolicy = [
+  ...cspDirectives.filter((directive) => !directive.startsWith("style-src-attr")),
+  "style-src-attr 'none'",
 ].join("; ");
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  {
+    key: "Permissions-Policy",
+    value: "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), usb=(), web-share=(self), xr-spatial-tracking=(), browsing-topics=()",
+  },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "Origin-Agent-Cluster", value: "?1" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
+  { key: "Reporting-Endpoints", value: 'csp-endpoint="https://www.linqingan.com/api/csp-report"' },
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
-  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
+  { key: "Content-Security-Policy-Report-Only", value: candidateContentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {
@@ -40,6 +55,12 @@ const nextConfig: NextConfig = {
   turbopack: { root: process.cwd() },
   async redirects() {
     return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "linqingan.com" }],
+        destination: "https://www.linqingan.com/:path*",
+        permanent: true,
+      },
       { source: "/changelog/page/2", destination: "/changelog", statusCode: 301 },
       { source: "/tags/%E6%96%B0%E6%89%8B%E5%85%A5%E9%97%A8", destination: "/tags/beginner", statusCode: 301 },
       { source: "/tags/%E5%9F%BA%E7%A1%80%E5%B7%A5%E7%A8%8B", destination: "/tags/basic-engineering", statusCode: 301 },
