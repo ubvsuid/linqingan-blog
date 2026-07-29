@@ -1,0 +1,87 @@
+.feedback {
+  display: grid;
+  grid-template-columns: minmax(210px, .72fr) minmax(0, 1.28fr);
+  gap: 46px;
+  margin-top: 72px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 42px 0;
+}
+
+.feedback h2 {
+  margin: 8px 0 0;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -.035em;
+}
+
+.intro,
+.status {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.actions {
+  display: grid;
+  align-content: start;
+  gap: 15px;
+}
+
+.votes,
+.links,
+.follow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.feedback button,
+.links a,
+.follow a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 17px;
+  background: var(--surface);
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.feedback button:hover,
+.links a:hover,
+.follow a:hover {
+  border-color: var(--muted);
+  text-decoration: none;
+}
+
+.feedback button.active {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.status {
+  min-height: 24px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.links,
+.follow {
+  margin-top: 3px;
+}
+
+.follow {
+  padding-top: 2px;
+}
+
+@media (max-width: 720px) {
+  .feedback {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+}
