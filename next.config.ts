@@ -29,6 +29,7 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {
