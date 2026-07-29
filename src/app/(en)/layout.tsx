@@ -8,6 +8,7 @@ import { siteConfig } from "@/lib/site";
 
 import "../globals.css";
 import "../improvements.css";
+import "../site-shell.css";
 import "./english-home.css";
 import "./english-article.css";
 import "./english-about.css";
