@@ -5,6 +5,8 @@ import { EnglishCreepBodyCalculator } from "@/components/creep-body-calculator-e
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { siteConfig } from "@/lib/site";
 
+import "../../../english-tools.css";
+
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Creep Body Calculator",
   description:

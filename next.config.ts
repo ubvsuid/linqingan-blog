@@ -23,10 +23,25 @@ const cspDirectives = [
 ];
 
 const contentSecurityPolicy = cspDirectives.join("; ");
-const candidateContentSecurityPolicy = [
-  ...cspDirectives.filter((directive) => !directive.startsWith("style-src-attr")),
-  "style-src-attr 'none'",
-].join("; ");
+
+function createCandidateContentSecurityPolicy() {
+  const stricterDirectives = cspDirectives
+    .filter((directive) => !directive.startsWith("style-src-attr "))
+    .map((directive) =>
+      directive.startsWith("script-src ")
+        ? directive.replace(" 'unsafe-inline'", "")
+        : directive,
+    );
+
+  return [...stricterDirectives, "style-src-attr 'none'"].join("; ");
+}
+
+const candidateContentSecurityPolicy =
+  createCandidateContentSecurityPolicy();
+const candidateContentSecurityPolicyHeader = {
+  key: "Content-Security-Policy-Report-Only",
+  value: candidateContentSecurityPolicy,
+};
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -44,7 +59,6 @@ const securityHeaders = [
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
   { key: "Reporting-Endpoints", value: 'csp-endpoint="https://www.linqingan.com/api/csp-report"' },
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
-  { key: "Content-Security-Policy-Report-Only", value: candidateContentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {
@@ -78,6 +92,20 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
+      {
+        source: "/en/verification",
+        headers: [candidateContentSecurityPolicyHeader],
+      },
+      {
+        source: "/theme-init.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value:
+              "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
       { source: "/en", headers: [{ key: "Content-Language", value: "en" }] },
       { source: "/en/:path*", headers: [{ key: "Content-Language", value: "en" }] },
     ];

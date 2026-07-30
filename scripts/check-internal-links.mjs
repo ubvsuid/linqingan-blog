@@ -33,6 +33,7 @@ const exactRoutes = new Set([
   "/en/blog",
   "/en/changelog",
   "/en/evidence",
+  "/en/evidence/status.json",
   "/en/feed.xml",
   "/en/license",
   "/en/roadmap",

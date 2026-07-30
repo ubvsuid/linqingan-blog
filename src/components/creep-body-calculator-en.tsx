@@ -66,12 +66,13 @@ export function EnglishCreepBodyCalculator() {
   const [counts, setCounts] = useState<BodyCounts>(() => createCounts({ WORK: 1, CARRY: 1, MOVE: 1 }));
   const [energyBudget, setEnergyBudget] = useState(300);
   const [copyState, setCopyState] = useState("Copy body array");
+  const [resultActionState, setResultActionState] = useState("");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const parsed = createCounts();
-    let hasBodyParam = false;
+    let hasBodyParam = params.get("body") === "configured";
 
     for (const part of bodyPartOrder) {
       const value = params.get(part.toLowerCase());
@@ -118,10 +119,22 @@ export function EnglishCreepBodyCalculator() {
     plain: movementTicks(nonMoveParts, counts.MOVE, 2),
     swamp: movementTicks(nonMoveParts, counts.MOVE, 10),
   };
+  const resultSummary = [
+    "Screeps Creep Body Calculator",
+    `Body: ${bodyCode}`,
+    `Cost: ${totalCost} Energy`,
+    `Energy budget: ${energyBudget}`,
+    `Spawn time: ${spawnTime} ticks`,
+    `Base hits: ${totalHits}`,
+    `Carry capacity: ${carryCapacity} resources`,
+    `Loaded movement: road ${formatMovement(movement.road)}, plain ${formatMovement(movement.plain)}, swamp ${formatMovement(movement.swamp)}`,
+    "Boundary: This is a deterministic calculator result, not a live-room observation.",
+  ].join("\n");
 
   useEffect(() => {
     if (!ready) return;
-    const url = new URL(window.location.href);
+    const url = new URL(window.location.pathname, window.location.origin);
+    url.searchParams.set("body", "configured");
     for (const part of bodyPartOrder) {
       const key = part.toLowerCase();
       if (counts[part] > 0) url.searchParams.set(key, String(counts[part]));
@@ -146,6 +159,51 @@ export function EnglishCreepBodyCalculator() {
       window.setTimeout(() => setCopyState("Copy body array"), 1600);
     } catch {
       setCopyState("Copy failed — select manually");
+    }
+  }
+
+  async function copyResult() {
+    try {
+      await navigator.clipboard.writeText(resultSummary);
+      setResultActionState("Result summary copied.");
+    } catch {
+      setResultActionState("Copy failed. Select the visible result manually.");
+    }
+  }
+
+  async function shareConfiguration() {
+    const shareUrl = new URL(window.location.pathname, window.location.origin);
+    shareUrl.searchParams.set("body", "configured");
+    for (const part of bodyPartOrder) {
+      if (counts[part] > 0) {
+        shareUrl.searchParams.set(part.toLowerCase(), String(counts[part]));
+      }
+    }
+    shareUrl.searchParams.set("energy", String(energyBudget));
+    const url = shareUrl.toString();
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Screeps Creep Body Calculator",
+          text: resultSummary,
+          url,
+        });
+        setResultActionState("Share sheet opened.");
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          setResultActionState("Sharing cancelled.");
+          return;
+        }
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setResultActionState("Shareable configuration link copied.");
+    } catch {
+      setResultActionState("Could not copy the link. Copy it from the address bar.");
     }
   }
 
@@ -207,51 +265,12 @@ export function EnglishCreepBodyCalculator() {
           <p>Assumes every non-MOVE part creates fatigue. Empty CARRY parts, boosts, damage, pulling, and actual path conditions can change the result.</p>
         </section>
         <div className="body-code-en"><code>{bodyCode}</code><button type="button" onClick={copyBody} disabled={totalParts === 0}>{copyState}</button></div>
+        <div className="tool-result-actions-en" aria-label="Copy or share this calculation">
+          <button type="button" onClick={copyResult} disabled={totalParts === 0}>Copy result summary</button>
+          <button type="button" onClick={shareConfiguration}>Share configuration link</button>
+        </div>
+        <p className="tool-action-status-en" role="status" aria-live="polite">{resultActionState}</p>
       </aside>
-
-      <style>{`
-        .body-calculator-en { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); gap: 24px; align-items: start; }
-        .body-builder-en, .body-results-en { border: 1px solid var(--border); border-radius: 24px; background: var(--surface); }
-        .body-builder-en { padding: clamp(24px, 4vw, 38px); }
-        .body-results-en { position: sticky; top: 24px; display: grid; gap: 24px; padding: 28px; }
-        .body-builder-heading-en { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
-        .body-builder-en h2, .body-results-en h2 { margin: 8px 0 0; font-size: clamp(30px, 4vw, 44px); letter-spacing: -.045em; }
-        .body-limit-en { display: flex; align-items: baseline; gap: 5px; color: var(--muted); white-space: nowrap; }
-        .body-limit-en strong { color: var(--foreground); font-size: 34px; }
-        .body-presets-en { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
-        .body-presets-en button, .body-stepper-en button, .body-code-en button { min-height: 42px; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
-        .body-part-grid-en { display: grid; margin-top: 28px; border-top: 1px solid var(--border); }
-        .body-part-grid-en article { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px; align-items: center; border-bottom: 1px solid var(--border); padding: 21px 0; }
-        .body-part-grid-en article > div:first-child { display: grid; gap: 5px; }
-        .body-part-grid-en article strong { font-family: "SFMono-Regular", Consolas, monospace; }
-        .body-part-grid-en article span, .body-part-grid-en article p { color: var(--muted); }
-        .body-part-grid-en article span { font-size: 12px; }
-        .body-part-grid-en article p { margin: 2px 0 0; line-height: 1.6; }
-        .body-stepper-en { display: grid; grid-template-columns: 42px 36px 42px; gap: 7px; align-items: center; }
-        .body-stepper-en button { width: 42px; padding: 0; font-size: 20px; }
-        .body-stepper-en output { text-align: center; font-weight: 700; }
-        .energy-budget-en { display: grid; gap: 8px; color: var(--muted); font-size: 13px; }
-        .energy-budget-en input { min-height: 50px; border: 1px solid var(--border); border-radius: 14px; padding: 0 14px; background: var(--background); color: var(--foreground); font: inherit; font-size: 16px; }
-        .body-metrics-en { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--border); }
-        .body-metrics-en div { display: grid; gap: 6px; border-bottom: 1px solid var(--border); padding: 18px 12px 18px 0; }
-        .body-metrics-en div:nth-child(even) { border-left: 1px solid var(--border); padding-left: 16px; }
-        .body-metrics-en dt, .movement-result-en dt { color: var(--muted); font-size: 12px; }
-        .body-metrics-en dd, .movement-result-en dd { margin: 0; font-weight: 700; }
-        .budget-status-en { border-radius: 14px; padding: 14px 16px; line-height: 1.6; }
-        .budget-ok-en { background: color-mix(in srgb, #2f9e44 12%, var(--background)); }
-        .budget-short-en { background: color-mix(in srgb, #e03131 10%, var(--background)); }
-        .movement-result-en { border-top: 1px solid var(--border); padding-top: 22px; }
-        .movement-result-en h3 { margin: 0; font-size: 18px; }
-        .movement-result-en dl { display: grid; gap: 10px; margin: 16px 0 0; }
-        .movement-result-en dl div { display: flex; justify-content: space-between; gap: 18px; }
-        .movement-result-en p { margin: 16px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
-        .body-code-en { display: grid; gap: 12px; }
-        .body-code-en code { overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: 14px; padding: 16px; background: var(--background); line-height: 1.65; }
-        .body-code-en button { justify-self: start; }
-        button:disabled { cursor: not-allowed; opacity: .42; }
-        @media (max-width: 900px) { .body-calculator-en { grid-template-columns: 1fr; } .body-results-en { position: static; } }
-        @media (max-width: 560px) { .body-builder-heading-en { align-items: flex-start; flex-direction: column; } .body-part-grid-en article { grid-template-columns: 1fr; } .body-stepper-en { justify-self: start; } .body-metrics-en { grid-template-columns: 1fr; } .body-metrics-en div:nth-child(even) { border-left: 0; padding-left: 0; } }
-      `}</style>
     </div>
   );
 }

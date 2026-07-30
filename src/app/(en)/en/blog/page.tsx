@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { EnglishArticleBrowser } from "@/components/english-article-browser";
 import { Container } from "@/components/container";
+import { parseEnglishArticleBrowseParams } from "@/lib/english-article-browser";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { englishDiscoveryArticles } from "@/lib/english-discovery";
 
@@ -22,15 +23,13 @@ interface EnglishBlogPageProps {
     difficulty?: string | string[];
     type?: string | string[];
     tag?: string | string[];
+    sort?: string | string[];
+    page?: string | string[];
   }>;
 }
 
-function readParam(value: string | string[] | undefined): string {
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
-}
-
 export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageProps) {
-  const params = await searchParams;
+  const params = parseEnglishArticleBrowseParams(await searchParams);
 
   return (
     <main className={styles.page} lang="en">
@@ -59,19 +58,18 @@ export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageP
 
         <EnglishArticleBrowser
           articles={englishDiscoveryArticles}
-          initialQuery={readParam(params.q)}
-          initialModule={readParam(params.module)}
-          initialDifficulty={readParam(params.difficulty)}
-          initialType={readParam(params.type)}
-          initialTag={readParam(params.tag)}
+          params={params}
+          pathname="/en/blog"
         />
 
         <div className={styles.notice}>
           <strong>Publication standard</strong>
           <p>
             English articles are published only after source review, official API checks where
-            applicable, JavaScript syntax review where code is present, duplicate-intent checks,
-            and a final score of at least 96.
+            applicable, JavaScript syntax review where code is present, duplicate-intent and link
+            checks, and editorial review. Publication does not imply Console or multi-tick live-room
+            verification; those evidence states remain separate in each guide. {" "}
+            <Link href="/en/verification">Review the verification method.</Link>
           </p>
         </div>
       </Container>

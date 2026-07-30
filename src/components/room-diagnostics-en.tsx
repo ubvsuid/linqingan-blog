@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Link from "next/link";
 
@@ -37,6 +37,14 @@ function parseNumber(value: string, fallback = 0) {
   return Number.isFinite(parsed) ? Math.max(0, parsed) : fallback;
 }
 
+function parseUrlNumber(value: string | null, fallback: string): string {
+  if (value === null) return fallback;
+  if (value.trim() === "") return "0";
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return String(Math.min(Math.max(0, parsed), 1_000_000_000));
+}
+
 export function EnglishRoomDiagnostics() {
   const [spawnCount, setSpawnCount] = useState("1");
   const [harvesterCount, setHarvesterCount] = useState("2");
@@ -50,6 +58,28 @@ export function EnglishRoomDiagnostics() {
   const [cpuLimit, setCpuLimit] = useState("20");
   const [bucket, setBucket] = useState("10000");
   const [copyState, setCopyState] = useState("Copy Console probe");
+  const [resultActionState, setResultActionState] = useState("");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const timer = window.setTimeout(() => {
+      setSpawnCount(parseUrlNumber(params.get("spawns"), "1"));
+      setHarvesterCount(parseUrlNumber(params.get("harvesters"), "2"));
+      setHaulerCount(parseUrlNumber(params.get("haulers"), "1"));
+      setEnergyAvailable(parseUrlNumber(params.get("energy"), "300"));
+      setEnergyCapacity(parseUrlNumber(params.get("capacity"), "550"));
+      setStorageEnergy(parseUrlNumber(params.get("storage"), "20000"));
+      setControllerTicks(parseUrlNumber(params.get("downgrade"), "10000"));
+      setConstructionSites(parseUrlNumber(params.get("sites"), "0"));
+      setCpuUsed(parseUrlNumber(params.get("cpu"), "8"));
+      setCpuLimit(parseUrlNumber(params.get("limit"), "20"));
+      setBucket(parseUrlNumber(params.get("bucket"), "10000"));
+      setReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const findings = useMemo<Finding[]>(() => {
     const spawns = parseNumber(spawnCount);
@@ -106,6 +136,56 @@ export function EnglishRoomDiagnostics() {
     return results.sort((left, right) => order[left.severity] - order[right.severity]);
   }, [spawnCount, harvesterCount, haulerCount, energyAvailable, energyCapacity, storageEnergy, controllerTicks, constructionSites, cpuUsed, cpuLimit, bucket]);
 
+  useEffect(() => {
+    if (!ready) return;
+
+    const url = new URL(window.location.pathname, window.location.origin);
+    const values = {
+      spawns: spawnCount,
+      harvesters: harvesterCount,
+      haulers: haulerCount,
+      energy: energyAvailable,
+      capacity: energyCapacity,
+      storage: storageEnergy,
+      downgrade: controllerTicks,
+      sites: constructionSites,
+      cpu: cpuUsed,
+      limit: cpuLimit,
+      bucket,
+    };
+
+    for (const [key, value] of Object.entries(values)) {
+      url.searchParams.set(key, String(parseNumber(value)));
+    }
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [
+    bucket,
+    constructionSites,
+    controllerTicks,
+    cpuLimit,
+    cpuUsed,
+    energyAvailable,
+    energyCapacity,
+    harvesterCount,
+    haulerCount,
+    ready,
+    spawnCount,
+    storageEnergy,
+  ]);
+
+  const resultSummary = [
+    "Static Screeps Room Snapshot Diagnostic",
+    "Input source: user-entered values; this tool is not connected to a Screeps account.",
+    `Snapshot: spawns ${parseNumber(spawnCount)}, harvesters ${parseNumber(harvesterCount)}, haulers ${parseNumber(haulerCount)}, Energy ${parseNumber(energyAvailable)}/${parseNumber(energyCapacity)}, storage Energy ${parseNumber(storageEnergy)}, Controller downgrade ${parseNumber(controllerTicks)}, construction sites ${parseNumber(constructionSites)}, CPU ${parseNumber(cpuUsed)}/${parseNumber(cpuLimit)}, bucket ${parseNumber(bucket)}.`,
+    "",
+    ...findings.map(
+      (finding) =>
+        `[${finding.severity}] ${finding.title}: ${finding.detail}`,
+    ),
+    "",
+    "Boundary: These are static maintenance checks, not live-room or multi-tick evidence.",
+  ].join("\n");
+
   async function copyProbe() {
     try {
       await navigator.clipboard.writeText(probeCode);
@@ -113,6 +193,60 @@ export function EnglishRoomDiagnostics() {
       window.setTimeout(() => setCopyState("Copy Console probe"), 1600);
     } catch {
       setCopyState("Copy failed — select manually");
+    }
+  }
+
+  async function copyResults() {
+    try {
+      await navigator.clipboard.writeText(resultSummary);
+      setResultActionState("Diagnostic summary copied.");
+    } catch {
+      setResultActionState("Copy failed. Select the visible findings manually.");
+    }
+  }
+
+  async function shareSnapshot() {
+    const shareUrl = new URL(window.location.pathname, window.location.origin);
+    const values = {
+      spawns: spawnCount,
+      harvesters: harvesterCount,
+      haulers: haulerCount,
+      energy: energyAvailable,
+      capacity: energyCapacity,
+      storage: storageEnergy,
+      downgrade: controllerTicks,
+      sites: constructionSites,
+      cpu: cpuUsed,
+      limit: cpuLimit,
+      bucket,
+    };
+    for (const [key, value] of Object.entries(values)) {
+      shareUrl.searchParams.set(key, String(parseNumber(value)));
+    }
+    const url = shareUrl.toString();
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Screeps Room Snapshot Diagnostic",
+          text: resultSummary,
+          url,
+        });
+        setResultActionState("Share sheet opened.");
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          setResultActionState("Sharing cancelled.");
+          return;
+        }
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setResultActionState("Shareable snapshot link copied.");
+    } catch {
+      setResultActionState("Could not copy the link. Copy it from the address bar.");
     }
   }
 
@@ -155,35 +289,13 @@ export function EnglishRoomDiagnostics() {
             </article>
           ))}
         </div>
+        <div className="tool-result-actions-en" aria-label="Copy or share these findings">
+          <button type="button" onClick={copyResults}>Copy diagnostic summary</button>
+          <button type="button" onClick={shareSnapshot}>Share snapshot link</button>
+        </div>
+        <p className="tool-action-status-en" role="status" aria-live="polite">{resultActionState}</p>
         <details className="diagnostic-probe-en"><summary>View the read-only Console probe</summary><pre><code>{probeCode}</code></pre></details>
       </section>
-
-      <style>{`
-        .room-diagnostics-en { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); gap: 24px; align-items: start; }
-        .diagnostic-inputs-en, .diagnostic-results-en { border: 1px solid var(--border); border-radius: 24px; padding: clamp(24px, 4vw, 38px); background: var(--surface); }
-        .diagnostic-results-en { position: sticky; top: 24px; display: grid; gap: 24px; }
-        .diagnostic-heading-en { display: flex; align-items: end; justify-content: space-between; gap: 18px; }
-        .diagnostic-heading-en h2, .diagnostic-results-en h2 { margin: 8px 0 0; font-size: clamp(30px, 4vw, 44px); letter-spacing: -.045em; }
-        .diagnostic-heading-en button { min-height: 42px; border: 1px solid var(--border); border-radius: 999px; padding: 0 14px; background: var(--background); color: var(--foreground); cursor: pointer; }
-        .diagnostic-note-en { margin: 22px 0 0; color: var(--muted); line-height: 1.7; }
-        .diagnostic-field-grid-en { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 28px; }
-        .diagnostic-field-grid-en label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; }
-        .diagnostic-field-grid-en input { min-height: 48px; border: 1px solid var(--border); border-radius: 13px; padding: 0 13px; background: var(--background); color: var(--foreground); font: inherit; font-size: 15px; }
-        .diagnostic-findings-en { display: grid; gap: 10px; }
-        .finding-en { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 16px; border: 1px solid var(--border); border-radius: 16px; padding: 18px; }
-        .finding-en > span { width: fit-content; height: fit-content; border-radius: 999px; padding: 5px 8px; background: var(--background); font-size: 10px; font-weight: 700; }
-        .finding-en h3 { margin: 0; font-size: 18px; }
-        .finding-en p { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
-        .finding-en a { display: inline-flex; margin-top: 10px; font-size: 13px; font-weight: 700; }
-        .finding-critical-en { border-color: color-mix(in srgb, #b91c1c 45%, var(--border)); }
-        .finding-warning-en { border-color: color-mix(in srgb, #b45309 40%, var(--border)); }
-        .finding-healthy-en { border-color: color-mix(in srgb, #15803d 35%, var(--border)); }
-        .diagnostic-probe-en { border-top: 1px solid var(--border); padding-top: 18px; }
-        .diagnostic-probe-en summary { cursor: pointer; font-weight: 700; }
-        .diagnostic-probe-en pre { overflow-x: auto; margin: 16px 0 0; border-radius: 14px; padding: 16px; background: var(--background); font-size: 12px; line-height: 1.6; }
-        @media (max-width: 900px) { .room-diagnostics-en { grid-template-columns: 1fr; } .diagnostic-results-en { position: static; } }
-        @media (max-width: 620px) { .diagnostic-field-grid-en { grid-template-columns: 1fr; } .diagnostic-heading-en { align-items: start; flex-direction: column; } .finding-en { grid-template-columns: 1fr; } }
-      `}</style>
     </div>
   );
 }

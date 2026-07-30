@@ -70,9 +70,12 @@ export default function HomePage() {
           <p className={styles.heroStats}>
             {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
           </p>
-          <HomeTaskHub />
         </Container>
       </section>
+
+      <Container>
+        <HomeTaskHub />
+      </Container>
 
       <section className={styles.learningSection} aria-labelledby="home-learning-title">
         <Container>

@@ -35,7 +35,8 @@ const checks = [
   ["/blog/screeps-game-get-object-by-id", ["Game.getObjectById()", "Memory", "null"]],
   ["/blog/screeps-power-spawn-process-power", ["processPower()", "Screeps Console", "待测试"]],
   ["/en/beginner", ["Learn Screeps in twelve focused lessons", "LESSON 01", "LESSON 12", "Complete beginner sequence published"]],
-  ["/en/blog", ["Practical Screeps articles", "What Is Screeps? A Programming Strategy Game", "How to Combine Your First Screeps Room Loop"]],
+  ["/en/blog", ["Practical Screeps articles", "Apply filters", "Publication standard", "Page 1 of"]],
+  ["/en/blog-index.json", ["What Is Screeps? A Programming Strategy Game", "How to Combine Your First Screeps Room Loop"]],
   ["/en/blog/screeps-introduction", ["What Is Screeps? How the Programming Strategy Game Works", "Chinese source", "Read in full", "Publication status", "Ready"]],
   ["/en/blog/screeps-first-room", ["How to Find Your First Screeps Room, Editor, and Console", "State impact", "Read-only", "Screeps Console", "Pending"]],
   ["/en/blog/screeps-tick-game-loop", ["What Is a Screeps Tick", "Game-loop model", "Checked", "Tick interval", "Server-dependent"]],
@@ -164,7 +165,11 @@ for (const [pathname, expectedTexts] of checks) {
     failures.push(`${pathname}: 仍然使用可能误导的“本文最后测试于”表述`);
   }
 
-  if (!pathname.endsWith(".xml") && !body.includes("https://www.linqingan.com")) {
+  if (
+    !pathname.endsWith(".xml") &&
+    !pathname.endsWith(".json") &&
+    !body.includes("https://www.linqingan.com")
+  ) {
     failures.push(`${pathname}: 未找到统一主域名信号`);
   }
 }
@@ -203,9 +208,33 @@ for (const pathname of metadataPaths) {
 }
 
 const securityResponse = await fetch(baseUrl);
-const cspReportOnly = securityResponse.headers.get("content-security-policy-report-only") ?? "";
-if (!cspReportOnly.includes("default-src 'self'") || !cspReportOnly.includes("object-src 'none'")) {
-  failures.push("安全响应头: 缺少有效的 Content-Security-Policy-Report-Only");
+const enforcedCsp = securityResponse.headers.get("content-security-policy") ?? "";
+const globalReportOnly =
+  securityResponse.headers.get("content-security-policy-report-only") ?? "";
+if (
+  !enforcedCsp.includes("default-src 'self'")
+  || !enforcedCsp.includes("object-src 'none'")
+) {
+  failures.push("Security headers: missing the enforced Content-Security-Policy.");
+}
+if (globalReportOnly) {
+  failures.push(
+    "Security headers: the strict Report-Only candidate must not run on every route.",
+  );
+}
+
+const cspCanaryResponse = await fetch(`${baseUrl}/en/verification`);
+const cspReportOnly =
+  cspCanaryResponse.headers.get("content-security-policy-report-only") ?? "";
+if (
+  !cspReportOnly.includes("default-src 'self'")
+  || !cspReportOnly.includes("object-src 'none'")
+  || !cspReportOnly.includes("style-src-attr 'none'")
+  || cspReportOnly.includes("script-src 'self' 'unsafe-inline'")
+) {
+  failures.push(
+    "/en/verification: missing the stricter Report-Only CSP canary.",
+  );
 }
 
 const searchResponse = await fetch(`${baseUrl}/search`);

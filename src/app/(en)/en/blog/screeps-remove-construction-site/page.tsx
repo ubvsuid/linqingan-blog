@@ -534,7 +534,7 @@ export default function RemoveConstructionSitePage() {
             </div>
           </header>
 
-          <section className="english-verification" aria-labelledby="verification-status-title">
+          <section className="english-verification remove-site-verification" aria-labelledby="verification-status-title">
             <div>
               <p className="eyebrow">VERIFICATION</p>
               <h2 id="verification-status-title">Verification status</h2>
@@ -572,54 +572,6 @@ export default function RemoveConstructionSitePage() {
         </article>
       </Container>
 
-      <style>{`
-        .article-breadcrumb {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 34px;
-          color: var(--muted);
-          font-size: 13px;
-        }
-        .article-breadcrumb a:hover { color: var(--foreground); }
-        .english-verification {
-          display: grid;
-          grid-template-columns: minmax(180px, .45fr) minmax(0, 1.55fr);
-          gap: 30px;
-          margin: -24px 0 52px;
-          border: 1px solid var(--border);
-          border-radius: 18px;
-          padding: 22px;
-          background: var(--surface);
-        }
-        .english-verification h2 { margin: 7px 0 0; font-size: 20px; }
-        .english-verification dl {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px 24px;
-          margin: 0;
-        }
-        .english-verification dl > div {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          border-bottom: 1px solid var(--border);
-          padding-bottom: 8px;
-        }
-        .english-verification dt { color: var(--muted); }
-        .english-verification dd { margin: 0; font-weight: 650; text-align: right; }
-        .english-toc { margin-bottom: 58px; }
-        .english-toc ol { columns: 2; column-gap: 36px; }
-        .english-toc li { break-inside: avoid; margin-bottom: 9px; }
-        .article-content .table-scroll { overflow-x: auto; }
-        .article-content h2, .article-content h3 { scroll-margin-top: 100px; }
-        .article-content pre { overflow-x: auto; }
-        @media (max-width: 760px) {
-          .english-verification { grid-template-columns: 1fr; }
-          .english-verification dl { grid-template-columns: 1fr; }
-          .english-toc ol { columns: 1; }
-        }
-      `}</style>
     </main>
   );
 }

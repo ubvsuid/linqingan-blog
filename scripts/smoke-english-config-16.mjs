@@ -106,13 +106,13 @@ if (redirectLocation !== "/en/blog/screeps-memory-basics") {
   failures.push(`/en/blog/screeps-memory-write-safety: 跳转目标错误 ${redirectLocation}`);
 }
 
-const blogResponse = await fetch(`${baseUrl}/en/blog`, { redirect: "manual" });
+const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
 const blogBody = await blogResponse.text();
 if (blogResponse.status !== 200) {
-  failures.push(`/en/blog: 预期 200，实际 ${blogResponse.status}`);
+  failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
   }
   if (blogBody.includes("How to Write Screeps Memory Without Losing Data or Saving Live Objects")) {
     failures.push("/en/blog: 仍展示重复 Memory 页面");

@@ -253,7 +253,11 @@ html[data-theme="dark"] .brand-logo {
 /* Reduce first-paint work without hiding content from the DOM or crawlers. */
 .site-footer,
 .english-root main > section:nth-of-type(n + 2),
-.english-system-visual {
+.english-system-visual,
+.deferred-home-block,
+.article-content,
+.site-search-results article,
+.english-search-results article {
   content-visibility: auto;
 }
 
@@ -267,6 +271,19 @@ html[data-theme="dark"] .brand-logo {
 
 .english-system-visual {
   contain-intrinsic-size: 520px;
+}
+
+.deferred-home-block {
+  contain-intrinsic-size: 760px;
+}
+
+.article-content {
+  contain-intrinsic-size: 4200px;
+}
+
+.site-search-results article,
+.english-search-results article {
+  contain-intrinsic-size: 210px;
 }
 
 /* An opaque sticky header avoids the expensive backdrop blur during LCP. */

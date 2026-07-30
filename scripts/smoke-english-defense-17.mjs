@@ -121,13 +121,13 @@ if (
   failures.push("防御维修页面缺少阶段、hitsMax、有效 WORK 或范围 3 边界");
 }
 
-const blogResponse = await fetch(`${baseUrl}/en/blog`, { redirect: "manual" });
+const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
 const blogBody = await blogResponse.text();
 if (blogResponse.status !== 200) {
-  failures.push(`/en/blog: 预期 200，实际 ${blogResponse.status}`);
+  failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
   }
 }
 

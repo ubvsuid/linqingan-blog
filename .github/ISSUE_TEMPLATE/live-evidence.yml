@@ -1,67 +1,102 @@
 name: Submit live Screeps evidence
-description: Add reproducible Console output, screenshots, or multi-tick observations to an English guide.
+description: Submit reproducible Console output, screenshots, or multi-tick observations for review.
 title: "Live evidence: "
+labels:
+  - evidence
 body:
   - type: markdown
     attributes:
       value: |
-        Submit only evidence you observed. Remove tokens, credentials, private messages, and unrelated player information.
+        Submit only evidence you personally observed. A submission is not an accepted live-test claim until it has been reviewed.
+
+        Remove account tokens, credentials, private messages, private room details, and unrelated player information before attaching anything.
   - type: input
     id: guide
     attributes:
       label: Guide URL
+      description: Paste the exact English guide that this observation supports.
       placeholder: https://www.linqingan.com/en/blog/...
     validations:
       required: true
   - type: input
+    id: objective
+    attributes:
+      label: Test objective
+      description: State one narrow claim that the evidence is intended to verify.
+      placeholder: Verify that the Creep reaches range and harvests on a later tick.
+    validations:
+      required: true
+  - type: input
+    id: observed_at
+    attributes:
+      label: Observation date
+      description: Use YYYY-MM-DD. Do not use the upload date unless it is also the observation date.
+      placeholder: "2026-07-30"
+    validations:
+      required: true
+  - type: textarea
     id: environment
     attributes:
       label: Test environment
-      description: Server or shard, room, RCL, and relevant object names.
-      placeholder: Official server, shard3, room W1N1, RCL 4
+      description: Include server or shard, room and RCL, relevant objects, and whether this was the official server, seasonal server, arena, or another environment.
+      placeholder: |
+        Environment: Official server, shard3
+        Room/RCL: W1N1, RCL 4
+        Objects: Creep Harvester1, Source abc123
     validations:
       required: true
   - type: input
     id: ticks
     attributes:
       label: Tick range
-      placeholder: Game.time 123450–123458
+      description: Provide the exact Game.time values or explain why one tick is sufficient.
+      placeholder: Game.time 123450-123458
     validations:
       required: true
   - type: textarea
-    id: setup
+    id: code
     attributes:
-      label: Reproduction setup
-      description: Include the exact code or action and the starting state.
+      label: Exact code or action
+      description: Paste the smallest reproducible code or Console command. Redact secrets without changing the behavior under test.
+      render: javascript
+    validations:
+      required: true
+  - type: textarea
+    id: starting_state
+    attributes:
+      label: Starting state
+      description: Record positions, stores, fatigue, cooldowns, Memory, Controller state, or other inputs needed to reproduce the observation.
     validations:
       required: true
   - type: textarea
     id: observations
     attributes:
-      label: Return codes and observations
-      description: Record each relevant return code and the state observed on later ticks.
+      label: Return codes and later-tick observations
+      description: Preserve raw return codes and relevant state changes. Separate what was directly observed from your interpretation.
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
-      label: Console output, screenshot, or log link
-      description: Attach or link the evidence. Explain any redactions.
+      label: Console output, screenshots, or log links
+      description: Attach the original evidence or stable links. State what was redacted. Do not paste tokens or credentials.
     validations:
       required: true
   - type: textarea
     id: limitations
     attributes:
-      label: Limitations and edge conditions
-      description: State what the evidence does not prove.
+      label: Limitations
+      description: State what the evidence does not prove, including untested shards, room states, edge cases, or confounding actions.
     validations:
       required: true
   - type: checkboxes
     id: confirmation
     attributes:
-      label: Confirmation
+      label: Submission confirmation
       options:
-        - label: I personally observed this result and did not infer it from documentation alone.
+        - label: I personally observed this result and did not infer it from documentation, generated output, or an offline mock.
           required: true
-        - label: I removed credentials, tokens, private messages, and unrelated player information.
+        - label: I removed credentials, tokens, private messages, private room details, and unrelated player information.
+          required: true
+        - label: I understand that submission does not mean acceptance or authorize the site to generalize beyond this test environment.
           required: true

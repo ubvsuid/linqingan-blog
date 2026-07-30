@@ -10,22 +10,15 @@ import { nowEntries } from "@/lib/now-entries";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
-import { getTagRecords } from "@/lib/tags";
-
-export type SitemapChangeFrequency =
-  | "always"
-  | "hourly"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "yearly"
-  | "never";
+import {
+  getStaticPageLastModified,
+  type StaticPagePath,
+} from "@/lib/static-page-revisions";
+import { getPostsForTag, getTagRecords } from "@/lib/tags";
 
 export interface SitemapEntry {
   url: string;
   lastModified: Date;
-  changeFrequency: SitemapChangeFrequency;
-  priority: number;
 }
 
 export interface SitemapIndexEntry {
@@ -54,54 +47,47 @@ function escapeXml(value: string): string {
     .replaceAll("'", "&apos;");
 }
 
+function staticPageEntry(
+  pathname: StaticPagePath,
+  dependentContentDates: string[] = [],
+): SitemapEntry {
+  return {
+    url: pathname === "/" ? siteConfig.url : `${siteConfig.url}${pathname}`,
+    lastModified: getStaticPageLastModified(
+      pathname,
+      dependentContentDates,
+    ),
+  };
+}
+
 export function getChineseSitemapEntries(): SitemapEntry[] {
   const allPosts = getAllPosts();
   const postsBySlug = new Map(allPosts.map((post) => [post.slug, post]));
-  const allPostsUpdatedAt = latestDate(
-    allPosts.map((post) => post.updatedAt ?? post.publishedAt),
+  const allPostDates = allPosts.map(
+    (post) => post.updatedAt ?? post.publishedAt,
   );
-  const allPostsPublishedAt = latestDate(
-    allPosts.map((post) => post.publishedAt),
-  );
-  const beginnerUpdatedAt = latestDate(
-    beginnerSeriesSlugs.flatMap((slug) => {
-      const post = postsBySlug.get(slug);
-      return post ? [post.updatedAt ?? post.publishedAt] : [];
-    }),
-  );
-  const changelogUpdatedAt = latestDate(
-    changelogEntries.map((entry) => entry.date),
-  );
-  const nowUpdatedAt = latestDate([
-    ...nowEntries.map((entry) => entry.date),
-    ...changelogEntries.map((entry) => entry.date),
-  ]);
-  const interfaceUpdatedAt = latestDate([
-    ...allPosts.map((post) => post.updatedAt ?? post.publishedAt),
-    ...changelogEntries.map((entry) => entry.date),
-    ...nowEntries.map((entry) => entry.date),
-    ...projects.map((project) => project.updatedAt),
-  ]);
-  const aboutUpdatedAt = latestDate([
-    allPostsPublishedAt.toISOString(),
-    ...projects.map((project) => project.updatedAt),
-    ...changelogEntries.map((entry) => entry.date),
-  ]);
+  const beginnerDates = beginnerSeriesSlugs.flatMap((slug) => {
+    const post = postsBySlug.get(slug);
+    return post ? [post.updatedAt ?? post.publishedAt] : [];
+  });
+  const changelogDates = changelogEntries.map((entry) => entry.date);
+  const nowDates = nowEntries.map((entry) => entry.date);
+  const projectDates = projects.map((project) => project.updatedAt);
 
   const staticPages: SitemapEntry[] = [
-    { url: siteConfig.url, lastModified: allPostsUpdatedAt, changeFrequency: "weekly", priority: 1 },
-    { url: `${siteConfig.url}/beginner`, lastModified: beginnerUpdatedAt, changeFrequency: "weekly", priority: 0.95 },
-    { url: `${siteConfig.url}/blog`, lastModified: allPostsUpdatedAt, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteConfig.url}/knowledge`, lastModified: allPostsUpdatedAt, changeFrequency: "weekly", priority: 0.94 },
-    { url: `${siteConfig.url}/tools/creep-body-calculator`, lastModified: interfaceUpdatedAt, changeFrequency: "monthly", priority: 0.86 },
-    { url: `${siteConfig.url}/tools/room-diagnostics`, lastModified: interfaceUpdatedAt, changeFrequency: "monthly", priority: 0.84 },
-    { url: `${siteConfig.url}/glossary`, lastModified: interfaceUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteConfig.url}/screeps-errors`, lastModified: interfaceUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteConfig.url}/verification`, lastModified: interfaceUpdatedAt, changeFrequency: "monthly", priority: 0.76 },
-    { url: `${siteConfig.url}/tags`, lastModified: allPostsUpdatedAt, changeFrequency: "weekly", priority: 0.72 },
-    { url: `${siteConfig.url}/now`, lastModified: nowUpdatedAt, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${siteConfig.url}/changelog`, lastModified: changelogUpdatedAt, changeFrequency: "daily", priority: 0.72 },
-    { url: `${siteConfig.url}/about`, lastModified: aboutUpdatedAt, changeFrequency: "monthly", priority: 0.7 },
+    staticPageEntry("/", allPostDates),
+    staticPageEntry("/beginner", beginnerDates),
+    staticPageEntry("/blog", allPostDates),
+    staticPageEntry("/knowledge", allPostDates),
+    staticPageEntry("/tools/creep-body-calculator"),
+    staticPageEntry("/tools/room-diagnostics"),
+    staticPageEntry("/glossary"),
+    staticPageEntry("/screeps-errors"),
+    staticPageEntry("/verification"),
+    staticPageEntry("/tags", allPostDates),
+    staticPageEntry("/now", nowDates),
+    staticPageEntry("/changelog", changelogDates),
+    staticPageEntry("/about", projectDates),
   ];
 
   const knowledgeModulePages: SitemapEntry[] = knowledgeBaseSections.map(
@@ -113,25 +99,23 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
           return post ? [post.updatedAt ?? post.publishedAt] : [];
         }),
       ),
-      changeFrequency: "weekly",
-      priority: 0.86,
     }),
   );
 
   const posts: SitemapEntry[] = allPosts.map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt ?? post.publishedAt),
-    changeFrequency: "monthly",
-    priority: 0.8,
   }));
 
   const tagPages: SitemapEntry[] = getTagRecords()
     .filter((tag) => tag.count >= 3)
     .map((tag) => ({
       url: `${siteConfig.url}/tags/${tag.slug}`,
-      lastModified: allPostsUpdatedAt,
-      changeFrequency: "weekly",
-      priority: 0.55,
+      lastModified: latestDate(
+        getPostsForTag(tag.slug).map(
+          (post) => post.updatedAt ?? post.publishedAt,
+        ),
+      ),
     }));
 
   return [
@@ -143,31 +127,55 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
 }
 
 export function getEnglishSitemapEntries(): SitemapEntry[] {
-  const englishArticleUpdatedAt = latestDate(
-    englishDiscoveryArticles.map((article) => article.updatedAt),
+  const englishArticleDates = englishDiscoveryArticles.map(
+    (article) => article.updatedAt,
   );
-  const englishInterfaceUpdatedAt = latestDate([
-    ...englishDiscoveryArticles.map((article) => article.updatedAt),
-    ...changelogEntries.map((entry) => entry.date),
+  const englishChangelogDates = changelogEntries.map((entry) => entry.date);
+  const englishBeginnerHrefs = new Set([
+    "/en/blog/screeps-introduction",
+    "/en/blog/screeps-first-room",
+    "/en/blog/screeps-tick-game-loop",
+    "/en/blog/screeps-creep-harvest-energy",
+    "/en/blog/screeps-transfer-energy-to-spawn",
+    "/en/blog/screeps-creep-body-parts",
+    "/en/blog/screeps-spawn-creep",
+    "/en/blog/screeps-creep-roles",
+    "/en/blog/screeps-upgrade-controller",
+    "/en/blog/screeps-first-extension",
+    "/en/blog/screeps-build-repair",
+    "/en/blog/screeps-first-room-code",
   ]);
+  const englishBeginnerDates = englishDiscoveryArticles
+    .filter((article) => englishBeginnerHrefs.has(article.href))
+    .map((article) => article.updatedAt);
 
   const staticPages: SitemapEntry[] = [
-    { url: `${siteConfig.url}/en`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.92 },
-    { url: `${siteConfig.url}/en/beginner`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.86 },
-    { url: `${siteConfig.url}/en/blog`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.88 },
-    { url: `${siteConfig.url}/en/knowledge`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.84 },
-    { url: `${siteConfig.url}/en/tags`, lastModified: englishArticleUpdatedAt, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${siteConfig.url}/en/tools`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteConfig.url}/en/tools/creep-body-calculator`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.84 },
-    { url: `${siteConfig.url}/en/tools/room-diagnostics`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.82 },
-    { url: `${siteConfig.url}/en/screeps-errors`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.76 },
-    { url: `${siteConfig.url}/en/glossary`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.74 },
-    { url: `${siteConfig.url}/en/verification`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.68 },
-    { url: `${siteConfig.url}/en/evidence`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.64 },
-    { url: `${siteConfig.url}/en/about`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${siteConfig.url}/en/changelog`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.62 },
-    { url: `${siteConfig.url}/en/roadmap`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "weekly", priority: 0.58 },
-    { url: `${siteConfig.url}/en/license`, lastModified: englishInterfaceUpdatedAt, changeFrequency: "yearly", priority: 0.36 },
+    staticPageEntry("/en", [
+      ...englishArticleDates,
+      ...englishChangelogDates,
+    ]),
+    staticPageEntry("/en/beginner", englishBeginnerDates),
+    staticPageEntry("/en/blog", englishArticleDates),
+    staticPageEntry("/en/knowledge", englishArticleDates),
+    staticPageEntry("/en/tags", englishArticleDates),
+    staticPageEntry("/en/tools", [
+      getStaticPageLastModified(
+        "/en/tools/creep-body-calculator",
+      ).toISOString(),
+      getStaticPageLastModified(
+        "/en/tools/room-diagnostics",
+      ).toISOString(),
+    ]),
+    staticPageEntry("/en/tools/creep-body-calculator"),
+    staticPageEntry("/en/tools/room-diagnostics"),
+    staticPageEntry("/en/screeps-errors"),
+    staticPageEntry("/en/glossary"),
+    staticPageEntry("/en/verification"),
+    staticPageEntry("/en/evidence"),
+    staticPageEntry("/en/about"),
+    staticPageEntry("/en/changelog", englishChangelogDates),
+    staticPageEntry("/en/roadmap"),
+    staticPageEntry("/en/license"),
   ];
 
   const knowledgePillars: SitemapEntry[] = englishKnowledgeSections.map((section) => ({
@@ -178,24 +186,22 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
         return discovery?.updatedAt ?? article.publishedAt;
       }),
     ),
-    changeFrequency: "weekly",
-    priority: 0.8,
   }));
 
   const articles: SitemapEntry[] = englishDiscoveryArticles.map((article) => ({
     url: `${siteConfig.url}${article.href}`,
     lastModified: new Date(article.updatedAt),
-    changeFrequency: "monthly",
-    priority: 0.84,
   }));
 
   const tagPages: SitemapEntry[] = englishTags
     .filter((tag) => tag.count >= 3)
     .map((tag) => ({
       url: `${siteConfig.url}/en/tags/${tag.slug}`,
-      lastModified: englishArticleUpdatedAt,
-      changeFrequency: "weekly",
-      priority: 0.66,
+      lastModified: latestDate(
+        englishDiscoveryArticles
+          .filter((article) => article.tagSlugs.includes(tag.slug))
+          .map((article) => article.updatedAt),
+      ),
     }));
 
   return [
@@ -216,16 +222,6 @@ export function getLatestSitemapDate(entries: SitemapEntry[]): Date {
   );
 
   return latest.getTime() > 0 ? latest : new Date(sitemapFallbackDate);
-}
-
-export function renderSitemapXml(entries: SitemapEntry[]): string {
-  const urls = entries
-    .map(
-      (entry) => `  <url>\n    <loc>${escapeXml(entry.url)}</loc>\n    <lastmod>${entry.lastModified.toISOString()}</lastmod>\n    <changefreq>${entry.changeFrequency}</changefreq>\n    <priority>${entry.priority}</priority>\n  </url>`,
-    )
-    .join("\n");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
 export function renderSitemapIndexXml(entries: SitemapIndexEntry[]): string {

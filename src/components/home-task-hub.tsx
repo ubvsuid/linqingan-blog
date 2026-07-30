@@ -67,7 +67,7 @@ export function HomeTaskHub() {
   );
 
   return (
-    <section className="home-task-hub" aria-labelledby="home-task-title">
+    <section className="home-task-hub deferred-home-block" aria-labelledby="home-task-title">
       <div className="home-task-heading">
         <p className="eyebrow">CHOOSE YOUR NEXT STEP</p>
         <h2 id="home-task-title">你现在想完成什么？</h2>

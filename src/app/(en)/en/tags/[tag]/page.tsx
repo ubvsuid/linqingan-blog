@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticleBrowser } from "@/components/english-article-browser";
 import { Container } from "@/components/container";
+import { parseEnglishArticleBrowseParams } from "@/lib/english-article-browser";
 import {
   englishTags,
   getEnglishArticlesByTag,
@@ -15,6 +16,14 @@ import styles from "../../english.module.css";
 
 interface EnglishTagPageProps {
   params: Promise<{ tag: string }>;
+  searchParams: Promise<{
+    q?: string | string[];
+    module?: string | string[];
+    difficulty?: string | string[];
+    type?: string | string[];
+    sort?: string | string[];
+    page?: string | string[];
+  }>;
 }
 
 export const dynamicParams = false;
@@ -52,12 +61,13 @@ export async function generateMetadata({ params }: EnglishTagPageProps): Promise
   };
 }
 
-export default async function EnglishTagPage({ params }: EnglishTagPageProps) {
+export default async function EnglishTagPage({ params, searchParams }: EnglishTagPageProps) {
   const { tag: slug } = await params;
   const tag = getEnglishTag(slug);
   if (!tag) notFound();
   const articles = getEnglishArticlesByTag(slug);
   const count = articles.length;
+  const browseParams = parseEnglishArticleBrowseParams(await searchParams);
 
   return (
     <main className={styles.page} lang="en">
@@ -70,7 +80,12 @@ export default async function EnglishTagPage({ params }: EnglishTagPageProps) {
           <h1>{tag.label} Screeps guides</h1>
           <p>Focused English articles connected to {tag.label.toLowerCase()}, organized with the same filters used by the main article library.</p>
         </header>
-        <EnglishArticleBrowser articles={articles} initialTag={tag.label} />
+        <EnglishArticleBrowser
+          articles={articles}
+          params={browseParams}
+          pathname={`/en/tags/${tag.slug}`}
+          lockedTag={tag.label}
+        />
       </Container>
     </main>
   );

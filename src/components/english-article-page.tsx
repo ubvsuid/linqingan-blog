@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ArticleFeedback } from "@/components/article-feedback";
 import { Container } from "@/components/container";
+import { EnglishArticleLearningTracker } from "@/components/english-learning-progress";
 import {
   englishDiscoveryArticles,
   getEnglishDiscoveryArticle,
@@ -172,6 +173,13 @@ export function EnglishArticlePage({
                 : tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}
             </div>
           </header>
+
+          {resolvedArticleHref ? (
+            <EnglishArticleLearningTracker
+              href={resolvedArticleHref}
+              title={headline}
+            />
+          ) : null}
 
           <details className="english-verification">
             <summary>

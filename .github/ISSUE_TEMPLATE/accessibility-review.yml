@@ -1,45 +1,101 @@
-name: Accessibility and mobile review
-description: Record a manual keyboard, screen-reader, touch, and mobile viewport review.
+name: Manual accessibility and mobile review
+description: Record a dated manual review without forcing every check to be marked as passed.
 title: "Accessibility review: "
+labels:
+  - accessibility
 body:
-  - type: input
-    id: routes
+  - type: markdown
     attributes:
-      label: Routes reviewed
-      placeholder: /en, /en/blog/..., /en/tools/...
+      value: |
+        Use one issue for a clearly defined route and environment set. Record **Pass**, **Fail**, **Blocked**, or **Not applicable** for each route/environment combination.
+
+        Automated checks and Lighthouse are useful inputs, but they do not replace keyboard, screen-reader, zoom, touch, and real-device testing.
+  - type: input
+    id: test_date
+    attributes:
+      label: Test date
+      placeholder: YYYY-MM-DD
     validations:
       required: true
   - type: input
+    id: reviewer
+    attributes:
+      label: Reviewer
+      description: GitHub handle or reviewer name.
+    validations:
+      required: true
+  - type: textarea
+    id: routes
+    attributes:
+      label: Route and environment matrix
+      description: List each route/environment pair with Pass, Fail, Blocked, or Not applicable.
+      placeholder: |
+        | Route | Browser/device/AT | Viewport/input | Status |
+        | --- | --- | --- | --- |
+        | /en | Firefox, Windows 11, NVDA | 1440 px, keyboard | Pass |
+        | /en/tools/room-diagnostics | Safari, iPhone | 390 px, touch, VoiceOver | Fail |
+    validations:
+      required: true
+  - type: textarea
     id: environment
     attributes:
-      label: Browser, device, and assistive technology
-      placeholder: Chrome 150, Windows 11, NVDA; Safari, iPhone
+      label: Environment details
+      description: Record browser and version, operating system, device, assistive technology and version, viewport, zoom, contrast mode, and input method.
+      placeholder: Firefox 128, Windows 11, NVDA 2026.1, 1440x900, 200% zoom, keyboard
     validations:
       required: true
   - type: checkboxes
     id: checks
     attributes:
-      label: Manual checks
+      label: Checks performed
+      description: Select only checks that were actually performed. Unselected checks are not treated as failures or passes.
       options:
-        - label: Keyboard focus order is logical and all controls are reachable.
-          required: true
-        - label: Focus indicators remain visible.
-          required: true
-        - label: Headings and landmarks make sense in a screen reader.
-          required: true
-        - label: Forms expose labels, errors, status messages, and button purpose.
-          required: true
-        - label: Touch targets and horizontal layouts work at mobile widths.
-          required: true
-        - label: Zoom to 200% does not hide required content or controls.
-          required: true
-  - type: textarea
-    id: findings
+        - label: Keyboard focus order, skip link, dialogs, menus, and all controls were tested.
+        - label: Visible focus and keyboard operation were checked at normal and 200% zoom.
+        - label: Headings, landmarks, link purpose, dynamic status, and form errors were checked with a screen reader.
+        - label: Reflow was checked at 320 CSS pixels without hiding required content or controls.
+        - label: Touch targets, orientation changes, and horizontal layouts were checked on a real mobile device.
+        - label: Reduced motion, high contrast or forced colors, and color-independent meaning were checked where supported.
+  - type: dropdown
+    id: overall_status
     attributes:
-      label: Findings and reproduction steps
+      label: Overall status
+      options:
+        - Fail
+        - Blocked
+        - Pass
+        - Not applicable
     validations:
       required: true
   - type: textarea
+    id: findings
+    attributes:
+      label: Findings, severity, and reproduction steps
+      description: For each failure, include the route, control, expected result, actual result, severity, and exact reproduction steps. If all tested combinations passed, say so explicitly.
+      placeholder: |
+        Finding A (serious)
+        Route/control:
+        Expected:
+        Actual:
+        Steps:
+    validations:
+      required: true
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Fix and retest record
+      description: Link the fix, identify the retest environment, and record the new outcome. Leave blank until a fix exists.
+  - type: textarea
     id: evidence
     attributes:
-      label: Screenshots or recordings
+      label: Screenshots, recordings, or assistive-technology output
+      description: Remove private data and describe what each attachment demonstrates.
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Review confirmation
+      options:
+        - label: I recorded only checks that were actually performed and did not infer manual results from Lighthouse or automated tests.
+          required: true
+        - label: I reported failures and blockers instead of selecting pass to complete the form.
+          required: true
