@@ -4,10 +4,14 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
-const source = fs.readFileSync(path.join(root, "src/lib/english-movement-content-6.ts"), "utf8");
-const published = fs.readFileSync(path.join(root, "src/lib/english-movement-content-6-published.ts"), "utf8");
-const registry = fs.readFileSync(path.join(root, "src/lib/english-movement-registry-6.ts"), "utf8");
-const route = fs.readFileSync(path.join(root, "src/app/(en)/en/blog/[slug]/page.tsx"), "utf8");
+function readSource(relativePath) {
+  return fs.readFileSync(path.join(root, relativePath), "utf8").replaceAll("\r\n", "\n");
+}
+
+const source = readSource("src/lib/english-movement-content-6.ts");
+const published = readSource("src/lib/english-movement-content-6-published.ts");
+const registry = readSource("src/lib/english-movement-registry-6.ts");
+const route = readSource("src/app/(en)/en/blog/[slug]/page.tsx");
 const failures = [];
 const slugs = [
   "screeps-move-fatigue-body-ratio",

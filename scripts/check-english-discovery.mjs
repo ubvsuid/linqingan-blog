@@ -53,8 +53,12 @@ for (const record of records) {
 
 const requiredFiles = [
   "src/lib/english-discovery.ts",
+  "src/lib/english-article-browser.ts",
   "src/lib/sitemaps.ts",
   "src/components/english-article-browser.tsx",
+  "src/components/english-article-browser.module.css",
+  "src/components/english-article-query-input.tsx",
+  "src/app/(en)/en/blog-index.json/route.ts",
   "src/app/(en)/en/tags/page.tsx",
   "src/app/(en)/en/tags/[tag]/page.tsx",
   "src/app/(en)/en/feed.xml/route.ts",
@@ -116,6 +120,8 @@ if (!overrideBlock) {
 if (discoverySource.includes("tagRules.filter((rule) => rule.terms.some")) failures.push("English topics still depend on broad keyword matching.");
 const browserSource = fs.readFileSync(path.join(root, "src/components/english-article-browser.tsx"), "utf8");
 if (browserSource.includes("Score {article.finalScore}")) failures.push("English article browser still exposes internal scores.");
+if (browserSource.includes('"use client"')) failures.push("English article browser must remain a Server Component.");
+if (browserSource.includes("<style")) failures.push("English article browser still contains component-local styles.");
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`ERROR: ${failure}`);

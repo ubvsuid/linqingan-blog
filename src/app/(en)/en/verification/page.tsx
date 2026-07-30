@@ -55,7 +55,7 @@ export default function EnglishVerificationPage() {
             <p className="eyebrow">TRANSPARENCY</p>
             <h2>Pending tests remain visible</h2>
             <p>If a guide has not been tested in the Console or in a live room, that status remains pending rather than being inferred from documentation alone.</p>
-            <Link href="/en/evidence">Review the 12 priority evidence gaps →</Link>
+            <Link href="/en/evidence">Review the live-evidence backlog →</Link>
           </article>
           <article className={styles.card}>
             <p className="eyebrow">CONTRIBUTE EVIDENCE</p>

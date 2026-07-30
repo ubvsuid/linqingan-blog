@@ -6,6 +6,7 @@ import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 import { englishKnowledgeModules } from "@/lib/i18n";
 
 import styles from "../../home.module.css";
+import "../english-home.css";
 
 export const metadata = createEnglishPageMetadata({
   title: "Verified Screeps Tutorials, Debugging Guides and Tools | Linqingan",
@@ -40,7 +41,11 @@ export default function EnglishHomePage() {
           </div>
           <p className={styles.heroStats}>{publishedEnglishArticles.length} published English guides · 8 knowledge modules · 2 working tools</p>
           <p className="english-verification-note">Every guide states its own verification level. Publication does not imply hidden live-room testing.</p>
+        </Container>
+      </section>
 
+      <section className="english-home-workflow" aria-label="English Screeps learning and debugging paths">
+        <Container>
           <section className="english-task-hub" aria-labelledby="english-task-title">
             <div className="english-task-heading"><p className="eyebrow">CHOOSE YOUR NEXT STEP</p><h2 id="english-task-title">What do you want to do?</h2></div>
             <div className="english-task-grid">

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -56,17 +57,6 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
-const themeBootScript = `
-(function () {
-  try {
-    var saved = localStorage.getItem("theme");
-    var systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.theme =
-      saved === "dark" || (!saved && systemDark) ? "dark" : "light";
-  } catch (_) {}
-})();
-`;
-
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -103,13 +93,13 @@ export default function ChineseRootLayout({ children }: Readonly<{ children: Rea
   return (
     <html lang="zh-CN" data-site-language="zh-CN" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
         />
       </head>
       <body>
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
         <a className="skip-link" href="#main-content">跳到正文</a>
         <SiteHeader />
         <div id="main-content" className="site-content">{children}</div>

@@ -1,13 +1,14 @@
 import { spawn } from "node:child_process";
+import path from "node:path";
 
 const host = "127.0.0.1";
 const port = process.env.SMOKE_PORT || "3210";
 const baseUrl = `http://${host}:${port}`;
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const nextCli = path.join(process.cwd(), "node_modules", "next", "dist", "bin", "next");
 
 const server = spawn(
-  npmCommand,
-  ["run", "start", "--", "--hostname", host, "--port", port],
+  process.execPath,
+  [nextCli, "start", "--hostname", host, "--port", port],
   {
     env: { ...process.env, PORT: port },
     stdio: ["ignore", "pipe", "pipe"],

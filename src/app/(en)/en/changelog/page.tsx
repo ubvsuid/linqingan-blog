@@ -14,6 +14,18 @@ export const metadata = createEnglishPageMetadata({
 
 const releases = [
   {
+    date: "July 30, 2026",
+    dateTime: "2026-07-30",
+    title: "Audit remediation and evidence workflow upgrade",
+    items: [
+      "Changed the English guide library to server-rendered pagination with a lightweight search index that loads only when search is used.",
+      "Added explicit static-page revision dates, stricter Lighthouse performance budgets, and automated checks for sitemap, CSP, and performance policy.",
+      "Added shareable tool configurations, copyable diagnostic results, local beginner progress, and recent-reading history without accounts or tracking.",
+      "Expanded evidence statuses, review provenance, submission guidance, and the manual accessibility test matrix without claiming unperformed live tests.",
+      "Moved the theme initializer and remaining eligible English page styles out of inline markup, with the stricter CSP candidate limited to a low-volume verification canary.",
+    ],
+  },
+  {
     date: "July 26, 2026",
     dateTime: "2026-07-26",
     title: "English interface and internationalization refinement",
@@ -43,7 +55,7 @@ export default function EnglishChangelogPage() {
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Changelog</span></nav>
         <header className={styles.header}><p className="eyebrow">CHANGELOG</p><h1>Meaningful English site changes</h1><p>This page records interface, navigation, search, tool, accessibility, and technical SEO changes. Individual article revisions are tracked separately.</p></header>
-        <div className="english-changelog-list">
+        <div className={styles.changelogList}>
           {releases.map((release) => (
             <article key={`${release.dateTime}-${release.title}`}>
               <time dateTime={release.dateTime}>{release.date}</time>
@@ -52,14 +64,6 @@ export default function EnglishChangelogPage() {
           ))}
         </div>
       </Container>
-      <style>{`
-        .english-changelog-list { display: grid; border-top: 1px solid var(--border); }
-        .english-changelog-list article { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 34px; border-bottom: 1px solid var(--border); padding: 34px 0; }
-        .english-changelog-list time { color: var(--screeps-controller); font-family: monospace; font-size: 12px; }
-        .english-changelog-list h2 { margin: 0; font-size: clamp(25px, 4vw, 38px); letter-spacing: -.04em; }
-        .english-changelog-list ul { display: grid; gap: 10px; margin: 18px 0 0; padding-left: 20px; color: var(--muted); }
-        @media (max-width: 660px) { .english-changelog-list article { grid-template-columns: 1fr; gap: 10px; } }
-      `}</style>
     </main>
   );
 }

@@ -5,6 +5,8 @@ import { EnglishRoomDiagnostics } from "@/components/room-diagnostics-en";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { siteConfig } from "@/lib/site";
 
+import "../../../english-tools.css";
+
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Room Snapshot Diagnostic",
   description:

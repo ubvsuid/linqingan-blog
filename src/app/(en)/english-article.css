@@ -63,6 +63,41 @@
 .english-verification-details dt { color: var(--muted); }
 .english-verification-details dd { margin: 0; font-weight: 650; text-align: right; }
 
+.remove-site-verification {
+  display: grid;
+  grid-template-columns: minmax(180px, .45fr) minmax(0, 1.55fr);
+  gap: 30px;
+  padding: 22px;
+}
+
+.remove-site-verification h2 {
+  margin: 7px 0 0;
+  font-size: 20px;
+}
+
+.remove-site-verification dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.remove-site-verification dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.remove-site-verification dt { color: var(--muted); }
+
+.remove-site-verification dd {
+  margin: 0;
+  font-weight: 650;
+  text-align: right;
+}
+
 .english-toc { margin-bottom: 58px; }
 .english-toc ol { columns: 2; column-gap: 36px; }
 .english-toc li { break-inside: avoid; margin-bottom: 9px; }
@@ -119,9 +154,11 @@
 @media (max-width: 760px) {
   .english-verification summary { align-items: flex-start; flex-direction: column; }
   .english-verification-details,
+  .remove-site-verification,
   .english-source-panel,
   .english-related { grid-template-columns: 1fr; }
   .english-verification-details dl { grid-template-columns: 1fr; }
+  .remove-site-verification dl { grid-template-columns: 1fr; }
   .english-toc ol { columns: 1; }
   .english-tool-recommendation { grid-template-columns: 1fr; }
   .english-tool-recommendation > span { writing-mode: horizontal-tb; }
@@ -130,4 +167,55 @@
 @media (max-width: 560px) {
   .english-related > div:last-child a { grid-template-columns: 1fr; }
   .english-related small { grid-column: 1; grid-row: auto; }
+}
+
+.english-lesson-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin: -24px 0 34px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 20px;
+  background: var(--surface);
+}
+
+.english-lesson-progress > div {
+  display: grid;
+  gap: 4px;
+}
+
+.english-lesson-progress span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.english-lesson-progress strong { font-size: 14px; }
+
+.english-lesson-progress button {
+  min-height: 42px;
+  border: 1px solid var(--foreground);
+  border-radius: 999px;
+  padding: 0 17px;
+  background: var(--foreground);
+  color: var(--background);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 680;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.english-lesson-progress button.is-complete {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+
+@media (max-width: 640px) {
+  .english-lesson-progress {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

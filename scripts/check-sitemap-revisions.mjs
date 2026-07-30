@@ -1,0 +1,98 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const registryPath = path.join(root, "src", "data", "static-page-revisions.json");
+const sitemapPath = path.join(root, "src", "lib", "sitemaps.ts");
+const policyPath = path.join(root, "docs", "sitemap-lastmod-policy.md");
+
+const requiredPaths = [
+  "/",
+  "/beginner",
+  "/blog",
+  "/knowledge",
+  "/tools/creep-body-calculator",
+  "/tools/room-diagnostics",
+  "/glossary",
+  "/screeps-errors",
+  "/verification",
+  "/tags",
+  "/now",
+  "/changelog",
+  "/about",
+  "/en",
+  "/en/beginner",
+  "/en/blog",
+  "/en/knowledge",
+  "/en/tags",
+  "/en/tools",
+  "/en/tools/creep-body-calculator",
+  "/en/tools/room-diagnostics",
+  "/en/screeps-errors",
+  "/en/glossary",
+  "/en/verification",
+  "/en/evidence",
+  "/en/about",
+  "/en/changelog",
+  "/en/roadmap",
+  "/en/license",
+];
+
+const failures = [];
+const revisions = JSON.parse(fs.readFileSync(registryPath, "utf8"));
+const today = new Date();
+today.setUTCHours(23, 59, 59, 999);
+
+for (const pathname of requiredPaths) {
+  const value = revisions[pathname];
+  if (!value) {
+    failures.push(`Missing static page revision: ${pathname}`);
+    continue;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    failures.push(`Revision must use YYYY-MM-DD: ${pathname} -> ${value}`);
+    continue;
+  }
+
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  if (!Number.isFinite(parsed.getTime())) {
+    failures.push(`Revision is not a valid date: ${pathname} -> ${value}`);
+  } else if (parsed.getTime() > today.getTime()) {
+    failures.push(`Revision cannot be in the future: ${pathname} -> ${value}`);
+  }
+}
+
+for (const pathname of Object.keys(revisions)) {
+  if (!requiredPaths.includes(pathname)) {
+    failures.push(`Untracked registry route: ${pathname}`);
+  }
+}
+
+const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
+for (const requiredText of [
+  "getStaticPageLastModified",
+  'staticPageEntry("/en/blog"',
+  'staticPageEntry("/en/evidence"',
+]) {
+  if (!sitemapSource.includes(requiredText)) {
+    failures.push(`Sitemap does not use the revision registry: ${requiredText}`);
+  }
+}
+
+for (const obsoleteField of ["changeFrequency:", "priority:"]) {
+  if (sitemapSource.includes(obsoleteField)) {
+    failures.push(`Sitemap retains obsolete field: ${obsoleteField}`);
+  }
+}
+
+if (!fs.existsSync(policyPath)) {
+  failures.push("Missing sitemap lastmod maintenance policy.");
+}
+
+if (failures.length > 0) {
+  console.error(failures.join("\n"));
+  process.exit(1);
+}
+
+console.log(`Sitemap revision check passed: ${requiredPaths.length} static routes tracked.`);

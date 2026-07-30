@@ -36,7 +36,7 @@ export default function EnglishRoadmapPage() {
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Roadmap</span></nav>
         <header className={styles.header}><p className="eyebrow">PUBLIC ROADMAP</p><h1>What improves next</h1><p>The roadmap separates completed interface work, evidence-dependent tasks, tool development, and recurring quality checks. Dates are added only when a deliverable has a real schedule.</p></header>
-        <div className="english-roadmap-grid">
+        <div className={styles.roadmapGrid}>
           {roadmap.map((group) => (
             <section key={group.status}>
               <span>{group.status}</span>
@@ -47,14 +47,6 @@ export default function EnglishRoadmapPage() {
         </div>
         <div className={styles.notice}><strong>Evidence-dependent work</strong><p>Real Screeps screenshots, Console output, and multi-tick observations cannot be fabricated. They are added only when the original session evidence is available.</p></div>
       </Container>
-      <style>{`
-        .english-roadmap-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-        .english-roadmap-grid section { border: 1px solid var(--border); border-radius: 22px; padding: 28px; background: var(--surface); }
-        .english-roadmap-grid section > span { color: var(--screeps-controller); font-family: monospace; font-size: 11px; letter-spacing: .08em; }
-        .english-roadmap-grid h2 { margin: 24px 0 0; font-size: 27px; letter-spacing: -.04em; }
-        .english-roadmap-grid ul { display: grid; gap: 11px; margin: 20px 0 0; padding-left: 20px; color: var(--muted); }
-        @media (max-width: 860px) { .english-roadmap-grid { grid-template-columns: 1fr; } }
-      `}</style>
     </main>
   );
 }

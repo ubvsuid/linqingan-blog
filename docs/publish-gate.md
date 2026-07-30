@@ -1,3 +1,3 @@
 # Publish gate
 
-Merge only after the production build and smoke tests pass. Lighthouse performance and best-practice warnings must be reviewed; accessibility, SEO, CLS, type, lint, route, link, content, and evidence-priority failures block publishing.
+Merge only after the production build and smoke tests pass. Lighthouse Performance (85), Accessibility (95), Best Practices (90), SEO (95), CLS (0.1), TBT (300 ms), and staged hard LCP budgets block publishing together with type, lint, route, link, content, sitemap-revision, CSP-boundary, and evidence failures. LCP is capped at 2500 ms for the stable lightweight route set, 2750 ms for the general route set, and 3000 ms for the current long Chinese article fixture; no LCP tier is warning-only. The tiers may tighten after repeated CI and production field data show that the stricter threshold will remain green. Retired one-time maintenance workflows are not edited or reactivated as part of routine quality-gate work.

@@ -25,3 +25,7 @@ Thumbs.db
 
 # typescript
 *.tsbuildinfo
+
+# local quality reports
+/.lighthouseci/
+/lhci-results/

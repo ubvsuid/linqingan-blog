@@ -31,6 +31,7 @@ const requiredFiles = [
   "src/app/(en)/en/roadmap/page.tsx",
   "src/app/(en)/en/license/page.tsx",
   "src/app/(en)/en/search-index.json/route.ts",
+  "src/app/(en)/en/blog-index.json/route.ts",
   "src/app/(en)/en/blog/screeps-memory-write-safety/page.tsx",
   "src/app/(zh)/sitemap.xml/route.ts",
   "src/app/(zh)/sitemap-en.xml/route.ts",
@@ -64,7 +65,9 @@ requireText("src/components/english-site-search.tsx", "popularQueries", "popular
 requireText("src/components/english-site-search.tsx", 'event.key !== "/"', "English search keyboard shortcut");
 requireText("src/components/english-site-search.tsx", "/en/search-index.json", "lazy English search-index request");
 requireText("src/app/(en)/en/search-index.json/route.ts", 'dynamic = "force-static"', "static English search-index route");
+requireText("src/app/(en)/en/blog-index.json/route.ts", 'dynamic = "force-static"', "static English article-index route");
 forbidText("src/app/(en)/en/search/page.tsx", "englishSearchDocuments", "full search index in initial page payload");
+forbidText("src/app/(en)/en/blog/page.tsx", "at least 96", "unexplained public numeric publication score");
 requireText("src/lib/search.ts", "compactArticleSearchText", "compact Chinese article search text");
 requireText("src/lib/search.ts", "MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400", "Chinese search payload limit");
 requireText("src/lib/english-search.ts", "compactKeywords", "compact English search keywords");

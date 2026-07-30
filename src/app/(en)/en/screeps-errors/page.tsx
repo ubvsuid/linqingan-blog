@@ -57,7 +57,7 @@ export default function EnglishScreepsErrorsPage() {
           </table>
         </div>
 
-        <section className={styles.grid} style={{ marginTop: 48 }}>
+        <section className={`${styles.grid} ${styles.referenceCardGrid}`}>
           <article className={styles.card}>
             <p className="eyebrow">DEBUGGING PATTERN</p>
             <h2>Store the result once</h2>

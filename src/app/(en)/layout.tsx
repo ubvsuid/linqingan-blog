@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -9,11 +10,9 @@ import { siteConfig } from "@/lib/site";
 import "../globals.css";
 import "../improvements.css";
 import "../site-shell.css";
-import "./english-home.css";
 import "./english-article.css";
 import "./english-about.css";
 import "./english-search.css";
-import "./english-tools.css";
 import "./english-knowledge.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
@@ -55,22 +54,11 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
-const themeBootScript = `
-(function () {
-  try {
-    var saved = localStorage.getItem("theme");
-    var systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.theme =
-      saved === "dark" || (!saved && systemDark) ? "dark" : "light";
-  } catch (_) {}
-})();
-`;
-
 export default function EnglishRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-site-language="en" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeBootScript }} /></head>
       <body>
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
         <a className="skip-link" href="#main-content">Skip to content</a>
         <SiteHeader />
         <div id="main-content" className="site-content">{children}</div>

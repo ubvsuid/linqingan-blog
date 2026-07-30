@@ -148,6 +148,77 @@
   font-weight: 650;
 }
 
+.statusRow,
+.evidenceActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.statusRow {
+  margin-bottom: 12px;
+}
+
+.statusRow small {
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--surface) 85%, var(--screeps-controller));
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.evidenceActions {
+  margin-top: 20px;
+}
+
+.evidenceActions a {
+  font-weight: 750;
+}
+
+.acceptedEvidenceScope {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  background: var(--surface-soft);
+}
+
+.acceptedEvidenceScope dl {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+
+.acceptedEvidenceScope dl div {
+  display: grid;
+  grid-template-columns: minmax(90px, .3fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.acceptedEvidenceScope dt {
+  color: var(--muted);
+}
+
+.acceptedEvidenceScope dd {
+  margin: 0;
+}
+
+.acceptedEvidenceScope ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
 .knowledgeArticleList {
   display: grid;
   gap: 10px;
@@ -213,6 +284,77 @@
 .table td { color: var(--muted); line-height: 1.6; }
 .table code { color: var(--foreground); }
 
+.referenceCardGrid {
+  margin-top: 48px;
+}
+
+.changelogList {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+
+.changelogList article {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 34px;
+  border-bottom: 1px solid var(--border);
+  padding: 34px 0;
+}
+
+.changelogList time {
+  color: var(--screeps-controller);
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.changelogList h2 {
+  margin: 0;
+  font-size: clamp(25px, 4vw, 38px);
+  letter-spacing: -.04em;
+}
+
+.changelogList ul {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.roadmapGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.roadmapGrid section {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 28px;
+  background: var(--surface);
+}
+
+.roadmapGrid section > span {
+  color: var(--screeps-controller);
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.roadmapGrid h2 {
+  margin: 24px 0 0;
+  font-size: 27px;
+  letter-spacing: -.04em;
+}
+
+.roadmapGrid ul {
+  display: grid;
+  gap: 11px;
+  margin: 20px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
 @media (max-width: 760px) {
   .grid { grid-template-columns: 1fr; }
   .full { grid-column: auto; }
@@ -222,5 +364,16 @@
   .knowledgeArticleList small {
     grid-column: 1;
     grid-row: auto;
+  }
+}
+
+@media (max-width: 860px) {
+  .roadmapGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 660px) {
+  .changelogList article {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 }
