@@ -4,17 +4,17 @@ const articles = [
   {
     path: "/en/blog/screeps-working-state",
     chinesePath: "/blog/screeps-creep-working-state",
-    headline: "How to Switch a Screeps Creep Between Getting Energy and Working",
-    listingTitle: "How to Switch a Screeps Creep Between Getting Energy and Working",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    faqExpected: true,
+    headline: "Use Store Boundaries as Hysteresis, Not a Tick Toggle",
+    listingTitle: "Screeps Working State: Switch Only at Empty and Full",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     verification: [
       "Chinese source article",
       "Reviewed in full",
-      "Source correction",
-      "Current harvest() docs do not list ERR_FULL",
-      "Screeps Console test",
+      "Technical correction",
+      "Energy phase decisions, Memory writes, branch selection, action return codes, and later-tick outcomes are separated",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -68,14 +68,11 @@ for (const article of articles) {
   }
 
   for (const expected of [article.headline, ...article.verification]) {
-    if (!body.includes(expected)) {
-      failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
-    }
+    if (!body.includes(expected)) failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
   }
 
   const canonical = `https://www.linqingan.com${article.path}`;
   const chinese = `https://www.linqingan.com${article.chinesePath}`;
-
   for (const expected of [
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
@@ -85,9 +82,7 @@ for (const article of articles) {
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
   ]) {
-    if (!body.includes(expected)) {
-      failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
-    }
+    if (!body.includes(expected)) failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
   }
 
   if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
@@ -95,32 +90,37 @@ for (const article of articles) {
   }
 }
 
-const targetBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-get-object-by-id`,
-)).text();
+const workingBody = await (await fetch(`${baseUrl}/en/blog/screeps-working-state`)).text();
+for (const expected of [
+  "partial-keep-previous",
+  "partial-initialized",
+  "decision.changed",
+  "invalid-store-values",
+]) {
+  if (!workingBody.includes(expected)) failures.push(`Working-state page is missing “${expected}”`);
+}
+if (workingBody.includes("function runHarvester")) {
+  failures.push("Working-state page still buries the phase contract under a full role framework");
+}
+
+const targetBody = await (await fetch(`${baseUrl}/en/blog/screeps-get-object-by-id`)).text();
 for (const expected of [
   "Game.getObjectById(record.id)",
   "vision-unavailable",
   "missing-visible-room",
   "wrong-type",
 ]) {
-  if (!targetBody.includes(expected)) {
-    failures.push(`Saved target page is missing “${expected}”`);
-  }
+  if (!targetBody.includes(expected)) failures.push(`Saved target page is missing “${expected}”`);
 }
 
-const cleanupBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-clean-dead-creep-memory`,
-)).text();
+const cleanupBody = await (await fetch(`${baseUrl}/en/blog/screeps-clean-dead-creep-memory`)).text();
 for (const expected of [
   "Object.hasOwn(gameCreeps, name)",
   "cleanOwnedCreepIndexes(name)",
   "runRoleCounts()",
   "ticksToLive === 1",
 ]) {
-  if (!cleanupBody.includes(expected)) {
-    failures.push(`Dead Creep Memory page is missing “${expected}”`);
-  }
+  if (!cleanupBody.includes(expected)) failures.push(`Dead Creep Memory page is missing “${expected}”`);
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -129,68 +129,50 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.listingTitle)) {
-      failures.push(`/en/blog-index.json: 缺少文章 “${article.listingTitle}”`);
-    }
+    if (!blogBody.includes(article.listingTitle)) failures.push(`/en/blog-index.json: 缺少文章 “${article.listingTitle}”`);
   }
 }
 
-const searchResponse = await fetch(`${baseUrl}/en/search?q=Memory`, {
-  redirect: "manual",
-});
+const searchResponse = await fetch(`${baseUrl}/en/search?q=Memory`, { redirect: "manual" });
 const searchBody = await searchResponse.text();
 if (searchResponse.status !== 200) {
   failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!searchBody.includes(article.listingTitle)) {
-      failures.push(`/en/search: 缺少服务端相关结果 “${article.listingTitle}”`);
-    }
+    if (!searchBody.includes(article.listingTitle)) failures.push(`/en/search: 缺少服务端相关结果 “${article.listingTitle}”`);
   }
   if (searchBody.includes("How to Launch a Nuke Without Reusing a Stale Target Request")) {
     failures.push("/en/search: 首屏仍嵌入与 Memory 查询无关的完整文章索引");
   }
 }
 
-const searchIndexResponse = await fetch(`${baseUrl}/en/search-index.json`, {
-  redirect: "manual",
-});
+const searchIndexResponse = await fetch(`${baseUrl}/en/search-index.json`, { redirect: "manual" });
 const searchIndexBody = await searchIndexResponse.text();
 if (searchIndexResponse.status !== 200) {
   failures.push(`/en/search-index.json: 预期 200，实际 ${searchIndexResponse.status}`);
 } else {
   const contentType = searchIndexResponse.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    failures.push(`/en/search-index.json: Content-Type 不是 application/json`);
-  }
+  if (!contentType.includes("application/json")) failures.push(`/en/search-index.json: Content-Type 不是 application/json`);
   for (const article of articles) {
-    if (!searchIndexBody.includes(article.listingTitle)) {
-      failures.push(`/en/search-index.json: 缺少文章 “${article.listingTitle}”`);
-    }
+    if (!searchIndexBody.includes(article.listingTitle)) failures.push(`/en/search-index.json: 缺少文章 “${article.listingTitle}”`);
   }
 }
 
-const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, {
-  redirect: "manual",
-});
+const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, { redirect: "manual" });
 const sitemapBody = await sitemapResponse.text();
 if (sitemapResponse.status !== 200) {
   failures.push(`/sitemap.xml: 预期 200，实际 ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
     const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
-      failures.push(`/sitemap.xml: 缺少 ${expected}`);
-    }
+    if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: 缺少 ${expected}`);
   }
 }
 
 if (failures.length > 0) {
-  for (const failure of failures) console.error(`ERROR: ${failure}`);
+  failures.forEach((failure) => console.error(`ERROR: ${failure}`));
   console.error(`\n第二批英文专题生产冒烟测试失败：${failures.length} 项。`);
   process.exit(1);
 }
 
-console.log(
-  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Saved target与Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
-);
+console.log(`第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Energy phase、Saved target与Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
