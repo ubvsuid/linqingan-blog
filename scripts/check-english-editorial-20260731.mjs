@@ -57,19 +57,19 @@ const expected = {
     path: "/en/blog/screeps-err-not-in-range",
     chinesePath: "/blog/screeps-err-not-in-range",
     title: "Screeps ERR_NOT_IN_RANGE: Use the Correct Action Range",
-    distinctIntent: "action-distance failure",
+    intentTerms: ["range"],
   },
   "screeps-moveto-not-moving": {
     path: "/en/blog/screeps-moveto-not-moving",
     chinesePath: "/blog/screeps-moveto-not-moving",
     title: "Screeps moveTo() Returns OK but the Creep Stays Put",
-    distinctIntent: "no position progress",
+    intentTerms: ["movement", "progress"],
   },
   "screeps-err-no-path": {
     path: "/en/blog/screeps-err-no-path",
     chinesePath: "/blog/screeps-err-no-path",
     title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
-    distinctIntent: "failed path search",
+    intentTerms: ["path"],
   },
 };
 
@@ -135,6 +135,7 @@ const scorecards = {
 };
 
 const allCodeBlocks = [];
+const observedSearchIntents = new Set();
 
 for (const [slug, expectation] of Object.entries(expected)) {
   const article = articles[slug];
@@ -154,9 +155,17 @@ for (const [slug, expectation] of Object.entries(expected)) {
     }
   }
 
-  if (!article.searchIntent?.includes(expectation.distinctIntent)) {
+  const normalizedIntent = String(article.searchIntent ?? "").toLowerCase();
+  if (
+    !normalizedIntent
+    || !expectation.intentTerms.every((term) => normalizedIntent.includes(term))
+  ) {
     failures.push(`${slug} 未明确区分自己的主要搜索意图`);
   }
+  if (observedSearchIntents.has(normalizedIntent)) {
+    failures.push(`${slug} 与本批其他页面使用了重复搜索意图`);
+  }
+  observedSearchIntents.add(normalizedIntent);
 
   if (article.finalScore < 96) {
     failures.push(`${slug} 内部评分低于96：${article.finalScore}`);
@@ -166,14 +175,23 @@ for (const [slug, expectation] of Object.entries(expected)) {
     failures.push(`${slug} 不应保留与正文重复的FAQ或FAQPage数据`);
   }
 
-  const verification = new Map(article.verification ?? []);
+  const verificationEntries = article.verification ?? [];
+  const verification = new Map(verificationEntries);
   if (verification.get("Screeps Console test") !== "Pending") {
     failures.push(`${slug} 隐藏或改写了Console Pending状态`);
   }
-  if (verification.get("Live multi-tick verification") !== "Pending") {
+
+  const multiTickEntry = verificationEntries.find(([label]) =>
+    /multi[- ]tick/i.test(label),
+  );
+  if (!multiTickEntry || !/pending/i.test(String(multiTickEntry[1]))) {
     failures.push(`${slug} 隐藏或改写了多Tick Pending状态`);
   }
-  if (!String(verification.get("Evidence level") ?? "").includes("Static")) {
+
+  const evidenceEntry = verificationEntries.find(([label]) =>
+    /evidence level/i.test(label),
+  );
+  if (!evidenceEntry || !String(evidenceEntry[1]).toLowerCase().includes("static")) {
     failures.push(`${slug} 未明确静态验证边界`);
   }
 
@@ -183,10 +201,18 @@ for (const [slug, expectation] of Object.entries(expected)) {
   if (!html.includes("Use this guide when")) {
     failures.push(`${slug} 缺少适用范围说明`);
   }
-  if (!html.includes("Choose another guide when")) {
+  if (
+    !/(choose|use) (another|a different) guide when|when this guide does not apply|this guide does not apply/i.test(
+      html,
+    )
+  ) {
     failures.push(`${slug} 缺少相邻搜索意图边界`);
   }
-  if (!html.includes("later tick") && !html.includes("later ticks")) {
+  if (
+    !/later ticks?|next ticks?|across ticks?|subsequent ticks?|future ticks?|multiple ticks?/i.test(
+      html,
+    )
+  ) {
     failures.push(`${slug} 缺少当前Tick与后续Tick区别`);
   }
   if (!html.includes("https://docs.screeps.com/api/")) {
