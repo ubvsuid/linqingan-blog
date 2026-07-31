@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishObservabilityBatchNineRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishObservabilityBatchNineRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-game-notify",
     chinesePath: "/blog/screeps-game-notify",
@@ -48,23 +52,25 @@ export const englishObservabilityBatchNineRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
-    category: "OBSERVABILITY · ROOMVISUAL DEBUG LAYER",
-    title: "How to Build a Safe RoomVisual Debug Layer in Screeps",
+    category: "OBSERVABILITY · BOUNDED ROOM VISUALS",
+    title: "Screeps RoomVisual Debugging: Draw Current State Within a Budget",
     description:
-      "Draw current Creep state, target relationships, and task labels with RoomVisual while enforcing per-room switches, stable ordering, item limits, the 512,000-byte ceiling, cross-room boundaries, and a strict separation between visuals and action results.",
+      "Plan current-tick debug marks from plain data, render them behind a room switch, stop on item and byte budgets, and record action results separately from drawings.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "12 min read",
     primaryKeyword: "Screeps RoomVisual debugging",
-    searchIntent: "Build bounded current-tick visual diagnostics without confusing drawings with game outcomes",
+    searchIntent:
+      "Add bounded RoomVisual diagnostics that observe current state without mutating task decisions or pretending drawings prove outcomes",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps RoomVisual debugging",
-      "RoomVisual getSize 512000",
-      "Screeps draw creep target",
-      "RoomVisual export import",
-      "Screeps visual CPU",
+      "RoomVisual getSize",
+      "Screeps visual byte limit",
+      "Screeps draw current state",
+      "Screeps RoomVisual CPU",
     ],
   },
 ];
