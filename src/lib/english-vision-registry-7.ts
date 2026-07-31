@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishVisionBatchSevenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishVisionBatchSevenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-room-visibility",
     chinesePath: "/blog/screeps-room-visibility",
@@ -48,23 +52,25 @@ export const englishVisionBatchSevenRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-pathfinder-costmatrix",
     chinesePath: "/blog/screeps-pathfinder-costmatrix",
-    category: "PATHFINDING · COSTMATRIX AND ROOM CALLBACKS",
-    title: "How to Build a Safe PathFinder CostMatrix in Screeps",
+    category: "PATHFINDING · COSTMATRIX DIAGNOSTICS",
+    title: "Screeps CostMatrix: Static Costs, Traffic, and Incomplete Paths",
     description:
-      "Use CostMatrix values 0–255 correctly, classify roads and structures, separate invisible rooms from blocked rooms, layer dynamic Creep costs, validate coordinates, and reject incomplete PathFinder results.",
+      "Build a static structure matrix, layer current traffic per search, preserve invisible-room routing, and diagnose empty or incomplete paths before submitting movement.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "19 min read",
-    primaryKeyword: "Screeps PathFinder CostMatrix",
-    searchIntent: "Build and debug a room CostMatrix for structures, traffic, and custom avoidance",
+    updatedAt: "2026-07-31",
+    readingTime: "13 min read",
+    primaryKeyword: "Screeps CostMatrix",
+    searchIntent:
+      "Build and debug one CostMatrix without confusing structure costs, traffic, visibility, or incomplete path search",
     status: "published",
     finalScore: 98,
     keywords: [
-      "Screeps PathFinder CostMatrix",
-      "Screeps roomCallback false undefined",
-      "CostMatrix road cost 255",
-      "Screeps PathFinder incomplete",
-      "Screeps obstacle pathfinding",
+      "Screeps CostMatrix",
+      "PathFinder roomCallback",
+      "Screeps incomplete path",
+      "Screeps traffic costs",
+      "Screeps structure walkability",
     ],
   },
 ];
