@@ -130,7 +130,7 @@ Still Pending by page:
 - synchronized titles, descriptions, keywords, intent, reading time, score, and discovery data;
 - fixed score component thresholds and 98-point totals;
 - 35 TOC anchors;
-- 11 JavaScript blocks through `node --check`;
+- 14 JavaScript blocks through `node --check`;
 - official Screeps sources;
 - removed FAQ data;
 - prohibited AI-style phrases;
