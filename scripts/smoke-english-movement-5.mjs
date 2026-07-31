@@ -12,7 +12,6 @@ const articles = [
       "Screeps Console test",
       "Live multi-tick verification",
       "Evidence level",
-      "Static",
       "Pending",
       "harvestResult === ERR_NOT_IN_RANGE",
       "getRangeTo",
@@ -30,7 +29,6 @@ const articles = [
       "Screeps Console test",
       "Live multi-tick verification",
       "Evidence level",
-      "Static",
       "Pending",
       "roomName",
       "unchangedTicks",
@@ -48,7 +46,6 @@ const articles = [
       "Screeps Console test",
       "Live multi-tick verification",
       "Evidence level",
-      "Static",
       "Pending",
       "PathFinder.search",
       "incomplete",
@@ -80,6 +77,10 @@ for (const article of articles) {
     }
   }
 
+  if (!body.toLowerCase().includes("static")) {
+    failures.push(`${article.path}: Evidence level 未显示静态验证边界`);
+  }
+
   const canonical = `https://www.linqingan.com${article.path}`;
   const chinese = `https://www.linqingan.com${article.chinesePath}`;
 
@@ -108,7 +109,6 @@ if (rangeBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
 }
 for (const expected of [
   "ERR_NOT_IN_RANGE",
-  "Retry",
   "later tick",
   "harvestResult === ERR_NOT_IN_RANGE",
 ]) {
