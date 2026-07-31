@@ -161,20 +161,15 @@ for (const [slug, identity] of Object.entries(expected)) {
       failures.push(`${slug}: missing technical signal ${signal}`);
     }
   }
-  for (const source of ["https://docs.screeps.com/"]) {
-    if (!article.articleHtml.includes(source)) {
-      failures.push(`${slug}: official documentation is missing`);
-    }
+  if (!article.articleHtml.includes("https://docs.screeps.com/")) {
+    failures.push(`${slug}: official documentation is missing`);
   }
 
   const recordStart = identity.registry.indexOf(`href: "${identity.path}"`);
   const overrideStart = identity.registry.indexOf(`"${identity.path}": {`);
   const start = recordStart >= 0 ? recordStart : overrideStart;
   const record = start >= 0 ? identity.registry.slice(start, start + 1800) : "";
-  for (const signal of [
-    identity.title,
-    'updatedAt: "2026-07-31"',
-  ]) {
+  for (const signal of [identity.title, 'updatedAt: "2026-07-31"']) {
     if (!record.includes(signal)) {
       failures.push(`${slug}: registry metadata missing ${signal}`);
     }
@@ -190,7 +185,7 @@ for (const [slug, identity] of Object.entries(expected)) {
     writeFileSync(path, decodeHtml(block[1]), "utf8");
     try {
       execFileSync(process.execPath, ["--check", path], { stdio: "pipe" });
-    } catch (error) {
+    } catch {
       failures.push(`${slug}: JavaScript block ${index + 1} failed node --check`);
     }
   }
@@ -211,6 +206,16 @@ if (tocCount !== 37) failures.push(`Expected 37 TOC anchors, received ${tocCount
 if (javascriptCount !== 8) failures.push(`Expected 8 JavaScript blocks, received ${javascriptCount}`);
 if (!publication.includes("englishEditorialFirstLoopStateNotifyOverrides20260731")) {
   failures.push("Publication aggregate is missing the new override batch");
+}
+for (const signal of [
+  "normalizeFirstLoopStateNotifyArticle",
+  "<code>energyPhase</code> string",
+  "movement-deferred-fatigue",
+  "The Creep was tired, so no new movement was accepted.",
+]) {
+  if (!publication.includes(signal)) {
+    failures.push(`Publication correction is missing ${signal}`);
+  }
 }
 if (!packageJson.includes("englisheditorialfirstloopstatenotify20260731check")) {
   failures.push("package.json is missing the dedicated editorial gate");
@@ -234,4 +239,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("First-loop, state, and notify editorial gate passed: 3 existing routes, 37 anchors, 8 JavaScript blocks, synchronized metadata, 98-point scorecards, no FAQ, and explicit Pending evidence.");
+console.log("First-loop, state, and notify editorial gate passed: 3 existing routes, 37 anchors, 8 JavaScript blocks, synchronized metadata, corrected fatigue and inline-code boundaries, 98-point scorecards, no FAQ, and explicit Pending evidence.");
