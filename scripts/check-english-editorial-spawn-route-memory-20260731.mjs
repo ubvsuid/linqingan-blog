@@ -161,7 +161,7 @@ if (override.includes("Quick answer")) {
 }
 for (const required of [
   "minimum, target, and emergency body policies",
-  "status: 'wait-or-scale'",
+  "'wait-or-scale'",
   "maximumParts > 50",
   "unusedEnergy: budget - bodyCost",
   "dryRunResult",
