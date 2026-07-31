@@ -96,11 +96,14 @@ const movementEditorialArticles = Object.fromEntries(
   ]),
 ) as Record<string, EnglishBeginnerArticle>;
 
-export const englishEditorialPublished20260731 = {
+export const englishEditorialPublished20260731: Record<
+  string,
+  EnglishBeginnerArticle
+> = {
   ...movementEditorialArticles,
   ...englishEditorialCorePublished20260731,
   ...englishEditorialRuntimeOverrides20260731,
-} satisfies Record<string, EnglishBeginnerArticle>;
+};
 
 export function getEnglishEditorialPublished20260731(
   slug: string,
