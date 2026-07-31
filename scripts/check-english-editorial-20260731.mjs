@@ -1,0 +1,291 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+import { gunzipSync } from "node:zlib";
+
+const root = process.cwd();
+const overridePath = path.join(
+  root,
+  "src",
+  "lib",
+  "english-editorial-overrides-20260731.ts",
+);
+const routePath = path.join(
+  root,
+  "src",
+  "app",
+  "(en)",
+  "en",
+  "blog",
+  "[slug]",
+  "page.tsx",
+);
+const registryPath = path.join(
+  root,
+  "src",
+  "lib",
+  "english-articles-complete.ts",
+);
+
+const source = fs.readFileSync(overridePath, "utf8");
+const routeSource = fs.readFileSync(routePath, "utf8");
+const registrySource = fs.readFileSync(registryPath, "utf8");
+const failures = [];
+
+const encodedMatch = source.match(
+  /const encodedEditorialOverrides = "([A-Za-z0-9+/=]+)";/,
+);
+
+if (!encodedMatch) {
+  failures.push("找不到英文编辑覆盖数据");
+}
+
+let articles = {};
+if (encodedMatch) {
+  try {
+    articles = JSON.parse(
+      gunzipSync(Buffer.from(encodedMatch[1], "base64")).toString("utf8"),
+    );
+  } catch (error) {
+    failures.push(`英文编辑覆盖数据无法解析：${error.message}`);
+  }
+}
+
+const expected = {
+  "screeps-err-not-in-range": {
+    path: "/en/blog/screeps-err-not-in-range",
+    chinesePath: "/blog/screeps-err-not-in-range",
+    title: "Screeps ERR_NOT_IN_RANGE: Use the Correct Action Range",
+    distinctIntent: "action-distance failure",
+  },
+  "screeps-moveto-not-moving": {
+    path: "/en/blog/screeps-moveto-not-moving",
+    chinesePath: "/blog/screeps-moveto-not-moving",
+    title: "Screeps moveTo() Returns OK but the Creep Stays Put",
+    distinctIntent: "no position progress",
+  },
+  "screeps-err-no-path": {
+    path: "/en/blog/screeps-err-no-path",
+    chinesePath: "/blog/screeps-err-no-path",
+    title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
+    distinctIntent: "failed path search",
+  },
+};
+
+const articleEntries = Object.entries(articles);
+if (articleEntries.length !== Object.keys(expected).length) {
+  failures.push(
+    `本批覆盖文章数量为 ${articleEntries.length}，预期 ${Object.keys(expected).length}`,
+  );
+}
+
+const forbiddenPhrases = [
+  "in today's fast-paced world",
+  "in this comprehensive guide",
+  "whether you are a beginner or an expert",
+  "let's dive in",
+  "delve into",
+  "unlock the power of",
+  "seamlessly",
+  "game-changing",
+  "it is important to note that",
+  "by following these steps",
+];
+
+const prohibitedEvidenceClaims = [
+  "tested on the official server",
+  "verified on the official server",
+  "our live room proved",
+  "search console shows",
+  "real users confirmed",
+];
+
+const scorecards = {
+  "screeps-err-not-in-range": {
+    technical: 23,
+    intent: 18,
+    originalValue: 14,
+    english: 12,
+    structure: 10,
+    evidence: 8,
+    seo: 8,
+    accessibility: 5,
+  },
+  "screeps-moveto-not-moving": {
+    technical: 23,
+    intent: 18,
+    originalValue: 14,
+    english: 12,
+    structure: 10,
+    evidence: 8,
+    seo: 8,
+    accessibility: 5,
+  },
+  "screeps-err-no-path": {
+    technical: 23,
+    intent: 18,
+    originalValue: 14,
+    english: 12,
+    structure: 10,
+    evidence: 8,
+    seo: 8,
+    accessibility: 5,
+  },
+};
+
+const allCodeBlocks = [];
+
+for (const [slug, expectation] of Object.entries(expected)) {
+  const article = articles[slug];
+  if (!article) {
+    failures.push(`缺少覆盖文章：${slug}`);
+    continue;
+  }
+
+  for (const [field, expectedValue] of Object.entries({
+    slug,
+    path: expectation.path,
+    chinesePath: expectation.chinesePath,
+    title: expectation.title,
+  })) {
+    if (article[field] !== expectedValue) {
+      failures.push(`${slug} 的 ${field} 不正确`);
+    }
+  }
+
+  if (!article.searchIntent?.includes(expectation.distinctIntent)) {
+    failures.push(`${slug} 未明确区分自己的主要搜索意图`);
+  }
+
+  if (article.finalScore < 96) {
+    failures.push(`${slug} 内部评分低于96：${article.finalScore}`);
+  }
+
+  if (!Array.isArray(article.faq) || article.faq.length !== 0) {
+    failures.push(`${slug} 不应保留与正文重复的FAQ或FAQPage数据`);
+  }
+
+  const verification = new Map(article.verification ?? []);
+  if (verification.get("Screeps Console test") !== "Pending") {
+    failures.push(`${slug} 隐藏或改写了Console Pending状态`);
+  }
+  if (verification.get("Live multi-tick verification") !== "Pending") {
+    failures.push(`${slug} 隐藏或改写了多Tick Pending状态`);
+  }
+  if (!String(verification.get("Evidence level") ?? "").includes("Static")) {
+    failures.push(`${slug} 未明确静态验证边界`);
+  }
+
+  const html = article.articleHtml ?? "";
+  const normalized = html.toLowerCase();
+
+  if (!html.includes("Use this guide when")) {
+    failures.push(`${slug} 缺少适用范围说明`);
+  }
+  if (!html.includes("Choose another guide when")) {
+    failures.push(`${slug} 缺少相邻搜索意图边界`);
+  }
+  if (!html.includes("later tick") && !html.includes("later ticks")) {
+    failures.push(`${slug} 缺少当前Tick与后续Tick区别`);
+  }
+  if (!html.includes("https://docs.screeps.com/api/")) {
+    failures.push(`${slug} 缺少Screeps官方API来源`);
+  }
+
+  for (const phrase of forbiddenPhrases) {
+    if (normalized.includes(phrase)) {
+      failures.push(`${slug} 包含AI化套话：${phrase}`);
+    }
+  }
+  for (const claim of prohibitedEvidenceClaims) {
+    if (normalized.includes(claim)) {
+      failures.push(`${slug} 包含无法追溯的证据声明：${claim}`);
+    }
+  }
+
+  for (const [id, label] of article.toc ?? []) {
+    if (!html.includes(`<h2 id="${id}">`) && !html.includes(`<h3 id="${id}">`)) {
+      failures.push(`${slug} 目录“${label}”找不到正文锚点：${id}`);
+    }
+  }
+
+  const codeBlocks = [
+    ...html.matchAll(
+      /<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g,
+    ),
+  ].map((match) =>
+    match[1]
+      .replaceAll("&lt;", "<")
+      .replaceAll("&gt;", ">")
+      .replaceAll("&amp;", "&"),
+  );
+
+  if (codeBlocks.length < 2) {
+    failures.push(`${slug} 缺少最小示例与诊断示例`);
+  }
+  allCodeBlocks.push(...codeBlocks.map((code) => ({ slug, code })));
+
+  const score = scorecards[slug];
+  const total = Object.values(score).reduce((sum, value) => sum + value, 0);
+  if (
+    total < 96
+    || score.technical < 22
+    || score.intent < 17
+    || score.originalValue < 13
+    || score.english < 11
+    || score.evidence < 7
+  ) {
+    failures.push(`${slug} 评分明细未达到发布门槛：${total}`);
+  }
+
+  if (!registrySource.includes(`"${expectation.path}": {`)) {
+    failures.push(`${slug} 未同步到英文文章登记覆盖表`);
+  }
+  if (!registrySource.includes(expectation.title)) {
+    failures.push(`${slug} 的文章库Title未同步`);
+  }
+}
+
+if (!routeSource.includes("getEnglishEditorialOverride20260731(slug)")) {
+  failures.push("英文动态路由未优先读取本批编辑覆盖内容");
+}
+
+for (const requiredMetadataText of [
+  'updatedAt: "2026-07-31"',
+  "allPublishedEnglishArticles.map",
+]) {
+  if (!registrySource.includes(requiredMetadataText)) {
+    failures.push(`完整英文登记缺少：${requiredMetadataText}`);
+  }
+}
+
+const tempDir = fs.mkdtempSync(
+  path.join(os.tmpdir(), "english-editorial-20260731-"),
+);
+try {
+  allCodeBlocks.forEach(({ slug, code }, index) => {
+    const filePath = path.join(tempDir, `block-${index + 1}.js`);
+    fs.writeFileSync(filePath, code, "utf8");
+    const result = spawnSync(process.execPath, ["--check", filePath], {
+      encoding: "utf8",
+    });
+    if (result.status !== 0) {
+      failures.push(
+        `${slug} 的JavaScript代码块 ${index + 1} 语法失败：${result.stderr.trim()}`,
+      );
+    }
+  });
+} finally {
+  fs.rmSync(tempDir, { recursive: true, force: true });
+}
+
+if (failures.length > 0) {
+  failures.forEach((failure) => console.error(`ERROR: ${failure}`));
+  console.error(`\n2026-07-31英文编辑批次检查失败：${failures.length} 项。`);
+  process.exit(1);
+}
+
+console.log(
+  `2026-07-31英文编辑批次检查通过：${articleEntries.length} 篇现有文章、${allCodeBlocks.length} 个JavaScript代码块；URL稳定、意图区分、Pending证据、元数据同步和98分内部门禁均有效。`,
+);
