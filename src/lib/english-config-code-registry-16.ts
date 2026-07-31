@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishConfigCodeBatchSixteenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishConfigCodeBatchSixteenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-flags-configuration",
     chinesePath: "/blog/screeps-flags-config",
@@ -26,23 +30,25 @@ export const englishConfigCodeBatchSixteenRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-require-modules",
     chinesePath: "/blog/screeps-modules-require",
-    category: "CODE ORGANIZATION · COMMONJS MODULES",
-    title: "How to Split Screeps Code into Modules Without Caching Stale Game Objects",
+    category: "CODE ORGANIZATION · TICK-SAFE MODULE CONTRACTS",
+    title: "Screeps Modules: One Main Loop, Small Contracts, Fresh Tick Data",
     description:
-      "Keep one module.exports.loop, export small role functions, validate module shapes, read current Game objects inside each tick, avoid module-scope world snapshots, and preserve diagnostics for missing roles and load failures.",
+      "Keep one main loop, export small functions, pass current game objects into modules, validate role contracts once per runtime, isolate per-Creep failures, and keep durable state out of module scope.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "17 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "13 min read",
     primaryKeyword: "Screeps require modules",
-    searchIntent: "Organize one Screeps game loop into reusable role modules without preserving tick-bound objects",
+    searchIntent:
+      "Structure Screeps modules around one loop and explicit contracts while keeping current-tick objects fresh and persistent state in Memory",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps require modules",
       "Screeps module.exports loop",
-      "Screeps role modules",
+      "Screeps role module contract",
       "Screeps CommonJS",
-      "Screeps stale game objects",
+      "Screeps fresh tick objects",
     ],
   },
 ];
