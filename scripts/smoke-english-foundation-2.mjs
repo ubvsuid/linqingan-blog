@@ -21,17 +21,17 @@ const articles = [
   {
     path: "/en/blog/screeps-get-object-by-id",
     chinesePath: "/blog/screeps-game-get-object-by-id",
-    headline: "How to Restore a Screeps Target from Memory with Game.getObjectById()",
-    listingTitle: "How to Restore a Screeps Target from Memory with Game.getObjectById()",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    faqExpected: true,
+    headline: "Resolve a Saved Screeps Target Without Guessing Why It Is Missing",
+    listingTitle: "Screeps Game.getObjectById(): Resolve Saved Targets Safely",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     verification: [
       "Chinese source article",
       "Reviewed in full",
-      "Visibility rule",
-      "Only objects in currently visible rooms are accessible",
-      "Live remote-vision test",
+      "Technical correction",
+      "Object lookup, visibility interpretation, type validation, invalidation, reselection, and actions are separated",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -92,6 +92,20 @@ for (const article of articles) {
 
   if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
     failures.push(`${article.path}: FAQPage expectation mismatch`);
+  }
+}
+
+const targetBody = await (await fetch(
+  `${baseUrl}/en/blog/screeps-get-object-by-id`,
+)).text();
+for (const expected of [
+  "Game.getObjectById(record.id)",
+  "vision-unavailable",
+  "missing-visible-room",
+  "wrong-type",
+]) {
+  if (!targetBody.includes(expected)) {
+    failures.push(`Saved target page is missing “${expected}”`);
   }
 }
 
@@ -178,5 +192,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
+  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Saved target与Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
 );
