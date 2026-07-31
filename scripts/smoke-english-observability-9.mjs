@@ -5,7 +5,11 @@ const articles = [
     path: "/en/blog/screeps-game-notify",
     chinesePath: "/blog/screeps-game-notify",
     headline: "How to Send Reliable Alerts with Game.notify()",
+    listingTitle: "How to Send Reliable Alerts with Game.notify()",
     query: "Game.notify",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     signals: [
       "slice(0, 20)",
       "groupInterval",
@@ -18,7 +22,11 @@ const articles = [
     path: "/en/blog/screeps-room-event-log",
     chinesePath: "/blog/screeps-room-event-log",
     headline: "How to Read Room.getEventLog() Safely in Screeps",
+    listingTitle: "How to Read Room.getEventLog() Safely in Screeps",
     query: "Room.getEventLog",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     signals: [
       "Game.time - 1",
       "room.getEventLog(true)",
@@ -30,13 +38,18 @@ const articles = [
   {
     path: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
-    headline: "How to Build a Safe RoomVisual Debug Layer in Screeps",
+    headline: "Build a RoomVisual Debug Layer That Cannot Change Game Logic",
+    listingTitle: "Screeps RoomVisual Debugging: Draw Current State Within a Budget",
     query: "RoomVisual",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     signals: [
       "visual.getSize()",
-      "512,000-byte",
-      "target.pos.roomName !== creep.pos.roomName",
-      "Live RoomVisual, byte-size and CPU test",
+      "512,000 serialized bytes",
+      "createCreepDebugSnapshot",
+      "byte-budget-reached",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -66,12 +79,15 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
   }
 
   const searchResponse = await fetch(
@@ -81,8 +97,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.listingTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.listingTitle}”`);
   }
 }
 
@@ -100,8 +116,19 @@ if (!eventBody.includes("tick: Game.time - 1") || !eventBody.includes("current a
 }
 
 const visualBody = await (await fetch(`${baseUrl}/en/blog/screeps-roomvisual-debug`)).text();
-if (!visualBody.includes("visual.getSize() >= config.maximumBytes") || !visualBody.includes("target.pos.roomName !== creep.pos.roomName")) {
-  failures.push("RoomVisual 页面缺少字节停止线或跨房间目标边界");
+for (const expected of [
+  "createCreepDebugSnapshot",
+  "selectDebugSnapshots",
+  "Math.min(\n    512000",
+  "return {\n    status: 'complete'",
+  "Game.cpu.getUsed()",
+]) {
+  if (!visualBody.includes(expected)) {
+    failures.push(`RoomVisual 页面缺少 “${expected}”`);
+  }
+}
+if (visualBody.includes("Memory.visualDebug[room.name].lastSummary")) {
+  failures.push("RoomVisual 最小渲染流程仍默认写入每 tick 持久摘要");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -110,7 +137,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.listingTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.listingTitle}”`);
   }
 }
 
