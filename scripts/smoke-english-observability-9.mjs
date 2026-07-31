@@ -4,17 +4,17 @@ const articles = [
   {
     path: "/en/blog/screeps-game-notify",
     chinesePath: "/blog/screeps-game-notify",
-    headline: "How to Send Reliable Alerts with Game.notify()",
-    listingTitle: "How to Send Reliable Alerts with Game.notify()",
+    headline: "Do Not Mark an Alert Sent Until Game.notify() Is Called",
+    listingTitle: "Screeps Game.notify(): Queue Alerts and Mark Them Submitted",
     query: "Game.notify",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    faqExpected: true,
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     signals: [
-      "slice(0, 20)",
-      "groupInterval",
-      "normalizeNotificationMessage",
-      "Live notification queue and external delivery test",
+      "valid.slice(0, 20)",
+      "awaiting-first-submission",
+      "lastSubmittedTick: Game.time",
+      "Live queue-cap, notification submission, grouping, and external delivery test",
       "Pending",
     ],
   },
@@ -103,8 +103,17 @@ for (const article of articles) {
 }
 
 const notifyBody = await (await fetch(`${baseUrl}/en/blog/screeps-game-notify`)).text();
-if (!notifyBody.includes("Memory.notificationQueue = deferred") || !notifyBody.includes("submitted = queue.slice(0, 20)")) {
-  failures.push("Game.notify 页面缺少中央队列与 20 条提交上限");
+for (const expected of [
+  "Memory.notificationQueue ??= {}",
+  "awaiting-first-submission",
+  "valid.slice(0, 20)",
+  "lastSubmittedTick: Game.time",
+  "delete Memory.notificationQueue[item.key]",
+]) {
+  if (!notifyBody.includes(expected)) failures.push(`Game.notify 页面缺少 “${expected}”`);
+}
+if (notifyBody.includes("nextState: {\n      active: true,\n      lastSubmittedTick: input.currentTick")) {
+  failures.push("Game.notify producer still advances the submission timestamp at queue time");
 }
 if (notifyBody.includes("delivery succeeded")) {
   failures.push("Game.notify 页面错误声称外部送达成功");
@@ -123,9 +132,7 @@ for (const expected of [
   "return {\n    status: 'complete'",
   "Game.cpu.getUsed()",
 ]) {
-  if (!visualBody.includes(expected)) {
-    failures.push(`RoomVisual 页面缺少 “${expected}”`);
-  }
+  if (!visualBody.includes(expected)) failures.push(`RoomVisual 页面缺少 “${expected}”`);
 }
 if (visualBody.includes("Memory.visualDebug[room.name].lastSummary")) {
   failures.push("RoomVisual 最小渲染流程仍默认写入每 tick 持久摘要");
@@ -158,4 +165,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第九批英文可观测性生产冒烟测试通过：${articles.length} 篇文章、三项证据边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第九批英文可观测性生产冒烟测试通过：${articles.length} 篇文章、通知提交与外部送达边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
