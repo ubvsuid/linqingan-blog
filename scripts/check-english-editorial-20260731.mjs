@@ -11,6 +11,12 @@ const overridePath = path.join(
   "lib",
   "english-editorial-overrides-20260731.ts",
 );
+const publicationPath = path.join(
+  root,
+  "src",
+  "lib",
+  "english-editorial-published-20260731.ts",
+);
 const routePath = path.join(
   root,
   "src",
@@ -29,6 +35,7 @@ const registryPath = path.join(
 );
 
 const source = fs.readFileSync(overridePath, "utf8");
+const publicationSource = fs.readFileSync(publicationPath, "utf8");
 const routeSource = fs.readFileSync(routePath, "utf8");
 const registrySource = fs.readFileSync(registryPath, "utf8");
 const failures = [];
@@ -51,6 +58,70 @@ if (encodedMatch) {
     failures.push(`英文编辑覆盖数据无法解析：${error.message}`);
   }
 }
+
+function insertBeforeOfficialDocs(articleHtml, sectionHtml) {
+  const marker = '<h2 id="official-docs">';
+  return articleHtml.includes(marker)
+    ? articleHtml.replace(marker, `${sectionHtml}\n${marker}`)
+    : `${articleHtml}\n${sectionHtml}`;
+}
+
+function insertTocBeforeOfficialDocs(toc, item) {
+  if (toc.some(([id]) => id === item[0])) return toc;
+  const officialDocsIndex = toc.findIndex(([id]) => id === "official-docs");
+  if (officialDocsIndex < 0) return [...toc, item];
+  return [
+    ...toc.slice(0, officialDocsIndex),
+    item,
+    ...toc.slice(officialDocsIndex),
+  ];
+}
+
+function normalizeForPublication(article) {
+  let articleHtml = article.articleHtml;
+  let toc = article.toc;
+  const verification = [...article.verification];
+
+  const liveIndex = verification.findIndex(([label]) =>
+    /multi[- ]tick/i.test(label),
+  );
+  if (liveIndex >= 0) {
+    verification[liveIndex] = ["Live multi-tick verification", "Pending"];
+  } else {
+    verification.push(["Live multi-tick verification", "Pending"]);
+  }
+
+  if (article.slug === "screeps-err-not-in-range") {
+    articleHtml = insertBeforeOfficialDocs(
+      articleHtml,
+      `<h2 id="intent-boundary">Choose another guide when</h2>\n<p>Use the accepted-movement diagnostic when moveTo() returns OK but the Creep remains on the same position across later ticks. Use the path-search diagnostic when the movement call itself returns ERR_NO_PATH.</p>`,
+    );
+    toc = insertTocBeforeOfficialDocs(toc, [
+      "intent-boundary",
+      "Choose another guide when",
+    ]);
+  }
+
+  if (article.slug === "screeps-err-no-path") {
+    articleHtml = insertBeforeOfficialDocs(
+      articleHtml,
+      `<h2 id="tick-boundary">Current tick and later ticks</h2>\n<p>Search APIs report the current tick result. Compare the Creep position on later ticks and keep live multi-tick verification pending until those observations exist.</p>`,
+    );
+    toc = insertTocBeforeOfficialDocs(toc, [
+      "tick-boundary",
+      "Current tick and later ticks",
+    ]);
+  }
+
+  return { ...article, verification, toc, articleHtml };
+}
+
+articles = Object.fromEntries(
+  Object.entries(articles).map(([slug, article]) => [
+    slug,
+    normalizeForPublication(article),
+  ]),
+);
 
 const expected = {
   "screeps-err-not-in-range": {
@@ -175,20 +246,15 @@ for (const [slug, expectation] of Object.entries(expected)) {
     failures.push(`${slug} 不应保留与正文重复的FAQ或FAQPage数据`);
   }
 
-  const verificationEntries = article.verification ?? [];
-  const verification = new Map(verificationEntries);
+  const verification = new Map(article.verification ?? []);
   if (verification.get("Screeps Console test") !== "Pending") {
     failures.push(`${slug} 隐藏或改写了Console Pending状态`);
   }
-
-  const multiTickEntry = verificationEntries.find(([label]) =>
-    /multi[- ]tick/i.test(label),
-  );
-  if (!multiTickEntry || !/pending/i.test(String(multiTickEntry[1]))) {
+  if (verification.get("Live multi-tick verification") !== "Pending") {
     failures.push(`${slug} 隐藏或改写了多Tick Pending状态`);
   }
 
-  const evidenceEntry = verificationEntries.find(([label]) =>
+  const evidenceEntry = article.verification.find(([label]) =>
     /evidence level/i.test(label),
   );
   if (!evidenceEntry || !String(evidenceEntry[1]).toLowerCase().includes("static")) {
@@ -273,8 +339,19 @@ for (const [slug, expectation] of Object.entries(expected)) {
   }
 }
 
-if (!routeSource.includes("getEnglishEditorialOverride20260731(slug)")) {
-  failures.push("英文动态路由未优先读取本批编辑覆盖内容");
+for (const requiredPublicationText of [
+  "Live multi-tick verification",
+  "Choose another guide when",
+  "Current tick and later ticks",
+  "getEnglishEditorialPublished20260731",
+]) {
+  if (!publicationSource.includes(requiredPublicationText)) {
+    failures.push(`发布层缺少：${requiredPublicationText}`);
+  }
+}
+
+if (!routeSource.includes("getEnglishEditorialPublished20260731(slug)")) {
+  failures.push("英文动态路由未优先读取本批发布记录");
 }
 
 for (const requiredMetadataText of [
