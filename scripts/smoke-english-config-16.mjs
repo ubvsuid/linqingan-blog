@@ -5,7 +5,11 @@ const articles = [
     path: "/en/blog/screeps-flags-configuration",
     chinesePath: "/blog/screeps-flags-config",
     headline: "How to Use Flags as Reviewed Configuration Instead of Hidden Automation",
+    listingTitle: "How to Use Flags as Reviewed Configuration Instead of Hidden Automation",
     query: "Game.flags",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     signals: [
       "Game.flags[name]",
       "flag.memory",
@@ -18,14 +22,18 @@ const articles = [
   {
     path: "/en/blog/screeps-require-modules",
     chinesePath: "/blog/screeps-modules-require",
-    headline: "How to Split Screeps Code into Modules Without Caching Stale Game Objects",
+    headline: "Split Screeps Code into Modules Without Hiding Tick Boundaries",
+    listingTitle: "Screeps Modules: One Main Loop, Small Contracts, Fresh Tick Data",
     query: "require modules",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     signals: [
       "module.exports.loop",
       "module.exports = { run }",
-      "cachedHarvesters",
-      "getCurrentHarvesters",
-      "Live module loading, syntax failure, global reset, role routing and stale-object test",
+      "getCurrentCreepNames",
+      "global.roleCountCache",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -55,12 +63,15 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
   }
 
   const searchResponse = await fetch(
@@ -70,8 +81,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.listingTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.listingTitle}”`);
   }
 }
 
@@ -85,13 +96,20 @@ if (
 }
 
 const modulesBody = await (await fetch(`${baseUrl}/en/blog/screeps-require-modules`)).text();
-if (
-  !modulesBody.includes("module.exports.loop")
-  || !modulesBody.includes("module.exports = { run }")
-  || !modulesBody.includes("cachedHarvesters")
-  || !modulesBody.includes("getCurrentHarvesters")
-) {
-  failures.push("模块页面缺少单一 loop、角色契约或 tick 快照边界");
+for (const expected of [
+  "run(creep, context)",
+  "validateRoles",
+  "getCurrentCreepNames",
+  "global.roleCountCache",
+  "role-threw",
+  "Circular dependencies",
+]) {
+  if (!modulesBody.includes(expected)) {
+    failures.push(`模块页面缺少 “${expected}”`);
+  }
+}
+if (modulesBody.includes("const cachedHarvesters")) {
+  failures.push("模块页面仍用完整角色查询示例掩盖通用 tick 边界");
 }
 
 const duplicateResponse = await fetch(
@@ -112,7 +130,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.listingTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.listingTitle}”`);
   }
   if (blogBody.includes("How to Write Screeps Memory Without Losing Data or Saving Live Objects")) {
     failures.push("/en/blog: 仍展示重复 Memory 页面");
