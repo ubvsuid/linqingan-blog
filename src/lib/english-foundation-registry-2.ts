@@ -30,23 +30,25 @@ export const englishFoundationBatchTwoRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-get-object-by-id",
     chinesePath: "/blog/screeps-game-get-object-by-id",
-    category: "FOUNDATION · TARGET RESTORATION",
-    title: "How to Restore a Screeps Target from Memory with Game.getObjectById()",
+    category: "FOUNDATION · SAVED TARGET RESOLUTION",
+    title: "Screeps Game.getObjectById(): Resolve Saved Targets Safely",
     description:
-      "Store an object ID and room name, recover the current object every tick, distinguish missing vision from a destroyed target, validate the restored type, and define an explicit invalidation policy.",
+      "Save an ID with room and kind metadata, return explicit invalid, no-vision, missing, wrong-type, and ready states, and keep restoration separate from reselection and actions.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "16 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "12 min read",
     primaryKeyword: "Screeps Game.getObjectById",
-    searchIntent: "Target-restoration tutorial and null-result troubleshooting",
+    searchIntent:
+      "Resolve one saved target and distinguish invalid data, missing vision, missing object, and wrong type before task logic decides what to do",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps Game.getObjectById",
-      "Screeps save target ID Memory",
       "Game.getObjectById null",
-      "Screeps restore Source target",
-      "Screeps room vision target",
+      "Screeps saved target ID",
+      "Screeps target room visibility",
+      "Screeps restore Memory target",
     ],
   },
   {
