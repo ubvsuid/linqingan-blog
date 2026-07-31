@@ -1,6 +1,7 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
 import { englishEditorialOverrides20260731 } from "./english-editorial-overrides-20260731";
+import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
 
 function insertBeforeOfficialDocs(
   articleHtml: string,
@@ -95,10 +96,14 @@ const movementEditorialArticles = Object.fromEntries(
   ]),
 ) as Record<string, EnglishBeginnerArticle>;
 
-export const englishEditorialPublished20260731 = {
+export const englishEditorialPublished20260731: Record<
+  string,
+  EnglishBeginnerArticle
+> = {
   ...movementEditorialArticles,
   ...englishEditorialCorePublished20260731,
-} satisfies Record<string, EnglishBeginnerArticle>;
+  ...englishEditorialRuntimeOverrides20260731,
+};
 
 export function getEnglishEditorialPublished20260731(
   slug: string,
