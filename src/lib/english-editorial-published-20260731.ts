@@ -1,5 +1,6 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
+import { englishEditorialFirstLoopStateNotifyOverrides20260731 } from "./english-editorial-first-loop-state-notify-overrides-20260731";
 import { englishEditorialOverrides20260731 } from "./english-editorial-overrides-20260731";
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
 import { englishEditorialSpawnRouteMemoryOverrides20260731 } from "./english-editorial-spawn-route-memory-overrides-20260731";
@@ -91,10 +92,49 @@ function normalizeEditorialArticle(
   };
 }
 
+function normalizeFirstLoopStateNotifyArticle(
+  article: EnglishBeginnerArticle,
+): EnglishBeginnerArticle {
+  if (article.slug !== "screeps-first-room-code") return article;
+
+  return {
+    ...article,
+    articleHtml: article.articleHtml
+      .replace(
+        "<code>energyPhase</code string",
+        "<code>energyPhase</code> string",
+      )
+      .replace(
+        String.raw`status: result === OK || result === ERR_TIRED
+      ? 'movement-submitted'
+      : 'movement-rejected',`,
+        String.raw`status: result === OK
+      ? 'movement-submitted'
+      : result === ERR_TIRED
+        ? 'movement-deferred-fatigue'
+        : 'movement-rejected',`,
+      )
+      .replace(
+        String.raw`<tr><td><code>*-rejected</code></td><td>The current API call returned a non-OK code.</td><td>Inspect the captured action or movement result.</td></tr>`,
+        String.raw`<tr><td><code>movement-deferred-fatigue</code></td><td>The Creep was tired, so no new movement was accepted.</td><td>Wait for fatigue to reach zero and compare later positions.</td></tr>
+<tr><td><code>*-rejected</code></td><td>The current API call returned a non-OK code.</td><td>Inspect the captured action or movement result.</td></tr>`,
+      ),
+  };
+}
+
 const movementEditorialArticles = Object.fromEntries(
   Object.entries(englishEditorialOverrides20260731).map(([slug, article]) => [
     slug,
     normalizeEditorialArticle(article),
+  ]),
+) as Record<string, EnglishBeginnerArticle>;
+
+const firstLoopStateNotifyEditorialArticles = Object.fromEntries(
+  Object.entries(
+    englishEditorialFirstLoopStateNotifyOverrides20260731,
+  ).map(([slug, article]) => [
+    slug,
+    normalizeFirstLoopStateNotifyArticle(article),
   ]),
 ) as Record<string, EnglishBeginnerArticle>;
 
@@ -107,6 +147,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialRuntimeOverrides20260731,
   ...englishEditorialSpawnRouteMemoryOverrides20260731,
   ...englishEditorialTargetsVisualModulesOverrides20260731,
+  ...firstLoopStateNotifyEditorialArticles,
 };
 
 export function getEnglishEditorialPublished20260731(

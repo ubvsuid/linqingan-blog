@@ -8,23 +8,25 @@ export const englishObservabilityBatchNineRegistry: DatedEnglishArticleRecord[] 
   {
     href: "/en/blog/screeps-game-notify",
     chinesePath: "/blog/screeps-game-notify",
-    category: "OBSERVABILITY · RATE-LIMITED ALERTS",
-    title: "How to Send Reliable Alerts with Game.notify()",
+    category: "OBSERVABILITY · NOTIFICATION SUBMISSION",
+    title: "Screeps Game.notify(): Queue Alerts and Mark Them Submitted",
     description:
-      "Use state transitions, per-room Memory, repeat intervals, message truncation, priorities, and a 20-notification queue without confusing groupInterval minutes with game ticks or claiming external delivery success.",
+      "Separate detected, queued, submitted, and externally delivered states; cap calls at 20; preserve deferred alerts; cancel recovered risks; and advance cooldowns only at the API call site.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "17 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "13 min read",
     primaryKeyword: "Screeps Game.notify",
-    searchIntent: "Build stateful, rate-limited alerts without notification spam",
+    searchIntent:
+      "Queue stateful Screeps alerts without starting submission cooldowns for deferred, expired, or cancelled items",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps Game.notify",
-      "Screeps notification rate limit",
+      "Screeps notification queue",
+      "Game.notify 20 per tick",
       "Game.notify groupInterval minutes",
-      "Screeps controller downgrade alert",
-      "Screeps alert queue",
+      "Screeps alert submitted vs delivered",
     ],
   },
   {
