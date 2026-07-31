@@ -1,143 +1,51 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
-
 const articles = [
   {
-    path: "/en/blog/screeps-spawncreep-return-codes",
-    chinesePath: "/blog/screeps-spawncreep-return-codes",
-    headline: "How to Debug spawnCreep() Return Codes in Screeps",
-    verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "API boundary",
-      "dryRun checks current conditions but does not start spawning",
-      "Screeps Console test",
-      "Pending",
-    ],
+    path: "/en/blog/screeps-spawncreep-return-codes", chinesePath: "/blog/screeps-spawncreep-return-codes",
+    headline: "How to Diagnose spawnCreep() Return Codes", listingTitle: "Screeps spawnCreep() Errors: Diagnose Every Return Code",
+    tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false,
+    verification: ["Chinese source article", "Reviewed in full", "Screeps Console test", "Pending", "Live multi-tick verification"],
+    signals: ["dryRunResult", "spawnResult", "ERR_RCL_NOT_ENOUGH", "optional <code>memory</code> field is documented as <code>any</code>"],
   },
   {
-    path: "/en/blog/screeps-dynamic-creep-body",
-    chinesePath: "/blog/screeps-dynamic-creep-body-energy",
-    headline: "How to Build a Screeps Creep Body from Available Energy",
-    verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "Policy boundary",
-      "Body builder chooses a valid body; spawn timing remains a separate decision",
-      "Live replacement-cycle test",
-      "Pending",
-    ],
+    path: "/en/blog/screeps-dynamic-creep-body", chinesePath: "/blog/screeps-dynamic-creep-body-energy",
+    headline: "How to Build a Screeps Creep Body from Available Energy", listingTitle: "How to Build a Screeps Creep Body from Available Energy",
+    tocId: "quick-answer", tocHeading: "Quick answer", faqExpected: true,
+    verification: ["Chinese source article", "Reviewed in full", "Policy boundary", "Body builder chooses a valid body; spawn timing remains a separate decision", "Live replacement-cycle test", "Pending"], signals: [],
   },
   {
-    path: "/en/blog/screeps-emergency-harvester-recovery",
-    chinesePath: "/blog/screeps-spawn-emergency-recovery",
-    headline: "How to Recover a Screeps Room with No Harvesters",
-    verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "Safety boundary",
-      "Initial Spawn 1-Energy refill is special and not assumed for ordinary rooms",
-      "Live colony-collapse recovery",
-      "Pending",
-    ],
+    path: "/en/blog/screeps-emergency-harvester-recovery", chinesePath: "/blog/screeps-spawn-emergency-recovery",
+    headline: "How to Recover a Screeps Room with No Harvesters", listingTitle: "How to Recover a Screeps Room with No Harvesters",
+    tocId: "quick-answer", tocHeading: "Quick answer", faqExpected: true,
+    verification: ["Chinese source article", "Reviewed in full", "Safety boundary", "Initial Spawn 1-Energy refill is special and not assumed for ordinary rooms", "Live colony-collapse recovery", "Pending"], signals: [],
   },
 ];
-
 const failures = [];
-
 for (const article of articles) {
-  const response = await fetch(`${baseUrl}${article.path}`, {
-    redirect: "manual",
-  });
+  const response = await fetch(`${baseUrl}${article.path}`, { redirect: "manual" });
   const body = await response.text();
-
-  if (response.status !== 200) {
-    failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
-    continue;
-  }
-
-  for (const expected of [article.headline, ...article.verification]) {
-    if (!body.includes(expected)) {
-      failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
-    }
-  }
-
+  if (response.status !== 200) { failures.push(`${article.path}: expected 200, received ${response.status}`); continue; }
   const canonical = `https://www.linqingan.com${article.path}`;
   const chinese = `https://www.linqingan.com${article.chinesePath}`;
-  for (const expected of [
-    `rel="canonical" href="${canonical}"`,
-    `rel="alternate" hrefLang="en" href="${canonical}"`,
-    `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
-    `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
-    `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
-  ]) {
-    if (!body.includes(expected)) {
-      failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
-    }
-  }
+  for (const expected of [article.headline, ...article.verification, ...article.signals,
+    `rel="canonical" href="${canonical}"`, `rel="alternate" hrefLang="en" href="${canonical}"`,
+    `rel="alternate" hrefLang="zh-CN" href="${chinese}"`, `rel="alternate" hrefLang="x-default" href="${canonical}"`,
+    `href="#${article.tocId}"`, `<h2 id="${article.tocId}">${article.tocHeading}</h2>`, `"@type":"BlogPosting"`,
+  ]) if (!body.includes(expected)) failures.push(`${article.path}: missing “${expected}”`);
+  if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) failures.push(`${article.path}: FAQPage expectation mismatch`);
 }
-
-const dynamicBodyResponse = await fetch(
-  `${baseUrl}/en/blog/screeps-dynamic-creep-body`,
-  { redirect: "manual" },
-);
-const dynamicBody = await dynamicBodyResponse.text();
-if (!dynamicBody.includes("maximumUnits !== Infinity")) {
-  failures.push("动态身体页面未呈现修正后的 Infinity 边界");
-}
-if (dynamicBody.includes("|| !Number.isFinite(maximumUnits)")) {
-  failures.push("动态身体页面仍呈现旧的 Infinity 误判条件");
-}
-
+const dynamicBody = await (await fetch(`${baseUrl}/en/blog/screeps-dynamic-creep-body`)).text();
+if (!dynamicBody.includes("maximumUnits !== Infinity")) failures.push("Dynamic body page is missing corrected Infinity boundary");
+if (dynamicBody.includes("|| !Number.isFinite(maximumUnits)")) failures.push("Dynamic body page still renders obsolete Infinity rejection");
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
 const blogBody = await blogResponse.text();
-if (blogResponse.status !== 200) {
-  failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
-} else {
-  for (const article of articles) {
-    if (!blogBody.includes(article.headline)) {
-      failures.push(`/en/blog-index.json: 缺少新文章 “${article.headline}”`);
-    }
-  }
-}
-
-const searchResponse = await fetch(`${baseUrl}/en/search?q=spawn`, {
-  redirect: "manual",
-});
+if (blogResponse.status !== 200) failures.push(`/en/blog-index.json: expected 200, received ${blogResponse.status}`);
+else for (const article of articles) if (!blogBody.includes(article.listingTitle)) failures.push(`/en/blog-index.json: missing “${article.listingTitle}”`);
+const searchResponse = await fetch(`${baseUrl}/en/search?q=spawn`, { redirect: "manual" });
 const searchBody = await searchResponse.text();
-if (searchResponse.status !== 200) {
-  failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
-} else {
-  for (const article of articles) {
-    if (!searchBody.includes(article.headline)) {
-      failures.push(`/en/search: 缺少新文章 “${article.headline}”`);
-    }
-  }
-}
-
-const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, {
-  redirect: "manual",
-});
-const sitemapBody = await sitemapResponse.text();
-if (sitemapResponse.status !== 200) {
-  failures.push(`/sitemap.xml: 预期 200，实际 ${sitemapResponse.status}`);
-} else {
-  for (const article of articles) {
-    const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
-      failures.push(`/sitemap.xml: 缺少 ${expected}`);
-    }
-  }
-}
-
-if (failures.length > 0) {
-  for (const failure of failures) console.error(`ERROR: ${failure}`);
-  console.error(`\n第三批 Spawn 英文专题生产冒烟测试失败：${failures.length} 项。`);
-  process.exit(1);
-}
-
-console.log(
-  `第三批 Spawn 英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、修正后代码、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
-);
+if (searchResponse.status !== 200) failures.push(`/en/search: expected 200, received ${searchResponse.status}`);
+else for (const article of articles) if (!searchBody.includes(article.listingTitle)) failures.push(`/en/search: missing “${article.listingTitle}”`);
+const sitemapBody = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
+for (const article of articles) if (!sitemapBody.includes(`https://www.linqingan.com${article.path}`)) failures.push(`/sitemap.xml: missing ${article.path}`);
+if (failures.length) { failures.forEach((failure) => console.error(`ERROR: ${failure}`)); process.exit(1); }
+console.log(`Spawn batch production smoke passed: ${articles.length} pages, revised return-code workflow, Verification, Canonical, hreflang, structured data, search, and Sitemap.`);
