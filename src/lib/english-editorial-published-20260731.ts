@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
+import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
 import { englishEditorialOverrides20260731 } from "./english-editorial-overrides-20260731";
 
 function insertBeforeOfficialDocs(
@@ -87,12 +88,17 @@ function normalizeEditorialArticle(
   };
 }
 
-export const englishEditorialPublished20260731 = Object.fromEntries(
+const movementEditorialArticles = Object.fromEntries(
   Object.entries(englishEditorialOverrides20260731).map(([slug, article]) => [
     slug,
     normalizeEditorialArticle(article),
   ]),
 ) as Record<string, EnglishBeginnerArticle>;
+
+export const englishEditorialPublished20260731 = {
+  ...movementEditorialArticles,
+  ...englishEditorialCorePublished20260731,
+} satisfies Record<string, EnglishBeginnerArticle>;
 
 export function getEnglishEditorialPublished20260731(
   slug: string,
