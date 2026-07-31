@@ -8,23 +8,25 @@ export const englishConfigCodeBatchSixteenRegistry: DatedEnglishArticleRecord[] 
   {
     href: "/en/blog/screeps-flags-configuration",
     chinesePath: "/blog/screeps-flags-config",
-    category: "CONFIGURATION · FLAGS AND OBJECT REFERENCES",
-    title: "How to Use Flags as Reviewed Configuration Instead of Hidden Automation",
+    category: "CONFIGURATION · FLAG AND TARGET BINDING",
+    title: "Screeps Flags: Bind Configuration to Room and Target Identity",
     description:
-      "Resolve exact Flag names from Game.flags, validate flag.memory fields, recover configured targets by ID before a deterministic local fallback, and report missing or stale configuration without mutating Flags.",
+      "Resolve an exact Flag, validate its schema, bind saved object IDs to the Flag room and expected type, make fallback an explicit policy, and report configuration drift without mutating the Flag.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "16 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "12 min read",
     primaryKeyword: "Screeps Game.flags configuration",
-    searchIntent: "Use named Flags as explicit reviewed configuration without silently mutating the game world",
+    searchIntent:
+      "Validate a named Flag and bind its saved target to the expected object type and Flag room without silent fallback",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps Game.flags configuration",
-      "Screeps Flag memory",
       "Screeps Flag target ID",
-      "Screeps Game.getObjectById flag",
-      "Screeps missing Flag diagnostics",
+      "Screeps Flag room mismatch",
+      "Screeps Flag memory schema",
+      "Screeps fail closed configuration",
     ],
   },
   {
