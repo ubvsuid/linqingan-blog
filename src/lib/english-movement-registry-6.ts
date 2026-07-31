@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishMovementBatchSixRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishMovementBatchSixRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-move-fatigue-body-ratio",
     chinesePath: "/blog/screeps-move-fatigue-body-ratio",
@@ -48,23 +52,26 @@ export const englishMovementBatchSixRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-map-find-route",
     chinesePath: "/blog/screeps-map-find-route",
-    category: "MOVEMENT · CROSS-ROOM ROUTING",
-    title: "How to Plan and Execute a Cross-Room Route in Screeps",
+    category: "MOVEMENT · CROSS-ROOM ROUTE EXECUTION",
+    title: "Screeps Game.map.findRoute(): Plan and Execute One Room Step",
     description:
-      "Use Game.map.findRoute() as a room-level plan, assign routeCallback costs, reject rooms deliberately, validate the first exit step, rebuild after room transitions, and keep route preference separate from live safety intel.",
+      "Separate room planning from exit-tile pathfinding, validate the first route step, use finite risk costs versus hard bans, and verify the border transition on later ticks.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "14 min read",
     primaryKeyword: "Screeps Game.map.findRoute",
-    searchIntent: "Build, validate, and execute an explainable room-level route",
+    searchIntent:
+      "Turn one room-level route result into a validated, reachable next-room movement step",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps Game.map.findRoute",
-      "Screeps cross room movement",
-      "routeCallback Infinity Screeps",
-      "Screeps highway room route",
-      "Screeps route cache",
+      "Screeps cross-room route",
+      "Screeps routeCallback Infinity",
+      "Screeps exit tile",
+      "Game.map.describeExits",
+      "Screeps room transition",
     ],
   },
 ];

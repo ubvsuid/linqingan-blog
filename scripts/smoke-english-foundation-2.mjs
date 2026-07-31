@@ -5,6 +5,10 @@ const articles = [
     path: "/en/blog/screeps-working-state",
     chinesePath: "/blog/screeps-creep-working-state",
     headline: "How to Switch a Screeps Creep Between Getting Energy and Working",
+    listingTitle: "How to Switch a Screeps Creep Between Getting Energy and Working",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     verification: [
       "Chinese source article",
       "Reviewed in full",
@@ -18,6 +22,10 @@ const articles = [
     path: "/en/blog/screeps-get-object-by-id",
     chinesePath: "/blog/screeps-game-get-object-by-id",
     headline: "How to Restore a Screeps Target from Memory with Game.getObjectById()",
+    listingTitle: "How to Restore a Screeps Target from Memory with Game.getObjectById()",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     verification: [
       "Chinese source article",
       "Reviewed in full",
@@ -30,13 +38,17 @@ const articles = [
   {
     path: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
-    headline: "How to Clean Dead Creep Memory Safely in Screeps",
+    headline: "Clean Dead Creep Memory Without Deleting Unrelated State",
+    listingTitle: "Screeps Dead Creep Memory: Clean Names and Owned Indexes",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     verification: [
       "Chinese source article",
       "Reviewed in full",
-      "Deletion boundary",
-      "Only name-indexed structures explicitly managed by the script",
-      "Live death-and-replacement cycle",
+      "Technical correction",
+      "Existence detection, owned-index cleanup, shared references, and death cause are separated",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -69,14 +81,31 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
     }
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
+  }
+}
+
+const cleanupBody = await (await fetch(
+  `${baseUrl}/en/blog/screeps-clean-dead-creep-memory`,
+)).text();
+for (const expected of [
+  "Object.hasOwn(gameCreeps, name)",
+  "cleanOwnedCreepIndexes(name)",
+  "runRoleCounts()",
+  "ticksToLive === 1",
+]) {
+  if (!cleanupBody.includes(expected)) {
+    failures.push(`Dead Creep Memory page is missing “${expected}”`);
   }
 }
 
@@ -86,8 +115,8 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) {
-      failures.push(`/en/blog-index.json: 缺少新文章 “${article.headline}”`);
+    if (!blogBody.includes(article.listingTitle)) {
+      failures.push(`/en/blog-index.json: 缺少文章 “${article.listingTitle}”`);
     }
   }
 }
@@ -100,8 +129,8 @@ if (searchResponse.status !== 200) {
   failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!searchBody.includes(article.headline)) {
-      failures.push(`/en/search: 缺少服务端相关结果 “${article.headline}”`);
+    if (!searchBody.includes(article.listingTitle)) {
+      failures.push(`/en/search: 缺少服务端相关结果 “${article.listingTitle}”`);
     }
   }
   if (searchBody.includes("How to Launch a Nuke Without Reusing a Stale Target Request")) {
@@ -121,8 +150,8 @@ if (searchIndexResponse.status !== 200) {
     failures.push(`/en/search-index.json: Content-Type 不是 application/json`);
   }
   for (const article of articles) {
-    if (!searchIndexBody.includes(article.headline)) {
-      failures.push(`/en/search-index.json: 缺少新文章 “${article.headline}”`);
+    if (!searchIndexBody.includes(article.listingTitle)) {
+      failures.push(`/en/search-index.json: 缺少文章 “${article.listingTitle}”`);
     }
   }
 }
@@ -149,5 +178,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
+  `第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、英文目录、渐进式搜索与 Sitemap。`,
 );

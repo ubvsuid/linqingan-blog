@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishSpawnBatchThreeRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishSpawnBatchThreeRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-spawncreep-return-codes",
     chinesePath: "/blog/screeps-spawncreep-return-codes",
@@ -26,23 +30,26 @@ export const englishSpawnBatchThreeRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-dynamic-creep-body",
     chinesePath: "/blog/screeps-dynamic-creep-body-energy",
-    category: "SPAWNING · DYNAMIC BODY DESIGN",
-    title: "How to Build a Screeps Creep Body from Available Energy",
+    category: "SPAWNING · BODY BUDGET POLICY",
+    title: "Screeps Dynamic Creep Body: Minimum, Target, and Emergency Plans",
     description:
-      "Distinguish current Energy from room capacity, repeat a role-specific body unit, enforce the 50-part limit, calculate cost and spawn time, and decide when to spawn a smaller emergency body.",
+      "Separate minimum, target, and emergency body policies; scale one role template within current Energy and the 50-part limit; then validate spawning separately.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "15 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "13 min read",
     primaryKeyword: "Screeps dynamic Creep body",
-    searchIntent: "Body-generation algorithm and current-Energy strategy",
+    searchIntent:
+      "Build one legal role body from an explicit minimum, current Energy budget, role cap, and emergency policy",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps dynamic Creep body",
-      "build Creep body from energyAvailable",
+      "Screeps minimum Creep body",
+      "Screeps emergency body",
+      "room.energyAvailable body",
       "Screeps 50 body part limit",
       "CREEP_SPAWN_TIME",
-      "Screeps body cost calculator code",
     ],
   },
   {

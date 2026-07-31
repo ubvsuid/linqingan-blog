@@ -9,9 +9,10 @@ const articles = [
   },
   {
     path: "/en/blog/screeps-dynamic-creep-body", chinesePath: "/blog/screeps-dynamic-creep-body-energy",
-    headline: "How to Build a Screeps Creep Body from Available Energy", listingTitle: "How to Build a Screeps Creep Body from Available Energy",
-    tocId: "quick-answer", tocHeading: "Quick answer", faqExpected: true,
-    verification: ["Chinese source article", "Reviewed in full", "Policy boundary", "Body builder chooses a valid body; spawn timing remains a separate decision", "Live replacement-cycle test", "Pending"], signals: [],
+    headline: "Build a Dynamic Creep Body Without Spending Energy Blindly", listingTitle: "Screeps Dynamic Creep Body: Minimum, Target, and Emergency Plans",
+    tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false,
+    verification: ["Chinese source article", "Reviewed in full", "Technical correction", "Minimum capability, target budget, emergency scaling, and Spawn submission are separate decisions", "Live multi-tick verification", "Pending"],
+    signals: ["'wait-or-scale'", "maximumParts > 50", "unusedEnergy: budget - bodyCost", "spawn-failed-after-dry-run"],
   },
   {
     path: "/en/blog/screeps-emergency-harvester-recovery", chinesePath: "/blog/screeps-spawn-emergency-recovery",
@@ -35,8 +36,9 @@ for (const article of articles) {
   if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) failures.push(`${article.path}: FAQPage expectation mismatch`);
 }
 const dynamicBody = await (await fetch(`${baseUrl}/en/blog/screeps-dynamic-creep-body`)).text();
-if (!dynamicBody.includes("maximumUnits !== Infinity")) failures.push("Dynamic body page is missing corrected Infinity boundary");
-if (dynamicBody.includes("|| !Number.isFinite(maximumUnits)")) failures.push("Dynamic body page still renders obsolete Infinity rejection");
+if (!dynamicBody.includes("minimumBody: [WORK, CARRY, MOVE]")) failures.push("Dynamic body page is missing the explicit minimum-body example");
+if (!dynamicBody.includes("maximumEnergy: 1200")) failures.push("Dynamic body page is missing the role Energy cap");
+if (!dynamicBody.includes("spawnTime: body.length * CREEP_SPAWN_TIME")) failures.push("Dynamic body page is missing Spawn-time reporting");
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
 const blogBody = await blogResponse.text();
 if (blogResponse.status !== 200) failures.push(`/en/blog-index.json: expected 200, received ${blogResponse.status}`);
@@ -48,4 +50,4 @@ else for (const article of articles) if (!searchBody.includes(article.listingTit
 const sitemapBody = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
 for (const article of articles) if (!sitemapBody.includes(`https://www.linqingan.com${article.path}`)) failures.push(`/sitemap.xml: missing ${article.path}`);
 if (failures.length) { failures.forEach((failure) => console.error(`ERROR: ${failure}`)); process.exit(1); }
-console.log(`Spawn batch production smoke passed: ${articles.length} pages, revised return-code workflow, Verification, Canonical, hreflang, structured data, search, and Sitemap.`);
+console.log(`Spawn batch production smoke passed: ${articles.length} pages, dynamic body policy, revised return-code workflow, Verification, Canonical, hreflang, structured data, search, and Sitemap.`);

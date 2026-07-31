@@ -5,7 +5,11 @@ const articles = [
     path: "/en/blog/screeps-move-fatigue-body-ratio",
     chinesePath: "/blog/screeps-move-fatigue-body-ratio",
     headline: "How to Calculate Screeps Creep Movement Speed",
+    listingTitle: "How to Calculate Screeps Creep Movement Speed",
     query: "fatigue",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     signals: [
       "terrain being entered",
       "estimateCreepMovement(creep, terrain)",
@@ -18,7 +22,11 @@ const articles = [
     path: "/en/blog/screeps-roomposition-distance",
     chinesePath: "/blog/screeps-roomposition-distance",
     headline: "Which Screeps RoomPosition Distance Method Should You Use?",
+    listingTitle: "Which Screeps RoomPosition Distance Method Should You Use?",
     query: "RoomPosition",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    faqExpected: true,
     signals: [
       "isNearTo() includes the same tile",
       "const strictlyAdjacent = withinOne",
@@ -31,13 +39,18 @@ const articles = [
   {
     path: "/en/blog/screeps-map-find-route",
     chinesePath: "/blog/screeps-map-find-route",
-    headline: "How to Plan and Execute a Cross-Room Route in Screeps",
+    headline: "Turn a Room Route into One Validated Exit Step",
+    listingTitle: "Screeps Game.map.findRoute(): Plan and Execute One Room Step",
     query: "findRoute",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
     signals: [
-      "const step = currentPlan.steps[0]",
-      "exits[step.exit] !== step.room",
-      "No vision does not mean safe",
-      "Live cross-room movement test",
+      "Game.map.describeExits(currentRoom)",
+      "findClosestByPath",
+      "range: 0",
+      "Room-name patterns are not live safety evidence",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -67,14 +80,17 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少 “${expected}”`);
     }
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
   }
 
   const searchResponse = await fetch(
@@ -84,8 +100,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.listingTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.listingTitle}”`);
   }
 }
 
@@ -99,6 +115,12 @@ if (fatigueBody.includes("getTerrainName(\n    creep.room,\n    creep.pos")) {
 const routeBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-map-find-route`,
 )).text();
+if (!routeBody.includes("const step = routeResult.steps[0]")) {
+  failures.push("跨房间页面缺少当前房间的首步验证");
+}
+if (!routeBody.includes("status: 'exit-position-unreachable'")) {
+  failures.push("跨房间页面缺少出口 tile 不可达状态");
+}
 if (routeBody.includes("currentPlan.steps.find(")) {
   failures.push("跨房间页面仍在整条旧路线中搜索出口");
 }
@@ -109,8 +131,8 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) {
-      failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.listingTitle)) {
+      failures.push(`/en/blog-index.json: 缺少 “${article.listingTitle}”`);
     }
   }
 }
@@ -135,5 +157,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第六批英文移动专题生产冒烟测试通过：${articles.length} 篇文章、三项语义修正、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
+  `第六批英文移动专题生产冒烟测试通过：${articles.length} 篇文章、跨房间首步与出口可达性、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
 );

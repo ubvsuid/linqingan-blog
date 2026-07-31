@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishFoundationBatchTwoRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishFoundationBatchTwoRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-working-state",
     chinesePath: "/blog/screeps-creep-working-state",
@@ -48,23 +52,25 @@ export const englishFoundationBatchTwoRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
-    category: "FOUNDATION · MEMORY CLEANUP",
-    title: "How to Clean Dead Creep Memory Safely in Screeps",
+    category: "MEMORY · DEAD-CREEP CLEANUP",
+    title: "Screeps Dead Creep Memory: Clean Names and Owned Indexes",
     description:
-      "Compare Memory.creeps with Game.creeps, remove only confirmed dead-name entries, synchronize explicitly managed task indexes, summarize logs, and avoid TTL-based or global deletion mistakes.",
+      "Collect names absent from Game.creeps, remove their Creep-owned Memory, clean only documented name indexes, bound logs, and keep death cause and shared queues separate.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "14 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "11 min read",
     primaryKeyword: "Screeps clean dead Creep Memory",
-    searchIntent: "Safe cleanup tutorial and stale-Memory troubleshooting",
+    searchIntent:
+      "Remove confirmed stale Creep-name state without deleting unrelated Memory or inventing a death cause",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps clean dead Creep Memory",
-      "delete Memory.creeps dead Creep",
-      "Game.creeps Memory.creeps cleanup",
-      "Screeps stale Creep memory",
-      "Screeps memory cleanup code",
+      "Memory.creeps cleanup",
+      "Game.creeps dead Creep",
+      "Screeps stale Creep assignment",
+      "Screeps Creep name reuse",
     ],
   },
 ];
