@@ -199,7 +199,7 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
     "primaryKeyword": "Screeps ERR_NOT_IN_RANGE",
     "searchIntent": "Diagnose an action-distance failure and implement the correct move-then-retry boundary",
     "finalScore": 98,
-    "updatedAt": "2026-07-31",
+    updatedAt: "2026-07-31",
     "keywords": [
       "Screeps ERR_NOT_IN_RANGE",
       "Screeps action range",
@@ -216,7 +216,7 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
     "primaryKeyword": "Screeps moveTo OK not moving",
     "searchIntent": "Diagnose accepted movement orders that show no position progress across later ticks",
     "finalScore": 98,
-    "updatedAt": "2026-07-31",
+    updatedAt: "2026-07-31",
     "keywords": [
       "Screeps moveTo OK not moving",
       "Screeps Creep stuck",
@@ -233,7 +233,7 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
     "primaryKeyword": "Screeps ERR_NO_PATH",
     "searchIntent": "Diagnose a failed path search without confusing it with traffic or accepted movement",
     "finalScore": 98,
-    "updatedAt": "2026-07-31",
+    updatedAt: "2026-07-31",
     "keywords": [
       "Screeps ERR_NO_PATH",
       "Screeps PathFinder incomplete",
@@ -250,7 +250,7 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
     "primaryKeyword": "Screeps Memory",
     "searchIntent": "Understand where cross-tick state belongs and implement durable Creep state without confusing Memory with disposable heap cache",
     "finalScore": 98,
-    "updatedAt": "2026-07-31",
+    updatedAt: "2026-07-31",
     "keywords": [
       "Screeps Memory",
       "Screeps global heap cache",
@@ -268,7 +268,7 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
     "primaryKeyword": "Screeps spawnCreep return codes",
     "searchIntent": "Diagnose one failed spawnCreep request from its documented return code and verify the accepted operation across later ticks",
     "finalScore": 98,
-    "updatedAt": "2026-07-31",
+    updatedAt: "2026-07-31",
     "keywords": [
       "Screeps spawnCreep return codes",
       "spawnCreep dryRun",
@@ -286,7 +286,7 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
     "primaryKeyword": "Screeps Game.cpu.getUsed",
     "searchIntent": "Measure a specific Screeps code path accurately and protect the current tick without treating bucket thresholds as performance evidence",
     "finalScore": 98,
-    "updatedAt": "2026-07-31",
+    updatedAt: "2026-07-31",
     "keywords": [
       "Screeps Game.cpu.getUsed",
       "Screeps CPU profiling",
