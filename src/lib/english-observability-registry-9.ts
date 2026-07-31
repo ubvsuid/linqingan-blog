@@ -32,23 +32,25 @@ export const englishObservabilityBatchNineRegistry: DatedEnglishArticleRecord[] 
   {
     href: "/en/blog/screeps-room-event-log",
     chinesePath: "/blog/screeps-room-event-log",
-    category: "OBSERVABILITY · PREVIOUS-TICK EVENT LOGS",
-    title: "How to Read Room.getEventLog() Safely in Screeps",
+    category: "OBSERVABILITY · IDEMPOTENT EVENT INGESTION",
+    title: "Screeps Room.getEventLog(): Process Each Previous Tick Once",
     description:
-      "Read previous-tick room events, distinguish parsed arrays from raw JSON strings, validate event-specific data, preserve IDs when objects disappear, filter attacks on owned targets, and store bounded aggregates instead of unlimited history.",
+      "Read the previous tick once per visible room, validate supported event shapes, keep historical IDs when objects vanish, attach ownership confidence, and store bounded idempotent incidents.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "13 min read",
     primaryKeyword: "Screeps Room.getEventLog",
-    searchIntent: "Read and normalize previous-tick events without misattributing current commands",
+    searchIntent:
+      "Process one visible Room's previous-tick event window once without duplicate persistence or false current-tick attribution",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps Room.getEventLog",
-      "Screeps previous tick events",
+      "Screeps previous tick event log",
+      "Screeps duplicate event incidents",
       "Screeps EVENT_ATTACK",
-      "Room.getEventLog raw",
-      "Screeps event history",
+      "Screeps event ingestion",
     ],
   },
   {
