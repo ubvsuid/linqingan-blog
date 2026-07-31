@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import { englishFoundationArticles, getEnglishFoundationArticle } from "@/lib/english-foundation-content";
 import { englishFoundationBatchTwoArticles, getEnglishFoundationBatchTwoArticle } from "@/lib/english-foundation-content-2";
 import { englishSpawnBatchThreeArticles, getEnglishSpawnBatchThreeArticle } from "@/lib/english-spawn-content-3-published";
@@ -52,7 +53,8 @@ const dynamicEnglishArticles = [
 ];
 
 function getDynamicEnglishArticle(slug: string) {
-  return getEnglishBeginnerArticle(slug)
+  return getEnglishEditorialPublished20260731(slug)
+    ?? getEnglishBeginnerArticle(slug)
     ?? getEnglishFoundationArticle(slug)
     ?? getEnglishFoundationBatchTwoArticle(slug)
     ?? getEnglishSpawnBatchThreeArticle(slug)

@@ -4,46 +4,56 @@ const articles = [
   {
     path: "/en/blog/screeps-err-not-in-range",
     chinesePath: "/blog/screeps-err-not-in-range",
-    headline: "How to Fix ERR_NOT_IN_RANGE in Screeps",
-    verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "Range boundary",
-      "Range 1 and range 3 actions are handled separately",
-      "Source correction",
-      "Current moveTo() return table does not list ERR_NO_BODYPART",
+    title: "Screeps ERR_NOT_IN_RANGE: Use the Correct Action Range",
+    searchQuery: "ERR_NOT_IN_RANGE",
+    requiredBody: [
+      "Use this guide when",
+      "Choose another guide when",
       "Screeps Console test",
+      "Live multi-tick verification",
+      "Evidence level",
       "Pending",
+      "harvestResult === ERR_NOT_IN_RANGE",
+      "getRangeTo",
+      "href=\"#intent-boundary\"",
+      "<h2 id=\"intent-boundary\">Choose another guide when</h2>",
     ],
   },
   {
     path: "/en/blog/screeps-moveto-not-moving",
     chinesePath: "/blog/screeps-moveto-not-moving",
-    headline: "Why moveTo() Returns OK but Your Screeps Creep Does Not Move",
-    verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "Timing boundary",
-      "OK schedules movement; position must be checked on a later tick",
-      "Source correction",
-      "Current moveTo() return table does not list ERR_NO_BODYPART",
-      "Live traffic and path-cache test",
+    title: "Screeps moveTo() Returns OK but the Creep Stays Put",
+    searchQuery: "moveTo",
+    requiredBody: [
+      "Use this guide when",
+      "Screeps Console test",
+      "Live multi-tick verification",
+      "Evidence level",
       "Pending",
+      "roomName",
+      "unchangedTicks",
+      "fatigue",
     ],
   },
   {
     path: "/en/blog/screeps-err-no-path",
     chinesePath: "/blog/screeps-err-no-path",
-    headline: "How to Debug ERR_NO_PATH in Screeps",
-    verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "Result distinction",
-      "ERR_NO_PATH, cached-path ERR_NOT_FOUND and incomplete searches are separated",
-      "Source correction",
-      "Owned or public Ramparts remain walkable in the diagnostic CostMatrix",
-      "Live terrain, callback and cross-room route test",
+    title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
+    searchQuery: "ERR_NO_PATH",
+    requiredBody: [
+      "Use this guide when",
+      "Current tick and later ticks",
+      "Screeps Console test",
+      "Live multi-tick verification",
+      "Evidence level",
       "Pending",
+      "PathFinder.search",
+      "incomplete",
+      "structure.my === true",
+      "structure.isPublic === true",
+      "return undefined",
+      "href=\"#tick-boundary\"",
+      "<h2 id=\"tick-boundary\">Current tick and later ticks</h2>",
     ],
   },
 ];
@@ -61,10 +71,14 @@ for (const article of articles) {
     continue;
   }
 
-  for (const expected of [article.headline, ...article.verification]) {
+  for (const expected of [article.title, ...article.requiredBody]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
     }
+  }
+
+  if (!body.toLowerCase().includes("static")) {
+    failures.push(`${article.path}: Evidence level 未显示静态验证边界`);
   }
 
   const canonical = `https://www.linqingan.com${article.path}`;
@@ -75,14 +89,16 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
+    `"dateModified":"2026-07-31"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
     }
+  }
+
+  if (body.includes('"@type":"FAQPage"')) {
+    failures.push(`${article.path}: 已删除重复FAQ，但页面仍输出FAQPage结构化数据`);
   }
 }
 
@@ -92,8 +108,8 @@ if (rangeBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
   failures.push("ERR_NOT_IN_RANGE 页面错误地把 ERR_NO_BODYPART 放入 moveTo() 返回表");
 }
 for (const expected of [
-  "Range 1 and range 3 actions are handled separately",
-  "Retry the original action on a later tick",
+  "ERR_NOT_IN_RANGE",
+  "later tick",
   "harvestResult === ERR_NOT_IN_RANGE",
 ]) {
   if (!rangeBody.includes(expected)) {
@@ -109,10 +125,10 @@ if (moveBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
 for (const expected of [
   "roomName",
   "unchangedTicks",
-  "reusePath = unchangedTicks >= 2 ? 0 : 5",
-  "later movement action takes precedence",
+  "reusePath",
+  "movement intent",
 ]) {
-  if (!moveBody.includes(expected)) {
+  if (!moveBody.toLowerCase().includes(expected.toLowerCase())) {
     failures.push(`moveTo no-progress 页面缺少诊断信号 “${expected}”`);
   }
 }
@@ -120,11 +136,13 @@ for (const expected of [
 const pathResponse = await fetch(`${baseUrl}/en/blog/screeps-err-no-path`);
 const pathBody = await pathResponse.text();
 for (const expected of [
+  "ERR_NO_PATH",
+  "ERR_NOT_FOUND",
+  "PathFinder.search",
+  "incomplete",
+  "CostMatrix",
   "structure.my === true",
   "structure.isPublic === true",
-  "structure.my || structure.isPublic",
-  "pathfinder-incomplete",
-  "cached-path-missing",
   "return undefined",
 ]) {
   if (!pathBody.includes(expected)) {
@@ -141,23 +159,23 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) {
-      failures.push(`/en/blog-index.json: 缺少新文章 “${article.headline}”`);
+    if (!blogBody.includes(article.title)) {
+      failures.push(`/en/blog-index.json: 缺少已优化文章 “${article.title}”`);
     }
   }
 }
 
-const searchResponse = await fetch(`${baseUrl}/en/search?q=move`, {
-  redirect: "manual",
-});
-const searchBody = await searchResponse.text();
-if (searchResponse.status !== 200) {
-  failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
-} else {
-  for (const article of articles) {
-    if (!searchBody.includes(article.headline)) {
-      failures.push(`/en/search: 缺少新文章 “${article.headline}”`);
-    }
+for (const article of articles) {
+  const searchResponse = await fetch(
+    `${baseUrl}/en/search?q=${encodeURIComponent(article.searchQuery)}`,
+    { redirect: "manual" },
+  );
+  const searchBody = await searchResponse.text();
+
+  if (searchResponse.status !== 200) {
+    failures.push(`${article.path} 搜索页: 预期 200，实际 ${searchResponse.status}`);
+  } else if (!searchBody.includes(article.title)) {
+    failures.push(`${article.path} 搜索页缺少已优化文章 “${article.title}”`);
   }
 }
 
@@ -183,5 +201,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第五批移动英文专题生产冒烟测试通过：${articles.length} 篇文章、两项源文修正、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
+  `第五批移动英文专题生产冒烟测试通过：${articles.length} 篇现有文章、独立搜索意图、Pending证据、Canonical、hreflang、BlogPosting、目录、搜索与 Sitemap。`,
 );
