@@ -164,7 +164,7 @@ for (const expected of [
   "Memory.roomEventWindows",
   "FIND_MY_POWER_CREEPS",
   "event-log-not-array",
-  "current command results separate",
+  "Record command submission separately",
 ]) {
   if (!eventBody.includes(expected)) {
     failures.push(`事件日志页面缺少 “${expected}”`);
