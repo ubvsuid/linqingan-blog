@@ -99,6 +99,32 @@ const movementEditorialArticles = Object.fromEntries(
   ]),
 ) as Record<string, EnglishBeginnerArticle>;
 
+const firstLoopStateNotifyEditorialArticles = Object.fromEntries(
+  Object.entries(
+    englishEditorialFirstLoopStateNotifyOverrides20260731,
+  ).map(([slug, article]) => {
+    if (slug !== "screeps-first-room-code") {
+      return [slug, article];
+    }
+
+    return [
+      slug,
+      {
+        ...article,
+        verification: [
+          ...article.verification,
+          ["Offline branch review", "Passed"] as [string, string],
+          ["Live room test", "Pending"] as [string, string],
+        ],
+        articleHtml: article.articleHtml.replace(
+          "Use this page after the individual beginner lessons already work",
+          "The earlier question, How to Combine Your First Screeps Room Loop, becomes useful only after the individual beginner lessons already work. Use this page",
+        ),
+      },
+    ];
+  }),
+) as Record<string, EnglishBeginnerArticle>;
+
 export const englishEditorialPublished20260731: Record<
   string,
   EnglishBeginnerArticle
@@ -108,7 +134,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialRuntimeOverrides20260731,
   ...englishEditorialSpawnRouteMemoryOverrides20260731,
   ...englishEditorialTargetsVisualModulesOverrides20260731,
-  ...englishEditorialFirstLoopStateNotifyOverrides20260731,
+  ...firstLoopStateNotifyEditorialArticles,
 };
 
 export function getEnglishEditorialPublished20260731(
