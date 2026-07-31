@@ -36,7 +36,7 @@ const checks = [
   ["/blog/screeps-power-spawn-process-power", ["processPower()", "Screeps Console", "待测试"]],
   ["/en/beginner", ["Learn Screeps in twelve focused lessons", "LESSON 01", "LESSON 12", "Complete beginner sequence published"]],
   ["/en/blog", ["Practical Screeps articles", "Apply filters", "Publication standard", "Page 1 of"]],
-  ["/en/blog-index.json", ["What Is Screeps? A Programming Strategy Game", "How to Combine Your First Screeps Room Loop"]],
+  ["/en/blog-index.json", ["What Is Screeps? A Programming Strategy Game", "Screeps First Room Code: A Small Loop You Can Verify"]],
   ["/en/blog/screeps-introduction", ["What Is Screeps? How the Programming Strategy Game Works", "Chinese source", "Read in full", "Publication status", "Ready"]],
   ["/en/blog/screeps-first-room", ["How to Find Your First Screeps Room, Editor, and Console", "State impact", "Read-only", "Screeps Console", "Pending"]],
   ["/en/blog/screeps-tick-game-loop", ["What Is a Screeps Tick", "Game-loop model", "Checked", "Tick interval", "Server-dependent"]],
@@ -48,7 +48,7 @@ const checks = [
   ["/en/blog/screeps-upgrade-controller", ["How to Make a Screeps Creep Upgrade the Room Controller", "API range and codes", "Checked", "Live multi-tick test", "Pending"]],
   ["/en/blog/screeps-first-extension", ["How to Build Your First Screeps Extension", "RCL and constants", "Checked", "Live construction test", "Pending"]],
   ["/en/blog/screeps-build-repair", ["How to Make a Screeps Creep Build and Repair Automatically", "Offline priority review", "Passed", "Live multi-tick test", "Pending"]],
-  ["/en/blog/screeps-first-room-code", ["How to Combine Your First Screeps Room Loop", "Offline branch review", "Passed", "Live room test", "Pending"]],
+  ["/en/blog/screeps-first-room-code", ["Combine Your First Screeps Room Loop Without Hiding Failure States", "Technical correction", "Spawning, role execution, Energy phase, current-tick acceptance, later-tick outcomes, and emergency recovery are separated", "Live multi-tick verification", "Pending", "trySpawnFirstMissing", "spawn-dry-run-rejected"]],
   ["/sitemap.xml", ["https://www.linqingan.com/sitemap-zh.xml", "https://www.linqingan.com/sitemap-en.xml", "<sitemapindex"]],
   ["/sitemap-zh.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/tags/basic-engineering"]],
   ["/sitemap-en.xml", ["https://www.linqingan.com/en", "https://www.linqingan.com/en/beginner", "https://www.linqingan.com/en/blog/screeps-introduction", "https://www.linqingan.com/en/blog/screeps-first-room-code"]],
@@ -187,9 +187,7 @@ for (const [source, destination] of redirectChecks) {
 
 for (const [pathname, expectedContentType] of assetChecks) {
   const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual" });
-  if (response.status !== 200) {
-    failures.push(`${pathname}: 预期 200，实际 ${response.status}`);
-  }
+  if (response.status !== 200) failures.push(`${pathname}: 预期 200，实际 ${response.status}`);
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.startsWith(expectedContentType)) {
     failures.push(`${pathname}: Content-Type 预期 ${expectedContentType}*，实际 ${contentType || "缺失"}`);
@@ -209,32 +207,23 @@ for (const pathname of metadataPaths) {
 
 const securityResponse = await fetch(baseUrl);
 const enforcedCsp = securityResponse.headers.get("content-security-policy") ?? "";
-const globalReportOnly =
-  securityResponse.headers.get("content-security-policy-report-only") ?? "";
-if (
-  !enforcedCsp.includes("default-src 'self'")
-  || !enforcedCsp.includes("object-src 'none'")
-) {
+const globalReportOnly = securityResponse.headers.get("content-security-policy-report-only") ?? "";
+if (!enforcedCsp.includes("default-src 'self'") || !enforcedCsp.includes("object-src 'none'")) {
   failures.push("Security headers: missing the enforced Content-Security-Policy.");
 }
 if (globalReportOnly) {
-  failures.push(
-    "Security headers: the strict Report-Only candidate must not run on every route.",
-  );
+  failures.push("Security headers: the strict Report-Only candidate must not run on every route.");
 }
 
 const cspCanaryResponse = await fetch(`${baseUrl}/en/verification`);
-const cspReportOnly =
-  cspCanaryResponse.headers.get("content-security-policy-report-only") ?? "";
+const cspReportOnly = cspCanaryResponse.headers.get("content-security-policy-report-only") ?? "";
 if (
   !cspReportOnly.includes("default-src 'self'")
   || !cspReportOnly.includes("object-src 'none'")
   || !cspReportOnly.includes("style-src-attr 'none'")
   || cspReportOnly.includes("script-src 'self' 'unsafe-inline'")
 ) {
-  failures.push(
-    "/en/verification: missing the stricter Report-Only CSP canary.",
-  );
+  failures.push("/en/verification: missing the stricter Report-Only CSP canary.");
 }
 
 const searchResponse = await fetch(`${baseUrl}/search`);
@@ -249,7 +238,9 @@ if (fullIndexResponse.status !== 200) {
 } else {
   try {
     const payload = await fullIndexResponse.json();
-    if (!Array.isArray(payload) || payload.length === 0) failures.push("/api/search-index: 应返回非空搜索文档数组");
+    if (!Array.isArray(payload) || payload.length === 0) {
+      failures.push("/api/search-index: 应返回非空搜索文档数组");
+    }
   } catch {
     failures.push("/api/search-index: 返回内容不是有效 JSON");
   }
@@ -280,9 +271,7 @@ for (const requiredSitemap of expectedSitemapDocuments) {
     failures.push(`/sitemap.xml: 缺少 ${requiredSitemap}`);
   }
 }
-if (!sitemapIndexBody.includes("<sitemapindex")) {
-  failures.push("/sitemap.xml: 根文档不是 Sitemap 索引");
-}
+if (!sitemapIndexBody.includes("<sitemapindex")) failures.push("/sitemap.xml: 根文档不是 Sitemap 索引");
 
 const sitemapUrls = [];
 const sitemapUrlGroups = new Map();
@@ -352,15 +341,11 @@ for (const pathname of sampledPaths) {
 const thinTagPath = "/tags/roomvisual";
 const thinTagResponse = await fetch(`${baseUrl}${thinTagPath}`);
 const thinTagBody = await thinTagResponse.text();
-if (thinTagResponse.status !== 200) {
-  failures.push(`${thinTagPath}: 薄标签页预期保留 200，实际 ${thinTagResponse.status}`);
-}
+if (thinTagResponse.status !== 200) failures.push(`${thinTagPath}: 薄标签页预期保留 200，实际 ${thinTagResponse.status}`);
 if (!/<meta[^>]+name="robots"[^>]+content="[^"]*noindex[^"]*"/i.test(thinTagBody)) {
   failures.push(`${thinTagPath}: 薄标签页缺少 noindex`);
 }
-if (sitemapPaths.includes(thinTagPath)) {
-  failures.push(`${thinTagPath}: 薄标签页不应出现在 Sitemap`);
-}
+if (sitemapPaths.includes(thinTagPath)) failures.push(`${thinTagPath}: 薄标签页不应出现在 Sitemap`);
 
 for (let index = 0; index < uniqueSitemapUrls.length; index += 10) {
   const batch = uniqueSitemapUrls.slice(index, index + 10);
@@ -382,7 +367,7 @@ for (let index = 0; index < uniqueSitemapUrls.length; index += 10) {
 }
 
 if (failures.length > 0) {
-  for (const failure of failures) console.error(`ERROR: ${failure}`);
+  failures.forEach((failure) => console.error(`ERROR: ${failure}`));
   console.error(`\n冒烟测试失败：${failures.length} 项。`);
   process.exit(1);
 }
