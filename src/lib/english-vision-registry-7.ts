@@ -30,23 +30,25 @@ export const englishVisionBatchSevenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-observer-observe-room",
     chinesePath: "/blog/screeps-observer-observe-room",
-    category: "VISION · OBSERVER REQUEST LIFECYCLE",
-    title: "How to Use StructureObserver.observeRoom() Safely",
+    category: "VISION · SINGLE-CALL OBSERVER COORDINATION",
+    title: "Screeps Observer: Coordinate One Final observeRoom() Call",
     description:
-      "Schedule Observer vision, store the accepted request, read the target Room on the next tick, preserve bounded intel, handle return codes, and avoid claiming that current visibility proves the new request completed.",
+      "Collect requests, choose one target per Observer, make one final observeRoom() call, store only that accepted target, read it next tick, and keep visibility attribution honest.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-07-31",
+    readingTime: "13 min read",
     primaryKeyword: "Screeps StructureObserver observeRoom",
-    searchIntent: "Build a correct next-tick Observer request and room-intel workflow",
+    searchIntent:
+      "Coordinate multiple vision producers into one final Observer call and track only the request that can actually execute",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps StructureObserver observeRoom",
+      "Screeps Observer multiple calls",
+      "observeRoom last call",
       "Screeps Observer next tick",
-      "Screeps room intel Observer",
-      "OBSERVER_RANGE Screeps",
-      "observeRoom return codes",
+      "Screeps Observer coordinator",
     ],
   },
   {
