@@ -209,15 +209,67 @@ const articleRecordOverrides: Record<string, EnglishArticleRecordOverride> = {
       "Room Controller range 3",
     ],
   },
+  "/en/blog/screeps-err-not-in-range": {
+    category: "MOVEMENT · ACTION RANGE DEBUGGING",
+    title: "Screeps ERR_NOT_IN_RANGE: Use the Correct Action Range",
+    description:
+      "Find the action that returned ERR_NOT_IN_RANGE, use its documented range, submit movement separately, and retry the action on a later tick.",
+    readingTime: "11 min read",
+    primaryKeyword: "Screeps ERR_NOT_IN_RANGE",
+    searchIntent:
+      "Diagnose an action-distance failure and implement the correct move-then-retry boundary",
+    finalScore: 98,
+    updatedAt: "2026-07-31",
+    keywords: [
+      "Screeps ERR_NOT_IN_RANGE",
+      "Screeps action range",
+      "moveTo then retry",
+      "upgradeController range 3",
+      "Creep action return codes",
+    ],
+  },
+  "/en/blog/screeps-moveto-not-moving": {
+    category: "MOVEMENT · MULTI-TICK PROGRESS DEBUGGING",
+    title: "Screeps moveTo() Returns OK but the Creep Stays Put",
+    description:
+      "Verify movement over later ticks, then isolate fatigue, repeated movement intents, traffic, cached paths, room edges, and impossible stop ranges.",
+    readingTime: "13 min read",
+    primaryKeyword: "Screeps moveTo OK not moving",
+    searchIntent:
+      "Diagnose accepted movement orders that show no position progress across later ticks",
+    finalScore: 98,
+    updatedAt: "2026-07-31",
+    keywords: [
+      "Screeps moveTo OK not moving",
+      "Screeps Creep stuck",
+      "Screeps movement diagnostic",
+      "Creep fatigue",
+      "Screeps duplicate movement intent",
+    ],
+  },
+  "/en/blog/screeps-err-no-path": {
+    category: "MOVEMENT · PATH SEARCH DEBUGGING",
+    title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
+    description:
+      "Separate ERR_NO_PATH from missing cached paths and incomplete PathFinder searches, then inspect goal range, CostMatrix rules, callbacks, limits, and room routes.",
+    readingTime: "15 min read",
+    primaryKeyword: "Screeps ERR_NO_PATH",
+    searchIntent:
+      "Diagnose a failed path search without confusing it with traffic or accepted movement",
+    finalScore: 98,
+    updatedAt: "2026-07-31",
+    keywords: [
+      "Screeps ERR_NO_PATH",
+      "Screeps PathFinder incomplete",
+      "Screeps CostMatrix walkability",
+      "roomCallback false Screeps",
+      "Game.map.findRoute ERR_NO_PATH",
+    ],
+  },
 };
 
-const publishedBaseArticles = basePublishedEnglishArticles.map((article) => ({
-  ...article,
-  ...(articleRecordOverrides[article.href] ?? {}),
-}));
-
-export const publishedEnglishArticles: EnglishArticleRecord[] = [
-  ...publishedBaseArticles,
+const allPublishedEnglishArticles: EnglishArticleRecord[] = [
+  ...basePublishedEnglishArticles,
   ...englishFoundationBatchTwoRegistry,
   ...englishSpawnBatchThreeRegistry,
   ...englishLifecycleBatchFourRegistry,
@@ -236,6 +288,12 @@ export const publishedEnglishArticles: EnglishArticleRecord[] = [
   ...englishDefenseOperationsBatchSeventeenRegistry,
   ...englishLinkSourceBatchEighteenRegistry,
 ];
+
+export const publishedEnglishArticles: EnglishArticleRecord[] =
+  allPublishedEnglishArticles.map((article) => ({
+    ...article,
+    ...(articleRecordOverrides[article.href] ?? {}),
+  }));
 
 export const englishArticleRoutePairs = {
   ...baseEnglishArticleRoutePairs,
