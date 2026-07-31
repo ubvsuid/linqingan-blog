@@ -111,6 +111,19 @@ for (const [slug, identity] of Object.entries(expected)) {
     failures.push(`${slug}: before score evidence is missing`);
   }
 
+  const recordStart = identity.registry.indexOf(`href: "${identity.path}"`);
+  const nextRecord = identity.registry.indexOf("\n  {", recordStart + 1);
+  const record = identity.registry.slice(
+    recordStart,
+    nextRecord < 0 ? identity.registry.length : nextRecord,
+  );
+  if (!record.includes('updatedAt: "2026-07-31"')) {
+    failures.push(`${slug}: scoped updatedAt is missing`);
+  }
+  if (!record.includes('publishedAt: "2026-07-25"')) {
+    failures.push(`${slug}: publication date changed or missing`);
+  }
+
   const components = scorecards[slug];
   for (const [name, minimum] of Object.entries(minimums)) {
     if (components[name] < minimum) {
@@ -129,14 +142,6 @@ for (const [slug, identity] of Object.entries(expected)) {
   }
 }
 
-const registries = `${foundationRegistry}\n${spawnRegistry}\n${movementRegistry}`;
-const updatedDates = registries.match(/updatedAt: "2026-07-31"/g) ?? [];
-if (updatedDates.length !== 3) {
-  failures.push(`Expected three scoped updatedAt values, received ${updatedDates.length}`);
-}
-if ((registries.match(/publishedAt: "2026-07-25"/g) ?? []).length !== 9) {
-  failures.push("Batch publication dates changed or are incomplete");
-}
 if ((override.match(/faq: \[\]/g) ?? []).length !== 3) {
   failures.push("All three selected pages must remove redundant FAQ data");
 }
