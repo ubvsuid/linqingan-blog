@@ -3,6 +3,7 @@ import { englishEditorialCorePublished20260731 } from "./english-editorial-core-
 import { englishEditorialOverrides20260731 } from "./english-editorial-overrides-20260731";
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
 import { englishEditorialSpawnRouteMemoryOverrides20260731 } from "./english-editorial-spawn-route-memory-overrides-20260731";
+import { englishEditorialTargetsVisualModulesOverrides20260731 } from "./english-editorial-targets-visual-modules-overrides-20260731";
 
 function insertBeforeOfficialDocs(
   articleHtml: string,
@@ -105,6 +106,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialCorePublished20260731,
   ...englishEditorialRuntimeOverrides20260731,
   ...englishEditorialSpawnRouteMemoryOverrides20260731,
+  ...englishEditorialTargetsVisualModulesOverrides20260731,
 };
 
 export function getEnglishEditorialPublished20260731(
