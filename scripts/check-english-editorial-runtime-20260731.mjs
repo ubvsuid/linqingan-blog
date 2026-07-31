@@ -84,6 +84,11 @@ const banned = [
 ];
 const failures = [];
 
+function getRegistryRecord(registry, path) {
+  const start = registry.indexOf(`href: "${path}"`);
+  return start >= 0 ? registry.slice(start, start + 1900) : "";
+}
+
 const selectedSlugs = Object.keys(expected);
 for (const [slug, identity] of Object.entries(expected)) {
   if (!override.includes(`"${slug}": {`)) failures.push(`${slug}: override missing`);
@@ -91,9 +96,12 @@ for (const [slug, identity] of Object.entries(expected)) {
   const registry = slug === "screeps-pathfinder-costmatrix"
     ? visionRegistry
     : runtimeRegistry;
-  if (!registry.includes(`href: "${identity.path}"`)) failures.push(`${slug}: existing URL missing`);
-  if (!registry.includes(`chinesePath: "${identity.chinesePath}"`)) failures.push(`${slug}: Chinese mapping changed or missing`);
-  if (!registry.includes(identity.title)) failures.push(`${slug}: discovery title is not synchronized`);
+  const record = getRegistryRecord(registry, identity.path);
+  if (!record.includes(`href: "${identity.path}"`)) failures.push(`${slug}: existing URL missing`);
+  if (!record.includes(`chinesePath: "${identity.chinesePath}"`)) failures.push(`${slug}: Chinese mapping changed or missing`);
+  if (!record.includes(identity.title)) failures.push(`${slug}: discovery title is not synchronized`);
+  if (!record.includes('updatedAt: "2026-07-31"')) failures.push(`${slug}: scoped updatedAt is missing`);
+  if (!record.includes('publishedAt: "2026-07-25"')) failures.push(`${slug}: publication date changed or is missing`);
   if (!auditDoc.includes(`| ${identity.path} | ${identity.beforeScore} |`)) {
     failures.push(`${slug}: before score evidence is missing`);
   }
@@ -109,11 +117,6 @@ for (const [slug, identity] of Object.entries(expected)) {
   }
 }
 
-const updatedDates = `${visionRegistry}\n${runtimeRegistry}`.match(/updatedAt: "2026-07-31"/g) ?? [];
-if (updatedDates.length !== 3) failures.push(`Expected three scoped updatedAt values, received ${updatedDates.length}`);
-if ((`${visionRegistry}\n${runtimeRegistry}`.match(/publishedAt: "2026-07-25"/g) ?? []).length !== 6) {
-  failures.push("Batch publication dates changed or are incomplete");
-}
 if ((override.match(/faq: \[\]/g) ?? []).length !== 3) failures.push("All three selected pages must remove redundant FAQ data");
 if (!publication.includes("englishEditorialRuntimeOverrides20260731")) failures.push("Runtime editorial overrides are not imported");
 if (!publication.includes("...englishEditorialRuntimeOverrides20260731")) failures.push("Runtime editorial overrides are not published");

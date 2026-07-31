@@ -1,5 +1,6 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
+import { englishEditorialEventObserverFlagsOverrides20260731 } from "./english-editorial-event-observer-flags-overrides-20260731";
 import { englishEditorialFirstLoopStateNotifyOverrides20260731 } from "./english-editorial-first-loop-state-notify-overrides-20260731";
 import { englishEditorialOverrides20260731 } from "./english-editorial-overrides-20260731";
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
@@ -148,6 +149,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialSpawnRouteMemoryOverrides20260731,
   ...englishEditorialTargetsVisualModulesOverrides20260731,
   ...firstLoopStateNotifyEditorialArticles,
+  ...englishEditorialEventObserverFlagsOverrides20260731,
 };
 
 export function getEnglishEditorialPublished20260731(
