@@ -12,7 +12,7 @@ const articles = [
     headline: "Build a Dynamic Creep Body Without Spending Energy Blindly", listingTitle: "Screeps Dynamic Creep Body: Minimum, Target, and Emergency Plans",
     tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false,
     verification: ["Chinese source article", "Reviewed in full", "Technical correction", "Minimum capability, target budget, emergency scaling, and Spawn submission are separate decisions", "Live multi-tick verification", "Pending"],
-    signals: ["status: 'wait-or-scale'", "maximumParts > 50", "unusedEnergy: budget - bodyCost", "spawn-failed-after-dry-run"],
+    signals: ["'wait-or-scale'", "maximumParts > 50", "unusedEnergy: budget - bodyCost", "spawn-failed-after-dry-run"],
   },
   {
     path: "/en/blog/screeps-emergency-harvester-recovery", chinesePath: "/blog/screeps-spawn-emergency-recovery",
