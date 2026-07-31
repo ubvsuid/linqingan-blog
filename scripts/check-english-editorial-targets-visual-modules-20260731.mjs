@@ -201,7 +201,7 @@ for (const required of [
   "480000",
   "module.exports.loop",
   "run(creep, context)",
-  "global.currentTickRoleCache",
+  "global.roleCountCache",
   "Screeps Console test",
   "Live multi-tick verification",
   "https://docs.screeps.com/",
