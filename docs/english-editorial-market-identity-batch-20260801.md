@@ -97,7 +97,7 @@ The dedicated gate validates:
 - official Screeps sources;
 - new-order ID difference;
 - one shared per-tick deal coordinator;
-- pre-call incoming and outgoing transaction ID snapshots;
+- transaction ID difference for incoming and outgoing records;
 - explicit no-match and ambiguity states;
 - no FAQ data or FAQPage output;
 - explicit Pending live evidence;
