@@ -1,70 +1,83 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishLabFactoryBatchElevenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishLabFactoryBatchElevenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-lab-run-reaction",
     chinesePath: "/blog/screeps-lab-run-reaction",
-    category: "RESOURCES · LAB REACTION WORKFLOW",
-    title: "How to Run Lab Reactions Safely in Screeps",
+    category: "RESOURCES · OWNED LAB REACTION",
+    title:
+      "Screeps runReaction(): Verify One Owned Lab Reaction",
     description:
-      "Validate three owned active Labs, resolve the REACTIONS recipe, check reagent stores, output mineral compatibility, free capacity, range 2, cooldown, and a one-time production request before calling runReaction() and verifying the next tick.",
+      "Bind one request to three exact Lab IDs, snapshot both reagent types and Stores, submit once, and verify the product and two reagent deltas under an exclusive action window.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-08-01",
+    readingTime: "14 min read",
     primaryKeyword: "Screeps StructureLab runReaction",
-    searchIntent: "Run one validated Lab reaction and verify the output afterward",
+    searchIntent:
+      "Submit one exact three-Lab reaction and verify its product and reagent Store signature",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps StructureLab runReaction",
-      "Screeps lab reaction range",
-      "Screeps REACTIONS constant",
-      "Screeps lab cooldown",
-      "Screeps reaction output capacity",
+      "Screeps verify Lab reaction",
+      "Screeps LAB_REACTION_AMOUNT",
+      "Screeps REACTIONS",
+      "Screeps Lab Store deltas",
     ],
   },
   {
     href: "/en/blog/screeps-lab-boost-creep",
     chinesePath: "/blog/screeps-lab-boost-creep",
-    category: "RESOURCES · LAB BOOST WORKFLOW",
-    title: "How to Boost Creep Body Parts Safely in Screeps",
+    category: "RESOURCES · BOOST TARGET IDENTITY",
+    title:
+      "Screeps boostCreep(): Verify Exact Body Part Changes",
     description:
-      "Match a Lab mineral to BOOSTS, count eligible unboosted body parts, calculate LAB_BOOST_MINERAL and LAB_BOOST_ENERGY budgets, enforce range 1, ownership and activity, submit one reviewed boost request, and verify exact body-part changes afterward.",
+      "Bind a boost request to the exact Creep ID, predict the documented part indexes, submit once, then verify the index set, final boost mineral, and Lab resource deltas.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-08-01",
+    readingTime: "14 min read",
     primaryKeyword: "Screeps StructureLab boostCreep",
-    searchIntent: "Boost a controlled number of eligible Creep parts with exact resource safeguards",
+    searchIntent:
+      "Boost one exact Creep and verify the documented body-part indexes and Lab resource consumption",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps StructureLab boostCreep",
-      "Screeps LAB_BOOST_MINERAL",
-      "Screeps LAB_BOOST_ENERGY",
-      "Screeps BOOSTS constant",
-      "Screeps boost eligible parts",
+      "Screeps boost body part indexes",
+      "Screeps Creep ID boost",
+      "LAB_BOOST_MINERAL",
+      "LAB_BOOST_ENERGY",
     ],
   },
   {
     href: "/en/blog/screeps-factory-produce",
     chinesePath: "/blog/screeps-factory-produce",
-    category: "RESOURCES · FACTORY PRODUCTION WORKFLOW",
-    title: "How to Produce Factory Commodities Safely in Screeps",
+    category: "RESOURCES · FACTORY BATCH VERIFICATION",
+    title:
+      "Screeps Factory.produce(): Verify One Production Batch",
     description:
-      "Validate an owned active Factory, resolve the COMMODITIES recipe, check all components and output capacity, respect cooldown, match commodity level to the Factory level and PWR_OPERATE_FACTORY effect, submit one reviewed production request, and verify Store deltas afterward.",
+      "Separate permanent Factory level from the active Power effect, snapshot every recipe component, submit one batch, and verify exact output and component deltas under an exclusive Store window.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "19 min read",
+    updatedAt: "2026-08-01",
+    readingTime: "15 min read",
     primaryKeyword: "Screeps StructureFactory produce",
-    searchIntent: "Produce one commodity with complete component, capacity, cooldown, level, and Power checks",
+    searchIntent:
+      "Submit one Factory production batch and verify its exact component and output Store signature",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps StructureFactory produce",
-      "Screeps COMMODITIES components",
-      "Screeps PWR_OPERATE_FACTORY",
-      "Screeps factory level",
-      "Screeps factory cooldown",
+      "Screeps verify Factory batch",
+      "Screeps Factory permanent level",
+      "PWR_OPERATE_FACTORY",
+      "Screeps commodity component deltas",
     ],
   },
 ];
