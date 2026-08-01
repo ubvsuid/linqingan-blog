@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 
 import { DeferredObservability } from "@/components/deferred-observability";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme-bootstrap";
 
 import "../globals.css";
 import "../improvements.css";
@@ -57,7 +57,10 @@ export default function EnglishRootLayout({ children }: Readonly<{ children: Rea
   return (
     <html lang="en" data-site-language="en" suppressHydrationWarning>
       <body>
-        <Script src="/theme-init.js" strategy="beforeInteractive" />
+        <script
+          id="theme-bootstrap"
+          dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }}
+        />
         <a className="skip-link" href="#main-content">Skip to content</a>
         <SiteHeader />
         <div id="main-content" className="site-content">{children}</div>
