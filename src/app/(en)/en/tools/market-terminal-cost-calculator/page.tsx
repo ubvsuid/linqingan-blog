@@ -58,7 +58,7 @@ export default function MarketTerminalCostCalculatorPage() {
             <p>The room parser supports standard World room names. Private servers with modified map rules or constants may produce different results.</p>
             <p>The player who executes a Market deal pays the transaction Energy and Terminal cooldown. The tool does not inspect a live order, room, store, cooldown, or Credits balance.</p>
             <div className="planning-tool-links">
-              <Link href="/en/blog/screeps-terminal-send">Send resources through a Terminal →</Link>
+              <Link href="/en/knowledge/market-advanced-resources">Browse Market and advanced-resource guides →</Link>
               <Link href="/en/blog/screeps-market-deal">Validate and execute a Market deal →</Link>
               <a href="https://docs.screeps.com/market.html" rel="noreferrer" target="_blank">Official Market documentation ↗</a>
             </div>
