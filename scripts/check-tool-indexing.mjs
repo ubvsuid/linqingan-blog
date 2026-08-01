@@ -6,33 +6,50 @@ const sitemapPath = path.join(root, "src/lib/sitemaps.ts");
 const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
 
 const publicTools = [
-  {
-    route: "/tools/creep-body-calculator",
-    page: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
-  },
-  {
-    route: "/tools/room-diagnostics",
-    page: "src/app/(zh)/tools/room-diagnostics/page.tsx",
-  },
-  {
-    route: "/en/tools/creep-body-calculator",
-    page: "src/app/(en)/en/tools/creep-body-calculator/page.tsx",
-  },
-  {
-    route: "/en/tools/room-diagnostics",
-    page: "src/app/(en)/en/tools/room-diagnostics/page.tsx",
-  },
+  { route: "/tools", page: "src/app/(zh)/tools/page.tsx" },
+  { route: "/tools/creep-body-calculator", page: "src/app/(zh)/tools/creep-body-calculator/page.tsx" },
+  { route: "/tools/room-diagnostics", page: "src/app/(zh)/tools/room-diagnostics/page.tsx" },
+  { route: "/tools/market-terminal-cost-calculator", page: "src/app/(zh)/tools/market-terminal-cost-calculator/page.tsx" },
+  { route: "/tools/controller-downgrade-planner", page: "src/app/(zh)/tools/controller-downgrade-planner/page.tsx" },
+  { route: "/tools/lab-reaction-boost-planner", page: "src/app/(zh)/tools/lab-reaction-boost-planner/page.tsx" },
+  { route: "/en/tools", page: "src/app/(en)/en/tools/page.tsx" },
+  { route: "/en/tools/creep-body-calculator", page: "src/app/(en)/en/tools/creep-body-calculator/page.tsx" },
+  { route: "/en/tools/room-diagnostics", page: "src/app/(en)/en/tools/room-diagnostics/page.tsx" },
+  { route: "/en/tools/market-terminal-cost-calculator", page: "src/app/(en)/en/tools/market-terminal-cost-calculator/page.tsx" },
+  { route: "/en/tools/controller-downgrade-planner", page: "src/app/(en)/en/tools/controller-downgrade-planner/page.tsx" },
+  { route: "/en/tools/lab-reaction-boost-planner", page: "src/app/(en)/en/tools/lab-reaction-boost-planner/page.tsx" },
 ];
 
 const failures = [];
 
 for (const tool of publicTools) {
-  if (!fs.existsSync(path.join(root, tool.page))) {
+  const absolutePage = path.join(root, tool.page);
+  if (!fs.existsSync(absolutePage)) {
     failures.push(`${tool.route}: 缺少公开工具页面 ${tool.page}`);
+    continue;
+  }
+
+  const pageSource = fs.readFileSync(absolutePage, "utf8");
+  if (!pageSource.includes("SoftwareApplication") && !pageSource.includes("CollectionPage")) {
+    failures.push(`${tool.route}: 缺少 SoftwareApplication 或 CollectionPage 结构化数据`);
   }
 
   if (!sitemapSource.includes(tool.route)) {
     failures.push(`${tool.route}: 公开工具未加入 src/lib/sitemaps.ts`);
+  }
+}
+
+const routePairsSource = fs.readFileSync(path.join(root, "src/lib/i18n.ts"), "utf8");
+for (const chineseRoute of [
+  "/tools",
+  "/tools/creep-body-calculator",
+  "/tools/room-diagnostics",
+  "/tools/market-terminal-cost-calculator",
+  "/tools/controller-downgrade-planner",
+  "/tools/lab-reaction-boost-planner",
+]) {
+  if (!routePairsSource.includes(`\"${chineseRoute}\"`)) {
+    failures.push(`${chineseRoute}: 缺少中英文 route pair`);
   }
 }
 
@@ -41,4 +58,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`公开工具索引检查通过：${publicTools.length} 个中英文工具页面均已进入对应 Sitemap。`);
+console.log(`公开工具索引检查通过：${publicTools.length} 个中英文工具与工具中心页面均已进入 Sitemap、结构化数据和语言映射。`);
