@@ -196,7 +196,7 @@ export function TowerPowerCalculator({ locale }: Props) {
     t.boundary,
   ].join("\n");
 
-  const probe = `const target = Game.getObjectById('TARGET_ID');\nconst towers = Object.values(Game.structures).filter(structure => structure.structureType === STRUCTURE_TOWER && structure.my);\nconsole.log(towers.map(tower => ({\n  id: tower.id,\n  room: tower.room.name,\n  range: target ? tower.pos.getRangeTo(target) : null,\n  energy: tower.store.getUsedCapacity(RESOURCE_ENERGY),\n  cooldown: tower.cooldown ?? 0\n})));`;
+  const probe = `const target = Game.getObjectById('TARGET_ID');\nconst towers = Object.values(Game.structures).filter(structure => structure.structureType === STRUCTURE_TOWER && structure.my);\nconsole.log(towers.map(tower => ({\n  id: tower.id,\n  room: tower.room.name,\n  range: target ? tower.pos.getRangeTo(target) : null,\n  energy: tower.store.getUsedCapacity(RESOURCE_ENERGY)\n})));`;
 
   async function copyText(value: string) {
     try {
@@ -209,8 +209,8 @@ export function TowerPowerCalculator({ locale }: Props) {
 
   return (
     <div className="planning-tool" data-tool="tower-power">
-      <div className="planning-tabs" role="tablist" aria-label={locale === "en" ? "Tower action" : "Tower动作"}>
-        {(Object.keys(t.tabs) as TowerAction[]).map((action) => <button type="button" role="tab" aria-selected={config.action === action} key={action} onClick={() => update({ action })}>{t.tabs[action]}</button>)}
+      <div className="planning-tabs" role="radiogroup" aria-label={locale === "en" ? "Tower action" : "Tower动作"}>
+        {(Object.keys(t.tabs) as TowerAction[]).map((action) => <button type="button" role="radio" aria-checked={config.action === action} key={action} onClick={() => update({ action })}>{t.tabs[action]}</button>)}
       </div>
       <div className="planning-grid">
         <section className="planning-panel" aria-labelledby="tower-input-title">
