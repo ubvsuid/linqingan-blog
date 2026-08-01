@@ -1,0 +1,1 @@
+export const THEME_BOOT_SCRIPT = 'try{var t=localStorage.getItem("theme"),d=t==="dark"||!t&&matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=d?"dark":"light"}catch(e){}';
