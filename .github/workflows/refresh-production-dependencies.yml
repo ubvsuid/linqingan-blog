@@ -27,7 +27,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Refresh stable Next.js and lockfile
+      - name: Refresh patched stable Next.js and lockfile
         run: npm install next@16.2.12 --save-exact
 
       - name: Verify production dependency audit
