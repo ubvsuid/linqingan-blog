@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { DeferredObservability } from "@/components/deferred-observability";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
@@ -63,8 +62,7 @@ export default function EnglishRootLayout({ children }: Readonly<{ children: Rea
         <SiteHeader />
         <div id="main-content" className="site-content">{children}</div>
         <SiteFooter />
-        <Analytics />
-        <SpeedInsights />
+        <DeferredObservability />
       </body>
     </html>
   );
