@@ -85,14 +85,11 @@ if (!unsupportedReport.headers.get("x-robots-tag")?.includes("noindex")) {
 
 const oversizedReport = await fetch(`${baseUrl}/api/csp-report`, {
   method: "POST",
-  headers: {
-    "content-type": "application/json",
-    "content-length": "20000",
-  },
-  body: "{}",
+  headers: { "content-type": "application/json" },
+  body: "x".repeat(16_385),
 });
 if (oversizedReport.status !== 413) {
-  failures.push(`/api/csp-report: oversized declared payload expected 413, received ${oversizedReport.status}`);
+  failures.push(`/api/csp-report: oversized payload expected 413, received ${oversizedReport.status}`);
 }
 
 const rateLimitResponses = await Promise.all(
