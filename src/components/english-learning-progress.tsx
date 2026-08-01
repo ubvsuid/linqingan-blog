@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
 
@@ -8,14 +8,19 @@ import { useEnglishLearning } from "@/hooks/use-english-learning";
 import {
   clearEnglishLearningState,
   ENGLISH_BEGINNER_PATHS,
+  exportEnglishLearningState,
   getEnglishResumePath,
+  importEnglishLearningState,
   isEnglishBeginnerPath,
   recordEnglishArticleVisit,
   toggleEnglishLessonCompleted,
 } from "@/lib/english-learning-state";
 
+const MAX_IMPORT_BYTES = 65_536;
+
 export function EnglishBeginnerProgress() {
   const learning = useEnglishLearning();
+  const importInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
   const completed = learning.completedPaths.length;
   const total = ENGLISH_BEGINNER_PATHS.length;
@@ -25,11 +30,47 @@ export function EnglishBeginnerProgress() {
   ) + 1;
   const hasProgress =
     completed > 0 ||
-    learning.lastVisitedPath !== null;
+    learning.lastVisitedPath !== null ||
+    learning.recentArticles.length > 0;
 
   function clearProgress() {
     clearEnglishLearningState();
     setStatus("Learning progress and recent reading were cleared.");
+  }
+
+  function exportProgress() {
+    const blob = new Blob([exportEnglishLearningState(learning)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `linqingan-learning-progress-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus("A private progress file was exported. It contains no account or room data.");
+  }
+
+  async function importProgress(file: File | undefined) {
+    if (!file) return;
+
+    try {
+      if (file.size > MAX_IMPORT_BYTES) {
+        throw new Error("The selected file is larger than 64 KB.");
+      }
+      importEnglishLearningState(await file.text());
+      setStatus("Learning progress was imported into this browser.");
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? `Progress import failed: ${error.message}`
+          : "Progress import failed because the file is invalid.",
+      );
+    } finally {
+      if (importInputRef.current) importInputRef.current.value = "";
+    }
   }
 
   return (
@@ -45,13 +86,33 @@ export function EnglishBeginnerProgress() {
           </h2>
           <p>
             Progress and recent reading stay in this browser. No Screeps
-            account, room, or game data is collected.
+            account, room, or game data is collected. You can export a private
+            JSON file to move this progress between browsers.
           </p>
         </div>
         <div className="english-learning-summary-actions">
           <Link href={resumePath}>
             {hasProgress ? `Continue with lesson ${resumeIndex}` : "Start lesson 1"}
           </Link>
+          {hasProgress ? (
+            <button type="button" onClick={exportProgress}>
+              Export progress
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => importInputRef.current?.click()}
+          >
+            Import progress
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            aria-label="Choose a learning progress JSON file"
+            onChange={(event) => void importProgress(event.target.files?.[0])}
+          />
           {hasProgress ? (
             <button type="button" onClick={clearProgress}>
               Clear local history
