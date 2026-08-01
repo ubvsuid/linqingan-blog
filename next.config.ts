@@ -42,6 +42,7 @@ const candidateContentSecurityPolicyHeader = {
   key: "Content-Security-Policy-Report-Only",
   value: candidateContentSecurityPolicy,
 };
+const cspCanaryRoutes = ["/verification", "/en/verification"] as const;
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -92,10 +93,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
-      {
-        source: "/en/verification",
+      ...cspCanaryRoutes.map((source) => ({
+        source,
         headers: [candidateContentSecurityPolicyHeader],
-      },
+      })),
       {
         source: "/theme-init.js",
         headers: [
