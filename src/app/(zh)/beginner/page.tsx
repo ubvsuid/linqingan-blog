@@ -9,5 +9,28 @@ export const metadata = createPageMetadata({
 });
 
 export default function BeginnerPage() {
-  return <BeginnerArchive />;
+  return (
+    <>
+      <style>{`
+        .beginner-stage-heading,
+        .beginner-item,
+        .beginner-complete {
+          content-visibility: auto;
+        }
+
+        .beginner-stage-heading {
+          contain-intrinsic-size: auto 150px;
+        }
+
+        .beginner-item {
+          contain-intrinsic-size: auto 150px;
+        }
+
+        .beginner-complete {
+          contain-intrinsic-size: auto 360px;
+        }
+      `}</style>
+      <BeginnerArchive />
+    </>
+  );
 }
