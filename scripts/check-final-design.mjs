@@ -73,7 +73,7 @@ const checks = [
   },
   {
     path: "src/app/(zh)/tools/page.tsx",
-    required: ["CollectionPage", "ItemList", "/tools/market-terminal-cost-calculator", "/tools/controller-downgrade-planner", "/tools/lab-reaction-boost-planner"],
+    required: ["CollectionPage", "ItemList", "/tools/spawn-queue-replacement-planner", "/tools/hauling-throughput-planner", "/tools/tower-damage-heal-repair-calculator"],
     forbidden: [],
   },
   {
@@ -98,6 +98,21 @@ const checks = [
   },
   {
     path: "src/app/(zh)/tools/lab-reaction-boost-planner/page.tsx",
+    required: ["ToolUtilityBar", "SoftwareApplication"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/spawn-queue-replacement-planner/page.tsx",
+    required: ["ToolUtilityBar", "SoftwareApplication"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/hauling-throughput-planner/page.tsx",
+    required: ["ToolUtilityBar", "SoftwareApplication"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/tower-damage-heal-repair-calculator/page.tsx",
     required: ["ToolUtilityBar", "SoftwareApplication"],
     forbidden: [],
   },
