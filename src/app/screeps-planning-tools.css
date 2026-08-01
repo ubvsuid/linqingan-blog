@@ -39,7 +39,8 @@
   cursor: pointer;
 }
 
-.planning-tabs button[aria-selected="true"] {
+.planning-tabs button[aria-selected="true"],
+.planning-tabs button[aria-checked="true"] {
   border-color: var(--foreground);
   background: var(--foreground);
   color: var(--background);
