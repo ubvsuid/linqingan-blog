@@ -5,6 +5,10 @@ const root = process.cwd();
 const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
 const englishLayout = fs.readFileSync(path.join(root, "src", "app", "(en)", "layout.tsx"), "utf8");
 const chineseLayout = fs.readFileSync(path.join(root, "src", "app", "(zh)", "layout.tsx"), "utf8");
+const reportRoute = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "api", "csp-report", "route.ts"),
+  "utf8",
+);
 const themeScriptPath = path.join(root, "public", "theme-init.js");
 const boundaryPath = path.join(root, "docs", "csp-inline-boundary.md");
 const failures = [];
@@ -50,11 +54,12 @@ if (
   failures.push("Report-Only CSP candidate is missing.");
 }
 if (
-  !nextConfig.includes('source: "/en/verification"')
+  !nextConfig.includes('const cspCanaryRoutes = ["/verification", "/en/verification"] as const')
+  || !nextConfig.includes("...cspCanaryRoutes.map")
   || !nextConfig.includes("headers: [candidateContentSecurityPolicyHeader]")
 ) {
   failures.push(
-    "The stricter Report-Only policy must stay scoped to the low-volume verification canary route.",
+    "The stricter Report-Only policy must stay scoped to the bilingual verification canary routes.",
   );
 }
 const securityHeadersBlock = nextConfig.match(
@@ -65,8 +70,28 @@ if (securityHeadersBlock.includes("Content-Security-Policy-Report-Only")) {
     "The stricter Report-Only policy must not generate expected Next.js bootstrap reports on every route.",
   );
 }
+
+for (const expected of [
+  "RATE_LIMIT_WINDOW_MS = 60_000",
+  "RATE_LIMIT_REQUESTS = 60",
+  "MAX_RATE_LIMIT_KEYS = 1_000",
+  "applyRateLimit(request)",
+  'status: 429',
+  '"Retry-After"',
+  '"X-Robots-Tag": "noindex, nofollow"',
+]) {
+  if (!reportRoute.includes(expected)) {
+    failures.push(`CSP report ingestion is missing ${expected}.`);
+  }
+}
+
 if (!fs.existsSync(boundaryPath)) {
   failures.push("Missing CSP inline compatibility boundary documentation.");
+} else {
+  const boundary = fs.readFileSync(boundaryPath, "utf8");
+  if (!boundary.includes("best-effort per-instance rate limit")) {
+    failures.push("CSP documentation does not explain the serverless rate-limit boundary.");
+  }
 }
 
 if (failures.length > 0) {
@@ -75,5 +100,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "CSP boundary check passed: theme boot is external and the stricter candidate is scoped to the verification canary route.",
+  "CSP boundary check passed: theme boot is external, bilingual verification routes host the stricter canary, and report ingestion is size-limited, redacted, noindex, and rate-limited per instance.",
 );
