@@ -30,6 +30,27 @@ const pages = [
     alternate: "https://www.linqingan.com/en/tools/lab-reaction-boost-planner",
   },
   {
+    pathname: "/tools/spawn-queue-replacement-planner",
+    title: "Spawn 队列与替换规划器",
+    structuredType: "SoftwareApplication",
+    canonical: "https://www.linqingan.com/tools/spawn-queue-replacement-planner",
+    alternate: "https://www.linqingan.com/en/tools/spawn-queue-replacement-planner",
+  },
+  {
+    pathname: "/tools/hauling-throughput-planner",
+    title: "运输吞吐量规划器",
+    structuredType: "SoftwareApplication",
+    canonical: "https://www.linqingan.com/tools/hauling-throughput-planner",
+    alternate: "https://www.linqingan.com/en/tools/hauling-throughput-planner",
+  },
+  {
+    pathname: "/tools/tower-damage-heal-repair-calculator",
+    title: "Tower 伤害、治疗与维修计算器",
+    structuredType: "SoftwareApplication",
+    canonical: "https://www.linqingan.com/tools/tower-damage-heal-repair-calculator",
+    alternate: "https://www.linqingan.com/en/tools/tower-damage-heal-repair-calculator",
+  },
+  {
     pathname: "/en/tools",
     title: "Calculate, diagnose, and plan safely",
     structuredType: "CollectionPage",
@@ -57,6 +78,27 @@ const pages = [
     canonical: "https://www.linqingan.com/en/tools/lab-reaction-boost-planner",
     alternate: "https://www.linqingan.com/tools/lab-reaction-boost-planner",
   },
+  {
+    pathname: "/en/tools/spawn-queue-replacement-planner",
+    title: "Spawn Queue and Replacement Planner",
+    structuredType: "SoftwareApplication",
+    canonical: "https://www.linqingan.com/en/tools/spawn-queue-replacement-planner",
+    alternate: "https://www.linqingan.com/tools/spawn-queue-replacement-planner",
+  },
+  {
+    pathname: "/en/tools/hauling-throughput-planner",
+    title: "Hauling Throughput Planner",
+    structuredType: "SoftwareApplication",
+    canonical: "https://www.linqingan.com/en/tools/hauling-throughput-planner",
+    alternate: "https://www.linqingan.com/tools/hauling-throughput-planner",
+  },
+  {
+    pathname: "/en/tools/tower-damage-heal-repair-calculator",
+    title: "Tower Damage, Heal, and Repair Calculator",
+    structuredType: "SoftwareApplication",
+    canonical: "https://www.linqingan.com/en/tools/tower-damage-heal-repair-calculator",
+    alternate: "https://www.linqingan.com/tools/tower-damage-heal-repair-calculator",
+  },
 ];
 
 const failures = [];
@@ -81,31 +123,25 @@ const [chineseSitemap, englishSitemap] = await Promise.all([
   fetch(`${baseUrl}/sitemap-en.xml`).then((response) => response.text()),
 ]);
 
-for (const pathname of [
-  "/tools",
-  "/tools/market-terminal-cost-calculator",
-  "/tools/controller-downgrade-planner",
-  "/tools/lab-reaction-boost-planner",
-]) {
+for (const pathname of pages.filter((page) => !page.pathname.startsWith("/en/")).map((page) => page.pathname)) {
   if (!chineseSitemap.includes(`https://www.linqingan.com${pathname}`)) failures.push(`${pathname}: missing from Chinese Sitemap`);
 }
 
-for (const pathname of [
-  "/en/tools",
-  "/en/tools/market-terminal-cost-calculator",
-  "/en/tools/controller-downgrade-planner",
-  "/en/tools/lab-reaction-boost-planner",
-]) {
+for (const pathname of pages.filter((page) => page.pathname.startsWith("/en/")).map((page) => page.pathname)) {
   if (!englishSitemap.includes(`https://www.linqingan.com${pathname}`)) failures.push(`${pathname}: missing from English Sitemap`);
 }
 
-const [chineseSearch, englishSearch] = await Promise.all([
-  fetch(`${baseUrl}/search?q=Terminal`).then((response) => response.text()),
-  fetch(`${baseUrl}/en/search?q=Terminal`).then((response) => response.text()),
-]);
+const searchCases = [
+  { pathname: "/search?q=Spawn", expected: "/tools/spawn-queue-replacement-planner", label: "Chinese Spawn search" },
+  { pathname: "/en/search?q=Spawn", expected: "/en/tools/spawn-queue-replacement-planner", label: "English Spawn search" },
+  { pathname: "/search?q=Tower", expected: "/tools/tower-damage-heal-repair-calculator", label: "Chinese Tower search" },
+  { pathname: "/en/search?q=hauling", expected: "/en/tools/hauling-throughput-planner", label: "English hauling search" },
+];
 
-if (!chineseSearch.includes("/tools/market-terminal-cost-calculator")) failures.push("Chinese search does not expose the Market and Terminal tool");
-if (!englishSearch.includes("/en/tools/market-terminal-cost-calculator")) failures.push("English search does not expose the Market and Terminal tool");
+for (const searchCase of searchCases) {
+  const body = await fetch(`${baseUrl}${searchCase.pathname}`).then((response) => response.text());
+  if (!body.includes(searchCase.expected)) failures.push(`${searchCase.label} does not expose ${searchCase.expected}`);
+}
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`ERROR: ${failure}`);
