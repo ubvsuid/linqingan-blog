@@ -10,12 +10,6 @@ const matrix = lighthouseConfig?.ci?.assert?.assertMatrix;
 const globalAssertions = Array.isArray(matrix)
   ? matrix.find((entry) => entry.matchingUrlPattern === ".*")?.assertions
   : undefined;
-const strictRoutePattern =
-  "^http://localhost:3000/(?:tools/room-diagnostics|en/evidence)(?:\\?|$)";
-const longArticlePattern =
-  "^http://localhost:3000/blog/screeps-memory-basics(?:\\?|$)";
-const generalRoutePattern =
-  "^http://localhost:3000/(?!tools/room-diagnostics(?:\\?|$)|en/evidence(?:\\?|$)|blog/screeps-memory-basics(?:\\?|$)).*";
 
 function requireAssertion(assertions, name, level, option, expected) {
   const assertion = assertions?.[name];
@@ -34,6 +28,11 @@ if (lighthouseConfig?.ci?.collect?.numberOfRuns !== 3) {
   failures.push("Lighthouse must collect three runs per route.");
 }
 
+const auditUrls = lighthouseConfig?.ci?.collect?.url;
+if (!Array.isArray(auditUrls) || !auditUrls.includes("http://localhost:3000/en/blog?page=2")) {
+  failures.push("Lighthouse must audit the crawlable second English article-library page.");
+}
+
 if (
   lighthouseConfig?.ci?.upload?.target !== "filesystem"
   || lighthouseConfig?.ci?.upload?.outputDir !== "./lhci-results"
@@ -43,18 +42,19 @@ if (
   );
 }
 
-function getAssertions(pattern) {
-  return Array.isArray(matrix)
-    ? matrix.find((entry) => entry.matchingUrlPattern === pattern)?.assertions
-    : undefined;
-}
-
 requireAssertion(
   globalAssertions,
   "categories:performance",
   "error",
   "minScore",
-  0.85,
+  0.9,
+);
+requireAssertion(
+  globalAssertions,
+  "largest-contentful-paint",
+  "error",
+  "maxNumericValue",
+  2500,
 );
 requireAssertion(
   globalAssertions,
@@ -64,26 +64,19 @@ requireAssertion(
   300,
 );
 requireAssertion(
-  getAssertions(strictRoutePattern),
-  "largest-contentful-paint",
+  globalAssertions,
+  "cumulative-layout-shift",
   "error",
   "maxNumericValue",
-  2500,
+  0.1,
 );
-requireAssertion(
-  getAssertions(generalRoutePattern),
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  2750,
-);
-requireAssertion(
-  getAssertions(longArticlePattern),
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  3000,
-);
+
+if (Array.isArray(matrix) && matrix.some((entry) =>
+  entry.matchingUrlPattern !== ".*"
+  && entry.assertions?.["largest-contentful-paint"]
+)) {
+  failures.push("Route-specific LCP exceptions are not allowed; every audited route must meet 2500 ms.");
+}
 
 const workflowDirectory = path.join(root, ".github", "workflows");
 const retiredOneTimeWorkflows = new Set([
@@ -115,5 +108,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 85, TBT 300 ms, and staged hard LCP budgets of 2500/2750/3000 ms across three runs on Node 22.",
+  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, and CLS 0.1 are hard limits for every audited route across three runs on Node 22.",
 );
