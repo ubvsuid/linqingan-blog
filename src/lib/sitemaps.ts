@@ -74,6 +74,9 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     "/tools/market-terminal-cost-calculator",
     "/tools/controller-downgrade-planner",
     "/tools/lab-reaction-boost-planner",
+    "/tools/spawn-queue-replacement-planner",
+    "/tools/hauling-throughput-planner",
+    "/tools/tower-damage-heal-repair-calculator",
   ];
 
   const staticPages: SitemapEntry[] = [
@@ -145,6 +148,9 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     "/en/tools/market-terminal-cost-calculator",
     "/en/tools/controller-downgrade-planner",
     "/en/tools/lab-reaction-boost-planner",
+    "/en/tools/spawn-queue-replacement-planner",
+    "/en/tools/hauling-throughput-planner",
+    "/en/tools/tower-damage-heal-repair-calculator",
   ];
 
   const staticPages: SitemapEntry[] = [
