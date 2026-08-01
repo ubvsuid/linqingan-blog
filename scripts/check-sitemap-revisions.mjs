@@ -90,6 +90,9 @@ for (const requiredText of [
   'staticPageEntry("/en/evidence"',
   '"/tools/spawn-queue-replacement-planner"',
   '"/tools/hauling-throughput-planner"',
+  '"/tools/tower-damage-heal-repair-calculator"',
+  '"/en/tools/spawn-queue-replacement-planner"',
+  '"/en/tools/hauling-throughput-planner"',
   '"/en/tools/tower-damage-heal-repair-calculator"',
 ]) {
   if (!sitemapSource.includes(requiredText)) {
