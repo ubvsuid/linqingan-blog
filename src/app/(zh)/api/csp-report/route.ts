@@ -2,8 +2,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_REPORT_LENGTH = 16_384;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_REQUESTS = 60;
+const MAX_RATE_LIMIT_KEYS = 1_000;
 
 type JsonRecord = Record<string, unknown>;
+type RateLimitEntry = { count: number; resetAt: number };
+
+const rateLimitEntries = new Map<string, RateLimitEntry>();
 
 function asRecord(value: unknown): JsonRecord | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -58,20 +64,85 @@ function summarizeReportPayload(value: unknown): unknown {
   return record ? summarizeLegacyReport(record) : { type: "invalid-report" };
 }
 
+function getClientKey(request: Request): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const address = forwardedFor?.split(",")[0]?.trim()
+    || request.headers.get("x-real-ip")
+    || "unknown";
+  return address.slice(0, 128);
+}
+
+function pruneRateLimitEntries(now: number) {
+  if (rateLimitEntries.size < MAX_RATE_LIMIT_KEYS) return;
+
+  for (const [key, entry] of rateLimitEntries) {
+    if (entry.resetAt <= now) rateLimitEntries.delete(key);
+  }
+
+  while (rateLimitEntries.size >= MAX_RATE_LIMIT_KEYS) {
+    const oldestKey = rateLimitEntries.keys().next().value as string | undefined;
+    if (!oldestKey) break;
+    rateLimitEntries.delete(oldestKey);
+  }
+}
+
+function applyRateLimit(request: Request): { limited: boolean; retryAfter: number } {
+  const now = Date.now();
+  const key = getClientKey(request);
+  const current = rateLimitEntries.get(key);
+
+  if (!current || current.resetAt <= now) {
+    pruneRateLimitEntries(now);
+    rateLimitEntries.set(key, {
+      count: 1,
+      resetAt: now + RATE_LIMIT_WINDOW_MS,
+    });
+    return { limited: false, retryAfter: 0 };
+  }
+
+  current.count += 1;
+  rateLimitEntries.delete(key);
+  rateLimitEntries.set(key, current);
+
+  return {
+    limited: current.count > RATE_LIMIT_REQUESTS,
+    retryAfter: Math.max(1, Math.ceil((current.resetAt - now) / 1_000)),
+  };
+}
+
+function responseHeaders() {
+  return {
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "X-Robots-Tag": "noindex, nofollow",
+  };
+}
+
 export async function POST(request: Request) {
+  const rateLimit = applyRateLimit(request);
+  if (rateLimit.limited) {
+    return new Response(null, {
+      status: 429,
+      headers: {
+        ...responseHeaders(),
+        "Retry-After": String(rateLimit.retryAfter),
+      },
+    });
+  }
+
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.includes("application/csp-report") && !contentType.includes("application/reports+json") && !contentType.includes("application/json")) {
-    return new Response(null, { status: 415 });
+    return new Response(null, { status: 415, headers: responseHeaders() });
   }
 
   const declaredLength = Number(request.headers.get("content-length") ?? "0");
   if (Number.isFinite(declaredLength) && declaredLength > MAX_REPORT_LENGTH) {
-    return new Response(null, { status: 413 });
+    return new Response(null, { status: 413, headers: responseHeaders() });
   }
 
   const body = await request.text();
   if (body.length > MAX_REPORT_LENGTH) {
-    return new Response(null, { status: 413 });
+    return new Response(null, { status: 413, headers: responseHeaders() });
   }
 
   if (body) {
@@ -84,9 +155,6 @@ export async function POST(request: Request) {
 
   return new Response(null, {
     status: 204,
-    headers: {
-      "Cache-Control": "no-store",
-      "X-Content-Type-Options": "nosniff",
-    },
+    headers: responseHeaders(),
   });
 }
