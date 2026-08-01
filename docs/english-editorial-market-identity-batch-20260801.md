@@ -144,6 +144,10 @@ Terminal checks still required:
 - two identical concurrent sends;
 - receiving-room allocation.
 
+## Preview queue protection
+
+The branch adds a minimal `vercel.json` setting with `github.autoJobCancelation=true`. It changes only superseded Git preview handling: a newer commit may cancel older queued or building previews from the same Git workflow. It does not change the build command, framework, production domains, environment variables, redirects, headers, or application routes.
+
 ## Release boundary
 
 Do not merge while any required CI, Lighthouse, review, preview, or production check fails. Production metadata, Canonical, hreflang, structured data, internal links, response status, and visible Pending evidence must be checked after merge.
