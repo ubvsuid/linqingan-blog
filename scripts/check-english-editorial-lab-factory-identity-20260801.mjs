@@ -42,19 +42,33 @@ const audit = readFileSync(
   "utf8",
 );
 
-const encodedMatch = overrideSource.match(
-  /const encodedEditorialOverrides = "([A-Za-z0-9+/=]+)";/,
+const chunkBlock = overrideSource.match(
+  /const encodedEditorialOverrideChunks = \[([\s\S]*?)\];/,
 );
-if (!encodedMatch) {
+if (!chunkBlock) {
   console.error(
-    "ERROR: Encoded Lab and Factory editorial payload is missing",
+    "ERROR: Encoded Lab and Factory editorial chunk list is missing",
   );
   process.exit(1);
 }
 
+const encodedChunks = [
+  ...chunkBlock[1].matchAll(
+    /"([A-Za-z0-9+/=]+)"/g,
+  ),
+].map((match) => match[1]);
+
+if (encodedChunks.length === 0) {
+  console.error(
+    "ERROR: Encoded Lab and Factory editorial chunks are empty",
+  );
+  process.exit(1);
+}
+
+const encodedPayload = encodedChunks.join("");
 const articles = JSON.parse(
   gunzipSync(
-    Buffer.from(encodedMatch[1], "base64"),
+    Buffer.from(encodedPayload, "base64"),
   ).toString("utf8"),
 );
 
@@ -230,10 +244,14 @@ for (const [slug, rule] of Object.entries(expected)) {
     }
   }
 
-  if (!article.articleHtml.includes("https://docs.screeps.com/")) {
-    failures.push(
-      `${slug}: official Screeps source missing`,
-    );
+  for (const source of [
+    "https://docs.screeps.com/",
+  ]) {
+    if (!article.articleHtml.includes(source)) {
+      failures.push(
+        `${slug}: official Screeps source missing`,
+      );
+    }
   }
 
   const verification = Object.fromEntries(
@@ -270,7 +288,7 @@ for (const [slug, rule] of Object.entries(expected)) {
       execFileSync("node", ["--check", path], {
         stdio: "pipe",
       });
-    } catch {
+    } catch (error) {
       failures.push(
         `${slug}: JavaScript block ${index + 1} failed node --check`,
       );
