@@ -35,6 +35,8 @@ const requiredFiles = [
   "src/app/(en)/en/blog/screeps-memory-write-safety/page.tsx",
   "src/app/(zh)/sitemap.xml/route.ts",
   "src/app/(zh)/sitemap-en.xml/route.ts",
+  "src/components/server-english-search.tsx",
+  "src/components/server-search.module.css",
 ];
 for (const relativePath of requiredFiles) read(relativePath);
 
@@ -60,13 +62,16 @@ requireText("src/app/(en)/en/knowledge/page.tsx", "discovery.difficulty", "knowl
 requireText("src/lib/english-knowledge.ts", "articleModuleOverrides", "curated knowledge-module mapping");
 requireText("src/lib/english-discovery.ts", "articleTagSlugOverrides", "curated article topic mapping");
 requireText("src/lib/english-discovery.ts", "moduleDefaultTagSlugs", "safe module topic fallback");
-requireText("src/components/english-site-search.tsx", "featuredResources", "curated default English search resources");
-requireText("src/components/english-site-search.tsx", "popularQueries", "popular English searches");
-requireText("src/components/english-site-search.tsx", 'event.key !== "/"', "English search keyboard shortcut");
-requireText("src/components/english-site-search.tsx", "/en/search-index.json", "lazy English search-index request");
+requireText("src/components/server-english-search.tsx", "popularQueries", "popular English searches");
+requireText("src/components/server-english-search.tsx", 'method="get"', "shareable server English search form");
+requireText("src/components/server-english-search.tsx", "scoreDocument", "server-side English result scoring");
+forbidText("src/components/server-english-search.tsx", '"use client"', "client boundary on English search results");
+forbidText("src/components/server-english-search.tsx", "@vercel/analytics", "English search analytics on the critical bundle");
+requireText("src/app/(en)/en/search/page.tsx", "ServerEnglishSearch", "server-rendered English search component");
+requireText("src/app/(en)/en/search/page.tsx", "englishSearchDocuments", "server-only English search document source");
+forbidText("src/app/(en)/en/search/page.tsx", "EnglishSiteSearch", "hydrated English search application");
 requireText("src/app/(en)/en/search-index.json/route.ts", 'dynamic = "force-static"', "static English search-index route");
 requireText("src/app/(en)/en/blog-index.json/route.ts", 'dynamic = "force-static"', "static English article-index route");
-forbidText("src/app/(en)/en/search/page.tsx", "englishSearchDocuments", "full search index in initial page payload");
 forbidText("src/app/(en)/en/blog/page.tsx", "at least 96", "unexplained public numeric publication score");
 requireText("src/lib/search.ts", "compactArticleSearchText", "compact Chinese article search text");
 requireText("src/lib/search.ts", "MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400", "Chinese search payload limit");
@@ -131,4 +136,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, lazy search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and bilingual Sitemap entries are present.");
+console.log("English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, server-rendered search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and bilingual Sitemap entries are present.");
