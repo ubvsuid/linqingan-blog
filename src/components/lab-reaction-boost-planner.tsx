@@ -21,6 +21,7 @@ interface Props {
 }
 
 const compounds = Object.keys(LAB_RECIPES) as LabCompound[];
+const boostCompounds = BOOST_OPTIONS.map((option) => option.compound);
 
 function clampNumber(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, Number.isFinite(value) ? value : min));
@@ -105,9 +106,14 @@ export function LabReactionBoostPlanner({ locale }: Props) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const nextMode = params.get("mode");
-    if (nextMode === "reaction" || nextMode === "boost") setMode(nextMode);
+    const resolvedMode: Mode = nextMode === "reaction" ? "reaction" : "boost";
+    setMode(resolvedMode);
+
     const nextTarget = params.get("target") as LabCompound | null;
-    if (nextTarget && nextTarget in LAB_RECIPES) setTarget(nextTarget);
+    if (nextTarget && nextTarget in LAB_RECIPES) {
+      setTarget(resolvedMode === "boost" && !boostCompounds.includes(nextTarget) ? "XGH2O" : nextTarget);
+    }
+
     const numeric: Array<[string, (value: number) => void, number, number]> = [
       ["amount", setAmount, 0, 100000000],
       ["stock", setExistingStock, 0, 100000000],
@@ -139,6 +145,7 @@ export function LabReactionBoostPlanner({ locale }: Props) {
   }, [amount, creepCount, existingStock, labCount, mode, operateLevel, partsPerCreep, ready, target]);
 
   const selectedBoost = BOOST_OPTIONS.find((option) => option.compound === target) ?? BOOST_OPTIONS.find((option) => option.compound === "XGH2O")!;
+  const availableCompounds = mode === "boost" ? boostCompounds : compounds;
   const boostMineral = partsPerCreep * creepCount * BOOST_MINERAL_PER_PART;
   const boostEnergy = partsPerCreep * creepCount * BOOST_ENERGY_PER_PART;
   const requestedAmount = mode === "boost" ? boostMineral : amount;
@@ -147,7 +154,7 @@ export function LabReactionBoostPlanner({ locale }: Props) {
   const calculation = useMemo(() => {
     const plan = buildReactionPlan(target, productionAmount);
     const outputLabs = Math.max(1, labCount - 2);
-    const amountPerRun = BASE_REACTION_AMOUNT + OPERATE_LAB_BONUS[operateLevel];
+    const amountPerRun = BASE_REACTION_AMOUNT + (OPERATE_LAB_BONUS[operateLevel] ?? 0);
     const stages = plan.stages.map((stage) => {
       const runs = stage.amount === 0 ? 0 : Math.ceil(stage.amount / (outputLabs * amountPerRun));
       return { ...stage, runs, ticks: runs * stage.cooldown };
@@ -197,6 +204,11 @@ export function LabReactionBoostPlanner({ locale }: Props) {
     t.boundary,
   ].join("\n");
 
+  function selectMode(nextMode: Mode) {
+    if (nextMode === "boost" && !boostCompounds.includes(target)) setTarget("XGH2O");
+    setMode(nextMode);
+  }
+
   async function copyText(value: string) {
     try {
       await navigator.clipboard.writeText(value);
@@ -209,7 +221,7 @@ export function LabReactionBoostPlanner({ locale }: Props) {
   return (
     <div className="planning-tool" data-tool="lab-boost">
       <div className="planning-tabs" role="tablist" aria-label={locale === "en" ? "Planning mode" : "规划模式"}>
-        {(Object.keys(t.tabs) as Mode[]).map((tab) => <button key={tab} type="button" role="tab" aria-selected={mode === tab} onClick={() => setMode(tab)}>{t.tabs[tab]}</button>)}
+        {(Object.keys(t.tabs) as Mode[]).map((tab) => <button key={tab} type="button" role="tab" aria-selected={mode === tab} onClick={() => selectMode(tab)}>{t.tabs[tab]}</button>)}
       </div>
 
       <div className="planning-grid">
@@ -217,7 +229,7 @@ export function LabReactionBoostPlanner({ locale }: Props) {
           <p className="eyebrow">INPUTS</p>
           <h2 id="lab-input-title">{t.inputs}</h2>
           <div className="planning-fields">
-            <label><span>{t.target}</span><select value={target} onChange={(event) => setTarget(event.target.value as LabCompound)}>{compounds.map((compound) => {
+            <label><span>{t.target}</span><select value={target} onChange={(event) => setTarget(event.target.value as LabCompound)}>{availableCompounds.map((compound) => {
               const boostOption = BOOST_OPTIONS.find((option) => option.compound === compound);
               const suffix = boostOption ? ` · ${locale === "en" ? boostOption.effect : boostOption.effectZh}` : "";
               return <option value={compound} key={compound}>{compound}{suffix}</option>;
@@ -226,7 +238,7 @@ export function LabReactionBoostPlanner({ locale }: Props) {
             {mode === "boost" && <><label><span>{t.parts}</span><input type="number" min="0" max="50" value={partsPerCreep} onChange={(event) => setPartsPerCreep(clampNumber(Number(event.target.value), 0, 50))} /></label><label><span>{t.creeps}</span><input type="number" min="0" max="10000" value={creepCount} onChange={(event) => setCreepCount(clampNumber(Number(event.target.value), 0, 10000))} /></label></>}
             <label><span>{t.stock}</span><input type="number" min="0" value={existingStock} onChange={(event) => setExistingStock(clampNumber(Number(event.target.value), 0, 100000000))} /></label>
             <label><span>{t.labs}</span><input type="number" min="3" max="10" value={labCount} onChange={(event) => setLabCount(clampNumber(Number(event.target.value), 3, 10))} /></label>
-            <label><span>{t.operate}</span><select value={operateLevel} onChange={(event) => setOperateLevel(clampNumber(Number(event.target.value), 0, 5))}><option value="0">{t.none}</option>{[1,2,3,4,5].map((level) => <option key={level} value={level}>Level {level} · +{OPERATE_LAB_BONUS[level]}</option>)}</select></label>
+            <label><span>{t.operate}</span><select value={operateLevel} onChange={(event) => setOperateLevel(clampNumber(Number(event.target.value), 0, 5))}><option value="0">{t.none}</option>{[1,2,3,4,5].map((level) => <option key={level} value={level}>Level {level} · +{OPERATE_LAB_BONUS[level] ?? 0}</option>)}</select></label>
           </div>
         </section>
 
