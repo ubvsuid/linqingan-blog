@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { SiteSearch } from "@/components/site-search";
+import { ServerSiteSearch } from "@/components/server-site-search";
 import { createPageMetadata } from "@/lib/metadata";
 import { getSearchDocuments } from "@/lib/search";
 
@@ -13,13 +13,21 @@ export const metadata = createPageMetadata({
 });
 
 interface SearchPageProps {
-  searchParams: Promise<{ q?: string | string[] }>;
+  searchParams: Promise<{
+    q?: string | string[];
+    type?: string | string[];
+  }>;
+}
+
+function readParam(value: string | string[] | undefined): string {
+  return (Array.isArray(value) ? value[0] ?? "" : value ?? "").trim();
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
-  const documents = getSearchDocuments({ includeArticleText: false });
+  const query = readParam(params.q).slice(0, 120);
+  const activeType = readParam(params.type);
+  const documents = getSearchDocuments({ includeArticleText: Boolean(query) });
 
   return (
     <main className="page-shell search-page">
@@ -38,7 +46,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </p>
         </header>
 
-        <SiteSearch documents={documents} initialQuery={initialQuery} />
+        <ServerSiteSearch
+          documents={documents}
+          query={query}
+          activeType={activeType}
+        />
       </Container>
 
       <style>{`
