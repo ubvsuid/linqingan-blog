@@ -92,22 +92,6 @@ function normalizeHref(value) {
   return value.split(/[?#]/)[0].replace(/\/$/, "") || "/";
 }
 
-function routeExists(href) {
-  if (exactRoutes.has(href)) return true;
-  if (/^\/blog\/[a-z0-9-]+$/.test(href)) {
-    return fs.existsSync(path.join(root, "content", "posts", `${href.slice(6)}.md`));
-  }
-  if (/^\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
-  if (/^\/en\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
-  if (/^\/tags\/[a-z0-9-]+$/.test(href)) return true;
-  if (/^\/en\/tags\/[a-z0-9-]+$/.test(href)) return true;
-  if (/^\/(blog|now|changelog)\/page\/[2-9][0-9]*$/.test(href)) return true;
-  if (/^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)) {
-    return fs.existsSync(path.join(root, "public", href.slice(1)));
-  }
-  return false;
-}
-
 function hasPageForRoute(route) {
   const routeParts = route.slice(1).split("/").filter(Boolean);
   const routeRoot = routeParts[0] === "en"
@@ -126,6 +110,23 @@ function hasPageForRoute(route) {
     return fs.existsSync(path.join(root, "src", "app", "(en)", "en", "knowledge", "[module]", "page.tsx"));
   }
 
+  return false;
+}
+
+function routeExists(href) {
+  if (exactRoutes.has(href)) return true;
+  if (hasPageForRoute(href)) return true;
+  if (/^\/blog\/[a-z0-9-]+$/.test(href)) {
+    return fs.existsSync(path.join(root, "content", "posts", `${href.slice(6)}.md`));
+  }
+  if (/^\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
+  if (/^\/en\/knowledge\/[a-z0-9-]+$/.test(href)) return true;
+  if (/^\/tags\/[a-z0-9-]+$/.test(href)) return true;
+  if (/^\/en\/tags\/[a-z0-9-]+$/.test(href)) return true;
+  if (/^\/(blog|now|changelog)\/page\/[2-9][0-9]*$/.test(href)) return true;
+  if (/^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)) {
+    return fs.existsSync(path.join(root, "public", href.slice(1)));
+  }
   return false;
 }
 
@@ -168,5 +169,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `组件与数据内链检查通过：${exactRoutes.size} 个静态、重定向或动态路由已登记，自动发现 ${englishRegistryPaths.length} 个英文登记文件，未发现旧页面链接或未知站内目标。`,
+  `组件与数据内链检查通过：${exactRoutes.size} 个登记路由、自动发现的静态 App Router 页面及 ${englishRegistryPaths.length} 个英文登记文件均已验证，未发现旧页面链接或未知站内目标。`,
 );

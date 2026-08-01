@@ -53,19 +53,14 @@ function staticPageEntry(
 ): SitemapEntry {
   return {
     url: pathname === "/" ? siteConfig.url : `${siteConfig.url}${pathname}`,
-    lastModified: getStaticPageLastModified(
-      pathname,
-      dependentContentDates,
-    ),
+    lastModified: getStaticPageLastModified(pathname, dependentContentDates),
   };
 }
 
 export function getChineseSitemapEntries(): SitemapEntry[] {
   const allPosts = getAllPosts();
   const postsBySlug = new Map(allPosts.map((post) => [post.slug, post]));
-  const allPostDates = allPosts.map(
-    (post) => post.updatedAt ?? post.publishedAt,
-  );
+  const allPostDates = allPosts.map((post) => post.updatedAt ?? post.publishedAt);
   const beginnerDates = beginnerSeriesSlugs.flatMap((slug) => {
     const post = postsBySlug.get(slug);
     return post ? [post.updatedAt ?? post.publishedAt] : [];
@@ -73,14 +68,21 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
   const changelogDates = changelogEntries.map((entry) => entry.date);
   const nowDates = nowEntries.map((entry) => entry.date);
   const projectDates = projects.map((project) => project.updatedAt);
+  const chineseToolPaths: StaticPagePath[] = [
+    "/tools/creep-body-calculator",
+    "/tools/room-diagnostics",
+    "/tools/market-terminal-cost-calculator",
+    "/tools/controller-downgrade-planner",
+    "/tools/lab-reaction-boost-planner",
+  ];
 
   const staticPages: SitemapEntry[] = [
     staticPageEntry("/", allPostDates),
     staticPageEntry("/beginner", beginnerDates),
     staticPageEntry("/blog", allPostDates),
     staticPageEntry("/knowledge", allPostDates),
-    staticPageEntry("/tools/creep-body-calculator"),
-    staticPageEntry("/tools/room-diagnostics"),
+    staticPageEntry("/tools", chineseToolPaths.map((path) => getStaticPageLastModified(path).toISOString())),
+    ...chineseToolPaths.map((path) => staticPageEntry(path)),
     staticPageEntry("/glossary"),
     staticPageEntry("/screeps-errors"),
     staticPageEntry("/verification"),
@@ -90,17 +92,15 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/about", projectDates),
   ];
 
-  const knowledgeModulePages: SitemapEntry[] = knowledgeBaseSections.map(
-    (section) => ({
-      url: `${siteConfig.url}/knowledge/${section.id}`,
-      lastModified: latestDate(
-        section.slugs.flatMap((slug) => {
-          const post = postsBySlug.get(slug);
-          return post ? [post.updatedAt ?? post.publishedAt] : [];
-        }),
-      ),
-    }),
-  );
+  const knowledgeModulePages: SitemapEntry[] = knowledgeBaseSections.map((section) => ({
+    url: `${siteConfig.url}/knowledge/${section.id}`,
+    lastModified: latestDate(
+      section.slugs.flatMap((slug) => {
+        const post = postsBySlug.get(slug);
+        return post ? [post.updatedAt ?? post.publishedAt] : [];
+      }),
+    ),
+  }));
 
   const posts: SitemapEntry[] = allPosts.map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}`,
@@ -112,24 +112,15 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     .map((tag) => ({
       url: `${siteConfig.url}/tags/${tag.slug}`,
       lastModified: latestDate(
-        getPostsForTag(tag.slug).map(
-          (post) => post.updatedAt ?? post.publishedAt,
-        ),
+        getPostsForTag(tag.slug).map((post) => post.updatedAt ?? post.publishedAt),
       ),
     }));
 
-  return [
-    ...staticPages,
-    ...knowledgeModulePages,
-    ...posts,
-    ...tagPages,
-  ];
+  return [...staticPages, ...knowledgeModulePages, ...posts, ...tagPages];
 }
 
 export function getEnglishSitemapEntries(): SitemapEntry[] {
-  const englishArticleDates = englishDiscoveryArticles.map(
-    (article) => article.updatedAt,
-  );
+  const englishArticleDates = englishDiscoveryArticles.map((article) => article.updatedAt);
   const englishChangelogDates = changelogEntries.map((entry) => entry.date);
   const englishBeginnerHrefs = new Set([
     "/en/blog/screeps-introduction",
@@ -148,26 +139,22 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
   const englishBeginnerDates = englishDiscoveryArticles
     .filter((article) => englishBeginnerHrefs.has(article.href))
     .map((article) => article.updatedAt);
+  const englishToolPaths: StaticPagePath[] = [
+    "/en/tools/creep-body-calculator",
+    "/en/tools/room-diagnostics",
+    "/en/tools/market-terminal-cost-calculator",
+    "/en/tools/controller-downgrade-planner",
+    "/en/tools/lab-reaction-boost-planner",
+  ];
 
   const staticPages: SitemapEntry[] = [
-    staticPageEntry("/en", [
-      ...englishArticleDates,
-      ...englishChangelogDates,
-    ]),
+    staticPageEntry("/en", [...englishArticleDates, ...englishChangelogDates]),
     staticPageEntry("/en/beginner", englishBeginnerDates),
     staticPageEntry("/en/blog", englishArticleDates),
     staticPageEntry("/en/knowledge", englishArticleDates),
     staticPageEntry("/en/tags", englishArticleDates),
-    staticPageEntry("/en/tools", [
-      getStaticPageLastModified(
-        "/en/tools/creep-body-calculator",
-      ).toISOString(),
-      getStaticPageLastModified(
-        "/en/tools/room-diagnostics",
-      ).toISOString(),
-    ]),
-    staticPageEntry("/en/tools/creep-body-calculator"),
-    staticPageEntry("/en/tools/room-diagnostics"),
+    staticPageEntry("/en/tools", englishToolPaths.map((path) => getStaticPageLastModified(path).toISOString())),
+    ...englishToolPaths.map((path) => staticPageEntry(path)),
     staticPageEntry("/en/screeps-errors"),
     staticPageEntry("/en/glossary"),
     staticPageEntry("/en/verification"),
@@ -204,20 +191,12 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
       ),
     }));
 
-  return [
-    ...staticPages,
-    ...knowledgePillars,
-    ...articles,
-    ...tagPages,
-  ];
+  return [...staticPages, ...knowledgePillars, ...articles, ...tagPages];
 }
 
 export function getLatestSitemapDate(entries: SitemapEntry[]): Date {
   const latest = entries.reduce(
-    (current, entry) =>
-      entry.lastModified.getTime() > current.getTime()
-        ? entry.lastModified
-        : current,
+    (current, entry) => entry.lastModified.getTime() > current.getTime() ? entry.lastModified : current,
     new Date(0),
   );
 
@@ -226,9 +205,7 @@ export function getLatestSitemapDate(entries: SitemapEntry[]): Date {
 
 export function renderSitemapIndexXml(entries: SitemapIndexEntry[]): string {
   const sitemaps = entries
-    .map(
-      (entry) => `  <sitemap>\n    <loc>${escapeXml(entry.url)}</loc>\n    <lastmod>${entry.lastModified.toISOString()}</lastmod>\n  </sitemap>`,
-    )
+    .map((entry) => `  <sitemap>\n    <loc>${escapeXml(entry.url)}</loc>\n    <lastmod>${entry.lastModified.toISOString()}</lastmod>\n  </sitemap>`)
     .join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps}\n</sitemapindex>\n`;

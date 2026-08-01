@@ -48,22 +48,23 @@ function compactArticleSearchText(value: string): string {
 
 const toolDocuments: SearchDocument[] = [
   {
+    id: "tool:hub",
+    type: "工具",
+    title: "免费 Screeps 工具",
+    description: "集中使用身体、房间、Market、Controller 与 Lab 计算和诊断工具。",
+    href: "/tools",
+    meta: "5 个浏览器本地工具",
+    keywords: ["Screeps 工具", "计算器", "诊断", "规划器", "tools"],
+    text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost 计算 诊断 规划",
+  },
+  {
     id: "tool:creep-body-calculator",
     type: "工具",
     title: "Screeps Creep 身体计算器",
     description: "组合身体部件，计算 Energy 成本、生成时间、生命值、携带容量和满载移动速度。",
     href: "/tools/creep-body-calculator",
     meta: "免费工具 · 支持链接分享",
-    keywords: [
-      "Creep Body",
-      "BODYPART_COST",
-      "MOVE",
-      "WORK",
-      "CARRY",
-      "身体计算器",
-      "生成时间",
-      "fatigue",
-    ],
+    keywords: ["Creep Body", "BODYPART_COST", "MOVE", "WORK", "CARRY", "身体计算器", "生成时间", "fatigue"],
     text: "Screeps 身体部件 成本 Spawn 生成时间 50 个部件 MOVE 比例 Road Plain Swamp",
   },
   {
@@ -75,6 +76,36 @@ const toolDocuments: SearchDocument[] = [
     meta: "免费工具 · 支持配置分享",
     keywords: ["房间诊断", "Spawn", "角色数量", "Controller", "CPU", "Energy"],
     text: "Screeps 房间运行 检查 断代 Spawn Energy Controller 工地 CPU bucket",
+  },
+  {
+    id: "tool:market-terminal-cost-calculator",
+    type: "工具",
+    title: "Screeps Market 与 Terminal 成本计算器",
+    description: "计算运输Energy、Market成交后的实际单价和创建订单的5%手续费。",
+    href: "/tools/market-terminal-cost-calculator",
+    meta: "免费工具 · URL参数可分享",
+    keywords: ["Market 计算器", "Terminal 成本", "calcTransactionCost", "deal", "订单手续费", "Credits"],
+    text: "Screeps Market Terminal 运输 Energy 实际单价 买单 卖单 deal 订单 5% 手续费",
+  },
+  {
+    id: "tool:controller-downgrade-planner",
+    type: "工具",
+    title: "Screeps Controller 降级与 Upgrader 规划器",
+    description: "根据ticksToDowngrade、WORK、Boost、有效升级比例和RCL8上限估算安全余量。",
+    href: "/tools/controller-downgrade-planner",
+    meta: "免费工具 · 只读Console探针",
+    keywords: ["Controller 降级", "ticksToDowngrade", "Upgrader", "WORK", "XGH2O", "OPERATE_CONTROLLER"],
+    text: "Screeps Controller 降级 安全线 Upgrader WORK Boost RCL8 升级 上限 进度",
+  },
+  {
+    id: "tool:lab-reaction-boost-planner",
+    type: "工具",
+    title: "Screeps Lab 反应与 Boost 规划器",
+    description: "展开化合物反应链，计算基础矿物、Lab轮数、生产Tick和整批Boost需求。",
+    href: "/tools/lab-reaction-boost-planner",
+    meta: "免费工具 · 支持计划JSON",
+    keywords: ["Lab 规划", "反应链", "Boost 计算", "XGH2O", "OPERATE_LAB", "矿物"],
+    text: "Screeps Lab reaction Boost compound mineral cooldown output lab XGH2O 化合物 反应",
   },
 ];
 
@@ -128,13 +159,7 @@ export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchD
     href: `/about#project-${project.id}`,
     meta: project.status,
     keywords: project.details.map((detail) => detail.value),
-    text: [
-      project.purpose,
-      project.challenge,
-      ...project.approach,
-      ...project.highlights,
-      ...project.nextSteps,
-    ].join(" "),
+    text: [project.purpose, project.challenge, ...project.approach, ...project.highlights, ...project.nextSteps].join(" "),
   }));
 
   return [...posts, ...glossary, ...errors, ...toolDocuments, ...projectDocuments];

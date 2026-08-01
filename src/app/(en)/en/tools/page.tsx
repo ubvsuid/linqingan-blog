@@ -2,30 +2,95 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { siteConfig } from "@/lib/site";
 
 import styles from "../english.module.css";
 import "../../english-tools.css";
+import "../../../screeps-planning-tools.css";
 
 export const metadata = createEnglishPageMetadata({
-  title: "Free Screeps Tools",
+  title: "Free Screeps Tools and Calculators",
   description:
-    "Free English Screeps tools for calculating Creep bodies and diagnosing room snapshots without connecting your game account.",
+    "Free Screeps tools for Creep bodies, room diagnostics, Market and Terminal costs, Controller downgrade planning, and Lab reaction and Boost production.",
   path: "/en/tools",
-  chinesePath: "/knowledge#reference-tools",
+  chinesePath: "/tools",
 });
 
+const allTools = [
+  { title: "Creep Body Calculator", href: "/en/tools/creep-body-calculator" },
+  { title: "Room Snapshot Diagnostic", href: "/en/tools/room-diagnostics" },
+  { title: "Market and Terminal Cost Calculator", href: "/en/tools/market-terminal-cost-calculator" },
+  { title: "Controller Downgrade and Upgrader Planner", href: "/en/tools/controller-downgrade-planner" },
+  { title: "Lab Reaction and Boost Planner", href: "/en/tools/lab-reaction-boost-planner" },
+] as const;
+
+const planningTools = [
+  {
+    eyebrow: "MARKET & TERMINAL",
+    title: "Market and Terminal Cost Calculator",
+    description: "Calculate transaction Energy, effective Market deal value, maximum Energy payload, and the 5% order creation fee.",
+    href: "/en/tools/market-terminal-cost-calculator",
+  },
+  {
+    eyebrow: "CONTROLLER",
+    title: "Controller Downgrade and Upgrader Planner",
+    description: "Estimate downgrade margin, Upgrader throughput, Boosted progress, RCL8 caps, and time to a target.",
+    href: "/en/tools/controller-downgrade-planner",
+  },
+  {
+    eyebrow: "LAB & BOOST",
+    title: "Lab Reaction and Boost Planner",
+    description: "Expand compound reaction chains and calculate base minerals, Lab runs, production ticks, and Boost batches.",
+    href: "/en/tools/lab-reaction-boost-planner",
+  },
+] as const;
+
 export default function EnglishToolsPage() {
+  const pageUrl = `${siteConfig.url}/en/tools`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: "Free Screeps Tools and Calculators",
+        url: pageUrl,
+        inLanguage: "en",
+        description: "Browser-based Screeps calculators and diagnostics that do not connect to a player account.",
+        mainEntity: { "@id": `${pageUrl}#tools` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#tools`,
+        numberOfItems: allTools.length,
+        itemListElement: allTools.map((tool, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: tool.title,
+          url: `${siteConfig.url}${tool.href}`,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${siteConfig.url}/en` },
+          { "@type": "ListItem", position: 2, name: "Tools", item: pageUrl },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className={styles.page} lang="en">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Tools</span></nav>
         <header className={styles.header}>
           <p className="eyebrow">SCREEPS TOOLS</p>
-          <h1>Calculate and diagnose safely</h1>
+          <h1>Calculate, diagnose, and plan safely</h1>
           <p>These tools run locally in the browser. They do not request a Screeps token, connect to your account, or execute game actions.</p>
         </header>
 
-        <section className="english-tools-showcase" aria-label="English Screeps tools">
+        <section className="english-tools-showcase" aria-label="Core Screeps tools">
           <article>
             <div className="english-tools-preview english-tools-body-preview" aria-label="Sample Creep body calculator interface preview">
               <span className="english-sample-label">INTERFACE PREVIEW</span>
@@ -48,12 +113,26 @@ export default function EnglishToolsPage() {
           </article>
         </section>
 
+        <section aria-labelledby="planning-tools-title" className="tool-related-guides">
+          <p className="eyebrow">PLANNING CALCULATORS</p>
+          <h2 id="planning-tools-title">Plan repeated decisions before changing automation</h2>
+          <div className="tools-hub-grid">
+            {planningTools.map((tool) => (
+              <Link className="tools-hub-card" href={tool.href} key={tool.href}>
+                <span className="eyebrow">{tool.eyebrow}</span>
+                <h2>{tool.title}</h2>
+                <p>{tool.description}</p>
+                <strong>Open tool →</strong>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         <div className={styles.notice}>
           <strong>Operational boundary</strong>
-          <p>Tool output is a calculation or static snapshot assessment. Always inspect live return codes and multi-tick behavior before changing production automation.</p>
+          <p>Tool output is a deterministic calculation or static snapshot assessment. Always inspect live return codes, current object identity, stores, cooldowns, and multi-tick behavior before changing production automation.</p>
         </div>
       </Container>
-
     </main>
   );
 }

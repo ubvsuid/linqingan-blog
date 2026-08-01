@@ -28,15 +28,17 @@ const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-errors", title: "Screeps Error Codes and Return Values", description: "Common constants such as ERR_NOT_IN_RANGE, ERR_NO_PATH, ERR_BUSY, ERR_FULL, and ERR_NOT_ENOUGH_ENERGY.", href: "/en/screeps-errors", type: "Reference", keywords: ["return code", "err_not_in_range", "err_no_path", "err_busy", "err_full", "error"] },
   { id: "english-glossary", title: "Screeps Glossary", description: "Definitions for Creep, Spawn, tick, Memory, Controller, RCL, GCL, CPU, bucket, store, and fatigue.", href: "/en/glossary", type: "Reference", keywords: ["glossary", "creep", "spawn", "tick", "rcl", "gcl", "bucket", "fatigue"] },
   { id: "english-verification", title: "How Screeps Guides Are Verified", description: "Documentation checks, syntax checks, offline simulation, Console testing, and live multi-tick verification.", href: "/en/verification", type: "Reference", keywords: ["verification", "tested", "console", "simulation", "live room"] },
-  { id: "english-tools", title: "Free Screeps Tools", description: "Browser-based tools that do not request a Screeps token or connect to an account.", href: "/en/tools", type: "Page", keywords: ["tools", "calculator", "diagnostics", "free"] },
+  { id: "english-tools", title: "Free Screeps Tools and Calculators", description: "Browser-based body, room, Market, Controller, and Lab tools that do not request a Screeps token or connect to an account.", href: "/en/tools", type: "Page", keywords: ["tools", "calculator", "diagnostics", "market", "controller", "lab", "free"] },
   { id: "english-body-calculator", title: "Screeps Creep Body Calculator", description: "Calculate Energy cost, spawn time, hits, carry capacity, and loaded movement speed.", href: "/en/tools/creep-body-calculator", type: "Tool", keywords: ["body calculator", "creep cost", "move ratio", "spawn time", "carry capacity"] },
   { id: "english-room-diagnostics", title: "Screeps Room Snapshot Diagnostic", description: "Check Spawn, workforce, Energy, Controller, construction, CPU, and bucket risks from a static snapshot.", href: "/en/tools/room-diagnostics", type: "Tool", keywords: ["room diagnostics", "spawn count", "harvester", "controller downgrade", "cpu bucket"] },
+  { id: "english-market-terminal-calculator", title: "Screeps Market and Terminal Cost Calculator", description: "Calculate Terminal transaction Energy, effective Market deal prices, maximum Energy payload, and order creation fees.", href: "/en/tools/market-terminal-cost-calculator", type: "Tool", keywords: ["market calculator", "terminal cost", "calcTransactionCost", "deal price", "order fee", "credits"] },
+  { id: "english-controller-planner", title: "Screeps Controller Downgrade and Upgrader Planner", description: "Estimate Controller downgrade margin, Upgrader Energy use, Boosted progress, RCL8 caps, and time to a target.", href: "/en/tools/controller-downgrade-planner", type: "Tool", keywords: ["controller downgrade", "ticksToDowngrade", "upgrader", "work parts", "xgh2o", "operate controller"] },
+  { id: "english-lab-boost-planner", title: "Screeps Lab Reaction and Boost Planner", description: "Plan compound reaction chains, base minerals, Lab runs, production ticks, and Boost batches.", href: "/en/tools/lab-reaction-boost-planner", type: "Tool", keywords: ["lab planner", "reaction chain", "boost calculator", "xgh2o", "operate lab", "mineral"] },
   { id: "english-about", title: "About Linqingan and the Screeps Knowledge Project", description: "Project purpose, verification approach, evidence boundaries, public development history, repository, and contact information.", href: "/en/about", type: "Page", keywords: ["linqingan", "about", "github", "project", "evidence", "public history"] },
   { id: "english-changelog", title: "English Site Changelog", description: "Meaningful changes to the English interface, navigation, search, tools, accessibility, and technical SEO.", href: "/en/changelog", type: "Page", keywords: ["changelog", "updates", "release notes", "site changes"] },
   { id: "english-roadmap", title: "English Site Roadmap", description: "Completed work, next improvements, evidence-dependent tasks, tool development, accessibility, and performance checks.", href: "/en/roadmap", type: "Page", keywords: ["roadmap", "next", "planned", "evidence", "performance"] },
   { id: "english-license", title: "Content and Code Use", description: "Current boundaries for reusing site content, code examples, third-party names, and commercial material.", href: "/en/license", type: "Reference", keywords: ["license", "copyright", "reuse", "permission", "code examples"] },
 ];
-
 
 function compactKeywords(values: string[], limit = 24): string[] {
   const seen = new Set<string>();
@@ -93,10 +95,7 @@ function tokenizeSearchQuery(value: string): string[] {
   return normalizeSearchValue(value).split(/[^a-z0-9_]+/).filter(Boolean);
 }
 
-export function getEnglishInitialSearchDocuments(
-  query: string,
-  limit = 80,
-): EnglishSearchDocument[] {
+export function getEnglishInitialSearchDocuments(query: string, limit = 80): EnglishSearchDocument[] {
   const tokens = tokenizeSearchQuery(query);
   if (tokens.length === 0) return [];
 
