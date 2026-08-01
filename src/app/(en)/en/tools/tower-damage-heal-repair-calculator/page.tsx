@@ -58,7 +58,7 @@ export default function TowerDamageHealRepairCalculatorPage() {
             <p>The tool uses standard Tower power, full output through range 5, linear falloff to range 20, and 10 Energy per action. It assumes all selected Towers can submit the same action every tick.</p>
             <p>Combat still depends on TOUGH ordering and Boosts, hostile healing, target movement, ramparts, Safe Mode, action conflicts, Tower Energy distribution, and accepted intents.</p>
             <div className="planning-tool-links">
-              <Link href="/en/blog/screeps-tower-attack-enemies">Build verifiable Tower attack logic →</Link>
+              <Link href="/en/blog/screeps-tower-auto-attack-hostiles">Build verifiable Tower attack logic →</Link>
               <Link href="/en/blog/screeps-tower-repair-threshold">Set a staged repair threshold →</Link>
               <a href="https://docs.screeps.com/defense.html" rel="noreferrer" target="_blank">Official defense documentation ↗</a>
               <a href="https://docs.screeps.com/power.html" rel="noreferrer" target="_blank">Official Power documentation ↗</a>
