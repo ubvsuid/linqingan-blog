@@ -59,7 +59,7 @@ export default function MarketTerminalCostCalculatorPage() {
             <p>房间名解析按官方世界的标准房间坐标计算。修改过地图或常量的私服可能得到不同结果。</p>
             <p>执行 Market deal 的一方承担交易 Energy 和 Terminal cooldown。本工具不会读取真实订单、房间库存、Credits或cooldown。</p>
             <div className="planning-tool-links">
-              <Link href="/knowledge/market-advanced-resources">查看市场与高级资源专题 →</Link>
+              <Link href="/knowledge">查看市场与高级资源专题 →</Link>
               <a href="https://docs.screeps.com/market.html" rel="noreferrer" target="_blank">查看官方 Market 文档 ↗</a>
             </div>
           </div>
