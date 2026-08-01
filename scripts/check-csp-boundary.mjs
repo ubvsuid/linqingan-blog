@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -5,30 +6,44 @@ const root = process.cwd();
 const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
 const englishLayout = fs.readFileSync(path.join(root, "src", "app", "(en)", "layout.tsx"), "utf8");
 const chineseLayout = fs.readFileSync(path.join(root, "src", "app", "(zh)", "layout.tsx"), "utf8");
+const themeModule = fs.readFileSync(path.join(root, "src", "lib", "theme-bootstrap.ts"), "utf8");
 const reportRoute = fs.readFileSync(
   path.join(root, "src", "app", "(zh)", "api", "csp-report", "route.ts"),
   "utf8",
 );
-const themeScriptPath = path.join(root, "public", "theme-init.js");
+const retiredThemeScriptPath = path.join(root, "public", "theme-init.js");
 const boundaryPath = path.join(root, "docs", "csp-inline-boundary.md");
 const failures = [];
+
+const themeMatch = themeModule.match(/THEME_BOOT_SCRIPT = '([^']+)'/);
+if (!themeMatch) {
+  failures.push("Theme bootstrap module does not expose one fixed single-quoted script.");
+}
+const themeScript = themeMatch?.[1] ?? "";
+const expectedThemeHash = `sha256-${crypto.createHash("sha256").update(themeScript).digest("base64")}`;
 
 for (const [name, source] of [
   ["English layout", englishLayout],
   ["Chinese layout", chineseLayout],
 ]) {
-  if (!source.includes('src="/theme-init.js"') || !source.includes('strategy="beforeInteractive"')) {
-    failures.push(`${name} does not load the external theme initializer before hydration.`);
+  if (
+    !source.includes("THEME_BOOT_SCRIPT")
+    || !source.includes('id="theme-bootstrap"')
+    || !source.includes("dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }}")
+  ) {
+    failures.push(`${name} does not use the shared fixed theme bootstrap before visible content.`);
   }
-  if (source.includes("themeBootScript")) {
-    failures.push(`${name} still contains the inline theme initializer.`);
+  if (source.includes("/theme-init.js") || source.includes('from "next/script"')) {
+    failures.push(`${name} still requests the superseded external theme script.`);
   }
 }
 
-if (!fs.existsSync(themeScriptPath)) {
-  failures.push("Missing public/theme-init.js.");
+if (fs.existsSync(retiredThemeScriptPath)) {
+  failures.push("The superseded public/theme-init.js file still exists.");
 }
-
+if (!nextConfig.includes(expectedThemeHash)) {
+  failures.push(`CSP script-src is missing the exact theme hash ${expectedThemeHash}.`);
+}
 if (!nextConfig.includes("createCandidateContentSecurityPolicy")) {
   failures.push("CSP candidate policy is not built independently.");
 }
@@ -37,12 +52,6 @@ if (!nextConfig.includes("directive.replace(\" 'unsafe-inline'\", \"\")")) {
 }
 if (!nextConfig.includes("\"style-src-attr 'none'\"")) {
   failures.push("Report-Only style policy does not reject inline style attributes.");
-}
-if (
-  !nextConfig.includes('source: "/theme-init.js"')
-  || !nextConfig.includes("stale-while-revalidate=604800")
-) {
-  failures.push("External theme initializer is missing its bounded cache policy.");
 }
 if (!nextConfig.includes('"Content-Security-Policy", value: contentSecurityPolicy')) {
   failures.push("Enforced CSP is missing.");
@@ -89,6 +98,9 @@ if (!fs.existsSync(boundaryPath)) {
   failures.push("Missing CSP inline compatibility boundary documentation.");
 } else {
   const boundary = fs.readFileSync(boundaryPath, "utf8");
+  if (!boundary.includes("fixed 175-byte inline script")) {
+    failures.push("CSP documentation does not explain the fixed hashed theme bootstrap.");
+  }
   if (!boundary.includes("best-effort per-instance rate limit")) {
     failures.push("CSP documentation does not explain the serverless rate-limit boundary.");
   }
@@ -100,5 +112,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "CSP boundary check passed: theme boot is external, bilingual verification routes host the stricter canary, and report ingestion is size-limited, redacted, noindex, and rate-limited per instance.",
+  "CSP boundary check passed: the shared theme bootstrap is hash-authorized without a network request, bilingual verification routes host the stricter canary, and report ingestion is size-limited, redacted, noindex, and rate-limited per instance.",
 );
