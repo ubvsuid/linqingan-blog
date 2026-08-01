@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { EnglishSiteSearch } from "@/components/english-site-search";
+import { ServerEnglishSearch } from "@/components/server-english-search";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
-import { getEnglishInitialSearchDocuments } from "@/lib/english-search";
+import { englishSearchDocuments } from "@/lib/english-search";
 
 import styles from "../english.module.css";
 
@@ -16,13 +16,20 @@ export const metadata = createEnglishPageMetadata({
 });
 
 interface EnglishSearchPageProps {
-  searchParams: Promise<{ q?: string | string[] }>;
+  searchParams: Promise<{
+    q?: string | string[];
+    type?: string | string[];
+  }>;
+}
+
+function readParam(value: string | string[] | undefined): string {
+  return (Array.isArray(value) ? value[0] ?? "" : value ?? "").trim();
 }
 
 export default async function EnglishSearchPage({ searchParams }: EnglishSearchPageProps) {
   const params = await searchParams;
-  const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
-  const initialDocuments = getEnglishInitialSearchDocuments(initialQuery);
+  const query = readParam(params.q).slice(0, 120);
+  const activeType = readParam(params.type);
 
   return (
     <main className={styles.page} lang="en">
@@ -35,7 +42,11 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
           <h1>Search the English section</h1>
           <p>Search published English guides, the beginner roadmap, knowledge topics, glossary, error codes, verification method, and working tools.</p>
         </header>
-        <EnglishSiteSearch initialQuery={initialQuery} initialDocuments={initialDocuments} />
+        <ServerEnglishSearch
+          documents={englishSearchDocuments}
+          query={query}
+          activeType={activeType}
+        />
       </Container>
     </main>
   );
