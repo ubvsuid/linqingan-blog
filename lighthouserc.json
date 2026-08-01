@@ -14,6 +14,9 @@
         "http://localhost:3000/tools/market-terminal-cost-calculator",
         "http://localhost:3000/tools/controller-downgrade-planner",
         "http://localhost:3000/tools/lab-reaction-boost-planner",
+        "http://localhost:3000/tools/spawn-queue-replacement-planner",
+        "http://localhost:3000/tools/hauling-throughput-planner",
+        "http://localhost:3000/tools/tower-damage-heal-repair-calculator",
         "http://localhost:3000/en",
         "http://localhost:3000/en/beginner",
         "http://localhost:3000/en/blog",
@@ -26,7 +29,10 @@
         "http://localhost:3000/en/tools/room-diagnostics",
         "http://localhost:3000/en/tools/market-terminal-cost-calculator",
         "http://localhost:3000/en/tools/controller-downgrade-planner",
-        "http://localhost:3000/en/tools/lab-reaction-boost-planner"
+        "http://localhost:3000/en/tools/lab-reaction-boost-planner",
+        "http://localhost:3000/en/tools/spawn-queue-replacement-planner",
+        "http://localhost:3000/en/tools/hauling-throughput-planner",
+        "http://localhost:3000/en/tools/tower-damage-heal-repair-calculator"
       ],
       "numberOfRuns": 3,
       "settings": {

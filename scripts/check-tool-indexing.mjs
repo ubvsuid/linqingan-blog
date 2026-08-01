@@ -12,12 +12,18 @@ const publicTools = [
   { route: "/tools/market-terminal-cost-calculator", page: "src/app/(zh)/tools/market-terminal-cost-calculator/page.tsx" },
   { route: "/tools/controller-downgrade-planner", page: "src/app/(zh)/tools/controller-downgrade-planner/page.tsx" },
   { route: "/tools/lab-reaction-boost-planner", page: "src/app/(zh)/tools/lab-reaction-boost-planner/page.tsx" },
+  { route: "/tools/spawn-queue-replacement-planner", page: "src/app/(zh)/tools/spawn-queue-replacement-planner/page.tsx" },
+  { route: "/tools/hauling-throughput-planner", page: "src/app/(zh)/tools/hauling-throughput-planner/page.tsx" },
+  { route: "/tools/tower-damage-heal-repair-calculator", page: "src/app/(zh)/tools/tower-damage-heal-repair-calculator/page.tsx" },
   { route: "/en/tools", page: "src/app/(en)/en/tools/page.tsx" },
   { route: "/en/tools/creep-body-calculator", page: "src/app/(en)/en/tools/creep-body-calculator/page.tsx" },
   { route: "/en/tools/room-diagnostics", page: "src/app/(en)/en/tools/room-diagnostics/page.tsx" },
   { route: "/en/tools/market-terminal-cost-calculator", page: "src/app/(en)/en/tools/market-terminal-cost-calculator/page.tsx" },
   { route: "/en/tools/controller-downgrade-planner", page: "src/app/(en)/en/tools/controller-downgrade-planner/page.tsx" },
   { route: "/en/tools/lab-reaction-boost-planner", page: "src/app/(en)/en/tools/lab-reaction-boost-planner/page.tsx" },
+  { route: "/en/tools/spawn-queue-replacement-planner", page: "src/app/(en)/en/tools/spawn-queue-replacement-planner/page.tsx" },
+  { route: "/en/tools/hauling-throughput-planner", page: "src/app/(en)/en/tools/hauling-throughput-planner/page.tsx" },
+  { route: "/en/tools/tower-damage-heal-repair-calculator", page: "src/app/(en)/en/tools/tower-damage-heal-repair-calculator/page.tsx" },
 ];
 
 const failures = [];
@@ -47,6 +53,9 @@ for (const chineseRoute of [
   "/tools/market-terminal-cost-calculator",
   "/tools/controller-downgrade-planner",
   "/tools/lab-reaction-boost-planner",
+  "/tools/spawn-queue-replacement-planner",
+  "/tools/hauling-throughput-planner",
+  "/tools/tower-damage-heal-repair-calculator",
 ]) {
   if (!routePairsSource.includes(`\"${chineseRoute}\"`)) {
     failures.push(`${chineseRoute}: 缺少中英文 route pair`);
