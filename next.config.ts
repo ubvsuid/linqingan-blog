@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+const themeBootstrapHash = "'sha256-Y1Yb6IWuCMjcdSFKJkNL/QYX4lilrbtXiMr/t1TaRJE='";
 const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -11,7 +12,7 @@ const cspDirectives = [
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+  `script-src 'self' 'unsafe-inline' ${themeBootstrapHash} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
   "script-src-attr 'none'",
   "connect-src 'self' https://vitals.vercel-insights.com https://*.vercel-insights.com",
   "worker-src 'self' blob:",
@@ -67,9 +68,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   compress: true,
   trailingSlash: false,
-  experimental: {
-    inlineCss: true,
-  },
   turbopack: { root: process.cwd() },
   async redirects() {
     return [
@@ -100,16 +98,6 @@ const nextConfig: NextConfig = {
         source,
         headers: [candidateContentSecurityPolicyHeader],
       })),
-      {
-        source: "/theme-init.js",
-        headers: [
-          {
-            key: "Cache-Control",
-            value:
-              "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
-          },
-        ],
-      },
       { source: "/en", headers: [{ key: "Content-Language", value: "en" }] },
       { source: "/en/:path*", headers: [{ key: "Content-Language", value: "en" }] },
     ];
