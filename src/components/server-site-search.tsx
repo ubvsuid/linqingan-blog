@@ -123,7 +123,13 @@ export function ServerSiteSearch({
 
   return (
     <section className={styles.search} aria-label="站内搜索结果">
-      <form className={styles.controls} action="/search" method="get" role="search">
+      <form
+        className={styles.controls}
+        action="/search"
+        method="get"
+        role="search"
+        aria-label="筛选搜索结果"
+      >
         <label>
           <span>搜索整个网站</span>
           <input
