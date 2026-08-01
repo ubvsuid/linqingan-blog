@@ -2,6 +2,7 @@ import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
 import { englishEditorialEventObserverFlagsOverrides20260731 } from "./english-editorial-event-observer-flags-overrides-20260731";
 import { englishEditorialFirstLoopStateNotifyOverrides20260731 } from "./english-editorial-first-loop-state-notify-overrides-20260731";
+import { englishEditorialMarketIdentityOverrides20260801 } from "./english-editorial-market-identity-overrides-20260801";
 import { englishEditorialOverrides20260731 } from "./english-editorial-overrides-20260731";
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
 import { englishEditorialSpawnRouteMemoryOverrides20260731 } from "./english-editorial-spawn-route-memory-overrides-20260731";
@@ -150,6 +151,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialTargetsVisualModulesOverrides20260731,
   ...firstLoopStateNotifyEditorialArticles,
   ...englishEditorialEventObserverFlagsOverrides20260731,
+  ...englishEditorialMarketIdentityOverrides20260801,
 };
 
 export function getEnglishEditorialPublished20260731(
