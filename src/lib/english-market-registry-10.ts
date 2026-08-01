@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishMarketBatchTenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishMarketBatchTenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-market-create-order",
     chinesePath: "/blog/screeps-market-create-order",
