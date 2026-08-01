@@ -1,5 +1,6 @@
 export const ENGLISH_LEARNING_STORAGE_KEY = "linqingan:english-learning:v1";
 export const ENGLISH_LEARNING_EVENT = "linqingan:english-learning-change";
+export const ENGLISH_LEARNING_EXPORT_VERSION = 1;
 
 export const ENGLISH_BEGINNER_PATHS = [
   "/en/blog/screeps-introduction",
@@ -28,6 +29,12 @@ export interface EnglishLearningState {
   completedPaths: string[];
   lastVisitedPath: string | null;
   recentArticles: RecentEnglishArticle[];
+}
+
+interface EnglishLearningExport {
+  schemaVersion: number;
+  exportedAt: string;
+  state: EnglishLearningState;
 }
 
 export const emptyEnglishLearningState: EnglishLearningState = {
@@ -113,6 +120,45 @@ export function serializeEnglishLearningState(
   state: EnglishLearningState,
 ): string {
   return JSON.stringify(normalizeEnglishLearningState(state));
+}
+
+export function exportEnglishLearningState(
+  state: EnglishLearningState,
+): string {
+  const payload: EnglishLearningExport = {
+    schemaVersion: ENGLISH_LEARNING_EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    state: normalizeEnglishLearningState(state),
+  };
+
+  return JSON.stringify(payload, null, 2);
+}
+
+export function importEnglishLearningState(serialized: string): EnglishLearningState {
+  const parsed: unknown = JSON.parse(serialized);
+  const candidate = parsed && typeof parsed === "object"
+    ? parsed as Partial<EnglishLearningExport> & Partial<EnglishLearningState>
+    : null;
+
+  if (!candidate) {
+    throw new Error("Learning progress file must contain a JSON object.");
+  }
+
+  if ("schemaVersion" in candidate) {
+    if (candidate.schemaVersion !== ENGLISH_LEARNING_EXPORT_VERSION) {
+      throw new Error("This learning progress file uses an unsupported version.");
+    }
+    if (!candidate.state || typeof candidate.state !== "object") {
+      throw new Error("Learning progress file does not contain a valid state.");
+    }
+    const normalized = normalizeEnglishLearningState(candidate.state);
+    writeEnglishLearningState(normalized);
+    return normalized;
+  }
+
+  const normalized = normalizeEnglishLearningState(candidate);
+  writeEnglishLearningState(normalized);
+  return normalized;
 }
 
 export function readEnglishLearningState(): EnglishLearningState {
