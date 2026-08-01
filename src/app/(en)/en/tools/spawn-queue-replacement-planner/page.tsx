@@ -43,7 +43,7 @@ export default function SpawnQueueReplacementPlannerPage() {
     <main className="page-shell planning-tool-page" lang="en">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
-        <nav className="planning-tool-breadcrumb" aria-label="Breadcrumb"><Link href="/en/tools">Tools</Link><span aria-hidden="true">/</span><span>Spawn Queue Planner</span></nav>
+        <nav className="planning-tool-breadcrumb" aria-label="Breadcrumb"><Link href="/en/tools">Tools</Link><span aria-hidden="true">/</span><span>Spawn Queue and Replacement Planner</span></nav>
         <header className="page-header">
           <p className="eyebrow">SCREEPS SPAWN TOOL</p>
           <h1>Spawn Queue and Replacement Planner</h1>
