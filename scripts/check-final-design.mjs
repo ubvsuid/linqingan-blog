@@ -73,7 +73,16 @@ const checks = [
   },
   {
     path: "src/app/(zh)/tools/page.tsx",
-    required: ["CollectionPage", "ItemList", "/tools/spawn-queue-replacement-planner", "/tools/hauling-throughput-planner", "/tools/tower-damage-heal-repair-calculator"],
+    required: [
+      "CollectionPage",
+      "ItemList",
+      "/tools/market-terminal-cost-calculator",
+      "/tools/controller-downgrade-planner",
+      "/tools/lab-reaction-boost-planner",
+      "/tools/spawn-queue-replacement-planner",
+      "/tools/hauling-throughput-planner",
+      "/tools/tower-damage-heal-repair-calculator",
+    ],
     forbidden: [],
   },
   {
