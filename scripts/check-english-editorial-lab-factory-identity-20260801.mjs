@@ -288,7 +288,7 @@ for (const [slug, rule] of Object.entries(expected)) {
       execFileSync("node", ["--check", path], {
         stdio: "pipe",
       });
-    } catch (error) {
+    } catch {
       failures.push(
         `${slug}: JavaScript block ${index + 1} failed node --check`,
       );
