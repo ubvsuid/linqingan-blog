@@ -42,34 +42,10 @@ if (
   );
 }
 
-requireAssertion(
-  globalAssertions,
-  "categories:performance",
-  "error",
-  "minScore",
-  0.9,
-);
-requireAssertion(
-  globalAssertions,
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  2500,
-);
-requireAssertion(
-  globalAssertions,
-  "total-blocking-time",
-  "error",
-  "maxNumericValue",
-  300,
-);
-requireAssertion(
-  globalAssertions,
-  "cumulative-layout-shift",
-  "error",
-  "maxNumericValue",
-  0.1,
-);
+requireAssertion(globalAssertions, "categories:performance", "error", "minScore", 0.9);
+requireAssertion(globalAssertions, "largest-contentful-paint", "error", "maxNumericValue", 2500);
+requireAssertion(globalAssertions, "total-blocking-time", "error", "maxNumericValue", 300);
+requireAssertion(globalAssertions, "cumulative-layout-shift", "error", "maxNumericValue", 0.1);
 
 if (Array.isArray(matrix) && matrix.some((entry) =>
   entry.matchingUrlPattern !== ".*"
@@ -79,25 +55,36 @@ if (Array.isArray(matrix) && matrix.some((entry) =>
 }
 
 const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
-if (
-  !nextConfig.includes("experimental: {")
-  || !nextConfig.includes("inlineCss: true")
-) {
-  failures.push("Production CSS inlining must remain enabled while external route CSS is the measured LCP bottleneck.");
+if (nextConfig.includes("inlineCss")) {
+  failures.push("Global experimental CSS inlining must remain disabled after it increased main-thread work on measured routes.");
 }
 
-const cspBoundary = fs.readFileSync(
-  path.join(root, "docs", "csp-inline-boundary.md"),
-  "utf8",
-);
-for (const expected of [
-  "roughly 300 ms",
-  "first-time search visitors",
-  "production field CWV",
-  "experimental, global",
+for (const [pagePath, expectedComponent, forbiddenComponent] of [
+  ["src/app/(zh)/search/page.tsx", "ServerSiteSearch", "SiteSearch"],
+  ["src/app/(en)/en/search/page.tsx", "ServerEnglishSearch", "EnglishSiteSearch"],
 ]) {
-  if (!cspBoundary.includes(expected)) {
-    failures.push(`CSS inlining documentation is missing ${expected}.`);
+  const source = fs.readFileSync(path.join(root, pagePath), "utf8");
+  if (!source.includes(expectedComponent)) {
+    failures.push(`${pagePath} does not render its search results on the server.`);
+  }
+  if (source.includes(`<${forbiddenComponent}`) || source.includes(`import { ${forbiddenComponent} }`)) {
+    failures.push(`${pagePath} still hydrates the full client search application.`);
+  }
+}
+
+for (const componentPath of [
+  "src/components/server-site-search.tsx",
+  "src/components/server-english-search.tsx",
+]) {
+  const source = fs.readFileSync(path.join(root, componentPath), "utf8");
+  if (source.includes('"use client"')) {
+    failures.push(`${componentPath} must remain a server component.`);
+  }
+  if (source.includes("@vercel/analytics") || source.includes("fetch(")) {
+    failures.push(`${componentPath} performs client-oriented analytics or index fetching.`);
+  }
+  if (!source.includes('method="get"')) {
+    failures.push(`${componentPath} is missing a shareable GET search form.`);
   }
 }
 
@@ -161,5 +148,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, measured CSS inlining, idle-loaded observability, and three-run coverage are enforced on Node 22.",
+  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, server-rendered search, idle-loaded observability, and three-run coverage are enforced on Node 22.",
 );
