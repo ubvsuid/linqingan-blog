@@ -31,7 +31,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
   const issueHref = useMemo(() => {
     const params = new URLSearchParams({
       title: `工具反馈：${title}`,
-      body: `工具：${title}\n地址：${currentUrl}\n\n问题描述：\n\n期望结果：`,
+      body: `工具：${title}\n地址：${currentUrl || "请粘贴当前页面地址"}\n\n问题描述：\n\n期望结果：`,
     });
     return `${issueUrl}?${params.toString()}`;
   }, [currentUrl, issueUrl, title]);
@@ -71,16 +71,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
       <div className="tool-utility-actions">
         <button type="button" disabled={!hydrated} onClick={shareCurrentState}>分享当前配置</button>
         <button type="button" disabled={!hydrated} onClick={resetTool}>重置工具</button>
-        <a
-          href={hydrated ? issueHref : undefined}
-          aria-disabled={!hydrated}
-          tabIndex={hydrated ? undefined : -1}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(event) => {
-            if (!hydrated) event.preventDefault();
-          }}
-        >
+        <a href={issueHref} target="_blank" rel="noreferrer">
           报告问题 ↗
         </a>
       </div>
@@ -131,8 +122,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
         }
         .tool-utility-actions button:hover,
         .tool-utility-actions a:hover { border-color: var(--muted); text-decoration: none; }
-        .tool-utility-actions button:disabled,
-        .tool-utility-actions a[aria-disabled="true"] { cursor: not-allowed; opacity: .5; }
+        .tool-utility-actions button:disabled { cursor: not-allowed; opacity: .5; }
         .tool-utility-bar > p { min-height: 20px; margin: 0; color: var(--muted); font-size: 12px; }
       `}</style>
     </section>
