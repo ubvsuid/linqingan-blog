@@ -43,7 +43,7 @@ export default function TowerDamageHealRepairCalculatorPage() {
     <main className="page-shell planning-tool-page" lang="en">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
-        <nav className="planning-tool-breadcrumb" aria-label="Breadcrumb"><Link href="/en/tools">Tools</Link><span aria-hidden="true">/</span><span>Tower Power Calculator</span></nav>
+        <nav className="planning-tool-breadcrumb" aria-label="Breadcrumb"><Link href="/en/tools">Tools</Link><span aria-hidden="true">/</span><span>Tower Damage, Heal, and Repair Calculator</span></nav>
         <header className="page-header">
           <p className="eyebrow">SCREEPS DEFENSE TOOL</p>
           <h1>Tower Damage, Heal, and Repair Calculator</h1>
