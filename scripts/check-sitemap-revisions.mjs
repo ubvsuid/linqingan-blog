@@ -11,8 +11,12 @@ const requiredPaths = [
   "/beginner",
   "/blog",
   "/knowledge",
+  "/tools",
   "/tools/creep-body-calculator",
   "/tools/room-diagnostics",
+  "/tools/market-terminal-cost-calculator",
+  "/tools/controller-downgrade-planner",
+  "/tools/lab-reaction-boost-planner",
   "/glossary",
   "/screeps-errors",
   "/verification",
@@ -28,6 +32,9 @@ const requiredPaths = [
   "/en/tools",
   "/en/tools/creep-body-calculator",
   "/en/tools/room-diagnostics",
+  "/en/tools/market-terminal-cost-calculator",
+  "/en/tools/controller-downgrade-planner",
+  "/en/tools/lab-reaction-boost-planner",
   "/en/screeps-errors",
   "/en/glossary",
   "/en/verification",
@@ -72,8 +79,11 @@ for (const pathname of Object.keys(revisions)) {
 const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
 for (const requiredText of [
   "getStaticPageLastModified",
+  'staticPageEntry("/tools"',
   'staticPageEntry("/en/blog"',
   'staticPageEntry("/en/evidence"',
+  '"/tools/market-terminal-cost-calculator"',
+  '"/en/tools/lab-reaction-boost-planner"',
 ]) {
   if (!sitemapSource.includes(requiredText)) {
     failures.push(`Sitemap does not use the revision registry: ${requiredText}`);
