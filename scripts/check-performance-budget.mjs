@@ -78,6 +78,29 @@ if (Array.isArray(matrix) && matrix.some((entry) =>
   failures.push("Route-specific LCP exceptions are not allowed; every audited route must meet 2500 ms.");
 }
 
+const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
+if (
+  !nextConfig.includes("experimental: {")
+  || !nextConfig.includes("inlineCss: true")
+) {
+  failures.push("Production CSS inlining must remain enabled while external route CSS is the measured LCP bottleneck.");
+}
+
+const cspBoundary = fs.readFileSync(
+  path.join(root, "docs", "csp-inline-boundary.md"),
+  "utf8",
+);
+for (const expected of [
+  "roughly 300 ms",
+  "first-time search visitors",
+  "production field CWV",
+  "experimental, global",
+]) {
+  if (!cspBoundary.includes(expected)) {
+    failures.push(`CSS inlining documentation is missing ${expected}.`);
+  }
+}
+
 const observabilityPath = path.join(root, "src", "components", "deferred-observability.tsx");
 if (!fs.existsSync(observabilityPath)) {
   failures.push("Missing the deferred observability client boundary.");
@@ -138,5 +161,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, idle-loaded observability, and three-run coverage are enforced on Node 22.",
+  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, measured CSS inlining, idle-loaded observability, and three-run coverage are enforced on Node 22.",
 );
