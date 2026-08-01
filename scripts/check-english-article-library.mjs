@@ -54,12 +54,19 @@ requireText(queryInput, 'fetch("/en/blog-index.json")', "lazy article-index requ
 requireText(indexRoute, 'dynamic = "force-static"', "static lightweight article index");
 requireText(indexRoute, '"X-Robots-Tag": "noindex, nofollow"', "article-index noindex header");
 requireText(blogPage, "Publication standard", "plain-language publication policy");
+requireText(blogPage, "export async function generateMetadata", "request-aware article-library metadata");
+requireText(blogPage, "buildEnglishBrowseHref", "self-referencing pagination canonical construction");
+requireText(blogPage, "hasNonPaginationParameters", "filtered-page noindex policy");
+requireText(blogPage, "hasInvalidPageParameter", "invalid-page noindex policy");
+requireText(blogPage, "notFound();", "out-of-range pagination 404 handling");
+requireText(blogPage, "metadata.alternates", "parameterized-page alternate cleanup");
 
 forbidText(serverBrowser, '"use client"', "client rendering on the full article browser");
 forbidText(serverBrowser, "<style", "component-local article-browser styles");
 forbidText(queryInput, "EnglishDiscoveryArticle[]", "full article records in the query client");
 forbidText(browserLibrary, "finalScore", "internal scores in the public article index");
 forbidText(blogPage, "at least 96", "unexplained public numeric publication score");
+forbidText(blogPage, "export const metadata", "static metadata that collapses paginated canonicals");
 
 const indexType = read(browserLibrary).match(
   /export interface EnglishArticleIndexItem \{([\s\S]*?)\n\}/,
@@ -86,5 +93,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "English article-library check passed: server-rendered 12-item pages, URL filters, crawlable pagination, lazy lightweight suggestions, external styles, and a plain-language publication policy are present.",
+  "English article-library check passed: server-rendered 12-item pages, self-canonical crawlable pagination, noindex filtered states, out-of-range 404 handling, lazy lightweight suggestions, external styles, and a plain-language publication policy are present.",
 );
