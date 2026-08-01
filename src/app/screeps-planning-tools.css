@@ -120,6 +120,33 @@
   margin: 0;
 }
 
+.planning-profile-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.planning-profile {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.planning-profile legend {
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.planning-profile .planning-fields {
+  margin-top: 4px;
+}
+
 .planning-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
