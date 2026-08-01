@@ -11,7 +11,7 @@ import "../../../screeps-planning-tools.css";
 export const metadata = createEnglishPageMetadata({
   title: "Free Screeps Tools and Calculators",
   description:
-    "Free Screeps tools for Creep bodies, room diagnostics, Market and Terminal costs, Controller downgrade planning, and Lab reaction and Boost production.",
+    "Free Screeps tools for Creep bodies, room diagnostics, Market, Controllers, Labs, Spawn queues, hauling throughput, and Tower power.",
   path: "/en/tools",
   chinesePath: "/tools",
 });
@@ -22,6 +22,9 @@ const allTools = [
   { title: "Market and Terminal Cost Calculator", href: "/en/tools/market-terminal-cost-calculator" },
   { title: "Controller Downgrade and Upgrader Planner", href: "/en/tools/controller-downgrade-planner" },
   { title: "Lab Reaction and Boost Planner", href: "/en/tools/lab-reaction-boost-planner" },
+  { title: "Spawn Queue and Replacement Planner", href: "/en/tools/spawn-queue-replacement-planner" },
+  { title: "Hauling Throughput Planner", href: "/en/tools/hauling-throughput-planner" },
+  { title: "Tower Damage, Heal, and Repair Calculator", href: "/en/tools/tower-damage-heal-repair-calculator" },
 ] as const;
 
 const planningTools = [
@@ -42,6 +45,24 @@ const planningTools = [
     title: "Lab Reaction and Boost Planner",
     description: "Expand compound reaction chains and calculate base minerals, Lab runs, production ticks, and Boost batches.",
     href: "/en/tools/lab-reaction-boost-planner",
+  },
+  {
+    eyebrow: "SPAWN CAPACITY",
+    title: "Spawn Queue and Replacement Planner",
+    description: "Model several role profiles, prespawn TTL thresholds, average Spawn utilization, and OPERATE_SPAWN capacity.",
+    href: "/en/tools/spawn-queue-replacement-planner",
+  },
+  {
+    eyebrow: "LOGISTICS",
+    title: "Hauling Throughput Planner",
+    description: "Calculate CARRY payload, MOVE fatigue, route cycle time, Creep count, and lifetime delivery.",
+    href: "/en/tools/hauling-throughput-planner",
+  },
+  {
+    eyebrow: "TOWER POWER",
+    title: "Tower Damage, Heal, and Repair Calculator",
+    description: "Calculate range falloff, combined Tower output, Energy use, opposing power, and target completion time.",
+    href: "/en/tools/tower-damage-heal-repair-calculator",
   },
 ] as const;
 
