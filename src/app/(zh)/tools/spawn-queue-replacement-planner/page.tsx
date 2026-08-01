@@ -43,7 +43,7 @@ export default function SpawnQueueReplacementPlannerPage() {
     <main className="page-shell planning-tool-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
-        <nav className="planning-tool-breadcrumb" aria-label="面包屑"><Link href="/tools">工具</Link><span aria-hidden="true">/</span><span>Spawn 队列规划器</span></nav>
+        <nav className="planning-tool-breadcrumb" aria-label="面包屑"><Link href="/tools">工具</Link><span aria-hidden="true">/</span><span>Spawn 队列与替换规划器</span></nav>
         <header className="page-header">
           <p className="eyebrow">SCREEPS SPAWN TOOL</p>
           <h1>Spawn 队列与替换规划器</h1>
