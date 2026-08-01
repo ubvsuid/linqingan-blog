@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { siteConfig } from "@/lib/site";
 
 import styles from "../english.module.css";
 import "../../english-tools.css";
@@ -14,6 +15,14 @@ export const metadata = createEnglishPageMetadata({
   path: "/en/tools",
   chinesePath: "/tools",
 });
+
+const allTools = [
+  { title: "Creep Body Calculator", href: "/en/tools/creep-body-calculator" },
+  { title: "Room Snapshot Diagnostic", href: "/en/tools/room-diagnostics" },
+  { title: "Market and Terminal Cost Calculator", href: "/en/tools/market-terminal-cost-calculator" },
+  { title: "Controller Downgrade and Upgrader Planner", href: "/en/tools/controller-downgrade-planner" },
+  { title: "Lab Reaction and Boost Planner", href: "/en/tools/lab-reaction-boost-planner" },
+] as const;
 
 const planningTools = [
   {
@@ -37,8 +46,42 @@ const planningTools = [
 ] as const;
 
 export default function EnglishToolsPage() {
+  const pageUrl = `${siteConfig.url}/en/tools`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: "Free Screeps Tools and Calculators",
+        url: pageUrl,
+        inLanguage: "en",
+        description: "Browser-based Screeps calculators and diagnostics that do not connect to a player account.",
+        mainEntity: { "@id": `${pageUrl}#tools` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#tools`,
+        numberOfItems: allTools.length,
+        itemListElement: allTools.map((tool, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: tool.title,
+          url: `${siteConfig.url}${tool.href}`,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${siteConfig.url}/en` },
+          { "@type": "ListItem", position: 2, name: "Tools", item: pageUrl },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className={styles.page} lang="en">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Tools</span></nav>
         <header className={styles.header}>
