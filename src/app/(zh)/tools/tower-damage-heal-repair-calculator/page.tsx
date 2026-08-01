@@ -59,7 +59,7 @@ export default function TowerDamageHealRepairCalculatorPage() {
             <p>工具按标准Tower能力、Range 5以内满效果、到Range 20线性衰减，以及每次动作10 Energy计算，并假设所有Tower每Tick都能对同一目标提交动作。</p>
             <p>真实战斗仍取决于TOUGH顺序与Boost、敌方治疗、目标移动、Rampart、Safe Mode、动作冲突、Tower之间的Energy差异和最终被接受的意图。</p>
             <div className="planning-tool-links">
-              <Link href="/blog/screeps-tower-attack-enemies">建立可验证的Tower攻击逻辑 →</Link>
+              <Link href="/blog/screeps-tower-auto-attack-hostiles">建立可验证的Tower攻击逻辑 →</Link>
               <Link href="/blog/screeps-tower-repair-threshold">设置分阶段维修阈值 →</Link>
               <a href="https://docs.screeps.com/defense.html" rel="noreferrer" target="_blank">查看官方防御文档 ↗</a>
               <a href="https://docs.screeps.com/power.html" rel="noreferrer" target="_blank">查看官方Power文档 ↗</a>
