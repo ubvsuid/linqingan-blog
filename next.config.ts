@@ -67,6 +67,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   compress: true,
   trailingSlash: false,
+  experimental: {
+    inlineCss: true,
+  },
   turbopack: { root: process.cwd() },
   async redirects() {
     return [
