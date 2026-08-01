@@ -78,6 +78,36 @@ if (Array.isArray(matrix) && matrix.some((entry) =>
   failures.push("Route-specific LCP exceptions are not allowed; every audited route must meet 2500 ms.");
 }
 
+const observabilityPath = path.join(root, "src", "components", "deferred-observability.tsx");
+if (!fs.existsSync(observabilityPath)) {
+  failures.push("Missing the deferred observability client boundary.");
+} else {
+  const observability = fs.readFileSync(observabilityPath, "utf8");
+  for (const expected of [
+    'import("@vercel/analytics/next")',
+    'import("@vercel/speed-insights/next")',
+    "requestIdleCallback",
+    "FALLBACK_DELAY_MS = 2_500",
+  ]) {
+    if (!observability.includes(expected)) {
+      failures.push(`Deferred observability is missing ${expected}.`);
+    }
+  }
+}
+
+for (const relativePath of ["src/app/(zh)/layout.tsx", "src/app/(en)/layout.tsx"]) {
+  const source = fs.readFileSync(path.join(root, relativePath), "utf8");
+  if (!source.includes("<DeferredObservability />")) {
+    failures.push(`${relativePath} does not defer observability bundles.`);
+  }
+  if (
+    source.includes('@vercel/analytics/next')
+    || source.includes('@vercel/speed-insights/next')
+  ) {
+    failures.push(`${relativePath} still imports observability on the critical route bundle.`);
+  }
+}
+
 const workflowDirectory = path.join(root, ".github", "workflows");
 const retiredOneTimeWorkflows = new Set([
   "ensure-article-maintenance-complete.yml",
@@ -108,5 +138,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, and CLS 0.1 are hard limits for every audited route across three runs on Node 22.",
+  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, idle-loaded observability, and three-run coverage are enforced on Node 22.",
 );
