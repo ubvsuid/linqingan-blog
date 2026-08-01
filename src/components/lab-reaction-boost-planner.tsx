@@ -9,9 +9,9 @@ import {
   BOOST_OPTIONS,
   LAB_RECIPES,
   OPERATE_LAB_BONUS,
-  buildReactionPlan,
   type LabCompound,
 } from "@/lib/screeps-planning-data";
+import { buildBatchedReactionPlan } from "@/lib/screeps-reaction-planner";
 
 type Locale = "en" | "zh";
 type Mode = "reaction" | "boost";
@@ -49,7 +49,8 @@ const copy = {
     perRun: "Compound per output Lab run",
     mineral: "Boost mineral required",
     energy: "Boost Energy required",
-    produce: "Compound still to produce",
+    produce: "Compound still required",
+    scheduled: "Scheduled output after batch rounding",
     ticks: "Sequential reaction ticks",
     stages: "Reaction stages",
     bases: "Base mineral requirements",
@@ -58,7 +59,7 @@ const copy = {
     copyJson: "Copy plan JSON",
     copied: "Copied.",
     failed: "Copy failed. Select the visible text manually.",
-    boundary: "The tick estimate assumes two input Labs, the remaining Labs used as parallel output Labs, one shared cluster reused sequentially for each reaction stage, uninterrupted cooldowns, enough reagent capacity, and no hauling delay. Verify stores, ranges, cooldowns, Power effects, return codes, and later-tick state in the live room.",
+    boundary: "The tick estimate assumes two input Labs, the remaining Labs used as parallel output Labs, one shared cluster reused sequentially for each reaction stage, uninterrupted cooldowns, enough reagent capacity, and no hauling delay. Every stage is rounded to complete parallel Lab batches. Verify stores, ranges, cooldowns, Power effects, return codes, and later-tick state in the live room.",
   },
   zh: {
     tabs: { reaction: "化合物生产", boost: "Creep Boost 批次" },
@@ -77,7 +78,8 @@ const copy = {
     perRun: "每个输出 Lab 每轮产量",
     mineral: "Boost 所需化合物",
     energy: "Boost 所需 Energy",
-    produce: "仍需生产的化合物",
+    produce: "仍然需要的化合物",
+    scheduled: "按完整批次安排的产量",
     ticks: "顺序生产所需 Tick",
     stages: "反应阶段",
     bases: "基础矿物需求",
@@ -86,7 +88,7 @@ const copy = {
     copyJson: "复制计划 JSON",
     copied: "已复制。",
     failed: "复制失败，请手动选择可见文本。",
-    boundary: "Tick估算假设使用2个输入Lab，其余Lab并行输出，同一组Lab按阶段顺序复用，cooldown不中断、输入容量充足且不计算运输时间。必须在真实房间中核对库存、距离、cooldown、Power效果、返回码和后续Tick状态。",
+    boundary: "Tick估算假设使用2个输入Lab，其余Lab并行输出，同一组Lab按阶段顺序复用，cooldown不中断、输入容量充足且不计算运输时间。每个阶段都会按完整并行Lab批次向上取整。必须在真实房间中核对库存、距离、cooldown、Power效果、返回码和后续Tick状态。",
   },
 } as const;
 
@@ -152,17 +154,22 @@ export function LabReactionBoostPlanner({ locale }: Props) {
   const productionAmount = Math.max(0, Math.ceil(requestedAmount - existingStock));
 
   const calculation = useMemo(() => {
-    const plan = buildReactionPlan(target, productionAmount);
     const outputLabs = Math.max(1, labCount - 2);
     const amountPerRun = BASE_REACTION_AMOUNT + (OPERATE_LAB_BONUS[operateLevel] ?? 0);
+    const parallelBatchSize = outputLabs * amountPerRun;
+    const plan = buildBatchedReactionPlan(target, productionAmount, parallelBatchSize);
     const stages = plan.stages.map((stage) => {
-      const runs = stage.amount === 0 ? 0 : Math.ceil(stage.amount / (outputLabs * amountPerRun));
+      const runs = stage.amount === 0 ? 0 : Math.ceil(stage.amount / parallelBatchSize);
       return { ...stage, runs, ticks: runs * stage.cooldown };
     });
+    const scheduledOutput = stages.find((stage) => stage.compound === target)?.amount ?? 0;
+
     return {
       plan,
       outputLabs,
       amountPerRun,
+      parallelBatchSize,
+      scheduledOutput,
       stages,
       totalTicks: stages.reduce((sum, stage) => sum + stage.ticks, 0),
     };
@@ -174,11 +181,13 @@ export function LabReactionBoostPlanner({ locale }: Props) {
     requestedAmount,
     existingStock,
     productionAmount,
+    scheduledOutput: calculation.scheduledOutput,
     labCount,
     inputLabs: 2,
     outputLabs: calculation.outputLabs,
     operateLabLevel: operateLevel,
     amountPerOutputLabRun: calculation.amountPerRun,
+    parallelBatchSize: calculation.parallelBatchSize,
     sequentialReactionTicks: calculation.totalTicks,
     boost: mode === "boost" ? {
       creeps: creepCount,
@@ -196,6 +205,7 @@ export function LabReactionBoostPlanner({ locale }: Props) {
     locale === "en" ? "Screeps Lab Reaction and Boost Planner" : "Screeps Lab 反应与 Boost 规划器",
     `${t.target}: ${target}`,
     `${t.produce}: ${formatNumber(productionAmount)}`,
+    `${t.scheduled}: ${formatNumber(calculation.scheduledOutput)}`,
     `${t.outputLabs}: ${calculation.outputLabs}`,
     `${t.perRun}: ${calculation.amountPerRun}`,
     `${t.ticks}: ${formatNumber(calculation.totalTicks)}`,
@@ -248,9 +258,10 @@ export function LabReactionBoostPlanner({ locale }: Props) {
           <dl className="planning-metrics">
             {mode === "boost" && <><div><dt>{t.mineral}</dt><dd>{formatNumber(boostMineral)}</dd></div><div><dt>{t.energy}</dt><dd>{formatNumber(boostEnergy)}</dd></div><div className="planning-metric-wide"><dt>{t.effect}</dt><dd>{locale === "en" ? selectedBoost.effect : selectedBoost.effectZh}</dd></div></>}
             <div><dt>{t.produce}</dt><dd>{formatNumber(productionAmount)}</dd></div>
+            <div><dt>{t.scheduled}</dt><dd>{formatNumber(calculation.scheduledOutput)}</dd></div>
             <div><dt>{t.outputLabs}</dt><dd>{calculation.outputLabs}</dd></div>
             <div><dt>{t.perRun}</dt><dd>{calculation.amountPerRun}</dd></div>
-            <div><dt>{t.ticks}</dt><dd>{formatNumber(calculation.totalTicks)}</dd></div>
+            <div className="planning-metric-wide"><dt>{t.ticks}</dt><dd>{formatNumber(calculation.totalTicks)}</dd></div>
           </dl>
 
           <section className="planning-stage-list" aria-labelledby="lab-stage-title"><h3 id="lab-stage-title">{t.stages}</h3>{calculation.stages.length === 0 ? <p>{locale === "en" ? "Existing stock already covers the requested amount." : "现有库存已经覆盖目标数量。"}</p> : <ol>{calculation.stages.map((stage) => <li key={stage.compound}><strong>{stage.compound}</strong><span>{formatNumber(stage.amount)} · {stage.runs} {t.runs} · {stage.ticks} ticks</span></li>)}</ol>}</section>
