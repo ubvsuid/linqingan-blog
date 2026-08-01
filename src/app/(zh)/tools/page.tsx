@@ -8,7 +8,7 @@ import "../../screeps-planning-tools.css";
 
 export const metadata = createPageMetadata({
   title: "免费 Screeps 工具",
-  description: "使用无需账号连接的 Screeps 身体、房间、市场、Controller 和 Lab 规划工具。所有计算都在浏览器本地完成。",
+  description: "使用无需账号连接的Screeps身体、房间、市场、Controller、Lab、Spawn、运输和Tower规划工具。所有计算都在浏览器本地完成。",
   path: "/tools",
 });
 
@@ -42,6 +42,24 @@ const tools = [
     title: "Lab 反应与 Boost 规划器",
     description: "展开化合物反应链，并计算生产轮数、基础矿物和整批Boost需求。",
     href: "/tools/lab-reaction-boost-planner",
+  },
+  {
+    eyebrow: "SPAWN CAPACITY",
+    title: "Spawn 队列与替换规划器",
+    description: "同时规划多个角色的生成负载、替换TTL和OPERATE_SPAWN容量。",
+    href: "/tools/spawn-queue-replacement-planner",
+  },
+  {
+    eyebrow: "LOGISTICS",
+    title: "运输吞吐量规划器",
+    description: "计算CARRY容量、MOVE疲劳、往返周期、所需Creep数量和寿命运输量。",
+    href: "/tools/hauling-throughput-planner",
+  },
+  {
+    eyebrow: "TOWER POWER",
+    title: "Tower 伤害、治疗与维修计算器",
+    description: "计算距离衰减、多塔效果、Energy消耗、对抗量和完成目标所需Tick。",
+    href: "/tools/tower-damage-heal-repair-calculator",
   },
 ] as const;
 
