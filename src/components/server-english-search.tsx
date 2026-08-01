@@ -145,7 +145,11 @@ export function ServerEnglishSearch({
           {results.map((result) => (
             <article className={styles.result} key={result.id}>
               <div className={styles.meta}><span>{result.type}</span></div>
-              <h2><Link href={result.href}>{highlight(result.title, tokens)}</Link></h2>
+              <h2>
+                <Link href={result.href} aria-label={result.title}>
+                  {highlight(result.title, tokens)}
+                </Link>
+              </h2>
               <p>{highlight(result.description, tokens)}</p>
               {result.keywords.length > 0 ? (
                 <div className={styles.keywords} aria-label="Related keywords">
