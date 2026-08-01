@@ -18,8 +18,8 @@ const checks = [
   },
   {
     path: "src/lib/site.ts",
-    required: ["入门", "文章", "/knowledge#reference-tools"],
-    forbidden: ["入门路线", "全部文章"],
+    required: ["入门", "文章", '{ label: "工具", href: "/tools" }'],
+    forbidden: ["入门路线", "全部文章", '{ label: "工具", href: "/knowledge#reference-tools" }'],
   },
   {
     path: "src/components/site-header.tsx",
@@ -72,6 +72,11 @@ const checks = [
     forbidden: [],
   },
   {
+    path: "src/app/(zh)/tools/page.tsx",
+    required: ["CollectionPage", "ItemList", "/tools/market-terminal-cost-calculator", "/tools/controller-downgrade-planner", "/tools/lab-reaction-boost-planner"],
+    forbidden: [],
+  },
+  {
     path: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
     required: ["ToolUtilityBar"],
     forbidden: [],
@@ -79,6 +84,21 @@ const checks = [
   {
     path: "src/app/(zh)/tools/room-diagnostics/page.tsx",
     required: ["ToolUtilityBar"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/market-terminal-cost-calculator/page.tsx",
+    required: ["ToolUtilityBar", "SoftwareApplication"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/controller-downgrade-planner/page.tsx",
+    required: ["ToolUtilityBar", "SoftwareApplication"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/lab-reaction-boost-planner/page.tsx",
+    required: ["ToolUtilityBar", "SoftwareApplication"],
     forbidden: [],
   },
   {
