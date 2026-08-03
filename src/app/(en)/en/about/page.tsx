@@ -68,7 +68,7 @@ export default function EnglishAboutPage() {
             <div><dt>English guides</dt><dd>{englishDiscoveryArticles.length}</dd></div>
             <div><dt>Knowledge modules</dt><dd>{moduleCount}</dd></div>
             <div><dt>Topic archives</dt><dd>{topicCount}</dd></div>
-            <div><dt>Working tools</dt><dd>2</dd></div>
+            <div><dt>Working tools</dt><dd>8</dd></div>
           </dl>
         </section>
 
