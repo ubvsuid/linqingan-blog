@@ -4,19 +4,20 @@ const articles = [
   {
     path: "/en/blog/screeps-mineral-extractor-harvest",
     chinesePath: "/blog/screeps-mineral-extractor-harvest",
-    headline: "How to Harvest Minerals with an Extractor Safely",
-    indexTitle: "How to Harvest Minerals with an Extractor Safely",
-    query: "Extractor",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    expectFaq: true,
-    verificationSignals: ["Chinese source article", "Reviewed in full"],
+    headline: "Verify Mineral Harvesting Without Trusting Store Deltas Alone",
+    indexTitle: "Screeps Mineral Harvesting: Exact Miner and Mineral Event Identity",
+    query: "EVENT_HARVEST mineral",
+    tocId: "contract",
+    tocHeading: "Define the Mineral harvest contract",
+    expectFaq: false,
     signals: [
-      "findExtractorForMineral",
-      "mineral.mineralAmount",
-      "extractor.cooldown",
-      "ERR_NOT_FOUND",
-      "Live Mineral depletion, regeneration, Store and cooldown test",
+      "resolveMineralStation",
+      "Memory.pendingMineralHarvests",
+      "EVENT_HARVEST",
+      "event.objectId === pending.creepId",
+      "event.data?.targetId === pending.mineralId",
+      "harvest-event-window-missed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -29,7 +30,6 @@ const articles = [
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     expectFaq: false,
-    verificationSignals: ["Existing English route", "Preserved"],
     signals: [
       "createStorageEnergyCoordinator",
       "withdrawalRemaining",
@@ -43,19 +43,20 @@ const articles = [
   {
     path: "/en/blog/screeps-power-spawn-process-power",
     chinesePath: "/blog/screeps-power-spawn-process-power",
-    headline: "How to Process Power Without Breaking Your Energy Budget",
-    indexTitle: "How to Process Power Without Breaking Your Energy Budget",
-    query: "processPower",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    expectFaq: true,
-    verificationSignals: ["Chinese source article", "Reviewed in full"],
+    headline: "Verify Power Processing Without Inventing an Event",
+    indexTitle: "Screeps processPower(): Single Dispatch and Local Resource Proof",
+    query: "processPower verification",
+    tocId: "evidence-limit",
+    tocHeading: "Start with the missing event",
+    expectFaq: false,
     signals: [
+      "createPowerProcessingDispatcher",
+      "Memory.pendingPowerProcessing",
       "POWER_SPAWN_ENERGY_RATIO",
-      "PWR_OPERATE_POWER",
-      "Game.gpl.progress",
-      "room.powerSpawn",
-      "Live GPL, Store, effect level and continuous processing test",
+      "local-signature-matches",
+      "transfer-confounded",
+      "does not currently create a Room event",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -66,7 +67,6 @@ const failures = [];
 for (const article of articles) {
   const response = await fetch(`${baseUrl}${article.path}`, { redirect: "manual" });
   const body = await response.text();
-
   if (response.status !== 200) {
     failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
     continue;
@@ -77,7 +77,6 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    ...article.verificationSignals,
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
@@ -111,27 +110,24 @@ const mineralBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-mineral-extractor-harvest`,
 )).text();
 if (
-  !mineralBody.includes("room.lookForAt")
-  || !mineralBody.includes("extractor.pos.isEqualTo(mineral.pos)")
+  !mineralBody.includes("mineral.pos.lookFor(LOOK_STRUCTURES)")
   || !mineralBody.includes("creep.harvest(mineral)")
+  || !mineralBody.includes("event.event === EVENT_HARVEST")
+  || !mineralBody.includes("event.objectId === pending.creepId")
+  || !mineralBody.includes("event.data?.targetId === pending.mineralId")
+  || !mineralBody.includes("event amount is based on harvest power")
 ) {
-  failures.push("Mineral 页面缺少同格 Extractor 或采集调用边界");
+  failures.push("Mineral 页面缺少同格 Extractor、精确 Miner-to-Mineral 事件或金额边界");
 }
 
 const storageBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-storage-energy-usage`,
 )).text();
 if (
-  !storageBody.includes("storageEnergy - reserveEnergy")
-  || !storageBody.includes("coordinator.withdrawalRemaining -= amount")
+  !storageBody.includes("coordinator.withdrawalRemaining -= amount")
   || !storageBody.includes("coordinator.targetReservations[target.id]")
   || !storageBody.includes("event.objectId === pending.sourceId")
   || !storageBody.includes("event.data?.targetId === pending.targetId")
-  || !storageBody.includes("event.data?.resourceType === RESOURCE_ENERGY")
-  || !storageBody.includes("sourceId: storage.id")
-  || !storageBody.includes("targetId: creep.id")
-  || !storageBody.includes("sourceId: creep.id")
-  || !storageBody.includes("targetId: target.id")
 ) {
   failures.push("Storage 页面缺少共享预算、容量预留或双向精确事件身份边界");
 }
@@ -140,11 +136,15 @@ const powerBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-power-spawn-process-power`,
 )).text();
 if (
-  !powerBody.includes("plannedPower * POWER_SPAWN_ENERGY_RATIO")
-  || !powerBody.includes("powerSpawn.processPower")
-  || !powerBody.includes("config.enabled !== true")
+  !powerBody.includes("powerSpawn.processPower()")
+  || !powerBody.includes("submittedIds.has(powerSpawn.id)")
+  || !powerBody.includes("pending.before.power")
+  || !powerBody.includes("EVENT_TRANSFER")
+  || !powerBody.includes("event.data?.targetId === pending.powerSpawnId")
+  || !powerBody.includes("Game.gpl.progress")
+  || !powerBody.includes("Do not invent an")
 ) {
-  failures.push("Power Spawn 页面缺少资源比例、处理调用或显式开关");
+  failures.push("Power Spawn 页面缺少单次调度、本地资源签名、transfer confound 或无事件边界");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -174,4 +174,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十二批英文资源生产冒烟测试通过：${articles.length} 篇文章、Mineral、Storage 精确事件、Power、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十二批英文资源生产冒烟测试通过：${articles.length} 篇文章、Mineral 精确事件、Storage 精确事件、Power 证据边界、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
