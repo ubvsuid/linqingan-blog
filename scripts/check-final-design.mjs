@@ -8,8 +8,13 @@ const checks = [
   },
   {
     path: "src/components/home-task-hub.tsx",
-    required: ["你现在想完成什么", "linqingan:recent-articles", "最近阅读"],
-    forbidden: [],
+    required: ["你现在想完成什么", "HomeTaskProgressCard", "HomeRecentReading"],
+    forbidden: ['"use client"', "<style>"],
+  },
+  {
+    path: "src/components/home-task-personalization.tsx",
+    required: ["linqingan:recent-articles", "最近阅读", "useSyncExternalStore"],
+    forbidden: ["@/lib/beginner-series", "<style>"],
   },
   {
     path: "src/components/home-maintenance-panel.tsx",
