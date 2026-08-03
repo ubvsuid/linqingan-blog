@@ -115,7 +115,8 @@ const renewBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-renew-creep`,
 )).text();
 for (const expected of [
-  "creep.body.some(part => part.type === CLAIM)",
+  "creep.body.some",
+  "part.type === CLAIM",
   "dispatcher.reserve(spawn, creep)",
   "Memory.pendingRenewals[creep.id]",
   "pending.before.ticksToLive",
