@@ -45,8 +45,8 @@ requireText("src/app/(en)/layout.tsx", '<html lang="en" data-site-language="en"'
 requireText("src/app/(zh)/layout.tsx", '<html lang="zh-CN" data-site-language="zh-CN"', "server-rendered Chinese document language");
 forbidText("src/app/(en)/layout.tsx", "document.documentElement.lang", "client-side document language mutation");
 requireText("src/app/(en)/en/layout.tsx", 'className="english-root" lang="en"', "English content language wrapper");
-requireText("src/components/site-header.tsx", 'lang={english ? "en" : "zh-CN"}', "localized header language");
-requireText("src/components/site-header.tsx", 'english ? "Switch to Chinese"', "English language-switch label");
+requireText("src/components/site-header-client.tsx", 'lang={english ? "en" : "zh-CN"}', "localized header language");
+requireText("src/components/site-header-client.tsx", 'english ? "Switch to Chinese"', "English language-switch label");
 requireText("src/components/site-footer.tsx", 'lang={english ? "en" : "zh-CN"}', "localized footer language");
 requireText("src/app/(en)/en/layout.tsx", "/en/search?q={search_term_string}", "English SearchAction");
 requireText("src/lib/english-metadata.ts", 'applicationName: "Linqingan Screeps Guides & Tools"', "English application metadata");
