@@ -4,26 +4,20 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
-const overridePath = path.join(
-  root,
-  "src/lib/english-editorial-controller-renew-nuker-20260803.ts",
-);
-const publishedPath = path.join(
-  root,
-  "src/lib/english-editorial-published-20260731.ts",
-);
-const registryPaths = [
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const source = read("src/lib/english-editorial-controller-renew-nuker-20260803.ts");
+const identitySource = [
+  "src/lib/english-reserve-claim-controller-14.ts",
+  "src/lib/english-lifecycle-content-4.ts",
+  "src/lib/english-nuker-launch-17.ts",
+].map(read).join("\n");
+const published = read("src/lib/english-editorial-published-20260731.ts");
+const registries = [
   "src/lib/english-controller-registry-14.ts",
   "src/lib/english-lifecycle-registry-4.ts",
   "src/lib/english-defense-operations-registry-17.ts",
-];
-
-const source = fs.readFileSync(overridePath, "utf8");
-const published = fs.readFileSync(publishedPath, "utf8");
-const registries = registryPaths
-  .map((file) => fs.readFileSync(path.join(root, file), "utf8"))
-  .join("\n");
-const packageJson = fs.readFileSync(path.join(root, "package.json"), "utf8");
+].map(read).join("\n");
+const packageJson = read("package.json");
 const failures = [];
 
 const articles = [
@@ -37,8 +31,8 @@ const articles = [
       "Memory.pendingControllerOperations",
       "EVENT_RESERVE_CONTROLLER",
       "event.objectId === pending.creepId",
-      "does not include a Controller targetId",
-      "claimController() has no Room event",
+      "does not include a Controller <code>targetId</code>",
+      "<code>claimController()</code> has no Room event",
       "controller.owner?.username === pending.username",
       "reserve-event-window-missed",
       "claim-owner-observed",
@@ -85,12 +79,19 @@ for (const article of articles) {
     `slug: \"${article.slug}\"`,
     `path: \"${article.path}\"`,
     `chinesePath: \"${article.chinesePath}\"`,
+  ]) {
+    if (!identitySource.includes(expected)) {
+      failures.push(`${article.slug}: 原始文章身份缺少 ${expected}`);
+    }
+  }
+
+  for (const expected of [
     `title: \"${article.title}\"`,
     `headline: \"${article.headline}\"`,
     ...article.signals,
   ]) {
     if (!source.includes(expected)) {
-      failures.push(`${article.slug}: 正文覆盖缺少 ${expected}`);
+      failures.push(`${article.slug}: 深度覆盖缺少 ${expected}`);
     }
   }
 
@@ -99,7 +100,6 @@ for (const article of articles) {
     `chinesePath: \"${article.chinesePath}\"`,
     `title: \"${article.title}\"`,
     `updatedAt: \"2026-08-03\"`,
-    "finalScore: 98",
   ]) {
     if (!registries.includes(expected)) {
       failures.push(`${article.slug}: 登记元数据缺少 ${expected}`);
@@ -111,9 +111,7 @@ for (const expected of [
   "englishEditorialControllerRenewNukerOverrides20260803",
   "...englishEditorialControllerRenewNukerOverrides20260803",
 ]) {
-  if (!published.includes(expected)) {
-    failures.push(`发布聚合缺少 ${expected}`);
-  }
+  if (!published.includes(expected)) failures.push(`发布聚合缺少 ${expected}`);
 }
 
 for (const expected of [
@@ -123,9 +121,7 @@ for (const expected of [
   "Last verified",
   "August 3, 2026",
 ]) {
-  if (!source.includes(expected)) {
-    failures.push(`证据边界缺少 ${expected}`);
-  }
+  if (!source.includes(expected)) failures.push(`证据边界缺少 ${expected}`);
 }
 
 const scores = [...source.matchAll(/finalScore:\s*(\d+)/g)]
@@ -140,9 +136,7 @@ if (faqArrays.length !== 3) {
 }
 
 const tocPairs = [...source.matchAll(/\["([a-z0-9-]+)", "([^"]+)"\],/g)];
-if (tocPairs.length < 27) {
-  failures.push(`目录条目不足：${tocPairs.length}`);
-}
+if (tocPairs.length < 27) failures.push(`目录条目不足：${tocPairs.length}`);
 for (const match of tocPairs) {
   const id = match[1];
   if (!source.includes(`<h2 id=\"${id}\">`) && !source.includes(`<h3 id=\"${id}\">`)) {
@@ -156,7 +150,6 @@ const blocks = [...source.matchAll(
   .replaceAll("&lt;", "<")
   .replaceAll("&gt;", ">")
   .replaceAll("&amp;", "&"));
-
 if (blocks.length !== 16) {
   failures.push(`JavaScript 代码块数量应为 16，实际 ${blocks.length}`);
 }
@@ -166,9 +159,7 @@ try {
   blocks.forEach((code, index) => {
     const file = path.join(temp, `${index + 1}.js`);
     fs.writeFileSync(file, code, "utf8");
-    const result = spawnSync(process.execPath, ["--check", file], {
-      encoding: "utf8",
-    });
+    const result = spawnSync(process.execPath, ["--check", file], { encoding: "utf8" });
     if (result.status !== 0) {
       failures.push(`代码块 ${index + 1} 语法失败：${result.stderr.trim()}`);
     }
@@ -183,8 +174,7 @@ function classifyReserve(input) {
   if (!input.roomVisible) return "room-not-visible";
   if (input.controllerId !== input.pendingControllerId) return "controller-identity-mismatch";
   const matches = input.events.filter((event) =>
-    event.type === "reserve"
-    && event.objectId === input.creepId
+    event.type === "reserve" && event.objectId === input.creepId
   );
   if (matches.length === 0) return "accepted-reserve-event-missing";
   if (matches.length > 1) return "reserve-event-ambiguous";
@@ -204,7 +194,7 @@ const reserveBase = {
   reservationUsername: "me",
   events: [{ type: "reserve", objectId: "creep-a", amount: 1000 }],
 };
-for (const [input, expected] of [
+const reserveCases = [
   [{ ...reserveBase, gameTime: 100 }, "wait-for-next-tick"],
   [{ ...reserveBase, gameTime: 102 }, "reserve-event-window-missed"],
   [{ ...reserveBase, roomVisible: false }, "room-not-visible"],
@@ -213,10 +203,9 @@ for (const [input, expected] of [
   [{ ...reserveBase, events: [...reserveBase.events, ...reserveBase.events] }, "reserve-event-ambiguous"],
   [{ ...reserveBase, reservationUsername: "other" }, "reserve-event-state-mismatch"],
   [reserveBase, "reserve-event-and-state-observed"],
-]) {
-  if (classifyReserve(input) !== expected) {
-    failures.push(`Reserve 离线边界失败：${expected}`);
-  }
+];
+for (const [input, expected] of reserveCases) {
+  if (classifyReserve(input) !== expected) failures.push(`Reserve 离线边界失败：${expected}`);
 }
 
 function classifyClaim(input) {
@@ -227,15 +216,14 @@ function classifyClaim(input) {
     : "accepted-claim-owner-not-observed";
 }
 
-for (const [input, expected] of [
+const claimCases = [
   [{ roomVisible: false }, "claimed-room-not-visible"],
   [{ roomVisible: true, controllerId: "b", pendingControllerId: "a" }, "controller-identity-mismatch"],
   [{ roomVisible: true, controllerId: "a", pendingControllerId: "a", ownerUsername: null, username: "me", controllerMy: false }, "accepted-claim-owner-not-observed"],
   [{ roomVisible: true, controllerId: "a", pendingControllerId: "a", ownerUsername: "me", username: "me", controllerMy: true }, "claim-owner-observed"],
-]) {
-  if (classifyClaim(input) !== expected) {
-    failures.push(`Claim 离线边界失败：${expected}`);
-  }
+];
+for (const [input, expected] of claimCases) {
+  if (classifyClaim(input) !== expected) failures.push(`Claim 离线边界失败：${expected}`);
 }
 
 function classifyRenew(input) {
@@ -247,15 +235,14 @@ function classifyRenew(input) {
     : "renewal-local-signature-observed";
 }
 
-for (const [input, expected] of [
+const renewCases = [
   [{ beforeTtl: 300, addedTicks: 200, observedTtl: 498, hadBoosts: false, boostsRemaining: 0, energyTransferCount: 0 }, "renewal-ttl-signature-mismatch"],
   [{ beforeTtl: 300, addedTicks: 200, observedTtl: 499, hadBoosts: true, boostsRemaining: 1, energyTransferCount: 0 }, "renewal-boost-removal-mismatch"],
   [{ beforeTtl: 300, addedTicks: 200, observedTtl: 499, hadBoosts: false, boostsRemaining: 0, energyTransferCount: 1 }, "renewal-observed-energy-confounded"],
   [{ beforeTtl: 300, addedTicks: 200, observedTtl: 499, hadBoosts: false, boostsRemaining: 0, energyTransferCount: 0 }, "renewal-local-signature-observed"],
-]) {
-  if (classifyRenew(input) !== expected) {
-    failures.push(`Renew 离线边界失败：${expected}`);
-  }
+];
+for (const [input, expected] of renewCases) {
+  if (classifyRenew(input) !== expected) failures.push(`Renew 离线边界失败：${expected}`);
 }
 
 function classifyNuker(input) {
@@ -285,22 +272,24 @@ const nukeBase = {
   launchRoomName: "W1N1",
   nukes: [{ x: 25, y: 25, launchRoomName: "W1N1" }],
 };
-for (const [input, expected] of [
+const nukeCases = [
   [{ ...nukeBase, nukerVisible: false }, "nuker-not-visible"],
   [{ ...nukeBase, energy: 1 }, "accepted-launch-signature-mismatch"],
   [{ ...nukeBase, targetVisible: false }, "launcher-observed-target-unavailable"],
   [{ ...nukeBase, nukes: [] }, "target-nuke-not-observed"],
   [{ ...nukeBase, nukes: [...nukeBase.nukes, ...nukeBase.nukes] }, "target-nuke-ambiguous"],
   [nukeBase, "launcher-and-target-observed"],
-]) {
-  if (classifyNuker(input) !== expected) {
-    failures.push(`Nuker 离线边界失败：${expected}`);
-  }
+];
+for (const [input, expected] of nukeCases) {
+  if (classifyNuker(input) !== expected) failures.push(`Nuker 离线边界失败：${expected}`);
 }
 
 if (!packageJson.includes("englisheditorialcontrollerrenewnuker20260803check")) {
   failures.push("package.json 尚未接入本批质量门禁");
 }
+
+const offlineCases = reserveCases.length + claimCases.length + renewCases.length + nukeCases.length;
+if (offlineCases !== 22) failures.push(`离线用例数量应为 22，实际 ${offlineCases}`);
 
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
@@ -309,5 +298,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Controller、续命与 Nuker 深度编辑门禁通过：3 个现有路由、${blocks.length} 个 JavaScript 代码块、精确 Reserve/Claim/Renew/Nuker 证据边界、Pending 真实环境证据与 98 分内部门槛均有效。`,
+  `Controller、续命与 Nuker 深度编辑门禁通过：3 个现有路由、${blocks.length} 个 JavaScript 代码块、${offlineCases} 个离线用例、精确 Reserve/Claim/Renew/Nuker 证据边界、Pending 真实环境证据与 98 分内部门槛均有效。`,
 );
