@@ -16,9 +16,10 @@ const articles = [
   },
   {
     path: "/en/blog/screeps-emergency-harvester-recovery", chinesePath: "/blog/screeps-spawn-emergency-recovery",
-    headline: "How to Recover a Screeps Room with No Harvesters", listingTitle: "How to Recover a Screeps Room with No Harvesters",
-    tocId: "quick-answer", tocHeading: "Quick answer", faqExpected: true,
-    verification: ["Chinese source article", "Reviewed in full", "Safety boundary", "Initial Spawn 1-Energy refill is special and not assumed for ordinary rooms", "Live colony-collapse recovery", "Pending"], signals: [],
+    headline: "Recover a Room with No Harvesters Without Spawning Duplicates", listingTitle: "Screeps Emergency Harvester Recovery: Track the Exact Spawn Request",
+    tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false,
+    verification: ["Existing English route", "Preserved", "Screeps Console test", "Pending", "Live multi-tick verification"],
+    signals: ["isCapableGeneralHarvester", "room.memory.emergencyRecovery", "spawn?.spawning?.name === pending.creepName", "recovery-creep-ready", "recovery-overdue", "spawn-rejected-after-dry-run"],
   },
 ];
 const failures = [];
@@ -39,6 +40,14 @@ const dynamicBody = await (await fetch(`${baseUrl}/en/blog/screeps-dynamic-creep
 if (!dynamicBody.includes("minimumBody: [WORK, CARRY, MOVE]")) failures.push("Dynamic body page is missing the explicit minimum-body example");
 if (!dynamicBody.includes("maximumEnergy: 1200")) failures.push("Dynamic body page is missing the role Energy cap");
 if (!dynamicBody.includes("spawnTime: body.length * CREEP_SPAWN_TIME")) failures.push("Dynamic body page is missing Spawn-time reporting");
+const emergencyBody = await (await fetch(`${baseUrl}/en/blog/screeps-emergency-harvester-recovery`)).text();
+if (
+  !emergencyBody.includes("pending.spawnId")
+  || !emergencyBody.includes("pending.creepName")
+  || !emergencyBody.includes("Game.creeps[pending.creepName]")
+  || !emergencyBody.includes("spawn.spawning.remainingTime")
+  || !emergencyBody.includes("bodyLength * CREEP_SPAWN_TIME")
+) failures.push("Emergency recovery page is missing exact Spawn/name, later-Creep, or overdue verification boundaries");
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
 const blogBody = await blogResponse.text();
 if (blogResponse.status !== 200) failures.push(`/en/blog-index.json: expected 200, received ${blogResponse.status}`);
@@ -50,4 +59,4 @@ else for (const article of articles) if (!searchBody.includes(article.listingTit
 const sitemapBody = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
 for (const article of articles) if (!sitemapBody.includes(`https://www.linqingan.com${article.path}`)) failures.push(`/sitemap.xml: missing ${article.path}`);
 if (failures.length) { failures.forEach((failure) => console.error(`ERROR: ${failure}`)); process.exit(1); }
-console.log(`Spawn batch production smoke passed: ${articles.length} pages, dynamic body policy, revised return-code workflow, Verification, Canonical, hreflang, structured data, search, and Sitemap.`);
+console.log(`Spawn batch production smoke passed: ${articles.length} pages, dynamic body policy, exact emergency request identity, Verification, Canonical, hreflang, structured data, search, and Sitemap.`);
