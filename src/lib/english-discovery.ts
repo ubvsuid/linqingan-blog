@@ -73,6 +73,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-creep-roles": ["creeps", "javascript"],
   "/en/blog/screeps-spawncreep-return-codes": ["spawn", "debugging"],
   "/en/blog/screeps-dynamic-creep-body": ["spawn", "creeps", "energy"],
+  "/en/blog/screeps-creep-prespawn-replacement": ["spawn", "creeps", "movement"],
   "/en/blog/screeps-emergency-harvester-recovery": ["spawn", "creeps", "energy"],
   "/en/blog/screeps-renew-creep": ["spawn", "creeps"],
   "/en/blog/screeps-recycle-creep": ["spawn", "creeps"],
@@ -195,6 +196,12 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
     "/en/blog/screeps-first-extension",
     "/en/blog/screeps-memory-basics",
     "/en/blog/screeps-err-not-in-range",
+  ],
+  "/en/blog/screeps-creep-prespawn-replacement": [
+    "/en/blog/screeps-dynamic-creep-body",
+    "/en/blog/screeps-renew-creep",
+    "/en/blog/screeps-emergency-harvester-recovery",
+    "/en/blog/screeps-move-fatigue-body-ratio",
   ],
 };
 
