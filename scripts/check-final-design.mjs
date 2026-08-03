@@ -23,6 +23,11 @@ const checks = [
   },
   {
     path: "src/components/site-header.tsx",
+    required: ["SiteHeaderClient", "beginnerArticlePaths", "languageRoutePairs"],
+    forbidden: ['"use client"'],
+  },
+  {
+    path: "src/components/site-header-client.tsx",
     required: ["profile-shortcut", "header-icon-link"],
     forbidden: ["<style>", ".header-icon-link { display: none; }"],
   },
