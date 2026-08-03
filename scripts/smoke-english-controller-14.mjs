@@ -46,20 +46,23 @@ const articles = [
   {
     path: "/en/blog/screeps-reserve-vs-claim-controller",
     chinesePath: "/blog/screeps-reserve-vs-claim-controller",
-    headline: "How to Choose Between Reserving and Claiming a Controller",
-    query: "reserveController",
-    expectFaq: true,
-    verificationSignals: ["Chinese source article", "Reviewed in full"],
+    headline: "Reserve or Claim a Controller Without Losing Mission Identity",
+    indexTitle: "Screeps reserveController() vs claimController(): Verify the Exact Mission",
+    query: "EVENT_RESERVE_CONTROLLER",
+    expectFaq: false,
+    verificationSignals: ["Official engine", "Claim boundary"],
     sectionSignals: [
-      `href="#quick-answer"`,
-      `<h2 id="quick-answer">Quick answer</h2>`,
+      `href="#operation-contract"`,
+      `<h2 id="operation-contract">Separate mission choice from operation proof</h2>`,
     ],
     signals: [
-      "creep.reserveController(controller)",
-      "creep.claimController(controller)",
-      "claimConfirmed",
-      "mission.enabled = false",
-      "Live reservation renewal, 5,000-tick cap, GCL claim, hostile reservation and next-tick state test",
+      "resolveControllerMission",
+      "Memory.pendingControllerOperations",
+      "EVENT_RESERVE_CONTROLLER",
+      "event.objectId === pending.creepId",
+      "claim-owner-observed",
+      "reserve-event-window-missed",
+      "Live reserve event, claim ownership, hostile reservation and missed-window verification",
       "Pending",
     ],
   },
@@ -141,11 +144,15 @@ const missionBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-reserve-vs-claim-controller`,
 )).text();
 if (
-  !missionBody.includes("claimConfirmed")
-  || !missionBody.includes("ownedRoomCount >= input.gclLevel")
-  || !missionBody.includes("mission.enabled = false")
+  !missionBody.includes("mission.controllerId !== controller.id")
+  || !missionBody.includes("Memory.pendingControllerOperations")
+  || !missionBody.includes("event.event === EVENT_RESERVE_CONTROLLER")
+  || !missionBody.includes("event.objectId === pending.creepId")
+  || !missionBody.includes("does not include a Controller")
+  || !missionBody.includes("claimController() has no Room event")
+  || !missionBody.includes("controller.owner?.username === pending.username")
 ) {
-  failures.push("Reserve/Claim 页面缺少人工确认、GCL 或 claim 一次性完成边界");
+  failures.push("Reserve/Claim 页面缺少任务身份、Reserve事件边界或Claim所有权验证");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -176,4 +183,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode、降级恢复与 Reserve/Claim 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode、降级恢复、精确 Reserve 事件与 Claim 所有权验证、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
