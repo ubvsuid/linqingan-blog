@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishControllerBatchFourteenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishControllerBatchFourteenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-controller-activate-safe-mode",
     chinesePath: "/blog/screeps-controller-activate-safe-mode",
@@ -48,23 +52,24 @@ export const englishControllerBatchFourteenRegistry: EnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-reserve-vs-claim-controller",
     chinesePath: "/blog/screeps-reserve-vs-claim-controller",
-    category: "CONTROLLER · RESERVE OR CLAIM",
-    title: "How to Choose Between Reserving and Claiming a Controller",
+    category: "CONTROLLER · RESERVE AND CLAIM IDENTITY",
+    title: "Screeps reserveController() vs claimController(): Verify the Exact Mission",
     description:
-      "Separate renewable remote-room reservations from one-time room ownership, require an active CLAIM part and range 1, block owned Controllers and hostile reservations, require explicit claim confirmation and GCL capacity, save return codes, and stop a claim mission after OK.",
+      "Bind the Claimer and Controller IDs, record only accepted reserve or claim calls, verify reserve events without inventing a targetId, and verify claims through exact next-tick ownership.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "19 min read",
-    primaryKeyword: "Screeps reserveController vs claimController",
-    searchIntent: "Choose a renewable reservation or explicitly confirmed permanent room claim from current Controller and GCL evidence",
+    updatedAt: "2026-08-03",
+    readingTime: "22 min read",
+    primaryKeyword: "Screeps reserveController vs claimController verification",
+    searchIntent: "Choose, submit, and verify one exact reserve or claim Controller mission without confusing an accepted call with completed state",
     status: "published",
     finalScore: 98,
     keywords: [
-      "Screeps reserveController vs claimController",
-      "Screeps remote room reservation",
-      "Screeps claim Controller GCL",
-      "Screeps CLAIM body part",
-      "Screeps Controller reservation ticksToEnd",
+      "Screeps reserveController vs claimController verification",
+      "Screeps EVENT_RESERVE_CONTROLLER",
+      "Screeps claimController next tick",
+      "Screeps Controller mission identity",
+      "Screeps remote reservation evidence",
     ],
   },
 ];
