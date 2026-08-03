@@ -31,7 +31,7 @@ function stopServer() {
   }
 }
 
-const smoke = spawn(process.execPath, ["scripts/smoke-all.mjs"], {
+const smoke = spawn(process.execPath, ["scripts/smoke-all-hardening.mjs"], {
   env: { ...process.env, BASE_URL: baseUrl },
   stdio: "inherit",
 });
