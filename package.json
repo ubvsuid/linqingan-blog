@@ -47,6 +47,7 @@
     "englisheditorialtowerevents20260801check": "node scripts/check-english-editorial-tower-events-20260801.mjs",
     "englisheditorialrecoverystoragebuild20260803check": "node scripts/check-english-editorial-recovery-storage-build-20260803.mjs",
     "englisheditorialdefensemineralpower20260803check": "node scripts/check-english-editorial-defense-mineral-power-20260803.mjs",
+    "englisheditorialcontrollerrenewnuker20260803check": "node scripts/check-english-editorial-controller-renew-nuker-20260803.mjs",
     "englishmovement6check": "node scripts/check-english-movement-6.mjs",
     "englishvision7check": "node scripts/check-english-vision-7.mjs",
     "englishruntime8check": "node scripts/check-english-runtime-8.mjs",
@@ -69,7 +70,7 @@
     "changelog:add": "node scripts/add-changelog.mjs",
     "smoke": "node scripts/smoke-test.mjs",
     "check": "npm run build",
-    "prebuild": "npm run locksynccheck && npm run contentcheck && npm run designcheck && npm run routecheck && npm run sitemaprevisioncheck && npm run cspboundarycheck && npm run performancebudgetcheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run englishmappingcheck && npm run englishsourcecoveragecheck && npm run englishdiscoverycheck && npm run englisharticlelibrarycheck && npm run englishinterfacecheck && npm run englishevidencecheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englisheditorial20260731check && npm run englisheditorialcore20260731check && npm run englisheditorialruntime20260731check && npm run englisheditorialspawnroutememory20260731check && npm run englisheditorialtargetsvisualmodules20260731check && npm run englisheditorialfirstloopstatenotify20260731check && npm run englisheditorialeventobserverflags20260731check && npm run englisheditorialmarketidentity20260801check && npm run englisheditoriallabfactoryidentity20260801check && npm run englisheditorialtowerevents20260801check && npm run englisheditorialrecoverystoragebuild20260803check && npm run englisheditorialdefensemineralpower20260803check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run englishobservability9check && npm run englishmarket10check && npm run englishlabfactory11check && npm run englishresources12check && npm run englishtower13check && npm run englishcontroller14check && npm run englishconstruction15check && npm run englishconfig16check && npm run englishdefense17check && npm run englishlinksource18check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint"
+    "prebuild": "npm run locksynccheck && npm run contentcheck && npm run designcheck && npm run routecheck && npm run sitemaprevisioncheck && npm run cspboundarycheck && npm run performancebudgetcheck && npm run toolindexcheck && npm run taggovernancecheck && npm run linkcheck && npm run englishmappingcheck && npm run englishsourcecoveragecheck && npm run englishdiscoverycheck && npm run englisharticlelibrarycheck && npm run englishinterfacecheck && npm run englishevidencecheck && npm run codecheck && npm run englishfoundationcheck && npm run englishfoundation2check && npm run englishspawn3check && npm run englishlifecycle4check && npm run englishmovement5check && npm run englisheditorial20260731check && npm run englisheditorialcore20260731check && npm run englisheditorialruntime20260731check && npm run englisheditorialspawnroutememory20260731check && npm run englisheditorialtargetsvisualmodules20260731check && npm run englisheditorialfirstloopstatenotify20260731check && npm run englisheditorialeventobserverflags20260731check && npm run englisheditorialmarketidentity20260801check && npm run englisheditoriallabfactoryidentity20260801check && npm run englisheditorialtowerevents20260801check && npm run englisheditorialrecoverystoragebuild20260803check && npm run englisheditorialdefensemineralpower20260803check && npm run englisheditorialcontrollerrenewnuker20260803check && npm run englishmovement6check && npm run englishvision7check && npm run englishruntime8check && npm run englishobservability9check && npm run englishmarket10check && npm run englishlabfactory11check && npm run englishresources12check && npm run englishtower13check && npm run englishcontroller14check && npm run englishconstruction15check && npm run englishconfig16check && npm run englishdefense17check && npm run englishlinksource18check && npm run simulationcheck && npm run accessibilitycheck && npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -85,7 +86,7 @@
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react-dom": "^19.2.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.2.0",
     "typescript": "^5.9.0"
