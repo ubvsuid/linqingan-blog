@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishMineralStoragePowerBatchTwelveRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishMineralStoragePowerBatchTwelveRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-mineral-extractor-harvest",
     chinesePath: "/blog/screeps-mineral-extractor-harvest",
@@ -26,22 +30,24 @@ export const englishMineralStoragePowerBatchTwelveRegistry: EnglishArticleRecord
   {
     href: "/en/blog/screeps-storage-energy-usage",
     chinesePath: "/blog/screeps-storage-energy-usage",
-    category: "LOGISTICS · STORAGE ENERGY RESERVE",
-    title: "How to Use Storage Energy Without Draining Your Reserve",
+    category: "LOGISTICS · STORAGE BUDGET AND EVENT IDENTITY",
+    title: "Screeps Storage Energy: Reserve Budgets and Verify Transfers",
     description:
-      "Guard room.storage access, calculate withdrawable Energy above a configurable reserve, switch a hauler between withdrawal and delivery, select Spawn and Extension targets deterministically, handle action return codes, and verify same-tick capacity races.",
+      "Coordinate one shared Storage withdrawal budget and target capacity map, record only accepted withdraw or transfer calls, and verify the exact source-target event on the next tick.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
+    updatedAt: "2026-08-03",
     readingTime: "18 min read",
-    primaryKeyword: "Screeps room.storage energy",
-    searchIntent: "Withdraw and deliver Storage Energy while preserving a room-specific reserve",
+    primaryKeyword: "Screeps Storage Energy reserve",
+    searchIntent:
+      "Coordinate Storage Energy withdrawals and deliveries without crossing a shared reserve or misattributing another logistics action",
     status: "published",
     finalScore: 98,
     keywords: [
-      "Screeps room.storage energy",
-      "Screeps Storage reserve",
-      "Screeps withdraw Storage Energy",
-      "Screeps Spawn Extension hauler",
+      "Screeps Storage Energy reserve",
+      "Screeps withdraw event verification",
+      "Screeps hauler capacity reservation",
+      "Room.getEventLog EVENT_TRANSFER",
       "Screeps Storage logistics",
     ],
   },
