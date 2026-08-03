@@ -89,6 +89,54 @@ if (!headerClient.startsWith('"use client"')) {
   failures.push("The interactive header boundary must remain an explicit client component.");
 }
 
+const homeTaskServer = fs.readFileSync(
+  path.join(root, "src", "components", "home-task-hub.tsx"),
+  "utf8",
+);
+const homeTaskClient = fs.readFileSync(
+  path.join(root, "src", "components", "home-task-personalization.tsx"),
+  "utf8",
+);
+const homeTaskStyles = fs.readFileSync(
+  path.join(root, "src", "components", "home-task-hub.module.css"),
+  "utf8",
+);
+if (homeTaskServer.includes('"use client"') || homeTaskServer.includes("<style>")) {
+  failures.push("The homepage task structure and its styles must remain server-rendered.");
+}
+if (
+  !homeTaskServer.includes("<HomeTaskProgressCard")
+  || !homeTaskServer.includes("<HomeRecentReading")
+) {
+  failures.push("The homepage task hub must isolate only progress and recent-reading personalization.");
+}
+for (const forbiddenImport of [
+  "@/lib/beginner-series",
+  "@/lib/beginner-progress",
+  "@/hooks/use-beginner-progress",
+]) {
+  if (homeTaskClient.includes(forbiddenImport)) {
+    failures.push(`Homepage personalization must not import ${forbiddenImport}.`);
+  }
+}
+if (!homeTaskClient.startsWith('"use client"') || homeTaskClient.includes("<style>")) {
+  failures.push("Homepage personalization must remain a small explicit client island without inline CSS.");
+}
+if (!homeTaskStyles.includes("content-visibility: auto")) {
+  failures.push("The below-fold homepage task hub must keep content-visibility containment.");
+}
+
+const beginnerPage = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "beginner", "page.tsx"),
+  "utf8",
+);
+if (
+  !beginnerPage.includes(".beginner-header-note")
+  || !beginnerPage.includes("font-size: 14px")
+) {
+  failures.push("Critical beginner-header note styles must be emitted before the archive markup.");
+}
+
 for (const [pagePath, expectedComponent, forbiddenComponent] of [
   ["src/app/(zh)/search/page.tsx", "ServerSiteSearch", "SiteSearch"],
   ["src/app/(en)/en/search/page.tsx", "ServerEnglishSearch", "EnglishSiteSearch"],
@@ -178,5 +226,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, server-rendered search, server-owned header route data, idle-loaded observability, and three-run coverage are enforced on Node 22.",
+  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, server-rendered search and homepage structure, server-owned header route data, idle-loaded observability, and three-run coverage are enforced on Node 22.",
 );
