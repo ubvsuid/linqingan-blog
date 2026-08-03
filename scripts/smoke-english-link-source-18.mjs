@@ -4,30 +4,32 @@ const articles = [
   {
     path: "/en/blog/screeps-link-transfer-energy",
     chinesePath: "/blog/screeps-link-transfer-energy",
-    headline: "How to Transfer Link Energy Without Depending on Structure Array Order",
-    query: "transferEnergy",
+    headline: "Coordinate Link Transfers and Verify the Exact Source-Target Event",
+    query: "EVENT_TRANSFER",
     signals: [
-      "getOwnedLink",
-      "LINK_LOSS_RATIO",
-      "sourceLink.transferEnergy",
-      "targetReserve",
-      "minimumSend",
-      "Live loss rounding, cooldown distance, concurrent send, Store and target-reserve test",
+      "planLinkTransfers",
+      "remainingTargetCapacity",
+      "lastDispatchAt",
+      "EVENT_TRANSFER",
+      "verifyLinkTransfers",
+      "verification-window-missed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
   {
     path: "/en/blog/screeps-select-source-by-path",
     chinesePath: "/blog/screeps-select-source-by-path",
-    headline: "How to Select an Active Source by Reachable Path Without Target Churn",
-    query: "FIND_SOURCES_ACTIVE",
+    headline: "Select a Reachable Source Without Treating a Partial Path as Success",
+    query: "PathFinder incomplete",
     signals: [
-      "countAssignmentsBySource",
-      "selectSourceCandidate",
-      "findPathTo",
-      "Game.getObjectById(sourceId)",
-      "creep.getActiveBodyparts(WORK)",
-      "Live multi-Source pathing, traffic, regeneration, assignment contention, remote visibility and CPU test",
+      "PathFinder.search",
+      "result.incomplete",
+      "OBSTACLE_OBJECT_TYPES",
+      "countOtherSourceAssignments",
+      "EVENT_HARVEST",
+      "complete-active-source-not-found",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -49,20 +51,23 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
+    "Existing English route",
+    "Preserved",
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#use-this-guide"`,
+    `<h2 id="use-this-guide">Use this guide when</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (body.includes(`"@type":"FAQPage"`)) {
+    failures.push(`${article.path}: 空 FAQ 不应输出 FAQPage`);
   }
 
   const searchResponse = await fetch(
@@ -79,22 +84,27 @@ for (const article of articles) {
 
 const linkBody = await (await fetch(`${baseUrl}/en/blog/screeps-link-transfer-energy`)).text();
 if (
-  !linkBody.includes("sourceLink.room.name === targetLink.room.name")
-  || !linkBody.includes("Math.max(0, input.targetFree - input.targetReserve)")
-  || !linkBody.includes("sourceLink.transferEnergy")
-  || !linkBody.includes("estimateLinkTransfer")
+  !linkBody.includes("source.room.name !== roomName")
+  || !linkBody.includes("remainingTargetCapacity")
+  || !linkBody.includes("estimate.estimatedReceived")
+  || !linkBody.includes("source.transferEnergy")
+  || !linkBody.includes("event.data?.targetId === pending.targetId")
+  || !linkBody.includes("state.lastDispatchAt === Game.time")
 ) {
-  failures.push("Link 页面缺少同房间、保留容量、传输或损耗估算边界");
+  failures.push("Link 页面缺少显式房间身份、共享容量预留、传输、事件身份或单 Tick 调度边界");
 }
 
 const sourceBody = await (await fetch(`${baseUrl}/en/blog/screeps-select-source-by-path`)).text();
 if (
   !sourceBody.includes("FIND_SOURCES_ACTIVE")
+  || !sourceBody.includes("PathFinder.search")
+  || !sourceBody.includes("result.incomplete !== true")
+  || !sourceBody.includes("OBSTACLE_OBJECT_TYPES.includes")
   || !sourceBody.includes("left.pathLength - right.pathLength")
   || !sourceBody.includes("left.assignmentCount - right.assignmentCount")
-  || !sourceBody.includes("delete creep.memory.sourceId")
+  || !sourceBody.includes("event.event === EVENT_HARVEST")
 ) {
-  failures.push("Source 页面缺少活跃查询、路径、分配或动态清除边界");
+  failures.push("Source 页面缺少活跃查询、完整路径、静态障碍、稳定排序或采集事件边界");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -124,4 +134,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十八批英文 Link 与 Source 生产冒烟测试通过：${articles.length} 篇文章、Link transfer 与 Source selection 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十八批英文 Link 与 Source 生产冒烟测试通过：${articles.length} 篇文章、Link 协调、完整 Source 路径、精确事件验证、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
