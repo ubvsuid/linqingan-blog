@@ -5,6 +5,7 @@ const articles = [
     path: "/en/blog/screeps-link-transfer-energy",
     chinesePath: "/blog/screeps-link-transfer-energy",
     headline: "Coordinate Link Transfers and Verify the Exact Source-Target Event",
+    indexTitle: "Screeps Link transferEnergy(): Coordinate Capacity and Verify Events",
     query: "EVENT_TRANSFER",
     signals: [
       "planLinkTransfers",
@@ -21,6 +22,7 @@ const articles = [
     path: "/en/blog/screeps-select-source-by-path",
     chinesePath: "/blog/screeps-select-source-by-path",
     headline: "Select a Reachable Source Without Treating a Partial Path as Success",
+    indexTitle: "Screeps Source Selection: Complete Paths and Stable Assignments",
     query: "PathFinder incomplete",
     signals: [
       "PathFinder.search",
@@ -77,8 +79,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -113,7 +115,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
   }
 }
 
