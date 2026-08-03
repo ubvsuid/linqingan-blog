@@ -7,6 +7,11 @@ const articles = [
     headline: "How to Activate Safe Mode Without Accidental Repeated Use",
     query: "activateSafeMode",
     expectFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
+    sectionSignals: [
+      `href="#quick-answer"`,
+      `<h2 id="quick-answer">Quick answer</h2>`,
+    ],
     signals: [
       "ACTIVATE_SAFE_MODE",
       "request.enabled = false",
@@ -22,6 +27,11 @@ const articles = [
     headline: "Recover a Downgrading Controller Without Hiding Failed Upgrade Ticks",
     query: "upgradeBlocked",
     expectFaq: false,
+    verificationSignals: ["Existing English route", "Preserved"],
+    sectionSignals: [
+      `href="#use-this-guide"`,
+      `<h2 id="use-this-guide">Use this guide when</h2>`,
+    ],
     signals: [
       "decideControllerRecovery",
       "controller.upgradeBlocked",
@@ -38,6 +48,11 @@ const articles = [
     headline: "How to Choose Between Reserving and Claiming a Controller",
     query: "reserveController",
     expectFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
+    sectionSignals: [
+      `href="#quick-answer"`,
+      `<h2 id="quick-answer">Quick answer</h2>`,
+    ],
     signals: [
       "creep.reserveController(controller)",
       "creep.claimController(controller)",
@@ -65,16 +80,14 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Existing English route",
-    "Preserved",
+    ...article.verificationSignals,
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#use-this-guide"`,
-    `<h2 id="use-this-guide">Use this guide when</h2>`,
+    ...article.sectionSignals,
     `"@type":"BlogPosting"`,
     ...(article.expectFaq ? [`"@type":"FAQPage"`] : []),
   ]) {
