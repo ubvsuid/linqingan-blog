@@ -90,10 +90,11 @@ if (
   || !linkBody.includes("remainingTargetCapacity")
   || !linkBody.includes("estimate.estimatedReceived")
   || !linkBody.includes("source.transferEnergy")
+  || !linkBody.includes("event.objectId === pending.sourceId")
   || !linkBody.includes("event.data?.targetId === pending.targetId")
   || !linkBody.includes("state.lastDispatchAt === Game.time")
 ) {
-  failures.push("Link 页面缺少显式房间身份、共享容量预留、传输、事件身份或单 Tick 调度边界");
+  failures.push("Link 页面缺少显式房间身份、共享容量预留、传输、源目标事件身份或单 Tick 调度边界");
 }
 
 const sourceBody = await (await fetch(`${baseUrl}/en/blog/screeps-select-source-by-path`)).text();
@@ -105,8 +106,10 @@ if (
   || !sourceBody.includes("left.pathLength - right.pathLength")
   || !sourceBody.includes("left.assignmentCount - right.assignmentCount")
   || !sourceBody.includes("event.event === EVENT_HARVEST")
+  || !sourceBody.includes("event.objectId === pending.creepId")
+  || !sourceBody.includes("event.data?.targetId === pending.sourceId")
 ) {
-  failures.push("Source 页面缺少活跃查询、完整路径、静态障碍、稳定排序或采集事件边界");
+  failures.push("Source 页面缺少活跃查询、完整路径、静态障碍、稳定排序或 Creep-Source 采集事件身份边界");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
