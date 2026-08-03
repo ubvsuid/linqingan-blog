@@ -25,6 +25,7 @@ const articles = [
     path: "/en/blog/screeps-controller-downgrade",
     chinesePath: "/blog/screeps-controller-downgrade",
     headline: "Recover a Downgrading Controller Without Hiding Failed Upgrade Ticks",
+    indexTitle: "Screeps Controller Downgrade Recovery: Verify Emergency Upgrades",
     query: "upgradeBlocked",
     expectFaq: false,
     verificationSignals: ["Existing English route", "Preserved"],
@@ -98,6 +99,7 @@ for (const article of articles) {
     failures.push(`${article.path}: 空 FAQ 不应输出 FAQPage`);
   }
 
+  const indexedTitle = article.indexTitle ?? article.headline;
   const searchResponse = await fetch(
     `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
     { redirect: "manual" },
@@ -105,8 +107,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(indexedTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${indexedTitle}”`);
   }
 }
 
@@ -152,7 +154,8 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    const indexedTitle = article.indexTitle ?? article.headline;
+    if (!blogBody.includes(indexedTitle)) failures.push(`/en/blog-index.json: 缺少 “${indexedTitle}”`);
   }
 }
 
