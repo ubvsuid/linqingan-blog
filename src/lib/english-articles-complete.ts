@@ -20,6 +20,7 @@ import { englishConstructionSafetyBatchFifteenRegistry } from "./english-constru
 import { englishConfigCodeBatchSixteenRegistry } from "./english-config-code-registry-16";
 import { englishDefenseOperationsBatchSeventeenRegistry } from "./english-defense-operations-registry-17";
 import { englishLinkSourceBatchEighteenRegistry } from "./english-link-source-registry-18";
+import { englishPrespawnBatchNineteenRegistry } from "./english-prespawn-registry-19";
 
 export type { EnglishArticleRecord };
 
@@ -334,6 +335,7 @@ const allPublishedEnglishArticles: EnglishArticleRecord[] = [
   ...englishConfigCodeBatchSixteenRegistry,
   ...englishDefenseOperationsBatchSeventeenRegistry,
   ...englishLinkSourceBatchEighteenRegistry,
+  ...englishPrespawnBatchNineteenRegistry,
 ];
 
 export const publishedEnglishArticles: EnglishArticleRecord[] =
@@ -363,6 +365,7 @@ export const englishArticleRoutePairs = {
       ...englishConfigCodeBatchSixteenRegistry,
       ...englishDefenseOperationsBatchSeventeenRegistry,
       ...englishLinkSourceBatchEighteenRegistry,
+      ...englishPrespawnBatchNineteenRegistry,
     ].map((article) => [article.chinesePath, article.href]),
   ),
 } as Record<string, string>;

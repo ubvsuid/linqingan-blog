@@ -8,6 +8,7 @@ import { englishFoundationArticles, getEnglishFoundationArticle } from "@/lib/en
 import { englishFoundationBatchTwoArticles, getEnglishFoundationBatchTwoArticle } from "@/lib/english-foundation-content-2";
 import { englishSpawnBatchThreeArticles, getEnglishSpawnBatchThreeArticle } from "@/lib/english-spawn-content-3-published";
 import { englishLifecycleBatchFourArticles, getEnglishLifecycleBatchFourArticle } from "@/lib/english-lifecycle-content-4-published";
+import { englishPrespawnBatchNineteenArticles, getEnglishPrespawnBatchNineteenArticle } from "@/lib/english-prespawn-content-19";
 import { englishMovementBatchFiveArticles, getEnglishMovementBatchFiveArticle } from "@/lib/english-movement-content-5";
 import { englishMovementBatchSixArticles, getEnglishMovementBatchSixArticle } from "@/lib/english-movement-content-6-published";
 import { englishVisionBatchSevenArticles, getEnglishVisionBatchSevenArticle } from "@/lib/english-vision-content-7";
@@ -36,6 +37,7 @@ const dynamicEnglishArticles = [
   ...englishFoundationBatchTwoArticles,
   ...englishSpawnBatchThreeArticles,
   ...englishLifecycleBatchFourArticles,
+  ...englishPrespawnBatchNineteenArticles,
   ...englishMovementBatchFiveArticles,
   ...englishMovementBatchSixArticles,
   ...englishVisionBatchSevenArticles,
@@ -59,6 +61,7 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishFoundationBatchTwoArticle(slug)
     ?? getEnglishSpawnBatchThreeArticle(slug)
     ?? getEnglishLifecycleBatchFourArticle(slug)
+    ?? getEnglishPrespawnBatchNineteenArticle(slug)
     ?? getEnglishMovementBatchFiveArticle(slug)
     ?? getEnglishMovementBatchSixArticle(slug)
     ?? getEnglishVisionBatchSevenArticle(slug)
