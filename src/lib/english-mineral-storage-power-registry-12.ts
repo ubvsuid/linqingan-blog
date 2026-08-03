@@ -1,8 +1,4 @@
-import type { EnglishArticleRecord } from "./english-articles";
-
-type DatedEnglishArticleRecord = EnglishArticleRecord & {
-  updatedAt?: string;
-};
+import type { DatedEnglishArticleRecord } from "./english-article-record-types";
 
 export const englishMineralStoragePowerBatchTwelveRegistry: DatedEnglishArticleRecord[] = [
   {
