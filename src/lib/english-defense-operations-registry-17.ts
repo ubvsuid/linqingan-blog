@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishDefenseOperationsBatchSeventeenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishDefenseOperationsBatchSeventeenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-nuker-launch",
     chinesePath: "/blog/screeps-nuker-launch-checklist",
@@ -48,23 +52,24 @@ export const englishDefenseOperationsBatchSeventeenRegistry: EnglishArticleRecor
   {
     href: "/en/blog/screeps-wall-rampart-repair-limit",
     chinesePath: "/blog/screeps-wall-rampart-repair-limit",
-    category: "DEFENSE · STAGED FORTIFICATION REPAIR",
-    title: "How to Repair Fortifications to a Room-Specific Stage Instead of hitsMax",
+    category: "DEFENSE · STAGED REPAIR AND EVENT IDENTITY",
+    title: "Screeps Fortification Repair: Stages, Reservations, and Event Proof",
     description:
-      "Configure a room-specific absolute hits limit, select the weakest Wall or Rampart below both the limit and hitsMax, require Creep Energy and active WORK, use range 3, save repair() and movement results, and raise stages only through a separate reviewed policy.",
+      "Set room-specific Wall and Rampart stages, reserve targets across repairers, record only accepted repair calls, and verify the exact Repairer-to-structure EVENT_REPAIR on the next tick.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "18 min read",
-    primaryKeyword: "Screeps Wall Rampart repair limit",
-    searchIntent: "Repair Walls and Ramparts to a reviewed room-specific absolute hits stage without monopolizing Energy forever",
+    updatedAt: "2026-08-03",
+    readingTime: "21 min read",
+    primaryKeyword: "Screeps fortification repair limit",
+    searchIntent: "Coordinate staged Wall and Rampart repair across multiple Creeps and verify the exact accepted repair action",
     status: "published",
     finalScore: 98,
     keywords: [
-      "Screeps Wall Rampart repair limit",
-      "Screeps fortification hits target",
-      "Screeps Creep repair range 3",
-      "Screeps weakest Rampart repair",
-      "Screeps staged defense repair",
+      "Screeps fortification repair limit",
+      "Screeps EVENT_REPAIR",
+      "Screeps Wall Rampart stage",
+      "Screeps repair target reservation",
+      "Room.getEventLog repair",
     ],
   },
 ];
