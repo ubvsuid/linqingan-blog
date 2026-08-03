@@ -84,7 +84,7 @@ for (const article of articles) {
 
 const linkBody = await (await fetch(`${baseUrl}/en/blog/screeps-link-transfer-energy`)).text();
 if (
-  !linkBody.includes("source.room.name !== roomName")
+  !linkBody.includes("link.room.name !== roomName")
   || !linkBody.includes("remainingTargetCapacity")
   || !linkBody.includes("estimate.estimatedReceived")
   || !linkBody.includes("source.transferEnergy")
