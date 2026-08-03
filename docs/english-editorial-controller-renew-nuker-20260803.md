@@ -182,20 +182,20 @@ It enforces:
 - 22 offline boundary cases;
 - explicit Pending Console, live-loop and screenshot evidence.
 
-The existing Controller, lifecycle and defense production smoke modules are updated rather than bypassed.
+The existing Controller, lifecycle and defense production smoke modules are updated rather than bypassed. Registries that expose `updatedAt` share one `DatedEnglishArticleRecord` type so future metadata changes do not require copy-pasted type edits.
 
 ## Dependency and publication order
 
-This PR is intentionally stacked:
+The formal PR is intentionally stacked:
 
-1. PR #91 must merge into `clean-blog-v1`.
-2. PR #92 must be retargeted or rebased, revalidated and merged.
-3. PR #94 must be retargeted or rebased, revalidated and merged.
-4. This branch must then be retargeted or rebased onto the updated `clean-blog-v1` branch.
-5. Site quality, Lighthouse, Vercel Preview and human desktop/mobile QA must run again.
-6. Only then can this batch merge and receive production verification.
+1. Merge PR `#91` into `clean-blog-v1`.
+2. Retarget or rebase PR `#92`, rerun its gates, and merge it.
+3. Retarget or rebase PR `#94`, rerun its gates, and merge it.
+4. Retarget or rebase this branch onto the updated `clean-blog-v1` branch.
+5. Rerun Site quality, Lighthouse, Vercel Preview and human desktop/mobile QA.
+6. PR `#96` is the only authorized merge path for this batch. After it merges, run the required production verification checks.
 
-A temporary CI-only PR may validate the combined stack against the default branch. It is never an authorized merge path and does not convert the accumulated stack into one publication batch.
+A CI-only validation PR may validate the combined dependency stack against the default branch. It must close after Site quality, Lighthouse, Vercel Preview and optional review validation complete. It is not an authorized merge path and does not convert the accumulated stack into one publication batch.
 
 ## Evidence still Pending
 
@@ -216,7 +216,7 @@ A temporary CI-only PR may validate the combined stack against the default branc
 
 ## Recommended next batch
 
-After the dependency chain is reduced, review these existing routes:
+Earlier batch records preserve their recommendation lists as historical snapshots at the time each record was written. The list below is the current recommendation for the combined stack after this batch:
 
 1. `/en/blog/screeps-controller-activate-safe-mode`
 2. `/en/blog/screeps-rampart-set-public`
