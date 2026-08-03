@@ -59,6 +59,36 @@ if (nextConfig.includes("inlineCss")) {
   failures.push("Global experimental CSS inlining must remain disabled after it increased main-thread work on measured routes.");
 }
 
+const headerServer = fs.readFileSync(
+  path.join(root, "src", "components", "site-header.tsx"),
+  "utf8",
+);
+const headerClient = fs.readFileSync(
+  path.join(root, "src", "components", "site-header-client.tsx"),
+  "utf8",
+);
+if (headerServer.includes('"use client"')) {
+  failures.push("The SiteHeader data wrapper must remain a server component.");
+}
+if (!headerServer.includes("<SiteHeaderClient")) {
+  failures.push("The server SiteHeader must render the lightweight client boundary.");
+}
+for (const forbiddenImport of [
+  "@/lib/beginner-series",
+  "@/lib/knowledge-base",
+  "@/lib/i18n",
+  "@/lib/english-articles-complete",
+]) {
+  if (headerClient.includes(forbiddenImport)) {
+    failures.push(
+      `The header client boundary must not import ${forbiddenImport}; pass compact serializable route data from the server.`,
+    );
+  }
+}
+if (!headerClient.startsWith('"use client"')) {
+  failures.push("The interactive header boundary must remain an explicit client component.");
+}
+
 for (const [pagePath, expectedComponent, forbiddenComponent] of [
   ["src/app/(zh)/search/page.tsx", "ServerSiteSearch", "SiteSearch"],
   ["src/app/(en)/en/search/page.tsx", "ServerEnglishSearch", "EnglishSiteSearch"],
@@ -148,5 +178,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, server-rendered search, idle-loaded observability, and three-run coverage are enforced on Node 22.",
+  "Performance budget check passed: Performance 90, LCP 2500 ms, TBT 300 ms, CLS 0.1, server-rendered search, server-owned header route data, idle-loaded observability, and three-run coverage are enforced on Node 22.",
 );
