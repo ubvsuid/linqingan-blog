@@ -43,7 +43,7 @@
     "englisheditorialfirstloopstatenotify20260731check": "node scripts/check-english-editorial-first-loop-state-notify-20260731.mjs",
     "englisheditorialeventobserverflags20260731check": "node scripts/check-english-editorial-event-observer-flags-20260731.mjs",
     "englisheditorialmarketidentity20260801check": "node scripts/check-english-editorial-market-identity-20260801.mjs",
-    "englisheditoriallabfactoryidentity20260801check": "node scripts/check-english-editorial-lab-factory-identity-overrides-20260801.mjs",
+    "englisheditoriallabfactoryidentity20260801check": "node scripts/check-english-editorial-lab-factory-identity-20260801.mjs",
     "englisheditorialtowerevents20260801check": "node scripts/check-english-editorial-tower-events-20260801.mjs",
     "englisheditorialrecoverystoragebuild20260803check": "node scripts/check-english-editorial-recovery-storage-build-20260803.mjs",
     "englishmovement6check": "node scripts/check-english-movement-6.mjs",
