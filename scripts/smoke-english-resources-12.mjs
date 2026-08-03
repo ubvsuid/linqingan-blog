@@ -110,7 +110,7 @@ const mineralBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-mineral-extractor-harvest`,
 )).text();
 if (
-  !mineralBody.includes("mineral.pos.lookFor(LOOK_STRUCTURES)")
+  !mineralBody.includes(".lookFor(LOOK_STRUCTURES)")
   || !mineralBody.includes("creep.harvest(mineral)")
   || !mineralBody.includes("event.event === EVENT_HARVEST")
   || !mineralBody.includes("event.objectId === pending.creepId")
