@@ -1,0 +1,70 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "npm run start",
+      "startServerReadyPattern": "ready",
+      "startServerReadyTimeout": 30000,
+      "url": [
+        "http://localhost:3000/",
+        "http://localhost:3000/beginner",
+        "http://localhost:3000/knowledge",
+        "http://localhost:3000/search?q=creep",
+        "http://localhost:3000/blog/screeps-memory-basics",
+        "http://localhost:3000/tools/room-diagnostics",
+        "http://localhost:3000/tools/market-terminal-cost-calculator",
+        "http://localhost:3000/tools/controller-downgrade-planner",
+        "http://localhost:3000/tools/lab-reaction-boost-planner",
+        "http://localhost:3000/tools/spawn-queue-replacement-planner",
+        "http://localhost:3000/tools/hauling-throughput-planner",
+        "http://localhost:3000/tools/tower-damage-heal-repair-calculator",
+        "http://localhost:3000/en",
+        "http://localhost:3000/en/beginner",
+        "http://localhost:3000/en/blog",
+        "http://localhost:3000/en/blog?page=2",
+        "http://localhost:3000/en/blog/screeps-creep-harvest-energy",
+        "http://localhost:3000/en/knowledge/movement-vision",
+        "http://localhost:3000/en/evidence",
+        "http://localhost:3000/en/tags/debugging",
+        "http://localhost:3000/en/search?q=creep%20not%20moving",
+        "http://localhost:3000/en/tools/creep-body-calculator",
+        "http://localhost:3000/en/tools/room-diagnostics",
+        "http://localhost:3000/en/tools/market-terminal-cost-calculator",
+        "http://localhost:3000/en/tools/controller-downgrade-planner",
+        "http://localhost:3000/en/tools/lab-reaction-boost-planner",
+        "http://localhost:3000/en/tools/spawn-queue-replacement-planner",
+        "http://localhost:3000/en/tools/hauling-throughput-planner",
+        "http://localhost:3000/en/tools/tower-damage-heal-repair-calculator"
+      ],
+      "numberOfRuns": 3,
+      "settings": {
+        "chromeFlags": "--no-sandbox --headless"
+      }
+    },
+    "assert": {
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": ".*",
+          "assertions": {
+            "categories:performance": ["error", { "minScore": 0.9 }],
+            "categories:accessibility": ["error", { "minScore": 0.95 }],
+            "categories:best-practices": ["error", { "minScore": 0.9 }],
+            "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+            "total-blocking-time": ["error", { "maxNumericValue": 300 }],
+            "speed-index": ["warn", { "maxNumericValue": 3200 }]
+          }
+        },
+        {
+          "matchingUrlPattern": "^http://localhost:3000/(?!search(?:\\?|$)|en/search(?:\\?|$)).*",
+          "assertions": {
+            "categories:seo": ["error", { "minScore": 0.95 }]
+          }
+        }
+      ]
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": "./lhci-results"
+    }
+  }
+}
