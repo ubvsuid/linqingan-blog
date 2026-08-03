@@ -1,26 +1,31 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishLifecycleBatchFourRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishLifecycleBatchFourRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-renew-creep",
     chinesePath: "/blog/screeps-spawn-renew-creep",
-    category: "CREEP LIFECYCLE · RENEWAL",
-    title: "How to Use renewCreep() Safely in Screeps",
+    category: "CREEP LIFECYCLE · RENEWAL IDENTITY",
+    title: "Screeps renewCreep(): Coordinate Spawn Time and Verify TTL Gain",
     description:
-      "Calculate the TTL and Energy gained per renewal, reject CLAIM Creeps, require explicit Boost removal approval, coordinate Spawn time, move adjacent, stop at a target TTL, and handle every documented result.",
+      "Reserve one Spawn and Creep per tick, record only accepted renewCreep calls, verify the exact TTL and Boost signature on the next tick, and label Energy-transfer confounds.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    readingTime: "17 min read",
-    primaryKeyword: "Screeps renewCreep",
-    searchIntent: "Safe Creep renewal decision, formula and return-code troubleshooting",
+    updatedAt: "2026-08-03",
+    readingTime: "22 min read",
+    primaryKeyword: "Screeps renewCreep verification",
+    searchIntent: "Coordinate one exact Creep renewal and distinguish accepted intent, observed TTL gain, Spawn Energy changes, Boost removal, and contention",
     status: "published",
     finalScore: 98,
     keywords: [
-      "Screeps renewCreep",
-      "StructureSpawn renewCreep",
-      "Screeps Creep TTL renewal",
-      "renewCreep Energy formula",
-      "renewCreep removes boosts",
+      "Screeps renewCreep verification",
+      "Screeps renewCreep TTL formula",
+      "Screeps Spawn renewal coordinator",
+      "Screeps renewCreep removes boosts",
+      "Screeps Spawn Energy confound",
     ],
   },
   {
