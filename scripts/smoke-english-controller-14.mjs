@@ -6,6 +6,7 @@ const articles = [
     chinesePath: "/blog/screeps-controller-activate-safe-mode",
     headline: "How to Activate Safe Mode Without Accidental Repeated Use",
     query: "activateSafeMode",
+    expectFaq: true,
     signals: [
       "ACTIVATE_SAFE_MODE",
       "request.enabled = false",
@@ -18,14 +19,16 @@ const articles = [
   {
     path: "/en/blog/screeps-controller-downgrade",
     chinesePath: "/blog/screeps-controller-downgrade",
-    headline: "How to Detect Controller Downgrade Risk and Recover Safely",
-    query: "ticksToDowngrade",
+    headline: "Recover a Downgrading Controller Without Hiding Failed Upgrade Ticks",
+    query: "upgradeBlocked",
+    expectFaq: false,
     signals: [
-      "CONTROLLER_DOWNGRADE",
-      "emergencyThreshold",
-      "recoveryThreshold",
-      "upgrader.upgradeController",
-      "Live downgrade timer, recovery hysteresis, upgrader supply and Controller progress test",
+      "decideControllerRecovery",
+      "controller.upgradeBlocked",
+      "EVENT_UPGRADE_CONTROLLER",
+      "verifyRecoveryUpgrade",
+      "verification-window-missed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -34,6 +37,7 @@ const articles = [
     chinesePath: "/blog/screeps-reserve-vs-claim-controller",
     headline: "How to Choose Between Reserving and Claiming a Controller",
     query: "reserveController",
+    expectFaq: true,
     signals: [
       "creep.reserveController(controller)",
       "creep.claimController(controller)",
@@ -61,20 +65,24 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
+    "Existing English route",
+    "Preserved",
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#use-this-guide"`,
+    `<h2 id="use-this-guide">Use this guide when</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
+    ...(article.expectFaq ? [`"@type":"FAQPage"`] : []),
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (!article.expectFaq && body.includes(`"@type":"FAQPage"`)) {
+    failures.push(`${article.path}: 空 FAQ 不应输出 FAQPage`);
   }
 
   const searchResponse = await fetch(
@@ -104,11 +112,14 @@ const downgradeBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-controller-downgrade`,
 )).text();
 if (
-  !downgradeBody.includes("recoveryThreshold")
-  || !downgradeBody.includes("getActiveBodyparts(WORK)")
+  !downgradeBody.includes("enterAt")
+  || !downgradeBody.includes("leaveAt")
+  || !downgradeBody.includes("getActiveBodyparts(CARRY)")
+  || !downgradeBody.includes("controller.upgradeBlocked")
+  || !downgradeBody.includes("EVENT_UPGRADE_CONTROLLER")
   || !downgradeBody.includes("range: 3")
 ) {
-  failures.push("Controller downgrade 页面缺少恢复阈值、有效 WORK 或范围 3 边界");
+  failures.push("Controller downgrade 页面缺少滞回、CARRY、upgradeBlocked、事件验证或范围 3 边界");
 }
 
 const missionBody = await (await fetch(
