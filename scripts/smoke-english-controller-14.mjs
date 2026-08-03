@@ -143,16 +143,18 @@ if (
 const missionBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-reserve-vs-claim-controller`,
 )).text();
-if (
-  !missionBody.includes("mission.controllerId !== controller.id")
-  || !missionBody.includes("Memory.pendingControllerOperations")
-  || !missionBody.includes("event.event === EVENT_RESERVE_CONTROLLER")
-  || !missionBody.includes("event.objectId === pending.creepId")
-  || !missionBody.includes("does not include a Controller")
-  || !missionBody.includes("claimController() has no Room event")
-  || !missionBody.includes("controller.owner?.username === pending.username")
-) {
-  failures.push("Reserve/Claim 页面缺少任务身份、Reserve事件边界或Claim所有权验证");
+for (const expected of [
+  "mission.controllerId !== controller.id",
+  "Memory.pendingControllerOperations",
+  "event.event === EVENT_RESERVE_CONTROLLER",
+  "event.objectId === pending.creepId",
+  "does not include a Controller",
+  "<code>claimController()</code> has no Room event",
+  "controller.owner?.username === pending.username",
+]) {
+  if (!missionBody.includes(expected)) {
+    failures.push(`Reserve/Claim 页面缺少证据边界 “${expected}”`);
+  }
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
