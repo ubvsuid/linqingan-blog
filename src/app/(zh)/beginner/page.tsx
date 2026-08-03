@@ -12,6 +12,16 @@ export default function BeginnerPage() {
   return (
     <>
       <style>{`
+        .beginner-header {
+          max-width: 920px;
+        }
+
+        .beginner-header-note {
+          margin-top: 14px !important;
+          color: var(--muted);
+          font-size: 14px;
+        }
+
         .beginner-stage-heading,
         .beginner-item,
         .beginner-complete {
