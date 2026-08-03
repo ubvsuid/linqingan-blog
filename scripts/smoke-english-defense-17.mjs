@@ -103,18 +103,20 @@ for (const article of articles) {
 const nukerBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-nuker-launch`,
 )).text();
-if (
-  !nukerBody.includes("request.nukerId")
-  || !nukerBody.includes("request.enabled = false")
-  || !nukerBody.includes("Memory.pendingNukeLaunches[nuker.id]")
-  || !nukerBody.includes("nuker.cooldown > 0")
-  || !nukerBody.includes("energy === 0")
-  || !nukerBody.includes("ghodium === 0")
-  || !nukerBody.includes("room.find(FIND_NUKES)")
-  || !nukerBody.includes("nuke.launchRoomName")
-  || !nukerBody.includes("does not emit a Room event")
-) {
-  failures.push("Nuker页面缺少精确目标确认、本地发射签名、目标Nuke身份或无事件边界");
+for (const expected of [
+  "request.nukerId",
+  "request.enabled = false",
+  "Memory.pendingNukeLaunches[nuker.id]",
+  "nuker.cooldown",
+  "energy === 0",
+  "ghodium === 0",
+  "room.find(FIND_NUKES)",
+  "nuke.launchRoomName",
+  "does not emit a Room event",
+]) {
+  if (!nukerBody.includes(expected)) {
+    failures.push(`Nuker页面缺少证据边界 “${expected}”`);
+  }
 }
 
 const repairBody = await (await fetch(
