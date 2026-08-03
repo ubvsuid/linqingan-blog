@@ -3,7 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const lighthouseConfig = JSON.parse(
-  fs.readFileSync(path.join(root, "lighthouserc.json"), "utf8"),
+  fs.readFileSync(path.join(root, "lighthouserc-hardening.json"), "utf8"),
 );
 const failures = [];
 const matrix = lighthouseConfig?.ci?.assert?.assertMatrix;
