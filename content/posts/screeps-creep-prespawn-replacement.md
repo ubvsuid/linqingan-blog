@@ -17,7 +17,7 @@ verification:
   liveTested: false
   checkedAt: "2026-08-03"
   testedAt: "2026-08-03"
-  testEnvironment: "Node.js 离线纯函数测试（TTL、目标数量、正在生成数量、Spawn 等待时间、生成时间、路程和安全余量；不是 Screeps 官方服务器）"
+  testEnvironment: "Node.js 22 离线模拟（纯函数边界测试：TTL、目标数量、正在生成数量、Spawn 等待时间、生成时间、路程和安全余量；不是 Screeps 官方服务器）"
   testResult: "8 个决策边界场景通过；完整运行示例通过 JavaScript 语法检查。尚未在 Screeps Console 或真实主循环验证。"
 featured: false
 ---
@@ -26,7 +26,7 @@ featured: false
 
 新 Creep 可能先等待当前 Spawn 完成任务，再按身体部件数量消耗生成时间，最后还要从 Spawn 走到工作位置。旧 Creep 在这段时间里继续减少 `ticksToLive`，于是角色数量平时看起来正常，岗位却会在换代时突然空缺。
 
-本文解决的是死亡前交接：计算替代者必须开始生成的时间，并避免同一角色被重复补员。身体成本和退化方案可先阅读[按房间 Energy 动态生成 Creep 身体](/blog/screeps-dynamic-creep-body-energy)，调用失败则参考[`spawnCreep()` 返回值排查](/blog/screeps-spawncreep-return-codes)。
+本文解决的是死亡前替换：计算新单位必须开始生成的时间，并避免同一角色被重复补员。身体成本和退化方案可先阅读[按房间 Energy 动态生成 Creep 身体](/blog/screeps-dynamic-creep-body-energy)，调用失败则参考[`spawnCreep()` 返回值排查](/blog/screeps-spawncreep-return-codes)。
 
 ## 为什么数量不足后再生成会产生空窗
 
@@ -45,9 +45,9 @@ if (harvesters.length < 2) {
 - 走到 Source：25 tick；
 - 预留误差：10 tick。
 
-完整交接需要 65 tick。等旧 Harvester 死亡后才提交，采集岗位必然出现空窗。
+完整换代需要 65 tick。等旧 Harvester 死亡后才提交，采集岗位必然出现空窗。
 
-`creep.ticksToLive` 表示 Creep 距离死亡还剩多少 tick，`creep.spawning` 表示它是否仍在生成。普通 Creep 与带 CLAIM 部件的 Creep 生命周期不同，所以补员判断应读取当前对象的 TTL，不要把固定生命周期写死进角色管理器。
+`creep.ticksToLive` 表示 Creep 距离死亡还剩多少 tick，`creep.spawning` 表示它是否仍在生成。普通 Creep 与带 CLAIM 部件的 Creep 生命周期不同，所以补员判断应读取对象当前 TTL，不要把固定生命周期写死进角色管理器。
 
 ## 提前量公式
 
@@ -66,7 +66,7 @@ if (harvesters.length < 2) {
 生成时间 = body.length × CREEP_SPAWN_TIME
 ```
 
-正在生成任务的 Spawn 会公开 `spawning.remainingTime`。把最早可用 Spawn 的剩余时间加入公式，可以避免角色已经进入 TTL 阈值，却因为 Spawn 仍被占用而来不及交接。
+正在执行任务的 Spawn 会公开 `spawning.remainingTime`。把最早可用 Spawn 的剩余时间加入公式，可以避免角色已经进入 TTL 阈值，却因为 Spawn 仍被占用而来不及替换。
 
 `travelTicks` 不应直接等同于直线距离。道路、沼泽、MOVE 与负载比例、fatigue、交通阻挡和跨房间出口都会改变到岗时间。第一版可为每个角色配置保守值，上线后再记录真实到岗 tick。移动明显慢于估算时，应检查[MOVE、fatigue、地形与负载](/blog/screeps-move-fatigue-body-ratio)和[`moveTo()` 返回 OK 但不移动](/blog/screeps-moveto-not-moving)。
 
@@ -467,7 +467,7 @@ Energy 不足时，提前量计算仍然可以是正确的，但执行条件不�
 
 ## 提前替换与 renewCreep() 的边界
 
-`renewCreep()` 会占用 Spawn，还要求 Creep 返回 Spawn 附近。普通经济角色通常更适合生成替代者：旧 Creep 可以继续工作，新 Creep 同时生成并通勤，完成交接后旧 Creep 再自然死亡或回收。
+`renewCreep()` 会占用 Spawn，还要求 Creep 返回 Spawn 附近。普通经济角色通常更适合生成替代者：旧 Creep 可以继续工作，新 Creep 同时生成并通勤，新单位到岗后旧 Creep 再自然死亡或回收。
 
 需要保留少数昂贵单位时，再单独评估续命。具体前提可阅读[`renewCreep()` 的 TTL、Energy、Boost 与 Spawn 占用](/blog/screeps-spawn-renew-creep)。
 
@@ -506,14 +506,14 @@ Object.values(Game.creeps).map(creep => ({
 - 多 Spawn 会统一判断，但不会在同一 tick 填满所有空闲 Spawn；
 - `travelTicks` 需要配置或实测；
 - 其他模块直接调用 `spawnCreep()` 会绕过队列；
-- Spawn 被摧毁、长期 Energy 饥饿和敌对封路可能破坏交接；
+- Spawn 被摧毁、长期 Energy 饥饿和敌对封路可能破坏替换计划；
 - 远程矿工、Claimer 和战斗编队应使用独立参数。
 
 当房间进入多 Spawn 或多房间阶段，可以在当前请求模型上继续增加 `deadline`、`reservedSpawn`、`replacementFor` 与过期时间。
 
 ## 总结
 
-稳定补员的关键不是 Creep 死亡后再生成一只，而是计算完整交接时间：
+稳定补员的关键不是 Creep 死亡后再生成一只，而是计算完整换代时间：
 
 ```text
 Spawn 等待 + body 生成 + 到岗路程 + 安全余量
