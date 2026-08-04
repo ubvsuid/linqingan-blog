@@ -44,6 +44,7 @@ const articleRequirements = [
     "screeps-rampart-set-public",
     "2026-07-26",
     "Screeps setPublic(): Prevent Same-Tick Rampart Intent Overwrite",
+    "englishEditorialRampartAccessArticle20260804",
     [
       "createRampartAccessDispatcher",
       "Memory.pendingRampartAccess",
@@ -57,6 +58,7 @@ const articleRequirements = [
     "screeps-recycle-creep",
     "2026-07-25",
     "Screeps recycleCreep(): Verify the Exact Creep Retirement",
+    "englishEditorialRecycleArticle20260804",
     [
       "createRecycleDispatcher",
       "Memory.pendingRecycleOperations",
@@ -70,6 +72,7 @@ const articleRequirements = [
     "screeps-structure-destroy",
     "2026-07-26",
     "Screeps Structure.destroy(): Verify One Exact Extension Removal",
+    "englishEditorialStructureDestroyArticle20260804",
     [
       "FIND_HOSTILE_POWER_CREEPS",
       "createDestructionDispatcher",
@@ -81,8 +84,8 @@ const articleRequirements = [
   ],
 ];
 
-for (const [slug, publishedAt, title, signals] of articleRequirements) {
-  requireText(override, `slug: "${slug}"`, `${slug} existing slug`);
+for (const [slug, publishedAt, title, exportName, signals] of articleRequirements) {
+  requireText(override, `[${exportName}.slug]`, `${slug} override key`);
   requireText(override, `publishedAt: "${publishedAt}"`, `${slug} preserved publication date`);
   requireText(override, `title: "${title}"`, `${slug} title`);
   requireText(override, 'updatedAt: "2026-08-04"', `${slug} modified date`);
