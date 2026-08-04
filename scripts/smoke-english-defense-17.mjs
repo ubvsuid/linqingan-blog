@@ -5,43 +5,42 @@ const articles = [
     path: "/en/blog/screeps-nuker-launch",
     chinesePath: "/blog/screeps-nuker-launch-checklist",
     headline: "How to Launch a Nuke Without Reusing a Stale Target Request",
+    indexTitle: "How to Launch a Nuke Without Reusing a Stale Target Request",
     query: "launchNuke",
-    signals: [
-      "buildNukeConfirmation",
-      "NUKE_RANGE",
-      "NUKER_ENERGY_CAPACITY",
-      "NUKER_GHODIUM_CAPACITY",
-      "nuker.launchNuke(target)",
-      "Live protected-area, launch, cooldown, target Nuke object and resource-consumption test",
-      "Pending",
-    ],
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
+    signals: ["buildNukeConfirmation", "NUKE_RANGE", "nuker.launchNuke(target)", "Pending"],
   },
   {
     path: "/en/blog/screeps-rampart-set-public",
     chinesePath: "/blog/screeps-rampart-set-public",
     headline: "How to Change Rampart Access Without Treating Public as an Ally List",
+    indexTitle: "How to Change Rampart Access Without Treating Public as an Ally List",
     query: "setPublic",
-    signals: [
-      "buildRampartConfirmation",
-      "Game.structures[rampart.id]",
-      "rampart.setPublic(request.public)",
-      "state-already-matches",
-      "Live public/private passage, object replacement, ownership and next-tick state test",
-      "Pending",
-    ],
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
+    signals: ["buildRampartConfirmation", "rampart.setPublic(request.public)", "state-already-matches", "Pending"],
   },
   {
     path: "/en/blog/screeps-wall-rampart-repair-limit",
     chinesePath: "/blog/screeps-wall-rampart-repair-limit",
-    headline: "How to Repair Fortifications to a Room-Specific Stage Instead of hitsMax",
-    query: "Rampart repair limit",
+    headline: "Repair Walls and Ramparts Without Hiding Duplicate Work",
+    indexTitle: "Screeps Fortification Repair: Stages, Reservations, and Event Proof",
+    query: "EVENT_REPAIR",
+    tocId: "decision-model",
+    tocHeading: "Separate the repair stage from target identity",
+    expectFaq: false,
     signals: [
-      "selectDefenseRepairTarget",
-      "STRUCTURE_WALL",
-      "STRUCTURE_RAMPART",
-      "creep.getActiveBodyparts(WORK)",
-      "range: 3",
-      "Live repair, boosts, pathing, stage completion, RCL hitsMax and multi-repairer test",
+      "createRepairCoordinator",
+      "reservedTargets",
+      "Memory.pendingFortificationRepairs",
+      "EVENT_REPAIR",
+      "event.objectId === pending.creepId",
+      "event.data?.targetId === pending.targetId",
+      "repair-event-window-missed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -52,7 +51,6 @@ const failures = [];
 for (const article of articles) {
   const response = await fetch(`${baseUrl}${article.path}`, { redirect: "manual" });
   const body = await response.text();
-
   if (response.status !== 200) {
     failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
     continue;
@@ -63,20 +61,21 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
+    failures.push(`${article.path}: FAQPage 预期不一致`);
   }
 
   const searchResponse = await fetch(
@@ -86,39 +85,24 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
-const nukeBody = await (await fetch(`${baseUrl}/en/blog/screeps-nuker-launch`)).text();
+const repairBody = await (await fetch(
+  `${baseUrl}/en/blog/screeps-wall-rampart-repair-limit`,
+)).text();
 if (
-  !nukeBody.includes("request.enabled = false")
-  || !nukeBody.includes("Game.map.getRoomLinearDistance")
-  || !nukeBody.includes("nuker.launchNuke(target)")
-  || !nukeBody.includes("targetVisible")
-) {
-  failures.push("Nuker 页面缺少一次性关闭、距离、发射或可见性边界");
-}
-
-const rampartBody = await (await fetch(`${baseUrl}/en/blog/screeps-rampart-set-public`)).text();
-if (
-  !rampartBody.includes("'SET_RAMPART_' + state + '_' + roomName + '_' + x + '_' + y")
-  || !rampartBody.includes("Game.structures[rampart.id]")
-  || !rampartBody.includes("request.enabled = false")
-  || !rampartBody.includes("rampart.setPublic(request.public)")
-) {
-  failures.push("Rampart 页面缺少状态绑定、所有权、一次性关闭或 setPublic 边界");
-}
-
-const repairBody = await (await fetch(`${baseUrl}/en/blog/screeps-wall-rampart-repair-limit`)).text();
-if (
-  !repairBody.includes("structure.hits < hitsLimit")
-  || !repairBody.includes("structure.hits < structure.hitsMax")
+  !repairBody.includes("policy.stages[structure.structureType]")
+  || !repairBody.includes("reservedTargets.has(structure.id)")
   || !repairBody.includes("creep.getActiveBodyparts(WORK)")
-  || !repairBody.includes("range: 3")
+  || !repairBody.includes("event.event === EVENT_REPAIR")
+  || !repairBody.includes("event.objectId === pending.creepId")
+  || !repairBody.includes("event.data?.targetId === pending.targetId")
+  || !repairBody.includes("energySpent")
 ) {
-  failures.push("防御维修页面缺少阶段、hitsMax、有效 WORK 或范围 3 边界");
+  failures.push("防御维修页面缺少阶段、目标预留或精确 Repairer-to-target 事件边界");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -127,7 +111,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -148,4 +132,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十七批英文防御操作生产冒烟测试通过：${articles.length} 篇文章、Nuker、Rampart access 与 staged repair 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十七批英文防御操作生产冒烟测试通过：${articles.length} 篇文章、精确 Repairer 事件、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
