@@ -106,9 +106,13 @@ export function scoreEditorialArticle({
     verification.get("Screeps Console test") === "Pending"
     && verification.get("Live multi-tick verification") === "Pending"
     && verification.get("Genuine room or Console screenshots") === "Pending";
-  const hasPolicyBoundary = [...verification.keys()].some(
-    (label) => label.toLowerCase().includes("policy boundary"),
-  );
+  const hasPolicyBoundary =
+    [...verification.keys()].some(
+      (label) => label.toLowerCase().includes("policy boundary"),
+    )
+    || (expected.policyBoundarySignals ?? []).some(
+      (signal) => html.includes(signal),
+    );
 
   const score = {
     technical: scoreDimension("technical", [
