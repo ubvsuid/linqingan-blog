@@ -71,7 +71,7 @@ export const englishEditorialRecycleArticle20260804: EnglishBeginnerArticle = {
 <h2 id="evidence-contract">Use the event and artifact contract</h2>
 <p><code>StructureSpawn.recycleCreep()</code> is an irreversible retirement request. The call returning <code>OK</code> proves that the current script submitted an acceptable intent; it does not prove that the target disappeared until the server processes the tick.</p>
 <p>The official engine then removes the exact Creep ID, creates a Tombstone at the Creep's position and appends an <code>EVENT_OBJECT_DESTROYED</code> record whose <code>objectId</code> is that Creep ID and whose type is <code>creep</code>. Because <code>Room.getEventLog()</code> reports the previous tick, the next script tick can match that exact event.</p>
-<p>Resource recovery also follows the Creep position, not the Spawn position. The engine first fills a Container on the Creep tile when one exists and has capacity, then writes the remainder into the new Tombstone Store. Do not search <code>LOOK_RESOURCES</code> on the Spawn tile or infer a refund from Spawn Energy.</p>
+<p>Resource recovery also follows the Creep position, not the Spawn position. The engine first fills a Container on the Creep tile when one exists and has capacity, then writes the remainder into the new Tombstone Store. Do not search for loose resource objects on the Spawn tile or infer a refund from Spawn Energy.</p>
 
 <h2 id="request-identity">Bind exact Spawn and Creep identity</h2>
 <pre><code class="language-javascript">function buildRecycleConfirmation(request) {
