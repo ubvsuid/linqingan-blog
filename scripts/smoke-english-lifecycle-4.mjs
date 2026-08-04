@@ -4,24 +4,39 @@ const articles = [
   {
     path: "/en/blog/screeps-renew-creep",
     chinesePath: "/blog/screeps-spawn-renew-creep",
-    headline: "How to Use renewCreep() Safely in Screeps",
+    headline: "Renew a Creep Without Hiding Spawn Contention or Boost Loss",
+    indexTitle: "Screeps renewCreep(): Coordinate Spawn Time and Verify TTL Gain",
+    query: "renewCreep verification",
+    tocId: "evidence-contract",
+    tocHeading: "Start with the missing event",
+    expectFaq: false,
     verification: [
-      "Chinese source article",
-      "Reviewed in full",
-      "Formula check",
-      "TTL floor(600 / body size); Energy ceil(creep cost / 2.5 / body size)",
-      "Safety boundary",
-      "Renewal removes all Boosts and rejects Creeps with CLAIM parts",
-      "Source correction",
-      "Persistent renewing state keeps the mission active until targetTtl",
+      "Official engine",
+      "Formula boundary",
+      "Static code review",
       "Screeps Console test",
       "Pending",
+    ],
+    signals: [
+      "createRenewalDispatcher",
+      "usedSpawnIds",
+      "usedCreepIds",
+      "Memory.pendingRenewals",
+      "expectedAddedTicks",
+      "renewal-ttl-signature-mismatch",
+      "renewal-observed-energy-confounded",
+      "Live renewal, Boost removal, dual-Spawn contention and Energy-transfer verification",
     ],
   },
   {
     path: "/en/blog/screeps-recycle-creep",
     chinesePath: "/blog/screeps-spawn-recycle-creep",
     headline: "How to Recycle a Creep Safely in Screeps",
+    indexTitle: "How to Recycle a Creep Safely in Screeps",
+    query: "recycleCreep",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
     verification: [
       "Chinese source article",
       "Reviewed in full",
@@ -31,6 +46,11 @@ const articles = [
       "Current recycleCreep() docs do not require an idle Spawn or list ERR_BUSY",
       "Live recycling and resource-drop test",
       "Pending",
+    ],
+    signals: [
+      "request.enabled = false",
+      "request.enabled = true",
+      "spawn.recycleCreep(creep)",
     ],
   },
 ];
@@ -48,7 +68,11 @@ for (const article of articles) {
     continue;
   }
 
-  for (const expected of [article.headline, ...article.verification]) {
+  for (const expected of [
+    article.headline,
+    ...article.verification,
+    ...article.signals,
+  ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
     }
@@ -62,46 +86,58 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
     }
   }
-}
 
-const renewResponse = await fetch(`${baseUrl}/en/blog/screeps-renew-creep`);
-const renewBody = await renewResponse.text();
-for (const expected of [
-  "creep.memory.renewing = true",
-  "creep.memory.renewing = false",
-  "renewMissionActive !== true",
-  "a renewal mission must remember that it has started",
-]) {
-  if (!renewBody.includes(expected)) {
-    failures.push(`/en/blog/screeps-renew-creep: 缺少续命状态修正 “${expected}”`);
+  if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
+    failures.push(`${article.path}: FAQPage 预期不一致`);
+  }
+
+  const searchResponse = await fetch(
+    `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
+    { redirect: "manual" },
+  );
+  const searchBody = await searchResponse.text();
+  if (searchResponse.status !== 200) {
+    failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
-const recycleResponse = await fetch(`${baseUrl}/en/blog/screeps-recycle-creep`);
-const recycleBody = await recycleResponse.text();
+const renewBody = await (await fetch(
+  `${baseUrl}/en/blog/screeps-renew-creep`,
+)).text();
+for (const expected of [
+  "creep.body.some",
+  "part.type === CLAIM",
+  "dispatcher.reserve(spawn, creep)",
+  "Memory.pendingRenewals[creep.id]",
+  "pending.before.ticksToLive",
+  "pending.expectedAddedTicks",
+  "event.event === EVENT_TRANSFER",
+  "creep.memory.renewing = false",
+  "does not create a Room event",
+]) {
+  if (!renewBody.includes(expected)) {
+    failures.push(`/en/blog/screeps-renew-creep: 缺少续命证据边界 “${expected}”`);
+  }
+}
+
+const recycleBody = await (await fetch(
+  `${baseUrl}/en/blog/screeps-recycle-creep`,
+)).text();
 if (recycleBody.includes("if (spawn.spawning)")) {
   failures.push("/en/blog/screeps-recycle-creep: 错误套用了 Spawn 忙碌前置判断");
 }
 if (recycleBody.includes("creep.suicide();")) {
   failures.push("/en/blog/screeps-recycle-creep: 不应自动调用 creep.suicide()" );
-}
-for (const expected of [
-  "request.enabled = false",
-  "request.enabled = true",
-  "spawn.recycleCreep(creep)",
-]) {
-  if (!recycleBody.includes(expected)) {
-    failures.push(`/en/blog/screeps-recycle-creep: 缺少一次性请求流程 “${expected}”`);
-  }
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
@@ -110,22 +146,8 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) {
-      failures.push(`/en/blog-index.json: 缺少新文章 “${article.headline}”`);
-    }
-  }
-}
-
-const searchResponse = await fetch(`${baseUrl}/en/search?q=creep`, {
-  redirect: "manual",
-});
-const searchBody = await searchResponse.text();
-if (searchResponse.status !== 200) {
-  failures.push(`/en/search: 预期 200，实际 ${searchResponse.status}`);
-} else {
-  for (const article of articles) {
-    if (!searchBody.includes(article.headline)) {
-      failures.push(`/en/search: 缺少新文章 “${article.headline}”`);
+    if (!blogBody.includes(article.indexTitle)) {
+      failures.push(`/en/blog-index.json: 缺少文章 “${article.indexTitle}”`);
     }
   }
 }
@@ -152,5 +174,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第四批生命周期英文专题生产冒烟测试通过：${articles.length} 篇文章、续命状态修正、回收安全边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
+  `第四批生命周期英文专题生产冒烟测试通过：${articles.length} 篇文章、续命精确TTL与Boost证据、回收安全边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
 );
