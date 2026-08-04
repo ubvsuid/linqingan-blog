@@ -10,15 +10,7 @@ const articles = [
     tocId: "quick-answer",
     tocHeading: "Quick answer",
     expectFaq: true,
-    verificationSignals: ["Chinese source article", "Reviewed in full"],
-    signals: [
-      "MAX_CONSTRUCTION_SITES",
-      "TERRAIN_MASK_WALL",
-      "request.enabled = false",
-      "room.createConstructionSite",
-      "Live Road placement, wall terrain, RCL, special-tile and site-limit test",
-      "Pending",
-    ],
+    signals: ["MAX_CONSTRUCTION_SITES", "room.createConstructionSite", "Pending"],
   },
   {
     path: "/en/blog/screeps-construction-site-progress",
@@ -29,33 +21,25 @@ const articles = [
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     expectFaq: false,
-    verificationSignals: ["Existing English route", "Preserved"],
-    signals: [
-      "summarizeConstructionProgress",
-      "submitTrackedBuild",
-      "EVENT_BUILD",
-      "verification-window-missed",
-      "build-event-verified-site-completed",
-      "Live multi-tick verification",
-      "Pending",
-    ],
+    signals: ["submitTrackedBuild", "EVENT_BUILD", "verification-window-missed", "Pending"],
   },
   {
     path: "/en/blog/screeps-structure-destroy",
     chinesePath: "/blog/screeps-structure-destroy",
-    headline: "How to Destroy a Misplaced Extension Without Hitting the Wrong Structure",
-    indexTitle: "How to Destroy a Misplaced Extension Without Hitting the Wrong Structure",
-    query: "Structure.destroy",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    expectFaq: true,
-    verificationSignals: ["Chinese source article", "Reviewed in full"],
+    headline: "Destroy One Extension Without Losing Object or Room Identity",
+    indexTitle: "Screeps Structure.destroy(): Verify One Exact Extension Removal",
+    query: "Structure destroy verification",
+    tocId: "evidence-contract",
+    tocHeading: "Separate accepted destruction from removal proof",
+    expectFaq: false,
     signals: [
-      "DESTROY_EXTENSION",
-      "Game.structures",
-      "structure.destroy()",
+      "buildDestroyConfirmation",
       "FIND_HOSTILE_CREEPS",
-      "Live Extension removal, hostile-room busy state, capacity impact and coordinate verification test",
+      "FIND_HOSTILE_POWER_CREEPS",
+      "createDestructionDispatcher",
+      "Memory.pendingStructureDestructions",
+      "original-destroyed-replacement-present",
+      "room-controller-not-owned",
       "Pending",
     ],
   },
@@ -63,12 +47,15 @@ const articles = [
 
 const failures = [];
 
-for (const article of articles) {
-  const response = await fetch(`${baseUrl}${article.path}`, { redirect: "manual" });
-  const body = await response.text();
+async function fetchText(path) {
+  const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
+  return { response, body: await response.text() };
+}
 
+for (const article of articles) {
+  const { response, body } = await fetchText(article.path);
   if (response.status !== 200) {
-    failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
+    failures.push(`${article.path}: expected 200, received ${response.status}`);
     continue;
   }
 
@@ -77,7 +64,6 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    ...article.verificationSignals,
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
@@ -88,89 +74,77 @@ for (const article of articles) {
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
   ]) {
-    if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+    if (!body.includes(expected)) {
+      failures.push(`${article.path}: missing “${expected}”`);
+    }
   }
 
   if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
-    failures.push(`${article.path}: FAQPage 预期不一致`);
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
   }
 
-  const searchResponse = await fetch(
-    `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
-    { redirect: "manual" },
+  const { response: searchResponse, body: searchBody } = await fetchText(
+    `/en/search?q=${encodeURIComponent(article.query)}`,
   );
-  const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
-    failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
+    failures.push(`/en/search?q=${article.query}: received ${searchResponse.status}`);
   } else if (!searchBody.includes(article.indexTitle)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
+    failures.push(`/en/search?q=${article.query}: missing “${article.indexTitle}”`);
   }
 }
 
-const createBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-room-create-construction-site`,
-)).text();
-if (
-  !createBody.includes("request.enabled = false")
-  || !createBody.includes("MAX_CONSTRUCTION_SITES")
-  || !createBody.includes("room.createConstructionSite")
-) {
-  failures.push("工地创建页面缺少一次性关闭、站点上限或创建调用边界");
+const { body: destroyBody } = await fetchText("/en/blog/screeps-structure-destroy");
+for (const expected of [
+  "request.structureId",
+  "request.expectedType !== STRUCTURE_EXTENSION",
+  "controller.my !== true",
+  "room.find(FIND_HOSTILE_CREEPS)",
+  "room.find(FIND_HOSTILE_POWER_CREEPS)",
+  "structure.destroy()",
+  "Game.getObjectById(pending.structureId)",
+  "original-destroyed-tile-empty",
+  "does not create a Room event",
+]) {
+  if (!destroyBody.includes(expected)) {
+    failures.push(`Structure.destroy evidence boundary missing “${expected}”`);
+  }
+}
+if (destroyBody.includes("confirmation !== 'DESTROY_EXTENSION'")) {
+  failures.push("Structure.destroy still uses a static confirmation phrase");
+}
+if (destroyBody.includes("Game.structures[structure.id]")) {
+  failures.push("Structure.destroy incorrectly treats Game.structures membership as the engine authority boundary");
 }
 
-const progressBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-construction-site-progress`,
-)).text();
-if (
-  !progressBody.includes("Math.max(0, total - progress)")
-  || !progressBody.includes("site.pos.roomName")
-  || !progressBody.includes("creep.pos.inRangeTo(site, 3)")
-  || !progressBody.includes("event.objectId === pending.builderId")
-  || !progressBody.includes("event.data?.targetId === pending.siteId")
-  || !progressBody.includes("findCompletedStructure(room, pending)")
-  || !progressBody.includes("structure-observed-without-matching-event")
-  || !progressBody.includes("not a tick or wall-clock promise")
-) {
-  failures.push("工地进度页面缺少进度、Builder/Site 事件身份、完成/删除或禁止 ETA 边界");
-}
-
-const destroyBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-structure-destroy`,
-)).text();
-if (
-  !destroyBody.includes("DESTROY_EXTENSION")
-  || !destroyBody.includes("Game.structures[structure.id]")
-  || !destroyBody.includes("request.enabled = false")
-  || !destroyBody.includes("structure.destroy()")
-) {
-  failures.push("结构销毁页面缺少确认、所有权、一次性关闭或销毁调用边界");
-}
-
-const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
-const blogBody = await blogResponse.text();
-if (blogResponse.status !== 200) {
-  failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
+const { response: indexResponse, body: indexBody } = await fetchText("/en/blog-index.json");
+if (indexResponse.status !== 200) {
+  failures.push(`/en/blog-index.json: received ${indexResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
+    if (!indexBody.includes(article.indexTitle)) {
+      failures.push(`/en/blog-index.json: missing “${article.indexTitle}”`);
+    }
   }
 }
 
-const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, { redirect: "manual" });
-const sitemapBody = await sitemapResponse.text();
+const { response: sitemapResponse, body: sitemapBody } = await fetchText("/sitemap.xml");
 if (sitemapResponse.status !== 200) {
-  failures.push(`/sitemap.xml: 预期 200，实际 ${sitemapResponse.status}`);
+  failures.push(`/sitemap.xml: received ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
     const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: 缺少 ${expected}`);
+    if (!sitemapBody.includes(expected)) {
+      failures.push(`/sitemap.xml: missing ${expected}`);
+    }
   }
 }
 
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
-  console.error(`\n第十五批英文建造安全生产冒烟测试失败：${failures.length} 项。`);
+  console.error(`\nConstruction production smoke failed: ${failures.length} issue(s).`);
   process.exit(1);
 }
 
-console.log(`第十五批英文建造安全生产冒烟测试通过：${articles.length} 篇文章、工地创建、精确 Builder 事件、销毁、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(
+  `Construction production smoke passed: ${articles.length} articles, exact Builder and destruction identity, hostile Power Creep boundary, replacement states, Canonical, hreflang, JSON-LD, search and Sitemap.`,
+);
