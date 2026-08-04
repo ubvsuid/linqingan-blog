@@ -65,6 +65,7 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-wall-rampart-repair-limit": 6,
 
   "/en/blog/screeps-market-create-order": 7,
+  "/en/blog/screeps-market-order-maintenance": 7,
   "/en/blog/screeps-market-deal": 7,
   "/en/blog/screeps-terminal-send-resources": 7,
   "/en/blog/screeps-lab-run-reaction": 7,
