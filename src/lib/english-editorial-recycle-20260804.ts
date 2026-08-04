@@ -14,64 +14,64 @@ export const englishEditorialRecycleArticle20260804: EnglishBeginnerArticle = {
   title: "Screeps recycleCreep(): Verify the Exact Creep Retirement",
   headline: "Recycle One Creep Without Retrying an Irreversible Request",
   description:
-    "Bind one retirement request to exact Spawn and Creep IDs, reserve both objects for the tick, record pending evidence only after OK, verify the exact Creep disappears, and label drop evidence as confounded.",
+    "Bind one retirement request to exact Spawn and Creep IDs, reserve both objects, record pending evidence only after OK, then match the exact destruction event and Creep-tile Tombstone.",
   category: "CREEP LIFECYCLE · RECYCLING IDENTITY",
   publishedAt: "2026-07-25",
   publishedLabel: "July 25, 2026",
   updatedAt: "2026-08-04",
-  readingTime: "22 min read",
+  readingTime: "23 min read",
   primaryKeyword: "Screeps recycleCreep verification",
   searchIntent:
-    "Submit and verify one exact Creep recycling operation without automatic retry, name-only identity, Spawn-busy assumptions, or invented refund proof",
+    "Submit and verify one exact Creep recycling operation without automatic retry, name-only identity, Spawn-busy assumptions, or incorrect resource-drop evidence",
   finalScore: 98,
   keywords: [
     "Screeps recycleCreep verification",
-    "Screeps recycle exact Creep ID",
-    "Screeps recycling resource drops",
+    "Screeps recycle EVENT_OBJECT_DESTROYED",
+    "Screeps recycling Tombstone store",
     "Screeps recycleCreep no ERR_BUSY",
-    "Screeps recycleCreep vs suicide",
+    "Screeps recycleCreep exact Creep ID",
   ],
   verification: [
     ["Chinese source article", "Reviewed in full"],
     [
       "Official engine",
-      "Checked — recycling requires an owned non-spawning Creep adjacent to the Spawn, then removes that exact Creep; the processor does not require an idle Spawn",
+      "Checked — recycling validates an owned non-spawning adjacent Creep, removes that exact ID, creates a Tombstone at the Creep position and emits EVENT_OBJECT_DESTROYED",
     ],
     [
       "Resource boundary",
-      "Checked — docs describe lifetime-based spawning and Boost resource drops with an Energy cap; exact observed piles remain confounded by pickup, merging and visibility",
+      "Checked — recoverable resources first enter a Container on the Creep tile when capacity exists; the remainder enters the exact Tombstone Store",
     ],
     [
       "Static code review",
-      "Passed — exact Spawn and Creep IDs, one dispatcher reservation, accepted-call pending state, next-tick disappearance and drop-observation labels",
+      "Passed — exact Spawn and Creep IDs, one dispatcher, accepted-call pending state, previous-tick destruction event and exact Tombstone identity",
     ],
     ["JavaScript syntax", "Passed"],
     ["Screeps Console test", "Pending"],
     [
-      "Live recycling, simultaneous request contention, exact Creep disappearance and resource-drop observation",
+      "Live recycling, simultaneous request contention, destruction-event matching, Tombstone Store and Container-delta observation",
       "Pending",
     ],
     ["Genuine room or Console screenshots", "Pending"],
     ["Last verified", "August 4, 2026"],
   ],
   toc: [
-    ["evidence-contract", "Separate retirement from refund evidence"],
+    ["evidence-contract", "Use the event and artifact contract"],
     ["request-identity", "Bind exact Spawn and Creep identity"],
     ["preflight", "Evaluate the current objects"],
     ["coordinate", "Reserve both objects for the tick"],
     ["submit", "Submit once without automatic retry"],
-    ["verify-creep", "Verify the exact Creep disappears"],
-    ["verify-drops", "Treat resource drops as confounded evidence"],
+    ["verify-event", "Match the exact destruction event"],
+    ["verify-artifacts", "Inspect the Creep-tile Tombstone and Container"],
     ["failure-states", "Keep incomplete evidence visible"],
     ["integration", "Production integration boundary"],
     ["official-docs", "Official documentation"],
   ],
   faq: [],
   articleHtml: String.raw`
-<h2 id="evidence-contract">Separate retirement from refund evidence</h2>
-<p><code>StructureSpawn.recycleCreep()</code> is an irreversible retirement request. The strongest next-tick evidence is that the exact saved Creep ID no longer resolves. Resource piles near the Spawn are secondary evidence: another Creep may pick them up, compatible piles may merge, visibility may be lost and unrelated drops may already occupy the tile.</p>
-<p>The official processor validates the exact target Creep, ownership, spawning state and adjacency before removing it. It does not require the Spawn to be idle. Do not copy <code>renewCreep()</code>'s <code>ERR_BUSY</code> model into recycling, and do not use Spawn Energy changes as refund proof.</p>
-<p>Recycling creates no Room event. Preserve exact object identity before submission.</p>
+<h2 id="evidence-contract">Use the event and artifact contract</h2>
+<p><code>StructureSpawn.recycleCreep()</code> is an irreversible retirement request. The call returning <code>OK</code> proves that the current script submitted an acceptable intent; it does not prove that the target disappeared until the server processes the tick.</p>
+<p>The official engine then removes the exact Creep ID, creates a Tombstone at the Creep's position and appends an <code>EVENT_OBJECT_DESTROYED</code> record whose <code>objectId</code> is that Creep ID and whose type is <code>creep</code>. Because <code>Room.getEventLog()</code> reports the previous tick, the next script tick can match that exact event.</p>
+<p>Resource recovery also follows the Creep position, not the Spawn position. The engine first fills a Container on the Creep tile when one exists and has capacity, then writes the remainder into the new Tombstone Store. Do not search <code>LOOK_RESOURCES</code> on the Spawn tile or infer a refund from Spawn Energy.</p>
 
 <h2 id="request-identity">Bind exact Spawn and Creep identity</h2>
 <pre><code class="language-javascript">function buildRecycleConfirmation(request) {
@@ -98,7 +98,7 @@ Memory.recycleRequests['retire-worker-17'] = {
     'replace-with-spawn-id_' +
     'replace-with-creep-id_OldWorker1'
 };</code></pre>
-<p>The Creep name remains useful for operators and Memory cleanup, but the operation binds to IDs. A later Creep that reuses the same name is not the reviewed target.</p>
+<p>The name helps an operator identify the mission, but the retirement binds to IDs. A later Creep that reuses the same name is not the reviewed target.</p>
 
 <h2 id="preflight">Evaluate the current objects</h2>
 <pre><code class="language-javascript">function evaluateRecycleOperation(
@@ -156,7 +156,7 @@ Memory.recycleRequests['retire-worker-17'] = {
 
   return { ready: true, status: 'recycle-ready' };
 }</code></pre>
-<p>There is intentionally no <code>spawn.spawning</code> rejection. The current docs and processor do not make an idle Spawn a recycling precondition.</p>
+<p>There is intentionally no <code>spawn.spawning</code> rejection. The current API and processor do not require an idle Spawn for recycling.</p>
 
 <h2 id="coordinate">Reserve both objects for the tick</h2>
 <pre><code class="language-javascript">function createRecycleDispatcher() {
@@ -180,7 +180,6 @@ Memory.recycleRequests['retire-worker-17'] = {
 
       reservedSpawnIds.add(spawnId);
       reservedCreepIds.add(creepId);
-
       return {
         ready: true,
         status: 'recycle-reserved'
@@ -192,10 +191,19 @@ Memory.recycleRequests['retire-worker-17'] = {
     }
   };
 }</code></pre>
-<p>Reserve the Creep so two nearby Spawns cannot race for the same target, and reserve the Spawn so one final operations dispatcher owns its retirement call for the tick. The Spawn reservation is a project coordination rule, not an engine busy requirement.</p>
+<p>The Spawn reservation is a project coordination rule, not an engine busy rule. The Creep reservation prevents two adjacent Spawns or two retirement modules from targeting the same exact Creep during one script tick.</p>
 
 <h2 id="submit">Submit once without automatic retry</h2>
-<pre><code class="language-javascript">function submitRecycleOperation(
+<pre><code class="language-javascript">function snapshotStore(store) {
+  return Object.fromEntries(
+    Object.keys(store).map(resourceType =&gt; [
+      resourceType,
+      store.getUsedCapacity(resourceType)
+    ])
+  );
+}
+
+function submitRecycleOperation(
   dispatcher,
   requestId
 ) {
@@ -228,23 +236,27 @@ Memory.recycleRequests['retire-worker-17'] = {
       })
     };
   }
-  if (!decision.ready) {
-    return decision;
-  }
+  if (!decision.ready) return decision;
 
   const reservation = dispatcher.reserve(
     spawn.id,
     creep.id
   );
-  if (!reservation.ready) {
-    return reservation;
-  }
+  if (!reservation.ready) return reservation;
 
   Memory.pendingRecycleOperations ??= {};
   if (Memory.pendingRecycleOperations[creep.id]) {
     dispatcher.release(spawn.id, creep.id);
     return { status: 'pending-operation-exists' };
   }
+
+  const container = creep.room.lookForAt(
+    LOOK_STRUCTURES,
+    creep.pos.x,
+    creep.pos.y
+  ).find(structure =&gt;
+    structure.structureType === STRUCTURE_CONTAINER
+  ) || null;
 
   request.enabled = false;
   request.lastAttemptAt = Game.time;
@@ -258,9 +270,10 @@ Memory.recycleRequests['retire-worker-17'] = {
     creepRoomName: creep.pos.roomName,
     creepX: creep.pos.x,
     creepY: creep.pos.y,
-    spawnRoomName: spawn.pos.roomName,
-    spawnX: spawn.pos.x,
-    spawnY: spawn.pos.y
+    containerId: container?.id ?? null,
+    containerStore: container
+      ? snapshotStore(container.store)
+      : null
   };
 
   const result = spawn.recycleCreep(creep);
@@ -268,7 +281,8 @@ Memory.recycleRequests['retire-worker-17'] = {
 
   if (result !== OK) {
     dispatcher.release(spawn.id, creep.id);
-    request.status = 'recycle-rejected-review-required';
+    request.status =
+      'recycle-rejected-review-required';
     return {
       status: request.status,
       result
@@ -293,9 +307,9 @@ Memory.recycleRequests['retire-worker-17'] = {
     creepId: creep.id
   };
 }</code></pre>
-<p>A rejected destructive request remains disabled. Movement can continue while the request is enabled, but after the API call the operator must review any rejection before creating a fresh request. The code never falls back to <code>creep.suicide()</code>.</p>
+<p>A rejected irreversible request remains disabled for human review. Movement may continue before submission, but the code never silently retries a rejected call and never falls back to <code>creep.suicide()</code>.</p>
 
-<h2 id="verify-creep">Verify the exact Creep disappears</h2>
+<h2 id="verify-event">Match the exact destruction event</h2>
 <pre><code class="language-javascript">function verifyRecycledCreep(pending) {
   if (!pending) {
     return { status: 'no-pending-operation' };
@@ -309,60 +323,96 @@ Memory.recycleRequests['retire-worker-17'] = {
     return { status: 'verification-window-missed' };
   }
 
-  const creep =
-    Game.getObjectById(pending.creepId);
-  const namedCreep =
-    Game.creeps[pending.creepName] || null;
-  const spawn =
-    Game.getObjectById(pending.spawnId);
-
+  const creep = Game.getObjectById(pending.creepId);
   if (creep) {
     return {
       status: 'accepted-creep-still-observed',
-      creepId: creep.id,
-      creepName: creep.name
+      creepId: creep.id
+    };
+  }
+
+  const room =
+    Game.rooms[pending.before.creepRoomName];
+  if (!room) {
+    return {
+      status: 'exact-creep-gone-room-evidence-unavailable'
+    };
+  }
+
+  const events = room.getEventLog().filter(event =&gt;
+    event.event === EVENT_OBJECT_DESTROYED
+    &amp;&amp; event.objectId === pending.creepId
+    &amp;&amp; event.data?.type === 'creep'
+  );
+
+  const tombstones = room.find(FIND_TOMBSTONES).filter(
+    tombstone =&gt;
+      tombstone.creep?.id === pending.creepId
+      &amp;&amp; tombstone.pos.x === pending.before.creepX
+      &amp;&amp; tombstone.pos.y === pending.before.creepY
+  );
+
+  if (events.length !== 1) {
+    return {
+      status: events.length === 0
+        ? 'exact-creep-gone-destruction-event-not-observed'
+        : 'destruction-event-ambiguous',
+      eventCount: events.length,
+      tombstoneCount: tombstones.length
     };
   }
 
   return {
-    status: namedCreep
-      ? 'exact-creep-gone-name-reused'
-      : 'exact-creep-retirement-observed',
-    creepId: pending.creepId,
-    creepName: pending.creepName,
-    replacementId: namedCreep?.id ?? null,
-    spawnAvailable: Boolean(spawn)
+    status: tombstones.length === 1
+      ? 'recycle-event-and-tombstone-observed'
+      : 'recycle-event-observed-artifact-mismatch',
+    eventCount: events.length,
+    tombstoneCount: tombstones.length,
+    tombstoneId: tombstones[0]?.id ?? null
   };
 }</code></pre>
-<p>The exact ID is primary. Name absence alone is weaker because later code may reuse a role name after the original Creep disappears.</p>
+<p>The exact destruction event and exact Tombstone identity are stronger than name absence. A new Creep may reuse the old name, but it cannot reuse the destroyed object's ID.</p>
 
-<h2 id="verify-drops">Treat resource drops as confounded evidence</h2>
-<pre><code class="language-javascript">function observeRecycleDrops(pending) {
+<h2 id="verify-artifacts">Inspect the Creep-tile Tombstone and Container</h2>
+<pre><code class="language-javascript">function observeRecycleArtifacts(pending) {
   const room =
-    Game.rooms[pending.before.spawnRoomName];
+    Game.rooms[pending.before.creepRoomName];
 
   if (!room) {
-    return { status: 'drop-evidence-unavailable' };
+    return { status: 'artifact-evidence-unavailable' };
   }
 
-  const drops = room.lookForAt(
-    LOOK_RESOURCES,
-    pending.before.spawnX,
-    pending.before.spawnY
-  ).map(resource =&gt; ({
-    id: resource.id,
-    resourceType: resource.resourceType,
-    amount: resource.amount
-  }));
+  const tombstone = room.find(FIND_TOMBSTONES).find(
+    item =&gt;
+      item.creep?.id === pending.creepId
+      &amp;&amp; item.pos.x === pending.before.creepX
+      &amp;&amp; item.pos.y === pending.before.creepY
+  ) || null;
+
+  const container = pending.before.containerId
+    ? Game.getObjectById(pending.before.containerId)
+    : null;
+
+  const containerAfter = container
+    ? snapshotStore(container.store)
+    : null;
 
   return {
-    status: drops.length &gt; 0
-      ? 'drop-piles-observed-confounded'
-      : 'no-drop-pile-observed',
-    drops
+    status: tombstone
+      ? container
+        ? 'recycle-artifacts-observed-container-confounded'
+        : 'recycle-tombstone-observed'
+      : 'recycle-tombstone-not-observed',
+    tombstoneId: tombstone?.id ?? null,
+    tombstoneStore: tombstone
+      ? snapshotStore(tombstone.store)
+      : null,
+    containerId: container?.id ?? null,
+    containerBefore: pending.before.containerStore,
+    containerAfter
   };
 }</code></pre>
-<p>The documented lifetime and Energy-cap rules explain possible output, but this snapshot cannot attribute every pile to the saved operation. Pickup, merging, prior piles and timing remain confounds. Report the observed objects without converting them into guaranteed refund proof.</p>
+<p>The Tombstone is matched by deceased Creep ID and Creep coordinates. A Container Store change is intentionally labelled confounded because transfers, withdrawals and other writes may affect the same Store. Report observed values instead of claiming a guaranteed refund from a net delta.</p>
 
 <h2 id="failure-states">Keep incomplete evidence visible</h2>
 <div class="table-scroll"><table>
@@ -371,14 +421,15 @@ Memory.recycleRequests['retire-worker-17'] = {
 <tr><td><code>creep-already-reserved</code></td><td>Another retirement request owns this Creep for the tick</td><td>Do not submit a second call</td></tr>
 <tr><td><code>recycle-rejected-review-required</code></td><td>The API rejected the irreversible request</td><td>Keep it disabled and inspect the return code</td></tr>
 <tr><td><code>accepted-creep-still-observed</code></td><td>The saved ID still exists next tick</td><td>Preserve the discrepancy</td></tr>
-<tr><td><code>exact-creep-gone-name-reused</code></td><td>The reviewed ID vanished but another Creep uses the name</td><td>Do not delete the replacement's Memory</td></tr>
-<tr><td><code>drop-piles-observed-confounded</code></td><td>Resources are visible at the Spawn tile</td><td>Record them as secondary evidence only</td></tr>
+<tr><td><code>exact-creep-gone-destruction-event-not-observed</code></td><td>The exact ID vanished but the expected previous-tick event is absent</td><td>Keep the retirement unverified</td></tr>
+<tr><td><code>recycle-event-observed-artifact-mismatch</code></td><td>The exact event exists but no single matching Tombstone is visible</td><td>Inspect visibility and artifact identity</td></tr>
+<tr><td><code>recycle-artifacts-observed-container-confounded</code></td><td>The exact Tombstone and reviewed Container are visible</td><td>Report both Stores without forcing a refund delta</td></tr>
 </tbody></table></div>
 
 <h2 id="integration">Production integration boundary</h2>
-<p>Run retirement after replacement handoff and resource-delivery checks. Use one dispatcher for all Spawns, verify accepted operations before cleaning custom indexes, and delete only Memory records that still identify the retired Creep ID. Live Console execution, exact returned amounts, simultaneous Spawn contention, genuine screenshots and CPU measurements remain pending.</p>
+<p>Run retirement after replacement handoff and cargo-delivery checks. Verify accepted operations before cleaning custom indexes, and delete only Memory records that still identify the retired Creep ID. Live Console execution, exact recovered amounts, Container contention, simultaneous Spawn requests, genuine screenshots and CPU measurements remain pending.</p>
 
 <h2 id="official-docs">Official documentation</h2>
-<p>Review the official Screeps API for <code>StructureSpawn.recycleCreep()</code>, <code>Creep.suicide()</code>, <code>Creep.ticksToLive</code>, dropped resources, range and return codes. The engine processor clarifies the exact target, ownership, spawning and adjacency checks.</p>
+<p>Review the official Screeps API for <code>StructureSpawn.recycleCreep()</code>, <code>Room.getEventLog()</code>, <code>EVENT_OBJECT_DESTROYED</code>, <code>FIND_TOMBSTONES</code>, <code>Tombstone.creep</code>, <code>Tombstone.store</code>, Containers, range and return codes. The engine processor clarifies the exact Creep-tile artifact flow.</p>
 `,
 };
