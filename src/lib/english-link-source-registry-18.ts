@@ -67,4 +67,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Creep.withdraw Tombstone",
     ],
   },
+  {
+    href: "/en/blog/screeps-room-energyavailable-stuck",
+    chinesePath: "/blog/screeps-room-energyavailable-stuck",
+    category: "SPAWN SYSTEM · ENERGY DIAGNOSTICS",
+    title: "Why room.energyAvailable Stays Below Capacity in Screeps",
+    description:
+      "Inspect active Spawn and Extension Stores, distinguish a real delivery failure from normal spawning demand, select one deterministic fill target, record transfer() results, and verify bounded later deltas.",
+    publishedAt: "2026-08-04",
+    publishedLabel: "August 4, 2026",
+    readingTime: "15 min read",
+    primaryKeyword: "Screeps room.energyAvailable",
+    searchIntent: "Diagnose why room.energyAvailable remains below energyCapacityAvailable and verify one Spawn or Extension delivery attempt",
+    status: "published",
+    finalScore: 97,
+    keywords: [
+      "Screeps room.energyAvailable",
+      "energyCapacityAvailable",
+      "Screeps Extension not filling",
+      "Screeps Spawn energy",
+      "Creep.transfer Extension",
+    ],
+  },
 ];
