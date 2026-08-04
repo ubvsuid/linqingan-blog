@@ -45,4 +45,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps findClosestByPath Source",
     ],
   },
+  {
+    href: "/en/blog/screeps-tombstone-ruin-recovery",
+    chinesePath: "/blog/screeps-tombstone-ruin-recovery",
+    category: "ROOM ECONOMY · RESOURCE RECOVERY",
+    title: "How to Recover Resources from Tombstones and Ruins in Screeps",
+    description:
+      "Scan visible Tombstones and Ruins, rank candidates by ticksToDecay, resource priority, amount and range, submit withdraw() safely, and verify bounded Store deltas on a later tick.",
+    publishedAt: "2026-08-04",
+    publishedLabel: "August 4, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps Tombstone resource recovery",
+    searchIntent: "Recover expiring resources from visible Tombstones and Ruins with deterministic target selection and bounded verification",
+    status: "published",
+    finalScore: 97,
+    keywords: [
+      "Screeps Tombstone resource recovery",
+      "Screeps Ruin withdraw",
+      "FIND_TOMBSTONES",
+      "FIND_RUINS",
+      "Creep.withdraw Tombstone",
+    ],
+  },
 ];
