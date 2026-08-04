@@ -1,4 +1,5 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const requestTimeoutMs = 15_000;
 
 const articles = [
   {
@@ -45,7 +46,10 @@ const articles = [
 const failures = [];
 
 async function fetchText(path) {
-  const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
+  const response = await fetch(`${baseUrl}${path}`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(requestTimeoutMs),
+  });
   return { response, body: await response.text() };
 }
 
