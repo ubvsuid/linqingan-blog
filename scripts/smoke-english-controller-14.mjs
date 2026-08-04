@@ -5,6 +5,7 @@ const articles = [
     path: "/en/blog/screeps-controller-activate-safe-mode",
     chinesePath: "/blog/screeps-controller-activate-safe-mode",
     headline: "Activate Safe Mode Once Without Losing the Final Controller Intent",
+    indexTitle: "Screeps activateSafeMode(): Prevent Same-Tick Intent Overwrite",
     query: "activateSafeMode",
     tocAnchor: "failure-mode",
     firstHeading: "The failure mode: two OK results, one surviving intent",
@@ -24,6 +25,7 @@ const articles = [
     path: "/en/blog/screeps-controller-downgrade",
     chinesePath: "/blog/screeps-controller-downgrade",
     headline: "How to Detect Controller Downgrade Risk and Recover Safely",
+    indexTitle: "How to Detect Controller Downgrade Risk and Recover Safely",
     query: "ticksToDowngrade",
     tocAnchor: "quick-answer",
     firstHeading: "Quick answer",
@@ -41,6 +43,7 @@ const articles = [
     path: "/en/blog/screeps-reserve-vs-claim-controller",
     chinesePath: "/blog/screeps-reserve-vs-claim-controller",
     headline: "How to Choose Between Reserving and Claiming a Controller",
+    indexTitle: "How to Choose Between Reserving and Claiming a Controller",
     query: "reserveController",
     tocAnchor: "quick-answer",
     firstHeading: "Quick answer",
@@ -102,8 +105,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -152,7 +155,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
   }
 }
 
