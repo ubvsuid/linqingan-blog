@@ -1,4 +1,5 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const requestTimeoutMs = 15_000;
 
 const articles = [
   {
@@ -48,7 +49,10 @@ const articles = [
 const failures = [];
 
 async function fetchText(path) {
-  const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
+  const response = await fetch(`${baseUrl}${path}`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(requestTimeoutMs),
+  });
   return { response, body: await response.text() };
 }
 
@@ -74,9 +78,7 @@ for (const article of articles) {
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
   ]) {
-    if (!body.includes(expected)) {
-      failures.push(`${article.path}: missing “${expected}”`);
-    }
+    if (!body.includes(expected)) failures.push(`${article.path}: missing “${expected}”`);
   }
 
   if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
@@ -133,9 +135,7 @@ if (sitemapResponse.status !== 200) {
 } else {
   for (const article of articles) {
     const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
-      failures.push(`/sitemap.xml: missing ${expected}`);
-    }
+    if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: missing ${expected}`);
   }
 }
 
