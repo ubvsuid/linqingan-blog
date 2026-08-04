@@ -118,6 +118,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-wall-rampart-repair-limit": ["defense", "construction"],
 
   "/en/blog/screeps-market-create-order": ["market", "resources"],
+  "/en/blog/screeps-market-order-maintenance": ["market", "resources"],
   "/en/blog/screeps-market-deal": ["market", "resources"],
   "/en/blog/screeps-terminal-send-resources": ["market", "resources"],
   "/en/blog/screeps-lab-run-reaction": ["resources", "market"],
