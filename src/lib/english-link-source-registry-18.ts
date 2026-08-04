@@ -89,4 +89,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Creep.transfer Extension",
     ],
   },
+  {
+    href: "/en/blog/screeps-market-order-maintenance",
+    chinesePath: "/blog/screeps-market-order-maintenance",
+    category: "MARKET · ORDER LIFECYCLE",
+    title: "How to Maintain Screeps Market Orders Safely",
+    description:
+      "Resolve one current owned order, require an exact order fingerprint, estimate change-price or extension fees, protect a Credits reserve, submit one changeOrderPrice(), extendOrder(), or cancelOrder() request, and verify the later order state.",
+    publishedAt: "2026-08-04",
+    publishedLabel: "August 4, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps market order maintenance",
+    searchIntent: "Safely change, extend, or cancel one owned Screeps market order and verify the result",
+    status: "published",
+    finalScore: 97,
+    keywords: [
+      "Screeps changeOrderPrice",
+      "Screeps extendOrder",
+      "Screeps cancelOrder",
+      "Screeps market order fee",
+      "Screeps market order maintenance",
+    ],
+  },
 ];
