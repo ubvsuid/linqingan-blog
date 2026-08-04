@@ -12,6 +12,8 @@ PR #94 now targets `clean-blog-v1` directly. It remains the only authorized merg
 - `/en/blog/screeps-mineral-extractor-harvest`
 - `/en/blog/screeps-power-spawn-process-power`
 
+The branch was cleanly replayed onto the merged default branch. The formal PR now contains only the reviewed Defense, Mineral, and Power batch files rather than inherited parent commits.
+
 This record intentionally creates no article route, changes no slug, and modifies no article body, Canonical URL, hreflang pair, Chinese mapping, or publication date.
 
 The new head must pass the complete Site quality workflow, Lighthouse quality gate, Vercel Preview, and review-thread check after retargeting. Screeps Console execution, live multi-tick evidence, genuine screenshots, Search Console evidence, complete human visual QA, and post-merge production verification remain Pending.
