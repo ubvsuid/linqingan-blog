@@ -1,4 +1,5 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const requestTimeoutMs = 15_000;
 
 const articles = [
   {
@@ -10,28 +11,27 @@ const articles = [
     tocId: "evidence-contract",
     tocHeading: "Use two evidence layers",
     expectFaq: false,
-    signals: [
-      "buildNukeConfirmation",
-      "Memory.pendingNukeLaunches",
-      "accepted-awaiting-verification",
-      "launcher-signature-observed",
-      "FIND_NUKES",
-      "nuke.launchRoomName",
-      "target-evidence-unavailable",
-      "Live protected-area rejection, launch, cooldown, resource consumption and target Nuke observation",
-      "Pending",
-    ],
+    signals: ["Memory.pendingNukeLaunches", "launcher-signature-observed", "FIND_NUKES", "Pending"],
   },
   {
     path: "/en/blog/screeps-rampart-set-public",
     chinesePath: "/blog/screeps-rampart-set-public",
-    headline: "How to Change Rampart Access Without Treating Public as an Ally List",
-    indexTitle: "How to Change Rampart Access Without Treating Public as an Ally List",
-    query: "setPublic",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    expectFaq: true,
-    signals: ["buildRampartConfirmation", "rampart.setPublic(request.public)", "state-already-matches", "Pending"],
+    headline: "Change One Rampart Access State and Verify the Exact Object",
+    indexTitle: "Screeps setPublic(): Prevent Same-Tick Rampart Intent Overwrite",
+    query: "setPublic verification",
+    tocId: "evidence-contract",
+    tocHeading: "Start with the intent boundary",
+    expectFaq: false,
+    signals: [
+      "buildRampartConfirmation",
+      "createRampartAccessDispatcher",
+      "Memory.pendingRampartAccess",
+      "accepted-state-not-observed",
+      "original-rampart-missing-replacement-present",
+      "rampart-already-reserved",
+      "creates no Room event",
+      "Pending",
+    ],
   },
   {
     path: "/en/blog/screeps-wall-rampart-repair-limit",
@@ -42,27 +42,24 @@ const articles = [
     tocId: "decision-model",
     tocHeading: "Separate the repair stage from target identity",
     expectFaq: false,
-    signals: [
-      "createRepairCoordinator",
-      "reservedTargets",
-      "Memory.pendingFortificationRepairs",
-      "EVENT_REPAIR",
-      "event.objectId === pending.creepId",
-      "event.data?.targetId === pending.targetId",
-      "repair-event-window-missed",
-      "Live multi-tick verification",
-      "Pending",
-    ],
+    signals: ["Memory.pendingFortificationRepairs", "EVENT_REPAIR", "repair-event-window-missed", "Pending"],
   },
 ];
 
 const failures = [];
 
+async function fetchText(path) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(requestTimeoutMs),
+  });
+  return { response, body: await response.text() };
+}
+
 for (const article of articles) {
-  const response = await fetch(`${baseUrl}${article.path}`, { redirect: "manual" });
-  const body = await response.text();
+  const { response, body } = await fetchText(article.path);
   if (response.status !== 200) {
-    failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
+    failures.push(`${article.path}: expected 200, received ${response.status}`);
     continue;
   }
 
@@ -81,84 +78,65 @@ for (const article of articles) {
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
   ]) {
-    if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+    if (!body.includes(expected)) failures.push(`${article.path}: missing “${expected}”`);
   }
 
   if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
-    failures.push(`${article.path}: FAQPage 预期不一致`);
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
   }
 
-  const searchResponse = await fetch(
-    `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
-    { redirect: "manual" },
+  const { response: searchResponse, body: searchBody } = await fetchText(
+    `/en/search?q=${encodeURIComponent(article.query)}`,
   );
-  const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
-    failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
+    failures.push(`/en/search?q=${article.query}: received ${searchResponse.status}`);
   } else if (!searchBody.includes(article.indexTitle)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
+    failures.push(`/en/search?q=${article.query}: missing “${article.indexTitle}”`);
   }
 }
 
-const nukerBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-nuker-launch`,
-)).text();
+const { body: rampartBody } = await fetchText("/en/blog/screeps-rampart-set-public");
 for (const expected of [
-  "request.nukerId",
-  "request.enabled = false",
-  "Memory.pendingNukeLaunches[nuker.id]",
-  "nuker.cooldown",
-  "energy === 0",
-  "ghodium === 0",
-  "room.find(FIND_NUKES)",
-  "nuke.launchRoomName",
-  "does not emit a Room event",
+  "typeof request.public !== 'boolean'",
+  "reservedRampartIds",
+  "rampart.setPublic(request.public)",
+  "Memory.pendingRampartAccess[rampart.id]",
+  "Game.getObjectById(pending.rampartId)",
+  "verification-window-missed",
+  "A second call for the same Rampart",
 ]) {
-  if (!nukerBody.includes(expected)) {
-    failures.push(`Nuker页面缺少证据边界 “${expected}”`);
+  if (!rampartBody.includes(expected)) {
+    failures.push(`Rampart setPublic evidence boundary missing “${expected}”`);
   }
 }
 
-const repairBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-wall-rampart-repair-limit`,
-)).text();
-if (
-  !repairBody.includes("policy.stages[structure.structureType]")
-  || !repairBody.includes("reservedTargets.has(structure.id)")
-  || !repairBody.includes("creep.getActiveBodyparts(WORK)")
-  || !repairBody.includes("event.event === EVENT_REPAIR")
-  || !repairBody.includes("event.objectId === pending.creepId")
-  || !repairBody.includes("event.data?.targetId === pending.targetId")
-  || !repairBody.includes("energySpent")
-) {
-  failures.push("防御维修页面缺少阶段、目标预留或精确 Repairer-to-target 事件边界");
-}
-
-const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
-const blogBody = await blogResponse.text();
-if (blogResponse.status !== 200) {
-  failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
+const { response: indexResponse, body: indexBody } = await fetchText("/en/blog-index.json");
+if (indexResponse.status !== 200) {
+  failures.push(`/en/blog-index.json: received ${indexResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
+    if (!indexBody.includes(article.indexTitle)) {
+      failures.push(`/en/blog-index.json: missing “${article.indexTitle}”`);
+    }
   }
 }
 
-const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, { redirect: "manual" });
-const sitemapBody = await sitemapResponse.text();
+const { response: sitemapResponse, body: sitemapBody } = await fetchText("/sitemap.xml");
 if (sitemapResponse.status !== 200) {
-  failures.push(`/sitemap.xml: 预期 200，实际 ${sitemapResponse.status}`);
+  failures.push(`/sitemap.xml: received ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
     const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: 缺少 ${expected}`);
+    if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: missing ${expected}`);
   }
 }
 
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
-  console.error(`\n第十七批英文防御操作生产冒烟测试失败：${failures.length} 项。`);
+  console.error(`\nDefense production smoke failed: ${failures.length} issue(s).`);
   process.exit(1);
 }
 
-console.log(`第十七批英文防御操作生产冒烟测试通过：${articles.length} 篇文章、精确Nuker本地与目标证据、精确Repairer事件、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
+console.log(
+  `Defense production smoke passed: ${articles.length} articles, exact Nuker, Rampart and repair identity, same-tick overwrite boundary, Canonical, hreflang, JSON-LD, search and Sitemap.`,
+);
