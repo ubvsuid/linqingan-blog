@@ -20,7 +20,7 @@ Official Screeps API documentation and `screeps/engine` commit `80977824199a596d
 
 - `setPublic()` schedules a boolean state change and emits no Room event.
 - The engine stores one `setPublic` intent for the exact Rampart ID, so a later same-tick call for that Rampart can replace the earlier value.
-- The article now requires a strict boolean request, exact ID/room/coordinate identity, one shared per-tick dispatcher, pending state only after `OK`, and exact next-tick object verification.
+- The article requires a strict boolean request, exact ID/room/coordinate identity, one shared per-tick dispatcher, pending state only after `OK`, and exact next-tick object verification.
 - A missing original ID and a replacement Rampart at the same tile remain separate evidence states.
 - Public access is not described as a player or alliance allow-list.
 
@@ -29,8 +29,10 @@ Official Screeps API documentation and `screeps/engine` commit `80977824199a596d
 - Recycling binds exact Spawn and Creep IDs instead of relying on names alone.
 - The processor checks target existence, ownership, spawning state and adjacency, but does not require the Spawn to be idle.
 - One dispatcher reserves both object IDs, and a rejected irreversible request remains disabled for review.
-- Exact Creep-ID disappearance is primary next-tick evidence.
-- Dropped resource objects are reported as confounded secondary evidence because pickup, merging, prior piles, visibility and timing can change the observed result.
+- The death processor emits `EVENT_OBJECT_DESTROYED` for the exact Creep ID; `Room.getEventLog()` exposes that previous-tick event on the next script tick.
+- The Tombstone is created at the Creep position and is matched by `tombstone.creep.id`, not by name or Spawn coordinates.
+- Recoverable resources first enter a Container on the Creep tile when capacity exists; the remainder enters the exact Tombstone Store.
+- Container Store deltas remain labelled confounded because unrelated transfers or withdrawals may affect the same Store.
 - No automatic `suicide()` fallback is present.
 
 ### Structure destruction
@@ -66,7 +68,7 @@ This is a project-internal editorial score. It is not a Google score, ranking gu
 - Screeps Console execution: Pending
 - Live same-tick Rampart overwrite trace: Pending
 - Live public/private passage test: Pending
-- Live recycling and exact resource-drop observation: Pending
+- Live recycling, exact destruction-event match, Tombstone Store and Container-delta observation: Pending
 - Live hostile Power Creep destruction rejection: Pending
 - Genuine room or Console screenshots: Pending
 - Real CPU and Memory measurements: Pending
