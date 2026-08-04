@@ -1,6 +1,6 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { englishConstructionProgressArticle } from "./english-construction-progress-15";
-import { englishEditorialRecoveryConstructionOverride20260803 } from "./editorial/english-editorial-recovery-construction-20260803";
+import { englishEditorialRecoveryConstructionOverride20260804 } from "./editorial/english-editorial-recovery-construction-followup-20260804";
 import { englishEditorialRecoveryEmergencyOverride20260803 } from "./editorial/english-editorial-recovery-emergency-20260803";
 import { englishEditorialRecoveryStorageOverride20260803 } from "./editorial/english-editorial-recovery-storage-20260803";
 import { getEnglishSpawnBatchThreeArticle } from "./english-spawn-content-3";
@@ -26,7 +26,7 @@ export const englishEditorialStorageEnergyArticle20260803: EnglishBeginnerArticl
 
 export const englishEditorialConstructionProgressArticle20260803: EnglishBeginnerArticle = {
   ...englishConstructionProgressArticle,
-  ...englishEditorialRecoveryConstructionOverride20260803,
+  ...englishEditorialRecoveryConstructionOverride20260804,
 };
 
 export const englishEditorialRecoveryStorageBuildOverrides20260803: Record<
