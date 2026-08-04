@@ -56,6 +56,7 @@ const gettingStartedArticleHrefs = new Set([
   "/en/blog/screeps-creep-roles",
   "/en/blog/screeps-upgrade-controller",
 ]);
+
 const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-tick-game-loop": ["javascript", "console"],
   "/en/blog/screeps-memory-basics": ["memory", "javascript"],
@@ -84,6 +85,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-storage-energy-usage": ["energy", "resources"],
   "/en/blog/screeps-link-transfer-energy": ["energy", "resources"],
   "/en/blog/screeps-select-source-by-path": ["energy", "pathfinding", "movement"],
+  "/en/blog/screeps-tombstone-ruin-recovery": ["creeps", "resources", "energy"],
 
   "/en/blog/screeps-err-not-in-range": ["movement", "debugging"],
   "/en/blog/screeps-moveto-not-moving": ["movement", "debugging", "pathfinding"],

@@ -60,11 +60,18 @@ for (const text of [
   if (!source.includes(text)) failures.push(`缺少必备内容：${text}`);
 }
 
-for (const input of [source, registry]) {
-  const scores = [...input.matchAll(/finalScore:\s*(\d+)/g)].map((match) => Number(match[1]));
-  if (scores.length !== 2 || scores.some((score) => score < 96)) {
-    failures.push("评分数量或发布门槛不正确");
-  }
+const sourceScores = [...source.matchAll(/finalScore:\s*(\d+)/g)]
+  .map((match) => Number(match[1]));
+if (sourceScores.length !== 2 || sourceScores.some((score) => score < 96)) {
+  failures.push("第十八批正文评分数量或发布门槛不正确");
+}
+
+// The registry can also contain statically routed paired guides. Every
+// registered score must still pass the same publication threshold.
+const registryScores = [...registry.matchAll(/finalScore:\s*(\d+)/g)]
+  .map((match) => Number(match[1]));
+if (registryScores.length < 2 || registryScores.some((score) => score < 96)) {
+  failures.push("第十八批登记评分数量或发布门槛不正确");
 }
 
 if (!aggregate.includes("englishLinkSourceBatchEighteenArticles")) failures.push("第十八批聚合器缺失");
@@ -181,4 +188,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十八批英文 Link 与 Source 检查通过：2 篇、${toc.length} 个目录锚点、${blocks.length} 个 JavaScript 代码块，以及 Link 与 Source 选择边界用例。`);
+console.log(`第十八批英文 Link 与 Source 检查通过：2 篇正文、${registryScores.length} 条门槛合格登记、${toc.length} 个目录锚点、${blocks.length} 个 JavaScript 代码块，以及 Link 与 Source 选择边界用例。`);
