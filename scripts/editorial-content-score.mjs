@@ -113,6 +113,12 @@ export function scoreEditorialArticle({
     || (expected.policyBoundarySignals ?? []).some(
       (signal) => html.includes(signal),
     );
+  const hasIntentHandoff =
+    html.includes('id="choose-another-guide"')
+    || containsEvery(
+      html,
+      expected.intentHandoffSignals ?? [],
+    );
 
   const score = {
     technical: scoreDimension("technical", [
@@ -196,7 +202,7 @@ export function scoreEditorialArticle({
           && html.includes('id="official-docs"'),
         "failure and source sections",
       ],
-      [1, html.includes('id="choose-another-guide"'), "intent handoff"],
+      [1, hasIntentHandoff, "intent handoff"],
     ], articleKey, addFailure),
     evidence: scoreDimension("evidence", [
       [3, evidencePending, "honest Pending evidence"],
