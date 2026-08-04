@@ -1,26 +1,31 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishControllerBatchFourteenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishControllerBatchFourteenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-controller-activate-safe-mode",
     chinesePath: "/blog/screeps-controller-activate-safe-mode",
     category: "CONTROLLER · SAFE MODE ACTIVATION",
-    title: "How to Activate Safe Mode Without Accidental Repeated Use",
+    title: "Screeps activateSafeMode(): Prevent Same-Tick Intent Overwrite",
     description:
-      "Use an explicit one-time Memory request, confirmation phrase, owned Controller checks, safeMode, safeModeAvailable, safeModeCooldown and upgradeBlocked preflight, disable before activateSafeMode(), save the return code, and verify later state.",
+      "Route every Safe Mode request through one final per-tick dispatcher, bind the exact Controller ID, disable the request before activateSafeMode(), and verify activation consumption on the next tick.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "18 min read",
+    updatedAt: "2026-08-04",
+    readingTime: "17 min read",
     primaryKeyword: "Screeps activateSafeMode",
-    searchIntent: "Activate Safe Mode once with explicit confirmation and current Controller evidence",
+    searchIntent: "Coordinate and verify one exact Safe Mode activation without same-tick intent replacement",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps activateSafeMode",
+      "Screeps Safe Mode intent overwrite",
+      "Screeps Safe Mode coordinator",
       "Screeps safeModeAvailable",
-      "Screeps safeModeCooldown",
       "Screeps Controller ERR_BUSY",
-      "Screeps Safe Mode request",
     ],
   },
   {
