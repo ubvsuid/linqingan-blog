@@ -4,20 +4,21 @@ const articles = [
   {
     path: "/en/blog/screeps-controller-activate-safe-mode",
     chinesePath: "/blog/screeps-controller-activate-safe-mode",
-    headline: "How to Activate Safe Mode Without Accidental Repeated Use",
+    headline: "Activate Safe Mode Once Without Losing the Final Controller Intent",
+    indexTitle: "Screeps activateSafeMode(): Prevent Same-Tick Intent Overwrite",
     query: "activateSafeMode",
-    expectFaq: true,
+    tocAnchor: "failure-mode",
+    firstHeading: "The failure mode: two OK results, one surviving intent",
+    expectsFaq: false,
     verificationSignals: ["Chinese source article", "Reviewed in full"],
-    sectionSignals: [
-      `href="#quick-answer"`,
-      `<h2 id="quick-answer">Quick answer</h2>`,
-    ],
     signals: [
-      "ACTIVATE_SAFE_MODE",
+      "only the last intent survives",
+      "one final per-tick dispatcher",
       "request.enabled = false",
       "controller.activateSafeMode()",
-      "safeModeAvailable",
-      "Live activation, same-shard busy state, charge consumption and next-tick Controller test",
+      "accepted-pending",
+      "overwritten-or-conflicted",
+      "Live same-tick overwrite, activation, charge consumption and next-tick Controller test",
       "Pending",
     ],
   },
@@ -27,12 +28,10 @@ const articles = [
     headline: "Recover a Downgrading Controller Without Hiding Failed Upgrade Ticks",
     indexTitle: "Screeps Controller Downgrade Recovery: Verify Emergency Upgrades",
     query: "upgradeBlocked",
-    expectFaq: false,
+    tocAnchor: "use-this-guide",
+    firstHeading: "Use this guide when",
+    expectsFaq: false,
     verificationSignals: ["Existing English route", "Preserved"],
-    sectionSignals: [
-      `href="#use-this-guide"`,
-      `<h2 id="use-this-guide">Use this guide when</h2>`,
-    ],
     signals: [
       "decideControllerRecovery",
       "controller.upgradeBlocked",
@@ -47,13 +46,12 @@ const articles = [
     path: "/en/blog/screeps-reserve-vs-claim-controller",
     chinesePath: "/blog/screeps-reserve-vs-claim-controller",
     headline: "How to Choose Between Reserving and Claiming a Controller",
+    indexTitle: "How to Choose Between Reserving and Claiming a Controller",
     query: "reserveController",
-    expectFaq: true,
+    tocAnchor: "quick-answer",
+    firstHeading: "Quick answer",
+    expectsFaq: true,
     verificationSignals: ["Chinese source article", "Reviewed in full"],
-    sectionSignals: [
-      `href="#quick-answer"`,
-      `<h2 id="quick-answer">Quick answer</h2>`,
-    ],
     signals: [
       "creep.reserveController(controller)",
       "creep.claimController(controller)",
@@ -88,18 +86,21 @@ for (const article of articles) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    ...article.sectionSignals,
+    `href="#${article.tocAnchor}"`,
+    `<h2 id="${article.tocAnchor}">${article.firstHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    ...(article.expectFaq ? [`"@type":"FAQPage"`] : []),
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
   }
 
-  if (!article.expectFaq && body.includes(`"@type":"FAQPage"`)) {
-    failures.push(`${article.path}: 空 FAQ 不应输出 FAQPage`);
+  const hasFaqPage = body.includes(`"@type":"FAQPage"`);
+  if (article.expectsFaq && !hasFaqPage) {
+    failures.push(`${article.path}: 缺少 FAQPage`);
+  }
+  if (!article.expectsFaq && hasFaqPage) {
+    failures.push(`${article.path}: 不应输出 FAQPage`);
   }
 
-  const indexedTitle = article.indexTitle ?? article.headline;
   const searchResponse = await fetch(
     `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
     { redirect: "manual" },
@@ -107,8 +108,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(indexedTitle)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${indexedTitle}”`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -119,8 +120,14 @@ if (
   !safeModeBody.includes("request.enabled = false")
   || !safeModeBody.includes("controller.activateSafeMode()")
   || !safeModeBody.includes("ERR_BUSY")
+  || !safeModeBody.includes("only the last intent survives")
+  || !safeModeBody.includes("Memory.safeModePending")
+  || !safeModeBody.includes("overwritten-or-conflicted")
 ) {
-  failures.push("Safe Mode 页面缺少调用前关闭、激活调用或 same-shard busy 边界");
+  failures.push("Safe Mode 页面缺少调用前关闭、单次最终提交、精确 pending 身份或同 tick 覆盖边界");
+}
+if (safeModeBody.includes(`"@type":"FAQPage"`)) {
+  failures.push("Safe Mode 页面已移除重复 FAQ，不应继续输出 FAQPage");
 }
 
 const downgradeBody = await (await fetch(
@@ -154,8 +161,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    const indexedTitle = article.indexTitle ?? article.headline;
-    if (!blogBody.includes(indexedTitle)) failures.push(`/en/blog-index.json: 缺少 “${indexedTitle}”`);
+    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -176,4 +182,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode、降级恢复与 Reserve/Claim 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode 最终意图身份、降级精确事件恢复与 Reserve/Claim 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
