@@ -4,13 +4,23 @@ const articles = [
   {
     path: "/en/blog/screeps-nuker-launch",
     chinesePath: "/blog/screeps-nuker-launch-checklist",
-    headline: "How to Launch a Nuke Without Reusing a Stale Target Request",
-    indexTitle: "How to Launch a Nuke Without Reusing a Stale Target Request",
-    query: "launchNuke",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    expectFaq: true,
-    signals: ["buildNukeConfirmation", "NUKE_RANGE", "nuker.launchNuke(target)", "Pending"],
+    headline: "Launch a Nuke Once and Preserve the Exact Operation Record",
+    indexTitle: "Screeps launchNuke(): Exact Target Records and Post-Launch Proof",
+    query: "launchNuke verification",
+    tocId: "evidence-contract",
+    tocHeading: "Use two evidence layers",
+    expectFaq: false,
+    signals: [
+      "buildNukeConfirmation",
+      "Memory.pendingNukeLaunches",
+      "accepted-awaiting-verification",
+      "launcher-signature-observed",
+      "FIND_NUKES",
+      "nuke.launchRoomName",
+      "target-evidence-unavailable",
+      "Live protected-area rejection, launch, cooldown, resource consumption and target Nuke observation",
+      "Pending",
+    ],
   },
   {
     path: "/en/blog/screeps-rampart-set-public",
@@ -90,6 +100,25 @@ for (const article of articles) {
   }
 }
 
+const nukerBody = await (await fetch(
+  `${baseUrl}/en/blog/screeps-nuker-launch`,
+)).text();
+for (const expected of [
+  "request.nukerId",
+  "request.enabled = false",
+  "Memory.pendingNukeLaunches[nuker.id]",
+  "nuker.cooldown",
+  "energy === 0",
+  "ghodium === 0",
+  "room.find(FIND_NUKES)",
+  "nuke.launchRoomName",
+  "does not emit a Room event",
+]) {
+  if (!nukerBody.includes(expected)) {
+    failures.push(`Nuker页面缺少证据边界 “${expected}”`);
+  }
+}
+
 const repairBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-wall-rampart-repair-limit`,
 )).text();
@@ -132,4 +161,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十七批英文防御操作生产冒烟测试通过：${articles.length} 篇文章、精确 Repairer 事件、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
+console.log(`第十七批英文防御操作生产冒烟测试通过：${articles.length} 篇文章、精确Nuker本地与目标证据、精确Repairer事件、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);

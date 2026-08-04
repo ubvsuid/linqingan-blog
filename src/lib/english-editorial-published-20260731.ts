@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
+import { englishEditorialControllerRenewNukerOverrides20260803 } from "./english-editorial-controller-renew-nuker-20260803";
 import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
 import { englishEditorialDefenseMineralPowerOverrides20260803 } from "./english-editorial-defense-mineral-power-20260803";
 import { englishEditorialEnergyControlOverrides20260803 } from "./english-editorial-energy-control-20260803";
@@ -162,6 +163,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialEnergyControlOverrides20260803,
   ...englishEditorialRecoveryStorageBuildOverrides20260803,
   ...englishEditorialDefenseMineralPowerOverrides20260803,
+  ...englishEditorialControllerRenewNukerOverrides20260803,
 };
 
 export function getEnglishEditorialPublished20260731(
