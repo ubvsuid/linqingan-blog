@@ -5,7 +5,12 @@ const articles = [
     path: "/en/blog/screeps-mineral-extractor-harvest",
     chinesePath: "/blog/screeps-mineral-extractor-harvest",
     headline: "How to Harvest Minerals with an Extractor Safely",
+    indexTitle: "How to Harvest Minerals with an Extractor Safely",
     query: "Extractor",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
     signals: [
       "findExtractorForMineral",
       "mineral.mineralAmount",
@@ -18,13 +23,20 @@ const articles = [
   {
     path: "/en/blog/screeps-storage-energy-usage",
     chinesePath: "/blog/screeps-storage-energy-usage",
-    headline: "How to Use Storage Energy Without Draining Your Reserve",
-    query: "Storage reserve",
+    headline: "Use Storage Energy Without Crossing the Reserve or Misreading Transfers",
+    indexTitle: "Screeps Storage Energy: Reserve Budgets and Verify Transfers",
+    query: "Storage EVENT_TRANSFER",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    expectFaq: false,
+    verificationSignals: ["Existing English route", "Preserved"],
     signals: [
-      "getStorageWithdrawableEnergy",
-      "storageEnergy - reserveEnergy",
-      "delivery-target-not-found",
-      "Live Storage reserve, pathing, same-tick capacity and delivery test",
+      "createStorageEnergyCoordinator",
+      "withdrawalRemaining",
+      "targetReservations",
+      "EVENT_TRANSFER",
+      "verification-window-missed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -32,7 +44,12 @@ const articles = [
     path: "/en/blog/screeps-power-spawn-process-power",
     chinesePath: "/blog/screeps-power-spawn-process-power",
     headline: "How to Process Power Without Breaking Your Energy Budget",
+    indexTitle: "How to Process Power Without Breaking Your Energy Budget",
     query: "processPower",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
     signals: [
       "POWER_SPAWN_ENERGY_RATIO",
       "PWR_OPERATE_POWER",
@@ -60,20 +77,22 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
+    ...article.verificationSignals,
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
+    failures.push(`${article.path}: FAQPage 预期不一致`);
   }
 
   const searchResponse = await fetch(
@@ -83,8 +102,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -103,11 +122,18 @@ const storageBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-storage-energy-usage`,
 )).text();
 if (
-  !storageBody.includes("Math.max(0, storageEnergy - reserveEnergy)")
-  || !storageBody.includes("creep.withdraw")
-  || !storageBody.includes("creep.transfer")
+  !storageBody.includes("storageEnergy - reserveEnergy")
+  || !storageBody.includes("coordinator.withdrawalRemaining -= amount")
+  || !storageBody.includes("coordinator.targetReservations[target.id]")
+  || !storageBody.includes("event.objectId === pending.sourceId")
+  || !storageBody.includes("event.data?.targetId === pending.targetId")
+  || !storageBody.includes("event.data?.resourceType === RESOURCE_ENERGY")
+  || !storageBody.includes("sourceId: storage.id")
+  || !storageBody.includes("targetId: creep.id")
+  || !storageBody.includes("sourceId: creep.id")
+  || !storageBody.includes("targetId: target.id")
 ) {
-  failures.push("Storage 页面缺少保留线、取能或配送边界");
+  failures.push("Storage 页面缺少共享预算、容量预留或双向精确事件身份边界");
 }
 
 const powerBody = await (await fetch(
@@ -127,7 +153,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -148,4 +174,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十二批英文资源生产冒烟测试通过：${articles.length} 篇文章、Mineral、Storage 与 Power 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十二批英文资源生产冒烟测试通过：${articles.length} 篇文章、Mineral、Storage 精确事件、Power、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);

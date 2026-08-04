@@ -1,6 +1,10 @@
 import type { EnglishArticleRecord } from "./english-articles";
 
-export const englishConstructionSafetyBatchFifteenRegistry: EnglishArticleRecord[] = [
+type DatedEnglishArticleRecord = EnglishArticleRecord & {
+  updatedAt?: string;
+};
+
+export const englishConstructionSafetyBatchFifteenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-room-create-construction-site",
     chinesePath: "/blog/screeps-room-create-construction-site",
@@ -26,23 +30,25 @@ export const englishConstructionSafetyBatchFifteenRegistry: EnglishArticleRecord
   {
     href: "/en/blog/screeps-construction-site-progress",
     chinesePath: "/blog/screeps-construction-site-progress",
-    category: "CONSTRUCTION · PROGRESS MONITORING",
-    title: "How to Measure Construction Site Progress Without Guessing Completion Time",
+    category: "CONSTRUCTION · PROGRESS AND EVENT IDENTITY",
+    title: "Screeps ConstructionSite Progress: Verify One Builder Across Ticks",
     description:
-      "Read progress and progressTotal, clamp remaining work and completion percentage, report FIND_MY_CONSTRUCTION_SITES at a controlled interval, use site.pos.roomName when room is unavailable, distinguish completion from deletion, and avoid unsupported ETA claims.",
+      "Report progress and remaining work, submit one tracked build intent, match the exact Builder and Site in the next tick's EVENT_BUILD record, and separate completion from removal.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    readingTime: "16 min read",
+    updatedAt: "2026-08-03",
+    readingTime: "17 min read",
     primaryKeyword: "Screeps ConstructionSite progress",
-    searchIntent: "Measure current Construction Site progress without inventing a completion-time estimate",
+    searchIntent:
+      "Measure current Construction Site state and attribute one accepted build intent to the exact Builder and Site across ticks",
     status: "published",
     finalScore: 98,
     keywords: [
       "Screeps ConstructionSite progress",
-      "Screeps progressTotal",
-      "Screeps construction remaining work",
-      "Screeps FIND_MY_CONSTRUCTION_SITES",
-      "Screeps construction progress report",
+      "Screeps EVENT_BUILD",
+      "Screeps Builder verification",
+      "Construction Site completion vs removal",
+      "Room.getEventLog build",
     ],
   },
   {

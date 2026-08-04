@@ -5,7 +5,12 @@ const articles = [
     path: "/en/blog/screeps-room-create-construction-site",
     chinesePath: "/blog/screeps-room-create-construction-site",
     headline: "How to Create One Road Construction Site Safely",
+    indexTitle: "How to Create One Road Construction Site Safely",
     query: "createConstructionSite",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
     signals: [
       "MAX_CONSTRUCTION_SITES",
       "TERRAIN_MASK_WALL",
@@ -18,14 +23,20 @@ const articles = [
   {
     path: "/en/blog/screeps-construction-site-progress",
     chinesePath: "/blog/screeps-construction-site-progress",
-    headline: "How to Measure Construction Site Progress Without Guessing Completion Time",
-    query: "progressTotal",
+    headline: "Measure Construction Progress and Verify the Exact Builder Event",
+    indexTitle: "Screeps ConstructionSite Progress: Verify One Builder Across Ticks",
+    query: "EVENT_BUILD progress",
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    expectFaq: false,
+    verificationSignals: ["Existing English route", "Preserved"],
     signals: [
-      "site.progress",
-      "site.progressTotal",
-      "site.pos.roomName",
-      "unsupported ETA",
-      "Live progress, completion replacement, deletion, invisible-room and multi-Builder test",
+      "summarizeConstructionProgress",
+      "submitTrackedBuild",
+      "EVENT_BUILD",
+      "verification-window-missed",
+      "build-event-verified-site-completed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -33,7 +44,12 @@ const articles = [
     path: "/en/blog/screeps-structure-destroy",
     chinesePath: "/blog/screeps-structure-destroy",
     headline: "How to Destroy a Misplaced Extension Without Hitting the Wrong Structure",
+    indexTitle: "How to Destroy a Misplaced Extension Without Hitting the Wrong Structure",
     query: "Structure.destroy",
+    tocId: "quick-answer",
+    tocHeading: "Quick answer",
+    expectFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
     signals: [
       "DESTROY_EXTENSION",
       "Game.structures",
@@ -61,20 +77,22 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
+    ...article.verificationSignals,
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#quick-answer"`,
-    `<h2 id="quick-answer">Quick answer</h2>`,
+    `href="#${article.tocId}"`,
+    `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"@type":"FAQPage"`,
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少 “${expected}”`);
+  }
+
+  if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
+    failures.push(`${article.path}: FAQPage 预期不一致`);
   }
 
   const searchResponse = await fetch(
@@ -84,8 +102,8 @@ for (const article of articles) {
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(`/en/search?q=${article.query}: 实际 ${searchResponse.status}`);
-  } else if (!searchBody.includes(article.headline)) {
-    failures.push(`/en/search?q=${article.query}: 缺少 “${article.headline}”`);
+  } else if (!searchBody.includes(article.indexTitle)) {
+    failures.push(`/en/search?q=${article.query}: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -106,9 +124,14 @@ const progressBody = await (await fetch(
 if (
   !progressBody.includes("Math.max(0, total - progress)")
   || !progressBody.includes("site.pos.roomName")
-  || !progressBody.includes("not enough to promise a tick count")
+  || !progressBody.includes("creep.pos.inRangeTo(site, 3)")
+  || !progressBody.includes("event.objectId === pending.builderId")
+  || !progressBody.includes("event.data?.targetId === pending.siteId")
+  || !progressBody.includes("findCompletedStructure(room, pending)")
+  || !progressBody.includes("structure-observed-without-matching-event")
+  || !progressBody.includes("not a tick or wall-clock promise")
 ) {
-  failures.push("工地进度页面缺少剩余量、房间标识或禁止 ETA 边界");
+  failures.push("工地进度页面缺少进度、Builder/Site 事件身份、完成/删除或禁止 ETA 边界");
 }
 
 const destroyBody = await (await fetch(
@@ -129,7 +152,7 @@ if (blogResponse.status !== 200) {
   failures.push(`/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.headline)) failures.push(`/en/blog-index.json: 缺少 “${article.headline}”`);
+    if (!blogBody.includes(article.indexTitle)) failures.push(`/en/blog-index.json: 缺少 “${article.indexTitle}”`);
   }
 }
 
@@ -150,4 +173,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十五批英文建造安全生产冒烟测试通过：${articles.length} 篇文章、工地创建、进度与销毁边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十五批英文建造安全生产冒烟测试通过：${articles.length} 篇文章、工地创建、精确 Builder 事件、销毁、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
