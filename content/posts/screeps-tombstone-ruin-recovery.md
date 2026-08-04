@@ -8,9 +8,7 @@ tags:
   - "Screeps"
   - "常见问题"
   - "Creep API"
-  - "Tombstone"
-  - "Ruin"
-  - "资源回收"
+  - "资源采集"
 draft: false
 verification:
   docsChecked: true
@@ -28,7 +26,7 @@ Creep 死亡后留下的资源不一定需要放弃，建筑被摧毁后留在 R
 
 - 地面资源使用 `creep.pickup(resource)`；
 - Tombstone 和 Ruin 使用 `creep.withdraw(target, resourceType, amount)`；
-- Container、Storage 等建筑中的资源同样使用 `withdraw()`，但它们的生命周期和目标选择逻辑不同。
+- Container、Storage 等建筑也使用 `withdraw()`，但它们的生命周期和目标选择逻辑不同。
 
 本文只解决一个具体问题：**怎样让回收 Creep 在当前可见房间中发现 Tombstone 与 Ruin，按过期风险和资源价值选择目标，并对 `withdraw()` 的提交结果进行可追踪验证。**
 
@@ -43,7 +41,7 @@ Tombstone 代表已经死亡的 Creep。它可以被穿过，并带有：
 - `deathTime`：Creep 死亡的游戏时间；
 - `creep`：死亡 Creep 的只读信息。
 
-普通 Tombstone 的存在时间与原 Creep 的身体部件数量相关。实际回收逻辑不需要自己重新计算，直接读取当前对象的 `ticksToDecay` 更可靠。
+普通 Tombstone 的存在时间与原 Creep 的身体部件数量相关。实际业务代码不必自己重新计算，直接读取当前对象的 `ticksToDecay` 更可靠。
 
 ### Ruin 是被摧毁建筑的遗留对象
 
@@ -54,9 +52,9 @@ Ruin 代表已经被摧毁的 Structure。它同样可以被穿过，并带有�
 - `destroyTime`：建筑被摧毁的游戏时间；
 - `structure`：原建筑的只读信息。
 
-普通 Ruin 通常会保留一段固定时间，但特殊对象可能不同。因此不要在业务代码里把过期时间写死为某个常量，应始终以对象当前的 `ticksToDecay` 为准。
+普通 Ruin 通常会保留一段时间，但特殊对象可能不同。因此不要把过期时间写死，应始终以对象当前的 `ticksToDecay` 为准。
 
-## 为什么不能只选择最近的目标
+## 为什么不能只选择最近目标
 
 最近的 Tombstone 不一定最值得回收。例如：
 
@@ -64,20 +62,20 @@ Ruin 代表已经被摧毁的 Structure。它同样可以被穿过，并带有�
 - 一个目标将在 8 tick 后消失，另一个还有 300 tick；
 - Creep 只剩 50 容量，目标中有多种资源；
 - 多只回收 Creep 同时选择了同一个目标；
-- 目标被 hostile Rampart 覆盖，虽然看得到却无法正常接近或取用。
+- 目标被不可通行的敌对 Rampart 覆盖。
 
-因此候选排序至少应该考虑：
+候选排序至少应该考虑：
 
 1. 是否仍有可取资源；
 2. 是否即将过期；
 3. 资源类型的业务优先级；
 4. 当前最多能取多少；
-5. 距离或路径成本；
+5. 距离；
 6. 完全同分时的稳定排序。
 
-## 第一步：定义资源优先级
+## 资源优先级不是固定规则
 
-下面只是一个示例策略，不是 Screeps 的固定规则。你应根据自己的房间经济修改。
+下面只是一个示例。你应根据自己的房间经济修改。
 
 ```js
 const RESOURCE_PRIORITY = [
@@ -104,11 +102,11 @@ function getResourceRank(resourceType) {
 }
 ```
 
-这里把 Energy 放在较低优先级，是因为 Energy 通常更容易补充。战争现场、远程房间或低 RCL 房间可能需要把 Energy 提高。
+战争现场、远程房间或低 RCL 房间可能更缺 Energy，此时可以提高 Energy 的优先级。
 
-## 第二步：检查目标是否被敌对 Rampart 覆盖
+## 检查目标所在格的 Rampart
 
-可见目标并不代表一定适合回收。一个简单过滤方法是检查目标位置上的 Rampart：
+可见目标不代表一定适合回收。一个简单过滤方法是检查目标位置上的 Rampart：
 
 ```js
 function isBlockedByHostileRampart(target) {
@@ -122,11 +120,11 @@ function isBlockedByHostileRampart(target) {
 }
 ```
 
-这个过滤只能判断目标所在格。真实移动路径上仍可能有墙体、关闭的 Rampart、敌对 Creep 或 CostMatrix 限制，移动结果仍需单独记录。
+这个过滤只检查目标所在格。真实路径上仍可能有墙体、关闭的 Rampart、敌对 Creep 或 CostMatrix 限制，因此移动结果仍需单独记录。
 
-## 第三步：从 Store 中选择一种资源
+## 从 Store 中选择资源类型
 
-`target.store` 可能包含 Energy、矿物、化合物、Power 或商品。先排除数量无效的资源，再按优先级选择：
+Tombstone 与 Ruin 的 `store` 可能包含 Energy、矿物、化合物、Power 或商品。不要直接使用 `Object.keys(target.store)[0]` 作为业务优先级。
 
 ```js
 function selectResourceType(target, freeCapacity) {
@@ -134,11 +132,10 @@ function selectResourceType(target, freeCapacity) {
     return null;
   }
 
-  const resourceTypes = Object.keys(target.store)
-    .filter(resourceType => {
-      const amount = target.store.getUsedCapacity(resourceType);
-      return Number.isFinite(amount) && amount > 0;
-    })
+  return Object.keys(target.store)
+    .filter(resourceType =>
+      target.store.getUsedCapacity(resourceType) > 0
+    )
     .sort((left, right) => {
       const rankDifference =
         getResourceRank(left) - getResourceRank(right);
@@ -147,132 +144,27 @@ function selectResourceType(target, freeCapacity) {
         return rankDifference;
       }
 
-      const leftAmount = target.store.getUsedCapacity(left);
-      const rightAmount = target.store.getUsedCapacity(right);
+      const amountDifference =
+        target.store.getUsedCapacity(right)
+        - target.store.getUsedCapacity(left);
 
-      if (leftAmount !== rightAmount) {
-        return rightAmount - leftAmount;
-      }
-
-      return left.localeCompare(right);
-    });
-
-  return resourceTypes[0] ?? null;
+      return amountDifference !== 0
+        ? amountDifference
+        : left.localeCompare(right);
+    })[0] ?? null;
 }
 ```
 
-不要直接假设目标只有 Energy，也不要把 `Object.keys(target.store)[0]` 当成稳定业务优先级。
-
-## 第四步：建立候选对象并排序
-
-下面的实现同时扫描 Tombstone 和 Ruin，并使用 `ticksToDecay`、资源优先级、可取数量、距离和 ID 排序。
-
-```js
-function getRecoveryKind(target) {
-  if (typeof Tombstone !== 'undefined' && target instanceof Tombstone) {
-    return 'tombstone';
-  }
-
-  if (typeof Ruin !== 'undefined' && target instanceof Ruin) {
-    return 'ruin';
-  }
-
-  // 离线测试或不使用 instanceof 时的安全回退。
-  if ('deathTime' in target) return 'tombstone';
-  if ('destroyTime' in target) return 'ruin';
-
-  return 'unknown';
-}
-
-function describeRecoveryCandidate(creep, target) {
-  const freeCapacity = creep.store.getFreeCapacity();
-
-  if (
-    !Number.isFinite(freeCapacity)
-    || freeCapacity <= 0
-    || !target?.id
-    || !target.store
-    || !Number.isFinite(target.ticksToDecay)
-    || target.ticksToDecay <= 0
-    || isBlockedByHostileRampart(target)
-  ) {
-    return null;
-  }
-
-  const resourceType = selectResourceType(
-    target,
-    freeCapacity
-  );
-
-  if (!resourceType) {
-    return null;
-  }
-
-  const available = target.store.getUsedCapacity(resourceType);
-  const amount = Math.min(available, freeCapacity);
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return null;
-  }
-
-  return {
-    target,
-    targetId: target.id,
-    kind: getRecoveryKind(target),
-    resourceType,
-    amount,
-    ticksToDecay: target.ticksToDecay,
-    resourceRank: getResourceRank(resourceType),
-    range: creep.pos.getRangeTo(target)
-  };
-}
-
-function compareRecoveryCandidates(left, right) {
-  if (left.ticksToDecay !== right.ticksToDecay) {
-    return left.ticksToDecay - right.ticksToDecay;
-  }
-
-  if (left.resourceRank !== right.resourceRank) {
-    return left.resourceRank - right.resourceRank;
-  }
-
-  if (left.amount !== right.amount) {
-    return right.amount - left.amount;
-  }
-
-  if (left.range !== right.range) {
-    return left.range - right.range;
-  }
-
-  return left.targetId.localeCompare(right.targetId);
-}
-
-function selectRecoveryCandidate(creep) {
-  const targets = [
-    ...creep.room.find(FIND_TOMBSTONES),
-    ...creep.room.find(FIND_RUINS)
-  ];
-
-  return targets
-    .map(target => describeRecoveryCandidate(creep, target))
-    .filter(candidate => candidate !== null)
-    .sort(compareRecoveryCandidates)[0] ?? null;
-}
-```
-
-这套排序把“即将消失”放在第一位。它适合抢救型回收。若你的房间更关注高价值资源，可以把 `resourceRank` 放到 `ticksToDecay` 前面。
-
-## 完整可运行示例
+## 完整示例：扫描、排序、持久化与验证
 
 下面的版本包含：
 
-- Tombstone 与 Ruin 扫描；
-- 目标 ID 持久化；
-- 每 tick 重新恢复并校验目标；
-- `withdraw()` 与 `moveTo()` 返回值分开记录；
-- 同一 Creep 每 tick 只提交一次回收动作；
+- 同时扫描 `FIND_TOMBSTONES` 与 `FIND_RUINS`；
+- 按 `ticksToDecay`、资源优先级、数量和距离排序；
+- 跨 tick 只保存目标 ID 和资源类型；
+- 分开记录 `withdraw()` 与 `moveTo()` 的返回值；
 - 下一 tick 使用 Store 差值进行有限验证；
-- Memory 历史记录限制为最近 20 条。
+- Memory 历史只保留最近 20 条。
 
 ```js
 const RESOURCE_PRIORITY = [
@@ -338,13 +230,14 @@ function selectResourceType(target, freeCapacity) {
     })[0] ?? null;
 }
 
-function describeRecoveryCandidate(creep, target) {
+function describeCandidate(creep, target) {
   const freeCapacity = creep.store.getFreeCapacity();
 
   if (
     freeCapacity <= 0
     || !target?.id
     || !target.store
+    || !Number.isFinite(target.ticksToDecay)
     || target.ticksToDecay <= 0
     || isBlockedByHostileRampart(target)
   ) {
@@ -363,7 +256,7 @@ function describeRecoveryCandidate(creep, target) {
   const available = target.store.getUsedCapacity(resourceType);
   const amount = Math.min(available, freeCapacity);
 
-  if (amount <= 0) {
+  if (!Number.isFinite(amount) || amount <= 0) {
     return null;
   }
 
@@ -379,7 +272,7 @@ function describeRecoveryCandidate(creep, target) {
   };
 }
 
-function compareRecoveryCandidates(left, right) {
+function compareCandidates(left, right) {
   return (
     left.ticksToDecay - right.ticksToDecay
     || left.resourceRank - right.resourceRank
@@ -389,27 +282,26 @@ function compareRecoveryCandidates(left, right) {
   );
 }
 
-function selectRecoveryCandidate(creep) {
+function selectCandidate(creep) {
   return [
     ...creep.room.find(FIND_TOMBSTONES),
     ...creep.room.find(FIND_RUINS)
   ]
-    .map(target => describeRecoveryCandidate(creep, target))
+    .map(target => describeCandidate(creep, target))
     .filter(Boolean)
-    .sort(compareRecoveryCandidates)[0] ?? null;
+    .sort(compareCandidates)[0] ?? null;
 }
 
-function saveRecoveryTarget(creep, candidate) {
+function saveTarget(creep, candidate) {
   creep.memory.recoveryTarget = candidate
     ? {
         id: candidate.targetId,
-        kind: candidate.kind,
         resourceType: candidate.resourceType
       }
     : null;
 }
 
-function restoreRecoveryCandidate(creep) {
+function restoreCandidate(creep) {
   const saved = creep.memory.recoveryTarget;
 
   if (!saved?.id || !saved.resourceType) {
@@ -419,17 +311,17 @@ function restoreRecoveryCandidate(creep) {
   const target = Game.getObjectById(saved.id);
 
   if (!target) {
-    saveRecoveryTarget(creep, null);
+    saveTarget(creep, null);
     return null;
   }
 
-  const candidate = describeRecoveryCandidate(creep, target);
+  const candidate = describeCandidate(creep, target);
 
   if (
     !candidate
     || candidate.resourceType !== saved.resourceType
   ) {
-    saveRecoveryTarget(creep, null);
+    saveTarget(creep, null);
     return null;
   }
 
@@ -501,27 +393,23 @@ function verifyPreviousRecovery(creep) {
 }
 
 function submitRecovery(creep, candidate) {
-  creep.memory.recoverySubmittedAt ??= 0;
-
-  if (creep.memory.recoverySubmittedAt === Game.time) {
+  if (creep.memory.recoveryDecisionTick === Game.time) {
     return {
-      status: 'already-submitted-this-tick'
+      status: 'already-decided-this-tick'
     };
   }
+
+  creep.memory.recoveryDecisionTick = Game.time;
 
   if (!creep.pos.isNearTo(candidate.target)) {
     const moveResult = creep.moveTo(candidate.target, {
       range: 1,
-      reusePath: 5,
-      visualizePathStyle: {
-        stroke: '#ffffff'
-      }
+      reusePath: 5
     });
 
     return {
       status: 'moving-to-recovery-target',
       targetId: candidate.targetId,
-      kind: candidate.kind,
       resourceType: candidate.resourceType,
       moveResult
     };
@@ -540,20 +428,19 @@ function submitRecovery(creep, candidate) {
     candidate.amount
   );
 
-  creep.memory.recoverySubmittedAt = Game.time;
-
   if (result === OK) {
     const memory = getRecoveryMemory();
 
     memory.pending[creep.name] = {
       tick: Game.time,
       targetId: candidate.targetId,
-      kind: candidate.kind,
       resourceType: candidate.resourceType,
       requestedAmount: candidate.amount,
       creepAmountBefore,
       targetAmountBefore
     };
+  } else {
+    saveTarget(creep, null);
   }
 
   return {
@@ -592,11 +479,11 @@ function runRecoveryCreep(creep) {
     };
   }
 
-  let candidate = restoreRecoveryCandidate(creep);
+  let candidate = restoreCandidate(creep);
 
   if (!candidate) {
-    candidate = selectRecoveryCandidate(creep);
-    saveRecoveryTarget(creep, candidate);
+    candidate = selectCandidate(creep);
+    saveTarget(creep, candidate);
   }
 
   if (!candidate) {
@@ -635,7 +522,7 @@ module.exports.loop = function () {
 };
 ```
 
-## 为什么 `OK` 不能直接等同于资源已经到账
+## 为什么 `OK` 不等于资源已经到账
 
 Screeps 在 tick 中收集玩家提交的动作，并在后续阶段处理。`withdraw()` 返回 `OK` 表示命令已被接受安排，不应把同一行代码后读取到的 Store 变化当成最终结算证明。
 
@@ -644,9 +531,9 @@ Screeps 在 tick 中收集玩家提交的动作，并在后续阶段处理。`wi
 1. 当前 tick 保存 Creep 与目标的资源数量；
 2. 下一 tick 再读取两边 Store；
 3. 记录 Creep 增量与目标减量；
-4. 同时保留“目标已消失”“观察过晚”“未观察到变化”等状态。
+4. 同时保留目标消失、观察过晚和未观察到变化等状态。
 
-即使下一 tick 观察到差值，也只能说明状态变化与该动作一致。若同 tick 有其他 Creep、transfer、drop 或脚本动作参与，差值可能被并发行为干扰。因此本文使用的是**有限验证**，不是绝对因果证明。
+即使下一 tick 观察到差值，也只能说明状态变化与该动作一致。若同 tick 有其他 Creep、transfer、drop 或其他脚本动作参与，差值可能被并发行为干扰。因此本文使用的是**有限验证**，不是绝对因果证明。
 
 ## `withdraw()` 常见返回值
 
@@ -655,13 +542,13 @@ Screeps 在 tick 中收集玩家提交的动作，并在后续阶段处理。`wi
 | `OK` | 动作已经提交 | 下一 tick 验证 Store 变化 |
 | `ERR_NOT_OWNER` | 调用者不是自己的 Creep | 检查对象来源 |
 | `ERR_BUSY` | Creep 仍在生成 | 等待生成结束 |
-| `ERR_NOT_ENOUGH_RESOURCES` | 目标资源已不足或被其他 Creep 先取走 | 清除目标并重新选择 |
-| `ERR_INVALID_TARGET` | 目标已失效，或不是可 withdraw 的对象 | 重新通过 ID 恢复和判空 |
+| `ERR_NOT_ENOUGH_RESOURCES` | 目标资源不足或被其他 Creep 先取走 | 清除目标并重新选择 |
+| `ERR_INVALID_TARGET` | 目标失效或不是可 withdraw 对象 | 重新通过 ID 恢复和判空 |
 | `ERR_FULL` | Creep 没有剩余容量 | 先配送或卸载资源 |
 | `ERR_NOT_IN_RANGE` | 距离超过 1 格 | 调用 `moveTo()` 并单独检查结果 |
 | `ERR_INVALID_ARGS` | 资源类型或 amount 无效 | 重新计算资源类型与数量 |
 
-多只 Creep 可以在同一 tick 对同一个对象提交 `withdraw()`。这也是为什么候选选择、目标预订和下一 tick 验证不能省略。
+多只 Creep 可以在同一 tick 对同一个对象提交 `withdraw()`。这也是为什么目标预订和下一 tick 验证不能省略。
 
 ## 常见错误
 
@@ -671,15 +558,15 @@ Screeps 在 tick 中收集玩家提交的动作，并在后续阶段处理。`wi
 
 ### 只找 Tombstone，漏掉 Ruin
 
-战斗后被摧毁的 Storage、Terminal、Lab、Factory 或其他建筑可能留下更高价值资源。应根据任务范围同时扫描 `FIND_TOMBSTONES` 与 `FIND_RUINS`。
+战斗后被摧毁的 Storage、Terminal、Lab、Factory 或其他建筑可能留下高价值资源。应根据任务范围同时扫描两类对象。
 
 ### 把过期时间写死
 
-不同对象的生命周期可能不同。排序时直接读取 `ticksToDecay`，不要根据对象类型自行猜测剩余时间。
+不同对象的生命周期可能不同。排序时直接读取 `ticksToDecay`，不要根据对象类型猜测剩余时间。
 
-### 长期把完整对象写入 Memory
+### 把完整对象写入 Memory
 
-跨 tick 只保存 ID、资源类型和必要业务字段。下一 tick 使用 `Game.getObjectById()` 恢复对象，并再次检查是否为空、是否还有资源以及是否仍可访问。
+跨 tick 只保存 ID、资源类型和必要业务字段。下一 tick 使用 `Game.getObjectById()` 恢复对象，并再次检查资源和访问条件。
 
 ### 只记录 `withdraw()`，不记录 `moveTo()`
 
@@ -687,15 +574,15 @@ Screeps 在 tick 中收集玩家提交的动作，并在后续阶段处理。`wi
 
 ### 多只回收 Creep 同时冲向同一目标
 
-本文只提供单 Creep 示例。多 Creep 系统应增加目标预订表，并在候选过滤中排除已被其他 Creep 预订的对象或资源份额。
+本文只提供单 Creep 示例。多 Creep 系统应增加目标预订表，并排除已经被其他 Creep 预订的对象或资源份额。
 
 ### 回收后没有配送状态
 
-当 Creep 满载时，回收任务应切换到 Storage、Terminal、Spawn 或指定容器。本文故意不混入配送逻辑，以免一个示例同时承担过多职责。
+当 Creep 满载时，回收任务应切换到 Storage、Terminal、Spawn 或指定容器。本文故意不混入配送逻辑，以免一个示例承担过多职责。
 
 ## 离线验证覆盖
 
-候选选择测试覆盖了以下边界：
+候选选择测试覆盖：
 
 1. Creep 容量为 0；
 2. 目标 Store 为空；
