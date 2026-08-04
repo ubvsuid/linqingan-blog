@@ -46,7 +46,6 @@
   "调试": "debugging-tools",
   "可视化": "visualization",
   "目标选择": "target-selection",
-  "提前补员": "prespawn-replacement",
   "补员": "spawn-replenishment",
   "故障恢复": "recovery",
   "治疗": "healing",

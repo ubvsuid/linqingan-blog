@@ -10,6 +10,7 @@ const articles = [
     tocAnchor: "failure-mode",
     firstHeading: "The failure mode: two OK results, one surviving intent",
     expectsFaq: false,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
     signals: [
       "only the last intent survives",
       "one final per-tick dispatcher",
@@ -24,18 +25,20 @@ const articles = [
   {
     path: "/en/blog/screeps-controller-downgrade",
     chinesePath: "/blog/screeps-controller-downgrade",
-    headline: "How to Detect Controller Downgrade Risk and Recover Safely",
-    indexTitle: "How to Detect Controller Downgrade Risk and Recover Safely",
-    query: "ticksToDowngrade",
-    tocAnchor: "quick-answer",
-    firstHeading: "Quick answer",
-    expectsFaq: true,
+    headline: "Recover a Downgrading Controller Without Hiding Failed Upgrade Ticks",
+    indexTitle: "Screeps Controller Downgrade Recovery: Verify Emergency Upgrades",
+    query: "upgradeBlocked",
+    tocAnchor: "use-this-guide",
+    firstHeading: "Use this guide when",
+    expectsFaq: false,
+    verificationSignals: ["Existing English route", "Preserved"],
     signals: [
-      "CONTROLLER_DOWNGRADE",
-      "emergencyThreshold",
-      "recoveryThreshold",
-      "upgrader.upgradeController",
-      "Live downgrade timer, recovery hysteresis, upgrader supply and Controller progress test",
+      "decideControllerRecovery",
+      "controller.upgradeBlocked",
+      "EVENT_UPGRADE_CONTROLLER",
+      "verifyRecoveryUpgrade",
+      "verification-window-missed",
+      "Live multi-tick verification",
       "Pending",
     ],
   },
@@ -48,6 +51,7 @@ const articles = [
     tocAnchor: "quick-answer",
     firstHeading: "Quick answer",
     expectsFaq: true,
+    verificationSignals: ["Chinese source article", "Reviewed in full"],
     signals: [
       "creep.reserveController(controller)",
       "creep.claimController(controller)",
@@ -75,8 +79,7 @@ for (const article of articles) {
   for (const expected of [
     article.headline,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
+    ...article.verificationSignals,
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
@@ -131,11 +134,14 @@ const downgradeBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-controller-downgrade`,
 )).text();
 if (
-  !downgradeBody.includes("recoveryThreshold")
-  || !downgradeBody.includes("getActiveBodyparts(WORK)")
+  !downgradeBody.includes("enterAt")
+  || !downgradeBody.includes("leaveAt")
+  || !downgradeBody.includes("getActiveBodyparts(CARRY)")
+  || !downgradeBody.includes("controller.upgradeBlocked")
+  || !downgradeBody.includes("EVENT_UPGRADE_CONTROLLER")
   || !downgradeBody.includes("range: 3")
 ) {
-  failures.push("Controller downgrade 页面缺少恢复阈值、有效 WORK 或范围 3 边界");
+  failures.push("Controller downgrade 页面缺少滞回、CARRY、upgradeBlocked、事件验证或范围 3 边界");
 }
 
 const missionBody = await (await fetch(
@@ -176,4 +182,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode 最终意图身份、降级恢复与 Reserve/Claim 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode 最终意图身份、降级精确事件恢复与 Reserve/Claim 边界、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);

@@ -1,5 +1,6 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { englishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
+import { englishEditorialEnergyControlOverrides20260803 } from "./english-editorial-energy-control-20260803";
 import { englishEditorialEventObserverFlagsOverrides20260731 } from "./english-editorial-event-observer-flags-overrides-20260731";
 import { englishEditorialFirstLoopStateNotifyOverrides20260731 } from "./english-editorial-first-loop-state-notify-overrides-20260731";
 import { englishEditorialLabFactoryIdentityOverrides20260801 } from "./english-editorial-lab-factory-identity-overrides-20260801";
@@ -156,6 +157,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialMarketIdentityOverrides20260801,
   ...englishEditorialLabFactoryIdentityOverrides20260801,
   ...englishEditorialTowerEventsOverrides20260801,
+  ...englishEditorialEnergyControlOverrides20260803,
 };
 
 export function getEnglishEditorialPublished20260731(

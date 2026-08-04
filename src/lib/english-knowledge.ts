@@ -21,7 +21,6 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-creep-roles": 2,
   "/en/blog/screeps-spawncreep-return-codes": 2,
   "/en/blog/screeps-dynamic-creep-body": 2,
-  "/en/blog/screeps-creep-prespawn-replacement": 2,
   "/en/blog/screeps-emergency-harvester-recovery": 2,
   "/en/blog/screeps-renew-creep": 2,
   "/en/blog/screeps-recycle-creep": 2,
