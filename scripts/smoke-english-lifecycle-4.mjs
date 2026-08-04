@@ -9,7 +9,6 @@ const articles = [
     query: "renewCreep verification",
     tocId: "evidence-contract",
     tocHeading: "Start with the missing event",
-    expectFaq: false,
     signals: [
       "createRenewalDispatcher",
       "Memory.pendingRenewals",
@@ -25,16 +24,19 @@ const articles = [
     indexTitle: "Screeps recycleCreep(): Verify the Exact Creep Retirement",
     query: "recycleCreep verification",
     tocId: "evidence-contract",
-    tocHeading: "Separate retirement from refund evidence",
-    expectFaq: false,
+    tocHeading: "Use the event and artifact contract",
     signals: [
       "buildRecycleConfirmation",
       "createRecycleDispatcher",
       "Memory.pendingRecycleOperations",
-      "exact-creep-retirement-observed",
-      "drop-piles-observed-confounded",
-      "recycle-rejected-review-required",
-      "does not require the Spawn to be idle",
+      "EVENT_OBJECT_DESTROYED",
+      "event.objectId === pending.creepId",
+      "event.data?.type === 'creep'",
+      "FIND_TOMBSTONES",
+      "tombstone.creep?.id === pending.creepId",
+      "STRUCTURE_CONTAINER",
+      "recycle-event-and-tombstone-observed",
+      "recycle-artifacts-observed-container-confounded",
       "Pending",
     ],
   },
@@ -69,13 +71,11 @@ for (const article of articles) {
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
   ]) {
-    if (!body.includes(expected)) {
-      failures.push(`${article.path}: missing “${expected}”`);
-    }
+    if (!body.includes(expected)) failures.push(`${article.path}: missing “${expected}”`);
   }
 
-  if (body.includes(`"@type":"FAQPage"`) !== article.expectFaq) {
-    failures.push(`${article.path}: FAQPage expectation mismatch`);
+  if (body.includes(`"@type":"FAQPage"`)) {
+    failures.push(`${article.path}: unexpected FAQPage`);
   }
 
   const { response: searchResponse, body: searchBody } = await fetchText(
@@ -92,24 +92,29 @@ const { body: recycleBody } = await fetchText("/en/blog/screeps-recycle-creep");
 for (const expected of [
   "request.spawnId",
   "request.creepId",
-  "dispatcher.reserve(",
   "spawn.recycleCreep(creep)",
   "Game.getObjectById(pending.creepId)",
-  "LOOK_RESOURCES",
-  "creates no Room event",
+  "room.getEventLog()",
+  "room.find(FIND_TOMBSTONES)",
+  "pending.before.creepX",
+  "tombstone.store",
+  "containerBefore",
+  "containerAfter",
 ]) {
   if (!recycleBody.includes(expected)) {
     failures.push(`recycleCreep evidence boundary missing “${expected}”`);
   }
 }
-if (recycleBody.includes("if (spawn.spawning)")) {
-  failures.push("recycleCreep incorrectly requires an idle Spawn");
-}
-if (recycleBody.includes("creep.suicide();")) {
-  failures.push("recycleCreep must not call creep.suicide() automatically");
-}
-if (recycleBody.includes("request.enabled = true")) {
-  failures.push("recycleCreep must not automatically re-enable a rejected request");
+for (const forbidden of [
+  "if (spawn.spawning)",
+  "creep.suicide();",
+  "request.enabled = true",
+  "LOOK_RESOURCES",
+  "pending.before.spawnX",
+]) {
+  if (recycleBody.includes(forbidden)) {
+    failures.push(`recycleCreep contains forbidden legacy signal “${forbidden}”`);
+  }
 }
 
 const { response: indexResponse, body: indexBody } = await fetchText("/en/blog-index.json");
@@ -129,9 +134,7 @@ if (sitemapResponse.status !== 200) {
 } else {
   for (const article of articles) {
     const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
-      failures.push(`/sitemap.xml: missing ${expected}`);
-    }
+    if (!sitemapBody.includes(expected)) failures.push(`/sitemap.xml: missing ${expected}`);
   }
 }
 
@@ -142,5 +145,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Lifecycle production smoke passed: ${articles.length} articles, exact renewal and recycling identity, next-tick evidence, Canonical, hreflang, JSON-LD, search and Sitemap.`,
+  `Lifecycle production smoke passed: ${articles.length} articles, exact renewal and recycling identity, previous-tick destruction event, Creep-tile Tombstone and Container evidence, Canonical, hreflang, JSON-LD, search and Sitemap.`,
 );
