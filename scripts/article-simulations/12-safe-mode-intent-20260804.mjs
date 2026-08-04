@@ -12,7 +12,22 @@ const registry = fs.readFileSync(
   path.join(root, "src/lib/english-controller-registry-14.ts"),
   "utf8",
 );
+const audit = fs.readFileSync(
+  path.join(root, "docs/english-editorial-safe-mode-20260804.md"),
+  "utf8",
+);
 const failures = [];
+
+const safeModeHref = 'href: "/en/blog/screeps-controller-activate-safe-mode"';
+const safeModeHrefIndex = registry.indexOf(safeModeHref);
+const safeModeRecordStart = registry.lastIndexOf("  {", safeModeHrefIndex);
+const safeModeNextRecord = registry.indexOf("\n  {", safeModeHrefIndex + safeModeHref.length);
+const safeModeRecord = safeModeRecordStart >= 0
+  ? registry.slice(
+      safeModeRecordStart,
+      safeModeNextRecord >= 0 ? safeModeNextRecord : registry.length,
+    )
+  : "";
 
 function requireText(source, text, label) {
   if (!source.includes(text)) failures.push(`Missing ${label}: ${text}`);
@@ -39,9 +54,15 @@ for (const [source, text, label] of [
   [article, "Screeps Console test", "Console status"],
   [article, "Pending", "pending live evidence"],
   [article, "80977824199a596d174d392fd0cf8c458c21fcbd", "engine commit"],
-  [registry, 'updatedAt: "2026-08-04"', "modified date"],
-  [registry, 'title: "Screeps activateSafeMode(): Prevent Same-Tick Intent Overwrite"', "registry title"],
-  [registry, 'finalScore: 98', "registry score"],
+  [article, "request.requestId !== requestId", "request identity preflight"],
+  [article, "Memory.safeModeHistory", "terminal history"],
+  [article, "pending-operation-exists", "pending replacement guard"],
+  [article, "const verification = verifySafeModePending();", "main-loop verification"],
+  [safeModeRecord, 'updatedAt: "2026-08-04"', "Safe Mode modified date"],
+  [safeModeRecord, 'title: "Screeps activateSafeMode(): Prevent Same-Tick Intent Overwrite"', "Safe Mode registry title"],
+  [safeModeRecord, 'finalScore: 98', "Safe Mode registry score"],
+  [audit, '/en/blog/screeps-controller-activate-safe-mode', "audit route"],
+  [audit, '**98/100**', "audit score"],
 ]) {
   requireText(source, text, label);
 }
@@ -83,9 +104,12 @@ function evaluate(request, state, constants) {
   if (!request || request.enabled !== true) return "disabled";
   if (request.confirmed !== true) return "confirmation-missing";
   if (
-    typeof request.roomName !== "string"
+    typeof request.requestId !== "string"
+    || request.requestId.length === 0
+    || typeof request.roomName !== "string"
     || typeof request.controllerId !== "string"
     || !Number.isInteger(request.priority)
+    || !Number.isInteger(request.requestedAt)
   ) return "request-invalid";
   if (!state.roomVisible || !state.controllerFound) return "controller-unavailable";
   if (
@@ -104,11 +128,13 @@ function evaluate(request, state, constants) {
 }
 
 const request = {
+  requestId: "safe-mode-1",
   enabled: true,
   confirmed: true,
   roomName: "W1N1",
   controllerId: "controller-1",
   priority: 100,
+  requestedAt: 100,
 };
 const state = {
   roomVisible: true,
@@ -128,6 +154,7 @@ const constants = { downgrade: { 6: 120000 }, threshold: 5000 };
 const evaluationCases = [
   [null, state, "disabled"],
   [{ ...request, confirmed: false }, state, "confirmation-missing"],
+  [{ ...request, requestId: "" }, state, "request-invalid"],
   [{ ...request, controllerId: null }, state, "request-invalid"],
   [request, { ...state, roomVisible: false }, "controller-unavailable"],
   [request, { ...state, roomControllerId: "other" }, "controller-identity-mismatch"],
@@ -145,6 +172,11 @@ for (const [candidateRequest, candidateState, expected] of evaluationCases) {
 }
 
 function choose(candidates) {
+  const requestIds = candidates.map((candidate) => candidate.requestId);
+  if (new Set(requestIds).size !== requestIds.length) {
+    return "duplicate-request-id";
+  }
+
   return [...candidates]
     .sort((left, right) =>
       right.priority - left.priority
@@ -157,6 +189,7 @@ const selectionCases = [
   [[{ requestId: "a", priority: 1, requestedAt: 10 }], "a"],
   [[{ requestId: "a", priority: 1, requestedAt: 10 }, { requestId: "b", priority: 2, requestedAt: 20 }], "b"],
   [[{ requestId: "b", priority: 2, requestedAt: 10 }, { requestId: "a", priority: 2, requestedAt: 10 }], "a"],
+  [[{ requestId: "a", priority: 2, requestedAt: 10 }, { requestId: "a", priority: 1, requestedAt: 20 }], "duplicate-request-id"],
 ];
 for (const [candidates, expected] of selectionCases) {
   const actual = choose(candidates);

@@ -93,6 +93,7 @@ console.log(JSON.stringify({ first, second }));</code></pre>
 <pre><code class="language-javascript">Memory.safeModeRequests ??= {};
 
 Memory.safeModeRequests['W1N1-siege-20260804'] = {
+  requestId: 'W1N1-siege-20260804',
   enabled: true,
   confirmed: true,
   roomName: 'W1N1',
@@ -143,9 +144,12 @@ Memory.safeModeRequests['W1N1-siege-20260804'] = {
   }
 
   if (
-    typeof request.roomName !== 'string'
+    typeof request.requestId !== 'string'
+    || request.requestId.length === 0
+    || typeof request.roomName !== 'string'
     || typeof request.controllerId !== 'string'
     || !Number.isInteger(request.priority)
+    || !Number.isInteger(request.requestedAt)
   ) {
     return { ready: false, reason: 'request-invalid' };
   }
@@ -226,6 +230,16 @@ function enqueueSafeModeRequest(requestId) {
     return { accepted: false, reason: 'request-disabled' };
   }
 
+  if (request.requestId !== requestId) {
+    return { accepted: false, reason: 'request-identity-mismatch' };
+  }
+
+  const state = inspectSafeModeRequest(request);
+  const plan = evaluateSafeModeRequest(request, state);
+  if (!plan.ready) {
+    return { accepted: false, reason: plan.reason };
+  }
+
   if (candidates.some(item => item.requestId === requestId)) {
     return { accepted: true, reason: 'already-enqueued' };
   }
@@ -240,14 +254,21 @@ function enqueueSafeModeRequest(requestId) {
 }
 
 function chooseSafeModeCandidate() {
-  return [...candidates]
+  const requestIds = candidates.map(item => item.requestId);
+  if (new Set(requestIds).size !== requestIds.length) {
+    return { valid: false, reason: 'duplicate-request-id' };
+  }
+
+  const candidate = [...candidates]
     .sort((left, right) =>
       right.priority - left.priority
       || left.requestedAt - right.requestedAt
       || left.requestId.localeCompare(right.requestId)
     )[0] ?? null;
+
+  return { valid: true, candidate };
 }</code></pre>
-<p>The priority is explicit project policy. Stable request ID ordering makes equal inputs deterministic. The coordinator does not decide whether a room deserves Safe Mode; it only ensures that reviewed candidates compete in one place.</p>
+<p>The priority is explicit project policy. Each candidate is preflighted before selection, duplicate request IDs are rejected, and stable request ID ordering makes equal valid inputs deterministic. The coordinator does not decide whether a room deserves Safe Mode; it only ensures that reviewed candidates compete in one place.</p>
 <p>Each producer imports the same module and enqueues instead of calling the Controller:</p>
 <pre><code class="language-javascript">const safeMode = require('safe-mode-coordinator');
 
@@ -268,12 +289,20 @@ function runDefenseEscalation(room) {
   }
   finalized = true;
 
-  const candidate = chooseSafeModeCandidate();
-  if (!candidate) {
+  if (Memory.safeModePending) {
+    return { status: 'pending-operation-exists' };
+  }
+
+  const selection = chooseSafeModeCandidate();
+  if (!selection.valid) {
+    return { status: selection.reason };
+  }
+
+  if (!selection.candidate) {
     return { status: 'no-candidate' };
   }
 
-  return submitSafeModeRequest(candidate.requestId);
+  return submitSafeModeRequest(selection.candidate.requestId);
 }</code></pre>
 <p>The submission function resolves the exact object again, evaluates current state, disables before the API call and creates pending evidence only after <code>OK</code>:</p>
 <pre><code class="language-javascript">function submitSafeModeRequest(requestId) {
@@ -331,9 +360,21 @@ function runDefenseEscalation(room) {
     result
   };
 }</code></pre>
-<p>Do not re-enable automatically after a rejection. A failed high-impact request needs a new review. Do not report <code>accepted-pending</code> as an activated Safe Mode.</p>
+<p>Do not re-enable automatically after a rejection. A failed high-impact request needs a new review. Do not report <code>accepted-pending</code> as an activated Safe Mode. A pending operation blocks a second submission until verification stores a terminal record.</p>
 <p>Call the finalizer once, after every producer:</p>
 <pre><code class="language-javascript">module.exports.loop = function () {
+  const verification = verifySafeModePending();
+  if (![
+    'no-pending-operation',
+    'waiting-for-next-tick'
+  ].includes(verification.status)) {
+    console.log(JSON.stringify({
+      type: 'safe-mode-verification',
+      tick: Game.time,
+      ...verification
+    }));
+  }
+
   runAllRoomDefensePlanning();
 
   const outcome = finalizeSafeModeRequests();
@@ -348,7 +389,34 @@ function runDefenseEscalation(room) {
 
 <h2 id="next-tick-proof">Verify the exact Controller next tick</h2>
 <p><code>activateSafeMode()</code> does not emit a unique Room event. The primary evidence is the exact saved Controller on the next tick: Safe Mode is active and one activation has been consumed.</p>
-<pre><code class="language-javascript">function verifySafeModePending() {
+<pre><code class="language-javascript">function finishSafeModePending(status, details = {}) {
+  const pending = Memory.safeModePending;
+  if (!pending) return { status: 'no-pending-operation' };
+
+  const terminal = {
+    ...pending,
+    ...details,
+    status,
+    resolvedAt: Game.time
+  };
+
+  Memory.safeModeHistory ??= [];
+  Memory.safeModeHistory.push(terminal);
+  if (Memory.safeModeHistory.length > 20) {
+    Memory.safeModeHistory.shift();
+  }
+
+  const request = Memory.safeModeRequests?.[pending.requestId];
+  if (request) {
+    request.status = status;
+    request.resolvedAt = Game.time;
+  }
+
+  delete Memory.safeModePending;
+  return terminal;
+}
+
+function verifySafeModePending() {
   const pending = Memory.safeModePending;
   if (!pending) return { status: 'no-pending-operation' };
 
@@ -361,11 +429,17 @@ function runDefenseEscalation(room) {
   const controller = Game.getObjectById(pending.controllerId);
 
   if (!room || !controller) {
-    return { status: 'controller-unavailable' };
+    return finishSafeModePending('controller-unavailable', {
+      roomVisible: Boolean(room),
+      controllerFound: Boolean(controller)
+    });
   }
 
   if (room.controller?.id !== pending.controllerId) {
-    return { status: 'controller-identity-mismatch' };
+    return finishSafeModePending(
+      'controller-identity-mismatch',
+      { currentControllerId: room.controller?.id ?? null }
+    );
   }
 
   const safeModeTicks = controller.safeMode ?? 0;
@@ -374,40 +448,27 @@ function runDefenseEscalation(room) {
   const activationObserved = safeModeTicks > 0;
   const chargeObserved =
     controller.safeModeAvailable === expectedAvailable;
+  const observed = {
+    activationObserved,
+    chargeObserved,
+    safeModeTicks,
+    safeModeAvailable: controller.safeModeAvailable,
+    safeModeCooldown: controller.safeModeCooldown ?? 0
+  };
 
   if (Game.time !== expectedTick) {
-    return {
-      status: 'late-observation',
-      activationObserved,
-      chargeObserved,
-      safeModeTicks,
-      safeModeAvailable: controller.safeModeAvailable
-    };
+    return finishSafeModePending('late-observation', observed);
   }
 
   if (activationObserved && chargeObserved) {
-    const verified = {
-      status: 'verified',
-      requestId: pending.requestId,
-      controllerId: pending.controllerId,
-      verifiedAt: Game.time,
-      safeModeTicks,
-      safeModeAvailable: controller.safeModeAvailable,
-      safeModeCooldown: controller.safeModeCooldown ?? 0
-    };
-
-    Memory.safeModeRequests[pending.requestId].status = 'verified';
-    Memory.safeModeRequests[pending.requestId].verifiedAt = Game.time;
-    delete Memory.safeModePending;
-    return verified;
+    return finishSafeModePending('verified', observed);
   }
 
   if (activationObserved && !chargeObserved) {
-    return {
-      status: 'activation-observed-charge-confounded',
-      safeModeTicks,
-      safeModeAvailable: controller.safeModeAvailable
-    };
+    return finishSafeModePending(
+      'activation-observed-charge-confounded',
+      observed
+    );
   }
 
   const otherActiveRooms = Object.values(Game.rooms)
@@ -418,15 +479,15 @@ function runDefenseEscalation(room) {
     .map(visibleRoom => visibleRoom.name)
     .sort();
 
-  return {
-    status: otherActiveRooms.length > 0
+  return finishSafeModePending(
+    otherActiveRooms.length > 0
       ? 'overwritten-or-conflicted'
       : 'not-observed',
-    otherActiveRooms
-  };
+    { ...observed, otherActiveRooms }
+  );
 }</code></pre>
 <p>The exact charge comparison assumes that no Creep calls <code>generateSafeMode()</code> on this Controller during the submission and verification window. If charge generation is allowed concurrently, an active Safe Mode can still be observed, but the activation-count delta is confounded and must not be reported as exact proof.</p>
-<p>A late observation can describe current state, but it is weaker evidence for one specific accepted call. Keep the missed one-tick window visible instead of rewriting history.</p>
+<p>A late observation can describe current state, but it is weaker evidence for one specific accepted call. Every terminal outcome is copied to a bounded <code>Memory.safeModeHistory</code> record before pending state is cleared, so later submissions cannot erase unavailable, mismatched, confounded, overwritten or unobserved evidence.</p>
 
 <h2 id="failure-states">Keep failure and ambiguity visible</h2>
 <div class="table-scroll"><table>
@@ -455,14 +516,14 @@ function runDefenseEscalation(room) {
 <h2 id="integration-contract">Integration contract for a real codebase</h2>
 <ul>
 <li>Only the coordinator module may call <code>activateSafeMode()</code>.</li>
-<li>Every producer enqueues a reviewed request and never submits directly.</li>
+<li>Every producer enqueues a reviewed request with a non-empty unique request ID and never submits directly.</li>
 <li>The main loop calls the finalizer once after all defense planning.</li>
 <li>Each request binds a unique request ID, room name and Controller ID.</li>
 <li>The request is disabled before the API call.</li>
-<li>Pending state is created only after the real return code is <code>OK</code>.</li>
+<li>Pending state is created only after the real return code is <code>OK</code>, and it blocks replacement until verification finishes.</li>
 <li>The verifier runs before new requests are finalized on the next tick.</li>
 <li><code>generateSafeMode()</code> is excluded from the exact charge-verification window or labeled as a confound.</li>
-<li>A rejected, missed or ambiguous operation is preserved for review and never auto-retried.</li>
+<li>A rejected, missed or ambiguous operation is persisted in bounded history for review and never auto-retried.</li>
 <li>Tests and logs distinguish accepted intent from observed activation.</li>
 </ul>
 <p>This contract prevents accidental competition inside code that follows it. It cannot stop a Console command or another module that bypasses the coordinator. Code search for direct <code>activateSafeMode()</code> calls is part of deployment review.</p>
