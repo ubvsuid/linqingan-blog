@@ -45,7 +45,7 @@ for (const text of [
   "Reviewed in full",
   "Screeps Console test",
   "Pending",
-  "ACTIVATE_SAFE_MODE",
+  "request.confirmed !== true",
   "request.enabled = false",
   "controller.activateSafeMode()",
   "safeModeAvailable",
