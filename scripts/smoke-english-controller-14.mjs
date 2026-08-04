@@ -4,20 +4,23 @@ const articles = [
   {
     path: "/en/blog/screeps-controller-activate-safe-mode",
     chinesePath: "/blog/screeps-controller-activate-safe-mode",
-    headline: "How to Activate Safe Mode Without Accidental Repeated Use",
+    headline: "Activate Safe Mode Once Without Losing the Final Controller Intent",
+    indexTitle: "Screeps activateSafeMode(): Prevent Same-Tick Intent Overwrite",
     query: "activateSafeMode",
-    expectFaq: true,
+    expectFaq: false,
     verificationSignals: ["Chinese source article", "Reviewed in full"],
     sectionSignals: [
-      `href="#quick-answer"`,
-      `<h2 id="quick-answer">Quick answer</h2>`,
+      `href="#failure-mode"`,
+      `<h2 id="failure-mode">The failure mode: two OK results, one surviving intent</h2>`,
     ],
     signals: [
-      "ACTIVATE_SAFE_MODE",
+      "only the last intent survives",
+      "one final per-tick dispatcher",
       "request.enabled = false",
       "controller.activateSafeMode()",
-      "safeModeAvailable",
-      "Live activation, same-shard busy state, charge consumption and next-tick Controller test",
+      "accepted-pending",
+      "overwritten-or-conflicted",
+      "Live same-tick overwrite, activation, charge consumption and next-tick Controller test",
       "Pending",
     ],
   },
@@ -122,8 +125,14 @@ if (
   !safeModeBody.includes("request.enabled = false")
   || !safeModeBody.includes("controller.activateSafeMode()")
   || !safeModeBody.includes("ERR_BUSY")
+  || !safeModeBody.includes("only the last intent survives")
+  || !safeModeBody.includes("Memory.safeModePending")
+  || !safeModeBody.includes("overwritten-or-conflicted")
 ) {
-  failures.push("Safe Mode 页面缺少调用前关闭、激活调用或 same-shard busy 边界");
+  failures.push("Safe Mode 页面缺少调用前关闭、单次最终提交、精确 pending 身份或同 tick 覆盖边界");
+}
+if (safeModeBody.includes(`"@type":"FAQPage"`)) {
+  failures.push("Safe Mode 页面已移除重复 FAQ，不应继续输出 FAQPage");
 }
 
 const downgradeBody = await (await fetch(
@@ -185,4 +194,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode、降级恢复、精确 Reserve 事件与 Claim 所有权验证、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
+console.log(`第十四批英文 Controller 生产冒烟测试通过：${articles.length} 篇文章、Safe Mode 最终意图、降级精确升级事件、Reserve 精确事件与 Claim 所有权验证、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`);
