@@ -2,13 +2,26 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const lighthouseConfig = JSON.parse(
-  fs.readFileSync(path.join(root, "lighthouserc.json"), "utf8"),
-);
 const failures = [];
+
+function readJson(relativePath) {
+  const absolutePath = path.join(root, relativePath);
+  if (!fs.existsSync(absolutePath)) {
+    failures.push(`Missing performance configuration: ${relativePath}`);
+    return {};
+  }
+  return JSON.parse(fs.readFileSync(absolutePath, "utf8"));
+}
+
+const lighthouseConfig = readJson("lighthouserc.json");
+const productionConfig = readJson("lighthouserc.production.json");
 const matrix = lighthouseConfig?.ci?.assert?.assertMatrix;
+const productionMatrix = productionConfig?.ci?.assert?.assertMatrix;
 const globalAssertions = Array.isArray(matrix)
   ? matrix.find((entry) => entry.matchingUrlPattern === ".*")?.assertions
+  : undefined;
+const productionGlobalAssertions = Array.isArray(productionMatrix)
+  ? productionMatrix.find((entry) => entry.matchingUrlPattern === ".*")?.assertions
   : undefined;
 const strictRoutePattern =
   "^http://localhost:3000/(?:tools/room-diagnostics|en/evidence)(?:\\?|$)";
@@ -17,7 +30,7 @@ const longArticlePattern =
 const generalRoutePattern =
   "^http://localhost:3000/(?!tools/room-diagnostics(?:\\?|$)|en/evidence(?:\\?|$)|blog/screeps-memory-basics(?:\\?|$)).*";
 
-function requireAssertion(assertions, name, level, option, expected) {
+function requireAssertion(assertions, name, level, option, expected, label = "Lighthouse") {
   const assertion = assertions?.[name];
   if (
     !Array.isArray(assertion)
@@ -25,13 +38,13 @@ function requireAssertion(assertions, name, level, option, expected) {
     || assertion[1]?.[option] !== expected
   ) {
     failures.push(
-      `${name} must be ${level} with ${option}=${expected}.`,
+      `${label}: ${name} must be ${level} with ${option}=${expected}.`,
     );
   }
 }
 
 if (lighthouseConfig?.ci?.collect?.numberOfRuns !== 3) {
-  failures.push("Lighthouse must collect three runs per route.");
+  failures.push("Local Lighthouse must collect three runs per route.");
 }
 
 if (
@@ -39,13 +52,13 @@ if (
   || lighthouseConfig?.ci?.upload?.outputDir !== "./lhci-results"
 ) {
   failures.push(
-    "Lighthouse reports must stay in the local filesystem instead of relying on a public upload service.",
+    "Local Lighthouse reports must stay in ./lhci-results for workflow artifact retention.",
   );
 }
 
-function getAssertions(pattern) {
-  return Array.isArray(matrix)
-    ? matrix.find((entry) => entry.matchingUrlPattern === pattern)?.assertions
+function getAssertions(sourceMatrix, pattern) {
+  return Array.isArray(sourceMatrix)
+    ? sourceMatrix.find((entry) => entry.matchingUrlPattern === pattern)?.assertions
     : undefined;
 }
 
@@ -55,6 +68,15 @@ requireAssertion(
   "error",
   "minScore",
   0.85,
+  "Local Lighthouse",
+);
+requireAssertion(
+  globalAssertions,
+  "categories:accessibility",
+  "error",
+  "minScore",
+  0.95,
+  "Local Lighthouse",
 );
 requireAssertion(
   globalAssertions,
@@ -62,28 +84,130 @@ requireAssertion(
   "error",
   "maxNumericValue",
   300,
+  "Local Lighthouse",
 );
 requireAssertion(
-  getAssertions(strictRoutePattern),
+  getAssertions(matrix, strictRoutePattern),
   "largest-contentful-paint",
   "error",
   "maxNumericValue",
   2500,
+  "Local Lighthouse",
 );
 requireAssertion(
-  getAssertions(generalRoutePattern),
+  getAssertions(matrix, generalRoutePattern),
   "largest-contentful-paint",
   "error",
   "maxNumericValue",
   2750,
+  "Local Lighthouse",
 );
 requireAssertion(
-  getAssertions(longArticlePattern),
+  getAssertions(matrix, longArticlePattern),
   "largest-contentful-paint",
   "error",
   "maxNumericValue",
   3000,
+  "Local Lighthouse",
 );
+
+const productionUrls = productionConfig?.ci?.collect?.url;
+if (!Array.isArray(productionUrls) || productionUrls.length < 8) {
+  failures.push("Production Lighthouse must audit at least eight representative deployed routes.");
+} else {
+  if (productionUrls.some((url) => !url.startsWith("https://www.linqingan.com/"))) {
+    failures.push("Production Lighthouse URLs must use the canonical HTTPS www host.");
+  }
+  for (const requiredRoute of [
+    "https://www.linqingan.com/",
+    "https://www.linqingan.com/blog",
+    "https://www.linqingan.com/tools/room-diagnostics",
+    "https://www.linqingan.com/en",
+    "https://www.linqingan.com/en/tools/room-diagnostics",
+  ]) {
+    if (!productionUrls.includes(requiredRoute)) {
+      failures.push(`Production Lighthouse is missing representative route ${requiredRoute}.`);
+    }
+  }
+}
+
+if (productionConfig?.ci?.collect?.numberOfRuns !== 2) {
+  failures.push("Production Lighthouse must collect two runs per deployed route.");
+}
+if (
+  productionConfig?.ci?.upload?.target !== "filesystem"
+  || productionConfig?.ci?.upload?.outputDir !== "./lhci-production-results"
+) {
+  failures.push(
+    "Production Lighthouse reports must stay in ./lhci-production-results for workflow artifact retention.",
+  );
+}
+
+requireAssertion(
+  productionGlobalAssertions,
+  "categories:performance",
+  "error",
+  "minScore",
+  0.8,
+  "Production Lighthouse",
+);
+requireAssertion(
+  productionGlobalAssertions,
+  "categories:accessibility",
+  "error",
+  "minScore",
+  0.95,
+  "Production Lighthouse",
+);
+requireAssertion(
+  productionGlobalAssertions,
+  "categories:best-practices",
+  "error",
+  "minScore",
+  0.9,
+  "Production Lighthouse",
+);
+requireAssertion(
+  productionGlobalAssertions,
+  "cumulative-layout-shift",
+  "error",
+  "maxNumericValue",
+  0.1,
+  "Production Lighthouse",
+);
+requireAssertion(
+  productionGlobalAssertions,
+  "total-blocking-time",
+  "error",
+  "maxNumericValue",
+  400,
+  "Production Lighthouse",
+);
+requireAssertion(
+  productionGlobalAssertions,
+  "largest-contentful-paint",
+  "error",
+  "maxNumericValue",
+  4000,
+  "Production Lighthouse",
+);
+
+const lighthouseWorkflowPath = path.join(root, ".github", "workflows", "lighthouse.yml");
+const lighthouseWorkflow = fs.existsSync(lighthouseWorkflowPath)
+  ? fs.readFileSync(lighthouseWorkflowPath, "utf8")
+  : "";
+for (const requiredText of [
+  "content/**",
+  "schedule:",
+  "lighthouserc.production.json",
+  "actions/upload-artifact@v4",
+  "lhci-results",
+  "lhci-production-results",
+]) {
+  if (!lighthouseWorkflow.includes(requiredText)) {
+    failures.push(`Lighthouse workflow is missing ${requiredText}.`);
+  }
+}
 
 const workflowDirectory = path.join(root, ".github", "workflows");
 const retiredOneTimeWorkflows = new Set([
@@ -115,5 +239,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: Performance 85, TBT 300 ms, and staged hard LCP budgets of 2500/2750/3000 ms across three runs on Node 22.",
+  "Performance budget check passed: local production builds use three-run hard budgets, deployed canonical routes use a two-run weekly baseline, and both report sets are retained as workflow artifacts.",
 );
