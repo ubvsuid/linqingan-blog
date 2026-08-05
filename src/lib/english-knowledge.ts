@@ -47,6 +47,7 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-first-room": 4,
 
   "/en/blog/screeps-upgrade-controller": 5,
+  "/en/blog/screeps-upgrader-controller-link-not-upgrading": 5,
   "/en/blog/screeps-controller-activate-safe-mode": 5,
   "/en/blog/screeps-controller-downgrade": 5,
   "/en/blog/screeps-reserve-vs-claim-controller": 5,
