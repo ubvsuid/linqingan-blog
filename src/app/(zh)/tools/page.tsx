@@ -3,65 +3,15 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { createPageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
+import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 
 import "../../screeps-planning-tools.css";
 
 export const metadata = createPageMetadata({
   title: "免费 Screeps 工具",
-  description: "使用无需账号连接的Screeps身体、房间、市场、Controller、Lab、Spawn、运输和Tower规划工具。所有计算都在浏览器本地完成。",
+  description: "使用无需账号连接的 Screeps 身体、房间、市场、Controller、Lab、Spawn、运输和 Tower 规划工具。所有计算都在浏览器本地完成。",
   path: "/tools",
 });
-
-const tools = [
-  {
-    eyebrow: "BODY CALCULATOR",
-    title: "Creep 身体计算器",
-    description: "计算身体成本、生成时间、生命值、携带容量与满载移动速度。",
-    href: "/tools/creep-body-calculator",
-  },
-  {
-    eyebrow: "ROOM DIAGNOSTICS",
-    title: "房间运行诊断",
-    description: "根据Spawn、角色、Energy、Controller、工地、CPU和bucket快照检查风险。",
-    href: "/tools/room-diagnostics",
-  },
-  {
-    eyebrow: "MARKET & TERMINAL",
-    title: "Market 与 Terminal 成本计算器",
-    description: "计算运输Energy、成交后的实际单价和创建订单手续费。",
-    href: "/tools/market-terminal-cost-calculator",
-  },
-  {
-    eyebrow: "CONTROLLER",
-    title: "Controller 降级与 Upgrader 规划器",
-    description: "估算降级安全余量、WORK吞吐量、Boost效果和RCL8升级上限。",
-    href: "/tools/controller-downgrade-planner",
-  },
-  {
-    eyebrow: "LAB & BOOST",
-    title: "Lab 反应与 Boost 规划器",
-    description: "展开化合物反应链，并计算生产轮数、基础矿物和整批Boost需求。",
-    href: "/tools/lab-reaction-boost-planner",
-  },
-  {
-    eyebrow: "SPAWN CAPACITY",
-    title: "Spawn 队列与替换规划器",
-    description: "同时规划多个角色的生成负载、替换TTL和OPERATE_SPAWN容量。",
-    href: "/tools/spawn-queue-replacement-planner",
-  },
-  {
-    eyebrow: "LOGISTICS",
-    title: "运输吞吐量规划器",
-    description: "计算CARRY容量、MOVE疲劳、往返周期、所需Creep数量和寿命运输量。",
-    href: "/tools/hauling-throughput-planner",
-  },
-  {
-    eyebrow: "TOWER POWER",
-    title: "Tower 伤害、治疗与维修计算器",
-    description: "计算距离衰减、多塔效果、Energy消耗、对抗量和完成目标所需Tick。",
-    href: "/tools/tower-damage-heal-repair-calculator",
-  },
-] as const;
 
 export default function ToolsPage() {
   const pageUrl = `${siteConfig.url}/tools`;
@@ -73,18 +23,18 @@ export default function ToolsPage() {
         name: "免费 Screeps 工具",
         url: pageUrl,
         inLanguage: "zh-CN",
-        description: "无需连接Screeps账号的浏览器本地计算与诊断工具。",
+        description: "无需连接 Screeps 账号的浏览器本地计算与诊断工具。",
         mainEntity: { "@id": `${pageUrl}#tools` },
       },
       {
         "@type": "ItemList",
         "@id": `${pageUrl}#tools`,
-        numberOfItems: tools.length,
-        itemListElement: tools.map((tool, index) => ({
+        numberOfItems: toolCatalog.length,
+        itemListElement: toolCatalog.map((tool, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          name: tool.title,
-          url: `${siteConfig.url}${tool.href}`,
+          name: tool.zhTitle,
+          url: `${siteConfig.url}${getToolHref(tool.slug)}`,
         })),
       },
       {
@@ -105,15 +55,15 @@ export default function ToolsPage() {
         <header className="page-header">
           <p className="eyebrow">SCREEPS TOOLS</p>
           <h1>计算、诊断与规划工具</h1>
-          <p>全部工具都在浏览器本地运行，不要求Screeps Token，不连接玩家账号，也不会执行游戏操作。结果用于执行前检查，真实状态仍需通过返回码和后续Tick验证。</p>
+          <p>全部工具都在浏览器本地运行，不要求 Screeps Token，不连接玩家账号，也不会执行游戏操作。结果用于执行前检查，真实状态仍需通过返回码和后续 Tick 验证。</p>
         </header>
 
         <section className="tools-hub-grid" aria-label="Screeps 工具列表">
-          {tools.map((tool) => (
-            <Link className="tools-hub-card" href={tool.href} key={tool.href}>
+          {toolCatalog.map((tool) => (
+            <Link className="tools-hub-card" href={getToolHref(tool.slug)} key={tool.slug}>
               <span className="eyebrow">{tool.eyebrow}</span>
-              <h2>{tool.title}</h2>
-              <p>{tool.description}</p>
+              <h2>{tool.zhTitle}</h2>
+              <p>{tool.zhDescription}</p>
               <strong>打开工具 →</strong>
             </Link>
           ))}
