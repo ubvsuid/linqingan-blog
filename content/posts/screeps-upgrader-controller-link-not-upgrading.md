@@ -18,8 +18,8 @@ verification:
   liveTested: false
   checkedAt: "2026-08-05"
   testedAt: "2026-08-05"
-  testEnvironment: "Node.js 离线模拟（固定站位、Controller/Link 距离、身体部件、Link 库存、upgradeBlocked、动作决策和下一 tick 验证分类；不是 Screeps 官方服务器）"
-  testResult: "21 个离线场景通过；完整示例通过 JavaScript 语法检查。真实房间交通、Link 网络竞争、Boost、Power Creep 效果和官方 shard 行为仍待验证。"
+  testEnvironment: "Node.js 离线模拟（固定站位、Controller/Link 距离、身体部件、Link 库存、upgradeBlocked、动作决策、缺失证据和下一 tick 验证分类；不是 Screeps 官方服务器）"
+  testResult: "24 个离线场景通过；完整示例通过 JavaScript 语法检查。真实房间交通、Link 网络竞争、Boost、Power Creep 效果和官方 shard 行为仍待验证。"
 featured: false
 ---
 
@@ -311,6 +311,10 @@ function snapshot(creep, controller, link, anchor) {
   };
 }
 
+function allFinite(values) {
+  return values.every(value => Number.isFinite(value));
+}
+
 function verifyPrevious(room, state, creep, controller, link, anchor) {
   const pending = state.pending;
   if (!pending || pending.tick >= Game.time) return null;
@@ -327,29 +331,55 @@ function verifyPrevious(room, state, creep, controller, link, anchor) {
     status = 'anchor-arrival-observed';
   }
   if (pending.action === 'withdraw') {
-    const gain = after.creepEnergy - pending.before.creepEnergy;
-    const loss = pending.before.linkEnergy - after.linkEnergy;
-    status = gain > 0 && loss > 0
-      ? 'withdraw-deltas-observed'
-      : gain > 0 || loss > 0
-        ? 'withdraw-partial-observation'
-        : 'withdraw-not-observed';
+    const canMeasureWithdraw = allFinite([
+      after.creepEnergy,
+      pending.before.creepEnergy,
+      pending.before.linkEnergy,
+      after.linkEnergy
+    ]);
+
+    if (!canMeasureWithdraw) {
+      status = 'withdraw-evidence-unavailable';
+    } else {
+      const gain = after.creepEnergy - pending.before.creepEnergy;
+      const loss = pending.before.linkEnergy - after.linkEnergy;
+      status = gain > 0 && loss > 0
+        ? 'withdraw-deltas-observed'
+        : gain > 0 || loss > 0
+          ? 'withdraw-partial-observation'
+          : 'withdraw-not-observed';
+    }
   }
   if (pending.action === 'upgrade') {
-    const spent = pending.before.creepEnergy - after.creepEnergy;
-    const progress = Number.isFinite(after.controllerProgress)
-      && Number.isFinite(pending.before.controllerProgress)
-      && after.controllerProgress > pending.before.controllerProgress;
-    const downgrade = Number.isFinite(after.ticksToDowngrade)
-      && Number.isFinite(pending.before.ticksToDowngrade)
-      && after.ticksToDowngrade > pending.before.ticksToDowngrade;
-    status = exactUpgradeEvent
-      ? 'upgrade-event-observed'
-      : spent > 0 && (progress || downgrade)
+    const canMeasureSpent = allFinite([
+      after.creepEnergy,
+      pending.before.creepEnergy
+    ]);
+    const canMeasureProgress = allFinite([
+      after.controllerProgress,
+      pending.before.controllerProgress
+    ]);
+    const canMeasureDowngrade = allFinite([
+      after.ticksToDowngrade,
+      pending.before.ticksToDowngrade
+    ]);
+
+    if (exactUpgradeEvent) {
+      status = 'upgrade-event-observed';
+    } else if (!canMeasureSpent || (!canMeasureProgress && !canMeasureDowngrade)) {
+      status = 'upgrade-evidence-unavailable';
+    } else {
+      const spent = pending.before.creepEnergy - after.creepEnergy;
+      const progress = canMeasureProgress
+        && after.controllerProgress > pending.before.controllerProgress;
+      const downgrade = canMeasureDowngrade
+        && after.ticksToDowngrade > pending.before.ticksToDowngrade;
+      status = spent > 0 && (progress || downgrade)
         ? 'upgrade-deltas-observed'
         : spent > 0 || progress || downgrade
           ? 'upgrade-partial-observation'
           : 'upgrade-not-observed';
+    }
   }
 
   const record = {
@@ -512,7 +542,7 @@ module.exports.loop = function () {
 - 取能：比较 Creep Energy 增加与 Controller Link Energy 减少；
 - 升级：优先检查 `EVENT_UPGRADE_CONTROLLER`，并要求 `event.objectId === pending.creepId`。
 
-若事件不可用，再使用 Creep Energy、Controller progress 和 `ticksToDowngrade` 的有限变化作为辅助观察。并发 Upgrader 会使纯数值差值无法证明唯一因果。
+若 Creep、Link 或 Controller 的前后快照缺失，代码会记录 `withdraw-evidence-unavailable` 或 `upgrade-evidence-unavailable`，不会让 `null` 参与减法。若事件不可用，再使用 Creep Energy、Controller progress 和 `ticksToDowngrade` 的有限变化作为辅助观察。并发 Upgrader 会使纯数值差值无法证明唯一因果。
 
 ## Controller Link 一直为空怎么处理
 
@@ -538,7 +568,7 @@ module.exports.loop = function () {
 
 ## 离线验证覆盖
 
-21 个场景覆盖：配置、对象、所有权、spawning、站位、Controller/Link 距离、Energy 容量、WORK/MOVE、Link 空仓、upgradeBlocked、移动、取能、升级和下一 tick 分类。完整示例通过 `node --check`。
+24 个场景覆盖：配置、对象、所有权、spawning、站位、Controller/Link 距离、Energy 容量、WORK/MOVE、Link 空仓、upgradeBlocked、移动、取能、升级、缺失 Creep/Link/Controller 快照和下一 tick 分类。完整示例通过 `node --check`。
 
 离线测试不能证明官方 shard 交通、多 Creep 抢位、多 Link 竞争、Boost 与 Power Creep 的所有组合、RCL8 实际吞吐、真实 ID/坐标或最高效率。相关结论保持待验证。
 
@@ -561,4 +591,4 @@ module.exports.loop = function () {
 - [Simultaneous execution of creep actions](https://docs.screeps.com/simultaneous-actions.html)
 - [Boost 资源效果](https://docs.screeps.com/resources.html)
 
-资料核对日期：2026-08-05。官方文档、完整示例语法和 21 个离线场景已核对；真实 Console 与官方 shard 行为仍待验证。
+资料核对日期：2026-08-05。官方文档、完整示例语法和 24 个离线场景已核对；真实 Console 与官方 shard 行为仍待验证。
