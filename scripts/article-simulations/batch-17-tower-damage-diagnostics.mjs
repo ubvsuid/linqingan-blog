@@ -19,13 +19,13 @@ function towerAttackAtRange(range) {
   );
 }
 
-function applyTowerEffects(baseAmount, operateFactor = 0, disruptFactor = 0) {
+function applyTowerEffects(baseAmount, operateMultiplier = 1, disruptMultiplier = 1) {
   if (
     !Number.isFinite(baseAmount) || baseAmount < 0
-    || !Number.isFinite(operateFactor) || operateFactor < 0
-    || !Number.isFinite(disruptFactor) || disruptFactor < 0 || disruptFactor > 1
+    || !Number.isFinite(operateMultiplier) || operateMultiplier <= 0
+    || !Number.isFinite(disruptMultiplier) || disruptMultiplier <= 0
   ) return null;
-  return Math.floor(baseAmount * (1 + operateFactor) * (1 - disruptFactor));
+  return Math.floor(baseAmount * operateMultiplier * disruptMultiplier);
 }
 
 function estimateVolley(entries) {
@@ -33,13 +33,24 @@ function estimateVolley(entries) {
   const estimates = entries.map((entry) => {
     const base = towerAttackAtRange(entry.range);
     if (base === null) return null;
-    return applyTowerEffects(base, entry.operateFactor ?? 0, entry.disruptFactor ?? 0);
+    return applyTowerEffects(
+      base,
+      entry.operateMultiplier ?? 1,
+      entry.disruptMultiplier ?? 1
+    );
   });
   if (estimates.some((value) => value === null)) return null;
   return estimates.reduce((sum, value) => sum + value, 0);
 }
 
-function verifyVolley({ now, submittedAt, towerIds, targetId, events }) {
+function verifyVolley({
+  now,
+  submittedAt,
+  towerIds,
+  targetId,
+  eventTargetId = targetId,
+  events
+}) {
   if (!Number.isInteger(now) || !Number.isInteger(submittedAt)) {
     return { status: "invalid-window" };
   }
@@ -50,7 +61,7 @@ function verifyVolley({ now, submittedAt, towerIds, targetId, events }) {
   const attackEvents = events.filter((event) =>
     event.event === "attack"
     && expectedIds.has(event.objectId)
-    && event.data?.targetId === targetId
+    && event.data?.targetId === eventTargetId
     && event.data?.attackType === "ranged"
   );
   const matchedIds = new Set(attackEvents.map((event) => event.objectId));
@@ -89,12 +100,12 @@ const tests = [
   () => assert.equal(towerAttackAtRange(-1), null),
   () => assert.equal(towerAttackAtRange(5.5), null),
   () => assert.equal(applyTowerEffects(600), 600),
-  () => assert.equal(applyTowerEffects(600, 0.1, 0), 660),
-  () => assert.equal(applyTowerEffects(600, 0, 0.1), 540),
-  () => assert.equal(applyTowerEffects(600, 0.1, 0.1), 594),
-  () => assert.equal(applyTowerEffects(600, 0, 1.1), null),
+  () => assert.equal(applyTowerEffects(600, 1.1, 1), 660),
+  () => assert.equal(applyTowerEffects(600, 1, 0.9), 540),
+  () => assert.equal(applyTowerEffects(600, 1.1, 0.9), 594),
+  () => assert.equal(applyTowerEffects(600, 1, 0), null),
   () => assert.equal(estimateVolley([{ range: 5 }, { range: 10 }, { range: 20 }]), 1200),
-  () => assert.equal(estimateVolley([{ range: 6, operateFactor: 0.2 }]), 684),
+  () => assert.equal(estimateVolley([{ range: 6, operateMultiplier: 1.2 }]), 684),
   () => assert.equal(estimateVolley([{ range: -1 }]), null),
   () => assert.equal(verifyVolley({ now: 100, submittedAt: 100, towerIds: ["a"], targetId: "x", events: [] }).status, "pending"),
   () => assert.equal(verifyVolley({ now: 103, submittedAt: 100, towerIds: ["a"], targetId: "x", events: [] }).status, "missed-window"),
@@ -147,6 +158,17 @@ const tests = [
       events: [{ event: "attack", objectId: "a", data: { targetId: "y", attackType: "ranged", damage: 600 } }]
     }).status,
     "missing"
+  ),
+  () => assert.equal(
+    verifyVolley({
+      now: 101,
+      submittedAt: 100,
+      towerIds: ["a"],
+      targetId: "creep",
+      eventTargetId: "rampart",
+      events: [{ event: "attack", objectId: "a", data: { targetId: "rampart", attackType: "ranged", damage: 600 } }]
+    }).status,
+    "verified"
   )
 ];
 
