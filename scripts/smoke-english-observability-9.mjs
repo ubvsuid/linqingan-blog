@@ -1,85 +1,107 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const timeoutMs = 15000;
+
+async function fetchText(pathname) {
+  try {
+    const response = await fetch(`${baseUrl}${pathname}`, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    return {
+      response,
+      body: await response.text(),
+      error: null,
+    };
+  } catch (error) {
+    return {
+      response: null,
+      body: "",
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
 
 const articles = [
   {
     path: "/en/blog/screeps-game-notify",
     chinesePath: "/blog/screeps-game-notify",
-    headline: "Do Not Mark an Alert Sent Until Game.notify() Is Called",
-    listingTitle: "Screeps Game.notify(): Queue Alerts and Mark Them Submitted",
-    query: "Game.notify",
-    tocId: "use-this-guide",
-    tocHeading: "Use this guide when",
-    faqExpected: false,
-    modifiedExpected: true,
+    headline: "Submit One Immutable Alert Revision Without Claiming Email Delivery",
+    listingTitle: "Screeps Game.notify(): Bind Alert Payload Identity Before Submission",
+    query: "Game.notify payload identity",
+    tocId: "evidence-contract",
+    tocHeading: "Separate scheduling from delivery",
     signals: [
-      "valid.slice(0, 20)",
-      "awaiting-first-submission",
-      "lastSubmittedTick: Game.time",
-      "Live queue-cap, notification submission, grouping, and external delivery test",
-      "Pending",
+      "buildNotificationPayloadDigest",
+      "result = Game.notify",
+      "if (result !== OK)",
+      "notification-rejected-review-required",
+      "local-call-site-only",
+      "ERR_FULL",
     ],
   },
   {
     path: "/en/blog/screeps-room-event-log",
     chinesePath: "/blog/screeps-room-event-log",
-    headline: "Read a Room Event Log Once Without Duplicating Incidents",
-    listingTitle: "Screeps Room.getEventLog(): Process Each Previous Tick Once",
-    query: "Room.getEventLog",
-    tocId: "use-this-guide",
-    tocHeading: "Use this guide when",
-    faqExpected: false,
-    modifiedExpected: true,
+    headline: "Process One Event Window Without Reusing a Stale Ownership Snapshot",
+    listingTitle: "Screeps Room.getEventLog(): Bind Exact Previous-Tick Windows",
+    query: "Room.getEventLog previous tick",
+    tocId: "evidence-contract",
+    tocHeading: "Bind the previous-tick window",
     signals: [
-      "already-processed",
-      "Memory.roomEventWindows",
-      "FIND_MY_POWER_CREEPS",
-      "Live multi-tick verification",
-      "Pending",
+      "non-replayable-gap-observed",
+      "snapshot.capturedAt === eventTick",
+      "snapshot?.roomName === roomName",
+      "room.getEventLog(false)",
+      "window-schema-conflict",
+      "exact-window-committed",
     ],
   },
   {
     path: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
-    headline: "Build a RoomVisual Debug Layer That Cannot Change Game Logic",
-    listingTitle: "Screeps RoomVisual Debugging: Draw Current State Within a Budget",
-    query: "RoomVisual",
-    tocId: "use-this-guide",
-    tocHeading: "Use this guide when",
-    faqExpected: false,
-    modifiedExpected: true,
+    headline: "Draw Only Same-Room, Same-Tick Snapshots Through One Final Dispatcher",
+    listingTitle: "Screeps RoomVisual: Coordinate One Room-Bound Debug Layer",
+    query: "RoomVisual room identity",
+    tocId: "evidence-contract",
+    tocHeading: "Treat drawings as browser output",
     signals: [
-      "visual.getSize()",
-      "512,000 serialized bytes",
-      "createCreepDebugSnapshot",
-      "byte-budget-reached",
-      "Live multi-tick verification",
-      "Pending",
+      "createRoomVisualDispatcher",
+      "mark.roomName !== roomName",
+      "preexisting-visual-writer-detected",
+      "JSON.parse(JSON.stringify(layer))",
+      "soft-byte-budget-reached",
+      "room-visual-rendered-locally",
     ],
   },
 ];
 
 const failures = [];
+const bodies = new Map();
 
 for (const article of articles) {
-  const response = await fetch(`${baseUrl}${article.path}`, {
-    redirect: "manual",
-  });
-  const body = await response.text();
-
-  if (response.status !== 200) {
-    failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
+  const result = await fetchText(article.path);
+  if (result.error) {
+    failures.push(`${article.path}: request failed: ${result.error}`);
+    continue;
+  }
+  if (result.response.status !== 200) {
+    failures.push(`${article.path}: expected 200, received ${result.response.status}`);
     continue;
   }
 
+  const body = result.body;
+  bodies.set(article.path, body);
   const canonical = `https://www.linqingan.com${article.path}`;
   const chinese = `https://www.linqingan.com${article.chinesePath}`;
 
   for (const expected of [
     article.headline,
+    article.listingTitle,
     "Verification status",
     "Chinese source article",
     "Reviewed in full",
     "Screeps Console test",
+    "Pending",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
@@ -88,173 +110,128 @@ for (const article of articles) {
     `href="#${article.tocId}"`,
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
+    `"dateModified":"2026-08-05"`,
   ]) {
     if (!body.includes(expected)) {
-      failures.push(`${article.path}: 缺少 “${expected}”`);
+      failures.push(`${article.path}: missing “${expected}”`);
     }
   }
 
-  if (
-    body.includes(`"@type":"FAQPage"`)
-    !== article.faqExpected
-  ) {
-    failures.push(`${article.path}: FAQPage expectation mismatch`);
+  if (body.includes(`"@type":"FAQPage"`)) {
+    failures.push(`${article.path}: unexpected FAQPage schema`);
   }
 
-  if (
-    article.modifiedExpected
-    && !body.includes(`"dateModified":"2026-07-31"`)
-  ) {
-    failures.push(`${article.path}: 缺少 2026-07-31 dateModified`);
-  }
-
-  const searchResponse = await fetch(
-    `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
-    { redirect: "manual" },
+  const search = await fetchText(
+    `/en/search?q=${encodeURIComponent(article.query)}`,
   );
-  const searchBody = await searchResponse.text();
-
-  if (searchResponse.status !== 200) {
-    failures.push(
-      `/en/search?q=${article.query}: 实际 ${searchResponse.status}`,
-    );
-  } else if (!searchBody.includes(article.listingTitle)) {
-    failures.push(
-      `/en/search?q=${article.query}: 缺少 “${article.listingTitle}”`,
-    );
+  if (search.error) {
+    failures.push(`/en/search?q=${article.query}: request failed: ${search.error}`);
+  } else if (search.response.status !== 200) {
+    failures.push(`/en/search?q=${article.query}: received ${search.response.status}`);
+  } else if (!search.body.includes(article.listingTitle)) {
+    failures.push(`/en/search?q=${article.query}: missing “${article.listingTitle}”`);
   }
 }
 
-const notifyBody = await (
-  await fetch(`${baseUrl}/en/blog/screeps-game-notify`)
-).text();
-
+const notifyBody = bodies.get("/en/blog/screeps-game-notify") || "";
 for (const expected of [
-  "Memory.notificationQueue ??= {}",
-  "awaiting-first-submission",
-  "valid.slice(0, 20)",
-  "lastSubmittedTick: Game.time",
-  "delete Memory.notificationQueue[item.key]",
+  "revision: 3",
+  "payload-confirmation-mismatch",
+  "call-limit-reached",
+  "request.lastResult = result",
+  "result !== OK",
+  "submitted-locally",
 ]) {
   if (!notifyBody.includes(expected)) {
-    failures.push(`Game.notify 页面缺少 “${expected}”`);
+    failures.push(`Game.notify page missing “${expected}”`);
+  }
+}
+for (const forbidden of [
+  "delivery succeeded",
+  "email delivered",
+]) {
+  if (notifyBody.includes(forbidden)) {
+    failures.push(`Game.notify page contains false delivery claim “${forbidden}”`);
   }
 }
 
-if (
-  notifyBody.includes(
-    "nextState: {\n      active: true,\n      lastSubmittedTick: input.currentTick",
-  )
-) {
-  failures.push(
-    "Game.notify producer still advances the submission timestamp at queue time",
-  );
-}
-
-if (notifyBody.includes("delivery succeeded")) {
-  failures.push("Game.notify 页面错误声称外部送达成功");
-}
-
-const eventBody = await (
-  await fetch(`${baseUrl}/en/blog/screeps-room-event-log`)
-).text();
-
+const eventBody = bodies.get("/en/blog/screeps-room-event-log") || "";
 for (const expected of [
-  "lastProcessedEventTick === eventTick",
-  "Memory.roomEventWindows",
-  "FIND_MY_POWER_CREEPS",
-  "event-log-not-array",
-  "Record command submission separately",
+  "EVENT_WINDOW_SCHEMA = 2",
+  "snapshot?.roomName === roomName",
+  "snapshot?.capturedAt === eventTick",
+  "exact-snapshot-unavailable",
+  "unsupported-event-preserved",
+  "first-observed-window",
 ]) {
   if (!eventBody.includes(expected)) {
-    failures.push(`事件日志页面缺少 “${expected}”`);
+    failures.push(`Event-log page missing “${expected}”`);
+  }
+}
+for (const forbidden of [
+  "snapshot?.roomName === snapshot?.roomName",
+  "room.getEventLog(true)",
+]) {
+  if (eventBody.includes(forbidden)) {
+    failures.push(`Event-log page contains forbidden model “${forbidden}”`);
   }
 }
 
-if (eventBody.includes("room.getEventLog(true)")) {
-  failures.push("事件日志最小流程仍以 raw JSON 解析为主");
-}
-
-const visualBody = await (
-  await fetch(`${baseUrl}/en/blog/screeps-roomvisual-debug`)
-).text();
-
+const visualBody = bodies.get("/en/blog/screeps-roomvisual-debug") || "";
 for (const expected of [
-  "createCreepDebugSnapshot",
-  "selectDebugSnapshots",
-  "Math.min(\n    512000",
-  "return {\n    status: 'complete'",
-  "Game.cpu.getUsed()",
+  "layer.roomName !== roomName",
+  "mark.roomName !== roomName",
+  "existingBytes !== 0",
+  "Math.min(480000",
+  "JSON.parse(JSON.stringify(layer))",
+  "replay-artifact-reviewed",
 ]) {
   if (!visualBody.includes(expected)) {
-    failures.push(`RoomVisual 页面缺少 “${expected}”`);
+    failures.push(`RoomVisual page missing “${expected}”`);
+  }
+}
+for (const forbidden of [
+  "structuredClone(layer)",
+  "Memory.visualDebug[room.name].lastSummary",
+]) {
+  if (visualBody.includes(forbidden)) {
+    failures.push(`RoomVisual page contains forbidden model “${forbidden}”`);
   }
 }
 
-if (
-  visualBody.includes(
-    "Memory.visualDebug[room.name].lastSummary",
-  )
-) {
-  failures.push(
-    "RoomVisual 最小渲染流程仍默认写入每 tick 持久摘要",
-  );
-}
-
-const blogResponse = await fetch(
-  `${baseUrl}/en/blog-index.json`,
-  { redirect: "manual" },
-);
-const blogBody = await blogResponse.text();
-
-if (blogResponse.status !== 200) {
-  failures.push(
-    `/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`,
-  );
+const blogIndex = await fetchText("/en/blog-index.json");
+if (blogIndex.error) {
+  failures.push(`/en/blog-index.json: request failed: ${blogIndex.error}`);
+} else if (blogIndex.response.status !== 200) {
+  failures.push(`/en/blog-index.json: received ${blogIndex.response.status}`);
 } else {
   for (const article of articles) {
-    if (!blogBody.includes(article.listingTitle)) {
-      failures.push(
-        `/en/blog-index.json: 缺少 “${article.listingTitle}”`,
-      );
+    if (!blogIndex.body.includes(article.listingTitle)) {
+      failures.push(`/en/blog-index.json: missing “${article.listingTitle}”`);
     }
   }
 }
 
-const sitemapResponse = await fetch(
-  `${baseUrl}/sitemap.xml`,
-  { redirect: "manual" },
-);
-const sitemapBody = await sitemapResponse.text();
-
-if (sitemapResponse.status !== 200) {
-  failures.push(
-    `/sitemap.xml: 预期 200，实际 ${sitemapResponse.status}`,
-  );
+const sitemap = await fetchText("/sitemap.xml");
+if (sitemap.error) {
+  failures.push(`/sitemap.xml: request failed: ${sitemap.error}`);
+} else if (sitemap.response.status !== 200) {
+  failures.push(`/sitemap.xml: received ${sitemap.response.status}`);
 } else {
   for (const article of articles) {
-    const expected =
-      `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
-      failures.push(`/sitemap.xml: 缺少 ${expected}`);
+    const expected = `https://www.linqingan.com${article.path}`;
+    if (!sitemap.body.includes(expected)) {
+      failures.push(`/sitemap.xml: missing ${expected}`);
     }
   }
 }
 
 if (failures.length > 0) {
-  failures.forEach((failure) =>
-    console.error(`ERROR: ${failure}`),
-  );
-  console.error(
-    `\n第九批英文可观测性生产冒烟测试失败：`
-      + `${failures.length} 项。`,
-  );
+  failures.forEach((failure) => console.error(`ERROR: ${failure}`));
+  console.error(`\nEnglish observability production smoke failed: ${failures.length} finding(s).`);
   process.exit(1);
 }
 
 console.log(
-  "第九批英文可观测性生产冒烟测试通过："
-    + "3 篇文章、通知提交边界、幂等事件窗口、"
-    + "有界 RoomVisual、Verification、Canonical、"
-    + "hreflang、JSON-LD、目录、搜索与 Sitemap。",
+  "English observability production smoke passed: 3 articles, notification return-code identity, exact previous-tick windows, room-bound visuals, finite request timeouts, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
 );
