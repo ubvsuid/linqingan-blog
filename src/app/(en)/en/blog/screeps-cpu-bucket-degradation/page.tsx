@@ -129,6 +129,7 @@ confirm recovery for 20 ticks</code></pre>
     : { mode: 'RECOVERY', reason: 'recovery-hold', immediate: false };
 }</code></pre>
 <p>The full Chinese implementation adds candidate counters, minimum hold time, bounded transition and failure history, stable task offsets, remaining-CPU headroom checks, and a complete integration scaffold.</p>
+<p>Malformed task entries are partitioned before sorting. A null entry, missing name, missing callback, or unknown tier cannot throw in the comparator before critical work runs.</p>
 
 <h2 id="cadence">Throttle and stagger lower-tier work</h2>
 <p>Critical work keeps its original cadence in every mode. Important work may move from every tick to every 2 or 10 ticks. Optional work may move to every 20 ticks in conserve mode, stop in emergency mode, and restart only after a recovery warm-up.</p>
@@ -140,7 +141,7 @@ confirm recovery for 20 ticks</code></pre>
 <p>Record notifications only on real transitions such as <code>NORMAL → CONSERVE</code> or <code>EMERGENCY → RECOVERY</code>. Use the <a href="/en/blog/screeps-game-notify">notification guide</a> for rate limiting instead of sending a low-bucket message every tick.</p>
 
 <h2 id="boundaries">Evidence boundaries</h2>
-<p>Twenty-seven offline cases passed: hard emergency entry, three-tick degradation confirmation, twenty-tick recovery confirmation, minimum mode duration, candidate reset, recovery regression, and task intervals across all four modes. The complete Chinese scheduler passed JavaScript syntax checking.</p>
+<p>Thirty offline cases passed: hard emergency entry, three-tick degradation confirmation, twenty-tick recovery confirmation, minimum mode duration, candidate reset, recovery regression, task intervals across all four modes, malformed task isolation, and stable critical-first ordering. The complete Chinese scheduler passed JavaScript syntax checking.</p>
 <p>Node.js does not reproduce Screeps CPU units. Live Console measurements, official-shard bucket trends, multi-room costs, combat load, private-server settings, and proof that critical room behavior remains healthy are still pending.</p>
 `;
 
@@ -188,7 +189,7 @@ export default function CpuBucketDegradationPage() {
       verification={[
         { term: "Documentation", value: "Official CPU limit, Game.cpu, game-loop, and Memory references checked" },
         { term: "Syntax", value: "Complete Chinese scheduler checked offline" },
-        { term: "Offline cases", value: "27 passed" },
+        { term: "Offline cases", value: "30 passed" },
         { term: "Live shard", value: "Pending" },
       ]}
       toc={toc}
