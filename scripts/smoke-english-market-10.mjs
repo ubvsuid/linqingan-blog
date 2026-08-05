@@ -153,7 +153,7 @@ const dealBody = bodies.get("/en/blog/screeps-market-deal") || "";
 for (const signal of [
   "transaction.time === pending.submittedAt",
   "transaction.amount",
-  "<= pending.requestedAmount",
+  "&lt;= pending.requestedAmount",
   "partial-deal-settlement-observed",
 ]) {
   if (!dealBody.includes(signal)) {
