@@ -75,6 +75,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-spawncreep-return-codes": ["spawn", "debugging"],
   "/en/blog/screeps-dynamic-creep-body": ["spawn", "creeps", "energy"],
   "/en/blog/screeps-room-energyavailable-stuck": ["spawn", "energy", "debugging"],
+  "/en/blog/screeps-creep-prespawn-replacement": ["spawn", "creeps", "debugging"],
   "/en/blog/screeps-emergency-harvester-recovery": ["spawn", "creeps", "energy"],
   "/en/blog/screeps-renew-creep": ["spawn", "creeps"],
   "/en/blog/screeps-recycle-creep": ["spawn", "creeps"],
