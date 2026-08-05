@@ -131,6 +131,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
 
   "/en/blog/screeps-first-room-code": ["javascript", "debugging", "rooms"],
   "/en/blog/screeps-cpu-getused-bucket": ["cpu", "debugging"],
+  "/en/blog/screeps-cpu-bucket-degradation": ["cpu", "debugging", "javascript"],
   "/en/blog/screeps-game-notify": ["debugging", "javascript"],
   "/en/blog/screeps-room-event-log": ["debugging", "rooms"],
   "/en/blog/screeps-roomvisual-debug": ["debugging", "rooms", "javascript"],
