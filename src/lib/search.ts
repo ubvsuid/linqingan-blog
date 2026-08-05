@@ -3,6 +3,7 @@ import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
+import { getToolHref, toolCatalog, toolCount } from "@/lib/tool-catalog";
 
 export type SearchDocumentType = "文章" | "术语" | "错误码" | "工具" | "项目";
 
@@ -15,6 +16,14 @@ export interface SearchDocument {
   meta: string;
   keywords: string[];
   text: string;
+}
+
+export interface SearchIndexSummary {
+  total: number;
+  articleCount: number;
+  publicToolCount: number;
+  toolDocumentCount: number;
+  byType: Record<SearchDocumentType, number>;
 }
 
 interface SearchDocumentOptions {
@@ -51,92 +60,22 @@ const toolDocuments: SearchDocument[] = [
     id: "tool:hub",
     type: "工具",
     title: "免费 Screeps 工具",
-    description: "集中使用身体、房间、Market、Controller、Lab、Spawn、运输与Tower计算和诊断工具。",
+    description: "集中使用身体、房间、Market、Controller、Lab、Spawn、运输与 Tower 计算和诊断工具。",
     href: "/tools",
-    meta: "8 个浏览器本地工具",
+    meta: `${toolCount} 个浏览器本地工具`,
     keywords: ["Screeps 工具", "计算器", "诊断", "规划器", "tools"],
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
-  {
-    id: "tool:creep-body-calculator",
+  ...toolCatalog.map((tool): SearchDocument => ({
+    id: `tool:${tool.slug}`,
     type: "工具",
-    title: "Screeps Creep 身体计算器",
-    description: "组合身体部件，计算 Energy 成本、生成时间、生命值、携带容量和满载移动速度。",
-    href: "/tools/creep-body-calculator",
-    meta: "免费工具 · 支持链接分享",
-    keywords: ["Creep Body", "BODYPART_COST", "MOVE", "WORK", "CARRY", "身体计算器", "生成时间", "fatigue"],
-    text: "Screeps 身体部件 成本 Spawn 生成时间 50 个部件 MOVE 比例 Road Plain Swamp",
-  },
-  {
-    id: "tool:room-diagnostics",
-    type: "工具",
-    title: "Screeps 房间运行诊断",
-    description: "检查 Spawn、角色数量、Energy、Controller、工地和 CPU 风险。",
-    href: "/tools/room-diagnostics",
-    meta: "免费工具 · 支持配置分享",
-    keywords: ["房间诊断", "Spawn", "角色数量", "Controller", "CPU", "Energy"],
-    text: "Screeps 房间运行 检查 断代 Spawn Energy Controller 工地 CPU bucket",
-  },
-  {
-    id: "tool:market-terminal-cost-calculator",
-    type: "工具",
-    title: "Screeps Market 与 Terminal 成本计算器",
-    description: "计算运输Energy、Market成交后的实际单价和创建订单的5%手续费。",
-    href: "/tools/market-terminal-cost-calculator",
-    meta: "免费工具 · URL参数可分享",
-    keywords: ["Market 计算器", "Terminal 成本", "calcTransactionCost", "deal", "订单手续费", "Credits"],
-    text: "Screeps Market Terminal 运输 Energy 实际单价 买单 卖单 deal 订单 5% 手续费",
-  },
-  {
-    id: "tool:controller-downgrade-planner",
-    type: "工具",
-    title: "Screeps Controller 降级与 Upgrader 规划器",
-    description: "根据ticksToDowngrade、WORK、Boost、有效升级比例和RCL8上限估算安全余量。",
-    href: "/tools/controller-downgrade-planner",
-    meta: "免费工具 · 只读Console探针",
-    keywords: ["Controller 降级", "ticksToDowngrade", "Upgrader", "WORK", "XGH2O", "OPERATE_CONTROLLER"],
-    text: "Screeps Controller 降级 安全线 Upgrader WORK Boost RCL8 升级 上限 进度",
-  },
-  {
-    id: "tool:lab-reaction-boost-planner",
-    type: "工具",
-    title: "Screeps Lab 反应与 Boost 规划器",
-    description: "展开化合物反应链，计算基础矿物、Lab轮数、生产Tick和整批Boost需求。",
-    href: "/tools/lab-reaction-boost-planner",
-    meta: "免费工具 · 支持计划JSON",
-    keywords: ["Lab 规划", "反应链", "Boost 计算", "XGH2O", "OPERATE_LAB", "矿物"],
-    text: "Screeps Lab reaction Boost compound mineral cooldown output lab XGH2O 化合物 反应",
-  },
-  {
-    id: "tool:spawn-queue-replacement-planner",
-    type: "工具",
-    title: "Screeps Spawn 队列与替换规划器",
-    description: "计算多个角色的Spawn平均利用率、替换时间、prespawn TTL与OPERATE_SPAWN容量。",
-    href: "/tools/spawn-queue-replacement-planner",
-    meta: "免费工具 · 多角色队列规划",
-    keywords: ["Spawn 队列", "替换", "prespawn", "ticksToLive", "OPERATE_SPAWN", "Spawn 利用率"],
-    text: "Screeps Spawn queue replacement prespawn TTL 角色 生成时间 CLAIM 寿命 OPERATE_SPAWN",
-  },
-  {
-    id: "tool:hauling-throughput-planner",
-    type: "工具",
-    title: "Screeps 运输吞吐量规划器",
-    description: "根据CARRY、MOVE、地形和路线计算往返周期、所需Creep数量与寿命运输量。",
-    href: "/tools/hauling-throughput-planner",
-    meta: "免费工具 · 物流与远程采矿",
-    keywords: ["运输吞吐量", "Hauler", "CARRY", "MOVE", "fatigue", "remote mining", "物流"],
-    text: "Screeps hauling throughput CARRY MOVE fatigue Road Plain Swamp 往返 周期 运输",
-  },
-  {
-    id: "tool:tower-damage-heal-repair-calculator",
-    type: "工具",
-    title: "Screeps Tower 伤害、治疗与维修计算器",
-    description: "计算Tower距离衰减、多塔攻击治疗维修效果、Energy消耗和OPERATE_TOWER增益。",
-    href: "/tools/tower-damage-heal-repair-calculator",
-    meta: "免费工具 · 防御能力规划",
-    keywords: ["Tower 伤害", "Tower 治疗", "Tower 维修", "range falloff", "OPERATE_TOWER", "防御"],
-    text: "Screeps Tower attack heal repair range falloff Energy OPERATE_TOWER 防御 伤害 治疗 维修",
-  },
+    title: `Screeps ${tool.zhTitle}`,
+    description: tool.zhDescription,
+    href: getToolHref(tool.slug),
+    meta: tool.zhSearchMeta,
+    keywords: [...tool.zhKeywords],
+    text: tool.zhSearchText,
+  })),
 ];
 
 export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchDocument[] {
@@ -193,4 +132,26 @@ export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchD
   }));
 
   return [...posts, ...glossary, ...errors, ...toolDocuments, ...projectDocuments];
+}
+
+export function getSearchIndexSummary(documents: SearchDocument[]): SearchIndexSummary {
+  const byType: Record<SearchDocumentType, number> = {
+    文章: 0,
+    术语: 0,
+    错误码: 0,
+    工具: 0,
+    项目: 0,
+  };
+
+  for (const document of documents) {
+    byType[document.type] += 1;
+  }
+
+  return {
+    total: documents.length,
+    articleCount: byType.文章,
+    publicToolCount: toolCount,
+    toolDocumentCount: byType.工具,
+    byType,
+  };
 }
