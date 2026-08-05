@@ -14,6 +14,7 @@ interface BlogArchiveProps {
 export function BlogArchive({ currentPage }: BlogArchiveProps) {
   const allPosts = getAllPosts();
   const pagination = paginateBlogPosts(allPosts, currentPage);
+  const topicArticleCount = Math.max(0, allPosts.length - beginnerSeriesSlugs.length);
 
   return (
     <main className="page-shell">
@@ -22,7 +23,7 @@ export function BlogArchive({ currentPage }: BlogArchiveProps) {
           <p className="eyebrow">WRITING</p>
           <h1>文章</h1>
           <p>
-            汇总全部公开内容。当前以 Screeps 新手学习路线为主，后续会继续加入基础工程、系统架构与网站建设记录。
+            汇总全部公开内容，包括 {beginnerSeriesSlugs.length} 篇连续的新手路线与 {topicArticleCount} 篇基础工程、运行诊断和进阶专题文章。
           </p>
         </header>
 
