@@ -66,7 +66,7 @@ const damage = towers.length * 600;
 
 - [Tower 治疗己方 Creep](/blog/screeps-tower-heal-creeps)；
 - [Tower 按阈值维修建筑](/blog/screeps-tower-repair-threshold)；
-- [Tower 伤害、治疗与维修计算器](/tools/tower-damage-heal-repair-calculator)；
+- [Tower 伤害、治疗与维修计算器](/tools)；
 - [Room.getEventLog() 事件诊断](/blog/screeps-room-event-log)。
 
 创建第二个“Tower 伤害不足”URL，会让两个页面同时覆盖 Tower 攻击、距离、返回值和事件验证。更合理的处理是保留原 Slug：
@@ -668,7 +668,7 @@ Tower 攻击没有 `ERR_NOT_IN_RANGE`。不要把 Creep 近战动作的返回码
 
 ## 怎样使用站内 Tower 计算器
 
-[Tower 伤害、治疗与维修计算器](/tools/tower-damage-heal-repair-calculator) 适合在改代码前快速测试：
+[Tower 伤害、治疗与维修计算器](/tools) 适合在改代码前快速测试：
 
 - 单塔不同 Range 的原始能力；
 - 多塔齐射总量；
@@ -743,7 +743,7 @@ Tower 伤害诊断应分成三层：
 
 ## 相关站内内容
 
-- [Tower 伤害、治疗与维修计算器](/tools/tower-damage-heal-repair-calculator)
+- [Tower 伤害、治疗与维修计算器](/tools)
 - [Tower 如何治疗己方 Creep](/blog/screeps-tower-heal-creeps)
 - [Tower 如何按阈值维修建筑](/blog/screeps-tower-repair-threshold)
 - [Room.getEventLog() 如何读取上一 tick 事件](/blog/screeps-room-event-log)
