@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { CollectionPagination } from "@/components/collection-pagination";
 import { Container } from "@/components/container";
+import { changelogEntries } from "@/lib/changelog";
 import { formatDate } from "@/lib/date";
 import { nowEntries } from "@/lib/now-entries";
 import { paginateItems } from "@/lib/pagination";
@@ -14,7 +15,8 @@ interface NowArchiveProps {
 export function NowArchive({ currentPage }: NowArchiveProps) {
   const pagination = paginateItems(nowEntries, currentPage);
   const status = getSiteStatus();
-  const recentActivity = getRecentSiteActivity(3);
+  const recentActivityLimit = Math.max(3, changelogEntries.slice(0, 3).length);
+  const recentActivity = getRecentSiteActivity(recentActivityLimit);
 
   return (
     <main className="page-shell now-page">
