@@ -100,6 +100,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-first-room": ["rooms", "console", "javascript"],
 
   "/en/blog/screeps-upgrade-controller": ["controllers", "creeps", "energy"],
+  "/en/blog/screeps-upgrader-controller-link-not-upgrading": ["controllers", "energy", "debugging"],
   "/en/blog/screeps-controller-activate-safe-mode": ["controllers", "defense"],
   "/en/blog/screeps-controller-downgrade": ["controllers", "debugging"],
   "/en/blog/screeps-reserve-vs-claim-controller": ["controllers", "rooms"],
