@@ -133,4 +133,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps Controller Link Energy",
     ],
   },
+  {
+    href: "/en/blog/screeps-creep-prespawn-replacement",
+    chinesePath: "/blog/screeps-creep-prespawn-replacement",
+    category: "SPAWN LIFECYCLE · PRESPAWN REPLACEMENT",
+    title: "Screeps Prespawn Replacement: Start the Next Creep Before the Current One Dies",
+    description:
+      "Calculate a replacement deadline from ticksToLive, current Spawn work, body spawn time, travel and safety margin, prevent duplicate role replacements, preserve spawnCreep results, and observe the accepted name later.",
+    publishedAt: "2026-08-03",
+    publishedLabel: "August 3, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps prespawn replacement",
+    searchIntent: "Prevent role downtime by starting one covered Creep replacement before the current unit dies",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps prespawn replacement",
+      "Screeps ticksToLive replacement",
+      "Screeps Spawn queue",
+      "Creep replacement timing",
+      "prevent Screeps role downtime",
+    ],
+  },
 ];
