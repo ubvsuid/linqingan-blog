@@ -4,26 +4,31 @@ on:
   pull_request:
     branches: [clean-blog-v1]
     paths:
+      - "content/**"
       - "src/**"
       - "public/**"
+      - "scripts/check-performance-budget.mjs"
       - "next.config.ts"
       - "package.json"
       - "package-lock.json"
       - "lighthouserc.json"
+      - "lighthouserc.production.json"
       - ".github/workflows/lighthouse.yml"
+  schedule:
+    - cron: "30 17 * * 0"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: lighthouse-${{ github.ref }}
+  group: lighthouse-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  audit:
+  build-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
 
     steps:
       - name: Check out repository
@@ -41,5 +46,44 @@ jobs:
       - name: Build production site
         run: npm run build
 
-      - name: Audit Chinese and English routes
-        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json
+      - name: Audit local production build
+        run: npm run lighthouse
+
+      - name: Upload local Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-local-${{ github.run_id }}
+          path: lhci-results
+          if-no-files-found: warn
+          retention-days: 30
+
+  production-audit:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit deployed production routes
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.production.json
+
+      - name: Upload production Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-production-${{ github.run_id }}
+          path: lhci-production-results
+          if-no-files-found: warn
+          retention-days: 30
