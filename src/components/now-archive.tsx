@@ -6,6 +6,7 @@ import { changelogEntries } from "@/lib/changelog";
 import { formatDate } from "@/lib/date";
 import { nowEntries } from "@/lib/now-entries";
 import { paginateItems } from "@/lib/pagination";
+import { getRecentSiteActivity, getSiteStatus } from "@/lib/site-status";
 
 interface NowArchiveProps {
   currentPage: number;
@@ -13,8 +14,9 @@ interface NowArchiveProps {
 
 export function NowArchive({ currentPage }: NowArchiveProps) {
   const pagination = paginateItems(nowEntries, currentPage);
-  const recentChanges = changelogEntries.slice(0, 3);
-  const latestChangeDate = changelogEntries[0]?.date;
+  const status = getSiteStatus();
+  const recentActivityLimit = Math.max(3, changelogEntries.slice(0, 3).length);
+  const recentActivity = getRecentSiteActivity(recentActivityLimit);
 
   return (
     <main className="page-shell now-page">
@@ -26,32 +28,46 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         </header>
 
         {currentPage === 1 ? (
-          <section className="now-changelog" aria-labelledby="now-changelog-title">
-            <div className="now-changelog-heading">
+          <>
+            <section className="now-status" aria-label="网站当前公开状态">
+              <div><strong>{status.articleCount}</strong><span>篇公开文章</span></div>
+              <div><strong>{status.knowledgeSectionCount}</strong><span>个知识模块</span></div>
+              <div><strong>{status.toolCount}</strong><span>个在线工具</span></div>
               <div>
-                <p className="eyebrow">CHANGELOG</p>
-                <h2 id="now-changelog-title">更新日志</h2>
+                <strong>{status.latestContentDate ? formatDate(status.latestContentDate) : "—"}</strong>
+                <span>最近内容变更</span>
               </div>
-              {latestChangeDate ? (
-                <span>最近更新于 {formatDate(latestChangeDate)}</span>
-              ) : null}
-            </div>
-            <p className="now-changelog-description">
-              记录网站、文章、工具、SEO 和验证流程中的具体变化。这里会比近况页更新得更频繁。
-            </p>
-            <div className="now-changelog-preview">
-              {recentChanges.map((entry) => (
-                <article key={entry.id}>
-                  <span>{entry.type}</span>
-                  <time dateTime={entry.date}>{formatDate(entry.date)}</time>
-                  <h3>{entry.title}</h3>
-                </article>
-              ))}
-            </div>
-            <Link className="now-changelog-link" href="/changelog">
-              查看完整更新日志 →
-            </Link>
-          </section>
+            </section>
+
+            <section className="now-changelog" aria-labelledby="now-changelog-title">
+              <div className="now-changelog-heading">
+                <div>
+                  <p className="eyebrow">LIVE ACTIVITY</p>
+                  <h2 id="now-changelog-title">最近变化</h2>
+                </div>
+                {status.latestActivityDate ? (
+                  <span>最近更新于 {formatDate(status.latestActivityDate)}</span>
+                ) : null}
+              </div>
+              <p className="now-changelog-description">
+                这里会自动合并文章发布、文章修订与手工记录的网站更新，避免近况日期落后于实际内容。
+              </p>
+              <div className="now-changelog-preview">
+                {recentActivity.map((entry) => (
+                  <article key={entry.id}>
+                    <span>{entry.type}</span>
+                    <time dateTime={entry.date}>{formatDate(entry.date)}</time>
+                    <h3>
+                      {entry.href ? <Link href={entry.href}>{entry.title}</Link> : entry.title}
+                    </h3>
+                  </article>
+                ))}
+              </div>
+              <Link className="now-changelog-link" href="/changelog">
+                查看完整更新日志 →
+              </Link>
+            </section>
+          </>
         ) : null}
 
         <section className="now-history" aria-labelledby="now-history-title">
@@ -96,7 +112,12 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
 
       <style>{`
         .now-header { max-width: 820px; }
-        .now-changelog { margin-top: 68px; border: 1px solid var(--border); border-radius: 24px; padding: 30px; background: var(--surface); }
+        .now-status { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 48px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); overflow: hidden; }
+        .now-status > div { display: grid; gap: 7px; padding: 22px; }
+        .now-status > div + div { border-left: 1px solid var(--border); }
+        .now-status strong { font-size: clamp(22px, 3vw, 31px); letter-spacing: -.035em; }
+        .now-status span { color: var(--muted); font-size: 12px; }
+        .now-changelog { margin-top: 28px; border: 1px solid var(--border); border-radius: 24px; padding: 30px; background: var(--surface); }
         .now-changelog-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
         .now-changelog-heading h2, .now-history-heading h2 { margin: 8px 0 0; font-size: clamp(31px, 5vw, 44px); letter-spacing: -.04em; }
         .now-changelog-heading > span { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
@@ -106,6 +127,7 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         .now-changelog-preview article > span { color: var(--muted); font-size: 12px; }
         .now-changelog-preview time { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; }
         .now-changelog-preview h3 { margin: 0; font-size: 17px; }
+        .now-changelog-preview h3 a { color: inherit; }
         .now-changelog-link { display: inline-flex; margin-top: 24px; font-weight: 750; }
         .now-history { margin-top: 78px; }
         .now-history-heading { padding-bottom: 28px; }
@@ -114,6 +136,12 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         .now-entry:last-child { border-bottom: 1px solid var(--border); }
         .now-entry > time { color: var(--muted); font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 12px; }
         .now-entry h3 { margin-top: 14px; font-size: clamp(24px, 4vw, 32px); }
+        @media (max-width: 760px) {
+          .now-status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .now-status > div + div { border-left: 0; }
+          .now-status > div:nth-child(even) { border-left: 1px solid var(--border); }
+          .now-status > div:nth-child(n + 3) { border-top: 1px solid var(--border); }
+        }
         @media (max-width: 620px) {
           .now-changelog { padding: 24px 20px; }
           .now-changelog-heading { align-items: flex-start; flex-direction: column; gap: 12px; }

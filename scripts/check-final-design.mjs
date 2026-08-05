@@ -63,7 +63,7 @@ const checks = [
   },
   {
     path: "src/app/(zh)/api/search-index/route.ts",
-    required: ["getSearchDocuments", "s-maxage=86400"],
+    required: ["getSearchDocuments", "getSearchIndexSummary", "s-maxage=3600", "X-Search-Index-Articles"],
     forbidden: [],
   },
   {
@@ -73,16 +73,16 @@ const checks = [
   },
   {
     path: "src/app/(zh)/tools/page.tsx",
-    required: [
-      "CollectionPage",
-      "ItemList",
-      "/tools/market-terminal-cost-calculator",
-      "/tools/controller-downgrade-planner",
-      "/tools/lab-reaction-boost-planner",
-      "/tools/spawn-queue-replacement-planner",
-      "/tools/hauling-throughput-planner",
-      "/tools/tower-damage-heal-repair-calculator",
+    required: ["CollectionPage", "ItemList", "toolCatalog", "getToolHref"],
+    forbidden: [
+      'const tools = [',
+      'href: "/tools/market-terminal-cost-calculator"',
+      'href: "/tools/controller-downgrade-planner"',
     ],
+  },
+  {
+    path: "src/lib/tool-catalog.ts",
+    required: ["toolCatalog", "toolCount", "getToolHref", "creep-body-calculator", "tower-damage-heal-repair-calculator"],
     forbidden: [],
   },
   {
