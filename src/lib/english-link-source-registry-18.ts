@@ -111,4 +111,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps market order maintenance",
     ],
   },
+  {
+    href: "/en/blog/screeps-upgrader-controller-link-not-upgrading",
+    chinesePath: "/blog/screeps-upgrader-controller-link-not-upgrading",
+    category: "CONTROLLER · FIXED UPGRADER DIAGNOSTICS",
+    title: "Why a Fixed Screeps Upgrader Is Not Upgrading",
+    description:
+      "Validate one fixed anchor against Controller range 3 and Link range 1, recover the exact owned Controller Link, diagnose Energy and active body parts, preserve move, withdraw, and upgrade return codes, and verify later position, Store, or event evidence.",
+    publishedAt: "2026-08-05",
+    publishedLabel: "August 5, 2026",
+    readingTime: "20 min read",
+    primaryKeyword: "Screeps Upgrader not upgrading",
+    searchIntent: "Diagnose a fixed Upgrader that reached the Controller area but is not consuming Controller Link Energy or upgrading",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Upgrader not upgrading",
+      "Screeps Controller Link",
+      "Screeps fixed Upgrader",
+      "upgradeController return codes",
+      "Screeps Controller Link Energy",
+    ],
+  },
 ];
