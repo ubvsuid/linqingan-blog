@@ -29,4 +29,5 @@ Thumbs.db
 # local quality reports
 /.lighthouseci/
 /lhci-results/
+/lhci-pr-results/
 /lhci-production-results/
