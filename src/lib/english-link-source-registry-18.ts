@@ -155,4 +155,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "prevent Screeps role downtime",
     ],
   },
+  {
+    href: "/en/blog/screeps-cpu-bucket-degradation",
+    chinesePath: "/blog/screeps-cpu-bucket-degradation",
+    category: "OPERATIONS · CPU DEGRADATION",
+    title: "Screeps CPU Bucket Degradation: Protect Critical Tasks and Recover Gradually",
+    description:
+      "Use a hysteresis-based four-mode scheduler when Game.cpu.bucket keeps falling, protect Spawn, harvesting, Controller safety and defense, throttle lower-tier work, stagger recovery, and preserve explicit evidence boundaries.",
+    publishedAt: "2026-08-05",
+    publishedLabel: "August 5, 2026",
+    readingTime: "16 min read",
+    primaryKeyword: "Screeps CPU bucket falling",
+    searchIntent: "Protect critical Screeps tasks and degrade optional work safely when CPU bucket trends downward",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps CPU bucket falling",
+      "Screeps CPU degradation",
+      "Screeps CPU scheduler",
+      "Game.cpu.bucket recovery",
+      "Screeps optional task throttling",
+    ],
+  },
 ];
