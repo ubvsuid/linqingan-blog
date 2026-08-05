@@ -144,7 +144,7 @@ creep.getActiveBodyparts(WORK);
 controllerLink.store.getUsedCapacity(RESOURCE_ENERGY);
 ```
 
-为 0 时，应向上排查 Source Link、cooldown、Link 协调器、Storage 运输者和吞吐量。可以打开[工具中心](/tools)，使用其中的运输吞吐量规划器估算运输者容量与往返路程。
+为 0 时，应向上排查 Source Link、cooldown、Link 协调器、Storage 运输者和吞吐量。站内工具中心提供运输吞吐量规划器，可用于估算运输者容量与往返路程。
 
 ### 5. Controller 是否被阻止升级
 
@@ -549,7 +549,7 @@ module.exports.loop = function () {
 - [Game.getObjectById()](/blog/screeps-game-get-object-by-id)
 - [Link 传能](/blog/screeps-link-transfer-energy)
 - [Storage Energy 分配](/blog/screeps-storage-energy-usage)
-- [工具中心：运输吞吐量与 Controller 规划器](/tools)
+- 站内工具中心的运输吞吐量规划器与 Controller 降级规划器
 - [Controller 降级应急](/blog/screeps-controller-downgrade)
 - [Room Event Log](/blog/screeps-room-event-log)
 
