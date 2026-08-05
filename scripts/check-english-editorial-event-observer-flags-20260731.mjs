@@ -16,6 +16,14 @@ const observabilityRegistry = readFileSync(
   join(root, "src/lib/english-observability-registry-9.ts"),
   "utf8",
 );
+const eventWindowFinal = readFileSync(
+  join(root, "src/lib/english-editorial-event-window-final-20260805.ts"),
+  "utf8",
+);
+const observabilityFinalIndex = readFileSync(
+  join(root, "src/lib/english-editorial-observability-evidence-20260805.ts"),
+  "utf8",
+);
 const visionRegistry = readFileSync(
   join(root, "src/lib/english-vision-registry-7.ts"),
   "utf8",
@@ -52,6 +60,8 @@ const expected = {
     publishedAt: "2026-07-25",
     title: "Screeps Room.getEventLog(): Process Each Previous Tick Once",
     headline: "Read a Room Event Log Once Without Duplicating Incidents",
+    discoveryTitle: "Screeps Room.getEventLog(): Bind Exact Previous-Tick Windows",
+    updatedAt: "2026-08-05",
     registry: observabilityRegistry,
     signals: [
       "already-processed",
@@ -67,6 +77,8 @@ const expected = {
     title: "Screeps Observer: Coordinate One Final observeRoom() Call",
     headline:
       "Stop Multiple Observer Calls From Overwriting the Request You Track",
+    discoveryTitle: "Screeps Observer: Coordinate One Final observeRoom() Call",
+    updatedAt: "2026-07-31",
     registry: visionRegistry,
     signals: [
       "createObservationPlan",
@@ -82,6 +94,9 @@ const expected = {
     title:
       "Screeps Flags: Bind Configuration to Room and Target Identity",
     headline: "Fail Closed When a Flag and Its Saved Target Disagree",
+    discoveryTitle:
+      "Screeps Flags: Bind Configuration to Room and Target Identity",
+    updatedAt: "2026-07-31",
     registry: configRegistry,
     signals: [
       "target-room-mismatch",
@@ -123,7 +138,7 @@ if (
   Object.keys(articles).sort().join("|")
   !== Object.keys(expected).sort().join("|")
 ) {
-  failures.push("Payload must contain exactly the three selected existing slugs");
+  failures.push("Historical payload must contain exactly the three selected existing slugs");
 }
 
 const decodeHtml = (value) => value
@@ -140,7 +155,7 @@ const tempFiles = [];
 for (const [slug, identity] of Object.entries(expected)) {
   const article = articles[slug];
   if (!article) {
-    failures.push(`${slug}: article missing`);
+    failures.push(`${slug}: historical article missing`);
     continue;
   }
 
@@ -152,15 +167,15 @@ for (const [slug, identity] of Object.entries(expected)) {
     ["headline", identity.headline],
   ]) {
     if (article[field] !== expectedValue) {
-      failures.push(`${slug}: ${field} mismatch`);
+      failures.push(`${slug}: historical ${field} mismatch`);
     }
   }
 
   if (article.finalScore !== 98) {
-    failures.push(`${slug}: final score must be 98`);
+    failures.push(`${slug}: historical final score must be 98`);
   }
   if (!Array.isArray(article.faq) || article.faq.length !== 0) {
-    failures.push(`${slug}: FAQ data must be empty`);
+    failures.push(`${slug}: historical FAQ data must be empty`);
   }
   if (
     !article.verification.some(
@@ -182,13 +197,13 @@ for (const [slug, identity] of Object.entries(expected)) {
   tocCount += article.toc.length;
   for (const [id] of article.toc) {
     if (!article.articleHtml.includes(`id="${id}"`)) {
-      failures.push(`${slug}: missing TOC target ${id}`);
+      failures.push(`${slug}: missing historical TOC target ${id}`);
     }
   }
 
   for (const signal of identity.signals) {
     if (!article.articleHtml.includes(signal)) {
-      failures.push(`${slug}: missing technical signal ${signal}`);
+      failures.push(`${slug}: missing historical technical signal ${signal}`);
     }
   }
 
@@ -204,12 +219,12 @@ for (const [slug, identity] of Object.entries(expected)) {
       ? identity.registry.slice(recordStart, recordStart + 1900)
       : "";
   for (const signal of [
-    identity.title,
-    'updatedAt: "2026-07-31"',
+    identity.discoveryTitle,
+    `updatedAt: "${identity.updatedAt}"`,
     "finalScore: 98",
   ]) {
     if (!record.includes(signal)) {
-      failures.push(`${slug}: registry metadata missing ${signal}`);
+      failures.push(`${slug}: current registry metadata missing ${signal}`);
     }
   }
 
@@ -233,7 +248,7 @@ for (const [slug, identity] of Object.entries(expected)) {
       });
     } catch {
       failures.push(
-        `${slug}: JavaScript block ${index + 1} failed node --check`,
+        `${slug}: historical JavaScript block ${index + 1} failed node --check`,
       );
     }
   }
@@ -260,11 +275,11 @@ for (const file of tempFiles) {
 }
 
 if (tocCount !== 34) {
-  failures.push(`Expected 34 TOC anchors, received ${tocCount}`);
+  failures.push(`Expected 34 historical TOC anchors, received ${tocCount}`);
 }
 if (javascriptCount !== 21) {
   failures.push(
-    `Expected 21 JavaScript blocks, received ${javascriptCount}`,
+    `Expected 21 historical JavaScript blocks, received ${javascriptCount}`,
   );
 }
 if (
@@ -272,14 +287,43 @@ if (
     "englishEditorialEventObserverFlagsOverrides20260731",
   )
 ) {
-  failures.push("Publication aggregate is missing the new override batch");
+  failures.push("Publication aggregate is missing the historical override batch");
+}
+for (const signal of [
+  "englishEditorialObservabilityEvidenceOverrides20260805",
+  "...englishEditorialObservabilityEvidenceOverrides20260805",
+]) {
+  if (!publication.includes(signal)) {
+    failures.push(`Current observability publication wiring is missing ${signal}`);
+  }
+}
+for (const signal of [
+  "englishEditorialEventWindowFinalArticle20260805",
+  "snapshot?.roomName === roomName",
+  "missingFrom",
+  "missingTo",
+  "missingCount",
+  "sampleTicks",
+  "sampleTruncated",
+]) {
+  if (!eventWindowFinal.includes(signal)) {
+    failures.push(`Current event-window final wrapper is missing ${signal}`);
+  }
+}
+for (const signal of [
+  "englishEditorialEventWindowFinalArticle20260805",
+  "englishEditorialObservabilityEvidenceOverrides20260805",
+]) {
+  if (!observabilityFinalIndex.includes(signal)) {
+    failures.push(`Current observability index is missing ${signal}`);
+  }
 }
 if (
   !packageJson.includes(
     "englisheditorialeventobserverflags20260731check",
   )
 ) {
-  failures.push("package.json is missing the dedicated editorial gate");
+  failures.push("package.json is missing the dedicated historical editorial gate");
 }
 
 for (const phrase of [
@@ -302,7 +346,7 @@ for (const marker of [
   "same-tick Observer overwrite",
 ]) {
   if (!auditDoc.includes(marker)) {
-    failures.push(`Audit document is missing ${marker}`);
+    failures.push(`Historical audit document is missing ${marker}`);
   }
 }
 
@@ -319,8 +363,8 @@ if (failures.length > 0) {
 
 console.log(
   "Event, Observer, and Flag editorial gate passed: "
-    + "3 existing routes, 34 anchors, 21 JavaScript blocks, "
-    + "synchronized metadata, idempotent event windows, "
+    + "3 historical routes, 34 anchors, 21 JavaScript blocks, "
+    + "current discovery metadata, reviewed event-window supersession, "
     + "single-call Observer coordination, room-bound Flag identity, "
     + "98-point scorecards, no FAQ, and explicit Pending evidence.",
 );
