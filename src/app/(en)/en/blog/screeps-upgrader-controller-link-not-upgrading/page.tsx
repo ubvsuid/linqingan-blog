@@ -203,6 +203,10 @@ function snapshot(creep, controller, link, anchor) {
   };
 }
 
+function allFinite(values) {
+  return values.every(value =&gt; Number.isFinite(value));
+}
+
 function verifyPrevious(room, state, creep, controller, link, anchor) {
   const pending = state.pending;
   if (!pending || pending.tick &gt;= Game.time) return null;
@@ -219,29 +223,55 @@ function verifyPrevious(room, state, creep, controller, link, anchor) {
     status = 'anchor-arrival-observed';
   }
   if (pending.action === 'withdraw') {
-    const gain = after.creepEnergy - pending.before.creepEnergy;
-    const loss = pending.before.linkEnergy - after.linkEnergy;
-    status = gain &gt; 0 &amp;&amp; loss &gt; 0
-      ? 'withdraw-deltas-observed'
-      : gain &gt; 0 || loss &gt; 0
-        ? 'withdraw-partial-observation'
-        : 'withdraw-not-observed';
+    const canMeasureWithdraw = allFinite([
+      after.creepEnergy,
+      pending.before.creepEnergy,
+      pending.before.linkEnergy,
+      after.linkEnergy
+    ]);
+
+    if (!canMeasureWithdraw) {
+      status = 'withdraw-evidence-unavailable';
+    } else {
+      const gain = after.creepEnergy - pending.before.creepEnergy;
+      const loss = pending.before.linkEnergy - after.linkEnergy;
+      status = gain &gt; 0 &amp;&amp; loss &gt; 0
+        ? 'withdraw-deltas-observed'
+        : gain &gt; 0 || loss &gt; 0
+          ? 'withdraw-partial-observation'
+          : 'withdraw-not-observed';
+    }
   }
   if (pending.action === 'upgrade') {
-    const spent = pending.before.creepEnergy - after.creepEnergy;
-    const progress = Number.isFinite(after.controllerProgress)
-      &amp;&amp; Number.isFinite(pending.before.controllerProgress)
-      &amp;&amp; after.controllerProgress &gt; pending.before.controllerProgress;
-    const downgrade = Number.isFinite(after.ticksToDowngrade)
-      &amp;&amp; Number.isFinite(pending.before.ticksToDowngrade)
-      &amp;&amp; after.ticksToDowngrade &gt; pending.before.ticksToDowngrade;
-    status = exactUpgradeEvent
-      ? 'upgrade-event-observed'
-      : spent &gt; 0 &amp;&amp; (progress || downgrade)
+    const canMeasureSpent = allFinite([
+      after.creepEnergy,
+      pending.before.creepEnergy
+    ]);
+    const canMeasureProgress = allFinite([
+      after.controllerProgress,
+      pending.before.controllerProgress
+    ]);
+    const canMeasureDowngrade = allFinite([
+      after.ticksToDowngrade,
+      pending.before.ticksToDowngrade
+    ]);
+
+    if (exactUpgradeEvent) {
+      status = 'upgrade-event-observed';
+    } else if (!canMeasureSpent || (!canMeasureProgress &amp;&amp; !canMeasureDowngrade)) {
+      status = 'upgrade-evidence-unavailable';
+    } else {
+      const spent = pending.before.creepEnergy - after.creepEnergy;
+      const progress = canMeasureProgress
+        &amp;&amp; after.controllerProgress &gt; pending.before.controllerProgress;
+      const downgrade = canMeasureDowngrade
+        &amp;&amp; after.ticksToDowngrade &gt; pending.before.ticksToDowngrade;
+      status = spent &gt; 0 &amp;&amp; (progress || downgrade)
         ? 'upgrade-deltas-observed'
         : spent &gt; 0 || progress || downgrade
           ? 'upgrade-partial-observation'
           : 'upgrade-not-observed';
+    }
   }
 
   const record = {
@@ -369,10 +399,10 @@ module.exports.loop = function () {
   <li>Withdraw: Creep Energy increased and Controller Link Energy decreased.</li>
   <li>Upgrade: prefer an exact <code>EVENT_UPGRADE_CONTROLLER</code> whose <code>objectId</code> is the pending Creep ID.</li>
 </ul>
-<p>If the event is unavailable, Energy, Controller progress, and downgrade-timer changes are only bounded supporting observations. Concurrent Upgraders can confound pure deltas.</p>
+<p>If a Creep, Link, or Controller snapshot is missing, the code records <code>withdraw-evidence-unavailable</code> or <code>upgrade-evidence-unavailable</code>; it never lets <code>null</code> participate in arithmetic. When exact events are unavailable, Energy, Controller progress, and downgrade-timer changes are only bounded supporting observations. Concurrent Upgraders can confound pure deltas.</p>
 
 <h2 id="boundaries">Evidence boundaries</h2>
-<p>Twenty-one offline cases passed, including missing objects, ownership, spawning, walkability, both action ranges, Energy capacity, active WORK and MOVE, empty Link, blocked Controller, move, withdraw, upgrade, and later-observation classifications. The complete example passed a JavaScript syntax check.</p>
+<p>Twenty-four offline cases passed, including missing objects, ownership, spawning, walkability, both action ranges, Energy capacity, active WORK and MOVE, empty Link, blocked Controller, move, withdraw, upgrade, missing Creep, Link and Controller snapshots, and later-observation classifications. The complete example passed a JavaScript syntax check.</p>
 <p>These checks do not prove live shard traffic, anchor contention, competing Link senders, every Boost and Power Creep combination, RCL8 throughput, or that production IDs and coordinates are correct. Console and official-shard evidence remain pending.</p>
 <p>Continue with <a href="/en/blog/screeps-controller-downgrade">Controller downgrade recovery</a>, <a href="/en/blog/screeps-storage-energy-usage">Storage Energy policy</a>, or <a href="/en/blog/screeps-room-event-log">Room event logs</a>.</p>
 `;
@@ -420,7 +450,7 @@ export default function FixedUpgraderDiagnosticsPage() {
       verification={[
         { term: "Documentation", value: "Official API and game-loop references checked" },
         { term: "Syntax", value: "Complete JavaScript example checked offline" },
-        { term: "Offline cases", value: "21 passed" },
+        { term: "Offline cases", value: "24 passed" },
         { term: "Live shard", value: "Pending" },
       ]}
       toc={toc}
