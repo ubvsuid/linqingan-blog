@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { siteConfig } from "@/lib/site";
+import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 
 import styles from "../english.module.css";
 import "../../english-tools.css";
@@ -16,55 +17,9 @@ export const metadata = createEnglishPageMetadata({
   chinesePath: "/tools",
 });
 
-const allTools = [
-  { title: "Creep Body Calculator", href: "/en/tools/creep-body-calculator" },
-  { title: "Room Snapshot Diagnostic", href: "/en/tools/room-diagnostics" },
-  { title: "Market and Terminal Cost Calculator", href: "/en/tools/market-terminal-cost-calculator" },
-  { title: "Controller Downgrade and Upgrader Planner", href: "/en/tools/controller-downgrade-planner" },
-  { title: "Lab Reaction and Boost Planner", href: "/en/tools/lab-reaction-boost-planner" },
-  { title: "Spawn Queue and Replacement Planner", href: "/en/tools/spawn-queue-replacement-planner" },
-  { title: "Hauling Throughput Planner", href: "/en/tools/hauling-throughput-planner" },
-  { title: "Tower Damage, Heal, and Repair Calculator", href: "/en/tools/tower-damage-heal-repair-calculator" },
-] as const;
-
-const planningTools = [
-  {
-    eyebrow: "MARKET & TERMINAL",
-    title: "Market and Terminal Cost Calculator",
-    description: "Calculate transaction Energy, effective Market deal value, maximum Energy payload, and the 5% order creation fee.",
-    href: "/en/tools/market-terminal-cost-calculator",
-  },
-  {
-    eyebrow: "CONTROLLER",
-    title: "Controller Downgrade and Upgrader Planner",
-    description: "Estimate downgrade margin, Upgrader throughput, Boosted progress, RCL8 caps, and time to a target.",
-    href: "/en/tools/controller-downgrade-planner",
-  },
-  {
-    eyebrow: "LAB & BOOST",
-    title: "Lab Reaction and Boost Planner",
-    description: "Expand compound reaction chains and calculate base minerals, Lab runs, production ticks, and Boost batches.",
-    href: "/en/tools/lab-reaction-boost-planner",
-  },
-  {
-    eyebrow: "SPAWN CAPACITY",
-    title: "Spawn Queue and Replacement Planner",
-    description: "Model several role profiles, prespawn TTL thresholds, average Spawn utilization, and OPERATE_SPAWN capacity.",
-    href: "/en/tools/spawn-queue-replacement-planner",
-  },
-  {
-    eyebrow: "LOGISTICS",
-    title: "Hauling Throughput Planner",
-    description: "Calculate CARRY payload, MOVE fatigue, route cycle time, Creep count, and lifetime delivery.",
-    href: "/en/tools/hauling-throughput-planner",
-  },
-  {
-    eyebrow: "TOWER POWER",
-    title: "Tower Damage, Heal, and Repair Calculator",
-    description: "Calculate range falloff, combined Tower output, Energy use, opposing power, and target completion time.",
-    href: "/en/tools/tower-damage-heal-repair-calculator",
-  },
-] as const;
+const bodyTool = toolCatalog[0];
+const roomTool = toolCatalog[1];
+const planningTools = toolCatalog.slice(2);
 
 export default function EnglishToolsPage() {
   const pageUrl = `${siteConfig.url}/en/tools`;
@@ -82,12 +37,12 @@ export default function EnglishToolsPage() {
       {
         "@type": "ItemList",
         "@id": `${pageUrl}#tools`,
-        numberOfItems: allTools.length,
-        itemListElement: allTools.map((tool, index) => ({
+        numberOfItems: toolCatalog.length,
+        itemListElement: toolCatalog.map((tool, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          name: tool.title,
-          url: `${siteConfig.url}${tool.href}`,
+          name: tool.enTitle,
+          url: `${siteConfig.url}${getToolHref(tool.slug, "en")}`,
         })),
       },
       {
@@ -119,7 +74,7 @@ export default function EnglishToolsPage() {
               <dl aria-label="Example calculator output"><div><dt>Energy</dt><dd>250</dd></div><div><dt>Spawn time</dt><dd>12 ticks</dd></div><div><dt>Carry</dt><dd>50</dd></div></dl>
               <small>Example values · No account connected</small>
             </div>
-            <div className="english-tools-copy"><p className="eyebrow">BODY CALCULATOR</p><h2>Creep Body Calculator</h2><p>Combine body parts and calculate Energy cost, spawn time, total hits, carry capacity, and loaded movement speed.</p><ul><li>No account connection</li><li>Immediate recalculation</li><li>Movement and capacity checks</li></ul><Link href="/en/tools/creep-body-calculator">Open calculator →</Link></div>
+            <div className="english-tools-copy"><p className="eyebrow">{bodyTool.eyebrow}</p><h2>{bodyTool.enTitle}</h2><p>{bodyTool.enDescription}</p><ul><li>No account connection</li><li>Immediate recalculation</li><li>Movement and capacity checks</li></ul><Link href={getToolHref(bodyTool.slug, "en")}>Open calculator →</Link></div>
           </article>
 
           <article>
@@ -130,7 +85,7 @@ export default function EnglishToolsPage() {
               <ol><li><span>01</span>Spawn capacity stable</li><li><span>02</span>Controller downgrade safe</li><li><span>03</span>CPU bucket needs review</li></ol>
               <small>Example room · Static preview only</small>
             </div>
-            <div className="english-tools-copy"><p className="eyebrow">ROOM DIAGNOSTICS</p><h2>Room Snapshot Diagnostic</h2><p>Enter Spawn, workforce, Energy, Controller, construction, CPU, and bucket values to receive prioritized checks.</p><ul><li>Read-only snapshot</li><li>Prioritized warnings</li><li>Clear operational boundaries</li></ul><Link href="/en/tools/room-diagnostics">Open diagnostics →</Link></div>
+            <div className="english-tools-copy"><p className="eyebrow">{roomTool.eyebrow}</p><h2>{roomTool.enTitle}</h2><p>{roomTool.enDescription}</p><ul><li>Read-only snapshot</li><li>Prioritized warnings</li><li>Clear operational boundaries</li></ul><Link href={getToolHref(roomTool.slug, "en")}>Open diagnostics →</Link></div>
           </article>
         </section>
 
@@ -139,10 +94,10 @@ export default function EnglishToolsPage() {
           <h2 id="planning-tools-title">Plan repeated decisions before changing automation</h2>
           <div className="tools-hub-grid">
             {planningTools.map((tool) => (
-              <Link className="tools-hub-card" href={tool.href} key={tool.href}>
+              <Link className="tools-hub-card" href={getToolHref(tool.slug, "en")} key={tool.slug}>
                 <span className="eyebrow">{tool.eyebrow}</span>
-                <h2>{tool.title}</h2>
-                <p>{tool.description}</p>
+                <h2>{tool.enTitle}</h2>
+                <p>{tool.enDescription}</p>
                 <strong>Open tool →</strong>
               </Link>
             ))}
