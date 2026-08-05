@@ -12,6 +12,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - "lighthouserc.json"
+      - "lighthouserc.pr.json"
       - "lighthouserc.production.json"
       - ".github/workflows/lighthouse.yml"
   schedule:
@@ -26,7 +27,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-audit:
+  pull-request-audit:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production site
+        run: npm run build
+
+      - name: Audit representative pull request routes
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.pr.json
+
+      - name: Upload pull request Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-pr-${{ github.run_id }}
+          path: lhci-pr-results
+          if-no-files-found: warn
+          retention-days: 30
+
+  full-build-audit:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 35
 
@@ -46,14 +81,14 @@ jobs:
       - name: Build production site
         run: npm run build
 
-      - name: Audit local production build
+      - name: Audit the full local production build
         run: npm run lighthouse
 
-      - name: Upload local Lighthouse reports
+      - name: Upload full-build Lighthouse reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lighthouse-local-${{ github.run_id }}
+          name: lighthouse-full-${{ github.run_id }}
           path: lhci-results
           if-no-files-found: warn
           retention-days: 30
