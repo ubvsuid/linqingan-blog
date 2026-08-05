@@ -78,6 +78,7 @@ const articleModuleOverrides: Record<string, number> = {
 
   "/en/blog/screeps-first-room-code": 8,
   "/en/blog/screeps-cpu-getused-bucket": 8,
+  "/en/blog/screeps-cpu-bucket-degradation": 8,
   "/en/blog/screeps-game-notify": 8,
   "/en/blog/screeps-room-event-log": 8,
   "/en/blog/screeps-roomvisual-debug": 8,
