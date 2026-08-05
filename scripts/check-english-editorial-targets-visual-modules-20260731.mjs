@@ -21,6 +21,14 @@ const observabilityRegistry = readFileSync(
   join(root, "src/lib/english-observability-registry-9.ts"),
   "utf8",
 );
+const roomVisualFinal = readFileSync(
+  join(root, "src/lib/english-editorial-roomvisual-evidence-final-20260805.ts"),
+  "utf8",
+);
+const observabilityFinalIndex = readFileSync(
+  join(root, "src/lib/english-editorial-observability-evidence-20260805.ts"),
+  "utf8",
+);
 const configRegistry = readFileSync(
   join(root, "src/lib/english-config-code-registry-16.ts"),
   "utf8",
@@ -48,6 +56,8 @@ const expected = {
     path: "/en/blog/screeps-get-object-by-id",
     chinesePath: "/blog/screeps-game-get-object-by-id",
     title: "Screeps Game.getObjectById(): Resolve Saved Targets Safely",
+    discoveryTitle: "Screeps Game.getObjectById(): Resolve Saved Targets Safely",
+    updatedAt: "2026-07-31",
     beforeScore: 92,
     registry: foundationRegistry,
   },
@@ -55,6 +65,8 @@ const expected = {
     path: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
     title: "Screeps RoomVisual Debugging: Draw Current State Within a Budget",
+    discoveryTitle: "Screeps RoomVisual: Coordinate One Room-Bound Debug Layer",
+    updatedAt: "2026-08-05",
     beforeScore: 92,
     registry: observabilityRegistry,
   },
@@ -62,6 +74,8 @@ const expected = {
     path: "/en/blog/screeps-require-modules",
     chinesePath: "/blog/screeps-modules-require",
     title: "Screeps Modules: One Main Loop, Small Contracts, Fresh Tick Data",
+    discoveryTitle: "Screeps Modules: One Main Loop, Small Contracts, Fresh Tick Data",
+    updatedAt: "2026-07-31",
     beforeScore: 93,
     registry: configRegistry,
   },
@@ -111,7 +125,7 @@ for (const [slug, identity] of Object.entries(expected)) {
     continue;
   }
   if (article.title !== identity.title) {
-    failures.push(`${slug}: title mismatch`);
+    failures.push(`${slug}: historical title mismatch`);
   }
   if (article.finalScore !== 98) {
     failures.push(`${slug}: final score must be 98`);
@@ -125,8 +139,8 @@ for (const [slug, identity] of Object.entries(expected)) {
   if (!identity.registry.includes(`chinesePath: "${identity.chinesePath}"`)) {
     failures.push(`${slug}: Chinese mapping changed or missing`);
   }
-  if (!identity.registry.includes(identity.title)) {
-    failures.push(`${slug}: discovery title is not synchronized`);
+  if (!identity.registry.includes(identity.discoveryTitle)) {
+    failures.push(`${slug}: current discovery title is not synchronized`);
   }
   if (!auditDoc.includes(`| ${identity.path} | ${identity.beforeScore} |`)) {
     failures.push(`${slug}: before score evidence is missing`);
@@ -150,11 +164,9 @@ for (const [slug, identity] of Object.entries(expected)) {
   }
 }
 
-for (const [registry, path] of [
-  [foundationRegistry, "/en/blog/screeps-get-object-by-id"],
-  [observabilityRegistry, "/en/blog/screeps-roomvisual-debug"],
-  [configRegistry, "/en/blog/screeps-require-modules"],
-]) {
+for (const identity of Object.values(expected)) {
+  const registry = identity.registry;
+  const path = identity.path;
   const start = registry.indexOf(`href: "${path}"`);
   const next = registry.indexOf("\n  {", start + 1);
   const record = registry.slice(start, next < 0 ? registry.length : next);
@@ -162,19 +174,42 @@ for (const [registry, path] of [
       && !record.includes('publishedAt: "2026-07-26"')) {
     failures.push(`${path}: publication date changed or missing`);
   }
-  if (!record.includes('updatedAt: "2026-07-31"')) {
-    failures.push(`${path}: scoped updatedAt is missing`);
+  if (!record.includes(`updatedAt: "${identity.updatedAt}"`)) {
+    failures.push(`${path}: current scoped updatedAt is missing`);
   }
 }
 
 if (!publication.includes("englishEditorialTargetsVisualModulesOverrides20260731")) {
-  failures.push("New editorial overrides are not imported");
+  failures.push("Historical editorial overrides are not imported");
 }
 if (!publication.includes("...englishEditorialTargetsVisualModulesOverrides20260731")) {
-  failures.push("New editorial overrides are not published");
+  failures.push("Historical editorial overrides are not published");
+}
+if (!publication.includes("englishEditorialObservabilityEvidenceOverrides20260805")) {
+  failures.push("Current observability overrides are not imported");
+}
+if (!publication.includes("...englishEditorialObservabilityEvidenceOverrides20260805")) {
+  failures.push("Current observability overrides are not published");
 }
 if (!packageJson.includes("englisheditorialtargetsvisualmodules20260731check")) {
   failures.push("Dedicated editorial gate is not wired into package scripts");
+}
+
+for (const required of [
+  "englishEditorialRoomVisualEvidenceFinalArticle20260805",
+  "JSON.parse(JSON.stringify(layer))",
+]) {
+  if (!roomVisualFinal.includes(required)) {
+    failures.push(`Current RoomVisual final wrapper is missing: ${required}`);
+  }
+}
+for (const required of [
+  "englishEditorialRoomVisualEvidenceFinalArticle20260805",
+  "englishEditorialObservabilityEvidenceOverrides20260805",
+]) {
+  if (!observabilityFinalIndex.includes(required)) {
+    failures.push(`Current observability index is missing: ${required}`);
+  }
 }
 
 const articles = Object.values(overrides);
@@ -207,7 +242,7 @@ for (const required of [
   "https://docs.screeps.com/",
 ]) {
   if (!JSON.stringify(overrides).includes(required)) {
-    failures.push(`Missing technical or evidence boundary: ${required}`);
+    failures.push(`Missing historical technical or evidence boundary: ${required}`);
   }
 }
 
@@ -251,13 +286,13 @@ for (const [slug, article] of Object.entries(overrides)) {
 }
 
 if (tocCount !== 35) {
-  failures.push(`Expected 35 TOC entries, received ${tocCount}`);
+  failures.push(`Expected 35 historical TOC entries, received ${tocCount}`);
 }
 if (codeCount !== 14) {
-  failures.push(`Expected 14 JavaScript blocks, received ${codeCount}`);
+  failures.push(`Expected 14 historical JavaScript blocks, received ${codeCount}`);
 }
 if (Object.keys(expected).length !== 3 || articles.length !== 3) {
-  failures.push("Editorial batch must contain exactly three existing pages");
+  failures.push("Historical editorial batch must contain exactly three existing pages");
 }
 
 if (failures.length) {
@@ -269,5 +304,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Target, visual, and modules editorial gate passed: 3 existing pages, ${codeCount} JavaScript blocks, ${tocCount} TOC anchors, stable URLs, scoped dates, distinct intent, Pending live evidence, and 98-point internal scores.`,
+  `Target, visual, and modules editorial gate passed: 3 historical pages, ${codeCount} JavaScript blocks, ${tocCount} TOC anchors, stable URLs, current discovery metadata, reviewed RoomVisual supersession, Pending live evidence, and 98-point internal scores.`,
 );

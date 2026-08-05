@@ -25,6 +25,14 @@ const observabilityRegistry = readFileSync(
   join(root, "src/lib/english-observability-registry-9.ts"),
   "utf8",
 );
+const notifyFinal = readFileSync(
+  join(root, "src/lib/english-editorial-notify-evidence-final-20260805.ts"),
+  "utf8",
+);
+const observabilityFinalIndex = readFileSync(
+  join(root, "src/lib/english-editorial-observability-evidence-20260805.ts"),
+  "utf8",
+);
 const packageJson = readFileSync(join(root, "package.json"), "utf8");
 const auditDoc = readFileSync(
   join(root, "docs/english-editorial-first-loop-state-notify-batch-20260731.md"),
@@ -49,6 +57,8 @@ const expected = {
     publishedAt: "2026-07-24",
     title: "Screeps First Room Code: A Small Loop You Can Verify",
     headline: "Combine Your First Screeps Room Loop Without Hiding Failure States",
+    discoveryTitle: "Screeps First Room Code: A Small Loop You Can Verify",
+    updatedAt: "2026-07-31",
     registry: completeRegistry,
     signals: [
       "trySpawnFirstMissing",
@@ -63,6 +73,8 @@ const expected = {
     publishedAt: "2026-07-25",
     title: "Screeps Working State: Switch Only at Empty and Full",
     headline: "Use Store Boundaries as Hysteresis, Not a Tick Toggle",
+    discoveryTitle: "Screeps Working State: Switch Only at Empty and Full",
+    updatedAt: "2026-07-31",
     registry: foundationRegistry,
     signals: [
       "partial-keep-previous",
@@ -77,6 +89,8 @@ const expected = {
     publishedAt: "2026-07-25",
     title: "Screeps Game.notify(): Queue Alerts and Mark Them Submitted",
     headline: "Do Not Mark an Alert Sent Until Game.notify() Is Called",
+    discoveryTitle: "Screeps Game.notify(): Bind Alert Payload Identity Before Submission",
+    updatedAt: "2026-08-05",
     registry: observabilityRegistry,
     signals: [
       "awaiting-first-submission",
@@ -108,7 +122,7 @@ const minimums = {
 const failures = [];
 
 if (Object.keys(articles).sort().join("|") !== Object.keys(expected).sort().join("|")) {
-  failures.push("Editorial payload must contain exactly the three selected existing slugs");
+  failures.push("Historical editorial payload must contain exactly the three selected existing slugs");
 }
 
 let tocCount = 0;
@@ -124,7 +138,7 @@ const decodeHtml = (value) => value
 for (const [slug, identity] of Object.entries(expected)) {
   const article = articles[slug];
   if (!article) {
-    failures.push(`${slug}: article missing`);
+    failures.push(`${slug}: historical article missing`);
     continue;
   }
 
@@ -136,12 +150,12 @@ for (const [slug, identity] of Object.entries(expected)) {
     ["headline", identity.headline],
   ]) {
     if (article[field] !== expectedValue) {
-      failures.push(`${slug}: ${field} mismatch`);
+      failures.push(`${slug}: historical ${field} mismatch`);
     }
   }
 
   if (article.finalScore !== 98 || article.faq.length !== 0) {
-    failures.push(`${slug}: score must be 98 and FAQ must be empty`);
+    failures.push(`${slug}: historical score must be 98 and FAQ must be empty`);
   }
   if (!article.verification.some(([label, value]) => label === "Screeps Console test" && value === "Pending")) {
     failures.push(`${slug}: Console evidence boundary missing`);
@@ -153,12 +167,12 @@ for (const [slug, identity] of Object.entries(expected)) {
   tocCount += article.toc.length;
   for (const [id] of article.toc) {
     if (!article.articleHtml.includes(`id="${id}"`)) {
-      failures.push(`${slug}: missing TOC target ${id}`);
+      failures.push(`${slug}: missing historical TOC target ${id}`);
     }
   }
   for (const signal of identity.signals) {
     if (!article.articleHtml.includes(signal)) {
-      failures.push(`${slug}: missing technical signal ${signal}`);
+      failures.push(`${slug}: missing historical technical signal ${signal}`);
     }
   }
   if (!article.articleHtml.includes("https://docs.screeps.com/")) {
@@ -169,9 +183,12 @@ for (const [slug, identity] of Object.entries(expected)) {
   const overrideStart = identity.registry.indexOf(`"${identity.path}": {`);
   const start = recordStart >= 0 ? recordStart : overrideStart;
   const record = start >= 0 ? identity.registry.slice(start, start + 1800) : "";
-  for (const signal of [identity.title, 'updatedAt: "2026-07-31"']) {
+  for (const signal of [
+    identity.discoveryTitle,
+    `updatedAt: "${identity.updatedAt}"`,
+  ]) {
     if (!record.includes(signal)) {
-      failures.push(`${slug}: registry metadata missing ${signal}`);
+      failures.push(`${slug}: current registry metadata missing ${signal}`);
     }
   }
 
@@ -186,7 +203,7 @@ for (const [slug, identity] of Object.entries(expected)) {
     try {
       execFileSync(process.execPath, ["--check", path], { stdio: "pipe" });
     } catch {
-      failures.push(`${slug}: JavaScript block ${index + 1} failed node --check`);
+      failures.push(`${slug}: historical JavaScript block ${index + 1} failed node --check`);
     }
   }
 
@@ -202,10 +219,10 @@ for (const path of tempFiles) {
   try { unlinkSync(path); } catch {}
 }
 
-if (tocCount !== 37) failures.push(`Expected 37 TOC anchors, received ${tocCount}`);
-if (javascriptCount !== 8) failures.push(`Expected 8 JavaScript blocks, received ${javascriptCount}`);
+if (tocCount !== 37) failures.push(`Expected 37 historical TOC anchors, received ${tocCount}`);
+if (javascriptCount !== 8) failures.push(`Expected 8 historical JavaScript blocks, received ${javascriptCount}`);
 if (!publication.includes("englishEditorialFirstLoopStateNotifyOverrides20260731")) {
-  failures.push("Publication aggregate is missing the new override batch");
+  failures.push("Publication aggregate is missing the historical override batch");
 }
 for (const signal of [
   "normalizeFirstLoopStateNotifyArticle",
@@ -214,11 +231,38 @@ for (const signal of [
   "The Creep was tired, so no new movement was accepted.",
 ]) {
   if (!publication.includes(signal)) {
-    failures.push(`Publication correction is missing ${signal}`);
+    failures.push(`Historical publication correction is missing ${signal}`);
+  }
+}
+for (const signal of [
+  "englishEditorialObservabilityEvidenceOverrides20260805",
+  "...englishEditorialObservabilityEvidenceOverrides20260805",
+]) {
+  if (!publication.includes(signal)) {
+    failures.push(`Current observability publication wiring is missing ${signal}`);
+  }
+}
+for (const signal of [
+  "englishEditorialNotifyEvidenceFinalArticle20260805",
+  "result = Game.notify",
+  "if (result !== OK)",
+  "notification-rejected-review-required",
+  "ERR_FULL",
+]) {
+  if (!notifyFinal.includes(signal)) {
+    failures.push(`Current notification final wrapper is missing ${signal}`);
+  }
+}
+for (const signal of [
+  "englishEditorialNotifyEvidenceFinalArticle20260805",
+  "englishEditorialObservabilityEvidenceOverrides20260805",
+]) {
+  if (!observabilityFinalIndex.includes(signal)) {
+    failures.push(`Current observability index is missing ${signal}`);
   }
 }
 if (!packageJson.includes("englisheditorialfirstloopstatenotify20260731check")) {
-  failures.push("package.json is missing the dedicated editorial gate");
+  failures.push("package.json is missing the dedicated historical editorial gate");
 }
 for (const phrase of ["delve", "game-changer", "unlock the power", "in today's fast-paced"]) {
   if (overrideSource.toLowerCase().includes(phrase)) failures.push(`Prohibited AI-style phrase: ${phrase}`);
@@ -230,7 +274,7 @@ for (const marker of [
   "**98**",
   "Screeps Console execution",
 ]) {
-  if (!auditDoc.includes(marker)) failures.push(`Audit document is missing ${marker}`);
+  if (!auditDoc.includes(marker)) failures.push(`Historical audit document is missing ${marker}`);
 }
 
 if (failures.length > 0) {
@@ -239,4 +283,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("First-loop, state, and notify editorial gate passed: 3 existing routes, 37 anchors, 8 JavaScript blocks, synchronized metadata, corrected fatigue and inline-code boundaries, 98-point scorecards, no FAQ, and explicit Pending evidence.");
+console.log("First-loop, state, and notify editorial gate passed: 3 historical routes, 37 anchors, 8 JavaScript blocks, current discovery metadata, reviewed notification supersession, corrected fatigue and inline-code boundaries, 98-point scorecards, no FAQ, and explicit Pending evidence.");
