@@ -14,11 +14,16 @@ function readJson(relativePath) {
 }
 
 const lighthouseConfig = readJson("lighthouserc.json");
+const pullRequestConfig = readJson("lighthouserc.pr.json");
 const productionConfig = readJson("lighthouserc.production.json");
 const matrix = lighthouseConfig?.ci?.assert?.assertMatrix;
+const pullRequestMatrix = pullRequestConfig?.ci?.assert?.assertMatrix;
 const productionMatrix = productionConfig?.ci?.assert?.assertMatrix;
 const globalAssertions = Array.isArray(matrix)
   ? matrix.find((entry) => entry.matchingUrlPattern === ".*")?.assertions
+  : undefined;
+const pullRequestGlobalAssertions = Array.isArray(pullRequestMatrix)
+  ? pullRequestMatrix.find((entry) => entry.matchingUrlPattern === ".*")?.assertions
   : undefined;
 const productionGlobalAssertions = Array.isArray(productionMatrix)
   ? productionMatrix.find((entry) => entry.matchingUrlPattern === ".*")?.assertions
@@ -43,73 +48,65 @@ function requireAssertion(assertions, name, level, option, expected, label = "Li
   }
 }
 
-if (lighthouseConfig?.ci?.collect?.numberOfRuns !== 3) {
-  failures.push("Local Lighthouse must collect three runs per route.");
-}
-
-if (
-  lighthouseConfig?.ci?.upload?.target !== "filesystem"
-  || lighthouseConfig?.ci?.upload?.outputDir !== "./lhci-results"
-) {
-  failures.push(
-    "Local Lighthouse reports must stay in ./lhci-results for workflow artifact retention.",
-  );
-}
-
 function getAssertions(sourceMatrix, pattern) {
   return Array.isArray(sourceMatrix)
     ? sourceMatrix.find((entry) => entry.matchingUrlPattern === pattern)?.assertions
     : undefined;
 }
 
-requireAssertion(
-  globalAssertions,
-  "categories:performance",
-  "error",
-  "minScore",
-  0.85,
-  "Local Lighthouse",
-);
-requireAssertion(
-  globalAssertions,
-  "categories:accessibility",
-  "error",
-  "minScore",
-  0.95,
-  "Local Lighthouse",
-);
-requireAssertion(
-  globalAssertions,
-  "total-blocking-time",
-  "error",
-  "maxNumericValue",
-  300,
-  "Local Lighthouse",
-);
-requireAssertion(
-  getAssertions(matrix, strictRoutePattern),
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  2500,
-  "Local Lighthouse",
-);
-requireAssertion(
-  getAssertions(matrix, generalRoutePattern),
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  2750,
-  "Local Lighthouse",
-);
-requireAssertion(
-  getAssertions(matrix, longArticlePattern),
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  3000,
-  "Local Lighthouse",
-);
+if (lighthouseConfig?.ci?.collect?.numberOfRuns !== 3) {
+  failures.push("Full local Lighthouse must collect three runs per route.");
+}
+if (
+  lighthouseConfig?.ci?.upload?.target !== "filesystem"
+  || lighthouseConfig?.ci?.upload?.outputDir !== "./lhci-results"
+) {
+  failures.push(
+    "Full local Lighthouse reports must stay in ./lhci-results for workflow artifact retention.",
+  );
+}
+
+requireAssertion(globalAssertions, "categories:performance", "error", "minScore", 0.85, "Full local Lighthouse");
+requireAssertion(globalAssertions, "categories:accessibility", "error", "minScore", 0.95, "Full local Lighthouse");
+requireAssertion(globalAssertions, "total-blocking-time", "error", "maxNumericValue", 300, "Full local Lighthouse");
+requireAssertion(getAssertions(matrix, strictRoutePattern), "largest-contentful-paint", "error", "maxNumericValue", 2500, "Full local Lighthouse");
+requireAssertion(getAssertions(matrix, generalRoutePattern), "largest-contentful-paint", "error", "maxNumericValue", 2750, "Full local Lighthouse");
+requireAssertion(getAssertions(matrix, longArticlePattern), "largest-contentful-paint", "error", "maxNumericValue", 3000, "Full local Lighthouse");
+
+const pullRequestUrls = pullRequestConfig?.ci?.collect?.url;
+if (!Array.isArray(pullRequestUrls) || pullRequestUrls.length < 10) {
+  failures.push("Pull request Lighthouse must audit at least ten representative routes.");
+} else {
+  for (const requiredRoute of [
+    "http://localhost:3000/",
+    "http://localhost:3000/knowledge",
+    "http://localhost:3000/blog/screeps-memory-basics",
+    "http://localhost:3000/tools/room-diagnostics",
+    "http://localhost:3000/en",
+    "http://localhost:3000/en/tools/room-diagnostics",
+  ]) {
+    if (!pullRequestUrls.includes(requiredRoute)) {
+      failures.push(`Pull request Lighthouse is missing representative route ${requiredRoute}.`);
+    }
+  }
+}
+if (pullRequestConfig?.ci?.collect?.numberOfRuns !== 2) {
+  failures.push("Pull request Lighthouse must collect two runs per representative route.");
+}
+if (
+  pullRequestConfig?.ci?.upload?.target !== "filesystem"
+  || pullRequestConfig?.ci?.upload?.outputDir !== "./lhci-pr-results"
+) {
+  failures.push(
+    "Pull request Lighthouse reports must stay in ./lhci-pr-results for workflow artifact retention.",
+  );
+}
+requireAssertion(pullRequestGlobalAssertions, "categories:performance", "error", "minScore", 0.85, "Pull request Lighthouse");
+requireAssertion(pullRequestGlobalAssertions, "categories:accessibility", "error", "minScore", 0.95, "Pull request Lighthouse");
+requireAssertion(pullRequestGlobalAssertions, "categories:best-practices", "error", "minScore", 0.9, "Pull request Lighthouse");
+requireAssertion(pullRequestGlobalAssertions, "cumulative-layout-shift", "error", "maxNumericValue", 0.1, "Pull request Lighthouse");
+requireAssertion(pullRequestGlobalAssertions, "total-blocking-time", "error", "maxNumericValue", 300, "Pull request Lighthouse");
+requireAssertion(pullRequestGlobalAssertions, "largest-contentful-paint", "error", "maxNumericValue", 3000, "Pull request Lighthouse");
 
 const productionUrls = productionConfig?.ci?.collect?.url;
 if (!Array.isArray(productionUrls) || productionUrls.length < 8) {
@@ -143,54 +140,12 @@ if (
   );
 }
 
-requireAssertion(
-  productionGlobalAssertions,
-  "categories:performance",
-  "error",
-  "minScore",
-  0.8,
-  "Production Lighthouse",
-);
-requireAssertion(
-  productionGlobalAssertions,
-  "categories:accessibility",
-  "error",
-  "minScore",
-  0.95,
-  "Production Lighthouse",
-);
-requireAssertion(
-  productionGlobalAssertions,
-  "categories:best-practices",
-  "error",
-  "minScore",
-  0.9,
-  "Production Lighthouse",
-);
-requireAssertion(
-  productionGlobalAssertions,
-  "cumulative-layout-shift",
-  "error",
-  "maxNumericValue",
-  0.1,
-  "Production Lighthouse",
-);
-requireAssertion(
-  productionGlobalAssertions,
-  "total-blocking-time",
-  "error",
-  "maxNumericValue",
-  400,
-  "Production Lighthouse",
-);
-requireAssertion(
-  productionGlobalAssertions,
-  "largest-contentful-paint",
-  "error",
-  "maxNumericValue",
-  4000,
-  "Production Lighthouse",
-);
+requireAssertion(productionGlobalAssertions, "categories:performance", "error", "minScore", 0.8, "Production Lighthouse");
+requireAssertion(productionGlobalAssertions, "categories:accessibility", "error", "minScore", 0.95, "Production Lighthouse");
+requireAssertion(productionGlobalAssertions, "categories:best-practices", "error", "minScore", 0.9, "Production Lighthouse");
+requireAssertion(productionGlobalAssertions, "cumulative-layout-shift", "error", "maxNumericValue", 0.1, "Production Lighthouse");
+requireAssertion(productionGlobalAssertions, "total-blocking-time", "error", "maxNumericValue", 400, "Production Lighthouse");
+requireAssertion(productionGlobalAssertions, "largest-contentful-paint", "error", "maxNumericValue", 4000, "Production Lighthouse");
 
 const lighthouseWorkflowPath = path.join(root, ".github", "workflows", "lighthouse.yml");
 const lighthouseWorkflow = fs.existsSync(lighthouseWorkflowPath)
@@ -199,8 +154,13 @@ const lighthouseWorkflow = fs.existsSync(lighthouseWorkflowPath)
 for (const requiredText of [
   "content/**",
   "schedule:",
+  "pull-request-audit:",
+  "full-build-audit:",
+  "production-audit:",
+  "lighthouserc.pr.json",
   "lighthouserc.production.json",
   "actions/upload-artifact@v4",
+  "lhci-pr-results",
   "lhci-results",
   "lhci-production-results",
 ]) {
@@ -239,5 +199,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Performance budget check passed: local production builds use three-run hard budgets, deployed canonical routes use a two-run weekly baseline, and both report sets are retained as workflow artifacts.",
+  "Performance budget check passed: pull requests use a two-run representative gate, weekly full builds use three-run route budgets, deployed canonical routes use a separate two-run baseline, and all reports are retained as artifacts.",
 );
