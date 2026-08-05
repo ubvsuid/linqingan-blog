@@ -39,7 +39,7 @@ No new article route was created. Existing slugs, Canonical URLs, Chinese mappin
 - Every window is bound to room name, `eventTick`, `readAt`, parsed/raw mode, and a project schema version.
 - The committed window itself is the idempotency marker; a separate reader marker cannot drift away from stored content.
 - `Room.getEventLog()` is treated as a previous-tick window, not a historical backfill API.
-- Visibility, CPU, initialization, or global-reset gaps are recorded with exact missing ticks rather than replaced with empty windows.
+- Visibility, CPU, initialization, or global-reset gaps are recorded as an exact inclusive missing range and count, with at most 20 sample ticks, rather than replaced with empty windows or an unbounded tick array.
 - Ownership snapshots include `capturedAt` and are accepted only when `capturedAt === eventTick` and the room identity matches.
 - Current object state is not substituted for historical ownership evidence.
 - Array index is documented as local to the exact returned window and schema namespace.
@@ -65,7 +65,7 @@ The auto-discovered editorial simulation checks:
 - at least 18 JavaScript blocks with `node --check`;
 - exact notification revision and digest identity;
 - `OK` versus `ERR_FULL` handling;
-- event-window no-backfill and exact `capturedAt` ownership rules;
+- event-window no-backfill, bounded gap representation, and exact `capturedAt` ownership rules;
 - parsed mode and schema conflict behavior;
 - cross-room and stale visual rejection;
 - pre-existing visual writer detection;
