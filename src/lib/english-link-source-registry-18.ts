@@ -232,4 +232,28 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps Spawn adjacent tiles",
     ],
   },
+  {
+    href: "/en/blog/screeps-multi-spawn-queue",
+    chinesePath: "/blog/screeps-multi-spawn-queue",
+    category: "SPAWNING · QUEUE SCHEDULING",
+    title:
+      "Screeps Multi-Spawn Queue: Priority, Deduplication, and Shared Energy",
+    description:
+      "Centralize Creep demand, deduplicate stable request keys, rank emergency and replacement work, reserve shared room Energy locally, assign each idle Spawn once, and verify accepted names on later ticks.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "20 min read",
+    primaryKeyword: "Screeps multi Spawn queue",
+    searchIntent:
+      "Coordinate multiple Creep requests and idle Spawns without duplicate demand, priority inversion, or same-tick shared Energy overcommitment",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps multi Spawn queue",
+      "Screeps Spawn scheduler",
+      "Screeps spawn priority",
+      "Screeps spawnCreep dryRun shared Energy",
+      "Screeps Creep request deduplication",
+    ],
+  },
 ];
