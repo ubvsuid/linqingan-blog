@@ -29,6 +29,7 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-renew-creep": 2,
   "/en/blog/screeps-recycle-creep": 2,
 
+  "/en/blog/screeps-store-capacity-api": 3,
   "/en/blog/screeps-creep-harvest-energy": 3,
   "/en/blog/screeps-transfer-energy-to-spawn": 3,
   "/en/blog/screeps-withdraw-container-energy": 3,

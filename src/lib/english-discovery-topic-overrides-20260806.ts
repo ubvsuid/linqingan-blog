@@ -14,4 +14,10 @@ export const additionalArticleTagSlugOverrides = {
     "automation",
     "debugging",
   ],
+  "/en/blog/screeps-store-capacity-api": [
+    "resources",
+    "energy",
+    "javascript",
+    "debugging",
+  ],
 } as const;
