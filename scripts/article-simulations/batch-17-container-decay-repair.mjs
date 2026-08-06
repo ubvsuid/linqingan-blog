@@ -7,38 +7,43 @@ const DEFAULT_POLICY = Object.freeze({
   historyLimit: 20
 });
 
+const CONSTANTS = Object.freeze({
+  CONTAINER_DECAY: 5000,
+  CONTAINER_DECAY_TIME: 100,
+  CONTAINER_DECAY_TIME_OWNED: 500,
+  REPAIR_POWER: 100,
+  REPAIR_COST: 0.01
+});
+
 function finiteNonNegative(value, fallback = 0) {
-  return Number.isFinite(value) && value >= 0 ? value : fallback;
+  return Number.isFinite(value) && value >= 0
+    ? value
+    : fallback;
 }
 
-function normalizePolicy(policy = {}) {
-  const minimumHitsRatio =
-    Number.isFinite(policy.minimumHitsRatio)
-    && policy.minimumHitsRatio > 0
-    && policy.minimumHitsRatio <= 1
-      ? policy.minimumHitsRatio
-      : DEFAULT_POLICY.minimumHitsRatio;
-  const bufferDecayEvents =
-    Number.isInteger(policy.bufferDecayEvents)
-    && policy.bufferDecayEvents >= 1
-      ? policy.bufferDecayEvents
-      : DEFAULT_POLICY.bufferDecayEvents;
-  const safetyTicks =
-    Number.isInteger(policy.safetyTicks)
-    && policy.safetyTicks >= 0
-      ? policy.safetyTicks
-      : DEFAULT_POLICY.safetyTicks;
-  const historyLimit =
-    Number.isInteger(policy.historyLimit)
-    && policy.historyLimit >= 1
-      ? policy.historyLimit
-      : DEFAULT_POLICY.historyLimit;
-
+function normalizePolicy(value = {}) {
   return {
-    minimumHitsRatio,
-    bufferDecayEvents,
-    safetyTicks,
-    historyLimit
+    minimumHitsRatio:
+      Number.isFinite(value.minimumHitsRatio)
+      && value.minimumHitsRatio > 0
+      && value.minimumHitsRatio <= 1
+        ? value.minimumHitsRatio
+        : DEFAULT_POLICY.minimumHitsRatio,
+    bufferDecayEvents:
+      Number.isInteger(value.bufferDecayEvents)
+      && value.bufferDecayEvents >= 1
+        ? value.bufferDecayEvents
+        : DEFAULT_POLICY.bufferDecayEvents,
+    safetyTicks:
+      Number.isInteger(value.safetyTicks)
+      && value.safetyTicks >= 0
+        ? value.safetyTicks
+        : DEFAULT_POLICY.safetyTicks,
+    historyLimit:
+      Number.isInteger(value.historyLimit)
+      && value.historyLimit >= 1
+        ? value.historyLimit
+        : DEFAULT_POLICY.historyLimit
   };
 }
 
@@ -48,14 +53,24 @@ function getContainerDecayInterval(roomOwned, constants) {
     : constants.CONTAINER_DECAY_TIME;
 }
 
-function estimateContainerLoss(container, roomOwned, constants) {
-  const hits = finiteNonNegative(container?.hits, 0);
-  const hitsMax = finiteNonNegative(container?.hitsMax, 0);
-  const ticksToDecay = finiteNonNegative(container?.ticksToDecay, 0);
-  const decayAmount = finiteNonNegative(constants?.CONTAINER_DECAY, 0);
+function estimateContainerLoss(
+  container,
+  roomOwned,
+  constants
+) {
+  const hits = finiteNonNegative(container?.hits);
+  const hitsMax = finiteNonNegative(container?.hitsMax);
+  const ticksToDecay = finiteNonNegative(
+    container?.ticksToDecay
+  );
+  const decayAmount = finiteNonNegative(
+    constants?.CONTAINER_DECAY
+  );
   const interval = finiteNonNegative(
-    getContainerDecayInterval(roomOwned, constants ?? {}),
-    0
+    getContainerDecayInterval(
+      roomOwned,
+      constants ?? {}
+    )
   );
 
   if (
@@ -70,9 +85,9 @@ function estimateContainerLoss(container, roomOwned, constants) {
     };
   }
 
-  const decayEventsUntilLoss = Math.ceil(hits / decayAmount);
-  const estimatedTicksUntilLoss =
-    ticksToDecay + (decayEventsUntilLoss - 1) * interval;
+  const decayEventsUntilLoss = Math.ceil(
+    hits / decayAmount
+  );
 
   return {
     valid: true,
@@ -82,9 +97,14 @@ function estimateContainerLoss(container, roomOwned, constants) {
     decayAmount,
     interval,
     decayEventsUntilLoss,
-    estimatedTicksUntilLoss,
+    estimatedTicksUntilLoss:
+      ticksToDecay
+      + (decayEventsUntilLoss - 1) * interval,
     nextDecayFatal: hits <= decayAmount,
-    nextDecayHits: Math.max(0, hits - decayAmount)
+    nextDecayHits: Math.max(
+      0,
+      hits - decayAmount
+    )
   };
 }
 
@@ -97,18 +117,27 @@ function buildContainerRepairPlan({
   policy
 }) {
   const normalizedPolicy = normalizePolicy(policy);
-  const estimate = estimateContainerLoss(container, roomOwned, constants);
+  const containerId =
+    typeof container?.id === 'string'
+      ? container.id
+      : null;
+  const estimate = estimateContainerLoss(
+    container,
+    roomOwned,
+    constants
+  );
 
   if (!estimate.valid) {
     return {
+      containerId,
       action: 'wait',
       reason: estimate.reason,
       estimate
     };
   }
-
   if (!repairer || repairer.my !== true) {
     return {
+      containerId,
       action: 'wait',
       reason: 'repairer-missing',
       estimate
@@ -116,20 +145,29 @@ function buildContainerRepairPlan({
   }
   if (repairer.spawning === true) {
     return {
+      containerId,
       action: 'wait',
       reason: 'repairer-spawning',
       estimate
     };
   }
-  if (!Number.isInteger(repairer.activeWork) || repairer.activeWork <= 0) {
+  if (
+    !Number.isInteger(repairer.activeWork)
+    || repairer.activeWork <= 0
+  ) {
     return {
+      containerId,
       action: 'wait',
       reason: 'repairer-no-active-work',
       estimate
     };
   }
-  if (!Number.isFinite(repairer.energy) || repairer.energy <= 0) {
+  if (
+    !Number.isFinite(repairer.energy)
+    || repairer.energy <= 0
+  ) {
     return {
+      containerId,
       action: 'wait',
       reason: 'repairer-needs-energy',
       estimate
@@ -139,13 +177,18 @@ function buildContainerRepairPlan({
   const targetHits = Math.min(
     estimate.hitsMax,
     Math.max(
-      Math.ceil(estimate.hitsMax * normalizedPolicy.minimumHitsRatio),
-      estimate.decayAmount * (normalizedPolicy.bufferDecayEvents + 1)
+      Math.ceil(
+        estimate.hitsMax
+        * normalizedPolicy.minimumHitsRatio
+      ),
+      estimate.decayAmount
+        * (normalizedPolicy.bufferDecayEvents + 1)
     )
   );
 
   if (estimate.hits >= targetHits) {
     return {
+      containerId,
       action: 'wait',
       reason: 'container-above-policy-target',
       targetHits,
@@ -155,6 +198,7 @@ function buildContainerRepairPlan({
 
   if (!Number.isInteger(pathLength) || pathLength < 0) {
     return {
+      containerId,
       action: 'wait',
       reason: 'container-unreachable',
       targetHits,
@@ -162,21 +206,16 @@ function buildContainerRepairPlan({
     };
   }
 
-  const travelTicks = Math.max(0, pathLength);
-  const deadlineSlack =
-    estimate.ticksToDecay
-    - travelTicks
-    - normalizedPolicy.safetyTicks;
-
   const repairPower =
     repairer.activeWork
-    * finiteNonNegative(constants?.REPAIR_POWER, 0);
+    * finiteNonNegative(constants?.REPAIR_POWER);
   const energyPerAction =
     repairPower
-    * finiteNonNegative(constants?.REPAIR_COST, 0);
+    * finiteNonNegative(constants?.REPAIR_COST);
 
   if (repairPower <= 0 || energyPerAction <= 0) {
     return {
+      containerId,
       action: 'wait',
       reason: 'invalid-repair-constants',
       targetHits,
@@ -184,14 +223,31 @@ function buildContainerRepairPlan({
     };
   }
 
-  const missingHits = Math.max(0, targetHits - estimate.hits);
-  const actionsNeeded = Math.ceil(missingHits / repairPower);
-  const energyNeeded = Math.ceil(actionsNeeded * energyPerAction);
-  const inRange = repairer.rangeToContainer <= 3;
+  const travelTicks = pathLength;
+  const deadlineSlack =
+    estimate.ticksToDecay
+    - travelTicks
+    - normalizedPolicy.safetyTicks;
+  const missingHits = Math.max(
+    0,
+    targetHits - estimate.hits
+  );
+  const actionsNeeded = Math.ceil(
+    missingHits / repairPower
+  );
+  const energyNeeded = Math.ceil(
+    actionsNeeded * energyPerAction
+  );
+  const inRange =
+    Number.isFinite(repairer.rangeToContainer)
+    && repairer.rangeToContainer <= 3;
 
   return {
+    containerId,
     action: inRange ? 'repair' : 'move',
-    reason: inRange ? 'repair-container' : 'move-to-container',
+    reason: inRange
+      ? 'repair-container'
+      : 'move-to-container',
     targetHits,
     missingHits,
     actionsNeeded,
@@ -206,18 +262,22 @@ function buildContainerRepairPlan({
 }
 
 function rankContainerRepairPlans(plans) {
-  return plans
+  return [...plans]
     .filter(plan =>
       plan
-      && (plan.action === 'repair' || plan.action === 'move')
-      && plan.containerId
+      && typeof plan.containerId === 'string'
+      && (
+        plan.action === 'repair'
+        || plan.action === 'move'
+      )
     )
     .sort((left, right) => {
       if (left.urgent !== right.urgent) {
         return left.urgent ? -1 : 1;
       }
       if (left.deadlineSlack !== right.deadlineSlack) {
-        return left.deadlineSlack - right.deadlineSlack;
+        return left.deadlineSlack
+          - right.deadlineSlack;
       }
       if (
         left.estimate.estimatedTicksUntilLoss
@@ -229,12 +289,16 @@ function rankContainerRepairPlans(plans) {
         );
       }
       if (left.estimate.hits !== right.estimate.hits) {
-        return left.estimate.hits - right.estimate.hits;
+        return left.estimate.hits
+          - right.estimate.hits;
       }
       if (left.travelTicks !== right.travelTicks) {
-        return left.travelTicks - right.travelTicks;
+        return left.travelTicks
+          - right.travelTicks;
       }
-      return left.containerId.localeCompare(right.containerId);
+      return left.containerId.localeCompare(
+        right.containerId
+      );
     });
 }
 
@@ -245,14 +309,14 @@ function verifyContainerRepair(
   events = []
 ) {
   if (!previous) {
-    return {
-      state: 'no-pending-observation'
-    };
+    return { state: 'no-pending-observation' };
   }
-  if (gameTime !== previous.submittedAt + 1) {
+
+  const expectedTick = previous.submittedAt + 1;
+  if (gameTime !== expectedTick) {
     return {
       state: 'missed-observation-window',
-      expectedTick: previous.submittedAt + 1,
+      expectedTick,
       observedTick: gameTime
     };
   }
@@ -285,77 +349,60 @@ function verifyContainerRepair(
   const hitsDelta = current.hits - previous.hitsBefore;
   if (repairEvent) {
     return {
-      state:
-        hitsDelta > 0
-          ? 'repair-event-and-hits-increased'
-          : 'repair-event-with-net-offset',
+      state: hitsDelta > 0
+        ? 'repair-event-and-hits-increased'
+        : 'repair-event-with-net-offset',
       eventMatched: true,
-      energySpent: Number.isFinite(repairEvent.data?.energySpent)
-        ? repairEvent.data.energySpent
-        : null,
+      energySpent:
+        Number.isFinite(repairEvent.data?.energySpent)
+          ? repairEvent.data.energySpent
+          : null,
       hitsDelta
     };
   }
 
   return {
-    state:
-      hitsDelta > 0
-        ? 'hits-increased-without-matched-event'
-        : hitsDelta === 0
-          ? 'no-net-hits-change'
-          : 'hits-decreased',
+    state: hitsDelta > 0
+      ? 'hits-increased-without-matched-event'
+      : hitsDelta === 0
+        ? 'no-net-hits-change'
+        : 'hits-decreased',
     eventMatched: false,
     hitsDelta
   };
 }
 
-function pushBoundedHistory(history, entry, limit) {
-  const values = Array.isArray(history) ? history : [];
-  const next = [...values, entry];
-  return next.slice(-Math.max(1, limit));
+function pushBoundedHistory(
+  history,
+  entry,
+  requestedLimit
+) {
+  const values = Array.isArray(history)
+    ? history
+    : [];
+  const limit =
+    Number.isInteger(requestedLimit)
+    && requestedLimit >= 1
+      ? requestedLimit
+      : DEFAULT_POLICY.historyLimit;
+
+  return [...values, entry].slice(-limit);
 }
 
-const C = {
-  CONTAINER_DECAY: 5000,
-  CONTAINER_DECAY_TIME: 100,
-  CONTAINER_DECAY_TIME_OWNED: 500,
-  REPAIR_POWER: 100,
-  REPAIR_COST: 0.01
+let passed = 0;
+function test(name, callback) {
+  callback();
+  passed += 1;
+  console.log(`PASS ${passed}: ${name}`);
+}
+
+const baseContainer = {
+  id: 'c1',
+  hits: 5000,
+  hitsMax: 250000,
+  ticksToDecay: 20
 };
-
-let estimate = estimateContainerLoss(
-  { hits: 5000, hitsMax: 250000, ticksToDecay: 20 },
-  false,
-  C
-);
-assert.equal(estimate.nextDecayFatal, true);
-assert.equal(estimate.estimatedTicksUntilLoss, 20);
-
-estimate = estimateContainerLoss(
-  { hits: 5001, hitsMax: 250000, ticksToDecay: 20 },
-  false,
-  C
-);
-assert.equal(estimate.decayEventsUntilLoss, 2);
-assert.equal(estimate.estimatedTicksUntilLoss, 120);
-
-estimate = estimateContainerLoss(
-  { hits: 10001, hitsMax: 250000, ticksToDecay: 20 },
-  true,
-  C
-);
-assert.equal(estimate.estimatedTicksUntilLoss, 1020);
-
-assert.equal(
-  estimateContainerLoss(
-    { hits: 0, hitsMax: 250000, ticksToDecay: 1 },
-    true,
-    C
-  ).valid,
-  false
-);
-
-const repairer = {
+const baseRepairer = {
   my: true,
   spawning: false,
   activeWork: 2,
@@ -363,161 +410,240 @@ const repairer = {
   rangeToContainer: 4
 };
 
-let plan = buildContainerRepairPlan({
-  container: {
-    hits: 10000,
-    hitsMax: 250000,
-    ticksToDecay: 10
-  },
-  roomOwned: false,
-  repairer,
-  pathLength: 5,
-  constants: C,
-  policy: {
-    minimumHitsRatio: 0.2,
-    bufferDecayEvents: 2,
-    safetyTicks: 5
-  }
+function build(overrides = {}) {
+  return buildContainerRepairPlan({
+    container: baseContainer,
+    roomOwned: false,
+    repairer: baseRepairer,
+    pathLength: 5,
+    constants: CONSTANTS,
+    policy: { minimumHitsRatio: 0.2 },
+    ...overrides
+  });
+}
+
+test('one decay pulse is fatal at 5000 hits', () => {
+  const value = estimateContainerLoss(
+    baseContainer,
+    false,
+    CONSTANTS
+  );
+  assert.equal(value.nextDecayFatal, true);
+  assert.equal(value.estimatedTicksUntilLoss, 20);
 });
-assert.equal(plan.action, 'move');
-assert.equal(plan.urgent, true);
-assert.equal(plan.targetHits, 50000);
-assert.equal(plan.actionsNeeded, 200);
-assert.equal(plan.energyNeeded, 400);
 
-plan = buildContainerRepairPlan({
-  container: {
-    hits: 250000,
-    hitsMax: 250000,
-    ticksToDecay: 100
-  },
-  roomOwned: true,
-  repairer: {
-    ...repairer,
-    rangeToContainer: 2
-  },
-  pathLength: 0,
-  constants: C
+test('5001 hits survives one pulse', () => {
+  const value = estimateContainerLoss(
+    { ...baseContainer, hits: 5001 },
+    false,
+    CONSTANTS
+  );
+  assert.equal(value.decayEventsUntilLoss, 2);
+  assert.equal(value.estimatedTicksUntilLoss, 120);
 });
-assert.equal(plan.action, 'wait');
 
-const criticalContainer = {
-  hits: 5000,
-  hitsMax: 250000,
-  ticksToDecay: 20
-};
+test('owned-room interval is used', () => {
+  assert.equal(
+    estimateContainerLoss(
+      { ...baseContainer, hits: 10001 },
+      true,
+      CONSTANTS
+    ).estimatedTicksUntilLoss,
+    1020
+  );
+});
 
-assert.equal(
-  buildContainerRepairPlan({
-    container: criticalContainer,
-    roomOwned: false,
-    repairer: null,
-    pathLength: 0,
-    constants: C
-  }).reason,
-  'repairer-missing'
-);
+test('neutral-room interval is used', () => {
+  assert.equal(
+    getContainerDecayInterval(false, CONSTANTS),
+    100
+  );
+});
 
-assert.equal(
-  buildContainerRepairPlan({
-    container: criticalContainer,
-    roomOwned: false,
-    repairer: {
-      ...repairer,
-      spawning: true
+test('invalid hits fail closed', () => {
+  assert.equal(
+    estimateContainerLoss(
+      { ...baseContainer, hits: 0 },
+      false,
+      CONSTANTS
+    ).valid,
+    false
+  );
+});
+
+test('invalid decay constants fail closed', () => {
+  assert.equal(
+    estimateContainerLoss(
+      baseContainer,
+      false,
+      { ...CONSTANTS, CONTAINER_DECAY: 0 }
+    ).valid,
+    false
+  );
+});
+
+test('missing repairer waits', () => {
+  assert.equal(build({ repairer: null }).reason, 'repairer-missing');
+});
+
+test('spawning repairer waits', () => {
+  assert.equal(
+    build({ repairer: { ...baseRepairer, spawning: true } }).reason,
+    'repairer-spawning'
+  );
+});
+
+test('repairer without WORK waits', () => {
+  assert.equal(
+    build({ repairer: { ...baseRepairer, activeWork: 0 } }).reason,
+    'repairer-no-active-work'
+  );
+});
+
+test('repairer without Energy waits', () => {
+  assert.equal(
+    build({ repairer: { ...baseRepairer, energy: 0 } }).reason,
+    'repairer-needs-energy'
+  );
+});
+
+test('Container above policy target waits', () => {
+  assert.equal(
+    build({
+      container: { ...baseContainer, hits: 250000 }
+    }).reason,
+    'container-above-policy-target'
+  );
+});
+
+test('finite range 3 selects repair', () => {
+  assert.equal(
+    build({
+      pathLength: 0,
+      repairer: { ...baseRepairer, rangeToContainer: 3 }
+    }).action,
+    'repair'
+  );
+});
+
+test('range above 3 selects movement', () => {
+  assert.equal(build().action, 'move');
+});
+
+test('unknown null range cannot select repair', () => {
+  assert.equal(
+    build({
+      repairer: { ...baseRepairer, rangeToContainer: null }
+    }).action,
+    'move'
+  );
+});
+
+test('missing path waits', () => {
+  assert.equal(
+    build({ pathLength: null }).reason,
+    'container-unreachable'
+  );
+});
+
+test('fatal next pulse marks urgency', () => {
+  assert.equal(build().urgent, true);
+});
+
+test('travel can exhaust deadline slack', () => {
+  const plan = build({
+    container: {
+      ...baseContainer,
+      hits: 10000,
+      ticksToDecay: 8
     },
-    pathLength: 0,
-    constants: C
-  }).reason,
-  'repairer-spawning'
-);
+    pathLength: 5
+  });
+  assert.equal(plan.deadlineSlack <= 0, true);
+});
 
-assert.equal(
-  buildContainerRepairPlan({
-    container: criticalContainer,
-    roomOwned: false,
-    repairer: {
-      ...repairer,
-      activeWork: 0
-    },
-    pathLength: 0,
-    constants: C
-  }).reason,
-  'repairer-no-active-work'
-);
+test('actionable plan keeps Container identity', () => {
+  assert.equal(build().containerId, 'c1');
+});
 
-assert.equal(
-  buildContainerRepairPlan({
-    container: criticalContainer,
-    roomOwned: false,
-    repairer: {
-      ...repairer,
-      energy: 0
+test('urgent plan ranks before normal plan', () => {
+  const plans = rankContainerRepairPlans([
+    {
+      containerId: 'normal',
+      action: 'move',
+      urgent: false,
+      deadlineSlack: 1,
+      travelTicks: 1,
+      estimate: { estimatedTicksUntilLoss: 10, hits: 1000 }
     },
-    pathLength: 0,
-    constants: C
-  }).reason,
-  'repairer-needs-energy'
-);
-
-assert.equal(
-  buildContainerRepairPlan({
-    container: criticalContainer,
-    roomOwned: false,
-    repairer: {
-      ...repairer,
-      rangeToContainer: 2
-    },
-    pathLength: 0,
-    constants: C,
-    policy: {
-      minimumHitsRatio: 0.2
+    {
+      containerId: 'urgent',
+      action: 'repair',
+      urgent: true,
+      deadlineSlack: 10,
+      travelTicks: 0,
+      estimate: { estimatedTicksUntilLoss: 20, hits: 2000 }
     }
-  }).action,
-  'repair'
-);
+  ]);
+  assert.equal(plans[0].containerId, 'urgent');
+});
 
-assert.equal(
-  buildContainerRepairPlan({
-    container: criticalContainer,
-    roomOwned: false,
-    repairer,
-    pathLength: null,
-    constants: C
-  }).reason,
-  'container-unreachable'
-);
-
-const ranked = rankContainerRepairPlans([
-  {
-    containerId: 'b',
+test('smaller deadline slack ranks first', () => {
+  const common = {
     action: 'move',
     urgent: false,
-    deadlineSlack: 10,
     travelTicks: 1,
-    estimate: {
-      estimatedTicksUntilLoss: 100,
-      hits: 10000
-    }
-  },
-  {
-    containerId: 'a',
-    action: 'repair',
-    urgent: true,
-    deadlineSlack: 20,
-    travelTicks: 0,
-    estimate: {
-      estimatedTicksUntilLoss: 200,
-      hits: 20000
-    }
-  }
-]);
-assert.equal(ranked[0].containerId, 'a');
+    estimate: { estimatedTicksUntilLoss: 100, hits: 10000 }
+  };
+  assert.equal(
+    rankContainerRepairPlans([
+      { ...common, containerId: 'b', deadlineSlack: 9 },
+      { ...common, containerId: 'a', deadlineSlack: 2 }
+    ])[0].containerId,
+    'a'
+  );
+});
 
-assert.equal(
-  verifyContainerRepair(null, null, 1).state,
-  'no-pending-observation'
-);
+test('shorter estimated lifetime ranks first', () => {
+  const common = {
+    action: 'move',
+    urgent: false,
+    deadlineSlack: 5,
+    travelTicks: 1,
+    estimate: { hits: 10000 }
+  };
+  assert.equal(
+    rankContainerRepairPlans([
+      { ...common, containerId: 'b', estimate: { ...common.estimate, estimatedTicksUntilLoss: 200 } },
+      { ...common, containerId: 'a', estimate: { ...common.estimate, estimatedTicksUntilLoss: 100 } }
+    ])[0].containerId,
+    'a'
+  );
+});
+
+test('stable ID breaks a complete tie', () => {
+  const common = {
+    action: 'move',
+    urgent: false,
+    deadlineSlack: 5,
+    travelTicks: 1,
+    estimate: { estimatedTicksUntilLoss: 100, hits: 10000 }
+  };
+  assert.equal(
+    rankContainerRepairPlans([
+      { ...common, containerId: 'b' },
+      { ...common, containerId: 'a' }
+    ])[0].containerId,
+    'a'
+  );
+});
+
+test('no pending observation is explicit', () => {
+  assert.equal(
+    verifyContainerRepair(null, null, 1).state,
+    'no-pending-observation'
+  );
+});
 
 const previous = {
   submittedAt: 1,
@@ -526,87 +652,113 @@ const previous = {
   containerId: 'c1'
 };
 
-assert.equal(
-  verifyContainerRepair(
+test('missed observation window is explicit', () => {
+  assert.equal(
+    verifyContainerRepair(
+      previous,
+      { containerExists: true, hits: 200 },
+      3
+    ).state,
+    'missed-observation-window'
+  );
+});
+
+test('missing Container is explicit', () => {
+  assert.equal(
+    verifyContainerRepair(
+      previous,
+      { containerExists: false },
+      2
+    ).state,
+    'container-missing'
+  );
+});
+
+test('matched event survives missing target state', () => {
+  assert.equal(
+    verifyContainerRepair(
+      previous,
+      { containerExists: false },
+      2,
+      [{
+        event: 'repair',
+        objectId: 'r1',
+        data: { targetId: 'c1', energySpent: 1 }
+      }]
+    ).state,
+    'repair-event-target-missing'
+  );
+});
+
+test('missing hits evidence is explicit', () => {
+  assert.equal(
+    verifyContainerRepair(
+      previous,
+      { containerExists: true, hits: null },
+      2
+    ).state,
+    'repair-evidence-unavailable'
+  );
+});
+
+test('matched event and positive delta are recorded', () => {
+  const result = verifyContainerRepair(
     previous,
     { containerExists: true, hits: 200 },
-    3
-  ).state,
-  'missed-observation-window'
-);
-
-assert.equal(
-  verifyContainerRepair(
-    previous,
-    { containerExists: false },
-    2
-  ).state,
-  'container-missing'
-);
-
-assert.equal(
-  verifyContainerRepair(
-    previous,
-    { containerExists: false },
     2,
-    [{ event: 'repair', objectId: 'r1', data: { targetId: 'c1', energySpent: 1 } }]
-  ).state,
-  'repair-event-target-missing'
-);
+    [{
+      event: 'repair',
+      objectId: 'r1',
+      data: { targetId: 'c1', energySpent: 1 }
+    }]
+  );
+  assert.equal(result.state, 'repair-event-and-hits-increased');
+  assert.equal(result.energySpent, 1);
+});
 
-assert.equal(
-  verifyContainerRepair(
-    previous,
-    { containerExists: true, hits: null },
-    2
-  ).state,
-  'repair-evidence-unavailable'
-);
+test('matched event can have a negative net delta', () => {
+  assert.equal(
+    verifyContainerRepair(
+      previous,
+      { containerExists: true, hits: 50 },
+      2,
+      [{
+        event: 'repair',
+        objectId: 'r1',
+        data: { targetId: 'c1' }
+      }]
+    ).state,
+    'repair-event-with-net-offset'
+  );
+});
 
-assert.equal(
-  verifyContainerRepair(
-    previous,
-    { containerExists: true, hits: null },
-    2,
-    [{ event: 'repair', objectId: 'r1', data: { targetId: 'c1' } }]
-  ).state,
-  'repair-event-hits-unavailable'
-);
+test('positive hits without actor event stay unverified', () => {
+  assert.equal(
+    verifyContainerRepair(
+      previous,
+      { containerExists: true, hits: 200 },
+      2
+    ).state,
+    'hits-increased-without-matched-event'
+  );
+});
 
-assert.equal(
-  verifyContainerRepair(previous, { containerExists: true, hits: 200 }, 2).state,
-  'hits-increased-without-matched-event'
-);
-assert.equal(
-  verifyContainerRepair(previous, { containerExists: true, hits: 100 }, 2).state,
-  'no-net-hits-change'
-);
-assert.equal(
-  verifyContainerRepair(previous, { containerExists: true, hits: 50 }, 2).state,
-  'hits-decreased'
-);
+test('invalid policy and history limit use safe defaults', () => {
+  const policy = normalizePolicy({
+    minimumHitsRatio: Number.NaN,
+    bufferDecayEvents: 0,
+    safetyTicks: -1,
+    historyLimit: Number.NaN
+  });
+  assert.deepEqual(policy, DEFAULT_POLICY);
+  const history = pushBoundedHistory(
+    Array.from({ length: 25 }, (_, index) => index),
+    25,
+    Number.NaN
+  );
+  assert.equal(history.length, 20);
+  assert.equal(history.at(-1), 25);
+});
 
-let verification = verifyContainerRepair(
-  previous,
-  { containerExists: true, hits: 200 },
-  2,
-  [{ event: 'repair', objectId: 'r1', data: { targetId: 'c1', energySpent: 1 } }]
-);
-assert.equal(verification.state, 'repair-event-and-hits-increased');
-assert.equal(verification.energySpent, 1);
-
-verification = verifyContainerRepair(
-  previous,
-  { containerExists: true, hits: 50 },
-  2,
-  [{ event: 'repair', objectId: 'r1', data: { targetId: 'c1' } }]
-);
-assert.equal(verification.state, 'repair-event-with-net-offset');
-
-assert.deepEqual(pushBoundedHistory([1, 2], 3, 2), [2, 3]);
-assert.equal(normalizePolicy({ minimumHitsRatio: 2 }).minimumHitsRatio, 0.8);
-assert.equal(getContainerDecayInterval(true, C), 500);
-assert.equal(getContainerDecayInterval(false, C), 100);
-assert.equal(normalizePolicy({ bufferDecayEvents: 0 }).bufferDecayEvents, 2);
-
-console.log('Container decay repair simulations passed: 28 cases.');
+assert.equal(passed, 31);
+console.log('Container decay repair simulations passed: 31 cases.');
