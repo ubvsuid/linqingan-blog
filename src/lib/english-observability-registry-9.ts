@@ -77,4 +77,27 @@ export const englishObservabilityBatchNineRegistry: DatedEnglishArticleRecord[] 
       "Screeps RoomVisual clear import coordination",
     ],
   },
+  {
+    href: "/en/blog/screeps-room-error-isolation",
+    chinesePath: "/blog/screeps-room-error-isolation",
+    category: "OPERATIONS · ROOM ERROR ISOLATION",
+    title: "Screeps Room Error Isolation: Keep Other Rooms Running",
+    description:
+      "Catch JavaScript exceptions at room or subsystem boundaries, retain bounded rate-limited evidence, pause repeatedly failing optional work, and retry after cooldown without confusing API return codes or CPU termination with exceptions.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps room error isolation",
+    searchIntent:
+      "Keep unaffected rooms running after one room or optional subsystem throws a JavaScript exception",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps room error isolation",
+      "Screeps try catch room loop",
+      "Screeps one room error stops other rooms",
+      "Screeps runtime circuit breaker",
+      "Screeps structured error logging",
+    ],
+  },
 ];
