@@ -24,7 +24,7 @@ const checks = [
   ["/blog/screeps-introduction", ["Screeps 是什么", "发布于", "查看验证详情"]],
   ["/blog/screeps-memory-basics", ["Screeps Memory 是什么", "测试环境", "Screeps Console", "待测试"]],
   ["/blog/screeps-creep-withdraw-container-energy", ["withdraw()", "查看验证详情", "测试环境"]],
-  ["/blog/screeps-tower-auto-attack-hostiles", ["Tower 怎么自动攻击敌人", "FIND_HOSTILE_CREEPS", "测试环境"]],
+  ["/blog/screeps-tower-auto-attack-hostiles", ["Tower attack() 返回 OK 但伤害不足", "FIND_HOSTILE_CREEPS", "测试环境"]],
   ["/blog/screeps-controller-activate-safe-mode", ["activateSafeMode()", "查看验证详情", "测试环境"]],
   ["/blog/screeps-spawn-renew-creep", ["renewCreep()", "查看验证详情", "测试环境"]],
   ["/blog/screeps-dynamic-creep-body-energy", ["离线模拟结果", "Node.js 24 离线模拟", "Screeps Console", "待测试"]],
