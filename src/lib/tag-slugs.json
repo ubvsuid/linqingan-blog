@@ -52,5 +52,5 @@
   "自动化": "automation",
   "Creep 生命周期": "creep-lifecycle",
   "能量": "energy-resource",
-  "游戏 API": "game-api"
+  "游戏 API": "screeps-game-api"
 }
