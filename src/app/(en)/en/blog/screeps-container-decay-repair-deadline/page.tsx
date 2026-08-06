@@ -54,6 +54,7 @@ export const metadata: Metadata = {
 const toc: Array<[string, string]> = [
   ["meaning", "ticksToDecay is the next decay pulse"],
   ["estimate", "Estimate remaining decay events"],
+  ["policy", "Normalize maintenance policy"],
   ["deadline", "Subtract travel and safety time"],
   ["priority", "Rank the most urgent Container"],
   ["action", "Submit one move or repair action"],
@@ -84,6 +85,23 @@ const nextDecayFatal =
   container.hits &lt;= CONTAINER_DECAY;</code></pre>
 <p>This estimate is recalculated from visible state. A change in room control, visibility, server constants, or live damage invalidates an old prediction.</p>
 
+<h2 id="policy">Normalize maintenance policy</h2>
+<p>Do not let a malformed ratio, negative safety margin, or <code>NaN</code> history limit enter deadline arithmetic. The complete Chinese manager validates <code>minimumHitsRatio</code>, <code>bufferDecayEvents</code>, <code>safetyTicks</code>, and <code>historyLimit</code> before using them.</p>
+<pre><code class="language-js">const policy = {
+  minimumHitsRatio:
+    Number.isFinite(input.minimumHitsRatio)
+    &amp;&amp; input.minimumHitsRatio &gt; 0
+    &amp;&amp; input.minimumHitsRatio &lt;= 1
+      ? input.minimumHitsRatio
+      : 0.8,
+  historyLimit:
+    Number.isInteger(input.historyLimit)
+    &amp;&amp; input.historyLimit &gt;= 1
+      ? input.historyLimit
+      : 20
+};</code></pre>
+<p>These defaults are local policy, not official recommendations.</p>
+
 <h2 id="deadline">Subtract travel and safety time</h2>
 <p>A Creep repairs within range 3. The useful deadline is therefore the next decay pulse minus estimated travel and a local safety buffer.</p>
 <pre><code class="language-js">const deadlineSlack =
@@ -93,11 +111,11 @@ const nextDecayFatal =
 <p>Path length is still only a scheduling estimate. Fatigue, terrain, traffic, hostile units, Ramparts, and stale paths can make arrival slower.</p>
 
 <h2 id="priority">Rank the most urgent Container</h2>
-<p>Do not sort only by current hits. Prefer a Container whose next pulse is fatal, then the smallest deadline slack, the shortest estimated lifetime, lower hits, shorter travel, and finally a stable ID. The stable tie-breaker prevents target churn.</p>
+<p>Do not sort only by current hits. Prefer a Container whose next pulse is fatal, then the smallest deadline slack, the shortest estimated lifetime, lower hits, shorter travel, and finally a stable ID. Every actionable plan keeps the Container ID, and the stable tie-breaker prevents target churn.</p>
 <p>The Chinese implementation also uses a policy target instead of repairing every damaged Container to full health. The target combines a configurable hits ratio with enough hits to survive several decay pulses.</p>
 
 <h2 id="action">Submit one move or repair action</h2>
-<p>Validate the repairer before choosing a target: it must exist, belong to the player, be fully spawned, have active WORK, and carry Energy. If it is outside range 3, submit <code>moveTo()</code> with <code>range: 3</code>. If it is in range, preserve the exact <code>repair()</code> return value.</p>
+<p>Validate the repairer before choosing a target: it must exist, belong to the player, be fully spawned, have active WORK, and carry Energy. An unknown or non-finite range must not be treated as range 3. If the Creep is outside range 3, submit <code>moveTo()</code> with <code>range: 3</code>. If it is in range, preserve the exact <code>repair()</code> return value.</p>
 <p>An <code>OK</code> result means the repair intent was accepted for the current tick. It does not prove that the Container is now safe or that its final hits must increase.</p>
 
 <h2 id="evidence">Verify the exact repair event</h2>
@@ -124,7 +142,7 @@ const energyNeeded =
 <p>Boosted WORK changes output and Energy consumption. The baseline formula must not be presented as a complete boosted-body model.</p>
 
 <h2 id="boundaries">Evidence boundaries</h2>
-<p>Twenty-eight offline cases passed: owned and neutral decay intervals, fatal next pulses, lifetime estimates, invalid inputs, WORK and Energy guards, range and path decisions, deterministic target ranking, exact event identity, missed observation windows, missing targets, net offsets, and bounded history. All JavaScript blocks passed syntax checking.</p>
+<p>Thirty-one offline cases passed: owned and neutral decay intervals, fatal next pulses, lifetime estimates, invalid constants and policy input, WORK and Energy guards, finite range checks, path decisions, actionable Container identity, deterministic target ranking, exact event identity, missed observation windows, missing targets, net offsets, and bounded history.</p>
 <p>Real Console execution, official-shard decay and repair in the same settlement window, traffic, boosted WORK, hostile pressure, and multi-Creep task locking remain pending.</p>
 `;
 
@@ -167,12 +185,12 @@ export default function ContainerDecayRepairDeadlinePage() {
       publishedAt={publishedAt}
       publishedLabel={publishedLabel}
       modifiedAt={modifiedTime}
-      readingTime="14 min read"
+      readingTime="15 min read"
       tags={["Resources", "Construction", "Debugging"]}
       verification={[
         { term: "Documentation", value: "Official Container, repair, constants, game-loop, and engine sources checked" },
         { term: "Syntax", value: "Complete Chinese manager and article code blocks checked" },
-        { term: "Offline cases", value: "28 passed" },
+        { term: "Offline cases", value: "31 passed" },
         { term: "Live shard", value: "Pending" },
       ]}
       toc={toc}
