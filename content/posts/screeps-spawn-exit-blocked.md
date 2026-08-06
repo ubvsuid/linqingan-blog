@@ -25,7 +25,7 @@ Spawn 已经把身体部件全部孵化完，但新 Creep 迟迟没有离开，`
 处理顺序应当是：
 
 1. 确认孵化计时是否真的已经结束；
-2. 读取当前 `spawn.spawning.directions`；
+2. 读取当前 `spawn.spawning.directions`，没有显式配置时回退到八方向；
 3. 检查 Spawn 周围八格的地形、建筑、工地和 Creep；
 4. 区分“当前看起来被占用”和“长期不可通行”；
 5. 有空位时调整当前孵化对象的方向；
@@ -35,6 +35,24 @@ Spawn 已经把身体部件全部孵化完，但新 Creep 迟迟没有离开，`
 ## 快速判断是不是出口阻塞
 
 ```js
+const DEFAULT_SPAWN_DIRECTIONS = Object.freeze([
+  TOP,
+  TOP_RIGHT,
+  RIGHT,
+  BOTTOM_RIGHT,
+  BOTTOM,
+  BOTTOM_LEFT,
+  LEFT,
+  TOP_LEFT
+]);
+
+function getSpawningDirections(spawning) {
+  return Array.isArray(spawning?.directions)
+    && spawning.directions.length > 0
+    ? [...spawning.directions]
+    : [...DEFAULT_SPAWN_DIRECTIONS];
+}
+
 function getSpawnStatus(spawn) {
   if (!spawn) {
     return {
@@ -55,7 +73,9 @@ function getSpawnStatus(spawn) {
     creepName: spawn.spawning.name,
     needTime: spawn.spawning.needTime,
     remainingTime: spawn.spawning.remainingTime,
-    directions: [...spawn.spawning.directions]
+    directions: getSpawningDirections(
+      spawn.spawning
+    )
   };
 }
 ```
@@ -126,8 +146,16 @@ Game.creeps[name].spawning === false
 | `name` | 正在孵化的 Creep 名称 |
 | `needTime` | 本次孵化总时间 |
 | `remainingTime` | 剩余孵化时间 |
-| `directions` | 当前允许和优先尝试的出生方向 |
+| `directions` | 当前显式配置的出生方向；创建时未传该选项时可能为 `undefined` |
 | `spawn` | 对应 Spawn 对象 |
+
+公开引擎在真正解析出生位置时，会在 `directions` 未配置的情况下回退到八个方向。诊断代码也必须做相同回退，不能直接写：
+
+```js
+[...spawn.spawning.directions]
+```
+
+否则创建时省略 `directions` 会让诊断器自己抛出异常。
 
 正在孵化的 Creep 也已经可以通过名称访问，但它的：
 
@@ -397,6 +425,8 @@ const result = spawn.spawnCreep(
 
 即使左侧为空，右侧长期被堵时也可能继续等待。不要把 `directions` 当成仅用于显示的建议字段。
 
+如果创建时省略 `directions`，引擎出生解析会使用八方向默认顺序；因此诊断器和重定向器也应把未配置状态视为“八方向允许”，而不是异常。
+
 ## 孵化过程中调整方向
 
 当前 Spawn 正在孵化时，可以使用：
@@ -431,8 +461,10 @@ return {
 
 ```js
 function chooseOpenSpawnDirections(spawn) {
-  const allowed = spawn.spawning
-    ? [...spawn.spawning.directions]
+  const configured = spawn.spawning?.directions;
+  const allowed = Array.isArray(configured)
+    && configured.length > 0
+    ? [...configured]
     : [...ALL_DIRECTIONS];
   const report = allowed.map(direction =>
     inspectSpawnDirection(spawn, direction)
@@ -787,6 +819,10 @@ creep.spawning === false
 
 它的动作通常会返回 `ERR_BUSY`。出生方向由 Spawn 的 `directions` 控制。
 
+### 直接展开未配置的 `directions`
+
+创建时省略 `directions` 后，该字段可能为 `undefined`。诊断代码应回退到八方向。
+
 ### 只检查墙，不检查工地
 
 不可通行建筑的 Construction Site 也可能阻挡出生。
@@ -811,7 +847,7 @@ Energy 问题发生在提交孵化请求前；出口阻塞发生在孵化完成�
 
 1. 保存 Spawn 名称、`Game.time` 和正在孵化的 Creep 名称。
 2. 确认 `remainingTime <= 0`。
-3. 记录 `spawn.spawning.directions`。
+3. 读取 `spawn.spawning.directions`，未配置时按八方向处理。
 4. 扫描八格地形、结构、工地、Creep 和 Power Creep。
 5. 判断允许方向是否过窄。
 6. 使用 `setDirections()` 提交当前可用方向。
@@ -822,12 +858,13 @@ Energy 问题发生在提交孵化请求前；出口阻塞发生在孵化完成�
 
 ## 验证状态与适用边界
 
-仓库会对本文 JavaScript 代码块执行 Node.js 语法检查，并通过离线用例检查方向排序、阻塞分类、重定向决策和限频状态。该检查不能模拟 Screeps 服务器的真实移动结算、敌对单位出生覆盖、Power 效果、多个 Spawn 的同 tick 竞争或真实 CPU 成本。
+仓库会对本文 JavaScript 代码块执行 Node.js 语法检查，并通过离线用例检查方向默认值、方向排序、阻塞分类、重定向决策和限频状态。该检查不能模拟 Screeps 服务器的真实移动结算、敌对单位出生覆盖、Power 效果、多个 Spawn 的同 tick 竞争或真实 CPU 成本。
 
 本文适用于：
 
 - 孵化计时结束后 `spawn.spawning` 持续存在；
 - 固定布局导致出生方向不足；
+- 创建时未显式设置 `directions`；
 - 运输者或续命 Creep 占用 Spawn 周围格；
 - `directions` 设置过窄；
 - 需要对出生阻塞做限频诊断；
@@ -857,5 +894,6 @@ Energy 问题发生在提交孵化请求前；出口阻塞发生在孵化完成�
 - [StructureSpawn.Spawning API](https://docs.screeps.com/api/#StructureSpawn.Spawning)
 - [Creep.spawning API](https://docs.screeps.com/api/#Creep.spawning)
 - [Screeps Debugging](https://docs.screeps.com/debugging.html)
+- [Screeps Engine: Spawn request processing](https://github.com/screeps/engine/blob/master/src/processor/intents/spawns/create-creep.js)
 - [Screeps Engine: Spawn exit resolution](https://github.com/screeps/engine/blob/master/src/processor/intents/spawns/_born-creep.js)
 - [Screeps Engine: Spawn tick processing](https://github.com/screeps/engine/blob/master/src/processor/intents/spawns/tick.js)
