@@ -1,7 +1,7 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
+import { getEnglishEditorialCorePublished20260731 } from "./english-editorial-core-published-20260731";
 import { englishEditorialNotifyEvidenceFinalArticle20260805 } from "./english-editorial-notify-evidence-final-20260805";
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
-import { englishCpuArticle } from "./english-runtime-cpu-8";
 
 const UPDATED_AT = "2026-08-06";
 
@@ -23,79 +23,99 @@ function replaceSection(
   return `${articleHtml.slice(0, start)}${replacement}\n${articleHtml.slice(end)}`;
 }
 
-function insertTocBefore(
-  toc: Array<[string, string]>,
-  beforeId: string,
-  item: [string, string],
+function preserveVerificationWithUpdates(
+  verification: Array<[string, string]>,
+  updates: Array<[string, string]>,
 ): Array<[string, string]> {
-  const withoutDuplicate = toc.filter(([id]) => id !== item[0]);
-  const index = withoutDuplicate.findIndex(([id]) => id === beforeId);
-
-  if (index < 0) return [...withoutDuplicate, item];
+  const replacedLabels = new Set([
+    "Evidence level",
+    "Last verified",
+    "Last editorial review",
+    ...updates.map(([label]) => label),
+  ]);
 
   return [
-    ...withoutDuplicate.slice(0, index),
-    item,
-    ...withoutDuplicate.slice(index),
+    ...verification.filter(([label]) => !replacedLabels.has(label)),
+    ...updates,
+    ["Last editorial review", "August 6, 2026"],
   ];
 }
 
-const cpuSimulationSection = String.raw`<h2 id="simulation">Why two zero samples cannot identify the Simulation</h2>
-<p>The official Simulation reports <code>0</code> from <code>Game.cpu.getUsed()</code>, so it cannot validate production CPU cost. The reverse inference is not valid: two zero readings do not prove that code is running in the Simulation. A tiny section can be below the useful resolution of one observation, and sampling the counter twice without representative work answers almost nothing.</p>
-<pre><code class="language-javascript">function sampleCpuSection(label, work) {
-  if (typeof work !== 'function') {
+const cpuBase = getEnglishEditorialCorePublished20260731(
+  "screeps-cpu-getused-bucket",
+);
+if (!cpuBase) {
+  throw new Error("Published CPU editorial base is missing.");
+}
+
+const cpuMentalModelSection = String.raw`<h2 id="mental-model">getUsed() is cumulative within the current tick</h2>
+<p><code>Game.cpu.getUsed()</code> reports CPU consumed from the beginning of the current tick. A section cost is the end reading minus the start reading. The Simulation always reports <code>0</code>, so it cannot validate production CPU cost. The reverse inference is not valid: two zero readings do not prove that the code is running in the Simulation. A very small section can also produce a zero sample at the useful resolution of one observation.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Field</th><th>Use it for</th><th>Do not treat it as</th></tr></thead>
+<tbody>
+<tr><td><code>Game.cpu.getUsed()</code></td><td>Current-tick cumulative usage</td><td>A cross-tick average or environment detector</td></tr>
+<tr><td><code>Game.cpu.limit</code></td><td>Normal account allowance</td><td>The hard ceiling for every tick</td></tr>
+<tr><td><code>Game.cpu.tickLimit</code></td><td>Current hard ceiling</td><td>A target to consume</td></tr>
+<tr><td><code>Game.cpu.bucket</code></td><td>Stored rollover capacity</td><td>A profiler that identifies expensive code</td></tr>
+</tbody></table></div>`;
+
+const cpuMinimalProbeSection = String.raw`<h2 id="minimal-probe">Minimal function-level probe</h2>
+<pre><code class="language-javascript">function measureCpu(label, fn) {
+  if (typeof fn !== 'function') {
     return {
       status: 'function-required',
       label,
+      tick: Game.time,
       value: null,
       start: null,
       end: null,
-      delta: null
+      cpu: null
     };
   }
 
   const start = Game.cpu.getUsed();
-  const value = work();
+  const value = fn();
   const end = Game.cpu.getUsed();
-  const delta = Math.max(0, end - start);
+  const cpu = Math.max(0, end - start);
 
   return {
     status: start === 0 && end === 0
       ? 'zero-sample-inconclusive'
       : 'sample-recorded',
     label,
+    tick: Game.time,
     value,
     start,
     end,
-    delta
+    cpu
   };
 }</code></pre>
-<p>Use an environment you already know is a live server when measuring CPU. Record representative input size and collect several comparable ticks. Keep a zero sample as data; do not turn it into an environment detector or an optimization claim.</p>`;
+<p>The result includes the callback and a small amount of wrapper overhead. Use the same harness before and after a change. Do not place verbose logging inside the measured callback because formatting and Console output become part of the measurement. Keep a zero result as data, but do not convert it into a Simulation claim or an optimization claim.</p>`;
 
-const cpuIntentBoundary = String.raw`<h2 id="intent-boundary">Choose another guide when</h2>
-<p>Use this page to measure a specific code path and protect hard-tick headroom. Use <a href="/en/blog/screeps-cpu-bucket-degradation">the bucket-degradation guide</a> when the problem is a colony-wide low-bucket state, optional-work shedding, or recovery policy. A bucket trend can explain scheduling pressure, but it does not identify which function consumed the CPU.</p>`;
+const cpuChoiceSection = String.raw`<h2 id="choose-another-guide">Choose another guide when</h2>
+<p>Use <a href="/en/blog/screeps-cpu-bucket-degradation">the bucket-degradation guide</a> when the problem is colony-wide low-bucket behavior, optional-work shedding, or recovery policy. Use <a href="/en/blog/screeps-global-cache">the global-cache guide</a> when repeated computation is the problem. Use <a href="/en/blog/screeps-rawmemory-segments">the Segments guide</a> when durable profiling data is too large for ordinary Memory. Use the current page only to establish a trustworthy section measurement and a bounded optional-work guard.</p>`;
 
 let cpuHtml = replaceSection(
-  englishCpuArticle.articleHtml,
-  "simulation",
-  "samples",
-  cpuSimulationSection,
+  cpuBase.articleHtml,
+  "mental-model",
+  "minimal-probe",
+  cpuMentalModelSection,
 );
 cpuHtml = replaceSection(
   cpuHtml,
-  "faq",
-  "official-docs",
-  cpuIntentBoundary,
+  "minimal-probe",
+  "representative-input",
+  cpuMinimalProbeSection,
 );
-
-const cpuToc = insertTocBefore(
-  englishCpuArticle.toc.filter(([id]) => id !== "faq"),
+cpuHtml = replaceSection(
+  cpuHtml,
+  "choose-another-guide",
   "official-docs",
-  ["intent-boundary", "Choose another guide when"],
+  cpuChoiceSection,
 );
 
 const cpuArticle: EnglishBeginnerArticle = {
-  ...englishCpuArticle,
+  ...cpuBase,
   title: "Screeps CPU Profiling: Measure Code with Game.cpu.getUsed()",
   headline: "Measure Screeps CPU Without Treating Zero as an Environment Test",
   description:
@@ -106,23 +126,28 @@ const cpuArticle: EnglishBeginnerArticle = {
   searchIntent:
     "Measure a specific Screeps code path accurately without using zero samples or bucket thresholds as false performance evidence",
   finalScore: 98,
-  verification: [
-    ["Official documentation", "Checked — getUsed() is cumulative for the current tick and returns 0 in the Simulation"],
-    ["Technical correction", "Two zero samples are now treated as inconclusive instead of an environment detector"],
-    ["Static code review", "Passed — invalid callback, cumulative samples, non-negative delta and explicit zero-sample state"],
-    ["Evidence level", "Official documentation review, repository review, JavaScript syntax review and offline boundary analysis"],
-    ["Screeps Console test", "Pending"],
-    ["Live multi-tick verification", "Pending"],
-    ["Representative live-server CPU sample set", "Pending"],
-    ["Last editorial review", "August 6, 2026"],
-  ],
-  toc: cpuToc,
-  faq: [],
+  verification: preserveVerificationWithUpdates(cpuBase.verification, [
+    [
+      "Technical correction",
+      "Checked — two zero readings remain inconclusive instead of identifying the runtime environment",
+    ],
+    [
+      "Static code review",
+      "Passed — invalid callback, cumulative readings, non-negative delta, explicit zero-sample state, bounded heap samples and hard-tick guard",
+    ],
+    [
+      "Evidence level",
+      "Official documentation review, repository review, JavaScript syntax review and static analysis only",
+    ],
+  ]),
   articleHtml: cpuHtml,
 };
 
 const segmentsBase =
   englishEditorialRuntimeOverrides20260731["screeps-rawmemory-segments"];
+if (!segmentsBase) {
+  throw new Error("Published RawMemory Segments editorial base is missing.");
+}
 
 const segmentManagerSection = String.raw`<h2 id="activation-manager">Collect requests and finalize exactly once</h2>
 <pre><code class="language-javascript">function getSegmentCoordinator() {
@@ -245,7 +270,7 @@ function runSegmentTick() {
 
   return { update, activation };
 }</code></pre>
-<p>On the first tick, <code>updateIntelSegment()</code> commonly returns <code>unavailable</code> while the finalizer schedules Segment 7. On a later tick it can read and replace the active string. In a larger loop, let every feature request its IDs first and call <code>finalizeSegmentRequests()</code> once at the end of the tick.</p>`;
+<p>On the first tick, <code>updateIntelSegment()</code> commonly returns <code>segment-unavailable</code> while the finalizer schedules Segment 7. On a later tick it can read and replace the active string. In a larger loop, let every feature request its IDs first and call <code>finalizeSegmentRequests()</code> once at the end of the tick.</p>`;
 
 let segmentsHtml = replaceSection(
   segmentsBase.articleHtml,
@@ -266,16 +291,20 @@ const segmentsArticle: EnglishBeginnerArticle = {
     "Coordinate Segment requests, finalize activation once per tick, reject late requests, read data on a later tick, distinguish unavailable from empty, and write only after validation.",
   readingTime: "14 min read",
   finalScore: 98,
-  verification: [
-    ["Official documentation", "Checked — IDs 0–99, up to 10 active, later-tick activation and last-call replacement behavior"],
-    ["Technical correction", "The coordinator now rejects late requests and makes repeated same-tick finalization idempotent"],
-    ["Static code review", "Passed — invalid IDs, priority merge, 10-ID cap, deferred set, late request and repeated-finalize states"],
-    ["Evidence level", "Official documentation review, repository review, JavaScript syntax review and offline lifecycle analysis"],
-    ["Screeps Console test", "Pending"],
-    ["Live multi-tick verification", "Pending"],
-    ["Live Segment activation, persistence and competing-module test", "Pending"],
-    ["Last editorial review", "August 6, 2026"],
-  ],
+  verification: preserveVerificationWithUpdates(segmentsBase.verification, [
+    [
+      "Technical correction",
+      "Checked — the coordinator rejects late requests and makes repeated same-tick finalization idempotent",
+    ],
+    [
+      "Static code review",
+      "Passed — invalid IDs, priority merge, 10-ID cap, deferred set, unavailable state, late request and repeated-finalize states",
+    ],
+    [
+      "Evidence level",
+      "Official documentation review, repository review, JavaScript syntax review and static lifecycle analysis only",
+    ],
+  ]),
   articleHtml: segmentsHtml,
 };
 
@@ -286,12 +315,12 @@ const notifyIdentitySection = String.raw`<h2 id="revision-identity">Bind one pay
 <pre><code class="language-javascript">function hashNotificationPayload(value) {
   let hash = 2166136261;
 
-  for (let index = 0; index &lt; value.length; index += 1) {
+  for (let index = 0; index < value.length; index += 1) {
     hash ^= value.charCodeAt(index);
     hash = Math.imul(hash, 16777619);
   }
 
-  return (hash &gt;&gt;&gt; 0)
+  return (hash >>> 0)
     .toString(16)
     .padStart(8, '0');
 }
@@ -343,15 +372,19 @@ const notifyHtml = replaceSection(
 const notifyArticle: EnglishBeginnerArticle = {
   ...notifyBase,
   description:
-    "Bind each notification to one immutable request revision and integrity fingerprint, reserve shared call slots, record the Game.notify return code locally, and keep external delivery unverified.",
+    "Bind each notification to one immutable request revision and integrity fingerprint, reserve shared call slots, record local submission at the Game.notify call site, and keep external delivery unverified.",
   readingTime: "21 min read",
   finalScore: 98,
-  verification: [
-    ...notifyBase.verification.slice(0, 3),
-    ["Digest boundary", "Checked — the payload digest is an integrity fingerprint, not cryptographic authorization or human approval"],
-    ...notifyBase.verification.slice(3).filter(([label]) => label !== "Last verified"),
-    ["Last editorial review", "August 6, 2026"],
-  ],
+  verification: preserveVerificationWithUpdates(notifyBase.verification, [
+    [
+      "Digest boundary",
+      "Checked — the payload digest is an integrity fingerprint, not cryptographic authorization or human approval",
+    ],
+    [
+      "Evidence level",
+      "Official API review, repository review, JavaScript syntax review and static analysis only",
+    ],
+  ]),
   articleHtml: notifyHtml,
 };
 
