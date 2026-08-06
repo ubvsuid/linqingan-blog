@@ -5,12 +5,14 @@ import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const contentPath = path.join(root, "src/lib/english-spawn-egress-content-19.ts");
+const publishedPath = path.join(root, "src/lib/english-spawn-egress-published-19.ts");
 const registryPath = path.join(root, "src/lib/english-link-source-registry-18.ts");
 const staticRoutePath = path.join(root, "src/app/(en)/en/blog/screeps-spawn-exit-blocked/page.tsx");
 const completePath = path.join(root, "src/lib/english-articles-complete.ts");
 const supplementalTopicsPath = path.join(root, "src/lib/english-discovery-topic-overrides-20260806.ts");
 
 const source = fs.readFileSync(contentPath, "utf8");
+const published = fs.readFileSync(publishedPath, "utf8");
 const registry = fs.readFileSync(registryPath, "utf8");
 const staticRoute = fs.readFileSync(staticRoutePath, "utf8");
 const complete = fs.readFileSync(completePath, "utf8");
@@ -41,12 +43,27 @@ for (const text of [
 }
 
 for (const text of [
-  "englishSpawnEgressBatchNineteenArticles",
+  "englishSpawnEgressPublishedArticle",
+  "english-spawn-egress-content-19",
+  "english-spawn-egress-published-19",
   "EnglishArticlePage",
   "FAQPage",
   "getEnglishDiscoveryArticle",
 ]) {
   if (!staticRoute.includes(text)) failures.push(`Static route lacks ${text}`);
+}
+
+for (const text of [
+  "unsafeDirectionsSnippet",
+  "safeDirectionsSnippet",
+  "Array.isArray(",
+  "TOP_LEFT",
+  "Screeps Spawn Exit Blocked: Directions and Egress Recovery",
+]) {
+  if (!published.includes(text)) failures.push(`Published normalization lacks ${text}`);
+}
+if (!published.includes("articleHtml: rawArticle.articleHtml.replace(")) {
+  failures.push("Published normalization does not replace the unsafe directions snippet");
 }
 
 if (!complete.includes("englishLinkSourceBatchEighteenRegistry")) {
@@ -128,6 +145,18 @@ for (const [input, expected] of [
   if (classifySpawn(input) !== expected) failures.push(`Spawn-state case failed: ${expected}`);
 }
 
+function normalizeDirections(directions) {
+  return Array.isArray(directions) && directions.length > 0
+    ? [...directions]
+    : [1, 2, 3, 4, 5, 6, 7, 8];
+}
+if (normalizeDirections(undefined).join(",") !== "1,2,3,4,5,6,7,8") {
+  failures.push("Undefined Spawn directions did not fall back to all eight directions");
+}
+if (normalizeDirections([3, 2]).join(",") !== "3,2") {
+  failures.push("Configured Spawn direction order was not preserved");
+}
+
 function chooseDirections(report) {
   return report
     .filter((item) => item.status === "open-in-current-snapshot")
@@ -196,5 +225,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Batch 19 Spawn egress check passed: 1 article, ${tocPairs.length} TOC anchors, ${codeBlocks.length} JavaScript blocks, and offline Spawn-state, direction, blocker, logging, and release cases.`,
+  `Batch 19 Spawn egress check passed: 1 article, ${tocPairs.length} TOC anchors, ${codeBlocks.length} JavaScript blocks, safe default directions, and offline Spawn-state, direction, blocker, logging, and release cases.`,
 );
