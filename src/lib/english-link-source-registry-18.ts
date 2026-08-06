@@ -232,4 +232,28 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps Spawn adjacent tiles",
     ],
   },
+  {
+    href: "/en/blog/screeps-multiple-spawn-queue-coordinator",
+    chinesePath: "/blog/screeps-multiple-spawn-queue-coordinator",
+    category: "SPAWNING · MULTI-SPAWN QUEUE COORDINATION",
+    title:
+      "Screeps Multiple Spawn Queue: Coordinate Priority, Names, and Energy",
+    description:
+      "Coordinate several owned Spawns through one room queue, reserve global names, budget shared room Energy once, submit deterministically, and verify exact requests later.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "19 min read",
+    primaryKeyword: "Screeps multiple Spawn queue",
+    searchIntent:
+      "Coordinate several same-room Spawn requests through one deterministic priority queue without duplicating names, Spawns, or the shared Energy budget",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps multiple Spawn queue",
+      "Screeps Spawn coordinator",
+      "Screeps spawnCreep priority queue",
+      "Screeps shared room Energy budget",
+      "Screeps multiple Spawns",
+    ],
+  },
 ];
