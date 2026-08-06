@@ -256,4 +256,28 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps Creep request deduplication",
     ],
   },
+  {
+    href: "/en/blog/screeps-store-capacity-api",
+    chinesePath: "/blog/screeps-store-capacity-api",
+    category: "ROOM ECONOMY · STORE CAPACITY",
+    title:
+      "Screeps Store API: getUsedCapacity, getFreeCapacity, and null",
+    description:
+      "Distinguish general, limited, and read-only Stores; interpret resource arguments, zero and null correctly; handle Lab and specialized capacities; and calculate safe withdraw and transfer amounts.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "18 min read",
+    primaryKeyword: "Screeps Store API",
+    searchIntent:
+      "Interpret Store capacity methods correctly across general, limited, specialized, inactive, and read-only resource objects",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Store API",
+      "Screeps getUsedCapacity",
+      "Screeps getFreeCapacity",
+      "Screeps getCapacity null",
+      "Screeps Lab Store capacity",
+    ],
+  },
 ];
