@@ -14,9 +14,22 @@ export interface ChangelogEntry {
   links?: ChangelogLink[];
 }
 
-export const CHANGELOG_ITEMS_PER_PAGE = 12;
+export const CHANGELOG_ITEMS_PER_PAGE = 24;
 
 export const changelogEntries: ChangelogEntry[] = [
+  {
+    id: "2026-08-06-store-capacity-api-guide",
+    date: "2026-08-06",
+    type: "内容",
+    title: "上线 Store 容量 API 双语指南",
+    summary:
+      "新增 getUsedCapacity、getFreeCapacity 与 getCapacity 专题，区分通用、受限和只读 Store，解释 0 与 null、Lab 双容量、安全 withdraw/transfer 数量和后续 tick 验证边界。",
+    links: [
+      { label: "阅读中文文章", href: "/blog/screeps-store-capacity-api" },
+      { label: "Read in English", href: "/en/blog/screeps-store-capacity-api" },
+      { label: "查看房间经济模块", href: "/knowledge/room-economy" },
+    ],
+  },
   {
     id: "2026-07-23-p2-discovery-tools",
     date: "2026-07-23",

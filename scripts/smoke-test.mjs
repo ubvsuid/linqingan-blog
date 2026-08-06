@@ -5,8 +5,7 @@ const checks = [
   ["/about", ["临清安", "/profile-avatar.webp", "篇专题文章", "公开建设项目", "查看建设日志"]],
   ["/beginner", ["Screeps 新手入门", "12"]],
   ["/blog", ["全部文章", "篇"]],
-  ["/changelog", ["更新日志", "上线 Store 容量 API 双语指南", "新增独立更新日志"]],
-  ["/changelog/page/2", ["更新日志", "合并资料中心与项目页面"]],
+  ["/changelog", ["更新日志", "新增独立更新日志", "合并资料中心与项目页面"]],
   ["/knowledge", ["Screeps 知识库", "查询与工具", "Creep 身体计算器", "选择你要解决的问题"]],
   ["/tools/creep-body-calculator", ["Creep 身体计算器", "选择身体部件", "计算结果", "复制身体数组"]],
   ["/tools/room-diagnostics", ["房间运行诊断", "使用边界", "CPU 风险"]],
@@ -65,6 +64,7 @@ const assetChecks = [
 ];
 
 const redirectChecks = [
+  ["/changelog/page/2", "/changelog"],
   ["/tags/新手入门", "/tags/beginner"],
   ["/tags/基础工程", "/tags/basic-engineering"],
   ["/tags/常见问题", "/tags/common-questions"],
