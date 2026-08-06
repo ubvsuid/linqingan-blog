@@ -8,4 +8,10 @@ export const additionalArticleTagSlugOverrides = {
     "movement",
     "debugging",
   ],
+  "/en/blog/screeps-multi-spawn-queue": [
+    "spawn",
+    "creeps",
+    "automation",
+    "debugging",
+  ],
 } as const;
