@@ -23,6 +23,7 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-spawn-exit-blocked-directions": 2,
   "/en/blog/screeps-dynamic-creep-body": 2,
   "/en/blog/screeps-room-energyavailable-stuck": 2,
+  "/en/blog/screeps-multi-spawn-queue": 2,
   "/en/blog/screeps-creep-prespawn-replacement": 2,
   "/en/blog/screeps-emergency-harvester-recovery": 2,
   "/en/blog/screeps-renew-creep": 2,
