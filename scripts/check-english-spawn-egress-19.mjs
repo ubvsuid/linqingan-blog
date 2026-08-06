@@ -5,18 +5,16 @@ import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const contentPath = path.join(root, "src/lib/english-spawn-egress-content-19.ts");
-const registryPath = path.join(root, "src/lib/english-spawn-egress-registry-19.ts");
-const routePath = path.join(root, "src/app/(en)/en/blog/[slug]/page.tsx");
+const registryPath = path.join(root, "src/lib/english-link-source-registry-18.ts");
+const staticRoutePath = path.join(root, "src/app/(en)/en/blog/screeps-spawn-exit-blocked/page.tsx");
 const completePath = path.join(root, "src/lib/english-articles-complete.ts");
-const knowledgePath = path.join(root, "src/lib/english-knowledge.ts");
-const discoveryPath = path.join(root, "src/lib/english-discovery.ts");
+const supplementalTopicsPath = path.join(root, "src/lib/english-discovery-topic-overrides-20260806.ts");
 
 const source = fs.readFileSync(contentPath, "utf8");
 const registry = fs.readFileSync(registryPath, "utf8");
-const route = fs.readFileSync(routePath, "utf8");
+const staticRoute = fs.readFileSync(staticRoutePath, "utf8");
 const complete = fs.readFileSync(completePath, "utf8");
-const knowledge = fs.readFileSync(knowledgePath, "utf8");
-const discovery = fs.readFileSync(discoveryPath, "utf8");
+const supplementalTopics = fs.readFileSync(supplementalTopicsPath, "utf8");
 const failures = [];
 
 const slug = "screeps-spawn-exit-blocked";
@@ -36,6 +34,7 @@ for (const [label, text] of [
 for (const text of [
   `href: "${href}"`,
   `chinesePath: "${chinesePath}"`,
+  "category: \"SPAWNING · EXIT BLOCKAGE DIAGNOSIS\"",
   "finalScore: 98",
 ]) {
   if (!registry.includes(text)) failures.push(`Registry lacks ${text}`);
@@ -43,19 +42,23 @@ for (const text of [
 
 for (const text of [
   "englishSpawnEgressBatchNineteenArticles",
-  "getEnglishSpawnEgressBatchNineteenArticle",
+  "EnglishArticlePage",
+  "FAQPage",
+  "getEnglishDiscoveryArticle",
 ]) {
-  if (!route.includes(text)) failures.push(`Dynamic route lacks ${text}`);
+  if (!staticRoute.includes(text)) failures.push(`Static route lacks ${text}`);
 }
 
-if (!complete.includes("englishSpawnEgressBatchNineteenRegistry")) {
-  failures.push("Complete English registry does not include batch 19");
+if (!complete.includes("englishLinkSourceBatchEighteenRegistry")) {
+  failures.push("Complete English registry does not include the static-pair registry");
 }
-if (!knowledge.includes(`"${href}": 2`)) {
-  failures.push("English knowledge mapping does not place Spawn egress in module 2");
+if (!supplementalTopics.includes(`"${href}": [`)) {
+  failures.push("Supplemental English discovery map lacks the Spawn egress article");
 }
-if (!discovery.includes(`"${href}": ["spawn", "creeps", "movement", "debugging"]`)) {
-  failures.push("English discovery lacks the curated Spawn egress topic mapping");
+for (const tag of ["spawn", "creeps", "movement", "debugging"]) {
+  if (!supplementalTopics.includes(`"${tag}"`)) {
+    failures.push(`Supplemental English discovery map lacks topic ${tag}`);
+  }
 }
 
 for (const text of [
