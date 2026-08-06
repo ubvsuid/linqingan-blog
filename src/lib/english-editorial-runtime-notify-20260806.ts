@@ -355,11 +355,14 @@ const notifyArticle: EnglishBeginnerArticle = {
   articleHtml: notifyHtml,
 };
 
-export const englishEditorialRuntimeNotifyOverrides20260806 = {
+export const englishEditorialRuntimeNotifyOverrides20260806: Record<
+  string,
+  EnglishBeginnerArticle
+> = {
   [cpuArticle.slug]: cpuArticle,
   [segmentsArticle.slug]: segmentsArticle,
   [notifyArticle.slug]: notifyArticle,
-} satisfies Record<string, EnglishBeginnerArticle>;
+};
 
 export const englishEditorialRuntimeNotifyUpdatedAt20260806: Record<string, string> = {
   [cpuArticle.slug]: UPDATED_AT,
