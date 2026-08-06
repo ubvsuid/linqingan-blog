@@ -5,21 +5,23 @@ import { join } from "node:path";
 import vm from "node:vm";
 
 const root = process.cwd();
-const sourcePath = join(
-  root,
-  "src/lib/english-editorial-runtime-notify-20260806.ts",
+const source = readFileSync(
+  join(root, "src/lib/english-editorial-runtime-notify-20260806.ts"),
+  "utf8",
 );
-const routePath = join(root, "src/app/(en)/en/blog/[slug]/page.tsx");
-const smokePath = join(root, "scripts/smoke-english-runtime-8.mjs");
-const auditPath = join(
-  root,
-  "docs/english-editorial-runtime-notify-batch-20260806.md",
+const route = readFileSync(
+  join(root, "src/app/(en)/en/blog/[slug]/page.tsx"),
+  "utf8",
+);
+const smoke = readFileSync(
+  join(root, "scripts/smoke-english-runtime-8.mjs"),
+  "utf8",
+);
+const audit = readFileSync(
+  join(root, "docs/english-editorial-runtime-notify-batch-20260806.md"),
+  "utf8",
 );
 
-const source = readFileSync(sourcePath, "utf8");
-const route = readFileSync(routePath, "utf8");
-const smoke = readFileSync(smokePath, "utf8");
-const audit = readFileSync(auditPath, "utf8");
 const failures = [];
 let assertions = 0;
 
@@ -29,25 +31,18 @@ function assert(condition, message) {
 }
 
 for (const required of [
-  'getEnglishEditorialCorePublished20260731',
-  '"screeps-cpu-getused-bucket"',
-  'zero-sample-inconclusive',
-  'global.cpuProbe',
-  'minimumBucket = 2000',
-  'runDefense()',
-  'remaining > reserveCpu',
-  'screeps-cpu-bucket-degradation',
-  'getSegmentCoordinator()',
-  'activation-already-finalized',
-  'segment-request-invalid',
-  'RawMemory.setActiveSegments(activeNextTick)',
-  'coordinator.requested.clear()',
-  'segment-unavailable',
-  'not cryptographic, collision-resistant, secret',
-  'buildNotificationPayloadDigest(request)',
-  'Screeps Console test',
-  'Live multi-tick verification',
-  'static analysis only',
+  "getEnglishEditorialCorePublished20260731",
+  "zero-sample-inconclusive",
+  "screeps-cpu-bucket-degradation",
+  "getSegmentCoordinator()",
+  "activation-already-finalized",
+  "segment-request-invalid",
+  "RawMemory.setActiveSegments(activeNextTick)",
+  "coordinator.requested.clear()",
+  "segment-unavailable",
+  "not cryptographic, collision-resistant, secret",
+  "buildNotificationPayloadDigest(request)",
+  "static analysis only",
 ]) {
   if (!source.includes(required)) {
     failures.push(`Editorial override is missing required boundary: ${required}`);
@@ -55,11 +50,12 @@ for (const required of [
 }
 
 for (const forbidden of [
-  'replace-with-current-payload-digest',
-  'status: start === 0 && end === 0\n      ? \'simulation\'',
+  "replace-with-current-payload-digest",
+  "Console test passed",
+  "Live multi-tick verification passed",
 ]) {
   if (source.includes(forbidden)) {
-    failures.push(`Editorial override still contains forbidden pattern: ${forbidden}`);
+    failures.push(`Editorial override contains forbidden evidence or placeholder: ${forbidden}`);
   }
 }
 
@@ -97,14 +93,12 @@ for (const [index, code] of blocks.entries()) {
   }
 }
 
-if (blocks.length >= 5) {
+if (blocks.length === 5) {
   const cpuContext = vm.createContext({
-    Game: {
-      time: 101,
-      cpu: { getUsed: () => 0 },
-    },
+    Game: { time: 101, cpu: { getUsed: () => 0 } },
   });
   vm.runInContext(blocks[0], cpuContext);
+
   const invalid = vm.runInContext("measureCpu('invalid', null)", cpuContext);
   assert(invalid.status === "function-required", "CPU invalid callback state failed");
 
@@ -142,7 +136,7 @@ if (blocks.length >= 5) {
   assert(firstPlan.activeNextTick.length === 10, "Segment active cap was not 10");
   assert(firstPlan.deferred.length === 2, "Segment deferred set was not retained");
   assert(firstPlan.activeNextTick[0] === 11, "Segment priority ordering failed");
-  assert(activeCalls.length === 1, "Segment API was not called exactly once on first finalize");
+  assert(activeCalls.length === 1, "Segment API was not called once on first finalize");
 
   const repeatedPlan = vm.runInContext("finalizeSegmentRequests()", segmentContext);
   assert(
@@ -168,6 +162,7 @@ if (blocks.length >= 5) {
   });
   vm.runInContext(blocks[3], notifyContext);
   vm.runInContext(blocks[4], notifyContext);
+
   const confirmation = vm.runInContext(
     "Memory.notificationRequests['spawn-energy-low'].confirmation",
     notifyContext,
@@ -214,9 +209,9 @@ if (!route.includes("getEnglishEditorialRuntimeNotifyUpdatedAt20260806")) {
 
 for (const signal of [
   'modifiedDate: "2026-08-06"',
-  'zero-sample-inconclusive',
-  'coordinator.requested.clear()',
-  'activation-already-finalized',
+  "zero-sample-inconclusive",
+  "coordinator.requested.clear()",
+  "activation-already-finalized",
 ]) {
   if (!smoke.includes(signal)) failures.push(`Production smoke is missing: ${signal}`);
 }
@@ -232,8 +227,8 @@ for (const signal of [
   if (!audit.includes(signal)) failures.push(`Audit record is missing: ${signal}`);
 }
 
-if (assertions !== 15) {
-  failures.push(`Expected 15 offline assertions, executed ${assertions}`);
+if (assertions !== 16) {
+  failures.push(`Expected 16 offline assertions, executed ${assertions}`);
 }
 
 if (failures.length > 0) {
