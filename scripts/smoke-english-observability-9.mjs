@@ -225,8 +225,8 @@ for (const expected of [
   "JavaScript exception",
   "Screeps API return code",
   "CPU execution boundary",
-  "critical:" + "${room.name}",
-  "optional:" + "${room.name}",
+  "'critical:' + room.name",
+  "'optional:' + room.name",
   "runtime-guard-recovered",
   "Live multi-room, CPU cost, global reset, and notification delivery test",
 ]) {
