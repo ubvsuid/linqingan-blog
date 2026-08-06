@@ -181,12 +181,13 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
     id: "operations-debugging",
     number: 8,
     title: "工程配置与运行诊断",
-    description: "使用 Flag、CPU 指标、自动降载、通知与事件日志观察系统，把配置、性能保护和调试从具体业务动作中分离出来。",
-    audience: "代码已经开始变长，希望知道系统为什么变慢、报错或停止工作，并在 CPU 储备恶化时保住关键任务的玩家。",
-    learningGoal: "建立配置、CPU 测量、任务降载、通知和事件观察能力，把性能指标转成可恢复的运行策略。",
+    description: "使用 Flag、CPU 指标、自动降载、通知、事件日志和房间级异常隔离观察系统，把配置、性能保护和故障恢复从具体业务动作中分离出来。",
+    audience: "代码已经开始变长，希望知道系统为什么变慢、报错或停止工作，并在 CPU 储备恶化或单个房间异常时保住关键任务的玩家。",
+    learningGoal: "建立配置、CPU 测量、任务降载、通知、事件观察和异常隔离能力，把运行指标与错误记录转成可恢复的执行策略。",
     stages: [
       { title: "配置与性能保护", description: "先使用 Flag 配置，观察 CPU 和 bucket，再按任务等级自动降载与恢复。", from: 0, to: 3 },
       { title: "通知与事件", description: "继续使用 Game.notify() 和 Room Event Log。", from: 3, to: 5 },
+      { title: "异常隔离与恢复", description: "最后为房间和独立模块建立错误边界、限频日志、冷却和自动重试。", from: 5, to: 6 },
     ],
     slugs: [
       "screeps-flags-config",
@@ -194,6 +195,7 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
       "screeps-cpu-bucket-degradation",
       "screeps-game-notify",
       "screeps-room-event-log",
+      "screeps-room-error-isolation",
     ],
   },
 ];
