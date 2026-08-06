@@ -177,4 +177,26 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps optional task throttling",
     ],
   },
+  {
+    href: "/en/blog/screeps-container-decay-repair-deadline",
+    chinesePath: "/blog/screeps-container-decay-repair-deadline",
+    category: "ROOM ECONOMY · CONTAINER DECAY",
+    title: "Screeps Container Decay: Repair Before the Next Fatal Tick",
+    description:
+      "Treat ticksToDecay as the next decay pulse, estimate remaining Container decay events, include travel time, submit one maintenance action, and verify the exact event on the next tick.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "14 min read",
+    primaryKeyword: "Screeps Container decay",
+    searchIntent: "Prevent a visible Container from being lost to decay by estimating the next fatal pulse and scheduling one verifiable maintenance action",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Container decay",
+      "StructureContainer ticksToDecay",
+      "Screeps Container maintenance",
+      "CONTAINER_DECAY_TIME",
+      "Screeps Container loss deadline",
+    ],
+  },
 ];
