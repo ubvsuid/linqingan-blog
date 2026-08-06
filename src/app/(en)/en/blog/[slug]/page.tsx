@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
+import {
+  getEnglishEditorialRuntimeNotifyArticle20260806,
+  getEnglishEditorialRuntimeNotifyUpdatedAt20260806,
+} from "@/lib/english-editorial-runtime-notify-20260806";
 import { englishFoundationArticles, getEnglishFoundationArticle } from "@/lib/english-foundation-content";
 import { englishFoundationBatchTwoArticles, getEnglishFoundationBatchTwoArticle } from "@/lib/english-foundation-content-2";
 import { englishSpawnBatchThreeArticles, getEnglishSpawnBatchThreeArticle } from "@/lib/english-spawn-content-3-published";
@@ -53,7 +57,8 @@ const dynamicEnglishArticles = [
 ];
 
 function getDynamicEnglishArticle(slug: string) {
-  return getEnglishEditorialPublished20260731(slug)
+  return getEnglishEditorialRuntimeNotifyArticle20260806(slug)
+    ?? getEnglishEditorialPublished20260731(slug)
     ?? getEnglishBeginnerArticle(slug)
     ?? getEnglishFoundationArticle(slug)
     ?? getEnglishFoundationBatchTwoArticle(slug)
@@ -75,6 +80,11 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishLinkSourceBatchEighteenArticle(slug);
 }
 
+function getModifiedTime(slug: string, fallback: string): string {
+  return getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
+    ?? fallback;
+}
+
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -91,7 +101,10 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
   const articleUrl = `${siteConfig.url}${article.path}`;
   const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
   const discovery = getEnglishDiscoveryArticle(article.path);
-  const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
+  const modifiedTime = getModifiedTime(
+    slug,
+    discovery?.updatedAt ?? article.publishedAt,
+  );
 
   return {
     title: { absolute: `${article.title} | Linqingan` },
@@ -133,7 +146,10 @@ export default async function EnglishArticleRoute({ params }: EnglishArticlePage
 
   const articleUrl = `${siteConfig.url}${article.path}`;
   const discovery = getEnglishDiscoveryArticle(article.path);
-  const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
+  const modifiedTime = getModifiedTime(
+    slug,
+    discovery?.updatedAt ?? article.publishedAt,
+  );
   const jsonLd = [
     {
       "@context": "https://schema.org",
