@@ -12,6 +12,8 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-clean-dead-creep-memory": 1,
   "/en/blog/screeps-global-cache": 1,
   "/en/blog/screeps-rawmemory-segments": 1,
+  "/en/blog/screeps-rawmemory-foreign-segment": 1,
+  "/en/blog/screeps-intershardmemory-sync": 1,
   "/en/blog/screeps-flags-configuration": 1,
   "/en/blog/screeps-require-modules": 1,
   "/en/blog/screeps-introduction": 1,
