@@ -8,6 +8,7 @@ const articlePaths = [
   "src/lib/english-observability-notify-9.ts",
   "src/lib/english-observability-event-log-9.ts",
   "src/lib/english-observability-roomvisual-9.ts",
+  "src/lib/english-observability-error-isolation-9.ts",
 ];
 const sources = articlePaths.map((file) => fs.readFileSync(path.join(root, file), "utf8"));
 const source = sources.join("\n");
@@ -19,6 +20,7 @@ const slugs = [
   "screeps-game-notify",
   "screeps-room-event-log",
   "screeps-roomvisual-debug",
+  "screeps-room-error-isolation",
 ];
 
 for (const slug of slugs) {
@@ -42,22 +44,26 @@ for (const text of [
   "room.getEventLog(true)",
   "512,000 bytes",
   "A drawing is diagnostic evidence",
+  "Separate three failure types",
+  "Build a reusable runtime guard",
+  "Keep Other Rooms Running",
 ]) {
   if (!source.includes(text)) failures.push(`缺少必备内容：${text}`);
 }
 
 for (const input of [source, registry]) {
   const scores = [...input.matchAll(/finalScore:\s*(\d+)/g)].map((match) => Number(match[1]));
-  if (scores.length !== 3 || scores.some((score) => score < 96)) failures.push("评分数量或发布门槛不正确");
+  if (scores.length !== 4 || scores.some((score) => score < 96)) failures.push("评分数量或发布门槛不正确");
 }
 
 if (!aggregate.includes("englishObservabilityBatchNineArticles")) failures.push("第九批聚合器缺失");
+if (!aggregate.includes("englishRoomErrorIsolationArticle")) failures.push("异常隔离文章未进入第九批聚合器");
 if (!route.includes("englishObservabilityBatchNineArticles")) failures.push("动态路由未载入第九批数组");
 if (!route.includes("getEnglishObservabilityBatchNineArticle")) failures.push("动态路由未载入第九批查询函数");
 if ((source.match(/[\u3400-\u9fff]/g) ?? []).length > 0) failures.push("英文正文包含中文字符");
 
 const toc = [...source.matchAll(/\["([a-z0-9-]+)", "([^"]+)"\],/g)];
-if (toc.length < 45) failures.push(`目录条目不足：${toc.length}`);
+if (toc.length < 58) failures.push(`目录条目不足：${toc.length}`);
 for (const match of toc) {
   const id = match[1];
   if (!source.includes(`<h2 id="${id}">`) && !source.includes(`<h3 id="${id}">`)) failures.push(`目录锚点不存在：${id}`);
@@ -65,7 +71,7 @@ for (const match of toc) {
 
 const blocks = [...source.matchAll(/<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g)]
   .map((match) => match[1].replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&"));
-if (blocks.length < 22) failures.push(`JavaScript 代码块不足：${blocks.length}`);
+if (blocks.length < 28) failures.push(`JavaScript 代码块不足：${blocks.length}`);
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), "en-observability-9-"));
 try {
   blocks.forEach((code, index) => {
@@ -169,9 +175,71 @@ const trimmed = "x".repeat(50).slice(0, 37) + "...";
 if (trimmed.length !== 40) failures.push("视觉标签裁剪失败");
 if (!(479999 < 480000) || 480000 < 480000) failures.push("视觉字节停止线失败");
 
+function normalizeThrown(thrown) {
+  if (thrown instanceof Error) {
+    return { name: thrown.name || "Error", message: thrown.message || String(thrown) };
+  }
+  let message;
+  try {
+    message = typeof thrown === "string" ? thrown : JSON.stringify(thrown);
+  } catch {
+    message = String(thrown);
+  }
+  return { name: "NonErrorThrow", message: message ?? String(thrown) };
+}
+function evaluateGuard({ now, errorTicks, disabledUntil, windowTicks, maxErrors, cooldownTicks, throws }) {
+  const firstTick = now - windowTicks + 1;
+  const recent = errorTicks.filter((tick) => tick >= firstTick);
+  if (Number.isInteger(disabledUntil) && now < disabledUntil) {
+    return { status: "cooldown", errorTicks: recent, retryAt: disabledUntil };
+  }
+  if (!throws) {
+    return { status: Number.isInteger(disabledUntil) ? "recovered" : "ok", errorTicks: [] };
+  }
+  recent.push(now);
+  const tripped = recent.length >= maxErrors;
+  return {
+    status: tripped ? "disabled" : "error",
+    errorTicks: recent,
+    retryAt: tripped ? now + cooldownTicks : null,
+  };
+}
+const roomOrder = [];
+for (const roomName of ["W1N1", "W2N2", "W3N3"]) {
+  try {
+    if (roomName === "W1N1") throw new Error("broken room");
+    roomOrder.push(roomName);
+  } catch {
+    roomOrder.push(`${roomName}:error`);
+  }
+}
+if (roomOrder.join(",") !== "W1N1:error,W2N2,W3N3") failures.push("房间异常未正确隔离");
+const firstGuard = evaluateGuard({ now: 10, errorTicks: [], disabledUntil: null, windowTicks: 10, maxErrors: 3, cooldownTicks: 5, throws: true });
+const secondGuard = evaluateGuard({ now: 11, errorTicks: firstGuard.errorTicks, disabledUntil: null, windowTicks: 10, maxErrors: 3, cooldownTicks: 5, throws: true });
+const thirdGuard = evaluateGuard({ now: 12, errorTicks: secondGuard.errorTicks, disabledUntil: null, windowTicks: 10, maxErrors: 3, cooldownTicks: 5, throws: true });
+if (firstGuard.status !== "error" || secondGuard.status !== "error" || thirdGuard.status !== "disabled" || thirdGuard.retryAt !== 17) failures.push("异常熔断阈值失败");
+const cooldownGuard = evaluateGuard({ now: 15, errorTicks: thirdGuard.errorTicks, disabledUntil: thirdGuard.retryAt, windowTicks: 10, maxErrors: 3, cooldownTicks: 5, throws: false });
+if (cooldownGuard.status !== "cooldown" || cooldownGuard.retryAt !== 17) failures.push("异常冷却状态失败");
+const recoveryGuard = evaluateGuard({ now: 17, errorTicks: thirdGuard.errorTicks, disabledUntil: thirdGuard.retryAt, windowTicks: 10, maxErrors: 3, cooldownTicks: 5, throws: false });
+if (recoveryGuard.status !== "recovered") failures.push("异常冷却恢复失败");
+const nonError = normalizeThrown({ reason: "missing-anchor" });
+if (nonError.name !== "NonErrorThrow" || !nonError.message.includes("missing-anchor")) failures.push("非 Error throw 规范化失败");
+let apiCaught = false;
+try {
+  const apiResult = -9;
+  if (apiResult !== -9) throw new Error("unexpected result");
+} catch {
+  apiCaught = true;
+}
+if (apiCaught) failures.push("普通 API 返回码被错误当成异常");
+function logDue(lastLogAt, now, interval) {
+  return !Number.isInteger(lastLogAt) || now - lastLogAt >= interval;
+}
+if (!logDue(null, 10, 20) || logDue(5, 10, 20) || !logDue(5, 25, 20)) failures.push("异常日志限频失败");
+
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
   process.exit(1);
 }
 
-console.log(`第九批英文可观测性检查通过：3 篇、${toc.length} 个目录锚点、${blocks.length} 个 JavaScript 代码块、31 个离线边界用例。`);
+console.log(`第九批英文可观测性检查通过：4 篇、${toc.length} 个目录锚点、${blocks.length} 个 JavaScript 代码块，并覆盖通知、事件、视觉与异常隔离边界。`);

@@ -300,6 +300,13 @@ const genericRecommendationTags = new Set([
   "进阶开发",
 ]);
 
+const pinnedRelatedPostSlugs: Readonly<Record<string, readonly string[]>> = {
+  "screeps-modules-require": ["screeps-room-error-isolation"],
+  "screeps-cpu-bucket-degradation": ["screeps-room-error-isolation"],
+  "screeps-game-notify": ["screeps-room-error-isolation"],
+  "screeps-room-event-log": ["screeps-room-error-isolation"],
+};
+
 function markdownToSearchText(markdown: string): string {
   return markdown
     .replace(/```[\s\S]*?```/g, " ")
@@ -339,10 +346,20 @@ export function getRelatedPosts(
   post: PostSummary,
   limit = 3,
 ): PostSummary[] {
+  const allPosts = getAllPosts();
+  const pinnedSlugs = pinnedRelatedPostSlugs[post.slug] ?? [];
+  const pinnedPosts = pinnedSlugs
+    .map((slug) => allPosts.find((candidate) => candidate.slug === slug))
+    .filter((candidate): candidate is PostSummary => candidate !== undefined);
+  const pinnedSet = new Set(pinnedPosts.map((candidate) => candidate.slug));
   const sourceTags = new Set(post.tags.map(normalizeTag));
   const sourceSection = getKnowledgeBaseSectionId(post.slug);
-  const scored = getAllPosts()
-    .filter((candidate) => candidate.slug !== post.slug)
+  const scored = allPosts
+    .filter(
+      (candidate) =>
+        candidate.slug !== post.slug &&
+        !pinnedSet.has(candidate.slug),
+    )
     .map((candidate) => {
       const sharedTags = candidate.tags.filter((tag) =>
         sourceTags.has(normalizeTag(tag)) &&
@@ -363,10 +380,11 @@ export function getRelatedPosts(
           new Date(left.candidate.publishedAt).getTime(),
     );
 
-  return scored
+  const rankedPosts = scored
     .filter((item) => item.score > 0)
-    .slice(0, limit)
     .map((item) => item.candidate);
+
+  return [...pinnedPosts, ...rankedPosts].slice(0, limit);
 }
 
 export function getSearchablePosts(): PostSearchDocument[] {
