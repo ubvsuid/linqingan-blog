@@ -6,14 +6,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-link-transfer-energy",
     category: "LOGISTICS · LINK ENERGY NETWORK",
     title: "How to Transfer Link Energy Without Depending on Structure Array Order",
-    description:
-      "Recover source and target Links by fixed IDs, require ownership, different objects, the same room, active structures and zero source cooldown, calculate a conservative amount from source stock and target free capacity, estimate LINK_LOSS_RATIO only for logs, and verify Store changes later.",
+    description: "Recover source and target Links by fixed IDs, require ownership, different objects, the same room, active structures and zero source cooldown, calculate a conservative amount from source stock and target free capacity, estimate LINK_LOSS_RATIO only for logs, and verify Store changes later.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
     readingTime: "18 min read",
     primaryKeyword: "Screeps Link transferEnergy",
-    searchIntent:
-      "Transfer Energy between two explicitly identified owned Links with conservative capacity and cooldown checks",
+    searchIntent: "Transfer Energy between two explicitly identified owned Links with conservative capacity and cooldown checks",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -29,14 +27,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-select-source-by-path",
     category: "HARVESTING · SOURCE TARGET SELECTION",
     title: "How to Select an Active Source by Reachable Path Without Target Churn",
-    description:
-      "Recover a stored Source ID first, distinguish FIND_SOURCES from FIND_SOURCES_ACTIVE, build reachable path candidates, rank path length before assignment count and stable ID, store the selected identity, handle empty Sources according to a documented dynamic policy, and preserve harvest and movement results.",
+    description: "Recover a stored Source ID first, distinguish FIND_SOURCES from FIND_SOURCES_ACTIVE, build reachable path candidates, rank path length before assignment count and stable ID, store the selected identity, handle empty Sources according to a documented dynamic policy, and preserve harvest and movement results.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
     readingTime: "19 min read",
     primaryKeyword: "Screeps select Source by path",
-    searchIntent:
-      "Keep or select a reachable active Source with deterministic path and load ordering",
+    searchIntent: "Keep or select a reachable active Source with deterministic path and load ordering",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -52,14 +48,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-tombstone-ruin-recovery",
     category: "ROOM ECONOMY · RESOURCE RECOVERY",
     title: "How to Recover Resources from Tombstones and Ruins in Screeps",
-    description:
-      "Scan visible Tombstones and Ruins, rank candidates by ticksToDecay, resource priority, amount and range, submit withdraw() safely, and verify bounded Store deltas on a later tick.",
+    description: "Scan visible Tombstones and Ruins, rank candidates by ticksToDecay, resource priority, amount and range, submit withdraw() safely, and verify bounded Store deltas on a later tick.",
     publishedAt: "2026-08-04",
     publishedLabel: "August 4, 2026",
     readingTime: "17 min read",
     primaryKeyword: "Screeps Tombstone resource recovery",
-    searchIntent:
-      "Recover expiring resources from visible Tombstones and Ruins with deterministic target selection and bounded verification",
+    searchIntent: "Recover expiring resources from visible Tombstones and Ruins with deterministic target selection and bounded verification",
     status: "published",
     finalScore: 97,
     keywords: [
@@ -75,14 +69,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-room-energyavailable-stuck",
     category: "SPAWN SYSTEM · ENERGY DIAGNOSTICS",
     title: "Why room.energyAvailable Stays Below Capacity in Screeps",
-    description:
-      "Inspect active Spawn and Extension Stores, distinguish a real delivery failure from normal spawning demand, select one deterministic fill target, record transfer() results, and verify bounded later deltas.",
+    description: "Inspect active Spawn and Extension Stores, distinguish a real delivery failure from normal spawning demand, select one deterministic fill target, record transfer() results, and verify bounded later deltas.",
     publishedAt: "2026-08-04",
     publishedLabel: "August 4, 2026",
     readingTime: "15 min read",
     primaryKeyword: "Screeps room.energyAvailable",
-    searchIntent:
-      "Diagnose why room.energyAvailable remains below energyCapacityAvailable and verify one Spawn or Extension delivery attempt",
+    searchIntent: "Diagnose why room.energyAvailable remains below energyCapacityAvailable and verify one Spawn or Extension delivery attempt",
     status: "published",
     finalScore: 97,
     keywords: [
@@ -98,14 +90,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-market-order-maintenance",
     category: "MARKET · ORDER LIFECYCLE",
     title: "How to Maintain Screeps Market Orders Safely",
-    description:
-      "Resolve one current owned order, require an exact order fingerprint, estimate change-price or extension fees, protect a Credits reserve, submit one changeOrderPrice(), extendOrder(), or cancelOrder() request, and verify the later order state.",
+    description: "Resolve one current owned order, require an exact order fingerprint, estimate change-price or extension fees, protect a Credits reserve, submit one changeOrderPrice(), extendOrder(), or cancelOrder() request, and verify the later order state.",
     publishedAt: "2026-08-04",
     publishedLabel: "August 4, 2026",
     readingTime: "18 min read",
     primaryKeyword: "Screeps market order maintenance",
-    searchIntent:
-      "Safely change, extend, or cancel one owned Screeps market order and verify the result",
+    searchIntent: "Safely change, extend, or cancel one owned Screeps market order and verify the result",
     status: "published",
     finalScore: 97,
     keywords: [
@@ -121,14 +111,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-upgrader-controller-link-not-upgrading",
     category: "CONTROLLER · FIXED UPGRADER DIAGNOSTICS",
     title: "Why a Fixed Screeps Upgrader Is Not Upgrading",
-    description:
-      "Validate one fixed anchor against Controller range 3 and Link range 1, recover the exact owned Controller Link, diagnose Energy and active body parts, preserve move, withdraw, and upgrade return codes, and verify later position, Store, or event evidence.",
+    description: "Validate one fixed anchor against Controller range 3 and Link range 1, recover the exact owned Controller Link, diagnose Energy and active body parts, preserve move, withdraw, and upgrade return codes, and verify later position, Store, or event evidence.",
     publishedAt: "2026-08-05",
     publishedLabel: "August 5, 2026",
     readingTime: "20 min read",
     primaryKeyword: "Screeps Upgrader not upgrading",
-    searchIntent:
-      "Diagnose a fixed Upgrader that reached the Controller area but is not consuming Controller Link Energy or upgrading",
+    searchIntent: "Diagnose a fixed Upgrader that reached the Controller area but is not consuming Controller Link Energy or upgrading",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -144,14 +132,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-creep-prespawn-replacement",
     category: "SPAWN LIFECYCLE · PRESPAWN REPLACEMENT",
     title: "Screeps Prespawn Replacement: Start the Next Creep Before the Current One Dies",
-    description:
-      "Calculate a replacement deadline from ticksToLive, current Spawn work, body spawn time, travel and safety margin, prevent duplicate role replacements, preserve spawnCreep results, and observe the accepted name later.",
+    description: "Calculate a replacement deadline from ticksToLive, current Spawn work, body spawn time, travel and safety margin, prevent duplicate role replacements, preserve spawnCreep results, and observe the accepted name later.",
     publishedAt: "2026-08-03",
     publishedLabel: "August 3, 2026",
     readingTime: "17 min read",
     primaryKeyword: "Screeps prespawn replacement",
-    searchIntent:
-      "Prevent role downtime by starting one covered Creep replacement before the current unit dies",
+    searchIntent: "Prevent role downtime by starting one covered Creep replacement before the current unit dies",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -167,14 +153,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-cpu-bucket-degradation",
     category: "OPERATIONS · CPU DEGRADATION",
     title: "Screeps CPU Bucket Degradation: Protect Critical Tasks and Recover Gradually",
-    description:
-      "Use a hysteresis-based four-mode scheduler when Game.cpu.bucket keeps falling, protect Spawn, harvesting, Controller safety and defense, throttle lower-tier work, stagger recovery, and preserve explicit evidence boundaries.",
+    description: "Use a hysteresis-based four-mode scheduler when Game.cpu.bucket keeps falling, protect Spawn, harvesting, Controller safety and defense, throttle lower-tier work, stagger recovery, and preserve explicit evidence boundaries.",
     publishedAt: "2026-08-05",
     publishedLabel: "August 5, 2026",
     readingTime: "16 min read",
     primaryKeyword: "Screeps CPU bucket falling",
-    searchIntent:
-      "Protect critical Screeps tasks and degrade optional work safely when CPU bucket trends downward",
+    searchIntent: "Protect critical Screeps tasks and degrade optional work safely when CPU bucket trends downward",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -190,14 +174,12 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     chinesePath: "/blog/screeps-container-decay-repair-deadline",
     category: "ROOM ECONOMY · CONTAINER DECAY",
     title: "Screeps Container Decay: Repair Before the Next Fatal Tick",
-    description:
-      "Treat ticksToDecay as the next decay pulse, estimate remaining Container decay events, include travel time, submit one maintenance action, and verify the exact event on the next tick.",
+    description: "Treat ticksToDecay as the next decay pulse, estimate remaining Container decay events, include travel time, submit one maintenance action, and verify the exact event on the next tick.",
     publishedAt: "2026-08-06",
     publishedLabel: "August 6, 2026",
     readingTime: "14 min read",
     primaryKeyword: "Screeps Container decay",
-    searchIntent:
-      "Prevent a visible Container from being lost to decay by estimating the next fatal pulse and scheduling one verifiable maintenance action",
+    searchIntent: "Prevent a visible Container from being lost to decay by estimating the next fatal pulse and scheduling one verifiable maintenance action",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -212,16 +194,13 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     href: "/en/blog/screeps-spawn-exit-blocked-directions",
     chinesePath: "/blog/screeps-spawn-exit-blocked-directions",
     category: "SPAWNING · EXIT DIRECTION DIAGNOSIS",
-    title:
-      "Screeps Spawn Exit Blocked: Diagnose Directions and Occupied Tiles",
-    description:
-      "Inspect all eight Spawn-adjacent tiles, separate stable obstacles from temporary occupancy, submit one ordered directions list, refresh it near completion, and verify the Creep's later birth state.",
+    title: "Screeps Spawn Exit Blocked: Diagnose Directions and Occupied Tiles",
+    description: "Inspect all eight Spawn-adjacent tiles, separate stable obstacles from temporary occupancy, submit one ordered directions list, refresh it near completion, and verify the Creep's later birth state.",
     publishedAt: "2026-08-06",
     publishedLabel: "August 6, 2026",
     readingTime: "17 min read",
     primaryKeyword: "Screeps Spawn exit blocked",
-    searchIntent:
-      "Diagnose a scheduled Creep that cannot complete birth because its permitted Spawn-adjacent exit tiles are blocked or temporarily occupied",
+    searchIntent: "Diagnose a scheduled Creep that cannot complete birth because its permitted Spawn-adjacent exit tiles are blocked or temporarily occupied",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -236,16 +215,13 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     href: "/en/blog/screeps-multi-spawn-queue",
     chinesePath: "/blog/screeps-multi-spawn-queue",
     category: "SPAWNING · QUEUE SCHEDULING",
-    title:
-      "Screeps Multi-Spawn Queue: Priority, Deduplication, and Shared Energy",
-    description:
-      "Centralize Creep demand, deduplicate stable request keys, rank emergency and replacement work, reserve shared room Energy locally, assign each idle Spawn once, and verify accepted names on later ticks.",
+    title: "Screeps Multi-Spawn Queue: Priority, Deduplication, and Shared Energy",
+    description: "Centralize Creep demand, deduplicate stable request keys, rank emergency and replacement work, reserve shared room Energy locally, assign each idle Spawn once, and verify accepted names on later ticks.",
     publishedAt: "2026-08-06",
     publishedLabel: "August 6, 2026",
     readingTime: "20 min read",
     primaryKeyword: "Screeps multi Spawn queue",
-    searchIntent:
-      "Coordinate multiple Creep requests and idle Spawns without duplicate demand, priority inversion, or same-tick shared Energy overcommitment",
+    searchIntent: "Coordinate multiple Creep requests and idle Spawns without duplicate demand, priority inversion, or same-tick shared Energy overcommitment",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -260,16 +236,13 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     href: "/en/blog/screeps-store-capacity-api",
     chinesePath: "/blog/screeps-store-capacity-api",
     category: "ROOM ECONOMY · STORE CAPACITY",
-    title:
-      "Screeps Store API: getUsedCapacity, getFreeCapacity, and null",
-    description:
-      "Distinguish general, limited, and read-only Stores; interpret resource arguments, zero and null correctly; handle Lab and specialized capacities; and calculate safe withdraw and transfer amounts.",
+    title: "Screeps Store API: getUsedCapacity, getFreeCapacity, and null",
+    description: "Distinguish general, limited, and read-only Stores; interpret resource arguments, zero and null correctly; handle Lab and specialized capacities; and calculate safe withdraw and transfer amounts.",
     publishedAt: "2026-08-06",
     publishedLabel: "August 6, 2026",
     readingTime: "18 min read",
     primaryKeyword: "Screeps Store API",
-    searchIntent:
-      "Interpret Store capacity methods correctly across general, limited, specialized, inactive, and read-only resource objects",
+    searchIntent: "Interpret Store capacity methods correctly across general, limited, specialized, inactive, and read-only resource objects",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -278,6 +251,27 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps getFreeCapacity",
       "Screeps getCapacity null",
       "Screeps Lab Store capacity",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-intershardmemory-sync",
+    chinesePath: "/blog/screeps-intershardmemory-sync",
+    category: "MEMORY · CROSS-SHARD STATE",
+    title: "Screeps InterShardMemory: Versioned Cross-Shard State Without Remote Writes",
+    description: "Publish versioned shard-owned channels, validate remote strings, enforce a UTF-8 byte budget, detect writer restarts and revision regressions, and measure freshness with local observation windows.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "19 min read",
+    primaryKeyword: "Screeps InterShardMemory",
+    searchIntent: "Synchronize versioned state across Screeps shards without writing remote data or assuming one shared tick clock",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps InterShardMemory",
+      "Screeps cross shard Memory",
+      "InterShardMemory getRemote",
+      "InterShardMemory setLocal",
+      "Screeps shard state synchronization",
     ],
   },
 ];

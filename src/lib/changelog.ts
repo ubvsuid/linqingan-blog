@@ -14,7 +14,7 @@ export interface ChangelogEntry {
   links?: ChangelogLink[];
 }
 
-export const CHANGELOG_ITEMS_PER_PAGE = 12;
+export const CHANGELOG_ITEMS_PER_PAGE = 24;
 
 export const changelogEntries: ChangelogEntry[] = [
   {

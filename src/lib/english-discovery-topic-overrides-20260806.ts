@@ -20,4 +20,9 @@ export const additionalArticleTagSlugOverrides = {
     "javascript",
     "debugging",
   ],
+  "/en/blog/screeps-intershardmemory-sync": [
+    "memory",
+    "automation",
+    "debugging",
+  ],
 } as const;
