@@ -14,6 +14,10 @@ const numberedContentFiles = fs.readdirSync(libDirectory)
     /^english-[a-z0-9-]+-content-\d+(?:-published)?\.ts$/.test(name)
   )
   .sort();
+const staticNumberedContentRoutes = {
+  "english-spawn-egress-content-19.ts":
+    "src/app/(en)/en/blog/screeps-spawn-exit-blocked/page.tsx",
+};
 const records = [];
 const failures = [];
 
@@ -112,6 +116,21 @@ for (const fileName of registryFiles.filter((name) => name !== "english-articles
 
 for (const fileName of numberedContentFiles) {
   const stem = fileName.replace(/\.ts$/, "");
+  const staticRoute = staticNumberedContentRoutes[fileName];
+
+  if (staticRoute) {
+    const absoluteStaticRoute = path.join(root, staticRoute);
+    if (!fs.existsSync(absoluteStaticRoute)) {
+      failures.push(`静态英文路由不存在：${staticRoute}`);
+      continue;
+    }
+    const staticRouteSource = fs.readFileSync(absoluteStaticRoute, "utf8");
+    if (!staticRouteSource.includes(`@/lib/${stem}`)) {
+      failures.push(`静态英文路由未导入 ${fileName}`);
+    }
+    continue;
+  }
+
   if (!routeSource.includes(`@/lib/${stem}`)) {
     failures.push(`英文动态路由未导入 ${fileName}`);
   }
@@ -126,5 +145,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `英文文章映射检查通过：${records.length} 条中英文配对、${registryFiles.length} 个登记文件、${numberedContentFiles.length} 个动态内容批次；路径唯一、来源存在且统一接入完整。`,
+  `英文文章映射检查通过：${records.length} 条中英文配对、${registryFiles.length} 个登记文件、${numberedContentFiles.length} 个内容批次；路径唯一、来源存在且动态或静态路由完整。`,
 );
