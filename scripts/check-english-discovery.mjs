@@ -53,6 +53,7 @@ for (const record of records) {
 
 const requiredFiles = [
   "src/lib/english-discovery.ts",
+  "src/lib/english-discovery-topic-overrides-20260806.ts",
   "src/lib/english-article-browser.ts",
   "src/lib/sitemaps.ts",
   "src/components/english-article-browser.tsx",
@@ -92,17 +93,34 @@ for (const [relativePath, expected, label] of assertions) {
   if (!source.includes(expected)) failures.push(`Missing ${label} in ${relativePath}`);
 }
 
+function extractTopicMappings(source, objectName) {
+  const block = source.match(new RegExp(`const ${objectName}:[\\s\\S]*?= \\{([\\s\\S]*?)\\n\\};`))
+    ?? source.match(new RegExp(`export const ${objectName} = \\{([\\s\\S]*?)\\n\\} as const;`));
+  if (!block) return null;
+
+  return [...block[1].matchAll(/"(\/en\/blog\/[^"]+)": \[([^\]]*)\]/g)].map((match) => [
+    match[1],
+    [...match[2].matchAll(/"([^"]+)"/g)].map((topic) => topic[1]),
+  ]);
+}
+
 const discoverySource = fs.readFileSync(path.join(root, "src/lib/english-discovery.ts"), "utf8");
-const overrideBlock = discoverySource.match(/const articleTagSlugOverrides:[\s\S]*?= \{([\s\S]*?)\n\};/);
-if (!overrideBlock) {
+const primaryMappings = extractTopicMappings(discoverySource, "articleTagSlugOverrides");
+const supplementalSource = fs.readFileSync(
+  path.join(root, "src/lib/english-discovery-topic-overrides-20260806.ts"),
+  "utf8",
+);
+const supplementalMappings = extractTopicMappings(
+  supplementalSource,
+  "additionalArticleTagSlugOverrides",
+);
+
+if (!primaryMappings) {
   failures.push("English article topic override map is missing.");
+} else if (!supplementalMappings) {
+  failures.push("Supplemental English article topic override map is missing.");
 } else {
-  const topicCounts = new Map(
-    [...overrideBlock[1].matchAll(/"(\/en\/blog\/[^"]+)": \[([^\]]*)\]/g)].map((match) => [
-      match[1],
-      [...match[2].matchAll(/"([^"]+)"/g)].map((topic) => topic[1]),
-    ]),
-  );
+  const topicCounts = new Map([...primaryMappings, ...supplementalMappings]);
   for (const href of hrefs) {
     const topics = topicCounts.get(href);
     if (!topics) {
