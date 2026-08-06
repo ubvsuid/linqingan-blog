@@ -3,4 +3,10 @@ export const additionalArticleTagSlugOverrides = {
     "debugging",
     "javascript",
   ],
+  "/en/blog/screeps-spawn-exit-blocked": [
+    "spawn",
+    "creeps",
+    "movement",
+    "debugging",
+  ],
 } as const;
