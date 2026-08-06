@@ -1,3 +1,5 @@
+await import("./check-english-editorial-runtime-notify-20260806.mjs");
+
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 const articles = [
   {
