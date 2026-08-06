@@ -46,6 +46,8 @@ if (english.error) {
     "runSpawnEgressGuard",
     "open-in-current-snapshot",
     "spawn.spawning.setDirections",
+    "Array.isArray(",
+    "TOP_LEFT",
     "cancelled spawning does not refund the Energy already spent",
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
@@ -65,6 +67,7 @@ if (english.error) {
     "live Spawn egress test passed",
     "guaranteed-free",
     "cancel-on-blockage",
+    "directions: [...spawn.spawning.directions]",
   ]) {
     if (english.body.includes(forbidden)) {
       failures.push(`${englishPath}: unsupported or unsafe claim “${forbidden}”`);
@@ -80,6 +83,8 @@ if (chinese.error) {
 } else {
   for (const expected of [
     chineseTitle,
+    "getSpawningDirections",
+    "Array.isArray(spawning?.directions)",
     "spawn.spawning.setDirections",
     "open-in-current-snapshot",
     "不要用 cancel() 清理出口阻塞",
@@ -137,5 +142,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Spawn egress production smoke passed: Chinese and English pages, Canonical, hreflang, JSON-LD, search, knowledge modules, indexes, and both Sitemap shards.",
+  "Spawn egress production smoke passed: Chinese and English pages, safe default directions, Canonical, hreflang, JSON-LD, search, knowledge modules, indexes, and both Sitemap shards.",
 );
