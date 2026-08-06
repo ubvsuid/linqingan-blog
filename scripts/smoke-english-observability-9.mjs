@@ -76,6 +76,24 @@ const articles = [
       "room-visual-rendered-locally",
     ],
   },
+  {
+    path: "/en/blog/screeps-room-error-isolation",
+    chinesePath: "/blog/screeps-room-error-isolation",
+    headline: "How to Isolate One Room Error Without Stopping Every Other Room",
+    listingTitle: "Screeps Room Error Isolation: Keep Other Rooms Running",
+    query: "room error isolation",
+    tocId: "runtime-guard",
+    tocHeading: "Build a reusable runtime guard",
+    modifiedDate: "2026-08-06",
+    signals: [
+      "runGuarded",
+      "runtime-guard-error",
+      "breakerEnabled: false",
+      "NonErrorThrow",
+      "status: 'cooldown'",
+      "ERR_NOT_IN_RANGE",
+    ],
+  },
 ];
 
 const failures = [];
@@ -202,6 +220,30 @@ for (const forbidden of [
   }
 }
 
+const isolationBody = bodies.get("/en/blog/screeps-room-error-isolation") || "";
+for (const expected of [
+  "JavaScript exception",
+  "Screeps API return code",
+  "CPU execution boundary",
+  "'critical:' + room.name",
+  "'optional:' + room.name",
+  "runtime-guard-recovered",
+  "Live multi-room, CPU cost, global reset, and notification delivery test",
+]) {
+  if (!isolationBody.includes(expected)) {
+    failures.push(`Room error-isolation page missing “${expected}”`);
+  }
+}
+for (const forbidden of [
+  "CPU termination is caught",
+  "external notification arrived",
+  "live multi-room test passed",
+]) {
+  if (isolationBody.includes(forbidden)) {
+    failures.push(`Room error-isolation page contains unsupported claim “${forbidden}”`);
+  }
+}
+
 const blogIndex = await fetchText("/en/blog-index.json");
 if (blogIndex.error) {
   failures.push(`/en/blog-index.json: request failed: ${blogIndex.error}`);
@@ -236,5 +278,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "English observability production smoke passed: 3 articles, notification return-code identity, exact previous-tick windows, room-bound visuals, finite request timeouts, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
+  "English observability production smoke passed: 4 articles, notification return-code identity, exact previous-tick windows, room-bound visuals, room-level exception isolation, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
 );
