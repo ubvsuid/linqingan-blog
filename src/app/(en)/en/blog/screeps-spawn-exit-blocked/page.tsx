@@ -8,13 +8,14 @@ import { getEnglishDiscoveryArticle } from "@/lib/english-discovery";
 import { siteConfig } from "@/lib/site";
 
 const article = englishSpawnEgressBatchNineteenArticles[0];
+const pageTitle = "Screeps Spawn Exit Blocked: Directions and Egress Recovery";
 const discovery = getEnglishDiscoveryArticle(article.path);
 const articleUrl = `${siteConfig.url}${article.path}`;
 const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
 const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
 
 export const metadata: Metadata = {
-  title: { absolute: `${article.title} | Linqingan` },
+  title: { absolute: `${pageTitle} | Linqingan` },
   description: article.description,
   keywords: article.keywords,
   authors: [{ name: "Linqingan", url: `${siteConfig.url}/en/about` }],
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     alternateLocale: ["zh_CN"],
     url: articleUrl,
     siteName: "Linqingan",
-    title: `${article.title} | Linqingan`,
+    title: `${pageTitle} | Linqingan`,
     description: article.description,
     publishedTime: article.publishedAt,
     modifiedTime,
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${article.title} | Linqingan`,
+    title: `${pageTitle} | Linqingan`,
     description: article.description,
     images: [socialImage],
   },
