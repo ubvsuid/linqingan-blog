@@ -24,9 +24,9 @@ async function fetchText(pathname) {
 const failures = [];
 const englishPath = "/en/blog/screeps-spawn-exit-blocked";
 const chinesePath = "/blog/screeps-spawn-exit-blocked";
-const EnglishTitle = "Screeps Spawn Exit Blocked: directions and Egress Recovery";
-const EnglishHeadline = "How to Diagnose a Creep That Finishes Spawning but Cannot Exit";
-const ChineseTitle = "Screeps Spawn 出口被堵怎么办：directions、出生阻塞与自动疏通";
+const englishTitle = "Screeps Spawn Exit Blocked: Directions and Egress Recovery";
+const englishHeadline = "How to Diagnose a Creep That Finishes Spawning but Cannot Exit";
+const chineseTitle = "Screeps Spawn 出口被堵怎么办：directions、出生阻塞与自动疏通";
 
 const english = await fetchText(englishPath);
 if (english.error) {
@@ -37,8 +37,8 @@ if (english.error) {
   const canonical = `https://www.linqingan.com${englishPath}`;
   const chinese = `https://www.linqingan.com${chinesePath}`;
   for (const expected of [
-    EnglishTitle,
-    EnglishHeadline,
+    englishTitle,
+    englishHeadline,
     "Verification status",
     "Public engine source",
     "Screeps Console test",
@@ -79,11 +79,11 @@ if (chinese.error) {
   failures.push(`${chinesePath}: expected 200, received ${chinese.response.status}`);
 } else {
   for (const expected of [
-    ChineseTitle,
+    chineseTitle,
     "spawn.spawning.setDirections",
     "open-in-current-snapshot",
-    "consoleTested",
-    "liveTested",
+    "不要用 cancel() 清理出口阻塞",
+    "验证状态与适用边界",
   ]) {
     if (!chinese.body.includes(expected)) {
       failures.push(`${chinesePath}: missing “${expected}”`);
@@ -98,8 +98,8 @@ if (englishSearch.error) {
   failures.push(`/en/search: request failed: ${englishSearch.error}`);
 } else if (englishSearch.response.status !== 200) {
   failures.push(`/en/search: received ${englishSearch.response.status}`);
-} else if (!englishSearch.body.includes(EnglishTitle)) {
-  failures.push(`/en/search: missing “${EnglishTitle}”`);
+} else if (!englishSearch.body.includes(englishTitle)) {
+  failures.push(`/en/search: missing “${englishTitle}”`);
 }
 
 const chineseSearch = await fetchText(
@@ -109,14 +109,14 @@ if (chineseSearch.error) {
   failures.push(`/search: request failed: ${chineseSearch.error}`);
 } else if (chineseSearch.response.status !== 200) {
   failures.push(`/search: received ${chineseSearch.response.status}`);
-} else if (!chineseSearch.body.includes(ChineseTitle)) {
-  failures.push(`/search: missing “${ChineseTitle}”`);
+} else if (!chineseSearch.body.includes(chineseTitle)) {
+  failures.push(`/search: missing “${chineseTitle}”`);
 }
 
 for (const [pathname, expected] of [
-  ["/en/blog-index.json", EnglishTitle],
-  ["/knowledge/spawn-lifecycle", ChineseTitle],
-  ["/en/knowledge", EnglishTitle],
+  ["/en/blog-index.json", englishTitle],
+  ["/knowledge/spawn-lifecycle", chineseTitle],
+  ["/en/knowledge", englishTitle],
   ["/sitemap-zh.xml", `https://www.linqingan.com${chinesePath}`],
   ["/sitemap-en.xml", `https://www.linqingan.com${englishPath}`],
 ]) {
