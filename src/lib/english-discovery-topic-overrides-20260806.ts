@@ -8,4 +8,9 @@ export const additionalArticleTagSlugOverrides = {
     "movement",
     "debugging",
   ],
+  "/en/blog/screeps-multiple-spawn-queue-coordinator": [
+    "spawn",
+    "javascript",
+    "debugging",
+  ],
 } as const;
