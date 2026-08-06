@@ -12,7 +12,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "July 26, 2026",
     readingTime: "18 min read",
     primaryKeyword: "Screeps Link transferEnergy",
-    searchIntent: "Transfer Energy between two explicitly identified owned Links with conservative capacity and cooldown checks",
+    searchIntent:
+      "Transfer Energy between two explicitly identified owned Links with conservative capacity and cooldown checks",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -34,7 +35,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "July 26, 2026",
     readingTime: "19 min read",
     primaryKeyword: "Screeps select Source by path",
-    searchIntent: "Keep or select a reachable active Source with deterministic path and load ordering",
+    searchIntent:
+      "Keep or select a reachable active Source with deterministic path and load ordering",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -56,7 +58,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 4, 2026",
     readingTime: "17 min read",
     primaryKeyword: "Screeps Tombstone resource recovery",
-    searchIntent: "Recover expiring resources from visible Tombstones and Ruins with deterministic target selection and bounded verification",
+    searchIntent:
+      "Recover expiring resources from visible Tombstones and Ruins with deterministic target selection and bounded verification",
     status: "published",
     finalScore: 97,
     keywords: [
@@ -78,7 +81,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 4, 2026",
     readingTime: "15 min read",
     primaryKeyword: "Screeps room.energyAvailable",
-    searchIntent: "Diagnose why room.energyAvailable remains below energyCapacityAvailable and verify one Spawn or Extension delivery attempt",
+    searchIntent:
+      "Diagnose why room.energyAvailable remains below energyCapacityAvailable and verify one Spawn or Extension delivery attempt",
     status: "published",
     finalScore: 97,
     keywords: [
@@ -100,7 +104,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 4, 2026",
     readingTime: "18 min read",
     primaryKeyword: "Screeps market order maintenance",
-    searchIntent: "Safely change, extend, or cancel one owned Screeps market order and verify the result",
+    searchIntent:
+      "Safely change, extend, or cancel one owned Screeps market order and verify the result",
     status: "published",
     finalScore: 97,
     keywords: [
@@ -122,7 +127,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 5, 2026",
     readingTime: "20 min read",
     primaryKeyword: "Screeps Upgrader not upgrading",
-    searchIntent: "Diagnose a fixed Upgrader that reached the Controller area but is not consuming Controller Link Energy or upgrading",
+    searchIntent:
+      "Diagnose a fixed Upgrader that reached the Controller area but is not consuming Controller Link Energy or upgrading",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -144,7 +150,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 3, 2026",
     readingTime: "17 min read",
     primaryKeyword: "Screeps prespawn replacement",
-    searchIntent: "Prevent role downtime by starting one covered Creep replacement before the current unit dies",
+    searchIntent:
+      "Prevent role downtime by starting one covered Creep replacement before the current unit dies",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -166,7 +173,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 5, 2026",
     readingTime: "16 min read",
     primaryKeyword: "Screeps CPU bucket falling",
-    searchIntent: "Protect critical Screeps tasks and degrade optional work safely when CPU bucket trends downward",
+    searchIntent:
+      "Protect critical Screeps tasks and degrade optional work safely when CPU bucket trends downward",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -188,7 +196,8 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
     publishedLabel: "August 6, 2026",
     readingTime: "14 min read",
     primaryKeyword: "Screeps Container decay",
-    searchIntent: "Prevent a visible Container from being lost to decay by estimating the next fatal pulse and scheduling one verifiable maintenance action",
+    searchIntent:
+      "Prevent a visible Container from being lost to decay by estimating the next fatal pulse and scheduling one verifiable maintenance action",
     status: "published",
     finalScore: 98,
     keywords: [
@@ -197,6 +206,30 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps Container maintenance",
       "CONTAINER_DECAY_TIME",
       "Screeps Container loss deadline",
+    ],
+  },
+  {
+    href: "/en/blog/screeps-spawn-exit-blocked-directions",
+    chinesePath: "/blog/screeps-spawn-exit-blocked-directions",
+    category: "SPAWNING · EXIT DIRECTION DIAGNOSIS",
+    title:
+      "Screeps Spawn Exit Blocked: Diagnose Directions and Occupied Tiles",
+    description:
+      "Inspect all eight Spawn-adjacent tiles, separate stable obstacles from temporary occupancy, submit one ordered directions list, refresh it near completion, and verify the Creep's later birth state.",
+    publishedAt: "2026-08-06",
+    publishedLabel: "August 6, 2026",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps Spawn exit blocked",
+    searchIntent:
+      "Diagnose a scheduled Creep that cannot complete birth because its permitted Spawn-adjacent exit tiles are blocked or temporarily occupied",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Spawn exit blocked",
+      "spawnCreep directions",
+      "StructureSpawn.Spawning.setDirections",
+      "Screeps Creep stuck in Spawn",
+      "Screeps Spawn adjacent tiles",
     ],
   },
 ];
