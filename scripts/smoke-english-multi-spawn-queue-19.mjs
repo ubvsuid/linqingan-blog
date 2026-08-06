@@ -99,7 +99,7 @@ for (const [pathname, expected] of [
   [`/search?q=${encodeURIComponent("多 Spawn 队列")}`, chineseTitle],
   ["/en/blog-index.json", englishTitle],
   ["/knowledge/spawn-lifecycle", chineseTitle],
-  ["/en/knowledge", englishTitle],
+  ["/en/knowledge/spawn-creep-lifecycle", englishTitle],
   ["/sitemap-zh.xml", `https://www.linqingan.com${chinesePath}`],
   ["/sitemap-en.xml", `https://www.linqingan.com${englishPath}`],
 ]) {
