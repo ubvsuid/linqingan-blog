@@ -11,8 +11,8 @@ Validation available in this batch:
 - official Screeps documentation review;
 - repository and publication-chain review;
 - TypeScript-oriented static review;
-- JavaScript syntax review of the new examples;
-- 14 offline boundary assertions covering CPU samples, Segment coordination, and notification payload drift.
+- JavaScript syntax review of the five revised examples;
+- 16 offline boundary assertions covering CPU samples, Segment coordination, and notification payload drift.
 
 Validation not available in this batch:
 
@@ -26,7 +26,7 @@ Validation not available in this batch:
 
 | Existing URL | Why selected | Main pre-edit problem | Expected improvement |
 | --- | --- | --- | --- |
-| `/en/blog/screeps-cpu-getused-bucket` | CPU profiling is a core, high-frequency debugging task | Two zero `getUsed()` samples were presented as an environment detector even though zero is only conclusive in the known Simulation direction | Keep zero samples explicitly inconclusive, align title and H1, remove redundant FAQ, and separate profiling intent from bucket-degradation recovery |
+| `/en/blog/screeps-cpu-getused-bucket` | CPU profiling is a core, high-frequency debugging task | The current page correctly stated that Simulation returns zero, but its minimal probe returned a bare delta and did not explicitly prevent the invalid reverse inference that two zero samples identify the Simulation | Return an explicit inconclusive state for zero samples, align title and H1, and separate section profiling from bucket-degradation recovery |
 | `/en/blog/screeps-rawmemory-segments` | Segments require exact multi-tick reasoning and affect persistent data safety | A second same-tick finalizer could replace the first activation plan; late requests were silently accepted by module order | Make finalization idempotent, reject late requests visibly, preserve deferred IDs, and move finalization to one end-of-tick boundary |
 | `/en/blog/screeps-game-notify` | Alerts are a high-value observability feature with evidence and trust boundaries | The payload digest could be read as authorization or human approval, and the sample contained a non-executable placeholder | Label the digest as a non-cryptographic integrity fingerprint and provide an executable payload-binding example |
 
@@ -42,18 +42,27 @@ No URL merge, redirect, canonical change, or deletion is required.
 
 ### Screeps CPU profiling
 
-Removed:
+Removed or replaced:
 
-- the `canMeasureCpuHere()` detector that inferred environment availability from two immediate samples;
-- a repetitive FAQ section that repeated the body without adding a new decision path.
+- the throw-only invalid-callback path, which did not return a diagnostic state;
+- wording that explained the known Simulation behavior without explicitly rejecting the reverse inference from a zero sample;
+- the previous alternative-guide paragraph, which did not distinguish section profiling from colony-wide bucket recovery.
+
+Preserved:
+
+- the existing `Use this guide when` boundary;
+- bounded `global.cpuProbe` samples outside Memory;
+- the `minimumBucket = 2000` example as clearly labeled player policy;
+- essential work before optional analytics;
+- hard-tick headroom through `remaining > reserveCpu`;
+- official sources and Pending live evidence.
 
 Added:
 
-- `zero-sample-inconclusive` as an explicit diagnostic state;
-- an executable section sampler that preserves the cumulative start, end, and delta;
+- `function-required`, `zero-sample-inconclusive`, and `sample-recorded` states;
+- start, end, non-negative delta, tick, callback result, and label in one observable result;
 - a natural internal-link boundary to the bucket-degradation guide;
-- title, H1, description, and search-intent alignment;
-- explicit pending live-server sample evidence.
+- title, H1, description, and search-intent alignment.
 
 ### RawMemory Segments
 
@@ -91,7 +100,7 @@ Added:
 
 | Page | Technical /24 | Intent /18 | Original /15 | English /12 | Structure /10 | Evidence /8 | SEO /8 | Accessibility /5 | Total | Publication state |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CPU profiling | 21 | 17 | 14 | 12 | 10 | 7 | 8 | 5 | **94** | Blocked: misleading environment inference |
+| CPU profiling | 21 | 17 | 14 | 12 | 10 | 7 | 8 | 5 | **94** | Blocked: zero-sample ambiguity and no explicit diagnostic state |
 | RawMemory Segments | 21 | 18 | 14 | 12 | 10 | 7 | 8 | 5 | **95** | Blocked: activation plan could be overwritten |
 | Game.notify | 21 | 18 | 14 | 12 | 10 | 7 | 8 | 5 | **95** | Blocked: trust boundary and executable-example gap |
 
@@ -105,11 +114,11 @@ Added:
 
 ### Score rationale
 
-- **Technical accuracy and code safety — 23/24:** official boundaries are represented, unsafe inference or ordering behavior is removed, and offline edge cases pass. One point remains reserved because live Screeps execution is pending.
+- **Technical accuracy and code safety — 23/24:** official boundaries are represented, ambiguous or unsafe state handling is replaced, and offline edge cases pass. One point remains reserved because live Screeps execution is pending.
 - **Search intent — 18/18:** each page owns one task and links to the nearest alternative when the user's problem is different.
 - **Original value — 14/15:** the pages add practical state models and failure boundaries rather than restating the API. One point remains reserved for genuine live evidence.
-- **English quality — 12/12:** empty framing, placeholder copy, and redundant FAQ material were removed; wording remains concrete and engineering-focused.
-- **Structure — 10/10:** replacement sections preserve stable heading IDs and add a decision boundary only where needed.
+- **English quality — 12/12:** placeholder copy and ambiguous trust language were removed; wording remains concrete and engineering-focused.
+- **Structure — 10/10:** replacement sections preserve stable heading IDs and add decision boundaries only where needed.
 - **Evidence transparency — 8/8:** official review, static analysis, offline checks, and pending live evidence are separated.
 - **SEO — 8/8:** existing URLs and canonicals remain stable; CPU title/H1/description are aligned; internal links distinguish overlapping intents; modified date is scoped to these three substantive revisions.
 - **Accessibility — 5/5:** heading hierarchy and table semantics are preserved; no image or interaction regression is introduced by the content override.
@@ -118,11 +127,11 @@ The numeric scores are internal editorial scores. They are not Google scores, ra
 
 ## Offline assertions
 
-The local boundary harness passed 14 assertions:
+The repository gate executes 16 offline assertions after syntax-checking all five revised JavaScript blocks:
 
-- CPU: invalid callback, two-zero inconclusive state, and positive delta;
-- Segments: priority ordering, ten-ID active cap, deferred IDs, one API call on repeated finalization, late-request rejection, and next-tick reuse;
-- notifications: executable fingerprint creation and fingerprint mismatch after message mutation.
+- CPU: invalid callback state, two-zero inconclusive state, positive sample state, and non-negative delta;
+- Segments: invalid ID rejection, priority ordering, ten-ID active cap, deferred IDs, one API call, idempotent repeated finalization, late-request rejection, and next-tick reuse;
+- notifications: executable confirmation identity, deterministic digest, and fingerprint mismatch after message mutation.
 
 ## Release gate
 
