@@ -30,6 +30,7 @@ const articles = [
     query: "Game.notify payload identity",
     tocId: "evidence-contract",
     tocHeading: "Separate scheduling from delivery",
+    modifiedDate: "2026-08-06",
     signals: [
       "buildNotificationPayloadDigest",
       "result = Game.notify",
@@ -47,6 +48,7 @@ const articles = [
     query: "Room.getEventLog previous tick",
     tocId: "evidence-contract",
     tocHeading: "Bind the previous-tick window",
+    modifiedDate: "2026-08-05",
     signals: [
       "non-replayable-gap-observed",
       "snapshot.capturedAt === eventTick",
@@ -64,6 +66,7 @@ const articles = [
     query: "RoomVisual room identity",
     tocId: "evidence-contract",
     tocHeading: "Treat drawings as browser output",
+    modifiedDate: "2026-08-05",
     signals: [
       "createRoomVisualDispatcher",
       "mark.roomName !== roomName",
@@ -110,7 +113,7 @@ for (const article of articles) {
     `href="#${article.tocId}"`,
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-05"`,
+    `"dateModified":"${article.modifiedDate}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: missing “${expected}”`);
