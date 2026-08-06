@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
+import "@/lib/english-spawn-egress-content-19";
 import {
-  englishSpawnEgressBatchNineteenArticles,
-} from "@/lib/english-spawn-egress-content-19";
+  englishSpawnEgressPublishedArticle,
+} from "@/lib/english-spawn-egress-published-19";
 import { getEnglishDiscoveryArticle } from "@/lib/english-discovery";
 import { siteConfig } from "@/lib/site";
 
-const article = englishSpawnEgressBatchNineteenArticles[0];
-const pageTitle = "Screeps Spawn Exit Blocked: Directions and Egress Recovery";
+const article = englishSpawnEgressPublishedArticle;
 const discovery = getEnglishDiscoveryArticle(article.path);
 const articleUrl = `${siteConfig.url}${article.path}`;
 const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
 const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
 
 export const metadata: Metadata = {
-  title: { absolute: `${pageTitle} | Linqingan` },
+  title: { absolute: `${article.title} | Linqingan` },
   description: article.description,
   keywords: article.keywords,
   authors: [{ name: "Linqingan", url: `${siteConfig.url}/en/about` }],
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     alternateLocale: ["zh_CN"],
     url: articleUrl,
     siteName: "Linqingan",
-    title: `${pageTitle} | Linqingan`,
+    title: `${article.title} | Linqingan`,
     description: article.description,
     publishedTime: article.publishedAt,
     modifiedTime,
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${pageTitle} | Linqingan`,
+    title: `${article.title} | Linqingan`,
     description: article.description,
     images: [socialImage],
   },
