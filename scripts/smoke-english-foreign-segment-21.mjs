@@ -1,0 +1,131 @@
+const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const timeoutMs = 15000;
+
+async function fetchText(pathname) {
+  try {
+    const response = await fetch(`${baseUrl}${pathname}`, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    return {
+      response,
+      body: await response.text(),
+      error: null,
+    };
+  } catch (error) {
+    return {
+      response: null,
+      body: "",
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+const failures = [];
+const englishPath = "/en/blog/screeps-rawmemory-foreign-segment";
+const chinesePath = "/blog/screeps-rawmemory-foreign-segment";
+const englishTitle =
+  "Screeps RawMemory Foreign Segment: Publish and Read Public Segments Safely";
+const chineseTitle =
+  "Screeps RawMemory Foreign Segment 怎么用：公开 Segment、下一 Tick 读取与轮询调度";
+
+const english = await fetchText(englishPath);
+if (english.error) {
+  failures.push(`${englishPath}: request failed: ${english.error}`);
+} else if (english.response.status !== 200) {
+  failures.push(`${englishPath}: expected 200, received ${english.response.status}`);
+} else {
+  const canonical = `https://www.linqingan.com${englishPath}`;
+  const chinese = `https://www.linqingan.com${chinesePath}`;
+
+  for (const expected of [
+    englishTitle,
+    "Verification status",
+    "RawMemory.foreignSegment",
+    "setActiveForeignSegment",
+    "setPublicSegments",
+    "foreign-request-submitted",
+    "foreign-segment-matched",
+    "public-stream-stale",
+    "revision-regressed",
+    "Official-server foreign publication test",
+    "Pending",
+    `rel="canonical" href="${canonical}"`,
+    `rel="alternate" hrefLang="en" href="${canonical}"`,
+    `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
+    `rel="alternate" hrefLang="x-default" href="${canonical}"`,
+    `href="#coordinator"`,
+    `<h2 id="coordinator">Consume the old response before scheduling the next request</h2>`,
+    `"@type":"BlogPosting"`,
+    `"@type":"BreadcrumbList"`,
+    `"dateModified":"2026-08-06"`,
+  ]) {
+    if (!english.body.includes(expected)) {
+      failures.push(`${englishPath}: missing “${expected}”`);
+    }
+  }
+
+  for (const forbidden of [
+    "foreign segment write completed remotely",
+    "all foreign segments can be active",
+    "setPublicSegments appends",
+    "official-server foreign publication test passed",
+  ]) {
+    if (english.body.includes(forbidden)) {
+      failures.push(`${englishPath}: unsupported claim “${forbidden}”`);
+    }
+  }
+}
+
+const chinese = await fetchText(chinesePath);
+if (chinese.error) {
+  failures.push(`${chinesePath}: request failed: ${chinese.error}`);
+} else if (chinese.response.status !== 200) {
+  failures.push(`${chinesePath}: expected 200, received ${chinese.response.status}`);
+} else {
+  for (const expected of [
+    chineseTitle,
+    "foreign-request-submitted",
+    "foreign-segment-matched",
+    "public-stream-stale",
+    "revision-regressed",
+    "setDefaultPublicSegment(null)",
+    "验证状态与适用边界",
+  ]) {
+    if (!chinese.body.includes(expected)) {
+      failures.push(`${chinesePath}: missing “${expected}”`);
+    }
+  }
+}
+
+for (const [pathname, expected] of [
+  [`/en/search?q=${encodeURIComponent("RawMemory foreignSegment")}`, englishTitle],
+  [`/search?q=${encodeURIComponent("Foreign Segment")}`, chineseTitle],
+  ["/en/blog-index.json", englishTitle],
+  ["/knowledge/memory-engineering", chineseTitle],
+  ["/en/knowledge/memory-code-structure", englishTitle],
+  ["/sitemap-zh.xml", `https://www.linqingan.com${chinesePath}`],
+  ["/sitemap-en.xml", `https://www.linqingan.com${englishPath}`],
+]) {
+  const result = await fetchText(pathname);
+
+  if (result.error) {
+    failures.push(`${pathname}: request failed: ${result.error}`);
+  } else if (result.response.status !== 200) {
+    failures.push(`${pathname}: received ${result.response.status}`);
+  } else if (!result.body.includes(expected)) {
+    failures.push(`${pathname}: missing “${expected}”`);
+  }
+}
+
+if (failures.length > 0) {
+  failures.forEach((failure) => console.error(`ERROR: ${failure}`));
+  console.error(
+    `\nRawMemory foreign-segment production smoke failed: ${failures.length} finding(s).`,
+  );
+  process.exit(1);
+}
+
+console.log(
+  "RawMemory foreign-segment production smoke passed: bilingual pages, timing and evidence states, Canonical, hreflang, JSON-LD, search, knowledge modules, index, and both Sitemap shards.",
+);

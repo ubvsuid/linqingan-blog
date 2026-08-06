@@ -46,6 +46,7 @@ try {
   await import("./smoke-english-multi-spawn-queue-19.mjs");
   await import("./smoke-english-store-capacity-20.mjs");
   await import("./smoke-english-intershard-memory-20.mjs");
+  await import("./smoke-english-foreign-segment-21.mjs");
 } finally {
   globalThis.fetch = originalFetch;
 }
