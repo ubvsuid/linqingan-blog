@@ -18,8 +18,8 @@ verification:
   liveTested: false
   checkedAt: "2026-08-06"
   testedAt: "2026-08-06"
-  testEnvironment: "Node.js 22 离线模拟（Container 腐化间隔、损毁估算、维修截止时间、目标排序、证据窗口与异常输入；不是 Screeps 官方服务器）"
-  testResult: "28 个离线场景通过；完整维修决策代码与文章 JavaScript 代码块通过语法检查。真实 Console、官方 shard 腐化与维修同 tick 结算、交通阻塞和 Boost WORK 仍待验证。"
+  testEnvironment: "Node.js 22 离线模拟（Container 腐化间隔、损毁估算、策略归一化、维修截止时间、目标排序、证据窗口与异常输入；不是 Screeps 官方服务器）"
+  testResult: "31 个离线场景通过；完整维修决策代码与文章 JavaScript 代码块通过语法检查。真实 Console、官方 shard 腐化与维修同 tick 结算、交通阻塞和 Boost WORK 仍待验证。"
 featured: false
 ---
 
@@ -138,22 +138,57 @@ Controller level > 0
 
 但不要把该间隔写成永久事实。房间控制权变化、私服常量或特殊运行环境都可能让旧估算失效。每个可见 tick 都应重新读取当前房间状态。
 
-## 先确定维修目标，不要每次都修到满血
+## 先归一化维修策略
 
-“只要不是满血就维修”会浪费 Builder 的移动与 Energy，还可能抢占更重要的建设、Controller 或防御任务。
-
-本文使用两个本地策略值：
+生产示例通常会把阈值放进配置。配置被误写为 `NaN`、负数、小数或超出范围的比例时，不能让排序结果、截止时间或历史上限一起失效。
 
 ```js
-const REPAIR_POLICY = Object.freeze({
-  minimumHitsRatio: 0.8,
-  bufferDecayEvents: 2,
-  safetyTicks: 5,
-  historyLimit: 20
-});
+const DEFAULT_CONTAINER_REPAIR_POLICY =
+  Object.freeze({
+    minimumHitsRatio: 0.8,
+    bufferDecayEvents: 2,
+    safetyTicks: 5,
+    historyLimit: 20
+  });
+
+function normalizeContainerRepairPolicy(
+  value = {}
+) {
+  return {
+    minimumHitsRatio:
+      Number.isFinite(value.minimumHitsRatio)
+      && value.minimumHitsRatio > 0
+      && value.minimumHitsRatio <= 1
+        ? value.minimumHitsRatio
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .minimumHitsRatio,
+    bufferDecayEvents:
+      Number.isInteger(value.bufferDecayEvents)
+      && value.bufferDecayEvents >= 1
+        ? value.bufferDecayEvents
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .bufferDecayEvents,
+    safetyTicks:
+      Number.isInteger(value.safetyTicks)
+      && value.safetyTicks >= 0
+        ? value.safetyTicks
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .safetyTicks,
+    historyLimit:
+      Number.isInteger(value.historyLimit)
+      && value.historyLimit >= 1
+        ? value.historyLimit
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .historyLimit
+  };
+}
 ```
 
-它们不是官方推荐值。
+这些默认值是本站示例策略，不是官方推荐值。
+
+## 维修目标不必每次修到满血
+
+“只要不是满血就维修”会浪费 Builder 的移动与 Energy，还可能抢占更重要的建设、Controller 或防御任务。
 
 目标 hits 取以下两者的较大值：
 
@@ -164,8 +199,6 @@ hitsMax × minimumHitsRatio
 
 足以承受 bufferDecayEvents + 1 次腐化的 hits
 ```
-
-对应代码：
 
 ```js
 const targetHits = Math.min(
@@ -217,7 +250,7 @@ const deadlineSlack =
 
 ## 可离线验证的损毁估算函数
 
-下面的函数不依赖真实 Screeps 对象，可直接放进 Node.js 测试。
+下面的函数不依赖真实 Screeps 对象，可以直接放进 Node.js 测试。
 
 ```js
 function estimateContainerLoss(
@@ -280,7 +313,7 @@ function estimateContainerLoss(
 
 ## 怎样选择最紧急的 Container
 
-一个房间最多可能有多个 Source Container、Controller Container 或临时物流 Container。排序时不要只看最低 `hits`。
+一个房间可能有多个 Source Container、Controller Container 或临时物流 Container。排序时不要只看最低 `hits`。
 
 本文依次比较：
 
@@ -293,10 +326,10 @@ function estimateContainerLoss(
 
 ```js
 function rankContainerRepairPlans(plans) {
-  return plans
+  return [...plans]
     .filter(plan =>
       plan
-      && plan.containerId
+      && typeof plan.containerId === 'string'
       && (
         plan.action === 'repair'
         || plan.action === 'move'
@@ -306,41 +339,27 @@ function rankContainerRepairPlans(plans) {
       if (left.urgent !== right.urgent) {
         return left.urgent ? -1 : 1;
       }
-
       if (
         left.deadlineSlack
         !== right.deadlineSlack
       ) {
-        return (
-          left.deadlineSlack
-          - right.deadlineSlack
-        );
+        return left.deadlineSlack
+          - right.deadlineSlack;
       }
-
       if (
         left.estimatedTicksUntilLoss
         !== right.estimatedTicksUntilLoss
       ) {
-        return (
-          left.estimatedTicksUntilLoss
-          - right.estimatedTicksUntilLoss
-        );
+        return left.estimatedTicksUntilLoss
+          - right.estimatedTicksUntilLoss;
       }
-
       if (left.hits !== right.hits) {
         return left.hits - right.hits;
       }
-
-      if (
-        left.travelTicks
-        !== right.travelTicks
-      ) {
-        return (
-          left.travelTicks
-          - right.travelTicks
-        );
+      if (left.travelTicks !== right.travelTicks) {
+        return left.travelTicks
+          - right.travelTicks;
       }
-
       return left.containerId.localeCompare(
         right.containerId
       );
@@ -359,7 +378,7 @@ function rankContainerRepairPlans(plans) {
 把房间名和维修者名称替换成自己的。
 
 ```js
-const CONTAINER_REPAIR_POLICY =
+const DEFAULT_CONTAINER_REPAIR_POLICY =
   Object.freeze({
     minimumHitsRatio: 0.8,
     bufferDecayEvents: 2,
@@ -367,18 +386,54 @@ const CONTAINER_REPAIR_POLICY =
     historyLimit: 20
   });
 
+function normalizeContainerRepairPolicy(
+  value = {}
+) {
+  return {
+    minimumHitsRatio:
+      Number.isFinite(value.minimumHitsRatio)
+      && value.minimumHitsRatio > 0
+      && value.minimumHitsRatio <= 1
+        ? value.minimumHitsRatio
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .minimumHitsRatio,
+    bufferDecayEvents:
+      Number.isInteger(value.bufferDecayEvents)
+      && value.bufferDecayEvents >= 1
+        ? value.bufferDecayEvents
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .bufferDecayEvents,
+    safetyTicks:
+      Number.isInteger(value.safetyTicks)
+      && value.safetyTicks >= 0
+        ? value.safetyTicks
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .safetyTicks,
+    historyLimit:
+      Number.isInteger(value.historyLimit)
+      && value.historyLimit >= 1
+        ? value.historyLimit
+        : DEFAULT_CONTAINER_REPAIR_POLICY
+            .historyLimit
+  };
+}
+
 function pushBoundedHistory(
   history,
   entry,
-  limit
+  requestedLimit
 ) {
   const values = Array.isArray(history)
     ? history
     : [];
+  const limit =
+    Number.isInteger(requestedLimit)
+    && requestedLimit >= 1
+      ? requestedLimit
+      : DEFAULT_CONTAINER_REPAIR_POLICY
+          .historyLimit;
 
-  return [...values, entry].slice(
-    -Math.max(1, limit)
-  );
+  return [...values, entry].slice(-limit);
 }
 
 function getContainerDecayInterval(room) {
@@ -413,20 +468,31 @@ function createContainerRepairPlan(
   room,
   repairer,
   container,
-  policy
+  rawPolicy
 ) {
+  const policy =
+    normalizeContainerRepairPolicy(rawPolicy);
   const interval =
     getContainerDecayInterval(room);
+
+  if (
+    !container
+    || !Number.isFinite(container.hits)
+    || !Number.isFinite(container.hitsMax)
+    || !Number.isFinite(container.ticksToDecay)
+    || container.hits <= 0
+    || container.hitsMax <= 0
+  ) {
+    return null;
+  }
 
   const decayEventsUntilLoss = Math.ceil(
     container.hits / CONTAINER_DECAY
   );
-
   const estimatedTicksUntilLoss =
     container.ticksToDecay
     + (decayEventsUntilLoss - 1)
       * interval;
-
   const targetHits = Math.min(
     container.hitsMax,
     Math.max(
@@ -449,7 +515,7 @@ function createContainerRepairPlan(
       container
     );
 
-  if (travelTicks === null) {
+  if (!Number.isInteger(travelTicks)) {
     return null;
   }
 
@@ -478,11 +544,51 @@ function createContainerRepairPlan(
   };
 }
 
+function rankContainerRepairPlans(plans) {
+  return [...plans]
+    .filter(plan =>
+      plan
+      && typeof plan.containerId === 'string'
+      && (
+        plan.action === 'repair'
+        || plan.action === 'move'
+      )
+    )
+    .sort((left, right) => {
+      if (left.urgent !== right.urgent) {
+        return left.urgent ? -1 : 1;
+      }
+      if (left.deadlineSlack !== right.deadlineSlack) {
+        return left.deadlineSlack
+          - right.deadlineSlack;
+      }
+      if (
+        left.estimatedTicksUntilLoss
+        !== right.estimatedTicksUntilLoss
+      ) {
+        return left.estimatedTicksUntilLoss
+          - right.estimatedTicksUntilLoss;
+      }
+      if (left.hits !== right.hits) {
+        return left.hits - right.hits;
+      }
+      if (left.travelTicks !== right.travelTicks) {
+        return left.travelTicks
+          - right.travelTicks;
+      }
+      return left.containerId.localeCompare(
+        right.containerId
+      );
+    });
+}
+
 function selectContainerRepairPlan(
   room,
   repairer,
-  policy
+  rawPolicy
 ) {
+  const policy =
+    normalizeContainerRepairPolicy(rawPolicy);
   const containers = room.find(
     FIND_STRUCTURES,
     {
@@ -509,56 +615,13 @@ function selectContainerRepairPlan(
     ?? null;
 }
 
-function rankContainerRepairPlans(plans) {
-  return [...plans].sort((left, right) => {
-    if (left.urgent !== right.urgent) {
-      return left.urgent ? -1 : 1;
-    }
-
-    if (
-      left.deadlineSlack
-      !== right.deadlineSlack
-    ) {
-      return (
-        left.deadlineSlack
-        - right.deadlineSlack
-      );
-    }
-
-    if (
-      left.estimatedTicksUntilLoss
-      !== right.estimatedTicksUntilLoss
-    ) {
-      return (
-        left.estimatedTicksUntilLoss
-        - right.estimatedTicksUntilLoss
-      );
-    }
-
-    if (left.hits !== right.hits) {
-      return left.hits - right.hits;
-    }
-
-    if (
-      left.travelTicks
-      !== right.travelTicks
-    ) {
-      return (
-        left.travelTicks
-        - right.travelTicks
-      );
-    }
-
-    return left.containerId.localeCompare(
-      right.containerId
-    );
-  });
-}
-
 function verifyPreviousContainerRepair(
   room,
-  memory
+  memory,
+  rawPolicy
 ) {
+  const policy =
+    normalizeContainerRepairPolicy(rawPolicy);
   const pending = memory.pending;
 
   if (!pending) {
@@ -580,7 +643,7 @@ function verifyPreviousContainerRepair(
         expectedTick,
         containerId: pending.containerId
       },
-      CONTAINER_REPAIR_POLICY.historyLimit
+      policy.historyLimit
     );
     delete memory.pending;
     return;
@@ -589,7 +652,6 @@ function verifyPreviousContainerRepair(
   const container = Game.getObjectById(
     pending.containerId
   );
-
   const events = room.getEventLog();
   const repairEvent = events.find(event =>
     event.event === EVENT_REPAIR
@@ -597,13 +659,11 @@ function verifyPreviousContainerRepair(
     && event.data?.targetId
       === pending.containerId
   );
-
   const hitsAfter =
     container
     && Number.isFinite(container.hits)
       ? container.hits
       : null;
-
   const hitsDelta =
     Number.isFinite(hitsAfter)
       ? hitsAfter - pending.hitsBefore
@@ -655,7 +715,7 @@ function verifyPreviousContainerRepair(
           ? repairEvent.data.energySpent
           : null
     },
-    CONTAINER_REPAIR_POLICY.historyLimit
+    policy.historyLimit
   );
 
   delete memory.pending;
@@ -663,69 +723,53 @@ function verifyPreviousContainerRepair(
 
 function runContainerDecayRepair(
   roomName,
-  repairerName
+  repairerName,
+  rawPolicy = {}
 ) {
+  const policy =
+    normalizeContainerRepairPolicy(rawPolicy);
   Memory.containerDecayRepair ??= {};
   const memory =
     Memory.containerDecayRepair;
-
   const room = Game.rooms[roomName];
 
   if (!room) {
-    return {
-      state: 'room-not-visible'
-    };
+    return { state: 'room-not-visible' };
   }
 
   verifyPreviousContainerRepair(
     room,
-    memory
+    memory,
+    policy
   );
 
-  const repairer =
-    Game.creeps[repairerName];
+  const repairer = Game.creeps[repairerName];
 
   if (!repairer || !repairer.my) {
-    return {
-      state: 'repairer-missing'
-    };
+    return { state: 'repairer-missing' };
   }
-
   if (repairer.spawning) {
-    return {
-      state: 'repairer-spawning'
-    };
+    return { state: 'repairer-spawning' };
   }
-
-  if (
-    repairer.getActiveBodyparts(WORK)
-    <= 0
-  ) {
-    return {
-      state: 'repairer-no-active-work'
-    };
+  if (repairer.getActiveBodyparts(WORK) <= 0) {
+    return { state: 'repairer-no-active-work' };
   }
-
   if (
     repairer.store.getUsedCapacity(
       RESOURCE_ENERGY
     ) <= 0
   ) {
-    return {
-      state: 'repairer-needs-energy'
-    };
+    return { state: 'repairer-needs-energy' };
   }
 
   const plan = selectContainerRepairPlan(
     room,
     repairer,
-    CONTAINER_REPAIR_POLICY
+    policy
   );
 
   if (!plan) {
-    return {
-      state: 'no-container-needs-repair'
-    };
+    return { state: 'no-container-needs-repair' };
   }
 
   const container = Game.getObjectById(
@@ -733,9 +777,7 @@ function runContainerDecayRepair(
   );
 
   if (!container) {
-    return {
-      state: 'container-missing'
-    };
+    return { state: 'container-missing' };
   }
 
   if (plan.action === 'move') {
@@ -783,7 +825,8 @@ function runContainerDecayRepair(
 module.exports.loop = function () {
   const result = runContainerDecayRepair(
     'W1N1',
-    'Builder1'
+    'Builder1',
+    DEFAULT_CONTAINER_REPAIR_POLICY
   );
 
   if (
@@ -869,16 +912,12 @@ repairHits * REPAIR_COST
 
 按当前常量，一个普通 WORK 每次基础维修 100 hits，消耗 1 Energy。
 
-可以估算：
-
 ```js
 const repairPower =
   activeWorkParts * REPAIR_POWER;
-
 const actionsNeeded = Math.ceil(
   missingHits / repairPower
 );
-
 const energyNeeded = Math.ceil(
   actionsNeeded
   * repairPower
@@ -949,36 +988,18 @@ Tower 可以维修结构，但距离会影响维修效果，并且每次动作�
 
 ## 离线验证结果
 
-本次验证覆盖 28 个场景：
+本次验证覆盖 31 个场景，包括：
 
-1. 5,000 hits 时下一次腐化致命；
-2. 5,001 hits 需要两次腐化才损毁；
-3. 有等级 Controller 房间使用较长间隔；
-4. 中立或保留房间使用较短间隔；
-5. 无效 hits 输入失败关闭；
-6. Container 已达到策略目标时等待；
-7. 维修者不存在；
-8. 维修者仍在出生；
-9. 没有有效 WORK；
-10. 没有 Energy；
-11. 已在 Range 3 内选择维修；
-12. 超出 Range 3 选择移动；
-13. 无路径时不提交动作；
-14. 下一次腐化致命时标记紧急；
-15. 路程耗尽截止余量时标记紧急；
-16. 多个目标优先选择紧急 Container；
-17. 同优先级按截止余量排序；
-18. 完全同分时使用稳定 ID；
-19. 没有待验证动作；
-20. 错过下一 tick 观察窗口；
-21. Container 已消失；
-22. 事件存在但目标已消失；
-23. hits 证据缺失；
-24. 精确维修事件与 hits 增加同时出现；
-25. 事件存在但净 hits 被抵消；
-26. hits 增加但没有匹配事件；
-27. bounded history 保持固定长度；
-28. 非法策略值回退到安全默认值。
+- 5,000 与 5,001 hits 的致命边界；
+- 受控房间和中立房间的腐化间隔；
+- 无效 hits、常量和策略输入；
+- 维修者缺失、出生中、无 WORK、无 Energy；
+- Range 3、未知距离、移动与无路径；
+- 可执行计划保留 Container ID；
+- 紧急程度、截止余量与稳定 ID 排序；
+- 精确维修事件、目标消失、净值抵消和证据缺失；
+- 错过下一 tick 观察窗口；
+- bounded history 在非法 limit 下仍保持安全上限。
 
 全部 JavaScript 代码块通过语法检查。
 
@@ -1018,4 +1039,4 @@ Tower 可以维修结构，但距离会影响维修效果，并且每次动作�
 - [Screeps Constants](https://docs.screeps.com/api/#Constants)
 - [Screeps Game Loop](https://docs.screeps.com/game-loop.html)
 
-资料与官方开源引擎核对日期：2026-08-06。语法检查和 28 个离线场景已通过；真实 Screeps 环境仍待验证。
+资料与官方开源引擎核对日期：2026-08-06。语法检查和 31 个离线场景已通过；真实 Screeps 环境仍待验证。
