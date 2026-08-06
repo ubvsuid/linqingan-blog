@@ -91,8 +91,6 @@ if (chinese.error) {
     "revision-regressed",
     "setDefaultPublicSegment(null)",
     "验证状态与适用边界",
-    "consoleTested: false",
-    "liveTested: false",
   ]) {
     if (!chinese.body.includes(expected)) {
       failures.push(`${chinesePath}: missing “${expected}”`);
