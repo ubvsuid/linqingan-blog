@@ -1,3 +1,23 @@
+import { readFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
+
+const coreSource = readFileSync(
+  new URL("../src/lib/english-editorial-core-published-20260731.ts", import.meta.url),
+  "utf8",
+);
+const coreMatch = coreSource.match(
+  /const encodedEditorialCoreData = "([A-Za-z0-9+/=]+)";/,
+);
+if (!coreMatch) throw new Error("Embedded core editorial payload is missing.");
+const coreData = JSON.parse(
+  gunzipSync(Buffer.from(coreMatch[1], "base64")).toString("utf8"),
+);
+const currentCpu = coreData.articles["screeps-cpu-getused-bucket"];
+console.log("CPU_CORE_TOC", JSON.stringify(currentCpu.toc));
+console.log("CPU_CORE_HTML_BEGIN");
+console.log(currentCpu.articleHtml);
+console.log("CPU_CORE_HTML_END");
+
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 const articles = [
   {
