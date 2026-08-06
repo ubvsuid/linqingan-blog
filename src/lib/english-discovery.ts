@@ -88,6 +88,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-link-transfer-energy": ["energy", "resources"],
   "/en/blog/screeps-select-source-by-path": ["energy", "pathfinding", "movement"],
   "/en/blog/screeps-tombstone-ruin-recovery": ["creeps", "resources", "energy"],
+  "/en/blog/screeps-container-decay-repair-deadline": ["resources", "construction", "debugging"],
 
   "/en/blog/screeps-err-not-in-range": ["movement", "debugging"],
   "/en/blog/screeps-moveto-not-moving": ["movement", "debugging", "pathfinding"],
