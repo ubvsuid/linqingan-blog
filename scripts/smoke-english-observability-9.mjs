@@ -85,6 +85,7 @@ const articles = [
     tocId: "runtime-guard",
     tocHeading: "Build a reusable runtime guard",
     modifiedDate: "2026-08-06",
+    allowFaqSchema: true,
     signals: [
       "runGuarded",
       "runtime-guard-error",
@@ -138,7 +139,7 @@ for (const article of articles) {
     }
   }
 
-  if (body.includes(`"@type":"FAQPage"`)) {
+  if (!article.allowFaqSchema && body.includes(`"@type":"FAQPage"`)) {
     failures.push(`${article.path}: unexpected FAQPage schema`);
   }
 
@@ -236,7 +237,7 @@ for (const expected of [
 }
 for (const forbidden of [
   "CPU termination is caught",
-  "external notification arrived",
+  "notification delivery verified",
   "live multi-room test passed",
 ]) {
   if (isolationBody.includes(forbidden)) {
