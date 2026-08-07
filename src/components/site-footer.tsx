@@ -12,11 +12,13 @@ const chineseLearningLinks = [
   { href: "/knowledge", label: "知识库" },
   { href: "/blog", label: "全部文章" },
   { href: "/glossary", label: "术语表" },
+  { href: "/screeps-api", label: "API 快速查询" },
 ];
 
 const chineseSiteLinks = [
   { href: "/screeps-errors", label: "错误码" },
   { href: "/verification", label: "验证方法" },
+  { href: "/verified", label: "最近验证" },
   { href: "/tags", label: "文章标签" },
   { href: "/now", label: "近况" },
   { href: "/changelog", label: "更新日志" },
