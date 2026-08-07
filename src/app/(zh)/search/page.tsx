@@ -5,6 +5,8 @@ import { SiteSearch } from "@/components/site-search";
 import { createPageMetadata } from "@/lib/metadata";
 import { getSearchDocuments } from "@/lib/search";
 
+import styles from "./search-page.module.css";
+
 export const metadata = createPageMetadata({
   title: "站内搜索",
   description: "搜索临清安网站中的 Screeps 文章、术语、错误码、工具和公开建设内容。",
@@ -24,13 +26,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="page-shell search-page">
       <Container>
-        <nav className="search-breadcrumb" aria-label="面包屑">
+        <nav className={styles.breadcrumb} aria-label="面包屑">
           <Link href="/knowledge">知识库</Link>
           <span aria-hidden="true">/</span>
           <span>站内搜索</span>
         </nav>
 
-        <header className="page-header search-header">
+        <header className={`page-header ${styles.header}`}>
           <p className="eyebrow">SEARCH</p>
           <h1>搜索整个网站</h1>
           <p>
@@ -40,11 +42,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         <SiteSearch documents={documents} initialQuery={initialQuery} />
       </Container>
-
-      <style>{`
-        .search-breadcrumb { display: flex; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 13px; }
-        .search-header { max-width: 900px; }
-      `}</style>
     </main>
   );
 }
