@@ -54,10 +54,16 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
   { key: "Origin-Agent-Cluster", value: "?1" },
-  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
-  { key: "Reporting-Endpoints", value: 'csp-endpoint="https://www.linqingan.com/api/csp-report"' },
+  {
+    key: "Reporting-Endpoints",
+    value: 'csp-endpoint="https://www.linqingan.com/api/csp-report"',
+  },
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
 ];
 
@@ -75,18 +81,96 @@ const nextConfig: NextConfig = {
         destination: "https://www.linqingan.com/:path*",
         permanent: true,
       },
-      { source: "/changelog/page/2", destination: "/changelog", statusCode: 301 },
-      { source: "/tags/%E6%96%B0%E6%89%8B%E5%85%A5%E9%97%A8", destination: "/tags/beginner", statusCode: 301 },
-      { source: "/tags/%E5%9F%BA%E7%A1%80%E5%B7%A5%E7%A8%8B", destination: "/tags/basic-engineering", statusCode: 301 },
-      { source: "/tags/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98", destination: "/tags/common-questions", statusCode: 301 },
-      { source: "/tags/%E9%94%99%E8%AF%AF%E6%8E%92%E6%9F%A5", destination: "/tags/debugging", statusCode: 301 },
-      { source: "/tags/%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91", destination: "/tags/advanced-development", statusCode: 301 },
-      { source: "/resources", destination: "/knowledge#reference-tools", statusCode: 301 },
-      { source: "/resources/glossary", destination: "/glossary", permanent: true },
-      { source: "/resources/error-codes", destination: "/screeps-errors", permanent: true },
-      { source: "/resources/tags", destination: "/tags", permanent: true },
-      { source: "/projects", destination: "/about#public-projects", statusCode: 301 },
-      { source: "/projects/:path*", destination: "/about#public-projects", statusCode: 301 },
+      {
+        source: "/tags/energy-harvesting",
+        destination: "/tags/resource-harvesting",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/energy-delivery",
+        destination: "/tags/logistics",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/game-interface",
+        destination: "/tags/vision",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/debugging-tools",
+        destination: "/tags/debugging",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/energy-resource",
+        destination: "/tags/energy",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/screeps-game-api",
+        destination: "/tags/game-api",
+        statusCode: 301,
+      },
+      {
+        source: "/changelog/page/2",
+        destination: "/changelog",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/%E6%96%B0%E6%89%8B%E5%85%A5%E9%97%A8",
+        destination: "/tags/beginner",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/%E5%9F%BA%E7%A1%80%E5%B7%A5%E7%A8%8B",
+        destination: "/tags/basic-engineering",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98",
+        destination: "/tags/common-questions",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/%E9%94%99%E8%AF%AF%E6%8E%92%E6%9F%A5",
+        destination: "/tags/debugging",
+        statusCode: 301,
+      },
+      {
+        source: "/tags/%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91",
+        destination: "/tags/advanced-development",
+        statusCode: 301,
+      },
+      {
+        source: "/resources",
+        destination: "/knowledge#reference-tools",
+        statusCode: 301,
+      },
+      {
+        source: "/resources/glossary",
+        destination: "/glossary",
+        permanent: true,
+      },
+      {
+        source: "/resources/error-codes",
+        destination: "/screeps-errors",
+        permanent: true,
+      },
+      {
+        source: "/resources/tags",
+        destination: "/tags",
+        permanent: true,
+      },
+      {
+        source: "/projects",
+        destination: "/about#public-projects",
+        statusCode: 301,
+      },
+      {
+        source: "/projects/:path*",
+        destination: "/about#public-projects",
+        statusCode: 301,
+      },
     ];
   },
   async headers() {
@@ -106,8 +190,14 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      { source: "/en", headers: [{ key: "Content-Language", value: "en" }] },
-      { source: "/en/:path*", headers: [{ key: "Content-Language", value: "en" }] },
+      {
+        source: "/en",
+        headers: [{ key: "Content-Language", value: "en" }],
+      },
+      {
+        source: "/en/:path*",
+        headers: [{ key: "Content-Language", value: "en" }],
+      },
     ];
   },
 };
