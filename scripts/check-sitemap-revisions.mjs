@@ -85,6 +85,7 @@ for (const pathname of Object.keys(revisions)) {
 }
 
 const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
+const compactSitemapSource = sitemapSource.replace(/\s+/g, "");
 for (const requiredText of [
   "getStaticPageLastModified",
   'staticPageEntry("/screeps-api"',
@@ -99,7 +100,7 @@ for (const requiredText of [
   '"/en/tools/hauling-throughput-planner"',
   '"/en/tools/tower-damage-heal-repair-calculator"',
 ]) {
-  if (!sitemapSource.includes(requiredText)) {
+  if (!compactSitemapSource.includes(requiredText.replace(/\s+/g, ""))) {
     failures.push(`Sitemap does not use the revision registry: ${requiredText}`);
   }
 }
