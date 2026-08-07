@@ -36,8 +36,8 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
               <div><strong>{status.knowledgeSectionCount}</strong><span>个知识模块</span></div>
               <div><strong>{status.toolCount}</strong><span>个在线工具</span></div>
               <div>
-                <strong>{status.latestContentDate ? formatDate(status.latestContentDate) : "—"}</strong>
-                <span>最近内容变更</span>
+                <strong>{status.latestPublishedDate ? formatDate(status.latestPublishedDate) : "—"}</strong>
+                <span>最近文章发布</span>
               </div>
             </section>
 
