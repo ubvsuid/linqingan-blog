@@ -1,0 +1,18 @@
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.header {
+  max-width: 900px;
+}
+
+@media (max-width: 520px) {
+  .breadcrumb {
+    margin-bottom: 22px;
+  }
+}
