@@ -3,7 +3,7 @@ import fs from "node:fs";
 const checks = [
   {
     path: "src/app/(zh)/page.tsx",
-    required: ["HomeTaskHub", "slice(0, 2)", "screeps-room-grid"],
+    required: ["HomeTaskHub", "slice(0, 3)", "screeps-room-grid", "开始新手路线", "搜索问题"],
     forbidden: ["<HomeLearningActions />"],
   },
   {
@@ -13,7 +13,7 @@ const checks = [
   },
   {
     path: "src/components/home-maintenance-panel.tsx",
-    required: ["home-timeline", "维护时间流"],
+    required: ["home-timeline", "最近更新", "getRecentSiteActivity(3)"],
     forbidden: ["home-maintenance-grid", "home-change-strip"],
   },
   {
