@@ -30,8 +30,8 @@ interface SearchDocumentOptions {
   includeArticleText?: boolean;
 }
 
-const MAX_ARTICLE_SEARCH_TOKENS = 220;
-const MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400;
+export const ARTICLE_SEARCH_TOKEN_LIMIT = 120;
+export const ARTICLE_SEARCH_TEXT_LIMIT = 1200;
 
 function compactArticleSearchText(value: string): string {
   const normalized = value
@@ -49,10 +49,10 @@ function compactArticleSearchText(value: string): string {
     if (seen.has(key)) continue;
     seen.add(key);
     uniqueTokens.push(token);
-    if (uniqueTokens.length >= MAX_ARTICLE_SEARCH_TOKENS) break;
+    if (uniqueTokens.length >= ARTICLE_SEARCH_TOKEN_LIMIT) break;
   }
 
-  return uniqueTokens.join(" ").slice(0, MAX_ARTICLE_SEARCH_TEXT_LENGTH);
+  return uniqueTokens.join(" ").slice(0, ARTICLE_SEARCH_TEXT_LIMIT);
 }
 
 const toolDocuments: SearchDocument[] = [
