@@ -14,6 +14,7 @@ const canonicalTagNames = JSON.parse(
 const coreTagSlugs = JSON.parse(
   fs.readFileSync(path.join(root, "src", "lib", "core-tag-slugs.json"), "utf8"),
 );
+const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
 
 const MAX_UNIQUE_TAGS = 100;
 const MAX_PUBLIC_TAGS = 65;
@@ -23,6 +24,11 @@ const deprecatedCanonicalSlugs = new Set([
   "debugging-tools",
   "screeps-game-api",
 ]);
+const canonicalRedirects = [
+  ["/tags/energy-resource", "/tags/energy"],
+  ["/tags/debugging-tools", "/tags/debugging"],
+  ["/tags/screeps-game-api", "/tags/game-api"],
+];
 
 function tagToSlug(tag) {
   const normalized = String(tag).normalize("NFKC").trim();
@@ -93,6 +99,15 @@ for (const [tagName, slug] of Object.entries(fixedTagSlugs)) {
   }
 }
 
+for (const [source, destination] of canonicalRedirects) {
+  if (
+    !nextConfig.includes(`source: "${source}"`)
+    || !nextConfig.includes(`destination: "${destination}"`)
+  ) {
+    failures.push(`缺少标签规范化 301：${source} -> ${destination}`);
+  }
+}
+
 const uniqueTagCount = counts.size;
 const singletonCount = [...counts.values()].filter((count) => count === 1).length;
 const publicTagCount = [...counts.values()].filter((count) => count >= 2).length;
@@ -115,5 +130,5 @@ if (failures.length > 0) {
 console.log(
   `标签治理检查通过：${coreTagSlugs.length} 个核心标签，${publicTagCount} 个多文章标签，` +
     `${singletonCount} 个单篇标签，唯一标签共 ${uniqueTagCount} 个；` +
-    `上限分别为 ${MAX_PUBLIC_TAGS}/${MAX_SINGLETON_TAGS}/${MAX_UNIQUE_TAGS}。`,
+    `上限分别为 ${MAX_PUBLIC_TAGS}/${MAX_SINGLETON_TAGS}/${MAX_UNIQUE_TAGS}，canonical 301 已锁定。`,
 );
