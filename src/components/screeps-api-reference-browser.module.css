@@ -1,0 +1,153 @@
+.browser {
+  margin-top: 48px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, .6fr);
+  gap: 14px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 22px 0;
+}
+
+.controls label {
+  display: grid;
+  gap: 8px;
+}
+
+.controls span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.controls input,
+.controls select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 13px;
+  background: var(--surface);
+  color: var(--foreground);
+  font: inherit;
+}
+
+.controls input:focus-visible,
+.controls select:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.summary {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.summary strong {
+  color: var(--foreground);
+}
+
+.groups {
+  display: grid;
+  gap: 54px;
+  margin-top: 42px;
+}
+
+.group > header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.group h2 {
+  margin: 0;
+  font-size: clamp(25px, 3vw, 34px);
+  letter-spacing: -.035em;
+}
+
+.group header span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border-top: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+
+.tableWrap table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+}
+
+.tableWrap th,
+.tableWrap td {
+  border-bottom: 1px solid var(--border);
+  padding: 17px 14px 17px 0;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.tableWrap th {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.tableWrap td:first-child {
+  width: 19%;
+}
+
+.tableWrap td:nth-child(2) {
+  width: 29%;
+}
+
+.tableWrap td:nth-child(3) {
+  width: 37%;
+  color: var(--muted);
+}
+
+.tableWrap td:last-child {
+  width: 15%;
+}
+
+.tableWrap code {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.tableWrap td:last-child span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.empty {
+  margin-top: 40px;
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+}
+
+.empty p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .browser {
+    margin-top: 36px;
+  }
+}
