@@ -49,13 +49,15 @@ if (
 ) {
   failures.push("Report-Only CSP candidate is missing.");
 }
-if (
-  !nextConfig.includes('source: "/en/verification"')
-  || !nextConfig.includes("headers: [candidateContentSecurityPolicyHeader]")
-) {
-  failures.push(
-    "The stricter Report-Only policy must stay scoped to the low-volume verification canary route.",
-  );
+for (const canaryRoute of ["/verification", "/en/verification"]) {
+  if (
+    !nextConfig.includes(`source: "${canaryRoute}"`)
+    || !nextConfig.includes("headers: [candidateContentSecurityPolicyHeader]")
+  ) {
+    failures.push(
+      `The stricter Report-Only policy must include the low-volume canary route ${canaryRoute}.`,
+    );
+  }
 }
 const securityHeadersBlock = nextConfig.match(
   /const securityHeaders = \[([\s\S]*?)\n\];/,
@@ -75,5 +77,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "CSP boundary check passed: theme boot is external and the stricter candidate is scoped to the verification canary route.",
+  "CSP boundary check passed: theme boot is external and the stricter candidate is scoped to the Chinese and English verification canary routes.",
 );
