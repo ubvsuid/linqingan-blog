@@ -32,23 +32,41 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
         {currentPage === 1 ? (
           <>
             <section className={styles.status} aria-label="网站当前公开状态">
-              <div><strong>{status.articleCount}</strong><span>篇公开文章</span></div>
-              <div><strong>{status.knowledgeSectionCount}</strong><span>个知识模块</span></div>
-              <div><strong>{status.toolCount}</strong><span>个在线工具</span></div>
               <div>
-                <strong>{status.latestContentDate ? formatDate(status.latestContentDate) : "—"}</strong>
-                <span>最近内容变更</span>
+                <strong>{status.articleCount}</strong>
+                <span>篇公开文章</span>
+              </div>
+              <div>
+                <strong>{status.knowledgeSectionCount}</strong>
+                <span>个知识模块</span>
+              </div>
+              <div>
+                <strong>{status.toolCount}</strong>
+                <span>个在线工具</span>
+              </div>
+              <div>
+                <strong>
+                  {status.latestArticlePublishedDate
+                    ? formatDate(status.latestArticlePublishedDate)
+                    : "—"}
+                </strong>
+                <span>最近文章发布</span>
               </div>
             </section>
 
-            <section className={styles.changelog} aria-labelledby="now-changelog-title">
+            <section
+              className={styles.changelog}
+              aria-labelledby="now-changelog-title"
+            >
               <div className={styles.changelogHeading}>
                 <div>
                   <p className="eyebrow">LIVE ACTIVITY</p>
                   <h2 id="now-changelog-title">最近变化</h2>
                 </div>
                 {status.latestActivityDate ? (
-                  <span>最近更新于 {formatDate(status.latestActivityDate)}</span>
+                  <span>
+                    最近更新于 {formatDate(status.latestActivityDate)}
+                  </span>
                 ) : null}
               </div>
               <p className={styles.changelogDescription}>
@@ -59,7 +77,13 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
                   <article key={entry.id}>
                     <span>{entry.type}</span>
                     <time dateTime={entry.date}>{formatDate(entry.date)}</time>
-                    <h3>{entry.href ? <Link href={entry.href}>{entry.title}</Link> : entry.title}</h3>
+                    <h3>
+                      {entry.href ? (
+                        <Link href={entry.href}>{entry.title}</Link>
+                      ) : (
+                        entry.title
+                      )}
+                    </h3>
                   </article>
                 ))}
               </div>
@@ -76,14 +100,23 @@ export function NowArchive({ currentPage }: NowArchiveProps) {
             <h2 id="now-history-title">阶段性记录</h2>
           </div>
 
-          <div className={`article-content ${styles.list}`} aria-label={`近况第 ${pagination.currentPage} 页`}>
+          <div
+            className={`article-content ${styles.list}`}
+            aria-label={`近况第 ${pagination.currentPage} 页`}
+          >
             {pagination.items.map((entry) => (
               <section className={styles.entry} key={entry.id}>
                 <time dateTime={entry.date}>{formatDate(entry.date)}</time>
                 <h3>{entry.title}</h3>
-                {entry.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                {entry.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
                 {entry.bullets ? (
-                  <ul>{entry.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>
+                  <ul>
+                    {entry.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
                 ) : null}
               </section>
             ))}

@@ -28,7 +28,8 @@
 
 .votes,
 .links,
-.follow {
+.follow,
+.nextStepsLinks {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -36,7 +37,8 @@
 
 .feedback button,
 .links a,
-.follow a {
+.follow a,
+.nextStepsLinks a {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -53,7 +55,8 @@
 
 .feedback button:hover,
 .links a:hover,
-.follow a:hover {
+.follow a:hover,
+.nextStepsLinks a:hover {
   border-color: var(--muted);
   text-decoration: none;
 }
@@ -77,6 +80,22 @@
 
 .follow {
   padding-top: 2px;
+}
+
+.nextSteps {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+.nextSteps > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 @media (max-width: 720px) {

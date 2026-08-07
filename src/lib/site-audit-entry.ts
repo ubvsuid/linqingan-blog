@@ -4,12 +4,13 @@ export const latestSiteAuditEntry: ChangelogEntry = {
   id: "2026-08-07-final-site-audit",
   date: "2026-08-07",
   type: "网站",
-  title: "完成首页、知识库与站点治理优化",
+  title: "完成站点结构、标签与搜索治理优化",
   summary:
-    "保留首页 H1“构建，运行，迭代”和现有副标题，精简首页导航与重复区块，增加两个主要操作入口；知识库首页改为每模块展示代表文章；Blog 元数据、About 状态信息、最近更新数据源和内联样式治理同步调整。此次更新建立在此前合并资料中心与项目页面的站点结构基础上。",
+    "保留首页 H1“构建，运行，迭代”和现有副标题，在此前首页与知识库瘦身基础上继续治理标签归档、站内搜索体积、Sitemap 与阅读后路径；上线 Screeps API 快速查询和动态 Recently Verified 入口，同时继续迁移页面内联样式并保留严格 CSP 的 canary 验证边界。文章正文与文章验证数据未在本次治理中修改。",
   links: [
-    { label: "查看首页", href: "/" },
     { label: "查看知识库", href: "/knowledge" },
-    { label: "查看关于页", href: "/about" },
+    { label: "浏览文章标签", href: "/tags" },
+    { label: "查询 Screeps API", href: "/screeps-api" },
+    { label: "查看最近验证", href: "/verified" },
   ],
 };

@@ -17,14 +17,19 @@ interface ArticleFeedbackProps {
   changelogHref?: string;
 }
 
-type FeedbackValue = "helpful" | "partly" | "not-solved" | "outdated" | "suggestion";
+type FeedbackValue =
+  | "helpful"
+  | "partly"
+  | "not-solved"
+  | "outdated"
+  | "suggestion";
 
 function parseFeedback(value: string | null): FeedbackValue | null {
-  return value === "helpful"
-    || value === "partly"
-    || value === "not-solved"
-    || value === "outdated"
-    || value === "suggestion"
+  return value === "helpful" ||
+    value === "partly" ||
+    value === "not-solved" ||
+    value === "outdated" ||
+    value === "suggestion"
     ? value
     : null;
 }
@@ -48,11 +53,11 @@ export function ArticleFeedback({
       };
       const handleLocalFeedback = (event: Event) => {
         if (
-          event instanceof CustomEvent
-          && typeof event.detail === "object"
-          && event.detail !== null
-          && "slug" in event.detail
-          && event.detail.slug === slug
+          event instanceof CustomEvent &&
+          typeof event.detail === "object" &&
+          event.detail !== null &&
+          "slug" in event.detail &&
+          event.detail.slug === slug
         ) {
           onStoreChange();
         }
@@ -97,7 +102,9 @@ export function ArticleFeedback({
         ].join("\n");
 
     const params = new URLSearchParams({
-      title: isEnglish ? `English guide feedback: ${title}` : `文章反馈：${title}`,
+      title: isEnglish
+        ? `English guide feedback: ${title}`
+        : `文章反馈：${title}`,
       body,
     });
 
@@ -141,11 +148,18 @@ export function ArticleFeedback({
             : "选择一个选项即可完成反馈。";
 
   return (
-    <section className={styles.feedback} aria-labelledby={`article-feedback-title-${slug}`}>
+    <section
+      className={styles.feedback}
+      aria-labelledby={`article-feedback-title-${slug}`}
+    >
       <div>
-        <p className="eyebrow">{isEnglish ? "READER FEEDBACK" : "FEEDBACK"}</p>
+        <p className="eyebrow">
+          {isEnglish ? "READER FEEDBACK" : "FEEDBACK"}
+        </p>
         <h2 id={`article-feedback-title-${slug}`}>
-          {isEnglish ? "Did this guide solve your problem?" : "这篇文章解决了你的问题吗？"}
+          {isEnglish
+            ? "Did this guide solve your problem?"
+            : "这篇文章解决了你的问题吗？"}
         </h2>
         <p className={styles.intro}>
           {isEnglish
@@ -155,38 +169,105 @@ export function ArticleFeedback({
       </div>
 
       <div className={styles.actions}>
-        <div className={styles.votes} role="group" aria-label={isEnglish ? "Was this guide helpful?" : "文章是否有帮助"}>
-          <button type="button" className={feedback === "helpful" ? styles.active : undefined} aria-pressed={feedback === "helpful"} onClick={() => saveFeedback("helpful")}>
+        <div
+          className={styles.votes}
+          role="group"
+          aria-label={isEnglish ? "Was this guide helpful?" : "文章是否有帮助"}
+        >
+          <button
+            type="button"
+            className={feedback === "helpful" ? styles.active : undefined}
+            aria-pressed={feedback === "helpful"}
+            onClick={() => saveFeedback("helpful")}
+          >
             {isEnglish ? "Yes" : "有帮助"}
           </button>
-          <button type="button" className={feedback === "partly" || (!isEnglish && feedback === "not-solved") ? styles.active : undefined} aria-pressed={feedback === "partly" || (!isEnglish && feedback === "not-solved")} onClick={() => saveFeedback(isEnglish ? "partly" : "not-solved")}>
+          <button
+            type="button"
+            className={
+              feedback === "partly" || (!isEnglish && feedback === "not-solved")
+                ? styles.active
+                : undefined
+            }
+            aria-pressed={
+              feedback === "partly" || (!isEnglish && feedback === "not-solved")
+            }
+            onClick={() => saveFeedback(isEnglish ? "partly" : "not-solved")}
+          >
             {isEnglish ? "Partly" : "没解决"}
           </button>
-          <button type="button" className={feedback === "outdated" ? styles.active : undefined} aria-pressed={feedback === "outdated"} onClick={() => saveFeedback("outdated")}>
+          <button
+            type="button"
+            className={feedback === "outdated" ? styles.active : undefined}
+            aria-pressed={feedback === "outdated"}
+            onClick={() => saveFeedback("outdated")}
+          >
             {isEnglish ? "May be outdated" : "内容可能过时"}
           </button>
           {!isEnglish ? (
-            <button type="button" className={feedback === "suggestion" ? styles.active : undefined} aria-pressed={feedback === "suggestion"} onClick={() => saveFeedback("suggestion")}>
+            <button
+              type="button"
+              className={feedback === "suggestion" ? styles.active : undefined}
+              aria-pressed={feedback === "suggestion"}
+              onClick={() => saveFeedback("suggestion")}
+            >
               建议补充
             </button>
           ) : null}
         </div>
 
-        <p className={styles.status} aria-live="polite">{status}</p>
+        <p className={styles.status} aria-live="polite">
+          {status}
+        </p>
 
         <div className={styles.links}>
-          <a href={githubHref} target="_blank" rel="noreferrer" onClick={() => { if (isEnglish) saveFeedback("not-solved"); }}>
-            {isEnglish ? "No — report the missing case ↗" : "在 GitHub 提交问题 ↗"}
+          <a
+            href={githubHref}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => {
+              if (isEnglish) saveFeedback("not-solved");
+            }}
+          >
+            {isEnglish
+              ? "No — report the missing case ↗"
+              : "在 GitHub 提交问题 ↗"}
           </a>
-          <a href={`mailto:${email}?subject=${encodeURIComponent(isEnglish ? `English guide feedback: ${title}` : `文章反馈：${title}`)}&body=${encodeURIComponent(isEnglish ? `Guide: ${articleUrl}\n\nProblem description:` : `文章：${articleUrl}\n\n问题描述：`)}`}>
+          <a
+            href={`mailto:${email}?subject=${encodeURIComponent(
+              isEnglish
+                ? `English guide feedback: ${title}`
+                : `文章反馈：${title}`,
+            )}&body=${encodeURIComponent(
+              isEnglish
+                ? `Guide: ${articleUrl}\n\nProblem description:`
+                : `文章：${articleUrl}\n\n问题描述：`,
+            )}`}
+          >
             {isEnglish ? "Send private feedback" : "通过邮箱反馈"}
           </a>
         </div>
 
+        {!isEnglish ? (
+          <div className={styles.nextSteps} aria-label="继续解决问题">
+            <span>下一步</span>
+            <div className={styles.nextStepsLinks}>
+              <Link href="/screeps-api">查常用 API →</Link>
+              <Link href="/screeps-errors">查错误码 →</Link>
+              <Link href="/tools">打开工具 →</Link>
+              <Link href="/knowledge">返回知识模块 →</Link>
+            </div>
+          </div>
+        ) : null}
+
         {isEnglish && (rssHref || changelogHref) ? (
           <div className={styles.follow} aria-label="Follow English updates">
-            {rssHref ? <Link href={rssHref}>Follow English updates via RSS →</Link> : null}
-            {changelogHref ? <Link href={changelogHref}>Review meaningful changes →</Link> : null}
+            {rssHref ? (
+              <Link href={rssHref}>Follow English updates via RSS →</Link>
+            ) : null}
+            {changelogHref ? (
+              <Link href={changelogHref}>Review meaningful changes →</Link>
+            ) : null}
           </div>
         ) : null}
       </div>

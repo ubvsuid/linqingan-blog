@@ -96,7 +96,7 @@ let englishPublicTools = null;
 if (chineseIndex) {
   const articleCount = chineseIndex.documents.filter((document) => document.type === "文章").length;
   const toolDocuments = chineseIndex.documents.filter((document) => document.type === "工具");
-  const detailTools = toolDocuments.filter((document) => document.id !== "tool:hub");
+  const detailTools = toolDocuments.filter((document) => document.href.startsWith("/tools/"));
   const headerArticles = readCount(chineseIndex.response, "x-search-index-articles", "/api/search-index");
   const headerToolDocuments = readCount(chineseIndex.response, "x-search-index-tool-documents", "/api/search-index");
   chinesePublicTools = readCount(chineseIndex.response, "x-search-index-public-tools", "/api/search-index");
@@ -109,10 +109,13 @@ if (chineseIndex) {
     failures.push(`/api/search-index: tool-document header ${headerToolDocuments} does not match ${toolDocuments.length}`);
   }
   if (chinesePublicTools !== null && chinesePublicTools !== detailTools.length) {
-    failures.push(`/api/search-index: public-tool header ${chinesePublicTools} does not match ${detailTools.length} detail tools`);
+    failures.push(`/api/search-index: public-tool header ${chinesePublicTools} does not match ${detailTools.length} public /tools/ pages`);
   }
   if (!toolDocuments.some((document) => document.id === "tool:hub" && document.href === "/tools")) {
     failures.push("/api/search-index: missing the Chinese tools hub document");
+  }
+  if (!toolDocuments.some((document) => document.id === "reference:screeps-api" && document.href === "/screeps-api")) {
+    failures.push("/api/search-index: missing the Chinese Screeps API quick-reference document");
   }
 }
 
@@ -167,4 +170,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Search indexing smoke test passed: noindex rules, payload counts, unique records, public tool coverage, and Chinese/English parity are consistent.");
+console.log("Search indexing smoke test passed: noindex rules, payload counts, unique records, public tool coverage, API reference coverage, and Chinese/English parity are consistent.");

@@ -11,6 +11,7 @@ const requiredPaths = [
   "/beginner",
   "/blog",
   "/knowledge",
+  "/screeps-api",
   "/tools",
   "/tools/creep-body-calculator",
   "/tools/room-diagnostics",
@@ -23,6 +24,7 @@ const requiredPaths = [
   "/glossary",
   "/screeps-errors",
   "/verification",
+  "/verified",
   "/tags",
   "/now",
   "/changelog",
@@ -83,8 +85,11 @@ for (const pathname of Object.keys(revisions)) {
 }
 
 const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
+const compactSitemapSource = sitemapSource.replace(/\s+/g, "");
 for (const requiredText of [
   "getStaticPageLastModified",
+  'staticPageEntry("/screeps-api"',
+  'staticPageEntry("/verified"',
   'staticPageEntry("/tools"',
   'staticPageEntry("/en/blog"',
   'staticPageEntry("/en/evidence"',
@@ -95,7 +100,7 @@ for (const requiredText of [
   '"/en/tools/hauling-throughput-planner"',
   '"/en/tools/tower-damage-heal-repair-calculator"',
 ]) {
-  if (!sitemapSource.includes(requiredText)) {
+  if (!compactSitemapSource.includes(requiredText.replace(/\s+/g, ""))) {
     failures.push(`Sitemap does not use the revision registry: ${requiredText}`);
   }
 }
@@ -115,4 +120,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Sitemap revision check passed: ${requiredPaths.length} static routes tracked.`);
+console.log(
+  `Sitemap revision check passed: ${requiredPaths.length} static routes tracked.`,
+);

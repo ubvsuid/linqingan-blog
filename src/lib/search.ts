@@ -1,6 +1,7 @@
 import { getKnowledgeBaseSectionBySlug } from "@/lib/knowledge-base";
 import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
+import { screepsApiReference } from "@/lib/screeps-api-reference";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 import { getToolHref, toolCatalog, toolCount } from "@/lib/tool-catalog";
@@ -30,8 +31,9 @@ interface SearchDocumentOptions {
   includeArticleText?: boolean;
 }
 
-const MAX_ARTICLE_SEARCH_TOKENS = 220;
-const MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400;
+const MAX_ARTICLE_SEARCH_TOKENS = 72;
+const MAX_ARTICLE_SEARCH_TEXT_LENGTH = 720;
+export const SEARCH_INDEX_MAX_BYTES = 196_608;
 
 function compactArticleSearchText(value: string): string {
   const normalized = value
@@ -40,7 +42,10 @@ function compactArticleSearchText(value: string): string {
     .replace(/https?:\/\/\S+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  const tokens = normalized.match(/[A-Za-z_][A-Za-z0-9_.:-]*|[\u3400-\u9fff]{1,8}|\d+(?:\.\d+)?/g) ?? [];
+  const tokens =
+    normalized.match(
+      /[A-Za-z_][A-Za-z0-9_.:-]*|[\u3400-\u9fff]{1,8}|\d+(?:\.\d+)?/g,
+    ) ?? [];
   const seen = new Set<string>();
   const uniqueTokens: string[] = [];
 
@@ -55,30 +60,65 @@ function compactArticleSearchText(value: string): string {
   return uniqueTokens.join(" ").slice(0, MAX_ARTICLE_SEARCH_TEXT_LENGTH);
 }
 
+function compactKeywords(values: string[], limit = 14): string[] {
+  const seen = new Set<string>();
+  const keywords: string[] = [];
+
+  for (const value of values) {
+    const normalized = value.normalize("NFKC").replace(/\s+/g, " ").trim();
+    if (!normalized) continue;
+    const key = normalized.toLocaleLowerCase("zh-CN");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    keywords.push(normalized.slice(0, 80));
+    if (keywords.length >= limit) break;
+  }
+
+  return keywords;
+}
+
+const apiReferenceDocument: SearchDocument = {
+  id: "reference:screeps-api",
+  type: "工具",
+  title: "Screeps API 快速查询",
+  description:
+    "按对象、方法和关键词查询常用 Game、Creep、Room、Structure 与系统 API。",
+  href: "/screeps-api",
+  meta: `快速参考 · ${screepsApiReference.length} 项`,
+  keywords: ["Screeps API", "Game API", "Creep API", "Room API", "Structure API"],
+  text: screepsApiReference.map((entry) => entry.signature).join(" "),
+};
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:hub",
     type: "工具",
     title: "免费 Screeps 工具",
-    description: "集中使用身体、房间、Market、Controller、Lab、Spawn、运输与 Tower 计算和诊断工具。",
+    description:
+      "集中使用身体、房间、Market、Controller、Lab、Spawn、运输与 Tower 计算和诊断工具。",
     href: "/tools",
     meta: `${toolCount} 个浏览器本地工具`,
     keywords: ["Screeps 工具", "计算器", "诊断", "规划器", "tools"],
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
-  ...toolCatalog.map((tool): SearchDocument => ({
-    id: `tool:${tool.slug}`,
-    type: "工具",
-    title: `Screeps ${tool.zhTitle}`,
-    description: tool.zhDescription,
-    href: getToolHref(tool.slug),
-    meta: tool.zhSearchMeta,
-    keywords: [...tool.zhKeywords],
-    text: tool.zhSearchText,
-  })),
+  apiReferenceDocument,
+  ...toolCatalog.map(
+    (tool): SearchDocument => ({
+      id: `tool:${tool.slug}`,
+      type: "工具",
+      title: `Screeps ${tool.zhTitle}`,
+      description: tool.zhDescription,
+      href: getToolHref(tool.slug),
+      meta: tool.zhSearchMeta,
+      keywords: [...tool.zhKeywords],
+      text: tool.zhSearchText,
+    }),
+  ),
 ];
 
-export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchDocument[] {
+export function getSearchDocuments(
+  options: SearchDocumentOptions = {},
+): SearchDocument[] {
   const includeArticleText = options.includeArticleText ?? true;
   const posts: SearchDocument[] = getSearchablePosts().map((post) => {
     const section = getKnowledgeBaseSectionBySlug(post.slug);
@@ -89,11 +129,11 @@ export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchD
       description: post.description,
       href: `/blog/${post.slug}`,
       meta: `${section?.title ?? post.category} · ${post.readingMinutes} 分钟`,
-      keywords: [
+      keywords: compactKeywords([
         ...post.tags,
         post.category,
-        ...(section ? [section.title, section.description] : []),
-      ],
+        ...(section ? [section.title] : []),
+      ]),
       text: includeArticleText ? compactArticleSearchText(post.text) : "",
     };
   });
@@ -128,13 +168,35 @@ export function getSearchDocuments(options: SearchDocumentOptions = {}): SearchD
     href: `/about#project-${project.id}`,
     meta: project.status,
     keywords: project.details.map((detail) => detail.value),
-    text: [project.purpose, project.challenge, ...project.approach, ...project.highlights, ...project.nextSteps].join(" "),
+    text: [
+      project.purpose,
+      project.challenge,
+      ...project.approach,
+      ...project.highlights,
+      ...project.nextSteps,
+    ].join(" "),
   }));
 
   return [...posts, ...glossary, ...errors, ...toolDocuments, ...projectDocuments];
 }
 
-export function getSearchIndexSummary(documents: SearchDocument[]): SearchIndexSummary {
+export function getSearchIndexPayloadBytes(documents: SearchDocument[]): number {
+  return new TextEncoder().encode(JSON.stringify(documents)).byteLength;
+}
+
+export function assertSearchIndexBudget(documents: SearchDocument[]): number {
+  const bytes = getSearchIndexPayloadBytes(documents);
+  if (bytes > SEARCH_INDEX_MAX_BYTES) {
+    throw new Error(
+      `Chinese search index is ${bytes} bytes, exceeding the ${SEARCH_INDEX_MAX_BYTES}-byte budget.`,
+    );
+  }
+  return bytes;
+}
+
+export function getSearchIndexSummary(
+  documents: SearchDocument[],
+): SearchIndexSummary {
   const byType: Record<SearchDocumentType, number> = {
     文章: 0,
     术语: 0,

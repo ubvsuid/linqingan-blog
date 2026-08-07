@@ -25,7 +25,9 @@ const counts = new Map();
 const namesBySlug = new Map();
 const failures = [];
 
-for (const fileName of fs.readdirSync(postsDirectory).filter((name) => name.endsWith(".md"))) {
+for (const fileName of fs
+  .readdirSync(postsDirectory)
+  .filter((name) => name.endsWith(".md"))) {
   const source = fs.readFileSync(path.join(postsDirectory, fileName), "utf8");
   const { data } = matter(source);
   const tags = Array.isArray(data.tags) ? data.tags : [];
@@ -59,25 +61,70 @@ for (const slug of coreTagSlugs) {
 }
 
 for (const [slug, names] of namesBySlug) {
-  if (names.size > 1 && coreTagSlugs.includes(slug)) {
-    failures.push(`核心标签 ${slug} 对应多个名称：${[...names].join("、")}`);
+  if (names.size > 4) {
+    failures.push(
+      `标签 ${slug} 聚合了过多名称：${[...names].join("、")}，应重新检查 canonical 边界`,
+    );
   }
 }
 
 const uniqueTagCount = counts.size;
 const singletonCount = [...counts.values()].filter((count) => count === 1).length;
 const publicTagCount = [...counts.values()].filter((count) => count >= 2).length;
+const indexableTagCount = [...counts.values()].filter((count) => count >= 3).length;
 
 if (uniqueTagCount > 110) {
   failures.push(`唯一标签达到 ${uniqueTagCount} 个，超过当前治理上限 110 个`);
 }
+if (publicTagCount > 60) {
+  failures.push(
+    `可浏览标签归档达到 ${publicTagCount} 个，超过当前治理上限 60 个`,
+  );
+}
+if (publicTagCount < coreTagSlugs.length) {
+  failures.push(
+    `可浏览标签归档 ${publicTagCount} 个少于核心标签 ${coreTagSlugs.length} 个`,
+  );
+}
+
+const tagCenterSource = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "tags", "page.tsx"),
+  "utf8",
+);
+if (!tagCenterSource.includes("getPublicTagRecords")) {
+  failures.push("标签中心没有使用公开标签归档过滤器");
+}
+
+const tagArchiveSource = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "tags", "[tag]", "page.tsx"),
+  "utf8",
+);
+for (const marker of [
+  'record.count < 2',
+  'permanentRedirect("/tags/retired")',
+  'noindex: record.count < 3',
+]) {
+  if (!tagArchiveSource.includes(marker)) {
+    failures.push(`标签归档缺少治理边界：${marker}`);
+  }
+}
+
+const retiredTagSource = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "tags", "retired", "page.tsx"),
+  "utf8",
+);
+if (!retiredTagSource.includes("noindex: true")) {
+  failures.push("已收敛标签说明页必须保持 noindex");
+}
 
 if (failures.length > 0) {
-  console.error(`标签治理检查失败：\n${failures.map((item) => `- ${item}`).join("\n")}`);
+  console.error(
+    `标签治理检查失败：\n${failures.map((item) => `- ${item}`).join("\n")}`,
+  );
   process.exit(1);
 }
 
 console.log(
-  `标签治理检查通过：${coreTagSlugs.length} 个核心标签，${publicTagCount} 个多文章标签，` +
-    `${singletonCount} 个单篇标签，唯一标签共 ${uniqueTagCount} 个。`,
+  `标签治理检查通过：${coreTagSlugs.length} 个核心标签，${publicTagCount} 个可浏览归档，` +
+    `${indexableTagCount} 个可索引归档，${singletonCount} 个单篇描述标签，canonical 标签共 ${uniqueTagCount} 个。`,
 );

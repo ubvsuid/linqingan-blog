@@ -1,5 +1,8 @@
 import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
-import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
+import {
+  knowledgeBaseSections,
+  knowledgeBaseSlugs,
+} from "@/lib/knowledge-base";
 
 export interface ProjectDetail {
   label: string;
@@ -122,7 +125,8 @@ export const projects: ProjectRecord[] = [
       {
         date: "2026-07-19",
         title: "补全发布前质量检查",
-        description: "修复中文标签路由，并增加内容、路由和 JavaScript 代码块自动检查。",
+        description:
+          "修复中文标签路由，并增加内容、路由和 JavaScript 代码块自动检查。",
       },
       {
         date: "2026-07-22",
@@ -130,11 +134,18 @@ export const projects: ProjectRecord[] = [
         description:
           "建立 8 个独立专题页、52 篇专题文章的学习顺序，并让关键统计和发布检查自动运行。",
       },
+      {
+        date: "2026-08-07",
+        title: "完成标签、搜索与参考入口治理",
+        description:
+          "收敛薄标签归档、限制搜索索引体积，上线 Screeps API 快速查询和动态 Recently Verified 入口，并继续把重复内联样式迁出页面。",
+      },
     ],
     highlights: [
       `按 ${beginnerStageCount} 个阶段组织 ${beginnerArticleCount} 篇新手学习路线`,
       `把 ${knowledgeArticleCount} 篇专题文章组织为 ${knowledgeModuleCount} 个知识模块`,
       "上线 Creep 身体计算器与问题快速查询入口",
+      "上线 Screeps API 快速查询与动态 Recently Verified 入口",
       "支持目录、代码复制、专题进度和前后篇跳转",
       "静态生成文章、Sitemap、RSS 与结构化数据",
       "统一搜索文章、术语、错误码、工具和项目内容",
@@ -143,14 +154,16 @@ export const projects: ProjectRecord[] = [
     nextSteps: [
       "补齐文章较少的 Controller 与运行诊断模块。",
       "继续收集真实 Screeps Console 和多 tick 运行证据。",
-      "扩展身体计算器，并开发常用 API 快速查询。",
+      "根据真实使用数据继续扩展 API 快速查询、标签与搜索体验。",
       "根据 Google Search Console 的真实数据优化重要页面。",
     ],
     links: [
       { label: "查看项目摘要", href: "/about#project-linqingan-com" },
       { label: "进入学习路线", href: "/beginner" },
       { label: "浏览知识库", href: "/knowledge" },
+      { label: "查询 Screeps API", href: "/screeps-api" },
       { label: "使用身体计算器", href: "/tools/creep-body-calculator" },
+      { label: "查看最近验证", href: "/verified" },
       { label: "查看验证方法", href: "/verification" },
       {
         label: "查看 GitHub",
@@ -158,7 +171,7 @@ export const projects: ProjectRecord[] = [
         external: true,
       },
     ],
-    updatedAt: "2026-07-22",
+    updatedAt: "2026-08-07",
   },
   {
     id: "screeps-beginner-path",
@@ -194,8 +207,16 @@ export const projects: ProjectRecord[] = [
         label: "学习阶段",
         note: "从基础概念推进到房间循环",
       },
-      { value: "1", label: "基础房间代码", note: "第十二篇完成首次整合" },
-      { value: "0", label: "账号门槛", note: "进度仅保存在本地浏览器" },
+      {
+        value: "1",
+        label: "基础房间代码",
+        note: "第十二篇完成首次整合",
+      },
+      {
+        value: "0",
+        label: "账号门槛",
+        note: "进度仅保存在本地浏览器",
+      },
     ],
     flow: ["认识对象", "运行最小代码", "观察游戏结果", "进入下一问题"],
     timeline: [
@@ -207,7 +228,8 @@ export const projects: ProjectRecord[] = [
       {
         date: "2026-07-16",
         title: "完成十二篇学习路线",
-        description: "补充角色分工、升级、Extension、建造维修和基础房间代码。",
+        description:
+          "补充角色分工、升级、Extension、建造维修和基础房间代码。",
       },
       {
         date: "2026-07-17",
@@ -217,7 +239,8 @@ export const projects: ProjectRecord[] = [
       {
         date: "2026-07-21",
         title: "完成重点代码深度审校",
-        description: "补充对象保护、返回值处理、多 tick 状态说明与明确的验证边界。",
+        description:
+          "补充对象保护、返回值处理、多 tick 状态说明与明确的验证边界。",
       },
     ],
     highlights: [
@@ -233,7 +256,10 @@ export const projects: ProjectRecord[] = [
       "保持与专题知识库之间的前置知识和继续阅读链接。",
     ],
     links: [
-      { label: "查看项目摘要", href: "/about#project-screeps-beginner-path" },
+      {
+        label: "查看项目摘要",
+        href: "/about#project-screeps-beginner-path",
+      },
       { label: "开始学习", href: "/beginner" },
       { label: "进入知识库", href: "/knowledge" },
       { label: "查看验证方法", href: "/verification" },
