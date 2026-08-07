@@ -36,8 +36,7 @@ function createCandidateContentSecurityPolicy() {
   return [...stricterDirectives, "style-src-attr 'none'"].join("; ");
 }
 
-const candidateContentSecurityPolicy =
-  createCandidateContentSecurityPolicy();
+const candidateContentSecurityPolicy = createCandidateContentSecurityPolicy();
 const candidateContentSecurityPolicyHeader = {
   key: "Content-Security-Policy-Report-Only",
   value: candidateContentSecurityPolicy,
@@ -59,6 +58,7 @@ const securityHeaders = [
   { key: "Cross-Origin-Resource-Policy", value: "same-site" },
   { key: "Reporting-Endpoints", value: 'csp-endpoint="https://www.linqingan.com/api/csp-report"' },
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  candidateContentSecurityPolicyHeader,
 ];
 
 const nextConfig: NextConfig = {
@@ -92,10 +92,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
-      {
-        source: "/en/verification",
-        headers: [candidateContentSecurityPolicyHeader],
-      },
       {
         source: "/theme-init.js",
         headers: [
