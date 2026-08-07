@@ -6,6 +6,7 @@ import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base"
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
 import { getSearchDocuments } from "@/lib/search";
+import { screepsApiReference } from "@/lib/screeps-api-reference";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 import { siteConfig } from "@/lib/site";
@@ -16,7 +17,7 @@ import styles from "./knowledge.module.css";
 export const metadata = createPageMetadata({
   title: "Screeps 知识库",
   description:
-    "从 Screeps 新手路线进入 8 个专题模块，并查询术语、错误码、标签、验证方法、房间诊断、Creep 身体计算器和全部站内内容。",
+    "从 Screeps 新手路线进入 8 个专题模块，并查询常用 API、术语、错误码、标签、验证方法、房间诊断、Creep 身体计算器和全部站内内容。",
   path: "/knowledge",
 });
 
@@ -36,11 +37,18 @@ const referenceTools = [
     count: "已上线",
   },
   {
+    eyebrow: "API QUICK REFERENCE",
+    title: "Screeps API 快速查询",
+    description: "按对象、方法或用途查询常用 API 调用形式，并跳转到对应站内指南。",
+    href: "/screeps-api",
+    count: `${screepsApiReference.length} 个常用 API`,
+  },
+  {
     eyebrow: "SEARCH",
     title: "站内搜索",
     description: "同时搜索文章正文、知识模块、术语、错误码、工具和公开建设说明。",
     href: "/search",
-    count: `${getSearchDocuments().length} 条内容`,
+    count: `${getSearchDocuments({ includeArticleText: false }).length} 条内容`,
   },
   {
     eyebrow: "GLOSSARY",
@@ -70,6 +78,13 @@ const referenceTools = [
     href: "/verification",
     count: "5 种验证状态",
   },
+  {
+    eyebrow: "RECENTLY VERIFIED",
+    title: "最近验证状态",
+    description: "按最近核对日期查看每篇文章当前达到的文档、语法、Console 或真实主循环证据等级。",
+    href: "/verified",
+    count: "自动生成",
+  },
 ];
 
 export default function KnowledgePage() {
@@ -93,7 +108,7 @@ export default function KnowledgePage() {
       {
         "@type": "CollectionPage",
         name: "Screeps 知识库",
-        description: "Screeps 中文新手路线、专题模块、术语、错误码、验证方法和实用工具入口。",
+        description: "Screeps 中文新手路线、专题模块、API 快速查询、术语、错误码、验证方法和实用工具入口。",
         url: pageUrl,
         inLanguage: "zh-CN",
         mainEntity: { "@id": `${pageUrl}#items` },
@@ -167,7 +182,7 @@ export default function KnowledgePage() {
               <p className="eyebrow">REFERENCE &amp; TOOLS</p>
               <h2 id="knowledge-reference-title">查询与工具</h2>
             </div>
-            <p>文章用于连续学习；这些入口用于遇到具体名词、返回值、身体配置或代码问题时快速定位。</p>
+            <p>文章用于连续学习；这些入口用于遇到具体 API、名词、返回值、身体配置或代码问题时快速定位。</p>
           </div>
 
           <div className={styles.referenceGrid}>
@@ -183,10 +198,10 @@ export default function KnowledgePage() {
 
           <div className={styles.apiRoadmap}>
             <div>
-              <strong>常用 Screeps API 快速查询</strong>
-              <p>下一阶段会把常用对象、方法、参数和返回值整理成独立查询入口；上线前仍以官方文档和已验证文章为准。</p>
+              <strong>常用 Screeps API 快速查询已上线</strong>
+              <p>可以按对象、方法或用途筛选常用 API，再进入对应文章查看边界、返回码和完整示例。</p>
             </div>
-            <Link href="/search?q=API">先搜索现有 API 内容 →</Link>
+            <Link href="/screeps-api">打开 API 快速查询 →</Link>
           </div>
         </section>
 
