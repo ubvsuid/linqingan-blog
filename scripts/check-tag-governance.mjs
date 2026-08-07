@@ -8,6 +8,9 @@ const postsDirectory = path.join(root, "content", "posts");
 const fixedTagSlugs = JSON.parse(
   fs.readFileSync(path.join(root, "src", "lib", "tag-slugs.json"), "utf8"),
 );
+const tagAliases = JSON.parse(
+  fs.readFileSync(path.join(root, "src", "lib", "tag-aliases.json"), "utf8"),
+);
 const canonicalTagNames = JSON.parse(
   fs.readFileSync(path.join(root, "src", "lib", "tag-canonical-names.json"), "utf8"),
 );
@@ -19,24 +22,24 @@ const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
 const MAX_UNIQUE_TAGS = 100;
 const MAX_PUBLIC_TAGS = 65;
 const MAX_SINGLETON_TAGS = 70;
-const deprecatedCanonicalSlugs = new Set([
-  "energy-resource",
-  "debugging-tools",
-  "screeps-game-api",
-]);
 const canonicalRedirects = [
   ["/tags/energy-resource", "/tags/energy"],
   ["/tags/debugging-tools", "/tags/debugging"],
   ["/tags/screeps-game-api", "/tags/game-api"],
 ];
 
-function tagToSlug(tag) {
+function rawTagToSlug(tag) {
   const normalized = String(tag).normalize("NFKC").trim();
   if (fixedTagSlugs[normalized]) return fixedTagSlugs[normalized];
   return normalized
     .toLocaleLowerCase("zh-CN")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function tagToSlug(tag) {
+  const rawSlug = rawTagToSlug(tag);
+  return tagAliases[rawSlug] ?? rawSlug;
 }
 
 const counts = new Map();
@@ -93,9 +96,12 @@ for (const [slug, canonicalName] of Object.entries(canonicalTagNames)) {
   }
 }
 
-for (const [tagName, slug] of Object.entries(fixedTagSlugs)) {
-  if (deprecatedCanonicalSlugs.has(slug)) {
-    failures.push(`标签 ${tagName} 仍指向已废弃 slug：${slug}`);
+for (const [sourceSlug, canonicalSlug] of Object.entries(tagAliases)) {
+  if (sourceSlug === canonicalSlug) {
+    failures.push(`标签 alias 不能指向自身：${sourceSlug}`);
+  }
+  if (!counts.has(canonicalSlug)) {
+    failures.push(`标签 alias 目标没有实际内容：${sourceSlug} -> ${canonicalSlug}`);
   }
 }
 
@@ -129,6 +135,6 @@ if (failures.length > 0) {
 
 console.log(
   `标签治理检查通过：${coreTagSlugs.length} 个核心标签，${publicTagCount} 个多文章标签，` +
-    `${singletonCount} 个单篇标签，唯一标签共 ${uniqueTagCount} 个；` +
-    `上限分别为 ${MAX_PUBLIC_TAGS}/${MAX_SINGLETON_TAGS}/${MAX_UNIQUE_TAGS}，canonical 301 已锁定。`,
+    `${singletonCount} 个单篇标签，canonical 唯一标签共 ${uniqueTagCount} 个；` +
+    `上限分别为 ${MAX_PUBLIC_TAGS}/${MAX_SINGLETON_TAGS}/${MAX_UNIQUE_TAGS}，alias 与 301 已锁定。`,
 );
