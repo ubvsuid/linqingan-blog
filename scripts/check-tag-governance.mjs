@@ -8,9 +8,21 @@ const postsDirectory = path.join(root, "content", "posts");
 const fixedTagSlugs = JSON.parse(
   fs.readFileSync(path.join(root, "src", "lib", "tag-slugs.json"), "utf8"),
 );
+const canonicalTagNames = JSON.parse(
+  fs.readFileSync(path.join(root, "src", "lib", "tag-canonical-names.json"), "utf8"),
+);
 const coreTagSlugs = JSON.parse(
   fs.readFileSync(path.join(root, "src", "lib", "core-tag-slugs.json"), "utf8"),
 );
+
+const MAX_UNIQUE_TAGS = 100;
+const MAX_PUBLIC_TAGS = 65;
+const MAX_SINGLETON_TAGS = 70;
+const deprecatedCanonicalSlugs = new Set([
+  "energy-resource",
+  "debugging-tools",
+  "screeps-game-api",
+]);
 
 function tagToSlug(tag) {
   const normalized = String(tag).normalize("NFKC").trim();
@@ -59,8 +71,25 @@ for (const slug of coreTagSlugs) {
 }
 
 for (const [slug, names] of namesBySlug) {
-  if (names.size > 1 && coreTagSlugs.includes(slug)) {
-    failures.push(`核心标签 ${slug} 对应多个名称：${[...names].join("、")}`);
+  if (names.size > 1 && !canonicalTagNames[slug]) {
+    failures.push(
+      `标签 ${slug} 对应多个名称但没有 canonical display name：${[...names].join("、")}`,
+    );
+  }
+}
+
+for (const [slug, canonicalName] of Object.entries(canonicalTagNames)) {
+  if (!counts.has(slug)) {
+    failures.push(`canonical tag name 指向未使用 slug：${slug}`);
+  }
+  if (typeof canonicalName !== "string" || canonicalName.trim().length === 0) {
+    failures.push(`canonical tag name 无效：${slug}`);
+  }
+}
+
+for (const [tagName, slug] of Object.entries(fixedTagSlugs)) {
+  if (deprecatedCanonicalSlugs.has(slug)) {
+    failures.push(`标签 ${tagName} 仍指向已废弃 slug：${slug}`);
   }
 }
 
@@ -68,8 +97,14 @@ const uniqueTagCount = counts.size;
 const singletonCount = [...counts.values()].filter((count) => count === 1).length;
 const publicTagCount = [...counts.values()].filter((count) => count >= 2).length;
 
-if (uniqueTagCount > 110) {
-  failures.push(`唯一标签达到 ${uniqueTagCount} 个，超过当前治理上限 110 个`);
+if (uniqueTagCount > MAX_UNIQUE_TAGS) {
+  failures.push(`唯一标签达到 ${uniqueTagCount} 个，超过治理上限 ${MAX_UNIQUE_TAGS} 个`);
+}
+if (publicTagCount > MAX_PUBLIC_TAGS) {
+  failures.push(`多文章标签达到 ${publicTagCount} 个，超过治理上限 ${MAX_PUBLIC_TAGS} 个`);
+}
+if (singletonCount > MAX_SINGLETON_TAGS) {
+  failures.push(`单篇标签达到 ${singletonCount} 个，超过治理上限 ${MAX_SINGLETON_TAGS} 个`);
 }
 
 if (failures.length > 0) {
@@ -79,5 +114,6 @@ if (failures.length > 0) {
 
 console.log(
   `标签治理检查通过：${coreTagSlugs.length} 个核心标签，${publicTagCount} 个多文章标签，` +
-    `${singletonCount} 个单篇标签，唯一标签共 ${uniqueTagCount} 个。`,
+    `${singletonCount} 个单篇标签，唯一标签共 ${uniqueTagCount} 个；` +
+    `上限分别为 ${MAX_PUBLIC_TAGS}/${MAX_SINGLETON_TAGS}/${MAX_UNIQUE_TAGS}。`,
 );
