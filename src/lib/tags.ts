@@ -1,4 +1,5 @@
 import { getAllPosts } from "@/lib/posts";
+import canonicalTagNames from "@/lib/tag-canonical-names.json";
 import fixedTagSlugs from "@/lib/tag-slugs.json";
 
 export interface TagRecord {
@@ -19,6 +20,10 @@ export function tagToSlug(tag: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+function getCanonicalTagName(slug: string, fallback: string): string {
+  return (canonicalTagNames as Record<string, string>)[slug] ?? fallback;
+}
+
 export function getTagRecords(): TagRecord[] {
   const tags = new Map<string, TagRecord>();
 
@@ -27,7 +32,11 @@ export function getTagRecords(): TagRecord[] {
       const slug = tagToSlug(name);
       if (!slug) continue;
       const existing = tags.get(slug);
-      tags.set(slug, { name: existing?.name ?? name, slug, count: (existing?.count ?? 0) + 1 });
+      tags.set(slug, {
+        name: getCanonicalTagName(slug, existing?.name ?? name),
+        slug,
+        count: (existing?.count ?? 0) + 1,
+      });
     }
   }
 
@@ -43,4 +52,3 @@ export function getTagRecord(slug: string): TagRecord | undefined {
 export function getPostsForTag(slug: string) {
   return getAllPosts().filter((post) => post.tags.some((tag) => tagToSlug(tag) === slug));
 }
-
