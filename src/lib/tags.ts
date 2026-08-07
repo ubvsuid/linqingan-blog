@@ -1,4 +1,5 @@
 import { getAllPosts } from "@/lib/posts";
+import tagAliases from "@/lib/tag-aliases.json";
 import canonicalTagNames from "@/lib/tag-canonical-names.json";
 import fixedTagSlugs from "@/lib/tag-slugs.json";
 
@@ -8,7 +9,7 @@ export interface TagRecord {
   count: number;
 }
 
-export function tagToSlug(tag: string): string {
+function rawTagToSlug(tag: string): string {
   const normalizedTag = tag.normalize("NFKC").trim();
   const fixedSlug = (fixedTagSlugs as Record<string, string>)[normalizedTag];
 
@@ -18,6 +19,14 @@ export function tagToSlug(tag: string): string {
     .toLocaleLowerCase("zh-CN")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function canonicalizeTagSlug(slug: string): string {
+  return (tagAliases as Record<string, string>)[slug] ?? slug;
+}
+
+export function tagToSlug(tag: string): string {
+  return canonicalizeTagSlug(rawTagToSlug(tag));
 }
 
 function getCanonicalTagName(slug: string, fallback: string): string {
@@ -46,9 +55,11 @@ export function getTagRecords(): TagRecord[] {
 }
 
 export function getTagRecord(slug: string): TagRecord | undefined {
-  return getTagRecords().find((tag) => tag.slug === slug);
+  const canonicalSlug = canonicalizeTagSlug(slug);
+  return getTagRecords().find((tag) => tag.slug === canonicalSlug);
 }
 
 export function getPostsForTag(slug: string) {
-  return getAllPosts().filter((post) => post.tags.some((tag) => tagToSlug(tag) === slug));
+  const canonicalSlug = canonicalizeTagSlug(slug);
+  return getAllPosts().filter((post) => post.tags.some((tag) => tagToSlug(tag) === canonicalSlug));
 }
