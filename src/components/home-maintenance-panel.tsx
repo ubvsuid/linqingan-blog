@@ -1,8 +1,7 @@
 import Link from "next/link";
 
-import { getRecentArticleRevisions } from "@/lib/article-revisions";
-import { changelogEntries } from "@/lib/changelog";
-import { getAllPosts } from "@/lib/posts";
+import { formatDate } from "@/lib/date";
+import { getRecentSiteActivity } from "@/lib/site-status";
 
 const popularQuestions = [
   {
@@ -28,39 +27,16 @@ const popularQuestions = [
 ];
 
 export function HomeMaintenancePanel() {
-  const posts = getAllPosts();
-  const postsBySlug = new Map(posts.map((post) => [post.slug, post]));
-  const recentRevisions = getRecentArticleRevisions(4);
-  const latestChanges = changelogEntries.slice(0, 4);
-  const timelineItems = [
-    ...recentRevisions.map((revision) => ({
-      id: `revision-${revision.slug}-${revision.date}`,
-      date: revision.date,
-      type: "文章修订",
-      title: postsBySlug.get(revision.slug)?.title ?? revision.slug,
-      summary: revision.reason,
-      href: `/blog/${revision.slug}`,
-    })),
-    ...latestChanges.map((entry) => ({
-      id: entry.id,
-      date: entry.date,
-      type: entry.type,
-      title: entry.title,
-      summary: entry.summary,
-      href: entry.links?.[0]?.href ?? "/changelog",
-    })),
-  ]
-    .sort((left, right) => right.date.localeCompare(left.date))
-    .slice(0, 6);
+  const timelineItems = getRecentSiteActivity(3);
 
   return (
     <section className="home-maintenance" aria-labelledby="home-maintenance-title">
       <div className="home-maintenance-heading">
         <div>
-          <p className="eyebrow">POPULAR & RECENTLY FIXED</p>
-          <h2 id="home-maintenance-title">热门问题与维护时间流</h2>
+          <p className="eyebrow">POPULAR &amp; RECENT</p>
+          <h2 id="home-maintenance-title">热门问题与最近更新</h2>
         </div>
-        <Link href="/changelog">查看全部更新日志 →</Link>
+        <Link href="/changelog">查看完整更新日志 →</Link>
       </div>
 
       <nav className="home-question-strip" aria-label="热门问题">
@@ -73,82 +49,39 @@ export function HomeMaintenancePanel() {
         ))}
       </nav>
 
-      <div className="home-timeline" aria-label="最近文章修订与网站更新">
+      <div className="home-timeline" aria-label="最近内容与网站更新">
         {timelineItems.map((item) => (
-          <Link href={item.href} key={item.id}>
-            <time dateTime={item.date}>{item.date}</time>
+          <Link href={item.href ?? "/changelog"} key={item.id}>
+            <time dateTime={item.date}>{formatDate(item.date)}</time>
             <span>{item.type}</span>
             <strong>{item.title}</strong>
-            <p>{item.summary}</p>
           </Link>
         ))}
       </div>
 
       <style>{`
-        .home-maintenance { padding: 88px 0; }
-        .home-maintenance-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
-        .home-maintenance-heading h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 56px); letter-spacing: -.045em; }
+        .home-maintenance { padding: 72px 0; }
+        .home-maintenance-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+        .home-maintenance-heading h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 54px); letter-spacing: -.045em; }
         .home-maintenance-heading > a { font-weight: 700; }
-        .home-question-strip {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          border-top: 1px solid var(--border);
-          border-bottom: 1px solid var(--border);
-        }
-        .home-question-strip a {
-          position: relative;
-          display: grid;
-          gap: 7px;
-          padding: 20px 34px 20px 0;
-        }
-        .home-question-strip a + a {
-          border-left: 1px solid var(--border);
-          padding-left: 20px;
-        }
-        .home-question-strip a:hover { text-decoration: none; }
+        .home-question-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .home-question-strip a { position: relative; display: grid; gap: 7px; padding: 20px 34px 20px 0; }
+        .home-question-strip a + a { border-left: 1px solid var(--border); padding-left: 20px; }
+        .home-question-strip a:hover, .home-timeline a:hover { text-decoration: none; }
         .home-question-strip span { color: var(--muted); font-size: 12px; line-height: 1.55; }
         .home-question-strip small { position: absolute; top: 22px; right: 10px; }
-        .home-timeline {
-          position: relative;
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 0 42px;
-          margin-top: 42px;
-        }
-        .home-timeline::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 50%;
-          width: 1px;
-          background: var(--border);
-        }
-        .home-timeline a {
-          position: relative;
-          display: grid;
-          grid-template-columns: auto auto minmax(0, 1fr);
-          gap: 8px 12px;
-          border-top: 1px solid var(--border);
-          padding: 21px 0 24px;
-        }
-        .home-timeline a:hover { text-decoration: none; }
-        .home-timeline time,
-        .home-timeline > a > span {
-          color: var(--muted);
-          font-family: "SFMono-Regular", Consolas, monospace;
-          font-size: 10px;
-        }
-        .home-timeline strong { grid-column: 1 / -1; line-height: 1.45; }
-        .home-timeline p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+        .home-timeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 30px; }
+        .home-timeline a { display: grid; align-content: start; gap: 9px; min-height: 132px; border: 1px solid var(--border); border-radius: 16px; padding: 18px; background: var(--surface); }
+        .home-timeline time, .home-timeline > a > span { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 10px; }
+        .home-timeline strong { line-height: 1.5; }
         @media (max-width: 900px) {
           .home-question-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .home-question-strip a:nth-child(3) { border-left: 0; }
           .home-question-strip a:nth-child(n + 3) { border-top: 1px solid var(--border); }
           .home-timeline { grid-template-columns: 1fr; }
-          .home-timeline::before { display: none; }
         }
         @media (max-width: 620px) {
+          .home-maintenance { padding: 58px 0; }
           .home-maintenance-heading { align-items: start; flex-direction: column; }
           .home-question-strip { grid-template-columns: 1fr; }
           .home-question-strip a + a { border-top: 1px solid var(--border); border-left: 0; padding-left: 0; }
