@@ -6,6 +6,8 @@ import { createPageMetadata } from "@/lib/metadata";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
 import { siteConfig } from "@/lib/site";
 
+import styles from "./page.module.css";
+
 export const metadata = createPageMetadata({
   title: "Screeps API 快速查询",
   description:
@@ -44,7 +46,7 @@ export default function ScreepsApiPage() {
         }}
       />
       <Container>
-        <nav className="resource-breadcrumb" aria-label="面包屑">
+        <nav className={styles.breadcrumb} aria-label="面包屑">
           <Link href="/knowledge">知识库</Link>
           <span aria-hidden="true">/</span>
           <span>API 快速查询</span>
