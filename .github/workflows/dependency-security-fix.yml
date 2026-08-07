@@ -1,0 +1,55 @@
+name: One-time dependency security fix
+
+on:
+  push:
+    branches:
+      - fix/final-site-audit-20260807
+    paths:
+      - ".github/workflows/dependency-security-fix.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    name: Apply safe npm audit fix
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/final-site-audit-20260807
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Apply non-breaking audit fixes
+        run: npm audit fix
+
+      - name: Verify production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Verify complete dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Verify lockfile synchronization
+        run: npm run locksynccheck
+
+      - name: Commit safe dependency updates
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "No dependency file changes were required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "Fix high severity dependency vulnerabilities"
+          git push origin HEAD:fix/final-site-audit-20260807
