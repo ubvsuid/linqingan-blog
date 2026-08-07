@@ -68,6 +68,7 @@ const knownRoutes = new Set([
   "/glossary",
   "/knowledge",
   "/now",
+  "/screeps-api",
   "/screeps-errors",
   "/search",
   "/sitemap.xml",
@@ -80,13 +81,17 @@ const knownRoutes = new Set([
 ]);
 
 function isExistingPublicDiagram(href) {
-  return /^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)
-    && fs.existsSync(path.join(root, "public", href.slice(1)));
+  return (
+    /^\/diagrams\/[a-z0-9-]+\.svg$/.test(href) &&
+    fs.existsSync(path.join(root, "public", href.slice(1)))
+  );
 }
 
 for (const fileName of files) {
   const slug = fileName.replace(/\.md$/, "");
-  const { data } = matter(fs.readFileSync(path.join(postsDirectory, fileName), "utf8"));
+  const { data } = matter(
+    fs.readFileSync(path.join(postsDirectory, fileName), "utf8"),
+  );
   postSlugs.add(slug);
   knownRoutes.add(`/blog/${slug}`);
 
@@ -99,12 +104,18 @@ for (const fileName of files) {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(tagSlug)) {
       addError(`${fileName}: 标签“${tag}”生成了非 ASCII slug：${tagSlug}`);
     }
-    const existing = tagOwners.get(tagSlug);
-    if (existing && existing !== tag) {
-      addError(`标签 slug 冲突：${existing} 与 ${tag} 都映射到 ${tagSlug}`);
-    }
-    tagOwners.set(tagSlug, tag);
+    const names = tagOwners.get(tagSlug) ?? new Set();
+    names.add(tag);
+    tagOwners.set(tagSlug, names);
     knownRoutes.add(`/tags/${tagSlug}`);
+  }
+}
+
+for (const [tagSlug, names] of tagOwners) {
+  if (names.size > 4) {
+    addError(
+      `标签 canonical ${tagSlug} 聚合了过多名称：${[...names].join("、")}`,
+    );
   }
 }
 
@@ -137,8 +148,12 @@ for (const slug of postSlugs) {
 for (const slug of beginnerSet) {
   if (knowledgeSet.has(slug)) addError(`文章同时进入新手路线和知识模块：${slug}`);
 }
-if (knowledgeSet.size !== knowledgeSlugs.length) addError("知识模块中存在重复文章 slug");
-if (beginnerSet.size !== beginnerSlugs.length) addError("新手路线中存在重复文章 slug");
+if (knowledgeSet.size !== knowledgeSlugs.length) {
+  addError("知识模块中存在重复文章 slug");
+}
+if (beginnerSet.size !== beginnerSlugs.length) {
+  addError("新手路线中存在重复文章 slug");
+}
 if (new Set(knowledgeSectionIds).size !== knowledgeSectionIds.length) {
   addError("知识模块中存在重复 id");
 }
@@ -177,15 +192,21 @@ const routeFiles = new Map([
   ["/glossary", "src/app/(zh)/glossary/page.tsx"],
   ["/knowledge", "src/app/(zh)/knowledge/page.tsx"],
   ["/now", "src/app/(zh)/now/page.tsx"],
+  ["/screeps-api", "src/app/(zh)/screeps-api/page.tsx"],
   ["/screeps-errors", "src/app/(zh)/screeps-errors/page.tsx"],
   ["/search", "src/app/(zh)/search/page.tsx"],
   ["/tags", "src/app/(zh)/tags/page.tsx"],
-  ["/tools/creep-body-calculator", "src/app/(zh)/tools/creep-body-calculator/page.tsx"],
+  [
+    "/tools/creep-body-calculator",
+    "src/app/(zh)/tools/creep-body-calculator/page.tsx",
+  ],
   ["/tools/room-diagnostics", "src/app/(zh)/tools/room-diagnostics/page.tsx"],
   ["/verification", "src/app/(zh)/verification/page.tsx"],
 ]);
 for (const [route, relativePath] of routeFiles) {
-  if (!fs.existsSync(path.join(root, relativePath))) addError(`${route} 缺少页面文件 ${relativePath}`);
+  if (!fs.existsSync(path.join(root, relativePath))) {
+    addError(`${route} 缺少页面文件 ${relativePath}`);
+  }
 }
 
 for (const relativePath of [
@@ -201,7 +222,9 @@ for (const relativePath of [
   "src/app/(zh)/sitemap-en.xml/route.ts",
   "src/lib/sitemaps.ts",
 ]) {
-  if (!fs.existsSync(path.join(root, relativePath))) addError(`缺少动态路由文件 ${relativePath}`);
+  if (!fs.existsSync(path.join(root, relativePath))) {
+    addError(`缺少动态路由文件 ${relativePath}`);
+  }
 }
 
 if (fs.existsSync(path.join(root, "src/app/(zh)/sitemap.ts"))) {
@@ -214,7 +237,9 @@ for (const retiredPath of [
   "src/app/projects/[slug]/page.tsx",
   "src/app/projects/page/[page]/page.tsx",
 ]) {
-  if (fs.existsSync(path.join(root, retiredPath))) addError(`已合并页面仍然存在：${retiredPath}`);
+  if (fs.existsSync(path.join(root, retiredPath))) {
+    addError(`已合并页面仍然存在：${retiredPath}`);
+  }
 }
 
 const knowledgePageSource = fs.readFileSync(
@@ -224,11 +249,17 @@ const knowledgePageSource = fs.readFileSync(
 if (!knowledgePageSource.includes('id="reference-tools"')) {
   addError("知识库没有承接资料中心的查询与工具区域");
 }
-if (!knowledgePageSource.includes("CollectionPage") || !knowledgePageSource.includes("ItemList")) {
+if (
+  !knowledgePageSource.includes("CollectionPage") ||
+  !knowledgePageSource.includes("ItemList")
+) {
   addError("知识库缺少集合型结构化数据");
 }
 if (!knowledgePageSource.includes("/tools/creep-body-calculator")) {
   addError("知识库没有加入 Creep 身体计算器");
+}
+if (!knowledgePageSource.includes("/screeps-api")) {
+  addError("知识库没有加入 Screeps API 快速查询");
 }
 
 const knowledgeModulePageSource = fs.readFileSync(
@@ -243,7 +274,10 @@ const aboutPageSource = fs.readFileSync(
   path.join(root, "src", "app", "(zh)", "about", "page.tsx"),
   "utf8",
 );
-if (!aboutPageSource.includes('id="public-projects"') || !aboutPageSource.includes("projects.map")) {
+if (
+  !aboutPageSource.includes('id="public-projects"') ||
+  !aboutPageSource.includes("projects.map")
+) {
   addError("关于页没有承接公开项目内容");
 }
 if (aboutPageSource.includes("profile-project-columns")) {
@@ -255,10 +289,16 @@ const tagPageSource = fs.readFileSync(
   "utf8",
 );
 if (!tagPageSource.includes("getTagRecords().map")) {
-  addError("标签页没有从 getTagRecords 生成静态参数");
+  addError("标签页没有从 getTagRecords 生成兼容静态参数");
 }
 if (!tagPageSource.includes("noindex: record.count < 3")) {
   addError("薄标签页没有按文章数量设置 noindex");
+}
+if (
+  !tagPageSource.includes('record.count < 2') ||
+  !tagPageSource.includes('permanentRedirect("/tags")')
+) {
+  addError("单篇标签没有重定向到标签中心");
 }
 
 const englishTagPageSource = fs.readFileSync(
@@ -292,8 +332,14 @@ const nowPageSource = fs.readFileSync(
 if (!nowPageSource.includes("changelogEntries.slice(0, 3)")) {
   addError("近况页没有自动读取最近三条更新日志");
 }
+if (!nowPageSource.includes("最近文章发布")) {
+  addError("近况页没有区分最近文章发布和网站更新");
+}
 
-const nextConfigSource = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
+const nextConfigSource = fs.readFileSync(
+  path.join(root, "next.config.ts"),
+  "utf8",
+);
 for (const marker of [
   'source: "/changelog/page/2"',
   'destination: "/changelog"',
@@ -302,10 +348,15 @@ for (const marker of [
   'source: "/projects/:path*"',
   'destination: "/about#public-projects"',
 ]) {
-  if (!nextConfigSource.includes(marker)) addError(`缺少旧页面重定向：${marker}`);
+  if (!nextConfigSource.includes(marker)) {
+    addError(`缺少旧页面重定向：${marker}`);
+  }
 }
 
-const sitemapSource = fs.readFileSync(path.join(root, "src", "lib", "sitemaps.ts"), "utf8");
+const sitemapSource = fs.readFileSync(
+  path.join(root, "src", "lib", "sitemaps.ts"),
+  "utf8",
+);
 for (const marker of [
   "getAllPosts()",
   "getTagRecords()",
@@ -313,20 +364,29 @@ for (const marker of [
   "knowledgeBaseSections.map",
   "changelogEntries",
   "/knowledge",
+  "/screeps-api",
   "/verification",
   "/changelog",
   "/tools/creep-body-calculator",
   "/en/blog",
 ]) {
-  if (!sitemapSource.includes(marker)) addError(`Sitemap 缺少路由来源：${marker}`);
+  if (!sitemapSource.includes(marker)) {
+    addError(`Sitemap 缺少路由来源：${marker}`);
+  }
 }
 if (sitemapSource.includes("`${siteConfig.url}/search`")) {
   addError("站内搜索页不应出现在 Sitemap");
 }
-if (sitemapSource.includes("`${siteConfig.url}/resources`") || sitemapSource.includes("`${siteConfig.url}/projects`")) {
+if (
+  sitemapSource.includes("`${siteConfig.url}/resources`") ||
+  sitemapSource.includes("`${siteConfig.url}/projects`")
+) {
   addError("已合并的资料或项目页面不应出现在 Sitemap");
 }
-if (sitemapSource.includes("/blog/page/") || sitemapSource.includes("createArchivePages")) {
+if (
+  sitemapSource.includes("/blog/page/") ||
+  sitemapSource.includes("createArchivePages")
+) {
   addError("文章深层分页不应进入 Sitemap");
 }
 
@@ -334,8 +394,14 @@ const sitemapIndexSource = fs.readFileSync(
   path.join(root, "src", "app", "(zh)", "sitemap.xml", "route.ts"),
   "utf8",
 );
-for (const marker of ["/sitemap-zh.xml", "/sitemap-en.xml", "renderSitemapIndexXml"]) {
-  if (!sitemapIndexSource.includes(marker)) addError(`Sitemap 索引缺少：${marker}`);
+for (const marker of [
+  "/sitemap-zh.xml",
+  "/sitemap-en.xml",
+  "renderSitemapIndexXml",
+]) {
+  if (!sitemapIndexSource.includes(marker)) {
+    addError(`Sitemap 索引缺少：${marker}`);
+  }
 }
 
 const chineseSitemapRoute = fs.readFileSync(
@@ -361,5 +427,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个标签页、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章、${knowledgeSectionIds.length} 个专题页，并已启用双语 Sitemap 索引。`,
+  `路由检查通过：${files.length} 篇文章、${tagOwners.size} 个 canonical 标签、${beginnerSet.size} 篇新手路线、${knowledgeSet.size} 篇知识模块文章、${knowledgeSectionIds.length} 个专题页，并已启用双语 Sitemap 索引。`,
 );
