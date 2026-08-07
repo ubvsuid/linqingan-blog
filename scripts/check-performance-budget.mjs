@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -193,11 +194,24 @@ for (const fileName of fs.readdirSync(workflowDirectory)) {
   }
 }
 
+const searchBudgetResult = spawnSync(
+  process.execPath,
+  [path.join(root, "scripts", "check-search-index-budget.mjs")],
+  { cwd: root, encoding: "utf8" },
+);
+if (searchBudgetResult.status !== 0) {
+  failures.push(
+    `Search index budget gate failed:\n${(searchBudgetResult.stderr || searchBudgetResult.stdout || "unknown error").trim()}`,
+  );
+} else if (searchBudgetResult.stdout.trim()) {
+  console.log(searchBudgetResult.stdout.trim());
+}
+
 if (failures.length > 0) {
   console.error(failures.join("\n"));
   process.exit(1);
 }
 
 console.log(
-  "Performance budget check passed: pull requests use a two-run representative gate, weekly full builds use three-run route budgets, deployed canonical routes use a separate two-run baseline, and all reports are retained as artifacts.",
+  "Performance budget check passed: pull requests use a two-run representative gate, weekly full builds use three-run route budgets, deployed canonical routes use a separate two-run baseline, search-index raw size is bounded, and all reports are retained as artifacts.",
 );
