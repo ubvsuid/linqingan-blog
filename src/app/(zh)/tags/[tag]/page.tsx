@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { Container } from "@/components/container";
 import { createPageMetadata } from "@/lib/metadata";
@@ -9,6 +9,7 @@ import {
   getPublicTagRecords,
   getTagArchiveHref,
   getTagRecord,
+  getTagRecords,
 } from "@/lib/tags";
 
 import styles from "./tag-page.module.css";
@@ -20,13 +21,13 @@ interface TagPageProps {
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getPublicTagRecords().map((tag) => ({ tag: tag.slug }));
+  return getTagRecords().map((tag) => ({ tag: tag.slug }));
 }
 
 export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
   const { tag } = await params;
   const record = getTagRecord(tag);
-  if (!record || record.count < 2) return {};
+  if (!record) return {};
 
   return createPageMetadata({
     title: `${record.name} 相关文章`,
@@ -45,7 +46,8 @@ const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
 export default async function TagPage({ params }: TagPageProps) {
   const { tag } = await params;
   const record = getTagRecord(tag);
-  if (!record || record.count < 2) notFound();
+  if (!record) notFound();
+  if (record.count < 2) permanentRedirect("/tags");
 
   const posts = getPostsForTag(record.slug);
   const publicTags = getPublicTagRecords();
