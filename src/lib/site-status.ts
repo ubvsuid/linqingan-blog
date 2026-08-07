@@ -14,6 +14,7 @@ export interface SiteStatus {
   knowledgeSectionCount: number;
   toolCount: number;
   projectCount: number;
+  latestPublishedDate: string | null;
   latestContentDate: string | null;
   latestChangelogDate: string | null;
   latestActivityDate: string | null;
@@ -34,6 +35,7 @@ function newestDate(values: Array<string | null | undefined>): string | null {
 
 export function getSiteStatus(): SiteStatus {
   const posts = getAllPosts();
+  const latestPublishedDate = newestDate(posts.map((post) => post.publishedAt));
   const latestContentDate = newestDate(
     posts.map((post) => post.updatedAt ?? post.publishedAt),
   );
@@ -50,6 +52,7 @@ export function getSiteStatus(): SiteStatus {
     knowledgeSectionCount: knowledgeBaseSections.length,
     toolCount,
     projectCount: projects.length,
+    latestPublishedDate,
     latestContentDate,
     latestChangelogDate,
     latestActivityDate: newestDate([latestContentDate, latestChangelogDate]),
