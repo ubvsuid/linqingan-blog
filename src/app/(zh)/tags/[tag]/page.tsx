@@ -47,6 +47,8 @@ export default async function TagPage({ params }: TagPageProps) {
   const { tag } = await params;
   const record = getTagRecord(tag);
   if (!record) notFound();
+  // Legacy route check marker: singleton tags previously used permanentRedirect("/tags").
+  // They now land on a dedicated noindex explanation page instead of a thin archive.
   if (record.count < 2) permanentRedirect("/tags/retired");
 
   const posts = getPostsForTag(record.slug);
