@@ -47,7 +47,7 @@ export default async function TagPage({ params }: TagPageProps) {
   const { tag } = await params;
   const record = getTagRecord(tag);
   if (!record) notFound();
-  if (record.count < 2) permanentRedirect("/tags");
+  if (record.count < 2) permanentRedirect("/tags/retired");
 
   const posts = getPostsForTag(record.slug);
   const publicTags = getPublicTagRecords();
