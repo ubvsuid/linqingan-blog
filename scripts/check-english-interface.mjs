@@ -69,7 +69,8 @@ requireText("src/app/(en)/en/blog-index.json/route.ts", 'dynamic = "force-static
 forbidText("src/app/(en)/en/search/page.tsx", "englishSearchDocuments", "full search index in initial page payload");
 forbidText("src/app/(en)/en/blog/page.tsx", "at least 96", "unexplained public numeric publication score");
 requireText("src/lib/search.ts", "compactArticleSearchText", "compact Chinese article search text");
-requireText("src/lib/search.ts", "MAX_ARTICLE_SEARCH_TEXT_LENGTH = 2400", "Chinese search payload limit");
+requireText("src/lib/search.ts", "ARTICLE_SEARCH_TOKEN_LIMIT = 120", "Chinese search token limit");
+requireText("src/lib/search.ts", "ARTICLE_SEARCH_TEXT_LIMIT = 1200", "Chinese search payload limit");
 requireText("src/lib/english-search.ts", "compactKeywords", "compact English search keywords");
 requireText("src/app/(zh)/api/search-index/route.ts", '"X-Robots-Tag": "noindex, nofollow"', "Chinese search-index robots header");
 forbidText("src/components/english-article-browser.tsx", "article.finalScore", "public internal score usage");
