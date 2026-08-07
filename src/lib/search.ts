@@ -1,6 +1,7 @@
 import { getKnowledgeBaseSectionBySlug } from "@/lib/knowledge-base";
 import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
+import { screepsApiReference } from "@/lib/screeps-api-reference";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 import { getToolHref, toolCatalog, toolCount } from "@/lib/tool-catalog";
@@ -76,6 +77,18 @@ function compactKeywords(values: string[], limit = 14): string[] {
   return keywords;
 }
 
+const apiReferenceDocument: SearchDocument = {
+  id: "reference:screeps-api",
+  type: "工具",
+  title: "Screeps API 快速查询",
+  description:
+    "按对象、方法和关键词查询常用 Game、Creep、Room、Structure 与系统 API。",
+  href: "/screeps-api",
+  meta: `快速参考 · ${screepsApiReference.length} 项`,
+  keywords: ["Screeps API", "Game API", "Creep API", "Room API", "Structure API"],
+  text: screepsApiReference.map((entry) => entry.signature).join(" "),
+};
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:hub",
@@ -88,6 +101,7 @@ const toolDocuments: SearchDocument[] = [
     keywords: ["Screeps 工具", "计算器", "诊断", "规划器", "tools"],
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
+  apiReferenceDocument,
   ...toolCatalog.map(
     (tool): SearchDocument => ({
       id: `tool:${tool.slug}`,
