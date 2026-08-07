@@ -81,6 +81,9 @@ const nextConfig: NextConfig = {
       { source: "/tags/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98", destination: "/tags/common-questions", statusCode: 301 },
       { source: "/tags/%E9%94%99%E8%AF%AF%E6%8E%92%E6%9F%A5", destination: "/tags/debugging", statusCode: 301 },
       { source: "/tags/%E8%BF%9B%E9%98%B6%E5%BC%80%E5%8F%91", destination: "/tags/advanced-development", statusCode: 301 },
+      { source: "/tags/energy-resource", destination: "/tags/energy", statusCode: 301 },
+      { source: "/tags/debugging-tools", destination: "/tags/debugging", statusCode: 301 },
+      { source: "/tags/screeps-game-api", destination: "/tags/game-api", statusCode: 301 },
       { source: "/resources", destination: "/knowledge#reference-tools", statusCode: 301 },
       { source: "/resources/glossary", destination: "/glossary", permanent: true },
       { source: "/resources/error-codes", destination: "/screeps-errors", permanent: true },
@@ -92,6 +95,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
+      {
+        source: "/verification",
+        headers: [candidateContentSecurityPolicyHeader],
+      },
       {
         source: "/en/verification",
         headers: [candidateContentSecurityPolicyHeader],
