@@ -150,32 +150,39 @@ export default function AboutPage() {
             <p>这里只保留项目定位、当前成果摘要和下一步入口，详细变化交给对应页面与更新日志记录。</p>
           </div>
           <div className={styles.projectGrid}>
-            {projects.map((project) => (
-              <article id={`project-${project.id}`} key={project.id}>
-                <div className={styles.projectTopline}>
-                  <span>{project.status}</span>
-                  <time dateTime={project.updatedAt}>更新于 {project.updatedAt}</time>
-                </div>
-                <h3>{project.title}</h3>
-                <p>{project.summary}</p>
-                <p>{project.purpose}</p>
-                <ul>{project.highlights.slice(0, 3).map((item) => <li key={item}>{item}</li>)}</ul>
-                <div className={styles.projectLinks}>
-                  {project.id === "linqingan-com" ? (
-                    <>
-                      <Link href="/knowledge">浏览知识库 →</Link>
-                      <Link href="/changelog">查看建设日志 →</Link>
-                      <a href={siteConfig.links.repository} rel="noreferrer" target="_blank">查看 GitHub ↗</a>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/beginner">查看完整学习路线 →</Link>
-                      <Link href="/verification">查看验证方法 →</Link>
-                    </>
-                  )}
-                </div>
-              </article>
-            ))}
+            {projects.map((project) => {
+              const projectUpdatedAt =
+                project.id === "linqingan-com"
+                  ? status.latestActivityDate ?? project.updatedAt
+                  : project.updatedAt;
+
+              return (
+                <article id={`project-${project.id}`} key={project.id}>
+                  <div className={styles.projectTopline}>
+                    <span>{project.status}</span>
+                    <time dateTime={projectUpdatedAt}>更新于 {projectUpdatedAt}</time>
+                  </div>
+                  <h3>{project.title}</h3>
+                  <p>{project.summary}</p>
+                  <p>{project.purpose}</p>
+                  <ul>{project.highlights.slice(0, 3).map((item) => <li key={item}>{item}</li>)}</ul>
+                  <div className={styles.projectLinks}>
+                    {project.id === "linqingan-com" ? (
+                      <>
+                        <Link href="/knowledge">浏览知识库 →</Link>
+                        <Link href="/changelog">查看建设日志 →</Link>
+                        <a href={siteConfig.links.repository} rel="noreferrer" target="_blank">查看 GitHub ↗</a>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/beginner">查看完整学习路线 →</Link>
+                        <Link href="/verification">查看验证方法 →</Link>
+                      </>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
 
