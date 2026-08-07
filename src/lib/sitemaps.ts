@@ -60,11 +60,25 @@ function staticPageEntry(
 export function getChineseSitemapEntries(): SitemapEntry[] {
   const allPosts = getAllPosts();
   const postsBySlug = new Map(allPosts.map((post) => [post.slug, post]));
-  const allPostDates = allPosts.map((post) => post.updatedAt ?? post.publishedAt);
+  const allPostDates = allPosts.map(
+    (post) => post.updatedAt ?? post.publishedAt,
+  );
   const beginnerDates = beginnerSeriesSlugs.flatMap((slug) => {
     const post = postsBySlug.get(slug);
     return post ? [post.updatedAt ?? post.publishedAt] : [];
   });
+  const verifiedDates = allPosts
+    .filter(
+      (post) =>
+        post.verification.consoleTested || post.verification.liveTested,
+    )
+    .map(
+      (post) =>
+        post.verification.testedAt ??
+        post.verification.checkedAt ??
+        post.updatedAt ??
+        post.publishedAt,
+    );
   const changelogDates = changelogEntries.map((entry) => entry.date);
   const nowDates = nowEntries.map((entry) => entry.date);
   const projectDates = projects.map((project) => project.updatedAt);
@@ -87,12 +101,15 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/screeps-api"),
     staticPageEntry(
       "/tools",
-      chineseToolPaths.map((path) => getStaticPageLastModified(path).toISOString()),
+      chineseToolPaths.map((path) =>
+        getStaticPageLastModified(path).toISOString(),
+      ),
     ),
     ...chineseToolPaths.map((path) => staticPageEntry(path)),
     staticPageEntry("/glossary"),
     staticPageEntry("/screeps-errors"),
     staticPageEntry("/verification"),
+    staticPageEntry("/verified", verifiedDates),
     staticPageEntry("/tags", allPostDates),
     staticPageEntry("/now", nowDates),
     staticPageEntry("/changelog", changelogDates),
@@ -174,7 +191,9 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/en/tags", englishArticleDates),
     staticPageEntry(
       "/en/tools",
-      englishToolPaths.map((path) => getStaticPageLastModified(path).toISOString()),
+      englishToolPaths.map((path) =>
+        getStaticPageLastModified(path).toISOString(),
+      ),
     ),
     ...englishToolPaths.map((path) => staticPageEntry(path)),
     staticPageEntry("/en/screeps-errors"),
