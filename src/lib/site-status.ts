@@ -1,6 +1,9 @@
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { changelogEntries } from "@/lib/changelog";
-import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
+import {
+  knowledgeBaseSections,
+  knowledgeBaseSlugs,
+} from "@/lib/knowledge-base";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { latestSiteAuditEntry } from "@/lib/site-audit-entry";
@@ -14,6 +17,7 @@ export interface SiteStatus {
   knowledgeSectionCount: number;
   toolCount: number;
   projectCount: number;
+  latestArticlePublishedDate: string | null;
   latestContentDate: string | null;
   latestChangelogDate: string | null;
   latestActivityDate: string | null;
@@ -29,11 +33,16 @@ export interface SiteActivityEntry {
 
 function newestDate(values: Array<string | null | undefined>): string | null {
   const dates = values.filter((value): value is string => Boolean(value));
-  return dates.length > 0 ? dates.sort((left, right) => right.localeCompare(left))[0] : null;
+  return dates.length > 0
+    ? dates.sort((left, right) => right.localeCompare(left))[0]
+    : null;
 }
 
 export function getSiteStatus(): SiteStatus {
   const posts = getAllPosts();
+  const latestArticlePublishedDate = newestDate(
+    posts.map((post) => post.publishedAt),
+  );
   const latestContentDate = newestDate(
     posts.map((post) => post.updatedAt ?? post.publishedAt),
   );
@@ -50,6 +59,7 @@ export function getSiteStatus(): SiteStatus {
     knowledgeSectionCount: knowledgeBaseSections.length,
     toolCount,
     projectCount: projects.length,
+    latestArticlePublishedDate,
     latestContentDate,
     latestChangelogDate,
     latestActivityDate: newestDate([latestContentDate, latestChangelogDate]),
@@ -59,7 +69,9 @@ export function getSiteStatus(): SiteStatus {
 export function getRecentSiteActivity(limit = 3): SiteActivityEntry[] {
   const contentActivity: SiteActivityEntry[] = getAllPosts().map((post) => {
     const date = post.updatedAt ?? post.publishedAt;
-    const wasUpdated = Boolean(post.updatedAt && post.updatedAt !== post.publishedAt);
+    const wasUpdated = Boolean(
+      post.updatedAt && post.updatedAt !== post.publishedAt,
+    );
 
     return {
       id: `content-${post.slug}-${date}`,
@@ -70,7 +82,10 @@ export function getRecentSiteActivity(limit = 3): SiteActivityEntry[] {
     };
   });
 
-  const changelogActivity: SiteActivityEntry[] = [latestSiteAuditEntry, ...changelogEntries].map((entry) => ({
+  const changelogActivity: SiteActivityEntry[] = [
+    latestSiteAuditEntry,
+    ...changelogEntries,
+  ].map((entry) => ({
     id: `changelog-${entry.id}`,
     date: entry.date,
     type: entry.type,
