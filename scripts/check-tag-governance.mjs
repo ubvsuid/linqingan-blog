@@ -101,12 +101,20 @@ const tagArchiveSource = fs.readFileSync(
 );
 for (const marker of [
   'record.count < 2',
-  'permanentRedirect("/tags")',
+  'permanentRedirect("/tags/retired")',
   'noindex: record.count < 3',
 ]) {
   if (!tagArchiveSource.includes(marker)) {
     failures.push(`标签归档缺少治理边界：${marker}`);
   }
+}
+
+const retiredTagSource = fs.readFileSync(
+  path.join(root, "src", "app", "(zh)", "tags", "retired", "page.tsx"),
+  "utf8",
+);
+if (!retiredTagSource.includes("noindex: true")) {
+  failures.push("已收敛标签说明页必须保持 noindex");
 }
 
 if (failures.length > 0) {
