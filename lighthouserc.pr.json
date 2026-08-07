@@ -10,6 +10,8 @@
         "http://localhost:3000/knowledge",
         "http://localhost:3000/tags",
         "http://localhost:3000/tags/memory",
+        "http://localhost:3000/screeps-api",
+        "http://localhost:3000/verified",
         "http://localhost:3000/search?q=creep",
         "http://localhost:3000/blog/screeps-memory-basics",
         "http://localhost:3000/tools/room-diagnostics",
