@@ -37,8 +37,6 @@ export const siteConfig = {
     { label: "文章", href: "/blog" },
     { label: "知识库", href: "/knowledge" },
     { label: "工具", href: "/tools" },
-    { label: "近况", href: "/now" },
-    { label: "关于", href: "/about" },
   ],
   links: {
     github: "https://github.com/ubvsuid",

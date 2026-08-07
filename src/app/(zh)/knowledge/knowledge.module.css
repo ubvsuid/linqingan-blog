@@ -1,0 +1,324 @@
+.header {
+  max-width: 900px;
+}
+
+.header > p:not(:first-child) {
+  max-width: 780px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.stats span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stats strong {
+  color: var(--foreground);
+  font-size: 16px;
+}
+
+.allPosts {
+  display: inline-flex;
+  margin-top: 18px;
+  font-weight: 700;
+}
+
+.beginner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr);
+  gap: 42px;
+  margin-bottom: 78px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(26px, 5vw, 48px);
+  background: var(--surface);
+}
+
+.beginner h2,
+.sectionHeading h2,
+.modulesHeading h2 {
+  margin: 8px 0 18px;
+  font-size: clamp(34px, 5vw, 52px);
+  letter-spacing: -.045em;
+}
+
+.beginnerCopy {
+  margin: 0 0 24px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.stageList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.stageList li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding: 15px 0;
+}
+
+.stageList li > span,
+.moduleNumber,
+.previewList > li > span {
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+}
+
+.stageList li div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stageList small {
+  color: var(--muted);
+}
+
+.reference {
+  scroll-margin-top: 24px;
+  margin-bottom: 88px;
+  border-top: 1px solid var(--border);
+  padding-top: 68px;
+}
+
+.sectionHeading,
+.modulesHeading {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(280px, 1.1fr);
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 30px;
+}
+
+.sectionHeading > p,
+.modulesHeading > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.referenceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.referenceGrid > a {
+  display: grid;
+  min-height: 210px;
+  align-content: start;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  background: var(--surface);
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.referenceGrid > a:hover {
+  transform: translateY(-2px);
+  border-color: var(--muted);
+  text-decoration: none;
+}
+
+.referenceGrid h3 {
+  margin: 18px 0 0;
+  font-size: 22px;
+}
+
+.referenceGrid p {
+  margin: 12px 0 20px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.referenceMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.apiRoadmap {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 20px;
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+  padding: 20px 22px;
+}
+
+.apiRoadmap p {
+  max-width: 720px;
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.apiRoadmap a {
+  align-self: center;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+
+.jump a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.jump a:hover {
+  border-color: var(--muted);
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.moduleList {
+  display: grid;
+  gap: 20px;
+}
+
+.module {
+  scroll-margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: clamp(24px, 4vw, 36px);
+  background: var(--surface);
+}
+
+.moduleHeader {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.moduleTitleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.moduleTitleRow h2 {
+  margin: 0;
+  font-size: clamp(25px, 3.5vw, 34px);
+  letter-spacing: -.035em;
+}
+
+.moduleTitleRow small,
+.moduleDescription {
+  color: var(--muted);
+}
+
+.moduleDescription {
+  max-width: 780px;
+  margin: 12px 0 0;
+  line-height: 1.7;
+}
+
+.previewList {
+  display: grid;
+  margin: 26px 0 0 68px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.previewList li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding: 15px 0;
+}
+
+.previewList a {
+  display: grid;
+  gap: 4px;
+}
+
+.previewList small {
+  color: var(--muted);
+}
+
+.moduleFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin: 18px 0 0 68px;
+}
+
+.moduleFooter a {
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .referenceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .beginner,
+  .sectionHeading,
+  .modulesHeading {
+    grid-template-columns: 1fr;
+  }
+
+  .beginner {
+    gap: 28px;
+  }
+
+  .apiRoadmap,
+  .moduleTitleRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .previewList,
+  .moduleFooter {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .referenceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .moduleHeader {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .apiRoadmap {
+    display: grid;
+  }
+}

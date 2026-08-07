@@ -3,6 +3,7 @@ import { changelogEntries } from "@/lib/changelog";
 import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
+import { latestSiteAuditEntry } from "@/lib/site-audit-entry";
 import { toolCount } from "@/lib/tool-catalog";
 
 export interface SiteStatus {
@@ -36,9 +37,10 @@ export function getSiteStatus(): SiteStatus {
   const latestContentDate = newestDate(
     posts.map((post) => post.updatedAt ?? post.publishedAt),
   );
-  const latestChangelogDate = newestDate(
-    changelogEntries.map((entry) => entry.date),
-  );
+  const latestChangelogDate = newestDate([
+    latestSiteAuditEntry.date,
+    ...changelogEntries.map((entry) => entry.date),
+  ]);
 
   return {
     articleCount: posts.length,
@@ -68,7 +70,7 @@ export function getRecentSiteActivity(limit = 3): SiteActivityEntry[] {
     };
   });
 
-  const changelogActivity: SiteActivityEntry[] = changelogEntries.map((entry) => ({
+  const changelogActivity: SiteActivityEntry[] = [latestSiteAuditEntry, ...changelogEntries].map((entry) => ({
     id: `changelog-${entry.id}`,
     date: entry.date,
     type: entry.type,
