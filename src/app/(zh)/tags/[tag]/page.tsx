@@ -11,6 +11,8 @@ import {
   tagToSlug,
 } from "@/lib/tags";
 
+import styles from "./tag-page.module.css";
+
 interface TagPageProps {
   params: Promise<{ tag: string }>;
 }
@@ -49,7 +51,7 @@ export default async function TagPage({ params }: TagPageProps) {
   return (
     <main className="page-shell tag-page">
       <Container>
-        <nav className="tag-breadcrumb" aria-label="面包屑">
+        <nav className={styles.breadcrumb} aria-label="面包屑">
           <Link href="/knowledge">知识库</Link>
           <span aria-hidden="true">/</span>
           <Link href="/tags">文章标签</Link>
@@ -61,7 +63,7 @@ export default async function TagPage({ params }: TagPageProps) {
           <h1>{record.name}</h1>
           <p>当前共有 {posts.length} 篇文章使用这个标签。</p>
         </header>
-        <div className="tag-post-list">
+        <div className={styles.postList}>
           {posts.map((post) => {
             const visibleUpdatedAt =
               post.updatedAt && post.updatedAt !== post.publishedAt
@@ -70,7 +72,7 @@ export default async function TagPage({ params }: TagPageProps) {
 
             return (
               <article key={post.slug}>
-                <div className="tag-post-meta">
+                <div className={styles.postMeta}>
                   <time dateTime={post.publishedAt}>
                     发布于 {dateFormatter.format(new Date(`${post.publishedAt}T00:00:00`))}
                   </time>
@@ -91,7 +93,7 @@ export default async function TagPage({ params }: TagPageProps) {
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                 </h2>
                 <p>{post.description}</p>
-                <div className="tag-post-tags" aria-label="文章标签">
+                <div className={styles.postTags} aria-label="文章标签">
                   {post.tags.map((item) => (
                     <Link key={item} href={`/tags/${tagToSlug(item)}`}>
                       {item}
@@ -103,17 +105,6 @@ export default async function TagPage({ params }: TagPageProps) {
           })}
         </div>
       </Container>
-      <style>{`
-        .tag-breadcrumb { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 13px; }
-        .tag-post-list { display: grid; border-top: 1px solid var(--border); }
-        .tag-post-list article { border-bottom: 1px solid var(--border); padding: 30px 0; }
-        .tag-post-meta { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 12px; }
-        .tag-post-list h2 { margin: 13px 0 0; font-size: clamp(23px, 3vw, 32px); }
-        .tag-post-list p { max-width: 780px; margin: 12px 0 0; color: var(--muted); line-height: 1.75; }
-        .tag-post-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
-        .tag-post-tags a { border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; color: var(--muted); font-size: 11px; }
-        .tag-post-tags a:hover { border-color: var(--muted); color: var(--foreground); text-decoration: none; }
-      `}</style>
     </main>
   );
 }
