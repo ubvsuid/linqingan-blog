@@ -5,7 +5,7 @@ import { Container } from "@/components/container";
 import { HomeTaskHub } from "@/components/home-task-hub";
 import { HomeMaintenancePanel } from "@/components/home-maintenance-panel";
 import { PostCard } from "@/components/post-card";
-import { beginnerSeriesSlugs, beginnerStages } from "@/lib/beginner-series";
+import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
 import { getAllPosts } from "@/lib/posts";
@@ -53,7 +53,7 @@ const quickEntries = [
 
 export default function HomePage() {
   const allPosts = getAllPosts();
-  const latestPosts = allPosts.slice(0, 2);
+  const latestPosts = allPosts.slice(0, 3);
   const articleCount = allPosts.length;
   const knowledgeArticleCount = knowledgeBaseSlugs.length;
   const sectionCount = knowledgeBaseSections.length;
@@ -70,44 +70,16 @@ export default function HomePage() {
           <p className={styles.heroStats}>
             {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
           </p>
+          <div className="button-row">
+            <Link className="button button-primary" href="/beginner">开始新手路线</Link>
+            <Link className="button button-secondary" href="/search">搜索问题</Link>
+          </div>
         </Container>
       </section>
 
       <Container>
         <HomeTaskHub />
       </Container>
-
-      <section className={styles.learningSection} aria-labelledby="home-learning-title">
-        <Container>
-          <div className={styles.sectionHeading}>
-            <div><p className="eyebrow">BEGINNER PATH</p><h2 id="home-learning-title">从第一只 Creep 开始</h2></div>
-            <Link href="/beginner">查看完整路线 →</Link>
-          </div>
-
-          <div className={styles.learningGrid}>
-            <article className={styles.learningIntro}>
-              <p>
-                现有入门路线包含 {beginnerSeriesSlugs.length} 篇文章，分成 {beginnerStages.length}
-                个阶段。从认识游戏界面和 tick，一直到角色分工、Extension、建造维修与第一份房间基础代码。
-              </p>
-              <div className={styles.statRow} aria-label="入门学习路线数据">
-                <div><strong>{beginnerSeriesSlugs.length}</strong><span>篇文章</span></div>
-                <div><strong>{beginnerStages.length}</strong><span>个阶段</span></div>
-                <div><strong>0</strong><span>注册要求</span></div>
-              </div>
-            </article>
-
-            <ol className={styles.stageList}>
-              {beginnerStages.map((stage) => (
-                <li key={stage.id}>
-                  <span>{String(stage.number).padStart(2, "0")}</span>
-                  <div><strong>{stage.title}</strong><p>{stage.description}</p></div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </Container>
-      </section>
 
       <section className={styles.knowledgeSection} aria-labelledby="home-knowledge-title">
         <Container>
@@ -154,7 +126,7 @@ export default function HomePage() {
         <Container>
           <div className={styles.sectionHeading}>
             <div><p className="eyebrow">QUICK LOOKUP</p><h2 id="home-quick-title">常用查询工具</h2></div>
-            <Link href="/knowledge#reference-tools">查看全部查询工具 →</Link>
+            <Link href="/tools">查看全部工具 →</Link>
           </div>
           <div className={styles.quickGrid}>
             {quickEntries.map((entry) => (
