@@ -63,7 +63,14 @@ const checks = [
   },
   {
     path: "src/app/(zh)/api/search-index/route.ts",
-    required: ["getSearchDocuments", "getSearchIndexSummary", "s-maxage=3600", "X-Search-Index-Articles"],
+    required: [
+      "getSearchDocuments",
+      "getSearchIndexSummary",
+      "s-maxage=900",
+      "X-Search-Index-Articles",
+      "X-Search-Index-Raw-Bytes",
+      "X-Search-Index-Article-Token-Limit",
+    ],
     forbidden: [],
   },
   {
