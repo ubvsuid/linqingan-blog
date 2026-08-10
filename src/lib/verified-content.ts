@@ -4,6 +4,7 @@ import {
   getPublicVerificationEvidence,
   summarizeVerificationEvidence,
   type ArticleEvidenceSummary,
+  type PublicVerificationEvidenceRecord,
   type RuntimeVerificationType,
 } from "@/lib/verification-evidence";
 
@@ -53,50 +54,60 @@ function verificationDate(post: Post): string {
   );
 }
 
-function runtimeFrontmatterDate(post: Post): string | undefined {
-  if (!post.verification.consoleTested && !post.verification.liveTested) return undefined;
-  return post.verification.testedAt ?? verificationDate(post);
-}
-
 function evidenceDate(summary?: ArticleEvidenceSummary): string | undefined {
   return summary?.latestVerifiedAt.slice(0, 10);
 }
 
 function effectiveVerificationDate(post: Post, summary?: ArticleEvidenceSummary): string {
-  const candidates = [runtimeFrontmatterDate(post), evidenceDate(summary)].filter(
+  const candidates = [post.verification.testedAt, evidenceDate(summary)].filter(
     (value): value is string => Boolean(value),
   );
   if (candidates.length === 0) return verificationDate(post);
   return candidates.sort().at(-1) ?? verificationDate(post);
 }
 
-function getVerifiedSourcePosts(
-  evidenceByArticle: Map<string, ArticleEvidenceSummary> = new Map(),
+function getVerifiedSourcePosts(): Post[] {
+  return getAllPosts().filter(
+    (post) => post.verification.consoleTested || post.verification.liveTested,
+  );
+}
+
+function keepAcceptedEvidence(
+  records: PublicVerificationEvidenceRecord[],
+  posts: Post[],
+): PublicVerificationEvidenceRecord[] {
+  const acceptedBySlug = new Map(
+    posts.map((post) => [post.slug, post.verification] as const),
+  );
+
+  return records.filter((record) => {
+    const verification = acceptedBySlug.get(record.articleSlug);
+    if (!verification) return false;
+    return record.verificationType === "live"
+      ? verification.liveTested
+      : verification.consoleTested;
+  });
+}
+
+function sortVerifiedPosts(
+  posts: Post[],
+  evidenceByArticle: Map<string, ArticleEvidenceSummary>,
 ): Post[] {
-  return getAllPosts()
-    .filter(
-      (post) =>
-        post.verification.consoleTested ||
-        post.verification.liveTested ||
-        evidenceByArticle.has(post.slug),
-    )
-    .sort((left, right) =>
-      effectiveVerificationDate(right, evidenceByArticle.get(right.slug)).localeCompare(
-        effectiveVerificationDate(left, evidenceByArticle.get(left.slug)),
-      ),
-    );
+  return [...posts].sort((left, right) =>
+    effectiveVerificationDate(right, evidenceByArticle.get(right.slug)).localeCompare(
+      effectiveVerificationDate(left, evidenceByArticle.get(left.slug)),
+    ),
+  );
 }
 
 function recordVerification(post: Post, summary?: ArticleEvidenceSummary) {
-  const consoleTested = post.verification.consoleTested || Boolean(summary?.consoleTested);
-  const liveTested = post.verification.liveTested || Boolean(summary?.liveTested);
   const latest = summary?.latest;
 
   return {
     date: effectiveVerificationDate(post, summary),
-    level: liveTested ? ("live" as const) : ("console" as const),
-    consoleTested,
-    liveTested,
+    level: post.verification.liveTested ? ("live" as const) : ("console" as const),
+    consoleTested: post.verification.consoleTested,
+    liveTested: post.verification.liveTested,
     testEnvironment: summary?.environment ?? post.verification.testEnvironment,
     evidenceCount: summary?.count ?? 0,
     latestEvidence: latest
@@ -152,18 +163,26 @@ function mapVerifiedContent(
 
 export function getVerifiedContent(locale: VerifiedLocale): VerifiedContentRecord[] {
   const evidenceByArticle = new Map<string, ArticleEvidenceSummary>();
-  return mapVerifiedContent(locale, getVerifiedSourcePosts(), evidenceByArticle);
+  return mapVerifiedContent(
+    locale,
+    sortVerifiedPosts(getVerifiedSourcePosts(), evidenceByArticle),
+    evidenceByArticle,
+  );
 }
 
 export async function getVerifiedContentWithEvidence(
   locale: VerifiedLocale,
 ): Promise<VerifiedContentRecord[]> {
-  const evidenceByArticle = summarizeVerificationEvidence(
+  const posts = getVerifiedSourcePosts();
+  const acceptedEvidence = keepAcceptedEvidence(
     await getPublicVerificationEvidence(),
+    posts,
   );
+  const evidenceByArticle = summarizeVerificationEvidence(acceptedEvidence);
+
   return mapVerifiedContent(
     locale,
-    getVerifiedSourcePosts(evidenceByArticle),
+    sortVerifiedPosts(posts, evidenceByArticle),
     evidenceByArticle,
   );
 }
