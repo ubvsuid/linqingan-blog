@@ -4,6 +4,8 @@ import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
+import { buildIdentityHeaders } from "@/lib/browser-identity";
+
 import styles from "./article-feedback.module.css";
 
 interface ArticleFeedbackProps {
@@ -118,11 +120,22 @@ export function ArticleFeedback({
         detail: { slug, value },
       }),
     );
+
     track("article_feedback", {
       slug: slug.slice(0, 80),
       feedback: value,
       language,
     });
+
+    void fetch("/api/article-feedback", {
+      method: "POST",
+      keepalive: true,
+      headers: {
+        "Content-Type": "application/json",
+        ...buildIdentityHeaders(),
+      },
+      body: JSON.stringify({ slug, language, value }),
+    }).catch(() => {});
   }
 
   const status = isEnglish
@@ -163,8 +176,8 @@ export function ArticleFeedback({
         </h2>
         <p className={styles.intro}>
           {isEnglish
-            ? "Responses are stored in the current browser and anonymously summarized in site analytics. Technical reports open a public issue with this guide already included."
-            : "反馈会匿名汇总到站点分析中，同时保存在当前浏览器。具体错误仍可通过 GitHub 或邮箱提交。"}
+            ? "Responses are stored in the current browser and anonymously summarized in the platform data layer. Technical reports open a public issue with this guide already included."
+            : "反馈会匿名汇总到平台数据层，同时保存在当前浏览器。具体错误仍可通过 GitHub 或邮箱提交。"}
         </p>
       </div>
 
