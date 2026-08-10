@@ -1,4 +1,6 @@
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 import { validateVerificationEvidenceRecord } from "./lib/verification-evidence-validation.mjs";
@@ -105,6 +107,39 @@ for (const pagePath of [
   }
 }
 
+const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "linqingan-evidence-smoke-"));
+try {
+  const fixturePath = path.join(tempDir, "console-evidence.json");
+  fs.writeFileSync(fixturePath, JSON.stringify(validConsole), "utf8");
+
+  const writer = spawnSync(
+    process.execPath,
+    [path.join(process.cwd(), "scripts/verification-evidence-write.mjs"), fixturePath],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
+  if (writer.status !== 0) {
+    throw new Error(
+      `verification-evidence-write dry run failed: ${writer.stderr || writer.stdout}`,
+    );
+  }
+  if (!writer.stdout.includes("Dry run only")) {
+    throw new Error("verification-evidence-write must default to a non-writing dry run.");
+  }
+
+  const reportSyntax = spawnSync(
+    process.execPath,
+    ["--check", path.join(process.cwd(), "scripts/verification-evidence-report.mjs")],
+    { cwd: process.cwd(), encoding: "utf8" },
+  );
+  if (reportSyntax.status !== 0) {
+    throw new Error(
+      `verification-evidence-report syntax check failed: ${reportSyntax.stderr || reportSyntax.stdout}`,
+    );
+  }
+} finally {
+  fs.rmSync(tempDir, { recursive: true, force: true });
+}
+
 console.log(
-  "Verification evidence pipeline check passed: bounded payload validation, no public write route, Markdown acceptance gating, and bilingual verified-page integration are present.",
+  "Verification evidence pipeline check passed: bounded payload validation, no public write route, Markdown acceptance gating, bilingual verified-page integration, and a read-only writer dry run are verified.",
 );
