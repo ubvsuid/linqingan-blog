@@ -1,7 +1,13 @@
 "use client";
 
 import { track } from "@vercel/analytics";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import {
   buildIdentityHeaders,
@@ -69,29 +75,32 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
     return `${issueUrl}?${params.toString()}`;
   }, [currentUrl, issueUrl, title]);
 
-  function recordToolEvent(action: ToolEventAction) {
-    if (!toolId) return;
+  const recordToolEvent = useCallback(
+    (action: ToolEventAction) => {
+      if (!toolId || !currentUrl) return;
 
-    track("tool_event", {
-      tool: toolId,
-      action,
-    });
-
-    void fetch("/api/tool-event", {
-      method: "POST",
-      keepalive: true,
-      headers: {
-        "Content-Type": "application/json",
-        ...buildIdentityHeaders(),
-      },
-      body: JSON.stringify({
-        toolId,
+      track("tool_event", {
+        tool: toolId,
         action,
-        sourcePath:
-          getSameOriginReferrerPath() ?? new URL(currentUrl).pathname,
-      }),
-    }).catch(() => {});
-  }
+      });
+
+      void fetch("/api/tool-event", {
+        method: "POST",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          ...buildIdentityHeaders(),
+        },
+        body: JSON.stringify({
+          toolId,
+          action,
+          sourcePath:
+            getSameOriginReferrerPath() ?? new URL(currentUrl).pathname,
+        }),
+      }).catch(() => {});
+    },
+    [currentUrl, toolId],
+  );
 
   useEffect(() => {
     if (!hydrated || !toolId) return;
@@ -107,6 +116,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
     }
 
     const useKey = `linqingan:tool-use:${toolId}`;
+    let usedWithoutStorage = false;
     const handleInteraction = (event: Event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
@@ -116,7 +126,10 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
       try {
         if (window.sessionStorage.getItem(useKey)) return;
         window.sessionStorage.setItem(useKey, "1");
-      } catch {}
+      } catch {
+        if (usedWithoutStorage) return;
+        usedWithoutStorage = true;
+      }
 
       recordToolEvent("use");
     };
@@ -128,7 +141,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
       document.removeEventListener("click", handleInteraction, true);
       document.removeEventListener("change", handleInteraction, true);
     };
-  }, [hydrated, toolId]);
+  }, [hydrated, recordToolEvent, toolId]);
 
   async function shareCurrentState() {
     if (!hydrated) {
