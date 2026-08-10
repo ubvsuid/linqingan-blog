@@ -1,7 +1,8 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   screepsApiGroups,
@@ -71,6 +72,19 @@ export function ScreepsApiExplorer({
     [entries, group, locale, normalizedQuery],
   );
 
+  useEffect(() => {
+    if (!normalizedQuery) return;
+    const timeout = window.setTimeout(() => {
+      track("api_reference_search", {
+        locale,
+        queryLength: query.trim().length,
+        results: visibleEntries.length,
+        group: group === allGroup ? "all" : group,
+      });
+    }, 900);
+    return () => window.clearTimeout(timeout);
+  }, [group, locale, normalizedQuery, query, visibleEntries.length]);
+
   return (
     <section className={styles.explorer} aria-labelledby="api-explorer-title">
       <div className={styles.controls}>
@@ -93,7 +107,13 @@ export function ScreepsApiExplorer({
               key={item.value}
               type="button"
               aria-pressed={group === item.value}
-              onClick={() => setGroup(item.value)}
+              onClick={() => {
+                setGroup(item.value);
+                track("api_reference_filter", {
+                  locale,
+                  group: item.value === allGroup ? "all" : item.value,
+                });
+              }}
             >
               {item.label}
             </button>
@@ -120,7 +140,12 @@ export function ScreepsApiExplorer({
                 ))}
               </div>
               {entry.guideHref ? (
-                <Link href={entry.guideHref}>{copy.guide}</Link>
+                <Link
+                  href={entry.guideHref}
+                  onClick={() => track("api_reference_guide_open", { locale, entry: entry.id })}
+                >
+                  {copy.guide}
+                </Link>
               ) : null}
             </article>
           ))}
@@ -129,7 +154,12 @@ export function ScreepsApiExplorer({
         <div className={styles.empty}>
           <strong>{copy.emptyTitle}</strong>
           <p>{copy.emptyBody}</p>
-          <Link href={copy.searchHref}>{copy.search}</Link>
+          <Link
+            href={copy.searchHref}
+            onClick={() => track("api_reference_fallback_search", { locale })}
+          >
+            {copy.search}
+          </Link>
         </div>
       )}
     </section>
