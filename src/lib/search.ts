@@ -33,6 +33,7 @@ interface SearchDocumentOptions {
 
 const MAX_ARTICLE_SEARCH_TOKENS = 72;
 const MAX_ARTICLE_SEARCH_TEXT_LENGTH = 720;
+export const SEARCH_INDEX_WARN_BYTES = 163_840;
 export const SEARCH_INDEX_MAX_BYTES = 196_608;
 
 function compactArticleSearchText(value: string): string {
@@ -189,6 +190,11 @@ export function assertSearchIndexBudget(documents: SearchDocument[]): number {
   if (bytes > SEARCH_INDEX_MAX_BYTES) {
     throw new Error(
       `Chinese search index is ${bytes} bytes, exceeding the ${SEARCH_INDEX_MAX_BYTES}-byte budget.`,
+    );
+  }
+  if (bytes >= SEARCH_INDEX_WARN_BYTES) {
+    console.warn(
+      `Chinese search index is ${bytes} bytes, above the ${SEARCH_INDEX_WARN_BYTES}-byte warning threshold. Plan Search Index V2 before the ${SEARCH_INDEX_MAX_BYTES}-byte hard limit is reached.`,
     );
   }
   return bytes;
