@@ -24,7 +24,7 @@ globalThis.fetch = function sitemapAwareFetch(input, init) {
     return originalFetch(url, init);
   }
 
-  return originalFetch(url, init);
+  return originalFetch(input, init);
 };
 
 try {
