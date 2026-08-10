@@ -13,7 +13,7 @@ import styles from "../english.module.css";
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Knowledge Base",
   description:
-    "A structured map of Screeps topics covering Memory, spawning, room economy, movement, Controllers, defense, market systems, advanced resources, and debugging.",
+    "A structured map of Screeps topics covering Memory, spawning, room economy, movement, Controllers, defense, market systems, advanced resources, debugging, API lookup, tools, and verification evidence.",
   path: "/en/knowledge",
   chinesePath: "/knowledge",
 });
@@ -74,9 +74,11 @@ export default function EnglishKnowledgePage() {
         </div>
 
         <section className={`${styles.grid} knowledge-resource-grid`} aria-label="Available English resources">
+          <article className={styles.card}><p className="eyebrow">API QUICK REFERENCE</p><h2>Common Screeps APIs</h2><p>Search Game, Creep, Room, Structure, Market, and PathFinder APIs, then continue to a matching guide or official documentation.</p><Link href="/en/screeps-api">Open API quick reference →</Link></article>
           <article className={styles.card}><p className="eyebrow">ERROR REFERENCE</p><h2>Return codes</h2><p>Use common Screeps return codes as the first branch in an action debugging process.</p><Link href="/en/screeps-errors">Open error codes →</Link></article>
           <article className={styles.card}><p className="eyebrow">GLOSSARY</p><h2>Core terminology</h2><p>Review concise definitions for the objects, resources, limits, and runtime concepts used across Screeps.</p><Link href="/en/glossary">Open the glossary →</Link></article>
-          <article className={`${styles.card} ${styles.full}`}><p className="eyebrow">TOOLS</p><h2>Calculate and diagnose before editing production code</h2><p>The current English tool set includes a Creep body calculator and a room snapshot diagnostic tool.</p><Link href="/en/tools">Browse tools →</Link></article>
+          <article className={styles.card}><p className="eyebrow">RECENTLY VERIFIED</p><h2>Runtime evidence</h2><p>See English guides whose shared source records explicitly contain Console testing or live multi-tick verification.</p><Link href="/en/verified">Browse verified guides →</Link></article>
+          <article className={`${styles.card} ${styles.full}`}><p className="eyebrow">TOOLS</p><h2>Calculate and diagnose before editing production code</h2><p>Use the English body, room, Market, Controller, Lab, Spawn, hauling, and Tower tools without connecting a Screeps account.</p><Link href="/en/tools">Browse tools →</Link></article>
         </section>
       </Container>
     </main>
