@@ -21,6 +21,26 @@ async function fetchText(pathname) {
   }
 }
 
+async function fetchSearch(query) {
+  try {
+    const response = await fetch(
+      `${baseUrl}/api/search?q=${encodeURIComponent(query)}&limit=40`,
+      { signal: AbortSignal.timeout(timeoutMs) },
+    );
+    return {
+      response,
+      payload: response.ok ? await response.json() : null,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      response: null,
+      payload: null,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 const failures = [];
 const englishPath = "/en/blog/screeps-store-capacity-api";
 const chinesePath = "/blog/screeps-store-capacity-api";
@@ -93,9 +113,22 @@ if (chinese.error) {
   }
 }
 
+const chineseSearch = await fetchSearch("Store API 容量");
+if (chineseSearch.error) {
+  failures.push(`/api/search: request failed: ${chineseSearch.error}`);
+} else if (chineseSearch.response.status !== 200) {
+  failures.push(`/api/search: received ${chineseSearch.response.status}`);
+} else if (
+  !Array.isArray(chineseSearch.payload?.results) ||
+  !chineseSearch.payload.results.some(
+    (result) => result.href === chinesePath && result.title === chineseTitle,
+  )
+) {
+  failures.push(`/api/search?q=${encodeURIComponent("Store API 容量")}: missing “${chineseTitle}”`);
+}
+
 for (const [pathname, expected] of [
   [`/en/search?q=${encodeURIComponent("Store API")}`, englishTitle],
-  [`/search?q=${encodeURIComponent("Store API 容量")}`, chineseTitle],
   ["/en/blog-index.json", englishTitle],
   ["/knowledge/room-economy", chineseTitle],
   ["/en/knowledge/room-economy", englishTitle],
@@ -120,5 +153,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Store capacity production smoke passed: Chinese and English pages, evidence states, Canonical, hreflang, JSON-LD, search, Room Economy modules, index, and both Sitemap shards.",
+  "Store capacity production smoke passed: Chinese and English pages, evidence states, Canonical, hreflang, JSON-LD, Search V2, Room Economy modules, index, and both Sitemap shards.",
 );
