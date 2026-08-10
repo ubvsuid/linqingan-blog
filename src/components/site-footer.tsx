@@ -11,12 +11,14 @@ const chineseLearningLinks = [
   { href: "/beginner", label: "新手入门" },
   { href: "/knowledge", label: "知识库" },
   { href: "/blog", label: "全部文章" },
+  { href: "/screeps-api", label: "API 快速查询" },
   { href: "/glossary", label: "术语表" },
 ];
 
 const chineseSiteLinks = [
   { href: "/screeps-errors", label: "错误码" },
   { href: "/verification", label: "验证方法" },
+  { href: "/verified", label: "最近验证" },
   { href: "/tags", label: "文章标签" },
   { href: "/now", label: "近况" },
   { href: "/changelog", label: "更新日志" },
@@ -28,6 +30,7 @@ const englishLearningLinks = [
   { href: "/en/beginner", label: "Beginner Roadmap" },
   { href: "/en/knowledge", label: "Knowledge Base" },
   { href: "/en/blog", label: "Guide Library" },
+  { href: "/en/screeps-api", label: "API Quick Reference" },
   { href: "/en/tools", label: "Tools" },
   { href: "/en/glossary", label: "Glossary" },
 ];
@@ -36,6 +39,7 @@ const englishSiteLinks = [
   { href: "/en/tags", label: "Topics" },
   { href: "/en/screeps-errors", label: "Error Codes" },
   { href: "/en/verification", label: "Verification Method" },
+  { href: "/en/verified", label: "Recently Verified" },
   { href: "/en/changelog", label: "Changelog" },
   { href: "/en/roadmap", label: "Roadmap" },
   { href: "/en/license", label: "Content and Code Use" },
