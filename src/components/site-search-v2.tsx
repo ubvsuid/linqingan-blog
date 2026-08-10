@@ -2,7 +2,13 @@
 
 import { track } from "@vercel/analytics";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { SearchDocument, SearchDocumentType } from "@/lib/search";
 import type {
@@ -83,12 +89,24 @@ function getOrCreateBrowserId(storage: Storage, key: string): string {
   return next;
 }
 
-export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
+interface SiteSearchV2Props {
+  initialQuery?: string;
+  initialResponse?: SearchV2Response | null;
+}
+
+export function SiteSearchV2({
+  initialQuery = "",
+  initialResponse = null,
+}: SiteSearchV2Props) {
   const [query, setQuery] = useState(initialQuery);
   const [activeType, setActiveType] = useState<SearchFilter>("全部");
-  const [results, setResults] = useState<SearchDocument[]>([]);
+  const [results, setResults] = useState<SearchDocument[]>(
+    initialResponse?.results ?? [],
+  );
   const [queryId, setQueryId] = useState<number | null>(null);
-  const [source, setSource] = useState<SearchV2Source | null>(null);
+  const [source, setSource] = useState<SearchV2Source | null>(
+    initialResponse?.source ?? null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -96,6 +114,13 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
   const anonymousIdRef = useRef("");
   const sessionIdRef = useRef("");
   const lastRecordedSearchRef = useRef("");
+  const skipInitialFetchRef = useRef(
+    Boolean(
+      initialResponse &&
+        normalize(initialResponse.query) === normalize(initialQuery) &&
+        normalize(initialQuery),
+    ),
+  );
   const normalizedQuery = normalize(query);
 
   useEffect(() => {
@@ -116,6 +141,11 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
 
   useEffect(() => {
     if (!normalizedQuery) return;
+
+    if (skipInitialFetchRef.current) {
+      skipInitialFetchRef.current = false;
+      return;
+    }
 
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
@@ -138,9 +168,6 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setRequestError(true);
-        setResults([]);
-        setQueryId(null);
-        setSource(null);
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }
@@ -188,8 +215,12 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
-      if (anonymousIdRef.current) headers["X-Anonymous-Id"] = anonymousIdRef.current;
-      if (sessionIdRef.current) headers["X-Session-Id"] = sessionIdRef.current;
+      if (anonymousIdRef.current) {
+        headers["X-Anonymous-Id"] = anonymousIdRef.current;
+      }
+      if (sessionIdRef.current) {
+        headers["X-Session-Id"] = sessionIdRef.current;
+      }
 
       try {
         const response = await fetch("/api/search/event", {
@@ -210,7 +241,7 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
   }, [isLoading, normalizedQuery, query, requestError, results.length, source]);
 
   useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
+    function handleKeyDown(event: globalThis.KeyboardEvent) {
       const target = event.target;
       const isTypingTarget =
         target instanceof HTMLInputElement ||
@@ -258,6 +289,7 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
 
   function updateQuery(value: string) {
     const nextQuery = value.trim();
+    skipInitialFetchRef.current = false;
     setActiveSuggestionIndex(-1);
     setQueryId(null);
     setRequestError(false);
@@ -280,7 +312,7 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
     );
   }
 
-  function handleSuggestionKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  function handleSuggestionKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (suggestions.length === 0) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -313,8 +345,12 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    if (anonymousIdRef.current) headers["X-Anonymous-Id"] = anonymousIdRef.current;
-    if (sessionIdRef.current) headers["X-Session-Id"] = sessionIdRef.current;
+    if (anonymousIdRef.current) {
+      headers["X-Anonymous-Id"] = anonymousIdRef.current;
+    }
+    if (sessionIdRef.current) {
+      headers["X-Session-Id"] = sessionIdRef.current;
+    }
 
     void fetch("/api/search/click", {
       method: "POST",
@@ -361,7 +397,7 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
         {isLoading
           ? "正在搜索…"
           : requestError
-            ? "搜索服务暂时不可用，请稍后重试。"
+            ? "搜索服务暂时不可用，已保留上一组结果。"
             : normalizedQuery && source === "database"
               ? "Search V2 数据库检索已启用"
               : normalizedQuery && source === "static"
