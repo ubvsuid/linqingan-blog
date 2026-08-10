@@ -50,7 +50,7 @@ export default async function VerifiedPage() {
           <p className="eyebrow">RECENTLY VERIFIED</p>
           <h1>最近验证的 Screeps 内容</h1>
           <p>
-            这里不会把“文档核对”或“离线模拟”自动升级成真实环境验证。只有文章已经记录 Screeps Console 或真实主循环证据时，才会进入这个列表。
+            这里不会把“文档核对”或“离线模拟”自动升级成真实环境验证。只有文章验证字段已经明确接受 Screeps Console 或真实主循环证据时，才会进入这个列表；结构化证据只负责补充可核对的运行细节。
           </p>
         </header>
 
@@ -98,7 +98,7 @@ export default async function VerifiedPage() {
           <section className={styles.empty}>
             <strong>当前还没有达到 Console / 真实主循环等级的公开文章。</strong>
             <p>
-              页面会同时读取文章验证字段和受控的运行证据数据。后续获得真实证据后会自动出现，不需要手工维护一份“已验证清单”。
+              真实证据可以先进入受控证据库，但只有文章的 Markdown 验证字段经过审核并明确接受对应等级后，才会出现在这里。
             </p>
           </section>
         )}
