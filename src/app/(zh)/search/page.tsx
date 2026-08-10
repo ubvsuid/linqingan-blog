@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { SiteSearch } from "@/components/site-search";
+import { SiteSearchV2 } from "@/components/site-search-v2";
 import { createPageMetadata } from "@/lib/metadata";
-import { getSearchDocuments } from "@/lib/search";
+import { searchV2 } from "@/lib/search-v2";
 
 export const metadata = createPageMetadata({
   title: "站内搜索",
@@ -19,7 +19,9 @@ interface SearchPageProps {
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
-  const documents = getSearchDocuments({ includeArticleText: false });
+  const initialResponse = initialQuery
+    ? await searchV2(initialQuery, { limit: 40 })
+    : null;
 
   return (
     <main className="page-shell search-page">
@@ -34,11 +36,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <p className="eyebrow">SEARCH</p>
           <h1>搜索整个网站</h1>
           <p>
-            同时搜索文章正文、知识模块、标签、Screeps 术语、API 返回值、实用工具和公开建设说明。输入中文或英文都可以。
+            同时搜索文章、知识模块、标签、Screeps 术语、API 返回值、实用工具和公开建设说明。输入中文或英文都可以。
           </p>
         </header>
 
-        <SiteSearch documents={documents} initialQuery={initialQuery} />
+        <section aria-label="筛选搜索结果">
+          <SiteSearchV2
+            initialQuery={initialQuery}
+            initialResponse={initialResponse}
+          />
+        </section>
       </Container>
 
       <style>{`

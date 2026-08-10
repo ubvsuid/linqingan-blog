@@ -131,16 +131,39 @@ for (const pathname of pages.filter((page) => page.pathname.startsWith("/en/")).
   if (!englishSitemap.includes(`https://www.linqingan.com${pathname}`)) failures.push(`${pathname}: missing from English Sitemap`);
 }
 
-const searchCases = [
-  { pathname: "/search?q=Spawn", expected: "/tools/spawn-queue-replacement-planner", label: "Chinese Spawn search" },
-  { pathname: "/search?q=hauling", expected: "/tools/hauling-throughput-planner", label: "Chinese hauling search" },
-  { pathname: "/search?q=Tower", expected: "/tools/tower-damage-heal-repair-calculator", label: "Chinese Tower search" },
+const chineseSearchCases = [
+  { query: "Spawn", expected: "/tools/spawn-queue-replacement-planner", label: "Chinese Spawn search" },
+  { query: "hauling", expected: "/tools/hauling-throughput-planner", label: "Chinese hauling search" },
+  { query: "Tower", expected: "/tools/tower-damage-heal-repair-calculator", label: "Chinese Tower search" },
+];
+
+for (const searchCase of chineseSearchCases) {
+  const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(searchCase.query)}&limit=40`);
+  if (response.status !== 200) {
+    failures.push(`${searchCase.label} API returned ${response.status}`);
+    continue;
+  }
+
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    failures.push(`${searchCase.label} API did not return JSON`);
+    continue;
+  }
+
+  if (!Array.isArray(payload?.results) || !payload.results.some((result) => result.href === searchCase.expected)) {
+    failures.push(`${searchCase.label} does not expose ${searchCase.expected}`);
+  }
+}
+
+const englishSearchCases = [
   { pathname: "/en/search?q=Spawn", expected: "/en/tools/spawn-queue-replacement-planner", label: "English Spawn search" },
   { pathname: "/en/search?q=hauling", expected: "/en/tools/hauling-throughput-planner", label: "English hauling search" },
   { pathname: "/en/search?q=Tower", expected: "/en/tools/tower-damage-heal-repair-calculator", label: "English Tower search" },
 ];
 
-for (const searchCase of searchCases) {
+for (const searchCase of englishSearchCases) {
   const body = await fetch(`${baseUrl}${searchCase.pathname}`).then((response) => response.text());
   if (!body.includes(searchCase.expected)) failures.push(`${searchCase.label} does not expose ${searchCase.expected}`);
 }

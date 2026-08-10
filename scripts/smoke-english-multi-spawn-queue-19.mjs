@@ -21,6 +21,26 @@ async function fetchText(pathname) {
   }
 }
 
+async function fetchSearch(query) {
+  try {
+    const response = await fetch(
+      `${baseUrl}/api/search?q=${encodeURIComponent(query)}&limit=40`,
+      { signal: AbortSignal.timeout(timeoutMs) },
+    );
+    return {
+      response,
+      payload: response.ok ? await response.json() : null,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      response: null,
+      payload: null,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 const failures = [];
 const englishPath = "/en/blog/screeps-multi-spawn-queue";
 const chinesePath = "/blog/screeps-multi-spawn-queue";
@@ -94,9 +114,22 @@ if (chinese.error) {
   }
 }
 
+const chineseSearch = await fetchSearch("多 Spawn 队列");
+if (chineseSearch.error) {
+  failures.push(`/api/search: request failed: ${chineseSearch.error}`);
+} else if (chineseSearch.response.status !== 200) {
+  failures.push(`/api/search: received ${chineseSearch.response.status}`);
+} else if (
+  !Array.isArray(chineseSearch.payload?.results) ||
+  !chineseSearch.payload.results.some(
+    (result) => result.href === chinesePath && result.title === chineseTitle,
+  )
+) {
+  failures.push(`/api/search?q=${encodeURIComponent("多 Spawn 队列")}: missing “${chineseTitle}”`);
+}
+
 for (const [pathname, expected] of [
   [`/en/search?q=${encodeURIComponent("multi Spawn queue")}`, englishTitle],
-  [`/search?q=${encodeURIComponent("多 Spawn 队列")}`, chineseTitle],
   ["/en/blog-index.json", englishTitle],
   ["/knowledge/spawn-lifecycle", chineseTitle],
   ["/en/knowledge/spawn-creep-lifecycle", englishTitle],
@@ -121,5 +154,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Multi-Spawn queue production smoke passed: Chinese and English pages, evidence states, Canonical, hreflang, JSON-LD, search, knowledge modules, index, and both Sitemap shards.",
+  "Multi-Spawn queue production smoke passed: Chinese and English pages, evidence states, Canonical, hreflang, JSON-LD, Search V2, knowledge modules, index, and both Sitemap shards.",
 );

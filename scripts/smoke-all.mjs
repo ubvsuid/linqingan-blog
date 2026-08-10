@@ -1,6 +1,7 @@
 await import("./smoke-test.mjs");
 await import("./smoke-audit-priority.mjs");
 await import("./smoke-search-indexing.mjs");
+await import("./smoke-search-v2.mjs");
 await import("./smoke-planning-tools.mjs");
 
 const originalFetch = globalThis.fetch;
