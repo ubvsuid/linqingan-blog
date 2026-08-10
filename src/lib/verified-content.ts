@@ -11,6 +11,8 @@ export interface VerifiedContentRecord {
   description: string;
   date: string;
   level: VerifiedLevel;
+  consoleTested: boolean;
+  liveTested: boolean;
   testEnvironment?: string;
 }
 
@@ -42,6 +44,16 @@ function getVerifiedSourcePosts(): Post[] {
     );
 }
 
+function recordVerification(post: Post) {
+  return {
+    date: verificationDate(post),
+    level: post.verification.liveTested ? ("live" as const) : ("console" as const),
+    consoleTested: post.verification.consoleTested,
+    liveTested: post.verification.liveTested,
+    testEnvironment: post.verification.testEnvironment,
+  };
+}
+
 export function getVerifiedContent(locale: VerifiedLocale): VerifiedContentRecord[] {
   const posts = getVerifiedSourcePosts();
 
@@ -51,9 +63,7 @@ export function getVerifiedContent(locale: VerifiedLocale): VerifiedContentRecor
       href: `/blog/${post.slug}`,
       title: post.title,
       description: post.description,
-      date: verificationDate(post),
-      level: post.verification.liveTested ? "live" : "console",
-      testEnvironment: post.verification.testEnvironment,
+      ...recordVerification(post),
     }));
   }
 
@@ -71,9 +81,7 @@ export function getVerifiedContent(locale: VerifiedLocale): VerifiedContentRecor
         href: englishArticle.href,
         title: englishArticle.title,
         description: englishArticle.description,
-        date: verificationDate(post),
-        level: post.verification.liveTested ? "live" : "console",
-        testEnvironment: post.verification.testEnvironment,
+        ...recordVerification(post),
       } satisfies VerifiedContentRecord,
     ];
   });
@@ -82,14 +90,9 @@ export function getVerifiedContent(locale: VerifiedLocale): VerifiedContentRecor
 export function getVerifiedContentSummary(
   records: VerifiedContentRecord[],
 ): VerifiedContentSummary {
-  const liveCount = records.filter((record) => record.level === "live").length;
-  const consoleCount = records.filter(
-    (record) => record.level === "console" || record.level === "live",
-  ).length;
-
   return {
     total: records.length,
-    consoleCount,
-    liveCount,
+    consoleCount: records.filter((record) => record.consoleTested).length,
+    liveCount: records.filter((record) => record.liveTested).length,
   };
 }
