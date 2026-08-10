@@ -16,6 +16,14 @@ interface ToolEventBody {
   sourcePath?: string | null;
 }
 
+function isLocalSmokeRequest(request: NextRequest): boolean {
+  const hostname = request.nextUrl.hostname;
+  return (
+    request.headers.get("x-platform-smoke-test") === "1" &&
+    (hostname === "127.0.0.1" || hostname === "localhost")
+  );
+}
+
 export async function POST(request: NextRequest) {
   let body: ToolEventBody;
   try {
@@ -38,6 +46,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { stored: false, error: "invalid_payload" },
       { status: 400 },
+    );
+  }
+
+  if (isLocalSmokeRequest(request)) {
+    return NextResponse.json(
+      { stored: false, smoke: true },
+      {
+        status: 202,
+        headers: { "Cache-Control": "no-store" },
+      },
     );
   }
 
