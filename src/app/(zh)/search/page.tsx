@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { SiteSearchV2 } from "@/components/site-search-v2";
 import { createPageMetadata } from "@/lib/metadata";
+import { searchV2 } from "@/lib/search-v2";
 
 export const metadata = createPageMetadata({
   title: "站内搜索",
@@ -18,6 +19,9 @@ interface SearchPageProps {
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
+  const initialResponse = initialQuery
+    ? await searchV2(initialQuery, { limit: 40 })
+    : null;
 
   return (
     <main className="page-shell search-page">
@@ -37,7 +41,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </header>
 
         <section aria-label="筛选搜索结果">
-          <SiteSearchV2 initialQuery={initialQuery} />
+          <SiteSearchV2
+            initialQuery={initialQuery}
+            initialResponse={initialResponse}
+          />
         </section>
       </Container>
 
