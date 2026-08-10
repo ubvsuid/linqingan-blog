@@ -57,7 +57,7 @@ export default async function EnglishVerifiedPage() {
           <p className="eyebrow">RECENTLY VERIFIED</p>
           <h1>Screeps guides with recorded runtime evidence</h1>
           <p>
-            Documentation review and offline simulation do not automatically count as live proof. A guide appears here only when its shared source article has Console or live multi-tick runtime evidence.
+            Documentation review and offline simulation do not automatically count as live proof. A guide appears here only after its shared Markdown verification state explicitly accepts Console or live multi-tick evidence; structured evidence then adds bounded runtime detail.
           </p>
         </header>
 
@@ -65,12 +65,12 @@ export default async function EnglishVerifiedPage() {
           <article className={styles.card}>
             <p className="eyebrow">CONSOLE TESTED</p>
             <h2>{consoleCount}</h2>
-            <p>English guides mapped to source articles with recorded Screeps Console testing.</p>
+            <p>English guides mapped to source articles with accepted Screeps Console testing.</p>
           </article>
           <article className={styles.card}>
             <p className="eyebrow">LIVE MULTI-TICK</p>
             <h2>{liveCount}</h2>
-            <p>English guides mapped to source articles with recorded live multi-tick room evidence.</p>
+            <p>English guides mapped to source articles with accepted live multi-tick room evidence.</p>
           </article>
         </section>
 
@@ -108,7 +108,7 @@ export default async function EnglishVerifiedPage() {
           <section className={styles.notice}>
             <strong>No public English guide currently has mapped Console or live multi-tick verification.</strong>
             <p>
-              This page intentionally remains empty until a source article has real runtime evidence. The controlled evidence pipeline can promote a mapped guide without maintaining a separate hand-written list.
+              Real runtime evidence may be captured internally first, but a guide appears here only after the corresponding Markdown verification state is reviewed and accepted.
             </p>
             <Link href="/en/evidence">Open the live-evidence backlog →</Link>
           </section>
