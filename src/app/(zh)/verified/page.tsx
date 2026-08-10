@@ -3,7 +3,10 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { formatDate } from "@/lib/date";
 import { createPageMetadata } from "@/lib/metadata";
-import { getAllPosts } from "@/lib/posts";
+import {
+  getVerifiedContent,
+  getVerifiedContentSummary,
+} from "@/lib/verified-content";
 
 import styles from "./verified.module.css";
 
@@ -14,31 +17,9 @@ export const metadata = createPageMetadata({
   path: "/verified",
 });
 
-function verificationDate(post: ReturnType<typeof getAllPosts>[number]): string {
-  return (
-    post.verification.testedAt ??
-    post.verification.checkedAt ??
-    post.updatedAt ??
-    post.publishedAt
-  );
-}
-
 export default function VerifiedPage() {
-  const posts = getAllPosts();
-  const verifiedPosts = posts
-    .filter(
-      (post) =>
-        post.verification.consoleTested || post.verification.liveTested,
-    )
-    .sort((left, right) =>
-      verificationDate(right).localeCompare(verificationDate(left)),
-    );
-  const liveCount = verifiedPosts.filter(
-    (post) => post.verification.liveTested,
-  ).length;
-  const consoleCount = verifiedPosts.filter(
-    (post) => post.verification.consoleTested,
-  ).length;
+  const verifiedPosts = getVerifiedContent("zh");
+  const { liveCount, consoleCount } = getVerifiedContentSummary(verifiedPosts);
 
   return (
     <main className="page-shell">
@@ -72,31 +53,22 @@ export default function VerifiedPage() {
 
         {verifiedPosts.length > 0 ? (
           <section className={styles.list} aria-label="已验证文章">
-            {verifiedPosts.map((post) => {
-              const level = post.verification.liveTested
-                ? "真实主循环"
-                : "Screeps Console";
-              const date = verificationDate(post);
-
-              return (
-                <article key={post.slug}>
-                  <div className={styles.evidence}>
-                    <strong>{level}</strong>
-                    <time dateTime={date}>{formatDate(date)}</time>
-                    {post.verification.testEnvironment ? (
-                      <span>{post.verification.testEnvironment}</span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <h2>
-                      <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                    </h2>
-                    <p>{post.description}</p>
-                    <Link href={`/blog/${post.slug}`}>查看验证状态 →</Link>
-                  </div>
-                </article>
-              );
-            })}
+            {verifiedPosts.map((post) => (
+              <article key={post.id}>
+                <div className={styles.evidence}>
+                  <strong>{post.level === "live" ? "真实主循环" : "Screeps Console"}</strong>
+                  <time dateTime={post.date}>{formatDate(post.date)}</time>
+                  {post.testEnvironment ? <span>{post.testEnvironment}</span> : null}
+                </div>
+                <div>
+                  <h2>
+                    <Link href={post.href}>{post.title}</Link>
+                  </h2>
+                  <p>{post.description}</p>
+                  <Link href={post.href}>查看验证状态 →</Link>
+                </div>
+              </article>
+            ))}
           </section>
         ) : (
           <section className={styles.empty}>
