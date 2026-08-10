@@ -192,6 +192,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/en/beginner", englishBeginnerDates),
     staticPageEntry("/en/blog", englishArticleDates),
     staticPageEntry("/en/knowledge", englishArticleDates),
+    staticPageEntry("/en/screeps-api"),
     staticPageEntry("/en/tags", englishArticleDates),
     staticPageEntry(
       "/en/tools",
@@ -203,6 +204,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/en/screeps-errors"),
     staticPageEntry("/en/glossary"),
     staticPageEntry("/en/verification"),
+    staticPageEntry("/en/verified"),
     staticPageEntry("/en/evidence"),
     staticPageEntry("/en/about"),
     staticPageEntry("/en/changelog", englishChangelogDates),
