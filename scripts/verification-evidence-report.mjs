@@ -11,7 +11,7 @@ const sql = neon(databaseUrl);
 const [summary] = await sql`
   SELECT
     count(*)::int AS evidence_rows,
-    count(DISTINCT article_slug)::int AS verified_articles,
+    count(DISTINCT article_slug)::int AS evidence_articles,
     count(*) FILTER (WHERE verification_type = 'console')::int AS console_rows,
     count(*) FILTER (WHERE verification_type = 'live')::int AS live_rows,
     count(DISTINCT article_slug) FILTER (WHERE verification_type = 'console')::int AS console_articles,
@@ -38,9 +38,10 @@ const latest = await sql`
 
 console.log("Verification Evidence Report");
 console.log(`Evidence rows: ${summary?.evidence_rows ?? 0}`);
-console.log(`Verified articles: ${summary?.verified_articles ?? 0}`);
-console.log(`Console: ${summary?.console_rows ?? 0} row(s) across ${summary?.console_articles ?? 0} article(s)`);
-console.log(`Live multi-tick: ${summary?.live_rows ?? 0} row(s) across ${summary?.live_articles ?? 0} article(s)`);
+console.log(`Articles with captured evidence: ${summary?.evidence_articles ?? 0}`);
+console.log(`Console evidence: ${summary?.console_rows ?? 0} row(s) across ${summary?.console_articles ?? 0} article(s)`);
+console.log(`Live multi-tick evidence: ${summary?.live_rows ?? 0} row(s) across ${summary?.live_articles ?? 0} article(s)`);
+console.log("Public verified status is controlled separately by Markdown verification frontmatter.");
 
 console.log("\nLatest evidence");
 if (latest.length === 0) {
@@ -58,7 +59,7 @@ if (latest.length === 0) {
           ? `${row.tick_start}-${row.tick_end}`
           : "—",
       environment: [row.shard, row.room_name].filter(Boolean).join(" / ") || "—",
-      verifiedAt: row.verified_at,
+      capturedAt: row.verified_at,
     })),
   );
 }
