@@ -28,6 +28,8 @@ The value is never committed to GitHub. When `DATABASE_URL` is missing, database
 
 For rollout safety, new database integrations are first configured as a branch-scoped Vercel Preview environment variable and validated there before the same secret is enabled for Production. The Search V2 response exposes `X-Search-Source: static|database`, which is used during rollout verification.
 
+Production rollout was enabled only after Preview database connectivity, 131-document synchronization, Search V2 smoke coverage, and Lighthouse CLS validation passed. A fresh Production deployment is required whenever `DATABASE_URL` is first added or rotated because Vercel environment-variable changes apply to subsequent deployments.
+
 ## Initial tables
 
 - `search_documents`: searchable copies of public content metadata and compact recall text.
