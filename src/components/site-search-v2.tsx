@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { SearchDocument, SearchDocumentType } from "@/lib/search";
-import type { SearchV2Response } from "@/lib/search-v2";
+import type {
+  SearchEventResponse,
+  SearchV2Response,
+  SearchV2Source,
+} from "@/lib/search-v2-types";
 
 const typeOrder: SearchDocumentType[] = ["文章", "术语", "错误码", "工具", "项目"];
 type SearchFilter = "全部" | SearchDocumentType;
@@ -84,13 +88,14 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
   const [activeType, setActiveType] = useState<SearchFilter>("全部");
   const [results, setResults] = useState<SearchDocument[]>([]);
   const [queryId, setQueryId] = useState<number | null>(null);
-  const [source, setSource] = useState<"database" | "static" | null>(null);
+  const [source, setSource] = useState<SearchV2Source | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const anonymousIdRef = useRef("");
   const sessionIdRef = useRef("");
+  const lastRecordedSearchRef = useRef("");
   const normalizedQuery = normalize(query);
 
   useEffect(() => {
@@ -119,6 +124,7 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
       return;
     }
 
+    setQueryId(null);
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
       setIsLoading(true);
@@ -128,14 +134,6 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
         const params = new URLSearchParams({ q: query.trim(), limit: "40" });
         const response = await fetch(`/api/search?${params.toString()}`, {
           signal: controller.signal,
-          headers: {
-            ...(anonymousIdRef.current
-              ? { "X-Anonymous-Id": anonymousIdRef.current }
-              : {}),
-            ...(sessionIdRef.current
-              ? { "X-Session-Id": sessionIdRef.current }
-              : {}),
-          },
         });
 
         if (!response.ok) {
@@ -144,32 +142,7 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
 
         const payload = (await response.json()) as SearchV2Response;
         setResults(Array.isArray(payload.results) ? payload.results : []);
-        setQueryId(typeof payload.queryId === "number" ? payload.queryId : null);
         setSource(payload.source === "database" ? "database" : "static");
-
-        const analyticsPayload = {
-          query: query.trim().slice(0, 80),
-          results: payload.total,
-          source: payload.source,
-        };
-        track(
-          payload.total > 0 ? "site_search_v2" : "site_search_v2_no_results",
-          analyticsPayload,
-        );
-
-        try {
-          const history = JSON.parse(
-            window.localStorage.getItem("linqingan:search-history") ?? "[]",
-          );
-          const next = [
-            { ...analyticsPayload, at: new Date().toISOString() },
-            ...(Array.isArray(history) ? history : []),
-          ].slice(0, 50);
-          window.localStorage.setItem(
-            "linqingan:search-history",
-            JSON.stringify(next),
-          );
-        } catch {}
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setRequestError(true);
@@ -186,6 +159,63 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
       controller.abort();
     };
   }, [normalizedQuery, query]);
+
+  useEffect(() => {
+    if (!normalizedQuery || isLoading || requestError || !source) return;
+
+    const recordedKey = `${normalizedQuery}|${results.length}|${source}`;
+    const timeout = window.setTimeout(async () => {
+      if (lastRecordedSearchRef.current === recordedKey) return;
+      lastRecordedSearchRef.current = recordedKey;
+
+      const analyticsPayload = {
+        query: query.trim().slice(0, 80),
+        results: results.length,
+        source,
+      };
+
+      track(
+        results.length > 0 ? "site_search_v2" : "site_search_v2_no_results",
+        analyticsPayload,
+      );
+
+      try {
+        const history = JSON.parse(
+          window.localStorage.getItem("linqingan:search-history") ?? "[]",
+        );
+        const next = [
+          { ...analyticsPayload, at: new Date().toISOString() },
+          ...(Array.isArray(history) ? history : []),
+        ].slice(0, 50);
+        window.localStorage.setItem(
+          "linqingan:search-history",
+          JSON.stringify(next),
+        );
+      } catch {}
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (anonymousIdRef.current) headers["X-Anonymous-Id"] = anonymousIdRef.current;
+      if (sessionIdRef.current) headers["X-Session-Id"] = sessionIdRef.current;
+
+      try {
+        const response = await fetch("/api/search/event", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            query: query.trim(),
+            resultCount: results.length,
+          }),
+        });
+        if (!response.ok) return;
+        const payload = (await response.json()) as SearchEventResponse;
+        setQueryId(typeof payload.queryId === "number" ? payload.queryId : null);
+      } catch {}
+    }, 1000);
+
+    return () => window.clearTimeout(timeout);
+  }, [isLoading, normalizedQuery, query, requestError, results.length, source]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
