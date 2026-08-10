@@ -8,6 +8,7 @@ async function postJson(pathname, body) {
       "Content-Type": "application/json",
       "X-Anonymous-Id": "smoke-anonymous",
       "X-Session-Id": "smoke-session",
+      "X-Platform-Smoke-Test": "1",
     },
     body: JSON.stringify(body),
   });
@@ -25,11 +26,11 @@ const feedback = await postJson("/api/article-feedback", {
   language: "zh-CN",
   value: "helpful",
 });
-if (![200, 202].includes(feedback.response.status)) {
-  failures.push(`/api/article-feedback valid payload returned ${feedback.response.status}`);
+if (feedback.response.status !== 202) {
+  failures.push(`/api/article-feedback local smoke payload returned ${feedback.response.status}`);
 }
-if (typeof feedback.payload?.stored !== "boolean") {
-  failures.push("/api/article-feedback valid payload must return stored boolean");
+if (feedback.payload?.stored !== false || feedback.payload?.smoke !== true) {
+  failures.push("/api/article-feedback local smoke must validate without persisting");
 }
 
 const invalidFeedback = await postJson("/api/article-feedback", {
@@ -46,11 +47,11 @@ const toolEvent = await postJson("/api/tool-event", {
   action: "use",
   sourcePath: "/blog/screeps-controller-downgrade",
 });
-if (![200, 202].includes(toolEvent.response.status)) {
-  failures.push(`/api/tool-event valid payload returned ${toolEvent.response.status}`);
+if (toolEvent.response.status !== 202) {
+  failures.push(`/api/tool-event local smoke payload returned ${toolEvent.response.status}`);
 }
-if (typeof toolEvent.payload?.stored !== "boolean") {
-  failures.push("/api/tool-event valid payload must return stored boolean");
+if (toolEvent.payload?.stored !== false || toolEvent.payload?.smoke !== true) {
+  failures.push("/api/tool-event local smoke must validate without persisting");
 }
 
 const invalidToolEvent = await postJson("/api/tool-event", {
@@ -69,5 +70,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Phase 2 platform data smoke passed: anonymous article feedback and tool-event APIs accept bounded enums, reject invalid payloads, and degrade safely when DATABASE_URL is unavailable.",
+  "Phase 2 platform data smoke passed: bounded feedback/tool payloads are validated locally without writing to Neon, and invalid payloads are rejected.",
 );

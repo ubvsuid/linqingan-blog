@@ -16,6 +16,10 @@ interface ToolEventBody {
   sourcePath?: string | null;
 }
 
+function isSmokeRequest(request: NextRequest): boolean {
+  return request.headers.get("x-platform-smoke-test") === "1";
+}
+
 export async function POST(request: NextRequest) {
   let body: ToolEventBody;
   try {
@@ -38,6 +42,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { stored: false, error: "invalid_payload" },
       { status: 400 },
+    );
+  }
+
+  if (isSmokeRequest(request)) {
+    return NextResponse.json(
+      { stored: false, smoke: true },
+      {
+        status: 202,
+        headers: { "Cache-Control": "no-store" },
+      },
     );
   }
 
