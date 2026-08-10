@@ -94,13 +94,9 @@ export async function ensureSearchDocumentsReady(): Promise<void> {
   if (!getPlatformDatabase()) return;
 
   if (!syncPromise) {
-    syncPromise = synchronizeDocuments()
-      .catch((error) => {
-        console.warn("Search V2 document sync failed; static fallback remains available", error);
-      })
-      .finally(() => {
-        syncPromise = null;
-      });
+    syncPromise = synchronizeDocuments().finally(() => {
+      syncPromise = null;
+    });
   }
 
   await syncPromise;
