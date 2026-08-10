@@ -30,6 +30,8 @@ For rollout safety, new database integrations are first configured as a branch-s
 
 Production rollout was enabled only after Preview database connectivity, 131-document synchronization, Search V2 smoke coverage, and Lighthouse CLS validation passed. A fresh Production deployment is required whenever `DATABASE_URL` is first added or rotated because Vercel environment-variable changes apply to subsequent deployments.
 
+The Production secret was enabled on 2026-08-10 and a fresh deployment was intentionally triggered afterward so the runtime could pick up the new environment value before final database-source verification.
+
 ## Initial tables
 
 - `search_documents`: searchable copies of public content metadata and compact recall text.
