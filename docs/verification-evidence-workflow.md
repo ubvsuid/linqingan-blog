@@ -7,6 +7,8 @@ Phase 3A keeps runtime evidence separate from ordinary article metadata while pr
 - There is no public verification-evidence write API.
 - Runtime evidence is written only through the repository maintenance CLI.
 - `/verified` and `/en/verified` are read-only consumers.
+- Markdown verification frontmatter remains the public acceptance decision.
+- A database row alone does not promote an article from pending to verified.
 - Database failure must not remove existing Markdown-based verification states from public pages.
 - Offline simulation, documentation review, or generated fixtures must never be inserted as Console or live evidence.
 - `source_ref` is an internal trace reference and is not rendered on public pages.
@@ -75,6 +77,18 @@ node scripts/verification-evidence-write.mjs path/to/evidence.json --commit
 
 The writer checks that the article exists, validates bounded fields, and skips an evidence record when the same article/type/API/source/tick identity already exists.
 
+## Acceptance step
+
+Importing evidence and accepting a public verification claim are deliberately separate operations.
+
+After a real evidence record is reviewed, update the article's Markdown `verification` frontmatter in the same maintenance workflow:
+
+- set `consoleTested: true` only after accepted real Console evidence;
+- set `liveTested: true` only after accepted real multi-tick evidence;
+- update `testedAt`, `testEnvironment`, and `testResult` to match the accepted observation.
+
+Until that frontmatter change is reviewed and merged, the evidence remains internal and does not promote the article on `/verified`.
+
 ## Read-only report
 
 ```bash
@@ -85,12 +99,11 @@ The report shows total evidence rows, verified-article counts, Console/live coun
 
 ## Public rendering
 
-`/verified` and `/en/verified` merge two sources:
+`/verified` and `/en/verified` use Markdown runtime flags as the public acceptance source, then enrich accepted states with matching structured rows from `verification_evidence`.
 
-1. Markdown `verification.consoleTested` / `verification.liveTested` fields.
-2. Structured rows from `verification_evidence`.
+Structured evidence is rendered publicly only when its level has also been accepted in frontmatter. For example, an unaccepted `live` evidence row will not make a Console-only article appear as live verified.
 
-The structured evidence layer can promote an article into the verified list without editing a second hand-maintained list. Public output exposes only bounded summary fields such as evidence type, date, environment, API surface, return code, Game.time/tick range, and evidence note.
+Public output exposes only bounded summary fields such as evidence type, date, environment, API surface, return code, Game.time/tick range, and evidence note.
 
 The pages use a five-minute ISR window. If Neon is missing or temporarily unavailable, the public pages fall back to Markdown verification fields instead of failing.
 
