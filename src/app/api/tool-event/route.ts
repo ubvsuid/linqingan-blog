@@ -16,12 +16,8 @@ interface ToolEventBody {
   sourcePath?: string | null;
 }
 
-function isLocalSmokeRequest(request: NextRequest): boolean {
-  const hostname = request.nextUrl.hostname;
-  return (
-    request.headers.get("x-platform-smoke-test") === "1" &&
-    (hostname === "127.0.0.1" || hostname === "localhost")
-  );
+function isSmokeRequest(request: NextRequest): boolean {
+  return request.headers.get("x-platform-smoke-test") === "1";
 }
 
 export async function POST(request: NextRequest) {
@@ -49,7 +45,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (isLocalSmokeRequest(request)) {
+  if (isSmokeRequest(request)) {
     return NextResponse.json(
       { stored: false, smoke: true },
       {
