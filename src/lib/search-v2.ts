@@ -7,26 +7,15 @@ import {
   type SearchDocument,
   type SearchDocumentType,
 } from "@/lib/search";
+import { ensureSearchDocumentsReady } from "@/lib/search-sync";
+import type {
+  SearchIdentity,
+  SearchV2Response,
+  SearchV2Source,
+} from "@/lib/search-v2-types";
 
 export const SEARCH_V2_DEFAULT_LIMIT = 20;
 export const SEARCH_V2_MAX_LIMIT = 40;
-
-export type SearchV2Source = "database" | "static";
-
-export interface SearchV2Response {
-  query: string;
-  normalizedQuery: string;
-  results: SearchDocument[];
-  total: number;
-  source: SearchV2Source;
-  queryId: number | null;
-}
-
-export interface SearchIdentity {
-  anonymousId?: string | null;
-  sessionId?: string | null;
-  sourcePath?: string | null;
-}
 
 const synonymGroups = [
   ["采集", "harvest", "source"],
@@ -117,7 +106,11 @@ function rankStaticDocuments(
     .filter((document) => !type || document.type === type)
     .map((document) => ({ document, score: staticScore(document, terms) }))
     .filter((entry) => entry.score > 0)
-    .sort((left, right) => right.score - left.score || left.document.title.localeCompare(right.document.title, "zh-CN"))
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        left.document.title.localeCompare(right.document.title, "zh-CN"),
+    )
     .slice(0, limit)
     .map((entry) => entry.document);
 }
@@ -130,12 +123,14 @@ async function searchDatabase(
   const db = getPlatformDatabase();
   if (!db) return null;
 
+  await ensureSearchDocumentsReady();
+
   const normalized = normalizeSearchQuery(query);
   const expanded = expandSearchTerms(query).join(" ");
   const contains = `%${normalized}%`;
   const prefix = `${normalized}%`;
   const ftsVector = sql`to_tsvector('simple', coalesce(${searchDocuments.title}, '') || ' ' || coalesce(${searchDocuments.description}, '') || ' ' || coalesce(${searchDocuments.searchText}, ''))`;
-  const ftsQuery = sql`websearch_to_tsquery('simple', ${expanded})`;
+  const ftsQuery = sql`plainto_tsquery('simple', ${expanded})`;
   const score = sql<number>`(
     CASE
       WHEN lower(${searchDocuments.title}) = ${normalized} THEN 100
@@ -160,8 +155,15 @@ async function searchDatabase(
     sql`similarity(lower(${searchDocuments.title}), ${normalized}) >= 0.18`,
   );
 
-  const filters = [eq(searchDocuments.language, "zh-CN"), matchCondition];
-  if (type) filters.push(eq(searchDocuments.type, type));
+  if (!matchCondition) return [];
+
+  const whereCondition = type
+    ? and(
+        eq(searchDocuments.language, "zh-CN"),
+        eq(searchDocuments.type, type),
+        matchCondition,
+      )
+    : and(eq(searchDocuments.language, "zh-CN"), matchCondition);
 
   const rows = await db
     .select({
@@ -175,7 +177,7 @@ async function searchDatabase(
       score,
     })
     .from(searchDocuments)
-    .where(and(...filters))
+    .where(whereCondition)
     .orderBy(desc(score), searchDocuments.title)
     .limit(limit);
 
@@ -193,41 +195,11 @@ async function searchDatabase(
     }));
 }
 
-async function recordSearchQuery(
-  query: string,
-  normalizedQuery: string,
-  resultCount: number,
-  identity: SearchIdentity,
-): Promise<number | null> {
-  const db = getPlatformDatabase();
-  if (!db) return null;
-
-  try {
-    const [row] = await db
-      .insert(searchQueries)
-      .values({
-        anonymousId: identity.anonymousId?.slice(0, 80) || null,
-        sessionId: identity.sessionId?.slice(0, 80) || null,
-        language: "zh-CN",
-        query: query.slice(0, 120),
-        normalizedQuery,
-        resultCount,
-        sourcePath: identity.sourcePath?.slice(0, 240) || null,
-      })
-      .returning({ id: searchQueries.id });
-    return row?.id ?? null;
-  } catch (error) {
-    console.warn("Search V2 analytics write failed", error);
-    return null;
-  }
-}
-
 export async function searchV2(
   query: string,
   options: {
     type?: string | null;
     limit?: number;
-    identity?: SearchIdentity;
   } = {},
 ): Promise<SearchV2Response> {
   const normalizedQuery = normalizeSearchQuery(query);
@@ -244,7 +216,6 @@ export async function searchV2(
       results: [],
       total: 0,
       source: getPlatformDatabase() ? "database" : "static",
-      queryId: null,
     };
   }
 
@@ -253,23 +224,19 @@ export async function searchV2(
 
   try {
     const databaseResults = await searchDatabase(normalizedQuery, type, limit);
-    if (databaseResults && databaseResults.length > 0) {
+    if (databaseResults) {
       results = databaseResults;
       source = "database";
     } else {
       results = rankStaticDocuments(normalizedQuery, type, limit);
     }
   } catch (error) {
-    console.warn("Search V2 database query failed; using static fallback", error);
+    console.warn(
+      "Search V2 database query failed; using static fallback",
+      error,
+    );
     results = rankStaticDocuments(normalizedQuery, type, limit);
   }
-
-  const queryId = await recordSearchQuery(
-    query.trim(),
-    normalizedQuery,
-    results.length,
-    options.identity ?? {},
-  );
 
   return {
     query: query.trim(),
@@ -277,8 +244,38 @@ export async function searchV2(
     results,
     total: results.length,
     source,
-    queryId,
   };
+}
+
+export async function recordSearchQuery(input: {
+  query: string;
+  resultCount: number;
+  identity?: SearchIdentity;
+}): Promise<number | null> {
+  const db = getPlatformDatabase();
+  if (!db) return null;
+
+  const normalizedQuery = normalizeSearchQuery(input.query);
+  if (!normalizedQuery) return null;
+
+  try {
+    const [row] = await db
+      .insert(searchQueries)
+      .values({
+        anonymousId: input.identity?.anonymousId?.slice(0, 80) || null,
+        sessionId: input.identity?.sessionId?.slice(0, 80) || null,
+        language: "zh-CN",
+        query: input.query.trim().slice(0, 120),
+        normalizedQuery,
+        resultCount: Math.max(0, Math.min(input.resultCount, 10_000)),
+        sourcePath: input.identity?.sourcePath?.slice(0, 240) || null,
+      })
+      .returning({ id: searchQueries.id });
+    return row?.id ?? null;
+  } catch (error) {
+    console.warn("Search V2 analytics write failed", error);
+    return null;
+  }
 }
 
 export async function recordSearchResultClick(input: {
