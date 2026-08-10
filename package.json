@@ -67,6 +67,7 @@
     "accessibilitycheck": "node scripts/check-accessibility-basics.mjs",
     "lighthouse": "npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json",
     "searchconsole:report": "node scripts/search-console-opportunity-report.mjs",
+    "platform:search-report": "node scripts/platform-search-report.mjs",
     "verification:report": "node scripts/verification-report.mjs",
     "articles:priority": "node scripts/article-priority.mjs",
     "changelog:add": "node scripts/add-changelog.mjs",

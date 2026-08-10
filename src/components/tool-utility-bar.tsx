@@ -1,11 +1,30 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { track } from "@vercel/analytics";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+
+import {
+  buildIdentityHeaders,
+  getSameOriginReferrerPath,
+} from "@/lib/browser-identity";
 
 interface ToolUtilityBarProps {
   title: string;
   issueUrl: string;
 }
+
+type ToolEventAction = "view" | "use" | "share" | "reset" | "report";
+
+const knownToolIds = new Set([
+  "creep-body-calculator",
+  "room-diagnostics",
+  "market-terminal-cost-calculator",
+  "controller-downgrade-planner",
+  "lab-reaction-boost-planner",
+  "spawn-queue-replacement-planner",
+  "hauling-throughput-planner",
+  "tower-damage-heal-repair-calculator",
+]);
 
 function subscribeToLocation() {
   return () => {};
@@ -19,6 +38,19 @@ function getServerLocationSnapshot() {
   return "";
 }
 
+function readToolId(currentUrl: string): string | null {
+  if (!currentUrl) return null;
+  try {
+    const pathname = new URL(currentUrl).pathname;
+    const segments = pathname.split("/").filter(Boolean);
+    const toolsIndex = segments.indexOf("tools");
+    const candidate = toolsIndex >= 0 ? segments[toolsIndex + 1] : null;
+    return candidate && knownToolIds.has(candidate) ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+
 export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
   const [status, setStatus] = useState("");
   const currentUrl = useSyncExternalStore(
@@ -27,6 +59,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
     getServerLocationSnapshot,
   );
   const hydrated = currentUrl.length > 0;
+  const toolId = readToolId(currentUrl);
 
   const issueHref = useMemo(() => {
     const params = new URLSearchParams({
@@ -35,6 +68,67 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
     });
     return `${issueUrl}?${params.toString()}`;
   }, [currentUrl, issueUrl, title]);
+
+  function recordToolEvent(action: ToolEventAction) {
+    if (!toolId) return;
+
+    track("tool_event", {
+      tool: toolId,
+      action,
+    });
+
+    void fetch("/api/tool-event", {
+      method: "POST",
+      keepalive: true,
+      headers: {
+        "Content-Type": "application/json",
+        ...buildIdentityHeaders(),
+      },
+      body: JSON.stringify({
+        toolId,
+        action,
+        sourcePath:
+          getSameOriginReferrerPath() ?? new URL(currentUrl).pathname,
+      }),
+    }).catch(() => {});
+  }
+
+  useEffect(() => {
+    if (!hydrated || !toolId) return;
+
+    const viewKey = `linqingan:tool-view:${toolId}`;
+    try {
+      if (!window.sessionStorage.getItem(viewKey)) {
+        window.sessionStorage.setItem(viewKey, "1");
+        recordToolEvent("view");
+      }
+    } catch {
+      recordToolEvent("view");
+    }
+
+    const useKey = `linqingan:tool-use:${toolId}`;
+    const handleInteraction = (event: Event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest(".tool-utility-bar")) return;
+      if (!target.closest("button, input, select, textarea")) return;
+
+      try {
+        if (window.sessionStorage.getItem(useKey)) return;
+        window.sessionStorage.setItem(useKey, "1");
+      } catch {}
+
+      recordToolEvent("use");
+    };
+
+    document.addEventListener("click", handleInteraction, true);
+    document.addEventListener("change", handleInteraction, true);
+
+    return () => {
+      document.removeEventListener("click", handleInteraction, true);
+      document.removeEventListener("change", handleInteraction, true);
+    };
+  }, [hydrated, toolId]);
 
   async function shareCurrentState() {
     if (!hydrated) {
@@ -50,6 +144,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
         await navigator.clipboard.writeText(currentUrl);
         setStatus("当前配置链接已复制");
       }
+      recordToolEvent("share");
     } catch {
       setStatus("未完成分享");
     }
@@ -57,6 +152,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
 
   function resetTool() {
     if (!hydrated) return;
+    recordToolEvent("reset");
     window.location.assign(window.location.pathname);
   }
 
@@ -78,7 +174,11 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
           target="_blank"
           rel="noreferrer"
           onClick={(event) => {
-            if (!hydrated) event.preventDefault();
+            if (!hydrated) {
+              event.preventDefault();
+              return;
+            }
+            recordToolEvent("report");
           }}
         >
           报告问题 ↗
