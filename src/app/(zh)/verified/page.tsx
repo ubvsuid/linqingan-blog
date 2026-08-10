@@ -4,8 +4,9 @@ import { Container } from "@/components/container";
 import { formatDate } from "@/lib/date";
 import { createPageMetadata } from "@/lib/metadata";
 import {
-  getVerifiedContent,
   getVerifiedContentSummary,
+  getVerifiedContentWithEvidence,
+  type VerifiedEvidencePreview,
 } from "@/lib/verified-content";
 
 import styles from "./verified.module.css";
@@ -17,8 +18,21 @@ export const metadata = createPageMetadata({
   path: "/verified",
 });
 
-export default function VerifiedPage() {
-  const verifiedPosts = getVerifiedContent("zh");
+export const revalidate = 300;
+
+function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
+  const parts: string[] = [];
+  if (evidence.apiName) parts.push(evidence.apiName);
+  if (evidence.returnCode) parts.push(`返回 ${evidence.returnCode}`);
+  if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
+  if (evidence.tickStart !== null && evidence.tickEnd !== null) {
+    parts.push(`Tick ${evidence.tickStart}–${evidence.tickEnd}`);
+  }
+  return parts.join(" · ");
+}
+
+export default async function VerifiedPage() {
+  const verifiedPosts = await getVerifiedContentWithEvidence("zh");
   const { liveCount, consoleCount } = getVerifiedContentSummary(verifiedPosts);
 
   return (
@@ -59,12 +73,22 @@ export default function VerifiedPage() {
                   <strong>{post.level === "live" ? "真实主循环" : "Screeps Console"}</strong>
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
                   {post.testEnvironment ? <span>{post.testEnvironment}</span> : null}
+                  {post.evidenceCount > 0 ? <span>{post.evidenceCount} 条运行证据</span> : null}
                 </div>
                 <div>
                   <h2>
                     <Link href={post.href}>{post.title}</Link>
                   </h2>
                   <p>{post.description}</p>
+                  {post.latestEvidence ? (
+                    <div className={styles.runtimeEvidence}>
+                      <strong>最近一条结构化证据</strong>
+                      {formatEvidencePreview(post.latestEvidence) ? (
+                        <span>{formatEvidencePreview(post.latestEvidence)}</span>
+                      ) : null}
+                      {post.latestEvidence.note ? <span>{post.latestEvidence.note}</span> : null}
+                    </div>
+                  ) : null}
                   <Link href={post.href}>查看验证状态 →</Link>
                 </div>
               </article>
@@ -74,7 +98,7 @@ export default function VerifiedPage() {
           <section className={styles.empty}>
             <strong>当前还没有达到 Console / 真实主循环等级的公开文章。</strong>
             <p>
-              页面仍然保留，因为它会直接读取文章验证字段；后续获得真实证据后会自动出现，不需要手工维护一份“已验证清单”。
+              页面会同时读取文章验证字段和受控的运行证据数据。后续获得真实证据后会自动出现，不需要手工维护一份“已验证清单”。
             </p>
           </section>
         )}
