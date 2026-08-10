@@ -10,6 +10,7 @@ import { nowEntries } from "@/lib/now-entries";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
+import { latestSiteAuditEntry } from "@/lib/site-audit-entry";
 import {
   getStaticPageLastModified,
   type StaticPagePath,
@@ -79,7 +80,10 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
         post.updatedAt ??
         post.publishedAt,
     );
-  const changelogDates = changelogEntries.map((entry) => entry.date);
+  const changelogDates = [
+    latestSiteAuditEntry.date,
+    ...changelogEntries.map((entry) => entry.date),
+  ];
   const nowDates = nowEntries.map((entry) => entry.date);
   const projectDates = projects.map((project) => project.updatedAt);
   const chineseToolPaths: StaticPagePath[] = [
@@ -94,7 +98,7 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
   ];
 
   const staticPages: SitemapEntry[] = [
-    staticPageEntry("/", allPostDates),
+    staticPageEntry("/", [...allPostDates, latestSiteAuditEntry.date]),
     staticPageEntry("/beginner", beginnerDates),
     staticPageEntry("/blog", allPostDates),
     staticPageEntry("/knowledge", allPostDates),
