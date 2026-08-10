@@ -115,16 +115,8 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
   }, []);
 
   useEffect(() => {
-    if (!normalizedQuery) {
-      setResults([]);
-      setQueryId(null);
-      setSource(null);
-      setIsLoading(false);
-      setRequestError(false);
-      return;
-    }
+    if (!normalizedQuery) return;
 
-    setQueryId(null);
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
       setIsLoading(true);
@@ -265,10 +257,21 @@ export function SiteSearchV2({ initialQuery = "" }: { initialQuery?: string }) {
   );
 
   function updateQuery(value: string) {
+    const nextQuery = value.trim();
     setActiveSuggestionIndex(-1);
+    setQueryId(null);
+    setRequestError(false);
     setQuery(value);
+
+    if (!nextQuery) {
+      setResults([]);
+      setSource(null);
+      setIsLoading(false);
+      lastRecordedSearchRef.current = "";
+    }
+
     const url = new URL(window.location.href);
-    if (value.trim()) url.searchParams.set("q", value.trim());
+    if (nextQuery) url.searchParams.set("q", nextQuery);
     else url.searchParams.delete("q");
     window.history.replaceState(
       null,
