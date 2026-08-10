@@ -33,6 +33,7 @@ const requiredPaths = [
   "/en/beginner",
   "/en/blog",
   "/en/knowledge",
+  "/en/screeps-api",
   "/en/tags",
   "/en/tools",
   "/en/tools/creep-body-calculator",
@@ -46,6 +47,7 @@ const requiredPaths = [
   "/en/screeps-errors",
   "/en/glossary",
   "/en/verification",
+  "/en/verified",
   "/en/evidence",
   "/en/about",
   "/en/changelog",
@@ -88,10 +90,14 @@ const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
 const compactSitemapSource = sitemapSource.replace(/\s+/g, "");
 for (const requiredText of [
   "getStaticPageLastModified",
+  "latestSiteAuditEntry.date",
+  'staticPageEntry("/",[...allPostDates,latestSiteAuditEntry.date])',
   'staticPageEntry("/screeps-api"',
   'staticPageEntry("/verified"',
   'staticPageEntry("/tools"',
   'staticPageEntry("/en/blog"',
+  'staticPageEntry("/en/screeps-api"',
+  'staticPageEntry("/en/verified"',
   'staticPageEntry("/en/evidence"',
   '"/tools/spawn-queue-replacement-planner"',
   '"/tools/hauling-throughput-planner"',
@@ -103,6 +109,10 @@ for (const requiredText of [
   if (!compactSitemapSource.includes(requiredText.replace(/\s+/g, ""))) {
     failures.push(`Sitemap does not use the revision registry: ${requiredText}`);
   }
+}
+
+if (!compactSitemapSource.includes("constchangelogDates=[latestSiteAuditEntry.date,")) {
+  failures.push("Changelog sitemap lastmod must include the latest site audit entry date.");
 }
 
 for (const obsoleteField of ["changeFrequency:", "priority:"]) {
@@ -121,5 +131,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Sitemap revision check passed: ${requiredPaths.length} static routes tracked.`,
+  `Sitemap revision check passed: ${requiredPaths.length} static routes tracked, and homepage/changelog activity dates are data-derived.`,
 );

@@ -52,6 +52,12 @@ export default function EnglishVerificationPage() {
 
         <section className={`${styles.grid} about-detail-grid`}>
           <article className={styles.card}>
+            <p className="eyebrow">VERIFIED ARCHIVE</p>
+            <h2>Runtime-tested guides stay separate</h2>
+            <p>Only guides whose shared source records contain explicit Console or live multi-tick evidence appear in the recently verified archive.</p>
+            <Link href="/en/verified">Browse recently verified guides →</Link>
+          </article>
+          <article className={styles.card}>
             <p className="eyebrow">TRANSPARENCY</p>
             <h2>Pending tests remain visible</h2>
             <p>If a guide has not been tested in the Console or in a live room, that status remains pending rather than being inferred from documentation alone.</p>

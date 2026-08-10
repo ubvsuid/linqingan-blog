@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { ScreepsApiExplorer } from "@/components/screeps-api-explorer";
 import { createPageMetadata } from "@/lib/metadata";
-import { screepsApiReference } from "@/lib/screeps-api-reference";
+import { getLocalizedScreepsApiReference } from "@/lib/screeps-api-reference-localized";
 import { siteConfig } from "@/lib/site";
 
 import styles from "./page.module.css";
@@ -16,6 +16,7 @@ export const metadata = createPageMetadata({
 });
 
 export default function ScreepsApiPage() {
+  const entries = getLocalizedScreepsApiReference("zh");
   const pageUrl = `${siteConfig.url}/screeps-api`;
   const jsonLd = {
     "@context": "https://schema.org",
@@ -27,8 +28,8 @@ export default function ScreepsApiPage() {
     inLanguage: "zh-CN",
     mainEntity: {
       "@type": "ItemList",
-      numberOfItems: screepsApiReference.length,
-      itemListElement: screepsApiReference.map((entry, index) => ({
+      numberOfItems: entries.length,
+      itemListElement: entries.map((entry, index) => ({
         "@type": "ListItem",
         position: index + 1,
         name: entry.signature,
@@ -73,7 +74,7 @@ export default function ScreepsApiPage() {
           </div>
         </header>
 
-        <ScreepsApiExplorer entries={screepsApiReference} />
+        <ScreepsApiExplorer entries={entries} locale="zh" />
       </Container>
     </main>
   );

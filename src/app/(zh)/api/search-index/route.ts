@@ -5,6 +5,7 @@ import {
   getSearchDocuments,
   getSearchIndexSummary,
   SEARCH_INDEX_MAX_BYTES,
+  SEARCH_INDEX_WARN_BYTES,
 } from "@/lib/search";
 
 export const dynamic = "force-static";
@@ -25,7 +26,9 @@ export function GET() {
       "X-Search-Index-Public-Tools": String(summary.publicToolCount),
       "X-Search-Index-Tool-Documents": String(summary.toolDocumentCount),
       "X-Search-Index-Bytes": String(payloadBytes),
+      "X-Search-Index-Warning-Bytes": String(SEARCH_INDEX_WARN_BYTES),
       "X-Search-Index-Budget-Bytes": String(SEARCH_INDEX_MAX_BYTES),
+      "X-Search-Index-Headroom-Bytes": String(SEARCH_INDEX_MAX_BYTES - payloadBytes),
     },
   });
 }

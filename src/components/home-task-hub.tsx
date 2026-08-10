@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { useCallback, useSyncExternalStore } from "react";
 
@@ -59,6 +60,10 @@ function useRecentArticles() {
   return parseRecentArticles(rawValue);
 }
 
+function trackHomeAction(action: string) {
+  track("home_task_action", { action });
+}
+
 export function HomeTaskHub() {
   const progress = useBeginnerProgress();
   const recentArticles = useRecentArticles();
@@ -86,7 +91,10 @@ export function HomeTaskHub() {
               ? `已完成 ${progress.completedSlugs.length} / ${beginnerSeriesSlugs.length} 篇，从第 ${resumeIndex} 篇继续。`
               : "从游戏界面、tick 和第一只 Creep 开始，逐步写出可运行的房间基础代码。"}
           </p>
-          <Link href={`/blog/${resumeSlug}`}>
+          <Link
+            href={`/blog/${resumeSlug}`}
+            onClick={() => trackHomeAction(hasProgress ? "resume_beginner" : "start_beginner")}
+          >
             {hasProgress ? "继续学习" : "开始新手路线"} <span aria-hidden="true">→</span>
           </Link>
         </article>
@@ -96,7 +104,11 @@ export function HomeTaskHub() {
           <p className="eyebrow">解决当前问题</p>
           <h3>搜索错误码、API 或中文问题</h3>
           <p>支持 Creep、Memory、ERR_NOT_IN_RANGE、Spawn 失败、CPU bucket 等常见说法。</p>
-          <form action="/search" role="search">
+          <form
+            action="/search"
+            role="search"
+            onSubmit={() => trackHomeAction("submit_search")}
+          >
             <label htmlFor="home-task-search">描述你遇到的问题</label>
             <div>
               <input id="home-task-search" name="q" type="search" placeholder="例如：Creep 不移动" />
@@ -111,8 +123,8 @@ export function HomeTaskHub() {
           <h3>进入系统知识库与工具</h3>
           <p>按 Memory、Spawn、经济、寻路、防御、市场和运行诊断查找专题内容。</p>
           <div className={styles.links}>
-            <Link href="/knowledge">浏览知识库 →</Link>
-            <Link href="/tools">打开工具中心 →</Link>
+            <Link href="/knowledge" onClick={() => trackHomeAction("open_knowledge")}>浏览知识库 →</Link>
+            <Link href="/tools" onClick={() => trackHomeAction("open_tools")}>打开工具中心 →</Link>
           </div>
         </article>
       </div>
@@ -122,7 +134,11 @@ export function HomeTaskHub() {
           <span>最近阅读</span>
           <div>
             {recentArticles.slice(0, 3).map((article) => (
-              <Link href={article.href} key={article.slug}>
+              <Link
+                href={article.href}
+                key={article.slug}
+                onClick={() => trackHomeAction("resume_recent_article")}
+              >
                 <strong>{article.title}</strong>
                 <small>继续阅读 →</small>
               </Link>
