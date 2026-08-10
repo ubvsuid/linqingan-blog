@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import {
-  getVerifiedContent,
   getVerifiedContentSummary,
+  getVerifiedContentWithEvidence,
+  type VerifiedEvidencePreview,
 } from "@/lib/verified-content";
 
 import styles from "../english.module.css";
@@ -17,6 +18,8 @@ export const metadata = createEnglishPageMetadata({
   chinesePath: "/verified",
 });
 
+export const revalidate = 300;
+
 function formatEnglishDate(value: string): string {
   return new Intl.DateTimeFormat("en", {
     dateStyle: "medium",
@@ -24,8 +27,19 @@ function formatEnglishDate(value: string): string {
   }).format(new Date(`${value}T00:00:00.000Z`));
 }
 
-export default function EnglishVerifiedPage() {
-  const verifiedPosts = getVerifiedContent("en");
+function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
+  const parts: string[] = [];
+  if (evidence.apiName) parts.push(evidence.apiName);
+  if (evidence.returnCode) parts.push(`returned ${evidence.returnCode}`);
+  if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
+  if (evidence.tickStart !== null && evidence.tickEnd !== null) {
+    parts.push(`ticks ${evidence.tickStart}–${evidence.tickEnd}`);
+  }
+  return parts.join(" · ");
+}
+
+export default async function EnglishVerifiedPage() {
+  const verifiedPosts = await getVerifiedContentWithEvidence("en");
   const { liveCount, consoleCount } = getVerifiedContentSummary(verifiedPosts);
 
   return (
@@ -43,7 +57,7 @@ export default function EnglishVerifiedPage() {
           <p className="eyebrow">RECENTLY VERIFIED</p>
           <h1>Screeps guides with recorded runtime evidence</h1>
           <p>
-            Documentation review and offline simulation do not automatically count as live proof. A guide appears here only when the shared article record explicitly contains Console testing or live multi-tick verification.
+            Documentation review and offline simulation do not automatically count as live proof. A guide appears here only when its shared source article has Console or live multi-tick runtime evidence.
           </p>
         </header>
 
@@ -75,7 +89,15 @@ export default function EnglishVerifiedPage() {
                     <small>
                       Verified {formatEnglishDate(post.date)}
                       {post.testEnvironment ? ` · ${post.testEnvironment}` : ""}
+                      {post.evidenceCount > 0 ? ` · ${post.evidenceCount} structured evidence record${post.evidenceCount === 1 ? "" : "s"}` : ""}
                     </small>
+                    {post.latestEvidence ? (
+                      <p>
+                        <strong>Latest structured evidence:</strong>{" "}
+                        {formatEvidencePreview(post.latestEvidence)}
+                        {post.latestEvidence.note ? ` · ${post.latestEvidence.note}` : ""}
+                      </p>
+                    ) : null}
                     <p><Link href={post.href}>Open guide verification status →</Link></p>
                   </div>
                 </div>
@@ -86,7 +108,7 @@ export default function EnglishVerifiedPage() {
           <section className={styles.notice}>
             <strong>No public English guide currently has mapped Console or live multi-tick verification.</strong>
             <p>
-              This page intentionally remains empty until the shared source verification fields contain real evidence. The evidence backlog lists the highest-priority observations still needed.
+              This page intentionally remains empty until a source article has real runtime evidence. The controlled evidence pipeline can promote a mapped guide without maintaining a separate hand-written list.
             </p>
             <Link href="/en/evidence">Open the live-evidence backlog →</Link>
           </section>
