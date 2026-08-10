@@ -26,6 +26,8 @@ Required runtime secret:
 
 The value is never committed to GitHub. When `DATABASE_URL` is missing, database-backed features must degrade safely.
 
+For rollout safety, new database integrations are first configured as a branch-scoped Vercel Preview environment variable and validated there before the same secret is enabled for Production. The Search V2 response exposes `X-Search-Source: static|database`, which is used during rollout verification.
+
 ## Initial tables
 
 - `search_documents`: searchable copies of public content metadata and compact recall text.
