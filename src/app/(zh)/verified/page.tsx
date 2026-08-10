@@ -4,8 +4,9 @@ import { Container } from "@/components/container";
 import { formatDate } from "@/lib/date";
 import { createPageMetadata } from "@/lib/metadata";
 import {
-  getVerifiedContent,
   getVerifiedContentSummary,
+  getVerifiedContentWithEvidence,
+  type VerifiedEvidencePreview,
 } from "@/lib/verified-content";
 
 import styles from "./verified.module.css";
@@ -17,8 +18,21 @@ export const metadata = createPageMetadata({
   path: "/verified",
 });
 
-export default function VerifiedPage() {
-  const verifiedPosts = getVerifiedContent("zh");
+export const revalidate = 300;
+
+function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
+  const parts: string[] = [];
+  if (evidence.apiName) parts.push(evidence.apiName);
+  if (evidence.returnCode) parts.push(`返回 ${evidence.returnCode}`);
+  if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
+  if (evidence.tickStart !== null && evidence.tickEnd !== null) {
+    parts.push(`Tick ${evidence.tickStart}–${evidence.tickEnd}`);
+  }
+  return parts.join(" · ");
+}
+
+export default async function VerifiedPage() {
+  const verifiedPosts = await getVerifiedContentWithEvidence("zh");
   const { liveCount, consoleCount } = getVerifiedContentSummary(verifiedPosts);
 
   return (
@@ -36,7 +50,7 @@ export default function VerifiedPage() {
           <p className="eyebrow">RECENTLY VERIFIED</p>
           <h1>最近验证的 Screeps 内容</h1>
           <p>
-            这里不会把“文档核对”或“离线模拟”自动升级成真实环境验证。只有文章已经记录 Screeps Console 或真实主循环证据时，才会进入这个列表。
+            这里不会把“文档核对”或“离线模拟”自动升级成真实环境验证。只有文章验证字段已经明确接受 Screeps Console 或真实主循环证据时，才会进入这个列表；结构化证据只负责补充可核对的运行细节。
           </p>
         </header>
 
@@ -59,12 +73,22 @@ export default function VerifiedPage() {
                   <strong>{post.level === "live" ? "真实主循环" : "Screeps Console"}</strong>
                   <time dateTime={post.date}>{formatDate(post.date)}</time>
                   {post.testEnvironment ? <span>{post.testEnvironment}</span> : null}
+                  {post.evidenceCount > 0 ? <span>{post.evidenceCount} 条运行证据</span> : null}
                 </div>
                 <div>
                   <h2>
                     <Link href={post.href}>{post.title}</Link>
                   </h2>
                   <p>{post.description}</p>
+                  {post.latestEvidence ? (
+                    <div className={styles.runtimeEvidence}>
+                      <strong>最近一条结构化证据</strong>
+                      {formatEvidencePreview(post.latestEvidence) ? (
+                        <span>{formatEvidencePreview(post.latestEvidence)}</span>
+                      ) : null}
+                      {post.latestEvidence.note ? <span>{post.latestEvidence.note}</span> : null}
+                    </div>
+                  ) : null}
                   <Link href={post.href}>查看验证状态 →</Link>
                 </div>
               </article>
@@ -74,7 +98,7 @@ export default function VerifiedPage() {
           <section className={styles.empty}>
             <strong>当前还没有达到 Console / 真实主循环等级的公开文章。</strong>
             <p>
-              页面仍然保留，因为它会直接读取文章验证字段；后续获得真实证据后会自动出现，不需要手工维护一份“已验证清单”。
+              真实证据可以先进入受控证据库，但只有文章的 Markdown 验证字段经过审核并明确接受对应等级后，才会出现在这里。
             </p>
           </section>
         )}

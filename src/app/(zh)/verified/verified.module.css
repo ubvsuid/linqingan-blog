@@ -68,6 +68,22 @@
   line-height: 1.7;
 }
 
+.runtimeEvidence {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  border-left: 2px solid var(--border);
+  padding-left: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.runtimeEvidence strong {
+  color: var(--foreground);
+  font-size: 12px;
+}
+
 .list a:last-child {
   display: inline-block;
   margin-top: 14px;
