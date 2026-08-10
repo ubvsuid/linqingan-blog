@@ -71,6 +71,27 @@ if (fs.existsSync(publicWriteRoute)) {
   throw new Error("Public verification evidence API route is forbidden in Phase 3A.");
 }
 
+const verifiedContentSource = fs.readFileSync(
+  path.join(process.cwd(), "src/lib/verified-content.ts"),
+  "utf8",
+);
+if (!verifiedContentSource.includes("function keepAcceptedEvidence")) {
+  throw new Error("Structured evidence must pass the Markdown acceptance boundary before public rendering.");
+}
+if (
+  !verifiedContentSource.includes(
+    "post.verification.consoleTested || post.verification.liveTested",
+  )
+) {
+  throw new Error("Markdown runtime verification flags must remain the public verified-list source of truth.");
+}
+if (
+  !verifiedContentSource.includes("verification.liveTested") ||
+  !verifiedContentSource.includes("verification.consoleTested")
+) {
+  throw new Error("Structured Console/live evidence must be filtered by the matching accepted Markdown level.");
+}
+
 for (const pagePath of [
   "src/app/(zh)/verified/page.tsx",
   "src/app/(en)/en/verified/page.tsx",
@@ -85,5 +106,5 @@ for (const pagePath of [
 }
 
 console.log(
-  "Verification evidence pipeline check passed: bounded payload validation, no public write route, and bilingual verified-page integration are present.",
+  "Verification evidence pipeline check passed: bounded payload validation, no public write route, Markdown acceptance gating, and bilingual verified-page integration are present.",
 );
