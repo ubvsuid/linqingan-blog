@@ -36,7 +36,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </p>
         </header>
 
-        <SiteSearchV2 initialQuery={initialQuery} />
+        <section aria-label="筛选搜索结果">
+          <SiteSearchV2 initialQuery={initialQuery} />
+        </section>
       </Container>
 
       <style>{`
