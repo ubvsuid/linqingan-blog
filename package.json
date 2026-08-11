@@ -60,7 +60,7 @@
     "englishtower13check": "node scripts/check-english-tower-13.mjs",
     "englishcontroller14check": "node scripts/check-english-controller-14.mjs",
     "englishconstruction15check": "node scripts/check-english-construction-15.mjs",
-    "englishconfig16check": "node scripts/check-english-config-code-content-16.mjs",
+    "englishconfig16check": "node scripts/check-english-config-16.mjs",
     "englishdefense17check": "node scripts/check-english-defense-17.mjs",
     "englishlinksource18check": "node scripts/check-english-link-source-18.mjs",
     "simulationcheck": "node scripts/run-article-simulations.mjs",
