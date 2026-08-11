@@ -61,6 +61,9 @@ for (const fixture of [
 if (!entityIntent.includes("matchedKinds.size >= 2")) {
   failures.push("Symptom propagation must require multi-entity evidence when there is no direct symptom match.");
 }
+if (!entityIntent.includes("Math.round(direct * 2)")) {
+  failures.push("Multi-signal symptom propagation must preserve weak direct symptom context so object words such as Spawn can break generic ties without making a return code alone sufficient.");
+}
 if (!entityIntent.includes('node.kind === "symptom" ? 24')) {
   failures.push("Symptom-first intent results must receive an explicit promotion bonus.");
 }
