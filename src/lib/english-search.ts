@@ -1,7 +1,10 @@
 import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
-import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
+import {
+  getScreepsErrorDiagnosticHref,
+  screepsErrorDiagnostics,
+} from "@/lib/screeps-error-diagnostics";
 import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 
 export interface EnglishSearchDocument {
@@ -71,7 +74,6 @@ const foundationDocuments: EnglishSearchDocument[] = [
       "screeps error",
       "diagnostic path",
       ...screepsErrorDiagnostics.map((diagnostic) => diagnostic.name),
-      ...screepsErrorDiagnostics.flatMap((diagnostic) => diagnostic.enSearchTerms),
     ], 24),
   },
   { id: "english-glossary", title: "Screeps Glossary", description: "Definitions for Creep, Spawn, tick, Memory, Controller, RCL, GCL, CPU, bucket, store, and fatigue.", href: "/en/glossary", type: "Reference", keywords: ["glossary", "creep", "spawn", "tick", "rcl", "gcl", "bucket", "fatigue"] },
@@ -83,6 +85,22 @@ const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-roadmap", title: "English Site Roadmap", description: "Completed work, next improvements, evidence-dependent tasks, tool development, accessibility, and performance checks.", href: "/en/roadmap", type: "Page", keywords: ["roadmap", "next", "planned", "evidence", "performance"] },
   { id: "english-license", title: "Content and Code Use", description: "Current boundaries for reusing site content, code examples, third-party names, and commercial material.", href: "/en/license", type: "Reference", keywords: ["license", "copyright", "reuse", "permission", "code examples"] },
 ];
+
+const errorDiagnosticDocuments: EnglishSearchDocument[] = screepsErrorDiagnostics.map(
+  (diagnostic) => ({
+    id: `english-error-${diagnostic.name.toLowerCase()}`,
+    title: `${diagnostic.name} Screeps diagnostic path`,
+    description: diagnostic.enSummary,
+    href: getScreepsErrorDiagnosticHref(diagnostic.name, "en"),
+    type: "Reference",
+    keywords: compactKeywords([
+      diagnostic.name,
+      "Screeps error code",
+      ...diagnostic.enSearchTerms,
+      ...diagnostic.enChecks,
+    ]),
+  }),
+);
 
 const apiHubDocuments: EnglishSearchDocument[] = screepsApiHubs.map((hub) => ({
   id: `english-api-hub-${hub.slug}`,
@@ -131,6 +149,7 @@ export const englishSearchDocuments: EnglishSearchDocument[] = [
   ...topicDocuments,
   ...toolDocuments,
   ...apiHubDocuments,
+  ...errorDiagnosticDocuments,
   ...foundationDocuments,
 ];
 

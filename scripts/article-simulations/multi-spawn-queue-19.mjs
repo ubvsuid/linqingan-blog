@@ -86,7 +86,7 @@ for (const tag of ["spawn", "creeps", "automation", "debugging"]) {
   }
 }
 
-const chineseBlocks = [...chinese.matchAll(/```js\n([\s\S]*?)```/g)]
+const chineseBlocks = [...chinese.matchAll(/```js\r?\n([\s\S]*?)```/g)]
   .map((match) => match[1]);
 const englishBlocks = [...english.matchAll(
   /<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g,

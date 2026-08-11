@@ -4,7 +4,10 @@ import { getSearchablePosts } from "@/lib/posts";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
-import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
+import {
+  getScreepsErrorDiagnostic,
+  getScreepsErrorDiagnosticHref,
+} from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 import { getToolHref, toolCatalog, toolCount } from "@/lib/tool-catalog";
@@ -191,7 +194,9 @@ export function getSearchDocuments(
       type: "错误码",
       title: `${code.name}（${code.value}）`,
       description: code.meaning,
-      href: `/screeps-errors#${code.name.toLowerCase()}`,
+      href: diagnostic
+        ? getScreepsErrorDiagnosticHref(code.name, "zh")
+        : `/screeps-errors#${code.name.toLowerCase()}`,
       meta: diagnostic ? `返回值 ${code.value} · 重点诊断路径` : `返回值 ${code.value}`,
       keywords: compactKeywords([
         code.name,

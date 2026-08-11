@@ -9,6 +9,10 @@ import {
   type ScreepsApiReferenceEntry,
 } from "@/lib/screeps-api-reference";
 import type { ScreepsApiLocale } from "@/lib/screeps-api-reference-localized";
+import {
+  getScreepsErrorDiagnosticHref,
+  getScreepsErrorDiagnosticsForApiEntry,
+} from "@/lib/screeps-error-diagnostics";
 
 import styles from "./screeps-api-explorer.module.css";
 
@@ -34,6 +38,7 @@ export function ScreepsApiExplorer({
         filterLabel: "Filter APIs by group",
         summary: (visible: number, total: number) => `Showing ${visible} / ${total} entries`,
         keywordsLabel: "Related keywords",
+        diagnostics: "Related diagnostic paths",
         guide: "Open site guide →",
         emptyTitle: "No matching API entry",
         emptyBody: "Try an object name, method name, or a shorter keyword, or continue with site search.",
@@ -47,6 +52,7 @@ export function ScreepsApiExplorer({
         filterLabel: "API 分类筛选",
         summary: (visible: number, total: number) => `当前显示 ${visible} / ${total} 项`,
         keywordsLabel: "相关关键词",
+        diagnostics: "相关诊断路径",
         guide: "查看站内说明 →",
         emptyTitle: "没有找到匹配项",
         emptyBody: "可以改用对象名、方法名或更短的关键词，也可以继续使用站内搜索。",
@@ -127,28 +133,52 @@ export function ScreepsApiExplorer({
 
       {visibleEntries.length > 0 ? (
         <div className={styles.grid}>
-          {visibleEntries.map((entry) => (
-            <article id={entry.id} key={entry.id}>
-              <span className={styles.group}>{entry.group}</span>
-              <h2>
-                <code>{entry.signature}</code>
-              </h2>
-              <p>{entry.summary}</p>
-              <div className={styles.keywords} aria-label={copy.keywordsLabel}>
-                {entry.keywords.slice(0, 4).map((keyword) => (
-                  <span key={keyword}>{keyword}</span>
-                ))}
-              </div>
-              {entry.guideHref ? (
-                <Link
-                  href={entry.guideHref}
-                  onClick={() => track("api_reference_guide_open", { locale, entry: entry.id })}
-                >
-                  {copy.guide}
-                </Link>
-              ) : null}
-            </article>
-          ))}
+          {visibleEntries.map((entry) => {
+            const relatedDiagnostics = getScreepsErrorDiagnosticsForApiEntry(entry.id);
+
+            return (
+              <article id={entry.id} key={entry.id}>
+                <span className={styles.group}>{entry.group}</span>
+                <h2>
+                  <code>{entry.signature}</code>
+                </h2>
+                <p>{entry.summary}</p>
+                <div className={styles.keywords} aria-label={copy.keywordsLabel}>
+                  {entry.keywords.slice(0, 4).map((keyword) => (
+                    <span key={keyword}>{keyword}</span>
+                  ))}
+                </div>
+                {relatedDiagnostics.length > 0 ? (
+                  <nav className={styles.diagnostics} aria-label={copy.diagnostics}>
+                    <span>{copy.diagnostics}</span>
+                    <div>
+                      {relatedDiagnostics.map((diagnostic) => (
+                        <Link
+                          key={diagnostic.name}
+                          href={getScreepsErrorDiagnosticHref(diagnostic.name, locale)}
+                          onClick={() => track("api_reference_error_open", {
+                            locale,
+                            entry: entry.id,
+                            error: diagnostic.name,
+                          })}
+                        >
+                          <code>{diagnostic.name}</code>
+                        </Link>
+                      ))}
+                    </div>
+                  </nav>
+                ) : null}
+                {entry.guideHref ? (
+                  <Link
+                    href={entry.guideHref}
+                    onClick={() => track("api_reference_guide_open", { locale, entry: entry.id })}
+                  >
+                    {copy.guide}
+                  </Link>
+                ) : null}
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className={styles.empty}>

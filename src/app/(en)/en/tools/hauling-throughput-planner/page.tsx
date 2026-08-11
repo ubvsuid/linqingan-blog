@@ -59,7 +59,7 @@ export default function HaulingThroughputPlannerPage() {
             <p>Path changes, damaged MOVE parts, pull chains, hostile delays, source downtime, blocked transfer targets, and container capacity must still be checked in the live room.</p>
             <div className="planning-tool-links">
               <Link href="/en/blog/screeps-move-fatigue-body-ratio">Understand MOVE and fatigue ratios →</Link>
-              <Link href="/en/blog/screeps-creep-withdraw-container-energy">Verify Container withdrawal logic →</Link>
+              <Link href="/en/blog/screeps-withdraw-container-energy">Verify Container withdrawal logic →</Link>
               <a href="https://docs.screeps.com/creeps.html" rel="noreferrer" target="_blank">Official Creep movement documentation ↗</a>
             </div>
           </div>

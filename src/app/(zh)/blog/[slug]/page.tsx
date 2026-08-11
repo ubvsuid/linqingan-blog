@@ -10,6 +10,7 @@ import { ArticleToc } from "@/components/article-toc";
 import { ArticleVerificationSummary } from "@/components/article-verification-summary";
 import { ArticleLearningContext } from "@/components/article-learning-context";
 import { Container } from "@/components/container";
+import { RelatedErrorDiagnostics } from "@/components/related-error-diagnostics";
 import {
   beginnerSeriesSlugs,
   getBeginnerSeriesIndex,
@@ -280,6 +281,8 @@ export default async function PostPage({ params }: PostPageProps) {
             title={post.title}
             toc={post.tableOfContents}
           />
+
+          <RelatedErrorDiagnostics href={`/blog/${post.slug}`} locale="zh" />
 
           <ArticleFeedback
             slug={post.slug}

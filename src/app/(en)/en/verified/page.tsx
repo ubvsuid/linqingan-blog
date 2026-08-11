@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { RelatedErrorDiagnostics } from "@/components/related-error-diagnostics";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import {
   getVerifiedContentSummary,
@@ -96,6 +97,7 @@ export default async function EnglishVerifiedPage() {
                         {formatEvidencePreview(post.latestEvidence)} · {post.latestEvidence.note}
                       </p>
                     ) : null}
+                    <RelatedErrorDiagnostics href={post.href} locale="en" variant="compact" />
                     <p><Link href={post.href}>Open guide verification status →</Link></p>
                   </div>
                 </div>

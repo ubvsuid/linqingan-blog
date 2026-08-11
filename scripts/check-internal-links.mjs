@@ -93,6 +93,10 @@ function normalizeHref(value) {
 }
 
 function hasPageForRoute(route) {
+  if (/^\/en\/blog\/[a-z0-9-]+$/.test(route)) {
+    return exactRoutes.has(route);
+  }
+
   const routeParts = route.slice(1).split("/").filter(Boolean);
   const routeRoot = routeParts[0] === "en"
     ? path.join(root, "src", "app", "(en)")
@@ -103,9 +107,6 @@ function hasPageForRoute(route) {
   const routePath = path.join(routeRoot, ...routeParts, "route.ts");
   if (fs.existsSync(routePath)) return true;
 
-  if (/^\/en\/blog\/[a-z0-9-]+$/.test(route)) {
-    return fs.existsSync(path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx"));
-  }
   if (/^\/en\/knowledge\/[a-z0-9-]+$/.test(route)) {
     return fs.existsSync(path.join(root, "src", "app", "(en)", "en", "knowledge", "[module]", "page.tsx"));
   }

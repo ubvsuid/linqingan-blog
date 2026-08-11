@@ -73,7 +73,7 @@ function decodeHtml(code) {
 }
 
 const chineseBlocks = [
-  ...chinese.matchAll(/```js\n([\s\S]*?)```/g),
+  ...chinese.matchAll(/```js\r?\n([\s\S]*?)```/g),
 ].map((match) => match[1]);
 const englishBlocks = [
   ...english.matchAll(

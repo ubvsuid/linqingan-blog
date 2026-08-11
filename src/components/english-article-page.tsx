@@ -4,6 +4,7 @@ import { ArticleFeedback } from "@/components/article-feedback";
 import { ArticleRuntimeEvidenceCard } from "@/components/article-runtime-evidence-card";
 import { Container } from "@/components/container";
 import { EnglishArticleLearningTracker } from "@/components/english-learning-progress";
+import { RelatedErrorDiagnostics } from "@/components/related-error-diagnostics";
 import {
   englishDiscoveryArticles,
   getEnglishDiscoveryArticle,
@@ -238,6 +239,8 @@ export async function EnglishArticlePage({
           </nav>
 
           <div className="article-content" dangerouslySetInnerHTML={{ __html: articleHtml }} />
+
+          <RelatedErrorDiagnostics href={resolvedArticleHref} locale="en" />
 
           <section className="english-source-panel" aria-labelledby={`english-source-title-${articleSlug}`}>
             <div>

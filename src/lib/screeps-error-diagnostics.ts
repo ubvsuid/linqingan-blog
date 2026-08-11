@@ -70,7 +70,7 @@ export const screepsErrorDiagnostics = [
       "Check range, routeCallback, roomCallback, or CostMatrix rules that may exclude every usable route.",
       "When using PathFinder directly, inspect incomplete, path, cost, and ops rather than the path array alone.",
     ],
-    apiEntryIds: ["creep-move-to", "game-map-find-route", "pathfinder-search"],
+    apiEntryIds: ["creep-move-to", "game-map-find-route"],
     hubSlugs: ["creep", "room"],
     guides: [
       { zhLabel: "ERR_NO_PATH 排查流程", enLabel: "ERR_NO_PATH troubleshooting", zhHref: "/blog/screeps-err-no-path", enHref: "/en/blog/screeps-err-no-path" },
@@ -98,10 +98,10 @@ export const screepsErrorDiagnostics = [
       "Compare the requested amount with real availability, transaction cost, or recipe consumption.",
       "Retry only after the resource state changes, then store the new result to confirm the failure branch changed.",
     ],
-    apiEntryIds: ["spawn-spawn-creep", "terminal-send", "market-deal", "lab-run-reaction", "lab-boost-creep", "factory-produce"],
-    hubSlugs: ["structure-spawn", "market"],
+    apiEntryIds: ["creep-transfer", "creep-upgrade-controller", "spawn-spawn-creep", "terminal-send", "market-deal", "lab-run-reaction", "lab-boost-creep", "factory-produce"],
+    hubSlugs: ["creep", "structure-spawn", "market"],
     guides: [
-      { zhLabel: "动态 Creep Body 与 Energy", enLabel: "Dynamic Creep body and Energy", zhHref: "/blog/screeps-dynamic-creep-body-energy", enHref: "/en/blog/screeps-dynamic-creep-body-energy" },
+      { zhLabel: "动态 Creep Body 与 Energy", enLabel: "Dynamic Creep body and Energy", zhHref: "/blog/screeps-dynamic-creep-body-energy", enHref: "/en/blog/screeps-dynamic-creep-body" },
       { zhLabel: "Terminal 发送资源", enLabel: "Terminal resource sending", zhHref: "/blog/screeps-terminal-send-resources", enHref: "/en/blog/screeps-terminal-send-resources" },
       { zhLabel: "Power Spawn 资源检查", enLabel: "Power Spawn resource checks", zhHref: "/blog/screeps-power-spawn-process-power", enHref: "/en/blog/screeps-power-spawn-process-power" },
     ],
@@ -129,12 +129,12 @@ export const screepsErrorDiagnostics = [
       "Confirm that the same tick is not submitting mutually exclusive actions to the same object.",
       "After waiting or reassigning, store the next result so a persistent failure is not mistaken for normal queueing.",
     ],
-    apiEntryIds: ["spawn-spawn-creep", "spawn-renew-creep", "spawn-recycle-creep"],
+    apiEntryIds: ["spawn-spawn-creep", "spawn-renew-creep"],
     hubSlugs: ["structure-spawn"],
     guides: [
       { zhLabel: "spawnCreep() 返回码", enLabel: "spawnCreep() return codes", zhHref: "/blog/screeps-spawncreep-return-codes", enHref: "/en/blog/screeps-spawncreep-return-codes" },
-      { zhLabel: "renewCreep() 与 Spawn 状态", enLabel: "renewCreep() and Spawn state", zhHref: "/blog/screeps-spawn-renew-creep", enHref: "/en/blog/screeps-spawn-renew-creep" },
-      { zhLabel: "recycleCreep() 返回值边界", enLabel: "recycleCreep() return-value boundaries", zhHref: "/blog/screeps-spawn-recycle-creep", enHref: "/en/blog/screeps-spawn-recycle-creep" },
+      { zhLabel: "renewCreep() 与 Spawn 状态", enLabel: "renewCreep() and Spawn state", zhHref: "/blog/screeps-spawn-renew-creep", enHref: "/en/blog/screeps-renew-creep" },
+      { zhLabel: "recycleCreep() 返回值边界", enLabel: "recycleCreep() return-value boundaries", zhHref: "/blog/screeps-spawn-recycle-creep", enHref: "/en/blog/screeps-recycle-creep" },
     ],
     tools: [
       { zhLabel: "Spawn 队列与替换规划器", enLabel: "Spawn Queue and Replacement Planner", zhHref: "/tools/spawn-queue-replacement-planner", enHref: "/en/tools/spawn-queue-replacement-planner" },
@@ -161,7 +161,7 @@ export const screepsErrorDiagnostics = [
     apiEntryIds: ["creep-transfer", "creep-withdraw", "creep-upgrade-controller", "room-create-construction-site"],
     hubSlugs: ["creep", "room", "controller"],
     guides: [
-      { zhLabel: "安全使用 withdraw()", enLabel: "Safe withdraw() usage", zhHref: "/blog/screeps-creep-withdraw-container-energy", enHref: "/en/blog/screeps-creep-withdraw-container-energy" },
+      { zhLabel: "安全使用 withdraw()", enLabel: "Safe withdraw() usage", zhHref: "/blog/screeps-creep-withdraw-container-energy", enHref: "/en/blog/screeps-withdraw-container-energy" },
       { zhLabel: "创建 Construction Site", enLabel: "Create Construction Sites", zhHref: "/blog/screeps-room-create-construction-site", enHref: "/en/blog/screeps-room-create-construction-site" },
     ],
     tools: [
@@ -317,6 +317,37 @@ export const screepsErrorDiagnostics = [
 
 export function getScreepsErrorDiagnostic(name: string): ScreepsErrorDiagnostic | null {
   return screepsErrorDiagnostics.find((diagnostic) => diagnostic.name === name) ?? null;
+}
+
+export function getScreepsErrorDiagnosticHref(
+  name: string,
+  locale: ScreepsErrorDiagnosticLocale,
+): string {
+  const root = locale === "en" ? "/en/screeps-errors" : "/screeps-errors";
+  return `${root}#diagnostic-${name.toLowerCase()}`;
+}
+
+export function getScreepsErrorDiagnosticsForApiEntry(
+  apiEntryId: string,
+): ScreepsErrorDiagnostic[] {
+  return screepsErrorDiagnostics.filter((diagnostic) =>
+    (diagnostic.apiEntryIds as readonly string[]).includes(apiEntryId),
+  );
+}
+
+export function getScreepsErrorDiagnosticsForHref(
+  href: string,
+  locale: ScreepsErrorDiagnosticLocale,
+): ScreepsErrorDiagnostic[] {
+  return screepsErrorDiagnostics.filter((diagnostic) => {
+    const links: readonly ScreepsErrorDiagnosticLink[] = [
+      ...diagnostic.guides,
+      ...diagnostic.tools,
+    ];
+    return links.some((link) =>
+      locale === "en" ? link.enHref === href : link.zhHref === href,
+    );
+  });
 }
 
 export function getLocalizedErrorDiagnosticLink(

@@ -120,7 +120,7 @@ export const screepsApiHubs: readonly ScreepsApiHubConfig[] = [
     enScope:
       "Room is both a visibility boundary and a container for room-level state. This hub only aggregates Room surfaces already covered by the site and does not pretend to be a complete API reference.",
     entryIds: ["game-rooms", "room-create-construction-site", "room-get-event-log"],
-    errorNames: ["ERR_INVALID_ARGS", "ERR_INVALID_TARGET", "ERR_RCL_NOT_ENOUGH", "ERR_NOT_OWNER"],
+    errorNames: ["ERR_NO_PATH", "ERR_INVALID_ARGS", "ERR_INVALID_TARGET", "ERR_RCL_NOT_ENOUGH", "ERR_NOT_OWNER"],
     tools: [
       {
         zhLabel: "房间运行诊断",

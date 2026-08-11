@@ -8,6 +8,10 @@ import {
   type ScreepsApiHubLocale,
 } from "@/lib/screeps-api-hubs";
 import { getLocalizedScreepsApiReference } from "@/lib/screeps-api-reference-localized";
+import {
+  getScreepsErrorDiagnostic,
+  getScreepsErrorDiagnosticHref,
+} from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { siteConfig } from "@/lib/site";
 import { getVerifiedContentWithEvidence } from "@/lib/verified-content";
@@ -176,7 +180,14 @@ export async function ScreepsApiHubPage({
             <p>{copy.errorBody}</p>
             <div className={styles.linkStack}>
               {errors.map((error) => (
-                <Link key={error.name} href={`${errorsHref}#${error.name.toLowerCase()}`}>
+                <Link
+                  key={error.name}
+                  href={
+                    getScreepsErrorDiagnostic(error.name)
+                      ? getScreepsErrorDiagnosticHref(error.name, locale)
+                      : `${errorsHref}#${error.name.toLowerCase()}`
+                  }
+                >
                   <span><code>{error.name}</code> <small>{copy.result} {error.value}</small></span>
                   {!isEnglish ? <em>{error.meaning}</em> : null}
                 </Link>

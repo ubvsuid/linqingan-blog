@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { RelatedErrorDiagnostics } from "@/components/related-error-diagnostics";
 import { formatDate } from "@/lib/date";
 import { createPageMetadata } from "@/lib/metadata";
 import {
@@ -86,6 +87,7 @@ export default async function VerifiedPage() {
                       <span>{post.latestEvidence.note}</span>
                     </div>
                   ) : null}
+                  <RelatedErrorDiagnostics href={post.href} locale="zh" variant="compact" />
                   <Link href={post.href}>查看验证状态 →</Link>
                 </div>
               </article>

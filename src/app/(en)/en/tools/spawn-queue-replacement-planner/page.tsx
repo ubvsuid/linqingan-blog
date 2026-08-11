@@ -59,7 +59,7 @@ export default function SpawnQueueReplacementPlannerPage() {
             <p>Real production can still fail because replacement deadlines cluster, room Energy is not ready, a Spawn is disrupted, spawn directions are blocked, or queue priorities change.</p>
             <div className="planning-tool-links">
               <Link href="/en/blog/screeps-spawncreep-return-codes">Debug spawnCreep return codes →</Link>
-              <Link href="/en/blog/screeps-spawn-emergency-recovery">Build an emergency recovery queue →</Link>
+              <Link href="/en/blog/screeps-emergency-harvester-recovery">Build an emergency recovery queue →</Link>
               <a href="https://docs.screeps.com/creeps.html" rel="noreferrer" target="_blank">Official Creep documentation ↗</a>
               <a href="https://docs.screeps.com/power.html" rel="noreferrer" target="_blank">Official Power documentation ↗</a>
             </div>

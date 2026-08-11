@@ -29,7 +29,7 @@ export async function ScreepsErrorDiagnosticNetwork({
     ? {
         eyebrow: "DIAGNOSTIC NETWORK",
         title: "High-frequency error paths",
-        body: "Start from a return code, then move through the APIs, object hubs, focused guides, tools, and accepted runtime verification already connected to that failure branch.",
+        body: "Start from a return code, then move through the APIs, object hubs, focused guides, tools, and current runtime-verification status connected to that failure branch.",
         pathCount: "priority paths",
         checkNext: "What should I check next?",
         api: "API surfaces",
@@ -46,7 +46,7 @@ export async function ScreepsErrorDiagnosticNetwork({
     : {
         eyebrow: "DIAGNOSTIC NETWORK",
         title: "高频错误诊断路径",
-        body: "从返回码出发，继续进入它已经关联的 API、对象 Hub、专题教程、工具与已接受 Runtime Verification，而不是停留在错误码释义。",
+        body: "从返回码出发，继续进入它已经关联的 API、对象 Hub、专题教程、工具与当前 Runtime Verification 状态，而不是停留在错误码释义。",
         pathCount: "条重点路径",
         checkNext: "下一步检查什么？",
         api: "相关 API",
