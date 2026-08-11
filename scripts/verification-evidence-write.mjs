@@ -53,12 +53,12 @@ for (const record of records) {
       : "";
   const gameTime = record.gameTime !== null ? ` Game.time=${record.gameTime}` : "";
   console.log(
-    `- ${record.articleSlug} | ${record.verificationType} | ${record.apiName}${gameTime}${tickWindow} | ${record.verifiedAt}`,
+    `- ${record.evidenceKey} | ${record.articleSlug} | captured | ${record.verificationType} | ${record.apiName}${gameTime}${tickWindow} | ${record.sourceRef} | ${record.verifiedAt}`,
   );
 }
 
 if (!commit) {
-  console.log("Dry run only. Re-run with --commit to write these records to Neon.");
+  console.log("Dry run only. Re-run with --commit to write these captured records to Neon.");
   process.exit(0);
 }
 
@@ -73,33 +73,16 @@ let inserted = 0;
 let skipped = 0;
 
 for (const record of records) {
-  const existing = await sql`
-    SELECT id
-    FROM verification_evidence
-    WHERE article_slug = ${record.articleSlug}
-      AND verification_type = ${record.verificationType}
-      AND api_name = ${record.apiName}
-      AND source_ref = ${record.sourceRef}
-      AND game_time IS NOT DISTINCT FROM ${record.gameTime}
-      AND tick_start IS NOT DISTINCT FROM ${record.tickStart}
-      AND tick_end IS NOT DISTINCT FROM ${record.tickEnd}
-    LIMIT 1;
-  `;
-
-  if (existing.length > 0) {
-    skipped += 1;
-    console.log(`Skipped existing evidence: ${record.articleSlug} / ${record.apiName}`);
-    continue;
-  }
-
   const beforeStateJson = record.beforeState === null ? null : JSON.stringify(record.beforeState);
   const afterStateJson = record.afterState === null ? null : JSON.stringify(record.afterState);
 
-  await sql`
+  const created = await sql`
     INSERT INTO verification_evidence (
+      evidence_key,
       article_slug,
       language,
       verification_type,
+      status,
       game_time,
       shard,
       room_name,
@@ -113,9 +96,11 @@ for (const record of records) {
       source_ref,
       verified_at
     ) VALUES (
+      ${record.evidenceKey},
       ${record.articleSlug},
       ${record.language},
       ${record.verificationType},
+      'captured',
       ${record.gameTime},
       ${record.shard},
       ${record.roomName},
@@ -128,11 +113,20 @@ for (const record of records) {
       ${record.evidenceNote},
       ${record.sourceRef},
       ${record.verifiedAt}::timestamptz
-    );
+    )
+    ON CONFLICT DO NOTHING
+    RETURNING evidence_key;
   `;
 
+  if (created.length === 0) {
+    skipped += 1;
+    console.log(`Skipped existing evidence: ${record.evidenceKey}`);
+    continue;
+  }
+
   inserted += 1;
-  console.log(`Inserted evidence: ${record.articleSlug} / ${record.apiName}`);
+  console.log(`Inserted captured evidence: ${record.evidenceKey}`);
 }
 
 console.log(`Verification evidence import complete: inserted=${inserted}, skipped=${skipped}.`);
+console.log("Imported rows remain internal until they are reviewed/accepted and the article Markdown verification state is explicitly updated.");
