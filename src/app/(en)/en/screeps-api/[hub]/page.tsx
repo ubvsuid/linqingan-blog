@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ScreepsApiHubPage } from "@/components/screeps-api-hub-page";
+import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import type { languageRoutePairs } from "@/lib/i18n";
 import {
   getScreepsApiHub,
   getScreepsApiHubHref,
   screepsApiHubSlugs,
 } from "@/lib/screeps-api-hubs";
-import { createEnglishPageMetadata } from "@/lib/english-metadata";
 
 export const revalidate = 300;
 
@@ -28,7 +29,7 @@ export async function generateMetadata({
     title: hub.enTitle,
     description: hub.enDescription,
     path: getScreepsApiHubHref(hub.slug, "en"),
-    chinesePath: getScreepsApiHubHref(hub.slug, "zh"),
+    chinesePath: getScreepsApiHubHref(hub.slug, "zh") as keyof typeof languageRoutePairs,
   });
 }
 
