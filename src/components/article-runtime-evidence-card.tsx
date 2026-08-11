@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { PublicVerificationEvidenceRecord } from "@/lib/verification-evidence";
+import { getEvidenceRelations } from "@/lib/verification-evidence-relations";
 
 import styles from "./article-runtime-evidence-card.module.css";
 
@@ -58,22 +59,31 @@ export function ArticleRuntimeEvidenceCard({
       </div>
 
       <div className={styles.list}>
-        {visible.map((record) => (
-          <article className={styles.item} key={record.evidenceKey}>
-            <div className={styles.meta}>
-              <span className={styles.key}>{record.evidenceKey}</span>
-              <span>{record.verificationType === "live" ? (locale === "zh" ? "真实主循环" : "Live multi-tick") : "Console"}</span>
-              <span>{record.apiName}</span>
-              <span>{formatDate(record.verifiedAt, locale)}</span>
-            </div>
-            {evidenceRuntimeSummary(record, locale).length > 0 ? (
+        {visible.map((record) => {
+          const runtimeSummary = evidenceRuntimeSummary(record, locale);
+          const relations = getEvidenceRelations(record, locale);
+          return (
+            <article className={styles.item} key={record.evidenceKey}>
               <div className={styles.meta}>
-                {evidenceRuntimeSummary(record, locale).map((part) => <span key={part}>{part}</span>)}
+                <span className={styles.key}>{record.evidenceKey}</span>
+                <span>{record.verificationType === "live" ? (locale === "zh" ? "真实主循环" : "Live multi-tick") : "Console"}</span>
+                <span>{record.apiName}</span>
+                <span>{formatDate(record.verifiedAt, locale)}</span>
               </div>
-            ) : null}
-            <p className={styles.note}>{record.evidenceNote}</p>
-          </article>
-        ))}
+              {runtimeSummary.length > 0 ? (
+                <div className={styles.meta}>
+                  {runtimeSummary.map((part) => <span key={part}>{part}</span>)}
+                </div>
+              ) : null}
+              <p className={styles.note}>{record.evidenceNote}</p>
+              <nav className={styles.relations} aria-label={locale === "zh" ? "关联知识" : "Related knowledge"}>
+                <Link href={relations.api.href}>{relations.api.label}</Link>
+                {relations.error ? <Link href={relations.error.href}>{relations.error.label}</Link> : null}
+                {relations.tool ? <Link href={relations.tool.href}>{relations.tool.label}</Link> : null}
+              </nav>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
