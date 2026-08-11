@@ -111,10 +111,11 @@ export default function VerificationPage() {
             <p className="eyebrow">CONTINUE</p>
             <h2 id="verification-next-title">继续查看</h2>
             <p>
-              阅读文章时，可以把验证状态、测试环境和正文中的限制说明放在一起判断；也可以直接查看已经获得 Console 或真实主循环证据的内容。
+              阅读文章时，可以把验证状态、测试环境和正文中的限制说明放在一起判断；验证覆盖页面会进一步说明哪些高频诊断路径已经有 accepted 运行时证据，以及下一步最值得补什么。
             </p>
           </div>
           <div>
+            <Link href="/verification/coverage">查看验证覆盖与 Evidence 优先级 →</Link>
             <Link href="/verified">查看最近验证 →</Link>
             <Link href="/beginner">进入新手路线 →</Link>
             <Link href="/knowledge">浏览知识模块 →</Link>
