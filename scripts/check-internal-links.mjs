@@ -113,9 +113,16 @@ function hasPageForRoute(route) {
   return false;
 }
 
+function publicAssetExists(route) {
+  if (!route.startsWith("/") || route === "/") return false;
+  const publicPath = path.join(root, "public", route.slice(1));
+  return fs.existsSync(publicPath) && fs.statSync(publicPath).isFile();
+}
+
 function routeExists(href) {
   if (exactRoutes.has(href)) return true;
   if (hasPageForRoute(href)) return true;
+  if (publicAssetExists(href)) return true;
   if (/^\/blog\/[a-z0-9-]+$/.test(href)) {
     return fs.existsSync(path.join(root, "content", "posts", `${href.slice(6)}.md`));
   }
@@ -124,9 +131,6 @@ function routeExists(href) {
   if (/^\/tags\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/en\/tags\/[a-z0-9-]+$/.test(href)) return true;
   if (/^\/(blog|now|changelog)\/page\/[2-9][0-9]*$/.test(href)) return true;
-  if (/^\/diagrams\/[a-z0-9-]+\.svg$/.test(href)) {
-    return fs.existsSync(path.join(root, "public", href.slice(1)));
-  }
   return false;
 }
 
@@ -169,5 +173,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `组件与数据内链检查通过：${exactRoutes.size} 个登记路由、自动发现的静态 App Router 页面及 ${englishRegistryPaths.length} 个英文登记文件均已验证，未发现旧页面链接或未知站内目标。`,
+  `组件与数据内链检查通过：${exactRoutes.size} 个登记路由、自动发现的静态 App Router 页面、public 静态资源及 ${englishRegistryPaths.length} 个英文登记文件均已验证，未发现旧页面链接或未知站内目标。`,
 );
