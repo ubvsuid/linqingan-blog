@@ -52,6 +52,12 @@ export default function EnglishVerificationPage() {
 
         <section className={`${styles.grid} about-detail-grid`}>
           <article className={styles.card}>
+            <p className="eyebrow">COVERAGE</p>
+            <h2>See what still needs runtime evidence</h2>
+            <p>The coverage registry maps high-frequency symptom paths to Errors, APIs, Object Hubs, Guides, and Tools, then shows the accepted Console/live evidence level and the next evidence gap.</p>
+            <Link href="/en/verification/coverage">Review verification coverage →</Link>
+          </article>
+          <article className={styles.card}>
             <p className="eyebrow">VERIFIED ARCHIVE</p>
             <h2>Runtime-tested guides stay separate</h2>
             <p>Only guides whose shared source records contain explicit Console or live multi-tick evidence appear in the recently verified archive.</p>
