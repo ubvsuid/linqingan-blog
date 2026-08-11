@@ -106,6 +106,20 @@ export default function VerificationPage() {
           </ul>
         </section>
 
+        <section className={styles.next} aria-labelledby="verification-capture-title">
+          <div>
+            <p className="eyebrow">CAPTURE KIT</p>
+            <h2 id="verification-capture-title">用统一格式采集真实运行证据</h2>
+            <p>
+              Evidence Capture Kit 只负责读取对象状态、整理返回值和生成版本化 JSON Bundle；它本身不会调用移动、Spawn、Market、Link 或其他游戏动作。多 tick 会话只使用自己的 Memory 命名空间保存最多 30 个样本。
+            </p>
+          </div>
+          <div>
+            <a href="/screeps-evidence-capture-kit.js" target="_blank" rel="noreferrer">打开 Console Capture Kit →</a>
+            <Link href="/verification/coverage">查看优先验证路径 →</Link>
+          </div>
+        </section>
+
         <section className={styles.next} aria-labelledby="verification-next-title">
           <div>
             <p className="eyebrow">CONTINUE</p>
