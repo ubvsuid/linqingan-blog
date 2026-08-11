@@ -1,4 +1,5 @@
 import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
+import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 
 export interface EnglishSearchDocument {
@@ -37,6 +38,15 @@ const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-roadmap", title: "English Site Roadmap", description: "Completed work, next improvements, evidence-dependent tasks, tool development, accessibility, and performance checks.", href: "/en/roadmap", type: "Page", keywords: ["roadmap", "next", "planned", "evidence", "performance"] },
   { id: "english-license", title: "Content and Code Use", description: "Current boundaries for reusing site content, code examples, third-party names, and commercial material.", href: "/en/license", type: "Reference", keywords: ["license", "copyright", "reuse", "permission", "code examples"] },
 ];
+
+const apiHubDocuments: EnglishSearchDocument[] = screepsApiHubs.map((hub) => ({
+  id: `english-api-hub-${hub.slug}`,
+  title: `Screeps ${hub.enTitle}`,
+  description: hub.enDescription,
+  href: getScreepsApiHubHref(hub.slug, "en"),
+  type: "Reference",
+  keywords: ["screeps api hub", "object hub", hub.objectName, ...hub.keywords],
+}));
 
 const toolDocuments: EnglishSearchDocument[] = toolCatalog.map((tool) => ({
   id: `english-${tool.slug}`,
@@ -92,6 +102,7 @@ export const englishSearchDocuments: EnglishSearchDocument[] = [
   ...articleDocuments,
   ...topicDocuments,
   ...toolDocuments,
+  ...apiHubDocuments,
   ...foundationDocuments,
 ];
 
