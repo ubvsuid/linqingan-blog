@@ -48,7 +48,7 @@ export function RelatedErrorDiagnostics({
   return (
     <aside className={styles.panel} aria-labelledby={id}>
       <div>
-        <p className="eyebrow">DIAGNOSTIC PATHS</p>
+        <p className="eyebrow">{isEnglish ? "DIAGNOSTIC PATHS" : "诊断路径"}</p>
         <h2 id={id}>{isEnglish ? "Continue from this context" : "从当前场景继续排查"}</h2>
         <p>
           {isEnglish

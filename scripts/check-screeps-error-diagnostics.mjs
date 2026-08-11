@@ -93,8 +93,8 @@ const requiredNames = new Set([
   "ERR_TIRED",
 ]);
 
-if (diagnostics.length < 8 || diagnostics.length > 10) {
-  failures.push(`Expected 8-10 priority diagnostics, found ${diagnostics.length}.`);
+if (diagnostics.length !== 10) {
+  failures.push(`Expected 10 priority diagnostics, found ${diagnostics.length}.`);
 }
 
 const diagnosticNames = diagnostics.map((diagnostic) => diagnostic.name);
