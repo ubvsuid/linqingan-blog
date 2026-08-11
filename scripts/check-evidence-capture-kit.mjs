@@ -41,6 +41,10 @@ for (const required of [
   "sampleLive: sampleLive",
   "finishLive: finishLive",
   "clearLive: clearLive",
+  '"bucket"',
+  '"limit"',
+  '"tickLimit"',
+  'typeof object.getUsed === "function"',
 ]) {
   if (!kit.includes(required)) failures.push(`Capture Kit is missing contract marker: ${required}`);
 }
@@ -86,8 +90,12 @@ for (const networkMarker of ["fetch(", "XMLHttpRequest", "WebSocket", "EventSour
 if (!kit.includes("Memory[MEMORY_KEY]")) {
   failures.push("Multi-tick capture must use the dedicated Memory[MEMORY_KEY] namespace.");
 }
-if (/Memory\.[A-Za-z_$]/.test(kit)) {
+const memoryAuditSource = kit.replaceAll("Memory.__linqinganEvidenceCapture", "");
+if (/Memory\.[A-Za-z_$]/.test(memoryAuditSource)) {
   failures.push("Capture Kit must not write arbitrary direct Memory properties outside its dedicated namespace.");
+}
+if (!kit.includes("session.samples.length >= 30")) {
+  failures.push("Multi-tick capture must reject samples before exceeding the 30-sample budget.");
 }
 if (!kit.includes("sample budget exceeded (30)")) {
   failures.push("Multi-tick capture must retain an explicit bounded sample budget.");
