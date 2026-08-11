@@ -165,9 +165,18 @@
       "safeModeAvailable",
       "energy",
       "energyCapacity",
+      "energyAvailable",
+      "energyCapacityAvailable",
+      "bucket",
+      "limit",
+      "tickLimit",
     ].forEach(function copyNumeric(field) {
       if (typeof object[field] === "number") output[field] = object[field];
     });
+
+    if (typeof object.getUsed === "function") {
+      output.used = object.getUsed();
+    }
 
     if (object.spawning) {
       output.spawning = {
@@ -281,16 +290,15 @@
     var store = getMemoryStore();
     var session = store.sessions[id];
     if (!session) fail("unknown session: " + id);
+    if (session.samples.length >= 30) {
+      fail("sample budget exceeded (30); finish or clear this session before collecting more");
+    }
     var snapshotState = plainObject(state, "state");
 
     session.samples.push({
       gameTime: currentGameTime(),
       state: cloneJson(snapshotState),
     });
-
-    if (session.samples.length > 30) {
-      fail("sample budget exceeded (30); finish or clear this session before collecting more");
-    }
 
     return session.samples.length;
   }
