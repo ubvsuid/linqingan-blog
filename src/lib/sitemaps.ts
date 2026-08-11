@@ -9,6 +9,7 @@ import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
 import { getAllPosts } from "@/lib/posts";
 import { projects } from "@/lib/projects";
+import { screepsApiHubSlugs } from "@/lib/screeps-api-hubs";
 import { siteConfig } from "@/lib/site";
 import { latestSiteAuditEntry } from "@/lib/site-audit-entry";
 import {
@@ -96,6 +97,9 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     "/tools/hauling-throughput-planner",
     "/tools/tower-damage-heal-repair-calculator",
   ];
+  const chineseApiHubPaths = screepsApiHubSlugs.map(
+    (slug) => `/screeps-api/${slug}` as StaticPagePath,
+  );
 
   const staticPages: SitemapEntry[] = [
     staticPageEntry("/", [...allPostDates, latestSiteAuditEntry.date]),
@@ -103,6 +107,7 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/blog", allPostDates),
     staticPageEntry("/knowledge", allPostDates),
     staticPageEntry("/screeps-api"),
+    ...chineseApiHubPaths.map((path) => staticPageEntry(path)),
     staticPageEntry(
       "/tools",
       chineseToolPaths.map((path) =>
@@ -183,6 +188,9 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     "/en/tools/hauling-throughput-planner",
     "/en/tools/tower-damage-heal-repair-calculator",
   ];
+  const englishApiHubPaths = screepsApiHubSlugs.map(
+    (slug) => `/en/screeps-api/${slug}` as StaticPagePath,
+  );
 
   const staticPages: SitemapEntry[] = [
     staticPageEntry("/en", [
@@ -193,6 +201,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/en/blog", englishArticleDates),
     staticPageEntry("/en/knowledge", englishArticleDates),
     staticPageEntry("/en/screeps-api"),
+    ...englishApiHubPaths.map((path) => staticPageEntry(path)),
     staticPageEntry("/en/tags", englishArticleDates),
     staticPageEntry(
       "/en/tools",
