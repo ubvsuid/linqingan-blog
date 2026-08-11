@@ -61,8 +61,11 @@ for (const fixture of [
 if (!entityIntent.includes("matchedKinds.size >= 2")) {
   failures.push("Symptom propagation must require multi-entity evidence when there is no direct symptom match.");
 }
-if (!entityIntent.includes("Math.round(direct * 2)")) {
-  failures.push("Multi-signal symptom propagation must preserve weak direct symptom context so object words such as Spawn can break generic ties without making a return code alone sufficient.");
+if (!entityIntent.includes("const contextBonus = Math.round(direct * (direct >= 45 ? 1.5 : 2))")) {
+  failures.push("Multi-signal symptom propagation must use the same related-signal base for strong and weak direct context, then apply a direct symptom context bonus to break generic ties.");
+}
+if (!entityIntent.includes("best + Math.round(second * 0.65) + matchedKinds.size * 20 + contextBonus")) {
+  failures.push("Multi-signal propagation must consistently combine its two strongest related signals before applying direct symptom context.");
 }
 if (!entityIntent.includes('node.kind === "symptom" ? 24')) {
   failures.push("Symptom-first intent results must receive an explicit promotion bonus.");
