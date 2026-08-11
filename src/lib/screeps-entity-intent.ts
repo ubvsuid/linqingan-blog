@@ -457,10 +457,11 @@ export function getScreepsIntentPromotions(
     const second = relatedMatches[1]?.score ?? 0;
     let propagated = 0;
 
-    if (direct >= 45) {
+    if (matchedKinds.size >= 2) {
+      const contextBonus = Math.round(direct * (direct >= 45 ? 1.5 : 2));
+      propagated = best + Math.round(second * 0.65) + matchedKinds.size * 20 + contextBonus;
+    } else if (direct >= 45) {
       propagated = direct + Math.round(best * 0.65) + matchedKinds.size * 18;
-    } else if (matchedKinds.size >= 2) {
-      propagated = best + Math.round(second * 0.65) + matchedKinds.size * 20 + Math.round(direct * 2);
     }
 
     if (propagated > (promotedScores.get(symptomNodeId) ?? 0)) {
