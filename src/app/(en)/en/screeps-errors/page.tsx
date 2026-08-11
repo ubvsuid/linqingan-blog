@@ -8,7 +8,7 @@ import styles from "../english.module.css";
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Error Codes and Return Values",
   description:
-    "A concise English reference for common Screeps return codes, including OK, ERR_NOT_OWNER, ERR_NO_PATH, ERR_BUSY, ERR_NOT_FOUND, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_TARGET, ERR_FULL, and ERR_NOT_IN_RANGE.",
+    "A concise English reference for common Screeps return codes, including OK, ERR_NOT_OWNER, ERR_NO_PATH, ERR_BUSY, ERR_NOT_FOUND, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, and ERR_NOT_IN_RANGE.",
   path: "/en/screeps-errors",
   chinesePath: "/screeps-errors",
 });
@@ -20,7 +20,8 @@ const errorCodes = [
   ["ERR_NAME_EXISTS", "-3", "A requested name is already in use, commonly when spawning a Creep."],
   ["ERR_BUSY", "-4", "The object is already performing an incompatible action, such as a busy Spawn."],
   ["ERR_NOT_FOUND", "-5", "The requested object, resource, reaction, or state was not found."],
-  ["ERR_NOT_ENOUGH_ENERGY", "-6", "The action lacks Energy or another required resource."],
+  ["ERR_NOT_ENOUGH_RESOURCES", "-6", "The action lacks the specific resource required by the current method."],
+  ["ERR_NOT_ENOUGH_ENERGY", "-6", "A legacy Energy-focused name for the same numeric result; check the current method's documented resource requirement."],
   ["ERR_INVALID_TARGET", "-7", "The target exists but cannot be used by this method."],
   ["ERR_FULL", "-8", "The target store, structure, or capacity is already full."],
   ["ERR_NOT_IN_RANGE", "-9", "The acting object is too far from the target. Move closer and retry on a later tick."],
@@ -51,7 +52,7 @@ export default function EnglishScreepsErrorsPage() {
             <thead><tr><th>Constant</th><th>Value</th><th>Practical meaning</th></tr></thead>
             <tbody>
               {errorCodes.map(([name, value, meaning]) => (
-                <tr key={name}><td><code>{name}</code></td><td><code>{value}</code></td><td>{meaning}</td></tr>
+                <tr key={name} id={name.toLowerCase()}><td><code>{name}</code></td><td><code>{value}</code></td><td>{meaning}</td></tr>
               ))}
             </tbody>
           </table>

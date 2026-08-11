@@ -1,6 +1,7 @@
 import { getKnowledgeBaseSectionBySlug } from "@/lib/knowledge-base";
 import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
+import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
@@ -90,6 +91,17 @@ const apiReferenceDocument: SearchDocument = {
   text: screepsApiReference.map((entry) => entry.signature).join(" "),
 };
 
+const apiHubDocuments: SearchDocument[] = screepsApiHubs.map((hub) => ({
+  id: `reference:screeps-api-hub:${hub.slug}`,
+  type: "工具",
+  title: `Screeps ${hub.zhTitle}`,
+  description: hub.zhDescription,
+  href: getScreepsApiHubHref(hub.slug, "zh"),
+  meta: `对象 Hub · ${hub.entryIds.length} 个 API · ${hub.errorNames.length} 个返回码入口`,
+  keywords: compactKeywords(["Screeps API Hub", "对象 Hub", hub.objectName, ...hub.keywords]),
+  text: `${hub.zhScope} ${hub.entryIds.join(" ")} ${hub.errorNames.join(" ")}`,
+}));
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:hub",
@@ -103,6 +115,7 @@ const toolDocuments: SearchDocument[] = [
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
   apiReferenceDocument,
+  ...apiHubDocuments,
   ...toolCatalog.map(
     (tool): SearchDocument => ({
       id: `tool:${tool.slug}`,

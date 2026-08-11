@@ -1,0 +1,238 @@
+.page {
+  padding: 56px 0 88px;
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.header {
+  max-width: 900px;
+  margin-bottom: 42px;
+}
+
+.header h1 {
+  margin: 8px 0 14px;
+  font-size: clamp(36px, 7vw, 68px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.header > p:not(.scope) {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.scope {
+  max-width: 840px;
+  margin: 18px 0 0;
+  border-left: 3px solid var(--foreground);
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.section {
+  margin-top: 30px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px;
+  background: var(--surface);
+}
+
+.sectionHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.sectionHead h2,
+.panel h2 {
+  margin: 6px 0 8px;
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.sectionHead p,
+.panel > p:not(.eyebrow) {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.sectionHead > strong {
+  min-width: 48px;
+  text-align: right;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.apiGrid,
+.verifiedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.apiCard,
+.verifiedGrid article {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  background: var(--background);
+}
+
+.apiCard > span,
+.verifiedGrid article > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.apiCard h3,
+.verifiedGrid h3 {
+  margin: 10px 0;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.apiCard h3 code {
+  overflow-wrap: anywhere;
+}
+
+.apiCard p,
+.verifiedGrid p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.68;
+}
+
+.apiCard > a,
+.verifiedGrid a {
+  margin-top: auto;
+  font-weight: 700;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 2px 0 18px;
+}
+
+.tags span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 26px;
+  background: var(--surface);
+}
+
+.linkStack {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.linkStack a {
+  display: grid;
+  gap: 4px;
+  border-top: 1px solid var(--border);
+  padding: 13px 0 3px;
+  font-weight: 680;
+}
+
+.linkStack a:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.linkStack small,
+.linkStack em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 450;
+  line-height: 1.55;
+}
+
+.verification {
+  background: color-mix(in srgb, var(--surface) 88%, var(--foreground) 3%);
+}
+
+.verifiedGrid small {
+  margin: auto 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.emptyVerification {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.emptyVerification > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  font-weight: 700;
+}
+
+@media (max-width: 780px) {
+  .page {
+    padding-top: 38px;
+  }
+
+  .apiGrid,
+  .verifiedGrid,
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+
+  .section,
+  .panel {
+    padding: 21px;
+  }
+
+  .sectionHead,
+  .emptyVerification {
+    flex-direction: column;
+  }
+
+  .sectionHead > strong {
+    text-align: left;
+  }
+}
