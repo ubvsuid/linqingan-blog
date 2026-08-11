@@ -12,11 +12,11 @@ export interface EvidenceRelations {
 }
 
 const toolByApi: Array<[RegExp, EvidenceRelationLink]> = [
-  [/^StructureSpawn\.spawnCreep$/i, { label: "Spawn Capacity Planner", href: "/tools/spawn-capacity-planner" }],
+  [/^StructureSpawn\.spawnCreep$/i, { label: "Spawn Queue and Replacement Planner", href: "/tools/spawn-queue-replacement-planner" }],
   [/^Game\.cpu(?:\.|$)/i, { label: "Room Diagnostics", href: "/tools/room-diagnostics" }],
   [/^StructureLink\./i, { label: "Room Diagnostics", href: "/tools/room-diagnostics" }],
-  [/^Creep\.upgradeController$/i, { label: "Controller Planner", href: "/tools/controller-planner" }],
-  [/^Game\.market(?:\.|$)/i, { label: "Market & Terminal Calculator", href: "/tools/market-terminal-calculator" }],
+  [/^Creep\.upgradeController$/i, { label: "Controller Downgrade and Upgrader Planner", href: "/tools/controller-downgrade-planner" }],
+  [/^Game\.market(?:\.|$)/i, { label: "Market and Terminal Cost Calculator", href: "/tools/market-terminal-cost-calculator" }],
 ];
 
 export function getEvidenceRelations(
