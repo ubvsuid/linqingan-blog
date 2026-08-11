@@ -137,6 +137,7 @@ const maintenanceScripts = [
   "verification-evidence-write.mjs",
   "verification-evidence-list.mjs",
   "verification-evidence-show.mjs",
+  "verification-evidence-review.mjs",
   "verification-evidence-accept.mjs",
   "verification-evidence-reject.mjs",
   "verification-evidence-revoke.mjs",
