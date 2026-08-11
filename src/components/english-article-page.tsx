@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ArticleFeedback } from "@/components/article-feedback";
+import { ArticleRuntimeEvidenceCard } from "@/components/article-runtime-evidence-card";
 import { Container } from "@/components/container";
 import { EnglishArticleLearningTracker } from "@/components/english-learning-progress";
 import {
@@ -8,7 +9,9 @@ import {
   getEnglishDiscoveryArticle,
   getRelatedEnglishArticles,
 } from "@/lib/english-discovery";
+import { getAllPosts } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
+import { getPublicVerificationEvidenceForArticle } from "@/lib/verification-evidence";
 
 interface ArticleNavigationItem {
   href: string;
@@ -61,7 +64,12 @@ function formatEnglishDate(value: string): string {
   }).format(date);
 }
 
-export function EnglishArticlePage({
+function sourceSlugFromChinesePath(pathname: string): string | null {
+  const match = pathname.match(/^\/blog\/([a-z0-9-]+)$/);
+  return match?.[1] ?? null;
+}
+
+export async function EnglishArticlePage({
   articleHref,
   chinesePath,
   headline,
@@ -97,6 +105,18 @@ export function EnglishArticlePage({
     .slice(0, 3)
     .map((item) => `${item.term}: ${item.value}`)
     .join(" · ");
+  const sourceSlug = sourceSlugFromChinesePath(resolvedChinesePath);
+  const sourcePost = sourceSlug
+    ? getAllPosts().find((post) => post.slug === sourceSlug)
+    : undefined;
+  const runtimeEvidence =
+    sourcePost && (sourcePost.verification.consoleTested || sourcePost.verification.liveTested)
+      ? (await getPublicVerificationEvidenceForArticle(sourcePost.slug)).filter((record) =>
+          record.verificationType === "live"
+            ? sourcePost.verification.liveTested
+            : sourcePost.verification.consoleTested,
+        )
+      : [];
   const toolRecommendation = discovery?.suppressToolRecommendation
     ? null
     : discovery?.tagSlugs.some(
@@ -204,6 +224,8 @@ export function EnglishArticlePage({
               </dl>
             </div>
           </details>
+
+          <ArticleRuntimeEvidenceCard evidence={runtimeEvidence} locale="en" />
 
           <nav className="article-toc english-toc" aria-label="Table of contents">
             <p className="article-toc-title">Table of contents</p>
