@@ -9,6 +9,7 @@
         "http://localhost:3000/beginner",
         "http://localhost:3000/knowledge",
         "http://localhost:3000/diagnostics",
+        "http://localhost:3000/verification/coverage",
         "http://localhost:3000/tags",
         "http://localhost:3000/tags/memory",
         "http://localhost:3000/screeps-api",
@@ -19,6 +20,7 @@
         "http://localhost:3000/tools/controller-downgrade-planner",
         "http://localhost:3000/en",
         "http://localhost:3000/en/diagnostics",
+        "http://localhost:3000/en/verification/coverage",
         "http://localhost:3000/en/blog/screeps-creep-harvest-energy",
         "http://localhost:3000/en/search?q=creep%20not%20moving",
         "http://localhost:3000/en/tools/room-diagnostics"
