@@ -2,6 +2,7 @@ import { and, desc, eq, or, sql } from "drizzle-orm";
 
 import { getPlatformDatabase } from "@/db/client";
 import { searchClicks, searchDocuments, searchQueries } from "@/db/schema";
+import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 import {
   getSearchDocuments,
   type SearchDocument,
@@ -115,6 +116,64 @@ function rankStaticDocuments(
     .map((entry) => entry.document);
 }
 
+function intentDocumentType(kind: ScreepsEntityKind): SearchDocumentType {
+  if (kind === "error") return "错误码";
+  if (kind === "guide") return "文章";
+  return "工具";
+}
+
+function applyScreepsIntentRanking(
+  query: string,
+  documents: SearchDocument[],
+  type: SearchDocumentType | null,
+  limit: number,
+): SearchDocument[] {
+  const promotions = getScreepsIntentPromotions(query, "zh", 8)
+    .map((promotion) => ({ ...promotion, documentType: intentDocumentType(promotion.kind) }))
+    .filter((promotion) => !type || promotion.documentType === type);
+
+  if (promotions.length === 0) return documents.slice(0, limit);
+
+  const promotionScoreByHref = new Map(promotions.map((promotion) => [promotion.href, promotion.score]));
+  const mergedByHref = new Map<string, SearchDocument>();
+  const originalOrder = new Map<string, number>();
+
+  documents.forEach((document, index) => {
+    mergedByHref.set(document.href, document);
+    originalOrder.set(document.href, documents.length - index);
+  });
+
+  for (const promotion of promotions) {
+    if (mergedByHref.has(promotion.href)) continue;
+    mergedByHref.set(promotion.href, {
+      id: `intent:${promotion.entityId}`,
+      type: promotion.documentType,
+      title: promotion.title,
+      description: promotion.description,
+      href: promotion.href,
+      meta:
+        promotion.kind === "symptom"
+          ? "症状优先诊断"
+          : promotion.kind === "verification"
+            ? "Verification Coverage"
+            : promotion.kind === "api"
+              ? "API 意图命中"
+              : "实体关系命中",
+      keywords: [...promotion.aliases].slice(0, 14),
+      text: promotion.description,
+    });
+  }
+
+  return [...mergedByHref.values()]
+    .sort((left, right) => {
+      const leftIntent = promotionScoreByHref.get(left.href) ?? 0;
+      const rightIntent = promotionScoreByHref.get(right.href) ?? 0;
+      if (leftIntent !== rightIntent) return rightIntent - leftIntent;
+      return (originalOrder.get(right.href) ?? 0) - (originalOrder.get(left.href) ?? 0);
+    })
+    .slice(0, limit);
+}
+
 async function searchDatabase(
   query: string,
   type: SearchDocumentType | null,
@@ -223,20 +282,22 @@ export async function searchV2(
   let source: SearchV2Source = "static";
 
   try {
-    const databaseResults = await searchDatabase(normalizedQuery, type, limit);
+    const databaseResults = await searchDatabase(normalizedQuery, type, SEARCH_V2_MAX_LIMIT);
     if (databaseResults) {
       results = databaseResults;
       source = "database";
     } else {
-      results = rankStaticDocuments(normalizedQuery, type, limit);
+      results = rankStaticDocuments(normalizedQuery, type, SEARCH_V2_MAX_LIMIT);
     }
   } catch (error) {
     console.warn(
       "Search V2 database query failed; using static fallback",
       error,
     );
-    results = rankStaticDocuments(normalizedQuery, type, limit);
+    results = rankStaticDocuments(normalizedQuery, type, SEARCH_V2_MAX_LIMIT);
   }
+
+  results = applyScreepsIntentRanking(normalizedQuery, results, type, limit);
 
   return {
     query: query.trim(),

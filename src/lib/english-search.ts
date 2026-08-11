@@ -2,6 +2,7 @@ import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
+import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 import { verificationCoveragePlans } from "@/lib/verification-coverage";
 
@@ -156,19 +157,41 @@ function normalizeSearchValue(value: string): string {
 }
 
 function tokenizeSearchQuery(value: string): string[] {
-  return normalizeSearchValue(value).split(/[^a-z0-9_]+/).filter(Boolean);
+  return normalizeSearchValue(value).split(/[^a-z0-9_-]+/).filter(Boolean);
+}
+
+function intentDocumentType(kind: ScreepsEntityKind): EnglishSearchDocument["type"] {
+  if (kind === "guide") return "Article";
+  if (kind === "tool") return "Tool";
+  return "Reference";
 }
 
 export function getEnglishInitialSearchDocuments(query: string, limit = 80): EnglishSearchDocument[] {
   const tokens = tokenizeSearchQuery(query);
   if (tokens.length === 0) return [];
 
-  return englishSearchDocuments
+  const promotions = getScreepsIntentPromotions(query, "en", 8);
+  const promotionScoreByHref = new Map(promotions.map((promotion) => [promotion.href, promotion.score]));
+  const mergedByHref = new Map(englishSearchDocuments.map((document) => [document.href, document]));
+
+  for (const promotion of promotions) {
+    if (mergedByHref.has(promotion.href)) continue;
+    mergedByHref.set(promotion.href, {
+      id: `intent:${promotion.entityId}`,
+      title: promotion.title,
+      description: promotion.description,
+      href: promotion.href,
+      type: intentDocumentType(promotion.kind),
+      keywords: [...promotion.aliases],
+    });
+  }
+
+  return [...mergedByHref.values()]
     .map((document) => {
       const title = normalizeSearchValue(document.title);
       const description = normalizeSearchValue(document.description);
       const keywords = normalizeSearchValue(document.keywords.join(" "));
-      let score = 0;
+      let score = promotionScoreByHref.get(document.href) ?? 0;
 
       for (const token of tokens) {
         if (title === token) score += 25;

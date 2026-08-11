@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EnglishSearchDocument } from "@/lib/english-search";
+import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 
 const popularQueries = ["ERR_NOT_IN_RANGE", "creep not moving", "CPU bucket", "body calculator", "Memory cleanup"];
 
@@ -64,7 +65,13 @@ function normalize(value: string): string {
 }
 
 function tokenizeQuery(value: string): string[] {
-  return normalize(value).split(/[^a-z0-9_]+/).filter(Boolean);
+  return normalize(value).split(/[^a-z0-9_-]+/).filter(Boolean);
+}
+
+function intentDocumentType(kind: ScreepsEntityKind): EnglishSearchDocument["type"] {
+  if (kind === "guide") return "Article";
+  if (kind === "tool") return "Tool";
+  return "Reference";
 }
 
 function editDistance(left: string, right: string): number {
@@ -165,17 +172,39 @@ export function EnglishSiteSearch({
   const results = useMemo(() => {
     const tokens = tokenizeQuery(query);
     const sourceDocuments = normalizedQuery || type ? documents : featuredResources;
-    const filteredByType = type ? sourceDocuments.filter((document) => document.type === type) : sourceDocuments;
 
-    if (!normalizedQuery) return filteredByType.slice(0, 12);
+    if (!normalizedQuery) {
+      const filtered = type ? sourceDocuments.filter((document) => document.type === type) : sourceDocuments;
+      return filtered.slice(0, 12);
+    }
+
+    const promotions = getScreepsIntentPromotions(query, "en", 8);
+    const promotionScoreByHref = new Map(promotions.map((promotion) => [promotion.href, promotion.score]));
+    const mergedByHref = new Map(sourceDocuments.map((document) => [document.href, document]));
+
+    for (const promotion of promotions) {
+      if (mergedByHref.has(promotion.href)) continue;
+      mergedByHref.set(promotion.href, {
+        id: `intent:${promotion.entityId}`,
+        title: promotion.title,
+        description: promotion.description,
+        href: promotion.href,
+        type: intentDocumentType(promotion.kind),
+        keywords: [...promotion.aliases],
+      });
+    }
+
+    const filteredByType = type
+      ? [...mergedByHref.values()].filter((document) => document.type === type)
+      : [...mergedByHref.values()];
 
     return filteredByType
       .map((document) => {
         const title = normalize(document.title);
         const description = normalize(document.description);
         const keywords = normalize(document.keywords.join(" "));
-        const words = `${title} ${description} ${keywords}`.split(/[^a-z0-9_]+/).filter(Boolean);
-        let score = 0;
+        const words = `${title} ${description} ${keywords}`.split(/[^a-z0-9_-]+/).filter(Boolean);
+        let score = promotionScoreByHref.get(document.href) ?? 0;
 
         for (const token of tokens) {
           if (title === token) score += 25;
