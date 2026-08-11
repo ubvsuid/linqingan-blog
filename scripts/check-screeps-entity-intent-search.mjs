@@ -15,7 +15,8 @@ function read(relativePath) {
 
 const entityIntent = read("src/lib/screeps-entity-intent.ts");
 const chineseSearch = read("src/lib/search-v2.ts");
-const englishSearch = read("src/components/english-site-search.tsx");
+const englishClientSearch = read("src/components/english-site-search.tsx");
+const englishServerSearch = read("src/lib/english-search.ts");
 const packageJson = read("package.json");
 
 for (const registry of [
@@ -83,17 +84,27 @@ if (!chineseSearch.includes("intent:${promotion.entityId}")) {
   failures.push("Chinese search must be able to inject non-persisted intent results without adding search_documents rows.");
 }
 
-if (!englishSearch.includes('getScreepsIntentPromotions(query, "en", 8)')) {
+if (!englishClientSearch.includes('getScreepsIntentPromotions(query, "en", 8)')) {
   failures.push("English client search must use the shared English intent resolver.");
 }
-if (!englishSearch.includes('fetch("/en/search-index.json"')) {
+if (!englishClientSearch.includes('fetch("/en/search-index.json"')) {
   failures.push("English search must preserve lazy full-index loading after Phase 5.");
 }
-if (!englishSearch.includes("promotionScoreByHref")) {
-  failures.push("English search must combine lexical score with entity-intent promotion score.");
+if (!englishClientSearch.includes("promotionScoreByHref")) {
+  failures.push("English client search must combine lexical score with entity-intent promotion score.");
 }
-if (!englishSearch.includes("intent:${promotion.entityId}")) {
-  failures.push("English search must inject intent results without expanding the persisted index.");
+if (!englishClientSearch.includes("intent:${promotion.entityId}")) {
+  failures.push("English client search must inject intent results without expanding the persisted index.");
+}
+
+if (!englishServerSearch.includes('getScreepsIntentPromotions(query, "en", 8)')) {
+  failures.push("English SSR search must use the same shared intent resolver as the client.");
+}
+if (!englishServerSearch.includes("promotionScoreByHref")) {
+  failures.push("English SSR search must combine lexical and entity-intent scores before first paint.");
+}
+if (!englishServerSearch.includes("intent:${promotion.entityId}")) {
+  failures.push("English SSR search must support the same virtual intent results without changing the persisted index.");
 }
 
 for (const forbidden of ["drizzle-orm", "getPlatformDatabase", "pgvector", "neo4j", "OpenAI", "verificationEvidence"]) {
@@ -112,4 +123,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Screeps entity intent search check passed: shared bilingual entity relations and symptom-first intent ranking are wired without new persistence or AI dependencies.");
+console.log("Screeps entity intent search check passed: shared bilingual entity relations and symptom-first intent ranking are wired across Chinese database/static search plus English SSR/client search without new persistence or AI dependencies.");
