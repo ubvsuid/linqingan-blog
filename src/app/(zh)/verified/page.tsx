@@ -21,8 +21,7 @@ export const metadata = createPageMetadata({
 export const revalidate = 300;
 
 function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
-  const parts: string[] = [];
-  if (evidence.apiName) parts.push(evidence.apiName);
+  const parts: string[] = [evidence.evidenceKey, evidence.apiName];
   if (evidence.returnCode) parts.push(`返回 ${evidence.returnCode}`);
   if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
   if (evidence.tickStart !== null && evidence.tickEnd !== null) {
@@ -83,10 +82,8 @@ export default async function VerifiedPage() {
                   {post.latestEvidence ? (
                     <div className={styles.runtimeEvidence}>
                       <strong>最近一条结构化证据</strong>
-                      {formatEvidencePreview(post.latestEvidence) ? (
-                        <span>{formatEvidencePreview(post.latestEvidence)}</span>
-                      ) : null}
-                      {post.latestEvidence.note ? <span>{post.latestEvidence.note}</span> : null}
+                      <span>{formatEvidencePreview(post.latestEvidence)}</span>
+                      <span>{post.latestEvidence.note}</span>
                     </div>
                   ) : null}
                   <Link href={post.href}>查看验证状态 →</Link>
