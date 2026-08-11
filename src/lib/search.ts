@@ -8,6 +8,7 @@ import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 import { getToolHref, toolCatalog, toolCount } from "@/lib/tool-catalog";
+import { verificationCoveragePlans } from "@/lib/verification-coverage";
 
 export type SearchDocumentType = "文章" | "术语" | "错误码" | "工具" | "项目";
 
@@ -122,6 +123,26 @@ const diagnosticCenterDocument: SearchDocument = {
     .join(" "),
 };
 
+const verificationCoverageDocument: SearchDocument = {
+  id: "reference:verification-coverage",
+  type: "工具",
+  title: "Screeps 验证覆盖率与 Evidence 优先级",
+  description: "查看高频诊断路径当前有哪些 accepted Console / Live multi-tick 验证、缺什么证据，以及下一批真实 Evidence 的优先级。",
+  href: "/verification/coverage",
+  meta: `${verificationCoveragePlans.length} 条验证覆盖计划`,
+  keywords: compactKeywords([
+    "Screeps 验证覆盖",
+    "Evidence 优先级",
+    "Console 验证",
+    "Live multi-tick",
+    "验证缺口",
+    ...verificationCoveragePlans.map((plan) => plan.symptomId),
+  ]),
+  text: verificationCoveragePlans
+    .flatMap((plan) => [plan.zhGoal, plan.zhNextEvidence, ...plan.primaryErrorNames, ...plan.primaryApiEntryIds])
+    .join(" "),
+};
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:hub",
@@ -135,6 +156,7 @@ const toolDocuments: SearchDocument[] = [
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
   diagnosticCenterDocument,
+  verificationCoverageDocument,
   apiReferenceDocument,
   ...apiHubDocuments,
   ...toolCatalog.map(
