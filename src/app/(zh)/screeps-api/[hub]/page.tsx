@@ -9,6 +9,8 @@ import {
 } from "@/lib/screeps-api-hubs";
 import { createPageMetadata } from "@/lib/metadata";
 
+export const revalidate = 300;
+
 export function generateStaticParams() {
   return screepsApiHubSlugs.map((hub) => ({ hub }));
 }
