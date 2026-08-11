@@ -34,6 +34,7 @@ export const languageRoutePairs = {
   "/screeps-errors": "/en/screeps-errors",
   "/glossary": "/en/glossary",
   "/verification": "/en/verification",
+  "/verification/coverage": "/en/verification/coverage",
   "/verified": "/en/verified",
   "/tags": "/en/tags",
   "/about": "/en/about",

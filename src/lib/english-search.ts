@@ -3,6 +3,7 @@ import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
 import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
+import { verificationCoveragePlans } from "@/lib/verification-coverage";
 
 export interface EnglishSearchDocument {
   id: string;
@@ -56,6 +57,22 @@ const foundationDocuments: EnglishSearchDocument[] = [
       "symptom troubleshooting",
       ...screepsDiagnosticSymptoms.map((symptom) => symptom.enTitle),
       ...screepsDiagnosticSymptoms.flatMap((symptom) => symptom.enSearchTerms),
+    ], 24),
+  },
+  {
+    id: "english-verification-coverage",
+    title: "Screeps Verification Coverage and Evidence Priorities",
+    description: "See which high-frequency diagnostic paths have accepted Console or live multi-tick verification, what evidence is missing, and which runtime checks should come next.",
+    href: "/en/verification/coverage",
+    type: "Reference",
+    keywords: compactKeywords([
+      "verification coverage",
+      "evidence priority",
+      "console verification",
+      "live multi-tick",
+      "evidence gap",
+      ...verificationCoveragePlans.map((plan) => plan.symptomId),
+      ...verificationCoveragePlans.flatMap((plan) => plan.primaryErrorNames),
     ], 24),
   },
   { id: "english-api-reference", title: "Screeps API Quick Reference", description: "Search common Game, Creep, Room, Structure, Market, and PathFinder APIs and continue to matching guides or official documentation.", href: "/en/screeps-api", type: "Reference", keywords: ["screeps api", "game api", "creep api", "room api", "structure api", "pathfinder", "market"] },

@@ -33,6 +33,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
   const apiRootHref = isEnglish ? "/en/screeps-api" : "/screeps-api";
   const errorsRootHref = isEnglish ? "/en/screeps-errors" : "/screeps-errors";
   const verificationHref = isEnglish ? "/en/verification" : "/verification";
+  const coverageHref = isEnglish ? "/en/verification/coverage" : "/verification/coverage";
   const verifiedHref = isEnglish ? "/en/verified" : "/verified";
 
   const copy = isEnglish
@@ -52,6 +53,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
         noVerified: "No related public Console/live verified guide is accepted yet.",
         verifiedCount: "accepted verified guide(s)",
         verificationMethod: "Verification method",
+        coverage: "Verification coverage",
         recentlyVerified: "Recently verified",
         errorReference: "All error codes",
       }
@@ -71,6 +73,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
         noVerified: "当前还没有与这条症状路径相关的公开 Console / Live 已接受验证文章。",
         verifiedCount: "篇已接受验证文章",
         verificationMethod: "验证方法",
+        coverage: "验证覆盖",
         recentlyVerified: "最近验证",
         errorReference: "全部错误码",
       };
@@ -208,6 +211,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
                 ) : null}
                 <nav aria-label={copy.verification}>
                   <Link href={verificationHref}>{copy.verificationMethod}</Link>
+                  <Link href={`${coverageHref}#coverage-${symptom.id}`}>{copy.coverage}</Link>
                   <Link href={verifiedHref}>{copy.recentlyVerified}</Link>
                   <Link href={errorsRootHref}>{copy.errorReference}</Link>
                 </nav>
