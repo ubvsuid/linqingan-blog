@@ -1,6 +1,9 @@
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
-import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
+import {
+  screepsDiagnosticSymptoms,
+  type ScreepsDiagnosticSymptom,
+} from "@/lib/screeps-diagnostic-symptoms";
 import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { verificationCoveragePlans } from "@/lib/verification-coverage";
@@ -110,6 +113,7 @@ export const screepsIntentAcceptanceCases = [
 const nodes = new Map<string, ScreepsEntityNode>();
 const edges: ScreepsEntityEdge[] = [];
 const edgeKeys = new Set<string>();
+const diagnosticSymptoms: readonly ScreepsDiagnosticSymptom[] = screepsDiagnosticSymptoms;
 
 function localizedGuideHref(zhHref: string): string {
   if (!zhHref.startsWith("/")) return zhHref;
@@ -171,7 +175,6 @@ function addLinkedNode(input: {
 
 const errorCodeByName = new Map(screepsErrorCodes.map((entry) => [entry.name, entry]));
 const apiById = new Map(screepsApiReference.map((entry) => [entry.id, entry]));
-const hubBySlug = new Map(screepsApiHubs.map((hub) => [hub.slug, hub]));
 const diagnosticByName = new Map(screepsErrorDiagnostics.map((entry) => [entry.name, entry]));
 const coverageBySymptom = new Map(verificationCoveragePlans.map((plan) => [plan.symptomId, plan]));
 
@@ -260,7 +263,7 @@ for (const hub of screepsApiHubs) {
   }
 }
 
-for (const symptom of screepsDiagnosticSymptoms) {
+for (const symptom of diagnosticSymptoms) {
   const symptomId = `symptom:${symptom.id}`;
   const overrides = symptomAliasOverrides[symptom.id] ?? { zh: [], en: [] };
   addNode({
@@ -433,7 +436,7 @@ export function getScreepsIntentPromotions(
   }
 
   const promotedScores = new Map(directScores);
-  for (const symptom of screepsDiagnosticSymptoms) {
+  for (const symptom of diagnosticSymptoms) {
     const symptomNodeId = `symptom:${symptom.id}`;
     const direct = directScores.get(symptomNodeId) ?? 0;
     const relatedEdges = outgoingById.get(symptomNodeId) ?? [];
