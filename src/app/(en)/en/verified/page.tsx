@@ -28,8 +28,7 @@ function formatEnglishDate(value: string): string {
 }
 
 function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
-  const parts: string[] = [];
-  if (evidence.apiName) parts.push(evidence.apiName);
+  const parts: string[] = [evidence.evidenceKey, evidence.apiName];
   if (evidence.returnCode) parts.push(`returned ${evidence.returnCode}`);
   if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
   if (evidence.tickStart !== null && evidence.tickEnd !== null) {
@@ -94,8 +93,7 @@ export default async function EnglishVerifiedPage() {
                     {post.latestEvidence ? (
                       <p>
                         <strong>Latest structured evidence:</strong>{" "}
-                        {formatEvidencePreview(post.latestEvidence)}
-                        {post.latestEvidence.note ? ` · ${post.latestEvidence.note}` : ""}
+                        {formatEvidencePreview(post.latestEvidence)} · {post.latestEvidence.note}
                       </p>
                     ) : null}
                     <p><Link href={post.href}>Open guide verification status →</Link></p>

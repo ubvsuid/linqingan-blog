@@ -1,4 +1,7 @@
+import { createHash } from "node:crypto";
+
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const captureRefPattern = /^capture:CAP-\d{8}-[A-Z0-9][A-Z0-9-]{2,80}$/;
 const supportedLanguages = new Set(["zh-CN", "en"]);
 const supportedVerificationTypes = new Set(["console", "live"]);
 const allowedKeys = new Set([
@@ -58,7 +61,41 @@ function normalizeVerifiedAt(value) {
   const raw = requiredString(value, "verifiedAt", 64);
   const parsed = new Date(raw);
   if (Number.isNaN(parsed.getTime())) throw new Error("verifiedAt must be a valid ISO date/time");
+  const futureSkewMs = parsed.getTime() - Date.now();
+  if (futureSkewMs > 5 * 60 * 1000) {
+    throw new Error("verifiedAt cannot be more than five minutes in the future");
+  }
   return parsed.toISOString();
+}
+
+export function buildVerificationEvidenceIdentity(record) {
+  return [
+    record.articleSlug,
+    record.verificationType,
+    record.apiName,
+    record.sourceRef,
+    record.gameTime ?? "-",
+    record.tickStart ?? "-",
+    record.tickEnd ?? "-",
+  ].join("|");
+}
+
+export function createVerificationEvidenceKey(record) {
+  const digest = createHash("sha256")
+    .update(buildVerificationEvidenceIdentity(record), "utf8")
+    .digest("hex")
+    .slice(0, 20)
+    .toUpperCase();
+  return `EV-${digest}`;
+}
+
+export function validateCaptureSourceRef(sourceRef) {
+  if (!captureRefPattern.test(sourceRef)) {
+    throw new Error(
+      "sourceRef must use the controlled capture format capture:CAP-YYYYMMDD-LABEL, for example capture:CAP-20260811-ERR-NIR-001",
+    );
+  }
+  return sourceRef;
 }
 
 export function validateVerificationEvidenceRecord(input) {
@@ -102,7 +139,8 @@ export function validateVerificationEvidenceRecord(input) {
     throw new Error("at least one of beforeState or afterState is required");
   }
 
-  return {
+  const sourceRef = validateCaptureSourceRef(requiredString(input.sourceRef, "sourceRef", 240));
+  const normalized = {
     articleSlug,
     language,
     verificationType,
@@ -116,8 +154,13 @@ export function validateVerificationEvidenceRecord(input) {
     tickStart,
     tickEnd,
     evidenceNote: requiredString(input.evidenceNote, "evidenceNote", 1200),
-    sourceRef: requiredString(input.sourceRef, "sourceRef", 240),
+    sourceRef,
     verifiedAt: normalizeVerifiedAt(input.verifiedAt),
+  };
+
+  return {
+    evidenceKey: createVerificationEvidenceKey(normalized),
+    ...normalized,
   };
 }
 

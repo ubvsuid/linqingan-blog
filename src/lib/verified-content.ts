@@ -12,15 +12,16 @@ export type VerifiedLocale = "zh" | "en";
 export type VerifiedLevel = "console" | "live";
 
 export interface VerifiedEvidencePreview {
+  evidenceKey: string;
   type: RuntimeVerificationType;
   gameTime: number | null;
   shard: string | null;
   roomName: string | null;
-  apiName: string | null;
+  apiName: string;
   returnCode: string | null;
   tickStart: number | null;
   tickEnd: number | null;
-  note: string | null;
+  note: string;
 }
 
 export interface VerifiedContentRecord {
@@ -112,6 +113,7 @@ function recordVerification(post: Post, summary?: ArticleEvidenceSummary) {
     evidenceCount: summary?.count ?? 0,
     latestEvidence: latest
       ? ({
+          evidenceKey: latest.evidenceKey,
           type: latest.verificationType,
           gameTime: latest.gameTime,
           shard: latest.shard,

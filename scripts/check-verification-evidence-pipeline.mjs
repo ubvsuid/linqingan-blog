@@ -17,7 +17,7 @@ const validConsole = {
   beforeState: { range: 2 },
   afterState: { range: 2 },
   evidenceNote: "Synthetic validator fixture only; not runtime evidence.",
-  sourceRef: "fixture:console",
+  sourceRef: "capture:CAP-20260810-SMOKE-CONSOLE",
   verifiedAt: "2026-08-10T00:00:00.000Z",
 };
 
@@ -35,17 +35,24 @@ const validLive = {
   tickStart: 200000,
   tickEnd: 200002,
   evidenceNote: "Synthetic validator fixture only; not runtime evidence.",
-  sourceRef: "fixture:live",
+  sourceRef: "capture:CAP-20260810-SMOKE-LIVE",
   verifiedAt: "2026-08-10T00:00:00.000Z",
 };
 
-validateVerificationEvidenceRecord(validConsole);
-validateVerificationEvidenceRecord(validLive);
+const normalizedConsole = validateVerificationEvidenceRecord(validConsole);
+const normalizedLive = validateVerificationEvidenceRecord(validLive);
+if (!/^EV-[A-F0-9]{20}$/.test(normalizedConsole.evidenceKey)) {
+  throw new Error("Console evidence must receive a deterministic stable evidence key.");
+}
+if (normalizedConsole.evidenceKey === normalizedLive.evidenceKey) {
+  throw new Error("Different evidence identities must not share the same stable evidence key.");
+}
 
 const invalidFixtures = [
   { ...validConsole, gameTime: null },
   { ...validLive, tickEnd: validLive.tickStart },
   { ...validConsole, beforeState: null, afterState: null },
+  { ...validConsole, sourceRef: "fixture:console" },
   { ...validConsole, unexpectedField: true },
 ];
 
@@ -70,7 +77,26 @@ const publicWriteRoute = path.join(
   "route.ts",
 );
 if (fs.existsSync(publicWriteRoute)) {
-  throw new Error("Public verification evidence API route is forbidden in Phase 3A.");
+  throw new Error("Public verification evidence API route is forbidden.");
+}
+
+const schemaSource = fs.readFileSync(path.join(process.cwd(), "src/db/schema.ts"), "utf8");
+for (const requiredSchemaToken of [
+  'evidenceKey: text("evidence_key").notNull()',
+  'status: text("status").notNull().default("captured")',
+  'uniqueIndex("verification_evidence_key_uidx")',
+]) {
+  if (!schemaSource.includes(requiredSchemaToken)) {
+    throw new Error(`Verification evidence schema is missing governance token: ${requiredSchemaToken}`);
+  }
+}
+
+const evidenceReaderSource = fs.readFileSync(
+  path.join(process.cwd(), "src/lib/verification-evidence.ts"),
+  "utf8",
+);
+if (!evidenceReaderSource.includes('eq(verificationEvidence.status, "accepted")')) {
+  throw new Error("Public evidence reads must be restricted to internally accepted rows.");
 }
 
 const verifiedContentSource = fs.readFileSync(
@@ -107,6 +133,27 @@ for (const pagePath of [
   }
 }
 
+const maintenanceScripts = [
+  "verification-evidence-write.mjs",
+  "verification-evidence-list.mjs",
+  "verification-evidence-show.mjs",
+  "verification-evidence-review.mjs",
+  "verification-evidence-accept.mjs",
+  "verification-evidence-reject.mjs",
+  "verification-evidence-revoke.mjs",
+  "verification-evidence-report.mjs",
+  "verification-evidence-health.mjs",
+];
+for (const script of maintenanceScripts) {
+  const syntax = spawnSync(process.execPath, ["--check", path.join(process.cwd(), "scripts", script)], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+  if (syntax.status !== 0) {
+    throw new Error(`${script} syntax check failed: ${syntax.stderr || syntax.stdout}`);
+  }
+}
+
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "linqingan-evidence-smoke-"));
 try {
   const fixturePath = path.join(tempDir, "console-evidence.json");
@@ -122,24 +169,13 @@ try {
       `verification-evidence-write dry run failed: ${writer.stderr || writer.stdout}`,
     );
   }
-  if (!writer.stdout.includes("Dry run only")) {
-    throw new Error("verification-evidence-write must default to a non-writing dry run.");
-  }
-
-  const reportSyntax = spawnSync(
-    process.execPath,
-    ["--check", path.join(process.cwd(), "scripts/verification-evidence-report.mjs")],
-    { cwd: process.cwd(), encoding: "utf8" },
-  );
-  if (reportSyntax.status !== 0) {
-    throw new Error(
-      `verification-evidence-report syntax check failed: ${reportSyntax.stderr || reportSyntax.stdout}`,
-    );
+  if (!writer.stdout.includes("Dry run only") || !writer.stdout.includes(normalizedConsole.evidenceKey)) {
+    throw new Error("verification-evidence-write must default to a non-writing dry run and preview the stable evidence key.");
   }
 } finally {
   fs.rmSync(tempDir, { recursive: true, force: true });
 }
 
 console.log(
-  "Verification evidence pipeline check passed: bounded payload validation, no public write route, Markdown acceptance gating, bilingual verified-page integration, and a read-only writer dry run are verified.",
+  "Verification evidence pipeline check passed: stable evidence identity, controlled capture references, lifecycle schema, accepted-only public reads, Markdown acceptance gating, bilingual verified-page integration, maintenance CLI syntax, no public write route, and writer dry-run behavior are verified.",
 );
