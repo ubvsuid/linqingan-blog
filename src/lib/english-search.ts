@@ -1,5 +1,6 @@
 import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
+import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
 import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 
 export interface EnglishSearchDocument {
@@ -22,13 +23,43 @@ const knowledgeModuleSearchTerms: Record<number, string[]> = {
   8: ["operation", "debug", "debugging", "diagnostic", "cpu", "bucket", "event", "notify", "visual"],
 };
 
+function compactKeywords(values: string[], limit = 24): string[] {
+  const seen = new Set<string>();
+  const compact: string[] = [];
+
+  for (const value of values) {
+    const normalized = value.normalize("NFKC").trim();
+    if (!normalized) continue;
+    const key = normalized.toLocaleLowerCase("en");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    compact.push(normalized.slice(0, 120));
+    if (compact.length >= limit) break;
+  }
+
+  return compact;
+}
+
 const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-home", title: "Screeps Tutorials, Debugging Guides and Tools", description: "The English home for practical Screeps learning, debugging, references, and tools.", href: "/en", type: "Page", keywords: ["screeps", "tutorial", "debugging", "javascript", "automation"] },
   { id: "english-beginner", title: "Screeps Beginner Roadmap", description: "A learning sequence from ticks and the first Creep to roles, upgrading, construction, and a room loop.", href: "/en/beginner", type: "Page", keywords: ["beginner", "first creep", "spawn", "harvest", "upgrade controller"] },
   { id: "english-knowledge", title: "Screeps Knowledge Base", description: "A structured map for Memory, spawning, economy, movement, Controllers, defense, market systems, and debugging.", href: "/en/knowledge", type: "Page", keywords: ["memory", "spawn", "economy", "pathfinding", "controller", "market", "cpu"] },
   { id: "english-api-reference", title: "Screeps API Quick Reference", description: "Search common Game, Creep, Room, Structure, Market, and PathFinder APIs and continue to matching guides or official documentation.", href: "/en/screeps-api", type: "Reference", keywords: ["screeps api", "game api", "creep api", "room api", "structure api", "pathfinder", "market"] },
   { id: "english-topics", title: "English Screeps Topics", description: "Topic archives for Memory, spawning, Creeps, Energy, movement, pathfinding, Controllers, construction, defense, market systems, resources, CPU, debugging, and JavaScript.", href: "/en/tags", type: "Page", keywords: ["topics", "tags", "memory", "movement", "defense", "market", "debugging"] },
-  { id: "english-errors", title: "Screeps Error Codes and Return Values", description: "Common constants such as ERR_NOT_IN_RANGE, ERR_NO_PATH, ERR_BUSY, ERR_FULL, and ERR_NOT_ENOUGH_ENERGY.", href: "/en/screeps-errors", type: "Reference", keywords: ["return code", "err_not_in_range", "err_no_path", "err_busy", "err_full", "error"] },
+  {
+    id: "english-errors",
+    title: "Screeps Error Codes and Return Values",
+    description: "High-frequency Screeps error codes with diagnostic paths into APIs, object hubs, guides, tools, and runtime verification.",
+    href: "/en/screeps-errors",
+    type: "Reference",
+    keywords: compactKeywords([
+      "return code",
+      "screeps error",
+      "diagnostic path",
+      ...screepsErrorDiagnostics.map((diagnostic) => diagnostic.name),
+      ...screepsErrorDiagnostics.flatMap((diagnostic) => diagnostic.enSearchTerms),
+    ], 24),
+  },
   { id: "english-glossary", title: "Screeps Glossary", description: "Definitions for Creep, Spawn, tick, Memory, Controller, RCL, GCL, CPU, bucket, store, and fatigue.", href: "/en/glossary", type: "Reference", keywords: ["glossary", "creep", "spawn", "tick", "rcl", "gcl", "bucket", "fatigue"] },
   { id: "english-verification", title: "How Screeps Guides Are Verified", description: "Documentation checks, syntax checks, offline simulation, Console testing, and live multi-tick verification.", href: "/en/verification", type: "Reference", keywords: ["verification", "tested", "console", "simulation", "live room"] },
   { id: "english-recently-verified", title: "Recently Verified Screeps Guides", description: "English guides mapped to source records with explicit Console testing or live multi-tick verification evidence.", href: "/en/verified", type: "Reference", keywords: ["recently verified", "console tested", "live tested", "runtime evidence", "multi-tick"] },
@@ -56,23 +87,6 @@ const toolDocuments: EnglishSearchDocument[] = toolCatalog.map((tool) => ({
   type: "Tool",
   keywords: [...tool.enKeywords],
 }));
-
-function compactKeywords(values: string[], limit = 24): string[] {
-  const seen = new Set<string>();
-  const compact: string[] = [];
-
-  for (const value of values) {
-    const normalized = value.normalize("NFKC").trim();
-    if (!normalized) continue;
-    const key = normalized.toLocaleLowerCase("en");
-    if (seen.has(key)) continue;
-    seen.add(key);
-    compact.push(normalized.slice(0, 120));
-    if (compact.length >= limit) break;
-  }
-
-  return compact;
-}
 
 const topicDocuments: EnglishSearchDocument[] = englishTags.map((tag) => ({
   id: `english-topic-${tag.slug}`,

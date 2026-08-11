@@ -1,14 +1,18 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { ScreepsErrorDiagnosticNetwork } from "@/components/screeps-error-diagnostic-network";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
 
 import styles from "../english.module.css";
+
+export const revalidate = 300;
 
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Error Codes and Return Values",
   description:
-    "A concise English reference for common Screeps return codes, including OK, ERR_NOT_OWNER, ERR_NO_PATH, ERR_BUSY, ERR_NOT_FOUND, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, and ERR_NOT_IN_RANGE.",
+    "A practical English Screeps return-code reference with diagnostic paths connecting high-frequency errors to APIs, object hubs, guides, tools, and accepted runtime verification.",
   path: "/en/screeps-errors",
   chinesePath: "/screeps-errors",
 });
@@ -43,17 +47,27 @@ export default function EnglishScreepsErrorsPage() {
           <p className="eyebrow">RETURN CODE REFERENCE</p>
           <h1>Screeps error codes</h1>
           <p>
-            Save and inspect the return value of every important game action. A return code identifies the first failure branch; it does not replace checking the object, target, range, resources, cooldown, and next-tick state.
+            Save and inspect the return value of every important game action. A return code identifies the first failure branch; the diagnostic paths below continue from that branch into the relevant API, object hub, guide, tool, and later-tick verification workflow.
           </p>
         </header>
 
+        <ScreepsErrorDiagnosticNetwork locale="en" />
+
         <div className={styles.tableWrap}>
           <table className={styles.table}>
-            <thead><tr><th>Constant</th><th>Value</th><th>Practical meaning</th></tr></thead>
+            <thead><tr><th>Constant</th><th>Value</th><th>Practical meaning</th><th>Next</th></tr></thead>
             <tbody>
-              {errorCodes.map(([name, value, meaning]) => (
-                <tr key={name} id={name.toLowerCase()}><td><code>{name}</code></td><td><code>{value}</code></td><td>{meaning}</td></tr>
-              ))}
+              {errorCodes.map(([name, value, meaning]) => {
+                const diagnostic = getScreepsErrorDiagnostic(name);
+                return (
+                  <tr key={name} id={name.toLowerCase()}>
+                    <td><code>{name}</code></td>
+                    <td><code>{value}</code></td>
+                    <td>{meaning}</td>
+                    <td>{diagnostic ? <Link href={`#diagnostic-${name.toLowerCase()}`}>Diagnostic path ↑</Link> : "—"}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
