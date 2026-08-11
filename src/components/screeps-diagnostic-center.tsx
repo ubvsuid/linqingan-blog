@@ -114,7 +114,6 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
             .map((slug) => screepsApiHubs.find((hub) => hub.slug === slug))
             .filter((hub): hub is NonNullable<typeof hub> => Boolean(hub));
           const guides = uniqueByHref([
-            ...(symptom.guides ?? []).map((link) => localizeDiagnosticLink(link, locale)),
             ...diagnostics.flatMap((diagnostic) =>
               diagnostic.guides.map((link) => getLocalizedErrorDiagnosticLink(link, locale)),
             ),
