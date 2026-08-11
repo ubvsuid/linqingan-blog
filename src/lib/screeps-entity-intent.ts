@@ -460,7 +460,7 @@ export function getScreepsIntentPromotions(
     if (direct >= 45) {
       propagated = direct + Math.round(best * 0.65) + matchedKinds.size * 18;
     } else if (matchedKinds.size >= 2) {
-      propagated = best + Math.round(second * 0.65) + matchedKinds.size * 20;
+      propagated = best + Math.round(second * 0.65) + matchedKinds.size * 20 + Math.round(direct * 2);
     }
 
     if (propagated > (promotedScores.get(symptomNodeId) ?? 0)) {
