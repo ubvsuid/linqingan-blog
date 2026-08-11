@@ -1,5 +1,6 @@
 import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
+import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
 import { getToolHref, toolCatalog } from "@/lib/tool-catalog";
 
@@ -44,6 +45,19 @@ const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-home", title: "Screeps Tutorials, Debugging Guides and Tools", description: "The English home for practical Screeps learning, debugging, references, and tools.", href: "/en", type: "Page", keywords: ["screeps", "tutorial", "debugging", "javascript", "automation"] },
   { id: "english-beginner", title: "Screeps Beginner Roadmap", description: "A learning sequence from ticks and the first Creep to roles, upgrading, construction, and a room loop.", href: "/en/beginner", type: "Page", keywords: ["beginner", "first creep", "spawn", "harvest", "upgrade controller"] },
   { id: "english-knowledge", title: "Screeps Knowledge Base", description: "A structured map for Memory, spawning, economy, movement, Controllers, defense, market systems, and debugging.", href: "/en/knowledge", type: "Page", keywords: ["memory", "spawn", "economy", "pathfinding", "controller", "market", "cpu"] },
+  {
+    id: "english-diagnostics",
+    title: "Screeps Diagnostic Center",
+    description: "Start from visible symptoms such as a Creep not moving, Spawn failures, Controller downgrade pressure, Link transfer problems, Market failures, high CPU, or stalled logistics, then continue into return codes, APIs, object hubs, guides, tools, and runtime verification.",
+    href: "/en/diagnostics",
+    type: "Reference",
+    keywords: compactKeywords([
+      "screeps diagnostics",
+      "symptom troubleshooting",
+      ...screepsDiagnosticSymptoms.map((symptom) => symptom.enTitle),
+      ...screepsDiagnosticSymptoms.flatMap((symptom) => symptom.enSearchTerms),
+    ], 24),
+  },
   { id: "english-api-reference", title: "Screeps API Quick Reference", description: "Search common Game, Creep, Room, Structure, Market, and PathFinder APIs and continue to matching guides or official documentation.", href: "/en/screeps-api", type: "Reference", keywords: ["screeps api", "game api", "creep api", "room api", "structure api", "pathfinder", "market"] },
   { id: "english-topics", title: "English Screeps Topics", description: "Topic archives for Memory, spawning, Creeps, Energy, movement, pathfinding, Controllers, construction, defense, market systems, resources, CPU, debugging, and JavaScript.", href: "/en/tags", type: "Page", keywords: ["topics", "tags", "memory", "movement", "defense", "market", "debugging"] },
   {

@@ -1,0 +1,112 @@
+.center {
+  display: grid;
+  gap: 24px;
+  margin: 36px 0 48px;
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: end;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+}
+
+.heading > div { max-width: 780px; }
+.heading h2 { margin: 8px 0 12px; font-size: clamp(28px, 4vw, 44px); line-height: 1.05; }
+.heading p:last-child { margin: 0; color: var(--muted); line-height: 1.75; }
+.heading > strong { white-space: nowrap; font-size: 13px; color: var(--muted); }
+
+.index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.index a,
+.chips a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.index a:hover,
+.chips a:hover { border-color: var(--text); }
+
+.grid { display: grid; gap: 24px; }
+
+.card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  scroll-margin-top: 96px;
+}
+
+.cardHead {
+  display: grid;
+  grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+  gap: 28px;
+  align-items: end;
+  padding: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cardHead span { color: var(--muted); font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 11px; letter-spacing: .12em; }
+.cardHead h3 { margin: 8px 0 0; font-size: clamp(24px, 3vw, 34px); }
+.cardHead p { margin: 0; color: var(--muted); line-height: 1.75; }
+
+.triage,
+.errors { padding: 24px 28px; border-bottom: 1px solid var(--border); }
+
+.triage h4,
+.errors h4,
+.relations h4 { margin: 0 0 12px; font-size: 13px; letter-spacing: .02em; }
+
+.triage ol { display: grid; gap: 10px; margin: 0; padding-left: 22px; color: var(--muted); line-height: 1.7; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips code { white-space: normal; overflow-wrap: anywhere; }
+.chips span { color: var(--muted); font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 11px; }
+
+.muted { margin: 0; color: var(--muted); line-height: 1.7; }
+
+.relations {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border);
+}
+
+.relations section { min-width: 0; padding: 24px 28px; }
+.relations section:nth-child(odd) { border-right: 1px solid var(--border); }
+.relations section:nth-child(-n + 2) { border-bottom: 1px solid var(--border); }
+
+.linkStack { display: grid; gap: 9px; }
+.linkStack a { width: fit-content; line-height: 1.5; }
+
+.verification { display: grid; gap: 14px; padding: 24px 28px; background: color-mix(in srgb, var(--surface) 94%, var(--text)); }
+.verification > div:first-child { display: flex; justify-content: space-between; gap: 18px; }
+.verification span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.verifiedLinks { display: grid; gap: 8px; }
+.verifiedLinks a { width: fit-content; font-size: 13px; }
+.verification nav { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; }
+
+@media (max-width: 760px) {
+  .heading,
+  .cardHead { grid-template-columns: 1fr; display: grid; align-items: start; }
+  .heading > strong { white-space: normal; }
+  .relations { grid-template-columns: 1fr; }
+  .relations section:nth-child(odd) { border-right: 0; }
+  .relations section:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .verification > div:first-child { display: grid; }
+}

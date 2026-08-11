@@ -4,6 +4,7 @@ export const englishNavigation = [
   { label: "Beginner", href: "/en/beginner" },
   { label: "Articles", href: "/en/blog" },
   { label: "Knowledge", href: "/en/knowledge" },
+  { label: "Diagnostics", href: "/en/diagnostics" },
   { label: "Tools", href: "/en/tools" },
   { label: "About", href: "/en/about" },
 ] as const;
@@ -14,6 +15,7 @@ export const languageRoutePairs = {
   "/blog": "/en/blog",
   ...englishArticleRoutePairs,
   "/knowledge": "/en/knowledge",
+  "/diagnostics": "/en/diagnostics",
   "/screeps-api": "/en/screeps-api",
   "/screeps-api/creep": "/en/screeps-api/creep",
   "/screeps-api/room": "/en/screeps-api/room",

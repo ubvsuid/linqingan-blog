@@ -3,6 +3,7 @@ import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
+import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
@@ -103,6 +104,24 @@ const apiHubDocuments: SearchDocument[] = screepsApiHubs.map((hub) => ({
   text: `${hub.zhScope} ${hub.entryIds.join(" ")} ${hub.errorNames.join(" ")}`,
 }));
 
+const diagnosticCenterDocument: SearchDocument = {
+  id: "reference:screeps-diagnostics",
+  type: "工具",
+  title: "Screeps 故障诊断中心",
+  description: "从 Creep 不移动、Spawn 不生产、Controller 快降级、Link 不传能、Market 交易失败、CPU 过高和资源物流停滞等症状进入结构化排查路径。",
+  href: "/diagnostics",
+  meta: `${screepsDiagnosticSymptoms.length} 条症状优先诊断路径`,
+  keywords: compactKeywords([
+    "Screeps 故障诊断",
+    "症状排查",
+    ...screepsDiagnosticSymptoms.map((symptom) => symptom.zhTitle),
+    ...screepsDiagnosticSymptoms.flatMap((symptom) => symptom.zhSearchTerms),
+  ]),
+  text: screepsDiagnosticSymptoms
+    .flatMap((symptom) => [symptom.zhSummary, ...symptom.zhTriage, ...symptom.errorNames])
+    .join(" "),
+};
+
 const toolDocuments: SearchDocument[] = [
   {
     id: "tool:hub",
@@ -115,6 +134,7 @@ const toolDocuments: SearchDocument[] = [
     keywords: ["Screeps 工具", "计算器", "诊断", "规划器", "tools"],
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
+  diagnosticCenterDocument,
   apiReferenceDocument,
   ...apiHubDocuments,
   ...toolCatalog.map(
