@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 
+export const VERIFICATION_EVIDENCE_BUNDLE_SCHEMA_VERSION = "linqingan-evidence-bundle/v1";
+
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const captureRefPattern = /^capture:CAP-\d{8}-[A-Z0-9][A-Z0-9-]{2,80}$/;
 const supportedLanguages = new Set(["zh-CN", "en"]);
@@ -20,6 +22,12 @@ const allowedKeys = new Set([
   "evidenceNote",
   "sourceRef",
   "verifiedAt",
+]);
+const bundleAllowedKeys = new Set([
+  "schemaVersion",
+  "captureKitVersion",
+  "generatedAt",
+  "records",
 ]);
 
 function isPlainObject(value) {
@@ -66,6 +74,43 @@ function normalizeVerifiedAt(value) {
     throw new Error("verifiedAt cannot be more than five minutes in the future");
   }
   return parsed.toISOString();
+}
+
+function normalizeBundleGeneratedAt(value) {
+  const raw = optionalString(value, "generatedAt", 64);
+  if (!raw) return null;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) throw new Error("generatedAt must be a valid ISO date/time when provided");
+  return parsed.toISOString();
+}
+
+function unwrapVerificationEvidencePayload(payload) {
+  if (
+    isPlainObject(payload) &&
+    (Object.prototype.hasOwnProperty.call(payload, "schemaVersion") ||
+      Object.prototype.hasOwnProperty.call(payload, "records"))
+  ) {
+    for (const key of Object.keys(payload)) {
+      if (!bundleAllowedKeys.has(key)) throw new Error(`unknown evidence bundle field: ${key}`);
+    }
+
+    const schemaVersion = requiredString(payload.schemaVersion, "schemaVersion", 80);
+    if (schemaVersion !== VERIFICATION_EVIDENCE_BUNDLE_SCHEMA_VERSION) {
+      throw new Error(
+        `schemaVersion must be ${VERIFICATION_EVIDENCE_BUNDLE_SCHEMA_VERSION}`,
+      );
+    }
+
+    optionalString(payload.captureKitVersion, "captureKitVersion", 32);
+    normalizeBundleGeneratedAt(payload.generatedAt);
+
+    if (!Array.isArray(payload.records)) {
+      throw new Error("evidence bundle records must be an array");
+    }
+    return payload.records;
+  }
+
+  return Array.isArray(payload) ? payload : [payload];
 }
 
 export function buildVerificationEvidenceIdentity(record) {
@@ -165,7 +210,7 @@ export function validateVerificationEvidenceRecord(input) {
 }
 
 export function validateVerificationEvidencePayload(payload) {
-  const records = Array.isArray(payload) ? payload : [payload];
+  const records = unwrapVerificationEvidencePayload(payload);
   if (records.length === 0) throw new Error("evidence payload must contain at least one record");
   if (records.length > 100) throw new Error("a single evidence import is limited to 100 records");
   return records.map((record, index) => {
