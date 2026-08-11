@@ -3,6 +3,7 @@ import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
+import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
 import { screepsGlossary } from "@/lib/screeps-glossary";
 import { getToolHref, toolCatalog, toolCount } from "@/lib/tool-catalog";
@@ -163,16 +164,30 @@ export function getSearchDocuments(
     text: entry.detail,
   }));
 
-  const errors: SearchDocument[] = screepsErrorCodes.map((code) => ({
-    id: `error:${code.name}`,
-    type: "错误码",
-    title: `${code.name}（${code.value}）`,
-    description: code.meaning,
-    href: `/screeps-errors#${code.name.toLowerCase()}`,
-    meta: `返回值 ${code.value}`,
-    keywords: [code.name, String(code.value), "Screeps 错误码"],
-    text: `${code.commonCause} ${code.fix}`,
-  }));
+  const errors: SearchDocument[] = screepsErrorCodes.map((code) => {
+    const diagnostic = getScreepsErrorDiagnostic(code.name);
+    return {
+      id: `error:${code.name}`,
+      type: "错误码",
+      title: `${code.name}（${code.value}）`,
+      description: code.meaning,
+      href: `/screeps-errors#${code.name.toLowerCase()}`,
+      meta: diagnostic ? `返回值 ${code.value} · 重点诊断路径` : `返回值 ${code.value}`,
+      keywords: compactKeywords([
+        code.name,
+        String(code.value),
+        "Screeps 错误码",
+        ...(diagnostic?.zhSearchTerms ?? []),
+      ]),
+      text: [
+        code.commonCause,
+        code.fix,
+        ...(diagnostic?.zhChecks ?? []),
+        ...(diagnostic?.apiEntryIds ?? []),
+        ...(diagnostic?.hubSlugs ?? []),
+      ].join(" "),
+    };
+  });
 
   const projectDocuments: SearchDocument[] = projects.map((project) => ({
     id: `project:${project.id}`,
