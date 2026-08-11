@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ScreepsApiHubPage } from "@/components/screeps-api-hub-page";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
-import type { languageRoutePairs } from "@/lib/i18n";
+import { languageRoutePairs } from "@/lib/i18n";
 import {
   getScreepsApiHub,
   getScreepsApiHubHref,
