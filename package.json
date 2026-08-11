@@ -72,6 +72,7 @@
     "verification:evidence-write": "node scripts/verification-evidence-write.mjs",
     "verification:evidence-list": "node scripts/verification-evidence-list.mjs",
     "verification:evidence-show": "node scripts/verification-evidence-show.mjs",
+    "verification:evidence-review": "node scripts/verification-evidence-review.mjs",
     "verification:evidence-report": "node scripts/verification-evidence-report.mjs",
     "verification:evidence-accept": "node scripts/verification-evidence-accept.mjs",
     "verification:evidence-reject": "node scripts/verification-evidence-reject.mjs",
