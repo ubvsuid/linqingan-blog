@@ -23,6 +23,23 @@ const knowledgeModuleSearchTerms: Record<number, string[]> = {
   8: ["operation", "debug", "debugging", "diagnostic", "cpu", "bucket", "event", "notify", "visual"],
 };
 
+function compactKeywords(values: string[], limit = 24): string[] {
+  const seen = new Set<string>();
+  const compact: string[] = [];
+
+  for (const value of values) {
+    const normalized = value.normalize("NFKC").trim();
+    if (!normalized) continue;
+    const key = normalized.toLocaleLowerCase("en");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    compact.push(normalized.slice(0, 120));
+    if (compact.length >= limit) break;
+  }
+
+  return compact;
+}
+
 const foundationDocuments: EnglishSearchDocument[] = [
   { id: "english-home", title: "Screeps Tutorials, Debugging Guides and Tools", description: "The English home for practical Screeps learning, debugging, references, and tools.", href: "/en", type: "Page", keywords: ["screeps", "tutorial", "debugging", "javascript", "automation"] },
   { id: "english-beginner", title: "Screeps Beginner Roadmap", description: "A learning sequence from ticks and the first Creep to roles, upgrading, construction, and a room loop.", href: "/en/beginner", type: "Page", keywords: ["beginner", "first creep", "spawn", "harvest", "upgrade controller"] },
@@ -35,12 +52,13 @@ const foundationDocuments: EnglishSearchDocument[] = [
     description: "High-frequency Screeps error codes with diagnostic paths into APIs, object hubs, guides, tools, and runtime verification.",
     href: "/en/screeps-errors",
     type: "Reference",
-    keywords: [
+    keywords: compactKeywords([
       "return code",
       "screeps error",
       "diagnostic path",
-      ...screepsErrorDiagnostics.flatMap((diagnostic) => [diagnostic.name, ...diagnostic.enSearchTerms]),
-    ],
+      ...screepsErrorDiagnostics.map((diagnostic) => diagnostic.name),
+      ...screepsErrorDiagnostics.flatMap((diagnostic) => diagnostic.enSearchTerms),
+    ], 24),
   },
   { id: "english-glossary", title: "Screeps Glossary", description: "Definitions for Creep, Spawn, tick, Memory, Controller, RCL, GCL, CPU, bucket, store, and fatigue.", href: "/en/glossary", type: "Reference", keywords: ["glossary", "creep", "spawn", "tick", "rcl", "gcl", "bucket", "fatigue"] },
   { id: "english-verification", title: "How Screeps Guides Are Verified", description: "Documentation checks, syntax checks, offline simulation, Console testing, and live multi-tick verification.", href: "/en/verification", type: "Reference", keywords: ["verification", "tested", "console", "simulation", "live room"] },
@@ -69,23 +87,6 @@ const toolDocuments: EnglishSearchDocument[] = toolCatalog.map((tool) => ({
   type: "Tool",
   keywords: [...tool.enKeywords],
 }));
-
-function compactKeywords(values: string[], limit = 24): string[] {
-  const seen = new Set<string>();
-  const compact: string[] = [];
-
-  for (const value of values) {
-    const normalized = value.normalize("NFKC").trim();
-    if (!normalized) continue;
-    const key = normalized.toLocaleLowerCase("en");
-    if (seen.has(key)) continue;
-    seen.add(key);
-    compact.push(normalized.slice(0, 120));
-    if (compact.length >= limit) break;
-  }
-
-  return compact;
-}
 
 const topicDocuments: EnglishSearchDocument[] = englishTags.map((tag) => ({
   id: `english-topic-${tag.slug}`,
