@@ -175,7 +175,9 @@ function addLinkedNode(input: {
 
 const errorCodeByName = new Map(screepsErrorCodes.map((entry) => [entry.name, entry]));
 const apiById = new Map(screepsApiReference.map((entry) => [entry.id, entry]));
-const diagnosticByName = new Map(screepsErrorDiagnostics.map((entry) => [entry.name, entry]));
+const diagnosticByName = new Map<string, (typeof screepsErrorDiagnostics)[number]>(
+  screepsErrorDiagnostics.map((entry) => [entry.name, entry] as const),
+);
 const coverageBySymptom = new Map(verificationCoveragePlans.map((plan) => [plan.symptomId, plan]));
 
 for (const diagnostic of screepsErrorDiagnostics) {
@@ -332,7 +334,9 @@ for (const symptom of diagnosticSymptoms) {
       addEdge(symptomId, stableLinkId("guide", api.guideHref), "symptom-guide");
     }
     for (const hub of screepsApiHubs) {
-      if (hub.entryIds.includes(apiId)) addEdge(symptomId, `hub:${hub.slug}`, "symptom-hub");
+      if ((hub.entryIds as readonly string[]).includes(apiId)) {
+        addEdge(symptomId, `hub:${hub.slug}`, "symptom-hub");
+      }
     }
   }
 }
