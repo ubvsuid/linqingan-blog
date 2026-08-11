@@ -14,9 +14,12 @@ draft: false
 verification:
   docsChecked: true
   syntaxChecked: true
-  consoleTested: false
+  consoleTested: true
   liveTested: false
   checkedAt: "2026-07-21"
+  testedAt: "2026-08-11"
+  testEnvironment: "shard3 / W39N53"
+  testResult: "Accepted Console evidence: EV-4BFAF12BE09D383FACA6 verified Creep.upgradeController() returned OK (0) at range 3 with Energy and active WORK; EV-FAE0F4BC885D92F8A363 verified ERR_NOT_IN_RANGE (-9) at range 15 with Energy and Controller progress unchanged in the same Console expression."
 featured: false
 ---
 
