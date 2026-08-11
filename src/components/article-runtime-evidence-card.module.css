@@ -58,6 +58,25 @@
   line-height: 1.65;
 }
 
+.relations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.relations a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 9px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.relations a:hover {
+  color: var(--foreground);
+}
+
 @media (max-width: 640px) {
   .header {
     display: grid;
