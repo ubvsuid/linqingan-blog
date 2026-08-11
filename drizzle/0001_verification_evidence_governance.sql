@@ -24,16 +24,12 @@ ALTER TABLE verification_evidence
   ALTER COLUMN evidence_note SET NOT NULL,
   ALTER COLUMN source_ref SET NOT NULL;
 
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'verification_evidence_status_check'
-  ) THEN
-    ALTER TABLE verification_evidence
-      ADD CONSTRAINT verification_evidence_status_check
-      CHECK (status IN ('captured', 'reviewed', 'accepted', 'rejected', 'revoked'));
-  END IF;
-END $$;
+ALTER TABLE verification_evidence
+  DROP CONSTRAINT IF EXISTS verification_evidence_status_check;
+
+ALTER TABLE verification_evidence
+  ADD CONSTRAINT verification_evidence_status_check
+  CHECK (status IN ('captured', 'reviewed', 'accepted', 'rejected', 'revoked'));
 
 CREATE UNIQUE INDEX IF NOT EXISTS verification_evidence_key_uidx
   ON verification_evidence(evidence_key);
