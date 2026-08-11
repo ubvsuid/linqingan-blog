@@ -129,7 +129,6 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
       .map((name) => getScreepsErrorDiagnostic(name))
       .filter((item): item is NonNullable<typeof item> => Boolean(item));
     const guideLinks = uniqueByHref([
-      ...(symptom.guides ?? []).map((link) => localizeDiagnosticLink(link, locale)),
       ...diagnostics.flatMap((diagnostic) =>
         diagnostic.guides.map((link) => getLocalizedErrorDiagnosticLink(link, locale)),
       ),
