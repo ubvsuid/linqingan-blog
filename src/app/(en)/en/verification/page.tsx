@@ -52,6 +52,12 @@ export default function EnglishVerificationPage() {
 
         <section className={`${styles.grid} about-detail-grid`}>
           <article className={styles.card}>
+            <p className="eyebrow">CAPTURE KIT</p>
+            <h2>Capture runtime evidence in one standard format</h2>
+            <p>The Console Capture Kit reads selected object state, records explicit return values, and emits a versioned JSON Evidence Bundle. It never executes movement, Spawn, Market, Link, or other game actions; multi-tick sessions only stage bounded samples in its own Memory namespace.</p>
+            <a href="/screeps-evidence-capture-kit.js" rel="noreferrer" target="_blank">Open the Console Capture Kit →</a>
+          </article>
+          <article className={styles.card}>
             <p className="eyebrow">COVERAGE</p>
             <h2>See what still needs runtime evidence</h2>
             <p>The coverage registry maps high-frequency symptom paths to Errors, APIs, Object Hubs, Guides, and Tools, then shows the accepted Console/live evidence level and the next evidence gap.</p>
