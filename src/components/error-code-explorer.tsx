@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
+import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
 import type { ScreepsErrorCode } from "@/lib/screeps-errors";
 
 export function ErrorCodeExplorer({ codes }: { codes: ScreepsErrorCode[] }) {
@@ -12,8 +13,9 @@ export function ErrorCodeExplorer({ codes }: { codes: ScreepsErrorCode[] }) {
     const normalized = query.trim().toLocaleLowerCase("zh-CN");
     if (!normalized) return codes;
 
-    return codes.filter((code) =>
-      [
+    return codes.filter((code) => {
+      const diagnostic = getScreepsErrorDiagnostic(code.name);
+      return [
         code.name,
         String(code.value),
         code.meaning,
@@ -21,11 +23,13 @@ export function ErrorCodeExplorer({ codes }: { codes: ScreepsErrorCode[] }) {
         code.fix,
         ...(code.operations ?? []),
         ...(code.checks ?? []),
+        ...(diagnostic?.zhSearchTerms ?? []),
+        ...(diagnostic?.zhChecks ?? []),
       ]
         .join(" ")
         .toLocaleLowerCase("zh-CN")
-        .includes(normalized),
-    );
+        .includes(normalized);
+    });
   }, [codes, query]);
 
   return (
@@ -46,84 +50,92 @@ export function ErrorCodeExplorer({ codes }: { codes: ScreepsErrorCode[] }) {
 
       {filteredCodes.length > 0 ? (
         <div className="error-list">
-          {filteredCodes.map((code) => (
-            <article key={code.name} id={code.name.toLowerCase()}>
-              <header>
-                <div>
-                  <span>返回值 {code.value}</span>
-                  <h2>{code.name}</h2>
-                </div>
-                <p>{code.meaning}</p>
-              </header>
-
-              <dl>
-                <div>
-                  <dt>常见原因</dt>
-                  <dd>{code.commonCause}</dd>
-                </div>
-                <div>
-                  <dt>处理方法</dt>
-                  <dd>{code.fix}</dd>
-                </div>
-              </dl>
-
-              {code.operations && code.operations.length > 0 ? (
-                <section className="error-detail-section" aria-label="常见返回场景">
-                  <h3>常见返回场景</h3>
-                  <div className="error-operation-list">
-                    {code.operations.map((operation) => (
-                      <code key={operation}>{operation}</code>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-
-              {code.checks && code.checks.length > 0 ? (
-                <section className="error-detail-section" aria-label="排查顺序">
-                  <h3>建议排查顺序</h3>
-                  <ol>
-                    {code.checks.map((check) => (
-                      <li key={check}>{check}</li>
-                    ))}
-                  </ol>
-                </section>
-              ) : null}
-
-              {code.wrongExample || code.example ? (
-                <section className="error-code-comparison" aria-label="代码示例">
-                  {code.wrongExample ? (
-                    <div>
-                      <h3>未处理返回值</h3>
-                      <pre>
-                        <code>{code.wrongExample}</code>
-                      </pre>
-                    </div>
-                  ) : null}
-                  {code.example ? (
-                    <div>
-                      <h3>推荐处理方式</h3>
-                      <pre>
-                        <code>{code.example}</code>
-                      </pre>
-                    </div>
-                  ) : null}
-                </section>
-              ) : null}
-
-              {code.related && code.related.length > 0 ? (
-                <nav className="error-related-links" aria-label="相关内容">
-                  <span>相关内容</span>
+          {filteredCodes.map((code) => {
+            const diagnostic = getScreepsErrorDiagnostic(code.name);
+            return (
+              <article key={code.name} id={code.name.toLowerCase()}>
+                <header>
                   <div>
-                    {code.related.map((item) => (
-                      <Link key={item.href} href={item.href}>
-                        {item.label} →
+                    <span>返回值 {code.value}</span>
+                    <h2>{code.name}</h2>
+                    {diagnostic ? (
+                      <Link className="error-diagnostic-jump" href={`#diagnostic-${code.name.toLowerCase()}`}>
+                        打开重点诊断路径 ↑
                       </Link>
-                    ))}
+                    ) : null}
                   </div>
-                </nav>
-              ) : null}
-            </article>
-          ))}
+                  <p>{code.meaning}</p>
+                </header>
+
+                <dl>
+                  <div>
+                    <dt>常见原因</dt>
+                    <dd>{code.commonCause}</dd>
+                  </div>
+                  <div>
+                    <dt>处理方法</dt>
+                    <dd>{code.fix}</dd>
+                  </div>
+                </dl>
+
+                {code.operations && code.operations.length > 0 ? (
+                  <section className="error-detail-section" aria-label="常见返回场景">
+                    <h3>常见返回场景</h3>
+                    <div className="error-operation-list">
+                      {code.operations.map((operation) => (
+                        <code key={operation}>{operation}</code>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+
+                {code.checks && code.checks.length > 0 ? (
+                  <section className="error-detail-section" aria-label="排查顺序">
+                    <h3>建议排查顺序</h3>
+                    <ol>
+                      {code.checks.map((check) => (
+                        <li key={check}>{check}</li>
+                      ))}
+                    </ol>
+                  </section>
+                ) : null}
+
+                {code.wrongExample || code.example ? (
+                  <section className="error-code-comparison" aria-label="代码示例">
+                    {code.wrongExample ? (
+                      <div>
+                        <h3>未处理返回值</h3>
+                        <pre>
+                          <code>{code.wrongExample}</code>
+                        </pre>
+                      </div>
+                    ) : null}
+                    {code.example ? (
+                      <div>
+                        <h3>推荐处理方式</h3>
+                        <pre>
+                          <code>{code.example}</code>
+                        </pre>
+                      </div>
+                    ) : null}
+                  </section>
+                ) : null}
+
+                {code.related && code.related.length > 0 ? (
+                  <nav className="error-related-links" aria-label="相关内容">
+                    <span>相关内容</span>
+                    <div>
+                      {code.related.map((item) => (
+                        <Link key={item.href} href={item.href}>
+                          {item.label} →
+                        </Link>
+                      ))}
+                    </div>
+                  </nav>
+                ) : null}
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="error-empty">
@@ -143,6 +155,7 @@ export function ErrorCodeExplorer({ codes }: { codes: ScreepsErrorCode[] }) {
         .error-list header { display: grid; grid-template-columns: minmax(240px, .65fr) minmax(0, 1fr); gap: 32px; align-items: end; padding: 26px; border-bottom: 1px solid var(--border); }
         .error-list header span { color: var(--muted); font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 12px; }
         .error-list h2 { margin: 8px 0 0; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: clamp(22px, 3vw, 32px); }
+        .error-diagnostic-jump { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 650; }
         .error-list header p { margin: 0; color: var(--muted); line-height: 1.7; }
         .error-list dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
         .error-list dl div { padding: 24px 26px; }
