@@ -33,9 +33,15 @@ export default function EnglishAboutPage() {
         "@type": "Person",
         "@id": `${profileUrl}#author`,
         name: "Linqingan",
+        alternateName: [siteConfig.author.handle, siteConfig.author.socialHandle],
         url: profileUrl,
         image: `${siteConfig.url}/profile-avatar.webp`,
-        sameAs: [siteConfig.links.github, siteConfig.links.repository],
+        sameAs: [
+          siteConfig.links.x,
+          siteConfig.links.facebook,
+          siteConfig.links.github,
+          siteConfig.links.repository,
+        ],
         knowsAbout: [
           "Screeps",
           "JavaScript",
@@ -97,7 +103,7 @@ export default function EnglishAboutPage() {
           <article className={styles.card}><p className="eyebrow">OPEN DEVELOPMENT</p><h2>Issues and changes stay public</h2><p>The website repository, change history, pull requests, and issue tracker are public so technical claims and implementation decisions can be reviewed.</p><a href={siteConfig.links.repository} rel="noreferrer" target="_blank">Open the repository ↗</a></article>
           <article className={styles.card}><p className="eyebrow">LIMITATIONS</p><h2>No hidden live-game claim</h2><p>Tool results remain calculations or static snapshot assessments. Real screenshots and live-room evidence are added only when the underlying session evidence exists.</p><Link href="/en/verification">Read the verification method →</Link></article>
           <article className={styles.card}><p className="eyebrow">CHANGELOG</p><h2>Review completed changes</h2><p>The English changelog summarizes meaningful interface, navigation, tool, search, performance, verification, and SEO updates.</p><Link href="/en/changelog">Open the changelog →</Link></article>
-          <article className={styles.card}><p className="eyebrow">CONTACT</p><h2>Report a technical problem</h2><p>Provide the affected URL, Screeps object or API, return code, expected behavior, actual result, and relevant Console output. Remove account secrets before posting.</p><a href={siteConfig.links.issues} rel="noreferrer" target="_blank">Open an issue ↗</a></article>
+          <article className={styles.card}><p className="eyebrow">CONNECT</p><h2>Follow updates or report a problem</h2><p>New Screeps debugging notes, runtime verification, and tool updates are also shared on X and Facebook. Technical problems can still be reported through GitHub.</p><a href={siteConfig.links.x} rel="noreferrer" target="_blank">X {siteConfig.author.socialHandle} ↗</a><br /><a href={siteConfig.links.facebook} rel="noreferrer" target="_blank">Facebook ↗</a><br /><a href={siteConfig.links.issues} rel="noreferrer" target="_blank">Open an issue ↗</a></article>
         </section>
       </Container>
     </main>
