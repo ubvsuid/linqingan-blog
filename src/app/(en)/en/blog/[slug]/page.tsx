@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import {
+  applyEnglishEditorialCore20260812,
+  getEnglishEditorialCoreUpdatedAt20260812,
+} from "@/lib/english-editorial-core-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import {
   getEnglishEditorialRuntimeNotifyArticle20260806,
@@ -56,7 +60,7 @@ const dynamicEnglishArticles = [
   ...englishLinkSourceBatchEighteenArticles,
 ];
 
-function getDynamicEnglishArticle(slug: string) {
+function getBaseDynamicEnglishArticle(slug: string) {
   return getEnglishEditorialRuntimeNotifyArticle20260806(slug)
     ?? getEnglishEditorialPublished20260731(slug)
     ?? getEnglishBeginnerArticle(slug)
@@ -80,8 +84,15 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishLinkSourceBatchEighteenArticle(slug);
 }
 
+function getDynamicEnglishArticle(slug: string) {
+  return applyEnglishEditorialCore20260812(
+    getBaseDynamicEnglishArticle(slug),
+  );
+}
+
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
+  return getEnglishEditorialCoreUpdatedAt20260812(slug)
+    ?? getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
     ?? fallback;
 }
 
