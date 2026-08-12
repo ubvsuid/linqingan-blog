@@ -29,6 +29,7 @@ const expectedSymptoms = [
 const registry = read("src/lib/verification-coverage.ts");
 const symptoms = read("src/lib/screeps-diagnostic-symptoms.ts");
 const diagnostics = read("src/lib/screeps-error-diagnostics.ts");
+const errors = read("src/lib/screeps-errors.ts");
 const apiReference = read("src/lib/screeps-api-reference.ts");
 const component = read("src/components/verification-coverage.tsx");
 const diagnosticCenter = read("src/components/screeps-diagnostic-center.tsx");
@@ -69,9 +70,15 @@ if (targetLevels.length !== expectedSymptoms.length || targetLevels.some((value)
 }
 
 const diagnosticNames = new Set([...diagnostics.matchAll(/name: "(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
+const referenceErrorNames = new Set([...errors.matchAll(/name: "(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
 const coverageErrorNames = new Set([...registry.matchAll(/"(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
 for (const name of coverageErrorNames) {
-  if (!diagnosticNames.has(name)) failures.push(`Coverage plan references an error without a Phase 4A-2 diagnostic path: ${name}`);
+  if (!diagnosticNames.has(name) && !referenceErrorNames.has(name)) {
+    failures.push(`Coverage plan references an error without a diagnostic or general error-reference path: ${name}`);
+  }
+}
+if (!component.includes("diagnostic ? `diagnostic-${name.toLowerCase()}` : name.toLowerCase()")) {
+  failures.push("Verification Coverage must fall back to the general error anchor when a full diagnostic path is not registered.");
 }
 
 const apiIds = new Set([...apiReference.matchAll(/\bid:\s*"([a-z0-9-]+)"/g)].map((match) => match[1]));
