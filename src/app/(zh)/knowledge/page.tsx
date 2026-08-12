@@ -243,7 +243,7 @@ export default function KnowledgePage() {
             <h2>选择你要解决的问题</h2>
           </div>
           <p>
-            知识库首页只展示每个模块的代表文章，完整顺序放在模块页，减少首屏和服务器 HTML 体积。
+            每个专题不仅是一组文章，也显示从基础到深入的学习阶段；先看流程，再进入模块中的完整文章顺序。
           </p>
         </div>
 
@@ -290,6 +290,16 @@ export default function KnowledgePage() {
                     </p>
                   </div>
                 </header>
+
+                <ol className={styles.moduleFlow} aria-label={`${section.title}学习阶段`}>
+                  {section.stages.map((stage, index) => (
+                    <li key={`${section.id}-${stage.title}`}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <strong>{stage.title}</strong>
+                      {index < section.stages.length - 1 ? <i aria-hidden="true">→</i> : null}
+                    </li>
+                  ))}
+                </ol>
 
                 <ol
                   className={styles.previewList}

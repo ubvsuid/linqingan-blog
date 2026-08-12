@@ -90,8 +90,8 @@ if (!component.includes("getScreepsErrorDiagnostic")) {
 if (!i18n.includes('"/diagnostics": "/en/diagnostics"')) {
   failures.push("Missing bilingual route pair for Diagnostic Center.");
 }
-if (!site.includes('{ label: "诊断", href: "/diagnostics" }')) {
-  failures.push("Chinese primary navigation must expose the Diagnostic Center.");
+if (!site.includes('{ label: "解决问题", href: "/diagnostics" }')) {
+  failures.push("Chinese primary navigation must expose the task-first Diagnostic Center entry.");
 }
 if (!i18n.includes('{ label: "Diagnostics", href: "/en/diagnostics" }')) {
   failures.push("English primary navigation must expose the Diagnostic Center.");

@@ -36,6 +36,7 @@ export interface VerifiedContentRecord {
   testEnvironment?: string;
   evidenceCount: number;
   latestEvidence?: VerifiedEvidencePreview;
+  evidence: readonly VerifiedEvidencePreview[];
 }
 
 export interface VerifiedContentSummary {
@@ -101,7 +102,38 @@ function sortVerifiedPosts(
   );
 }
 
-function recordVerification(post: Post, summary?: ArticleEvidenceSummary) {
+function toEvidencePreview(record: PublicVerificationEvidenceRecord): VerifiedEvidencePreview {
+  return {
+    evidenceKey: record.evidenceKey,
+    type: record.verificationType,
+    gameTime: record.gameTime,
+    shard: record.shard,
+    roomName: record.roomName,
+    apiName: record.apiName,
+    returnCode: record.returnCode,
+    tickStart: record.tickStart,
+    tickEnd: record.tickEnd,
+    note: record.evidenceNote,
+  };
+}
+
+function groupEvidenceByArticle(
+  records: PublicVerificationEvidenceRecord[],
+): Map<string, PublicVerificationEvidenceRecord[]> {
+  const grouped = new Map<string, PublicVerificationEvidenceRecord[]>();
+  for (const record of records) {
+    const current = grouped.get(record.articleSlug) ?? [];
+    current.push(record);
+    grouped.set(record.articleSlug, current);
+  }
+  return grouped;
+}
+
+function recordVerification(
+  post: Post,
+  summary?: ArticleEvidenceSummary,
+  evidenceRecords: PublicVerificationEvidenceRecord[] = [],
+) {
   const latest = summary?.latest;
 
   return {
@@ -111,20 +143,8 @@ function recordVerification(post: Post, summary?: ArticleEvidenceSummary) {
     liveTested: post.verification.liveTested,
     testEnvironment: summary?.environment ?? post.verification.testEnvironment,
     evidenceCount: summary?.count ?? 0,
-    latestEvidence: latest
-      ? ({
-          evidenceKey: latest.evidenceKey,
-          type: latest.verificationType,
-          gameTime: latest.gameTime,
-          shard: latest.shard,
-          roomName: latest.roomName,
-          apiName: latest.apiName,
-          returnCode: latest.returnCode,
-          tickStart: latest.tickStart,
-          tickEnd: latest.tickEnd,
-          note: latest.evidenceNote,
-        } satisfies VerifiedEvidencePreview)
-      : undefined,
+    latestEvidence: latest ? toEvidencePreview(latest) : undefined,
+    evidence: evidenceRecords.map(toEvidencePreview),
   };
 }
 
@@ -132,6 +152,7 @@ function mapVerifiedContent(
   locale: VerifiedLocale,
   posts: Post[],
   evidenceByArticle: Map<string, ArticleEvidenceSummary>,
+  evidenceRecordsByArticle: Map<string, PublicVerificationEvidenceRecord[]>,
 ): VerifiedContentRecord[] {
   if (locale === "zh") {
     return posts.map((post) => ({
@@ -139,7 +160,11 @@ function mapVerifiedContent(
       href: `/blog/${post.slug}`,
       title: post.title,
       description: post.description,
-      ...recordVerification(post, evidenceByArticle.get(post.slug)),
+      ...recordVerification(
+        post,
+        evidenceByArticle.get(post.slug),
+        evidenceRecordsByArticle.get(post.slug),
+      ),
     }));
   }
 
@@ -157,7 +182,11 @@ function mapVerifiedContent(
         href: englishArticle.href,
         title: englishArticle.title,
         description: englishArticle.description,
-        ...recordVerification(post, evidenceByArticle.get(post.slug)),
+        ...recordVerification(
+          post,
+          evidenceByArticle.get(post.slug),
+          evidenceRecordsByArticle.get(post.slug),
+        ),
       } satisfies VerifiedContentRecord,
     ];
   });
@@ -165,10 +194,12 @@ function mapVerifiedContent(
 
 export function getVerifiedContent(locale: VerifiedLocale): VerifiedContentRecord[] {
   const evidenceByArticle = new Map<string, ArticleEvidenceSummary>();
+  const evidenceRecordsByArticle = new Map<string, PublicVerificationEvidenceRecord[]>();
   return mapVerifiedContent(
     locale,
     sortVerifiedPosts(getVerifiedSourcePosts(), evidenceByArticle),
     evidenceByArticle,
+    evidenceRecordsByArticle,
   );
 }
 
@@ -181,11 +212,13 @@ export async function getVerifiedContentWithEvidence(
     posts,
   );
   const evidenceByArticle = summarizeVerificationEvidence(acceptedEvidence);
+  const evidenceRecordsByArticle = groupEvidenceByArticle(acceptedEvidence);
 
   return mapVerifiedContent(
     locale,
     sortVerifiedPosts(posts, evidenceByArticle),
     evidenceByArticle,
+    evidenceRecordsByArticle,
   );
 }
 

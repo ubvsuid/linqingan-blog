@@ -1,12 +1,11 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { formatDate } from "@/lib/date";
+import { VerifiedContentExplorer } from "@/components/verified-content-explorer";
 import { createPageMetadata } from "@/lib/metadata";
 import {
   getVerifiedContentSummary,
   getVerifiedContentWithEvidence,
-  type VerifiedEvidencePreview,
 } from "@/lib/verified-content";
 
 import styles from "./verified.module.css";
@@ -14,25 +13,16 @@ import styles from "./verified.module.css";
 export const metadata = createPageMetadata({
   title: "最近验证的 Screeps 内容",
   description:
-    "查看已经获得 Screeps Console 或真实主循环验证证据的文章，并区分 Console 片段验证与多 tick 真实运行验证。",
+    "查看已经获得 Screeps Console 或真实主循环验证证据的文章，并按验证级别、API 和返回码筛选受控 Runtime Evidence。",
   path: "/verified",
 });
 
 export const revalidate = 300;
 
-function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
-  const parts: string[] = [evidence.evidenceKey, evidence.apiName];
-  if (evidence.returnCode) parts.push(`返回 ${evidence.returnCode}`);
-  if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
-  if (evidence.tickStart !== null && evidence.tickEnd !== null) {
-    parts.push(`Tick ${evidence.tickStart}–${evidence.tickEnd}`);
-  }
-  return parts.join(" · ");
-}
-
 export default async function VerifiedPage() {
   const verifiedPosts = await getVerifiedContentWithEvidence("zh");
   const { liveCount, consoleCount } = getVerifiedContentSummary(verifiedPosts);
+  const evidenceCount = verifiedPosts.reduce((total, post) => total + post.evidenceCount, 0);
 
   return (
     <main className="page-shell">
@@ -62,35 +52,14 @@ export default async function VerifiedPage() {
             <strong>{liveCount}</strong>
             <span>篇包含真实主循环验证</span>
           </div>
+          <div>
+            <strong>{evidenceCount}</strong>
+            <span>条公开 accepted Evidence</span>
+          </div>
         </section>
 
         {verifiedPosts.length > 0 ? (
-          <section className={styles.list} aria-label="已验证文章">
-            {verifiedPosts.map((post) => (
-              <article key={post.id}>
-                <div className={styles.evidence}>
-                  <strong>{post.level === "live" ? "真实主循环" : "Screeps Console"}</strong>
-                  <time dateTime={post.date}>{formatDate(post.date)}</time>
-                  {post.testEnvironment ? <span>{post.testEnvironment}</span> : null}
-                  {post.evidenceCount > 0 ? <span>{post.evidenceCount} 条运行证据</span> : null}
-                </div>
-                <div>
-                  <h2>
-                    <Link href={post.href}>{post.title}</Link>
-                  </h2>
-                  <p>{post.description}</p>
-                  {post.latestEvidence ? (
-                    <div className={styles.runtimeEvidence}>
-                      <strong>最近一条结构化证据</strong>
-                      <span>{formatEvidencePreview(post.latestEvidence)}</span>
-                      <span>{post.latestEvidence.note}</span>
-                    </div>
-                  ) : null}
-                  <Link href={post.href}>查看验证状态 →</Link>
-                </div>
-              </article>
-            ))}
-          </section>
+          <VerifiedContentExplorer posts={verifiedPosts} />
         ) : (
           <section className={styles.empty}>
             <strong>当前还没有达到 Console / 真实主循环等级的公开文章。</strong>

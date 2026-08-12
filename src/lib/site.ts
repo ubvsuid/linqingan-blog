@@ -32,12 +32,11 @@ export const siteConfig = {
     email: "linqingan501@gmail.com",
   },
   navigation: [
-    { label: "首页", href: "/" },
-    { label: "入门", href: "/beginner" },
-    { label: "文章", href: "/blog" },
-    { label: "知识库", href: "/knowledge" },
-    { label: "诊断", href: "/diagnostics" },
+    { label: "学习", href: "/beginner" },
+    { label: "解决问题", href: "/diagnostics" },
     { label: "工具", href: "/tools" },
+    { label: "验证", href: "/verification" },
+    { label: "关于", href: "/about" },
   ],
   links: {
     github: "https://github.com/ubvsuid",

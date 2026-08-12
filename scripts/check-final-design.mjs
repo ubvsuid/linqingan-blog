@@ -3,12 +3,17 @@ import fs from "node:fs";
 const checks = [
   {
     path: "src/app/(zh)/page.tsx",
-    required: ["HomeTaskHub", "slice(0, 3)", "screeps-room-grid", "开始新手路线", "搜索问题"],
+    required: ["HomeTaskHub", "HomeProblemHub", "slice(0, 3)", "screeps-room-grid", "构建，运行，迭代", "开始新手路线", "解决当前问题"],
     forbidden: ["<HomeLearningActions />"],
   },
   {
     path: "src/components/home-task-hub.tsx",
     required: ["你现在想完成什么", "linqingan:recent-articles", "最近阅读"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/home-problem-hub.tsx",
+    required: ["screepsDiagnosticSymptoms", "你现在遇到了什么问题", "/diagnostics#", "/screeps-errors", "/screeps-api"],
     forbidden: [],
   },
   {
@@ -18,7 +23,13 @@ const checks = [
   },
   {
     path: "src/lib/site.ts",
-    required: ["入门", "文章", '{ label: "工具", href: "/tools" }'],
+    required: [
+      '{ label: "学习", href: "/beginner" }',
+      '{ label: "解决问题", href: "/diagnostics" }',
+      '{ label: "工具", href: "/tools" }',
+      '{ label: "验证", href: "/verification" }',
+      '{ label: "关于", href: "/about" }',
+    ],
     forbidden: ["入门路线", "全部文章", '{ label: "工具", href: "/knowledge#reference-tools" }'],
   },
   {
@@ -49,6 +60,39 @@ const checks = [
   {
     path: "src/components/article-learning-context.tsx",
     required: ["难度", "适用阶段", "前置知识", "模块位置"],
+    forbidden: [],
+  },
+  {
+    path: "src/lib/beginner-series.ts",
+    required: ["outcomes", "完成基础房间循环", "spawnCreep()", "upgradeController()"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/beginner-archive.tsx",
+    required: ["完成后你应该能够", "stage.outcomes", "BeginnerProgressSummary"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/knowledge/page.tsx",
+    required: ["moduleFlow", "section.stages.map", "学习阶段"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/verified/page.tsx",
+    required: ["VerifiedContentExplorer", "accepted Evidence", "evidenceCount"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/verified-content-explorer.tsx",
+    required: [
+      "验证级别",
+      "全部 API",
+      "全部返回码",
+      '(level === "console" && post.consoleTested)',
+      '(level === "live" && post.liveTested)',
+      "post.evidence.some((item) => item.apiName === apiName)",
+      "post.evidence.some((item) => item.returnCode === returnCode)",
+    ],
     forbidden: [],
   },
   {
