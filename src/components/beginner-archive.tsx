@@ -94,7 +94,7 @@ export function BeginnerArchive() {
             12 篇文章组成一条完整学习路线：从认识游戏、控制第一只 Creep，到完成采集运输、角色分工、Controller 升级、Extension 建造与第一份房间代码。
           </p>
           <p className="beginner-header-note">
-            建议按顺序学习。遇到术语或返回码时，不必退出路线，可以使用下面的辅助入口查询后继续。
+            这里不只记录“读了几篇”。每个阶段都列出完成后应该具备的实际能力，方便你用房间状态和 Console 结果检查自己是否真的掌握。
           </p>
         </header>
 
@@ -147,6 +147,12 @@ export function BeginnerArchive() {
                     <div>
                       <strong>{stage.title}</strong>
                       <p>{stage.description}</p>
+                      <div className="beginner-stage-outcomes" aria-label={`${stage.title}完成能力`}>
+                        <span>完成后你应该能够</span>
+                        <ul>
+                          {stage.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}
+                        </ul>
+                      </div>
                       {knowledgeLink ? (
                         <Link href={knowledgeLink.href}>
                           完成本阶段后查看：{knowledgeLink.label} →
@@ -305,6 +311,30 @@ export function BeginnerArchive() {
           margin-top: 4px;
           font-size: 13px;
           font-weight: 650;
+        }
+
+        .beginner-stage-outcomes {
+          display: grid;
+          gap: 8px;
+          margin: 12px 0 8px;
+          border-left: 2px solid var(--border);
+          padding-left: 14px;
+        }
+
+        .beginner-stage-outcomes > span {
+          color: var(--foreground);
+          font-size: 12px;
+          font-weight: 700;
+        }
+
+        .beginner-stage-outcomes ul {
+          display: grid;
+          gap: 5px;
+          margin: 0;
+          padding-left: 18px;
+          color: var(--muted);
+          font-size: 12px;
+          line-height: 1.6;
         }
 
         .beginner-item {
