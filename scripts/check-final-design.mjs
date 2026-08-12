@@ -84,7 +84,15 @@ const checks = [
   },
   {
     path: "src/components/verified-content-explorer.tsx",
-    required: ["验证级别", "全部 API", "全部返回码", "post.evidence.some"],
+    required: [
+      "验证级别",
+      "全部 API",
+      "全部返回码",
+      '(level === "console" && post.consoleTested)',
+      '(level === "live" && post.liveTested)',
+      "post.evidence.some((item) => item.apiName === apiName)",
+      "post.evidence.some((item) => item.returnCode === returnCode)",
+    ],
     forbidden: [],
   },
   {
