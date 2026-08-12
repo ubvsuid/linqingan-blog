@@ -3,10 +3,8 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
-import {
-  applyEnglishEditorialCore20260812,
-  getEnglishEditorialCoreUpdatedAt20260812,
-} from "@/lib/english-editorial-core-20260812";
+import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
+import { applyEnglishEditorialFinal20260812 } from "@/lib/english-editorial-final-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import {
@@ -92,7 +90,7 @@ function getDynamicEnglishArticle(slug: string) {
     return applyEnglishMemoryEditorial20260812(article);
   }
 
-  return applyEnglishEditorialCore20260812(article);
+  return applyEnglishEditorialFinal20260812(article);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
