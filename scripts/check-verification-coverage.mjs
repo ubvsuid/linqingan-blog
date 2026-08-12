@@ -22,6 +22,8 @@ const expectedSymptoms = [
   "market-action-failed",
   "cpu-too-high",
   "resources-not-moving",
+  "builder-not-building",
+  "tower-not-acting",
 ];
 
 const registry = read("src/lib/verification-coverage.ts");
