@@ -2,9 +2,10 @@
 
 import { track } from "@vercel/analytics";
 import Link from "next/link";
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 
 import { buildIdentityHeaders } from "@/lib/browser-identity";
+import { siteConfig } from "@/lib/site";
 
 import styles from "./article-feedback.module.css";
 
@@ -36,6 +37,18 @@ function parseFeedback(value: string | null): FeedbackValue | null {
     : null;
 }
 
+function addSocialTracking(articleUrl: string, source: "x" | "facebook"): string {
+  try {
+    const url = new URL(articleUrl);
+    url.searchParams.set("utm_source", source);
+    url.searchParams.set("utm_medium", "social");
+    url.searchParams.set("utm_campaign", "article_share");
+    return url.toString();
+  } catch {
+    return articleUrl;
+  }
+}
+
 export function ArticleFeedback({
   slug,
   title,
@@ -48,6 +61,7 @@ export function ArticleFeedback({
 }: ArticleFeedbackProps) {
   const isEnglish = language === "en";
   const storageKey = `article-feedback:${slug}`;
+  const [copied, setCopied] = useState(false);
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
       const handleStorage = (event: StorageEvent) => {
@@ -113,6 +127,19 @@ export function ArticleFeedback({
     return `${issueUrl}?${params.toString()}`;
   }, [articleUrl, isEnglish, issueUrl, title]);
 
+  const socialShareLinks = useMemo(() => {
+    const xArticleUrl = addSocialTracking(articleUrl, "x");
+    const facebookArticleUrl = addSocialTracking(articleUrl, "facebook");
+    const xText = isEnglish
+      ? `${title} — Screeps guide by Linqingan ${xArticleUrl}`
+      : `${title}｜Screeps 技术记录 ${xArticleUrl}`;
+
+    return {
+      x: `https://x.com/intent/post?text=${encodeURIComponent(xText)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(facebookArticleUrl)}`,
+    };
+  }, [articleUrl, isEnglish, title]);
+
   function saveFeedback(value: FeedbackValue) {
     window.localStorage.setItem(storageKey, value);
     window.dispatchEvent(
@@ -136,6 +163,25 @@ export function ArticleFeedback({
       },
       body: JSON.stringify({ slug, language, value }),
     }).catch(() => {});
+  }
+
+  function trackSocialAction(action: string) {
+    track("article_social_action", {
+      slug: slug.slice(0, 80),
+      action,
+      language,
+    });
+  }
+
+  async function copyArticleLink() {
+    try {
+      await navigator.clipboard.writeText(articleUrl);
+      setCopied(true);
+      trackSocialAction("copy_link");
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      setCopied(false);
+    }
   }
 
   const status = isEnglish
@@ -259,6 +305,56 @@ export function ArticleFeedback({
           >
             {isEnglish ? "Send private feedback" : "通过邮箱反馈"}
           </a>
+        </div>
+
+        <div className={styles.social} aria-label={isEnglish ? "Follow and share" : "关注与分享"}>
+          <div>
+            <span>{isEnglish ? "FOLLOW AND SHARE" : "继续关注这些测试"}</span>
+            <p>
+              {isEnglish
+                ? "New Screeps debugging notes, runtime verification, and tool updates are also shared on X and Facebook."
+                : "新的 Screeps 排错记录、Runtime Verification 和工具更新也会同步到 X 和 Facebook。"}
+            </p>
+          </div>
+          <div className={styles.socialLinks}>
+            <a
+              href={siteConfig.links.x}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSocialAction("follow_x")}
+            >
+              X {siteConfig.author.socialHandle} ↗
+            </a>
+            <a
+              href={siteConfig.links.facebook}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSocialAction("follow_facebook")}
+            >
+              Facebook ↗
+            </a>
+            <a
+              href={socialShareLinks.x}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSocialAction("share_x")}
+            >
+              {isEnglish ? "Share on X ↗" : "分享到 X ↗"}
+            </a>
+            <a
+              href={socialShareLinks.facebook}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => trackSocialAction("share_facebook")}
+            >
+              {isEnglish ? "Share on Facebook ↗" : "分享到 Facebook ↗"}
+            </a>
+            <button type="button" onClick={() => void copyArticleLink()}>
+              {copied
+                ? isEnglish ? "Link copied" : "链接已复制"
+                : isEnglish ? "Copy link" : "复制链接"}
+            </button>
+          </div>
         </div>
 
         {!isEnglish ? (
