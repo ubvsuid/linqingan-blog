@@ -6,6 +6,7 @@ import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/englis
 import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
 import { applyEnglishEditorialFinal20260812 } from "@/lib/english-editorial-final-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
+import { applyEnglishSpawnVerification20260812 } from "@/lib/english-editorial-spawn-verification-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import {
   getEnglishEditorialRuntimeNotifyArticle20260806,
@@ -90,7 +91,13 @@ function getDynamicEnglishArticle(slug: string) {
     return applyEnglishMemoryEditorial20260812(article);
   }
 
-  return applyEnglishEditorialFinal20260812(article);
+  const editorialArticle = applyEnglishEditorialFinal20260812(article);
+
+  if (slug === "screeps-spawn-creep") {
+    return applyEnglishSpawnVerification20260812(editorialArticle);
+  }
+
+  return editorialArticle;
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
