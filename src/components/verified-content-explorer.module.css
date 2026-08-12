@@ -111,7 +111,7 @@
   border-left: 2px solid var(--border);
   padding-left: 12px;
   color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: SFMono-Regular, Consolas, monospace;
   font-size: 11px;
   line-height: 1.6;
 }
