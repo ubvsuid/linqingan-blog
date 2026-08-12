@@ -83,8 +83,6 @@ export async function ArticleLearningContext({ slug }: ArticleLearningContextPro
     );
   }
 
-  if (!learningContext && runtimeEvidence.length === 0) return null;
-
   return (
     <>
       {learningContext}
