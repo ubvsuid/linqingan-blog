@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
+import { applyEnglishCpuContract20260812 } from "./english-editorial-cpu-contract-20260812";
 
 const errIntentBoundary = String.raw`
 <h2 id="intent-boundary">Choose another guide when</h2>
@@ -92,5 +93,5 @@ export function applyEnglishMovementContract20260812(
     );
   }
 
-  return article;
+  return applyEnglishCpuContract20260812(article);
 }
