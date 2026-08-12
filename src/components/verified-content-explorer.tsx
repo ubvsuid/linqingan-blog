@@ -18,10 +18,17 @@ function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
   return parts.join(" · ");
 }
 
+function isWithinDays(date: string, days: number): boolean {
+  const timestamp = Date.parse(date);
+  if (!Number.isFinite(timestamp)) return false;
+  return timestamp >= Date.now() - days * 24 * 60 * 60 * 1000;
+}
+
 export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecord[] }) {
   const [level, setLevel] = useState("all");
   const [apiName, setApiName] = useState("all");
   const [returnCode, setReturnCode] = useState("all");
+  const [dateRange, setDateRange] = useState("all");
 
   const apiNames = useMemo(
     () => [...new Set(posts.flatMap((post) => post.evidence.map((item) => item.apiName)))].sort(),
@@ -42,19 +49,24 @@ export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecor
         (level === "live" && post.liveTested);
       const apiMatches = apiName === "all" || post.evidence.some((item) => item.apiName === apiName);
       const returnMatches = returnCode === "all" || post.evidence.some((item) => item.returnCode === returnCode);
-      return levelMatches && apiMatches && returnMatches;
+      const dateMatches =
+        dateRange === "all" ||
+        (dateRange === "30" && isWithinDays(post.date, 30)) ||
+        (dateRange === "90" && isWithinDays(post.date, 90)) ||
+        (dateRange === "365" && isWithinDays(post.date, 365));
+      return levelMatches && apiMatches && returnMatches && dateMatches;
     }),
-    [apiName, level, posts, returnCode],
+    [apiName, dateRange, level, posts, returnCode],
   );
 
-  const hasFilters = level !== "all" || apiName !== "all" || returnCode !== "all";
+  const hasFilters = level !== "all" || apiName !== "all" || returnCode !== "all" || dateRange !== "all";
 
   return (
     <section className={styles.explorer} aria-labelledby="verified-explorer-title">
       <div className={styles.filterPanel}>
         <div>
           <p className="eyebrow">FILTER EVIDENCE</p>
-          <h2 id="verified-explorer-title">按验证级别、API 或返回码筛选</h2>
+          <h2 id="verified-explorer-title">按验证级别、API、返回码或时间筛选</h2>
           <p>筛选只使用已经通过文章验证边界并进入公开列表的 accepted Evidence。</p>
         </div>
         <div className={styles.filters}>
@@ -80,6 +92,15 @@ export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecor
               {returnCodes.map((code) => <option key={code} value={code}>{code}</option>)}
             </select>
           </label>
+          <label>
+            <span>时间</span>
+            <select value={dateRange} onChange={(event) => setDateRange(event.target.value)}>
+              <option value="all">全部时间</option>
+              <option value="30">最近 30 天</option>
+              <option value="90">最近 90 天</option>
+              <option value="365">最近 1 年</option>
+            </select>
+          </label>
           <button
             type="button"
             disabled={!hasFilters}
@@ -87,6 +108,7 @@ export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecor
               setLevel("all");
               setApiName("all");
               setReturnCode("all");
+              setDateRange("all");
             }}
           >
             清除筛选

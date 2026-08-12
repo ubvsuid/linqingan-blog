@@ -6,6 +6,7 @@ import { HomeTaskHub } from "@/components/home-task-hub";
 import { HomeProblemHub } from "@/components/home-problem-hub";
 import { HomeMaintenancePanel } from "@/components/home-maintenance-panel";
 import { PostCard } from "@/components/post-card";
+import { RecentlyViewedArticles } from "@/components/recently-viewed-articles";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { knowledgeBaseSections, knowledgeBaseSlugs } from "@/lib/knowledge-base";
 import { createPageMetadata } from "@/lib/metadata";
@@ -81,6 +82,7 @@ export default function HomePage() {
       <Container>
         <HomeTaskHub />
         <HomeProblemHub />
+        <RecentlyViewedArticles />
       </Container>
 
       <section className={styles.knowledgeSection} aria-labelledby="home-knowledge-title">

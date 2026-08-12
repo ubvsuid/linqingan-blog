@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import Link from "next/link";
 
+import { ArticleKnowledgeRelations } from "@/components/article-knowledge-relations";
 import { ArticleRuntimeEvidenceCard } from "@/components/article-runtime-evidence-card";
 import {
   beginnerSeriesSlugs,
@@ -82,12 +83,11 @@ export async function ArticleLearningContext({ slug }: ArticleLearningContextPro
     );
   }
 
-  if (!learningContext && runtimeEvidence.length === 0) return null;
-
   return (
     <>
       {learningContext}
       <ArticleRuntimeEvidenceCard evidence={runtimeEvidence} locale="zh" />
+      {!beginnerStage ? <ArticleKnowledgeRelations slug={slug} /> : null}
     </>
   );
 }

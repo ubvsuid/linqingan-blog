@@ -105,6 +105,22 @@ export const screepsApiReference: ScreepsApiReferenceEntry[] = [
     guideHref: "/blog/screeps-upgrade-controller",
   },
   {
+    id: "creep-build",
+    group: "Creep",
+    signature: "creep.build(target)",
+    summary: "消耗 Creep 携带的 Energy 推进 Construction Site 建造进度，需要有效 WORK 部件并满足动作距离。",
+    keywords: ["Builder", "Construction Site", "WORK", "Energy", "建造"],
+    guideHref: "/blog/screeps-build-and-repair",
+  },
+  {
+    id: "creep-repair",
+    group: "Creep",
+    signature: "creep.repair(target)",
+    summary: "消耗 Creep 携带的 Energy 修复可维修结构，需要有效 WORK 部件并满足动作距离。",
+    keywords: ["Builder", "repair", "WORK", "Energy", "维修"],
+    guideHref: "/blog/screeps-build-and-repair",
+  },
+  {
     id: "room-create-construction-site",
     group: "Room",
     signature: "room.createConstructionSite(x, y, structureType)",

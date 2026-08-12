@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { ScreepsApiCoverageSnapshot } from "@/components/screeps-api-coverage-snapshot";
 import { ScreepsApiExplorer } from "@/components/screeps-api-explorer";
 import { ScreepsApiHubDirectory } from "@/components/screeps-api-hub-directory";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
@@ -12,7 +13,7 @@ import styles from "../english.module.css";
 export const metadata = createEnglishPageMetadata({
   title: "Screeps API Quick Reference",
   description:
-    "Search common Screeps Game, Creep, Room, Structure, Market, and PathFinder APIs, or start from Creep, Room, StructureSpawn, Controller, and Market object hubs that connect guides, return codes, tools, and verification.",
+    "Search common Screeps Game, Creep, Room, Structure, Market, and PathFinder APIs, or start from Creep, Room, Spawn, Controller, Market, Link, Tower, Terminal, Lab, PathFinder, and Store hubs that connect guides, return codes, tools, and verification.",
   path: "/en/screeps-api",
   chinesePath: "/screeps-api",
 });
@@ -25,7 +26,7 @@ export default function EnglishScreepsApiPage() {
     "@type": "CollectionPage",
     name: "Screeps API Quick Reference",
     description:
-      "A searchable quick reference for common Screeps APIs with focused object hubs for Creep, Room, StructureSpawn, Controller, and Market.",
+      "A searchable quick reference for common Screeps APIs with object and practice hubs that connect guides, errors, tools, and verification.",
     url: pageUrl,
     inLanguage: "en",
     mainEntity: {
@@ -59,7 +60,7 @@ export default function EnglishScreepsApiPage() {
           <p className="eyebrow">API QUICK REFERENCE</p>
           <h1>Search common Screeps APIs</h1>
           <p>
-            Find common APIs by object, method, or keyword. If you already know you are working with a Creep, Room, Spawn, Controller, or Market workflow, start from its object hub. This page remains a navigation and recall aid rather than a replacement for the official API Reference. For state-changing actions, record return codes and verify later-tick state.
+            Find common APIs by object, method, or keyword, or start from Creep, Room, Spawn, Controller, Market, Link, Tower, Terminal, Lab, PathFinder, and Store hubs. This page remains a practical navigation and recall layer rather than a replacement for the official API Reference. For state-changing actions, record return codes and verify later-tick state.
           </p>
           <div className="button-row">
             <a
@@ -76,6 +77,7 @@ export default function EnglishScreepsApiPage() {
           </div>
         </header>
 
+        <ScreepsApiCoverageSnapshot locale="en" />
         <ScreepsApiHubDirectory locale="en" />
         <ScreepsApiExplorer entries={entries} locale="en" />
       </Container>

@@ -13,7 +13,19 @@ function read(relativePath) {
   return fs.readFileSync(absolutePath, "utf8");
 }
 
-const expectedSlugs = ["creep", "room", "structure-spawn", "controller", "market"];
+const expectedSlugs = [
+  "creep",
+  "room",
+  "structure-spawn",
+  "controller",
+  "market",
+  "structure-link",
+  "structure-tower",
+  "structure-terminal",
+  "structure-lab",
+  "path-finder",
+  "store",
+];
 const hubConfig = read("src/lib/screeps-api-hubs.ts");
 const apiReference = read("src/lib/screeps-api-reference.ts");
 const chineseRoute = read("src/app/(zh)/screeps-api/[hub]/page.tsx");
@@ -53,7 +65,7 @@ for (const [label, source] of [
   ["Chinese hub route", chineseRoute],
   ["English hub route", englishRoute],
 ]) {
-  if (!source.includes("generateStaticParams")) failures.push(`${label} must statically enumerate the five hubs.`);
+  if (!source.includes("generateStaticParams")) failures.push(`${label} must statically enumerate the configured hubs.`);
   if (!source.includes("revalidate = 300")) failures.push(`${label} must use 5-minute ISR for verification freshness.`);
   if (!source.includes("ScreepsApiHubPage")) failures.push(`${label} must render the shared hub page.`);
 }

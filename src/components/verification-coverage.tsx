@@ -232,8 +232,10 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
                     <div className={styles.chips}>
                       {plan.primaryErrorNames.map((name) => {
                         const error = errorMap.get(name);
+                        const diagnostic = getScreepsErrorDiagnostic(name);
+                        const href = `${errorsRoot}#${diagnostic ? `diagnostic-${name.toLowerCase()}` : name.toLowerCase()}`;
                         return (
-                          <Link href={`${errorsRoot}#diagnostic-${name.toLowerCase()}`} key={name}>
+                          <Link href={href} key={name}>
                             <code>{name}</code>{error ? <span>{error.value}</span> : null}
                           </Link>
                         );

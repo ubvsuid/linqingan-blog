@@ -22,6 +22,8 @@ const expectedSymptoms = [
   "market-action-failed",
   "cpu-too-high",
   "resources-not-moving",
+  "builder-not-building",
+  "tower-not-acting",
 ];
 
 const registry = read("src/lib/screeps-diagnostic-symptoms.ts");
@@ -29,6 +31,7 @@ const component = read("src/components/screeps-diagnostic-center.tsx");
 const chineseRoute = read("src/app/(zh)/diagnostics/page.tsx");
 const englishRoute = read("src/app/(en)/en/diagnostics/page.tsx");
 const diagnostics = read("src/lib/screeps-error-diagnostics.ts");
+const errors = read("src/lib/screeps-errors.ts");
 const apiReference = read("src/lib/screeps-api-reference.ts");
 const hubs = read("src/lib/screeps-api-hubs.ts");
 const chineseSearch = read("src/lib/search.ts");
@@ -47,9 +50,15 @@ for (const id of expectedSymptoms) {
 }
 
 const diagnosticNames = new Set([...diagnostics.matchAll(/name: "(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
+const referenceErrorNames = new Set([...errors.matchAll(/name: "(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
 const registryErrorNames = new Set([...registry.matchAll(/"(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
 for (const name of registryErrorNames) {
-  if (!diagnosticNames.has(name)) failures.push(`Symptom registry references an error without a Phase 4A-2 diagnostic path: ${name}`);
+  if (!diagnosticNames.has(name) && !referenceErrorNames.has(name)) {
+    failures.push(`Symptom registry references an error without a diagnostic or general error-reference path: ${name}`);
+  }
+}
+if (!component.includes("diagnostic ? `diagnostic-${name.toLowerCase()}` : name.toLowerCase()")) {
+  failures.push("Diagnostic Center must fall back to the general error anchor when a full diagnostic path is not registered.");
 }
 
 const apiIds = new Set([...apiReference.matchAll(/\bid:\s*"([a-z0-9-]+)"/g)].map((match) => match[1]));
