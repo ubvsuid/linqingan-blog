@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { HomeTaskHub } from "@/components/home-task-hub";
+import { HomeProblemHub } from "@/components/home-problem-hub";
 import { HomeMaintenancePanel } from "@/components/home-maintenance-panel";
 import { PostCard } from "@/components/post-card";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
@@ -13,15 +14,15 @@ import { getAllPosts } from "@/lib/posts";
 import styles from "../home.module.css";
 
 const baseMetadata = createPageMetadata({
-  title: "Screeps 中文教程、知识库与实用工具｜临清安",
+  title: "Screeps 中文教程、API、排错与实用工具｜临清安",
   description:
-    "面向中文玩家的 Screeps 新手教程、错误排查、知识库与实用工具，覆盖 Creep、Spawn、Memory、寻路、经济与自动化系统。",
+    "面向中文玩家的 Screeps 学习与排错平台：从新手教程进入知识库，查询 API 与错误码，使用诊断和规划工具，并查看受控 Runtime Evidence。",
   path: "/",
 });
 
 export const metadata: Metadata = {
   ...baseMetadata,
-  title: { absolute: "Screeps 中文教程、知识库与实用工具｜临清安" },
+  title: { absolute: "Screeps 中文教程、API、排错与实用工具｜临清安" },
 };
 
 const quickEntries = [
@@ -65,20 +66,21 @@ export default function HomePage() {
           <p className="eyebrow">SCREEPS · JAVASCRIPT · SYSTEMS</p>
           <h1>构建，运行，迭代</h1>
           <p className={styles.heroDescription}>
-            从一套按顺序学习的 Screeps 中文入门路线开始，记录代码如何逐步变成可以持续运行的系统。
+            Screeps 中文教程、API 查询、错误排查与实用工具平台。从按顺序学习的新手路线开始，再用知识库、诊断中心和受控 Runtime Evidence 把代码逐步变成可以持续运行的系统。
           </p>
           <p className={styles.heroStats}>
             {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
           </p>
           <div className="button-row">
             <Link className="button button-primary" href="/beginner">开始新手路线</Link>
-            <Link className="button button-secondary" href="/search">搜索问题</Link>
+            <Link className="button button-secondary" href="/diagnostics">解决当前问题</Link>
           </div>
         </Container>
       </section>
 
       <Container>
         <HomeTaskHub />
+        <HomeProblemHub />
       </Container>
 
       <section className={styles.knowledgeSection} aria-labelledby="home-knowledge-title">
