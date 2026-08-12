@@ -6,6 +6,7 @@ const articles = [
     chinesePath: "/blog/screeps-err-not-in-range",
     title: "Screeps ERR_NOT_IN_RANGE: Use the Correct Action Range",
     searchQuery: "ERR_NOT_IN_RANGE",
+    modifiedAt: "2026-08-12",
     requiredBody: [
       "Use this guide when",
       "Choose another guide when",
@@ -24,6 +25,7 @@ const articles = [
     chinesePath: "/blog/screeps-moveto-not-moving",
     title: "Screeps moveTo() Returns OK but the Creep Stays Put",
     searchQuery: "moveTo",
+    modifiedAt: "2026-08-12",
     requiredBody: [
       "Use this guide when",
       "Screeps Console test",
@@ -40,6 +42,7 @@ const articles = [
     chinesePath: "/blog/screeps-err-no-path",
     title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
     searchQuery: "ERR_NO_PATH",
+    modifiedAt: "2026-07-31",
     requiredBody: [
       "Use this guide when",
       "Current tick and later ticks",
@@ -90,7 +93,7 @@ for (const article of articles) {
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-07-31"`,
+    `"dateModified":"${article.modifiedAt}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
@@ -104,8 +107,8 @@ for (const article of articles) {
 
 const rangeResponse = await fetch(`${baseUrl}/en/blog/screeps-err-not-in-range`);
 const rangeBody = await rangeResponse.text();
-if (rangeBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
-  failures.push("ERR_NOT_IN_RANGE 页面错误地把 ERR_NO_BODYPART 放入 moveTo() 返回表");
+if (!rangeBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
+  failures.push("ERR_NOT_IN_RANGE 页面缺少当前 Creep.moveTo() 官方返回码 ERR_NO_BODYPART");
 }
 for (const expected of [
   "ERR_NOT_IN_RANGE",
@@ -119,8 +122,8 @@ for (const expected of [
 
 const moveResponse = await fetch(`${baseUrl}/en/blog/screeps-moveto-not-moving`);
 const moveBody = await moveResponse.text();
-if (moveBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
-  failures.push("moveTo no-progress 页面错误地列出 ERR_NO_BODYPART");
+if (!moveBody.includes("<td><code>ERR_NO_BODYPART</code></td>")) {
+  failures.push("moveTo no-progress 页面缺少当前 Creep.moveTo() 官方返回码 ERR_NO_BODYPART");
 }
 for (const expected of [
   "roomName",

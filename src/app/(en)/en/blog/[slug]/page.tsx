@@ -3,6 +3,12 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
+import { applyEnglishEditorialFinal20260812 } from "@/lib/english-editorial-final-20260812";
+import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
+import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
+import { applyEnglishMovementContract20260812 } from "@/lib/english-editorial-movement-contract-20260812";
+import { applyEnglishSpawnVerification20260812 } from "@/lib/english-editorial-spawn-verification-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import {
   getEnglishEditorialRuntimeNotifyArticle20260806,
@@ -56,7 +62,7 @@ const dynamicEnglishArticles = [
   ...englishLinkSourceBatchEighteenArticles,
 ];
 
-function getDynamicEnglishArticle(slug: string) {
+function getBaseDynamicEnglishArticle(slug: string) {
   return getEnglishEditorialRuntimeNotifyArticle20260806(slug)
     ?? getEnglishEditorialPublished20260731(slug)
     ?? getEnglishBeginnerArticle(slug)
@@ -80,8 +86,27 @@ function getDynamicEnglishArticle(slug: string) {
     ?? getEnglishLinkSourceBatchEighteenArticle(slug);
 }
 
+function getDynamicEnglishArticle(slug: string) {
+  const article = getBaseDynamicEnglishArticle(slug);
+
+  if (slug === "screeps-memory-basics") {
+    return applyEnglishMemoryContract20260812(
+      applyEnglishMemoryEditorial20260812(article),
+    );
+  }
+
+  const editorialArticle = applyEnglishEditorialFinal20260812(article);
+
+  if (slug === "screeps-spawn-creep") {
+    return applyEnglishSpawnVerification20260812(editorialArticle);
+  }
+
+  return applyEnglishMovementContract20260812(editorialArticle);
+}
+
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
+  return getEnglishEditorialCoreUpdatedAt20260812(slug)
+    ?? getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
     ?? fallback;
 }
 
