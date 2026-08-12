@@ -248,6 +248,70 @@ export const screepsDiagnosticSymptoms = [
     zhSearchTerms: ["资源运不过去", "运输卡住", "物流失败", "搬运没反应", "transfer失败"],
     enSearchTerms: ["resources not moving", "hauling stuck", "logistics failed", "transfer not working", "delivery failed"],
   },
+  {
+    id: "builder-not-building",
+    zhTitle: "Builder 不建造或不维修",
+    enTitle: "Builder not building or repairing",
+    zhSummary: "build() 或 repair() 没有产生预期效果时，先检查真实返回值、目标类型、距离、WORK 部件、Creep Energy 与目标状态。",
+    enSummary: "When build() or repair() has no visible effect, inspect the real return code, target type, range, WORK parts, Creep Energy, and target state first.",
+    zhTriage: [
+      "分别保存 creep.build(target) 或 creep.repair(target) 的真实返回值。",
+      "确认 build 的目标仍是有效 Construction Site，repair 的目标仍是可维修结构。",
+      "检查 Creep 是否有可用 WORK、足够 Energy，并满足动作距离。",
+      "返回 OK 后在后续 tick 核对 Construction Site progress 或结构 hits，确认状态是否真实变化。",
+    ],
+    enTriage: [
+      "Store the real result from creep.build(target) or creep.repair(target).",
+      "Confirm build still targets a valid Construction Site and repair still targets a repairable structure.",
+      "Check usable WORK parts, carried Energy, and action range.",
+      "After OK, verify Construction Site progress or structure hits on a later tick to confirm the actual state change.",
+    ],
+    errorNames: ["ERR_NOT_IN_RANGE", "ERR_NOT_ENOUGH_RESOURCES", "ERR_INVALID_TARGET", "ERR_NO_BODYPART"],
+    directApiEntryIds: ["creep-build", "creep-repair", "room-create-construction-site", "room-get-event-log"],
+    directHubSlugs: ["creep", "store", "room"],
+    guides: [
+      { zhLabel: "自动建造与维修", enLabel: "Automatic build and repair", zhHref: "/blog/screeps-build-and-repair", enHref: "/en/blog/screeps-build-and-repair" },
+    ],
+    tools: [
+      { zhLabel: "Creep 身体计算器", enLabel: "Creep Body Calculator", zhHref: "/tools/creep-body-calculator", enHref: "/en/tools/creep-body-calculator" },
+      { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
+    ],
+    zhSearchTerms: ["builder不建造", "builder不维修", "build失败", "repair失败", "施工没进度"],
+    enSearchTerms: ["builder not building", "builder not repairing", "build failed", "repair failed", "construction no progress"],
+  },
+  {
+    id: "tower-not-acting",
+    zhTitle: "Tower 不攻击、治疗或维修",
+    enTitle: "Tower not attacking, healing, or repairing",
+    zhSummary: "Tower 没有产生预期动作时，先确认目标、Energy、所有权与真实动作返回值，再判断距离衰减和多塔输出是否满足预期。",
+    enSummary: "When a Tower does not produce the expected action, confirm target, Energy, ownership, and the real action result before judging range falloff or combined Tower output.",
+    zhTriage: [
+      "保存 tower.attack()、tower.heal() 或 tower.repair() 的真实返回值。",
+      "检查 Tower Energy、目标类型与目标是否仍存在，不要只看视觉效果。",
+      "需要比较输出时，再结合距离衰减与多个 Tower 的叠加效果。",
+      "返回 OK 后用目标 hits、事件日志或后续 tick 状态确认动作是否实际生效。",
+    ],
+    enTriage: [
+      "Store the real result from tower.attack(), tower.heal(), or tower.repair().",
+      "Inspect Tower Energy, target type, and whether the target still exists instead of relying on visual appearance alone.",
+      "When comparing output, include range falloff and combined output from multiple Towers.",
+      "After OK, use target hits, the event log, or later-tick state to confirm the action actually took effect.",
+    ],
+    errorNames: ["ERR_NOT_ENOUGH_RESOURCES", "ERR_INVALID_TARGET", "ERR_NOT_OWNER", "ERR_RCL_NOT_ENOUGH"],
+    directApiEntryIds: ["tower-attack-heal-repair", "room-get-event-log"],
+    directHubSlugs: ["structure-tower", "store", "room"],
+    guides: [
+      { zhLabel: "Tower 自动攻击敌人", enLabel: "Tower automatic hostile targeting", zhHref: "/blog/screeps-tower-auto-attack-hostiles", enHref: "/en/blog/screeps-tower-auto-attack-hostiles" },
+      { zhLabel: "Tower 维修阈值", enLabel: "Tower repair threshold", zhHref: "/blog/screeps-tower-repair-threshold", enHref: "/en/blog/screeps-tower-repair-threshold" },
+      { zhLabel: "Tower 治疗 Creep", enLabel: "Tower healing Creeps", zhHref: "/blog/screeps-tower-heal-creeps", enHref: "/en/blog/screeps-tower-heal-creeps" },
+    ],
+    tools: [
+      { zhLabel: "Tower 伤害、治疗与维修计算器", enLabel: "Tower Damage, Heal, and Repair Calculator", zhHref: "/tools/tower-damage-heal-repair-calculator", enHref: "/en/tools/tower-damage-heal-repair-calculator" },
+      { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
+    ],
+    zhSearchTerms: ["tower不攻击", "tower不维修", "tower不治疗", "tower没反应", "tower energy"],
+    enSearchTerms: ["tower not attacking", "tower not repairing", "tower not healing", "tower not working", "tower energy"],
+  },
 ] as const satisfies readonly ScreepsDiagnosticSymptom[];
 
 export function getScreepsDiagnosticSymptom(id: string): ScreepsDiagnosticSymptom | null {
