@@ -5,6 +5,7 @@ import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
 import { applyEnglishEditorialFinal20260812 } from "@/lib/english-editorial-final-20260812";
+import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { applyEnglishSpawnVerification20260812 } from "@/lib/english-editorial-spawn-verification-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
@@ -88,7 +89,9 @@ function getDynamicEnglishArticle(slug: string) {
   const article = getBaseDynamicEnglishArticle(slug);
 
   if (slug === "screeps-memory-basics") {
-    return applyEnglishMemoryEditorial20260812(article);
+    return applyEnglishMemoryContract20260812(
+      applyEnglishMemoryEditorial20260812(article),
+    );
   }
 
   const editorialArticle = applyEnglishEditorialFinal20260812(article);
