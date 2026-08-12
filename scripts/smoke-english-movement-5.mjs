@@ -42,21 +42,22 @@ const articles = [
     chinesePath: "/blog/screeps-err-no-path",
     title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
     searchQuery: "ERR_NO_PATH",
-    modifiedAt: "2026-07-31",
+    modifiedAt: "2026-08-12",
     requiredBody: [
       "Use this guide when",
-      "Current tick and later ticks",
       "Screeps Console test",
       "Live multi-tick verification",
-      "Evidence level",
       "Pending",
       "PathFinder.search",
       "incomplete",
+      "PathFinder cost is a route-selection weight",
+      "PathFinder defaults are plain 1 / swamp 5",
+      "movement fatigue",
       "structure.my === true",
       "structure.isPublic === true",
       "return undefined",
-      "href=\"#tick-boundary\"",
-      "<h2 id=\"tick-boundary\">Current tick and later ticks</h2>",
+      "href=\"#two-cost-systems\"",
+      "<h2 id=\"two-cost-systems\">Do not confuse search cost with movement fatigue</h2>",
     ],
   },
 ];
@@ -78,10 +79,6 @@ for (const article of articles) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
     }
-  }
-
-  if (!body.toLowerCase().includes("static")) {
-    failures.push(`${article.path}: Evidence level 未显示静态验证边界`);
   }
 
   const canonical = `https://www.linqingan.com${article.path}`;
@@ -147,6 +144,8 @@ for (const expected of [
   "structure.my === true",
   "structure.isPublic === true",
   "return undefined",
+  "PathFinder defaults are plain 1 / swamp 5",
+  "Actual Creep movement fatigue rate",
 ]) {
   if (!pathBody.includes(expected)) {
     failures.push(`ERR_NO_PATH 页面缺少修正或分类 “${expected}”`);
@@ -154,6 +153,9 @@ for (const expected of [
 }
 if (pathBody.includes("!structure.my\n      || !structure.isPublic")) {
   failures.push("ERR_NO_PATH 页面仍包含封锁己方私有 Rampart 的旧条件");
+}
+if (pathBody.includes("standalone PathFinder defaults are plain 2")) {
+  failures.push("ERR_NO_PATH 页面错误地把 2/10 当成 standalone PathFinder 默认搜索权重");
 }
 
 const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, { redirect: "manual" });
