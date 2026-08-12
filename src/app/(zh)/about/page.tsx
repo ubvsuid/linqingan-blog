@@ -68,11 +68,11 @@ export default function AboutPage() {
     "@context": "https://schema.org",
     "@type": "Person",
     name: "临清安",
-    alternateName: "@linqingan501",
+    alternateName: [siteConfig.author.handle, siteConfig.author.socialHandle],
     url: `${siteConfig.url}/about`,
     image: `${siteConfig.url}/profile-avatar.webp`,
     email: siteConfig.author.email,
-    sameAs: [siteConfig.links.github],
+    sameAs: [siteConfig.links.x, siteConfig.links.facebook, siteConfig.links.github],
     knowsAbout: ["Screeps", "JavaScript", "系统设计", "技术写作"],
   };
 
@@ -99,7 +99,7 @@ export default function AboutPage() {
           <div className={styles.identity}>
             <p className="eyebrow">ABOUT</p>
             <h1 id="profile-name">临清安</h1>
-            <p className={styles.handle}>@linqingan501</p>
+            <p className={styles.handle}>{siteConfig.author.handle}</p>
             <p className={styles.role}>Screeps 中文知识站作者 · JavaScript 实践者 · 系统建设记录者</p>
           </div>
         </section>
@@ -208,10 +208,12 @@ export default function AboutPage() {
         <section className={styles.contact} aria-labelledby="profile-contact-title">
           <div>
             <p className="eyebrow">CONTACT</p>
-            <h2 id="profile-contact-title">联系与纠错</h2>
-            <p>发现文章中的事实、代码、链接或表达存在问题，欢迎通过邮箱或 GitHub 反馈。未经真实验证的结果不会直接标记为已通过。</p>
+            <h2 id="profile-contact-title">联系、关注与纠错</h2>
+            <p>发现文章中的事实、代码、链接或表达存在问题，欢迎通过邮箱或 GitHub 反馈。新的 Screeps 排错记录、Runtime Verification 和工具更新也会同步到 X 与 Facebook。</p>
           </div>
           <div className={styles.contactLinks}>
+            <a href={siteConfig.links.x} rel="noreferrer" target="_blank">X {siteConfig.author.socialHandle} ↗</a>
+            <a href={siteConfig.links.facebook} rel="noreferrer" target="_blank">Facebook ↗</a>
             <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>
             <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub ↗</a>
             <Link href="/changelog">查看更新日志 →</Link>

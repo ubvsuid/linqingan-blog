@@ -64,11 +64,11 @@ const structuredData = {
       "@type": "Person",
       "@id": `${siteConfig.url}/#person`,
       name: "Linqingan",
-      alternateName: [siteConfig.author.name, siteConfig.author.handle],
+      alternateName: [siteConfig.author.name, siteConfig.author.handle, siteConfig.author.socialHandle],
       url: `${siteConfig.url}/about`,
       image: `${siteConfig.url}/profile-avatar.webp`,
       email: `mailto:${siteConfig.author.email}`,
-      sameAs: [siteConfig.links.github],
+      sameAs: [siteConfig.links.x, siteConfig.links.facebook, siteConfig.links.github],
       knowsAbout: ["Screeps", "JavaScript", "system design", "debugging", "technical documentation"],
     },
     {

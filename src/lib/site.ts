@@ -29,6 +29,7 @@ export const siteConfig = {
   author: {
     name: "临清安",
     handle: "@linqingan501",
+    socialHandle: "@H_linqingan",
     email: "linqingan501@gmail.com",
   },
   navigation: [
@@ -39,6 +40,8 @@ export const siteConfig = {
     { label: "关于", href: "/about" },
   ],
   links: {
+    x: "https://x.com/H_linqingan",
+    facebook: "https://www.facebook.com/profile.php?id=61568376002140",
     github: "https://github.com/ubvsuid",
     repository: repositoryUrl,
     issues: `${repositoryUrl}/issues/new`,
