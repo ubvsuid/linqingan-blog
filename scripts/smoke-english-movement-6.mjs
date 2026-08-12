@@ -13,9 +13,9 @@ const articles = [
     reviewedInFullExpected: false,
     modifiedAt: "2026-08-12",
     signals: [
-      "terrain being entered",
+      "terrain is the tile being entered",
       "estimateCreepMovement(creep, terrain)",
-      "Empty CARRY capacity does not add movement weight",
+      "Empty <code>CARRY</code> capacity does not add movement weight",
       "destroyed ordinary non-MOVE/non-CARRY parts still count",
       "part => part.type !== MOVE && part.type !== CARRY",
       "Engine source review",
@@ -122,19 +122,20 @@ const fatigueBody = await (await fetch(
 if (fatigueBody.includes("getTerrainName(\n    creep.room,\n    creep.pos")) {
   failures.push("MOVE 页面仍把当前脚下地形当作下一步成本");
 }
-if (fatigueBody.includes("part.hits > 0\n    && part.type !== MOVE\n    && part.type !== CARRY")) {
-  failures.push("MOVE 页面仍错误地把被摧毁的普通非 MOVE/CARRY 部件从移动重量中移除");
-}
 for (const expected of [
   "countMovementWeight(creep)",
   "part => part.type !== MOVE && part.type !== CARRY",
   "activeMoveParts = creep.getActiveBodyparts(MOVE)",
   "activeCarry = creep.getActiveBodyparts(CARRY)",
   "currentFatigue: creep.fatigue",
+  "// Wrong for movement weight.",
 ]) {
   if (!fatigueBody.includes(expected)) {
-    failures.push(`MOVE 页面缺少修正后的移动重量边界 “${expected}”`);
+    failures.push(`MOVE 页面缺少修正后的移动重量边界或明确反例标识 “${expected}”`);
   }
+}
+if (!fatigueBody.includes("The important correction is in <code>countMovementWeight()</code>")) {
+  failures.push("MOVE 页面缺少对可执行正确实现的明确指向");
 }
 
 const routeBody = await (await fetch(
