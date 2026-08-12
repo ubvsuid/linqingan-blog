@@ -83,9 +83,13 @@ export function SiteFooter() {
 
         <div className="footer-column" aria-label={english ? "Contact links" : "关注与联系"}>
           <strong>{english ? "Connect" : "关注"}</strong>
+          <a href={siteConfig.links.x} rel="noreferrer" target="_blank">
+            {english ? `X ${siteConfig.author.socialHandle} ↗` : `X ${siteConfig.author.socialHandle} ↗`}
+          </a>
+          <a href={siteConfig.links.facebook} rel="noreferrer" target="_blank">Facebook ↗</a>
+          <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub ↗</a>
           <Link href={english ? "/en/feed.xml" : "/feed.xml"}>{english ? "English RSS" : "RSS"}</Link>
           {english ? <Link href="/feed.xml">Chinese RSS</Link> : null}
-          <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub ↗</a>
           {english ? <a href={siteConfig.links.issues} rel="noreferrer" target="_blank">Report an issue ↗</a> : null}
           <a href={`mailto:${siteConfig.author.email}`}>Email</a>
         </div>
