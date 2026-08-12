@@ -7,14 +7,19 @@ const articles = [
     headline: "How to Calculate Screeps Creep Movement Speed",
     listingTitle: "How to Calculate Screeps Creep Movement Speed",
     query: "fatigue",
-    tocId: "quick-answer",
-    tocHeading: "Quick answer",
-    faqExpected: true,
+    tocId: "use-this-guide",
+    tocHeading: "Use this guide when",
+    faqExpected: false,
+    reviewedInFullExpected: false,
+    modifiedAt: "2026-08-12",
     signals: [
       "terrain being entered",
       "estimateCreepMovement(creep, terrain)",
-      "Empty CARRY parts do not add weight",
-      "Live multi-tick movement test",
+      "Empty CARRY capacity does not add movement weight",
+      "destroyed ordinary non-MOVE/non-CARRY parts still count",
+      "part => part.type !== MOVE && part.type !== CARRY",
+      "Engine source review",
+      "Live multi-tick verification pending",
       "Pending",
     ],
   },
@@ -27,6 +32,7 @@ const articles = [
     tocId: "quick-answer",
     tocHeading: "Quick answer",
     faqExpected: true,
+    reviewedInFullExpected: true,
     signals: [
       "isNearTo() includes the same tile",
       "const strictlyAdjacent = withinOne",
@@ -45,6 +51,7 @@ const articles = [
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     faqExpected: false,
+    reviewedInFullExpected: true,
     signals: [
       "Game.map.describeExits(currentRoom)",
       "findClosestByPath",
@@ -73,7 +80,6 @@ for (const article of articles) {
     article.headline,
     "Verification status",
     "Chinese source article",
-    "Reviewed in full",
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
@@ -83,10 +89,15 @@ for (const article of articles) {
     `href="#${article.tocId}"`,
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
+    ...(article.modifiedAt ? [`"dateModified":"${article.modifiedAt}"`] : []),
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少 “${expected}”`);
     }
+  }
+
+  if (body.includes("Reviewed in full") !== article.reviewedInFullExpected) {
+    failures.push(`${article.path}: Reviewed in full 证据边界 expectation mismatch`);
   }
 
   if (body.includes(`"@type":"FAQPage"`) !== article.faqExpected) {
@@ -110,6 +121,20 @@ const fatigueBody = await (await fetch(
 )).text();
 if (fatigueBody.includes("getTerrainName(\n    creep.room,\n    creep.pos")) {
   failures.push("MOVE 页面仍把当前脚下地形当作下一步成本");
+}
+if (fatigueBody.includes("part.hits > 0\n    && part.type !== MOVE\n    && part.type !== CARRY")) {
+  failures.push("MOVE 页面仍错误地把被摧毁的普通非 MOVE/CARRY 部件从移动重量中移除");
+}
+for (const expected of [
+  "countMovementWeight(creep)",
+  "part => part.type !== MOVE && part.type !== CARRY",
+  "activeMoveParts = creep.getActiveBodyparts(MOVE)",
+  "activeCarry = creep.getActiveBodyparts(CARRY)",
+  "currentFatigue: creep.fatigue",
+]) {
+  if (!fatigueBody.includes(expected)) {
+    failures.push(`MOVE 页面缺少修正后的移动重量边界 “${expected}”`);
+  }
 }
 
 const routeBody = await (await fetch(
@@ -157,5 +182,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `第六批英文移动专题生产冒烟测试通过：${articles.length} 篇文章、跨房间首步与出口可达性、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
+  `第六批英文移动专题生产冒烟测试通过：${articles.length} 篇文章、移动重量损伤边界、跨房间首步与出口可达性、Verification、Canonical、hreflang、JSON-LD、目录、搜索与 Sitemap。`,
 );
