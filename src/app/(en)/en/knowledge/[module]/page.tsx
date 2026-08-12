@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Container } from "@/components/container";
+import { KnowledgeSystemMap } from "@/components/knowledge-system-map";
 import { getEnglishDiscoveryArticle } from "@/lib/english-discovery";
 import { englishKnowledgeSections } from "@/lib/english-knowledge";
 import { siteConfig } from "@/lib/site";
@@ -128,6 +129,8 @@ export default async function EnglishKnowledgeModulePage({ params }: EnglishKnow
             </div>
           </article>
         </section>
+
+        <KnowledgeSystemMap moduleNumber={section.number} locale="en" />
 
         <section className={styles.knowledgeModule} aria-labelledby="module-guide-list-title">
           <div className={styles.knowledgeModuleHeader}>
