@@ -59,16 +59,19 @@ export async function ScreepsApiHubPage({
     description: isEnglish ? hub.enDescription : hub.zhDescription,
     url: pageUrl,
     inLanguage: isEnglish ? "en" : "zh-CN",
-    mainEntity: {
-      "@type": "ItemList",
-      numberOfItems: entries.length,
-      itemListElement: entries.map((entry, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        name: entry.signature,
-        url: `${apiRootHref}#${entry.id}`,
-      })),
-    },
+    mainEntity:
+      entries.length > 0
+        ? {
+            "@type": "ItemList",
+            numberOfItems: entries.length,
+            itemListElement: entries.map((entry, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: entry.signature,
+              url: `${apiRootHref}#${entry.id}`,
+            })),
+          }
+        : undefined,
   };
 
   const copy = isEnglish
@@ -145,29 +148,31 @@ export async function ScreepsApiHubPage({
           </div>
         </header>
 
-        <section className={styles.section} aria-labelledby="hub-api-title">
-          <div className={styles.sectionHead}>
-            <div>
-              <p className="eyebrow">API</p>
-              <h2 id="hub-api-title">{copy.apiTitle}</h2>
-              <p>{copy.apiBody}</p>
+        {entries.length > 0 ? (
+          <section className={styles.section} aria-labelledby="hub-api-title">
+            <div className={styles.sectionHead}>
+              <div>
+                <p className="eyebrow">API</p>
+                <h2 id="hub-api-title">{copy.apiTitle}</h2>
+                <p>{copy.apiBody}</p>
+              </div>
+              <strong>{entries.length}</strong>
             </div>
-            <strong>{entries.length}</strong>
-          </div>
-          <div className={styles.apiGrid}>
-            {entries.map((entry) => (
-              <article key={entry.id} className={styles.apiCard}>
-                <span>{entry.group}</span>
-                <h3><code>{entry.signature}</code></h3>
-                <p>{entry.summary}</p>
-                <div className={styles.tags}>
-                  {entry.keywords.slice(0, 4).map((keyword) => <span key={keyword}>{keyword}</span>)}
-                </div>
-                <Link href={`${apiRootHref}#${entry.id}`}>{copy.apiOpen}</Link>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.apiGrid}>
+              {entries.map((entry) => (
+                <article key={entry.id} className={styles.apiCard}>
+                  <span>{entry.group}</span>
+                  <h3><code>{entry.signature}</code></h3>
+                  <p>{entry.summary}</p>
+                  <div className={styles.tags}>
+                    {entry.keywords.slice(0, 4).map((keyword) => <span key={keyword}>{keyword}</span>)}
+                  </div>
+                  <Link href={`${apiRootHref}#${entry.id}`}>{copy.apiOpen}</Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className={styles.twoColumn}>
           <div className={styles.panel}>
