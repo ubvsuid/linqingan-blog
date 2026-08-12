@@ -4,6 +4,12 @@ export const screepsApiHubSlugs = [
   "structure-spawn",
   "controller",
   "market",
+  "structure-link",
+  "structure-tower",
+  "structure-terminal",
+  "structure-lab",
+  "path-finder",
+  "store",
 ] as const;
 
 export type ScreepsApiHubSlug = (typeof screepsApiHubSlugs)[number];
@@ -300,6 +306,296 @@ export const screepsApiHubs: readonly ScreepsApiHubConfig[] = [
       },
     ],
     keywords: ["Game.market", "Market", "deal", "createOrder", "Terminal", "Credits", "transaction cost"],
+  },
+  {
+    slug: "structure-link",
+    objectName: "StructureLink",
+    zhTitle: "StructureLink API Hub",
+    enTitle: "StructureLink API Hub",
+    zhDescription:
+      "把 Link 传能、cooldown、容量、房间内物流和 Controller 供能排查放进同一条入口。",
+    enDescription:
+      "A focused hub for Link Energy transfer, cooldown, capacity, room logistics, and Controller supply debugging.",
+    zhScope:
+      "Link 的问题通常不是单看 transferEnergy()。发送端库存、接收端剩余容量、cooldown、目标 Link 与下一 tick 的 Store 变化应该一起核对。",
+    enScope:
+      "Link debugging should not stop at transferEnergy(). Check sender stock, receiver free capacity, cooldown, target identity, and next-tick Store changes together.",
+    entryIds: ["link-transfer-energy"],
+    errorNames: ["ERR_TIRED", "ERR_NOT_ENOUGH_RESOURCES", "ERR_FULL", "ERR_INVALID_TARGET", "ERR_RCL_NOT_ENOUGH"],
+    tools: [
+      {
+        zhLabel: "运输吞吐量规划器",
+        enLabel: "Hauling Throughput Planner",
+        zhHref: "/tools/hauling-throughput-planner",
+        enHref: "/en/tools/hauling-throughput-planner",
+      },
+      {
+        zhLabel: "房间运行诊断",
+        enLabel: "Room Snapshot Diagnostic",
+        zhHref: "/tools/room-diagnostics",
+        enHref: "/en/tools/room-diagnostics",
+      },
+    ],
+    modules: [
+      {
+        zhLabel: "资源采集与房间经济",
+        enLabel: "Room Economy",
+        zhHref: "/knowledge/room-economy",
+        enHref: "/en/knowledge/room-economy",
+      },
+      {
+        zhLabel: "Controller 与房间控制",
+        enLabel: "Controllers and Expansion",
+        zhHref: "/knowledge/controller-control",
+        enHref: "/en/knowledge/controllers-expansion",
+      },
+    ],
+    extraGuides: [
+      {
+        zhLabel: "Upgrader 与 Controller Link 不升级排查",
+        enLabel: "Upgrader and Controller Link debugging",
+        zhHref: "/blog/screeps-upgrader-controller-link-not-upgrading",
+        enHref: "/en/blog/screeps-upgrader-controller-link-not-upgrading",
+      },
+    ],
+    keywords: ["StructureLink", "Link", "transferEnergy", "cooldown", "Controller Link", "Energy"],
+  },
+  {
+    slug: "structure-tower",
+    objectName: "StructureTower",
+    zhTitle: "StructureTower API Hub",
+    enTitle: "StructureTower API Hub",
+    zhDescription:
+      "集中查看 Tower 攻击、治疗、维修、距离衰减、Energy 预算与防御规划。",
+    enDescription:
+      "A focused hub for Tower attack, heal, repair, range falloff, Energy budgeting, and defense planning.",
+    zhScope:
+      "Tower 每 tick 只有一次主要行动机会。目标选择、距离衰减、Energy 与多塔叠加效果应放在同一个防御决策里检查。",
+    enScope:
+      "A Tower has one primary action opportunity per tick. Target selection, range falloff, Energy, and multi-Tower output belong to the same defense decision.",
+    entryIds: ["tower-attack-heal-repair"],
+    errorNames: ["ERR_NOT_OWNER", "ERR_NOT_ENOUGH_RESOURCES", "ERR_INVALID_TARGET", "ERR_RCL_NOT_ENOUGH"],
+    tools: [
+      {
+        zhLabel: "Tower 伤害、治疗与维修计算器",
+        enLabel: "Tower Damage, Heal, and Repair Calculator",
+        zhHref: "/tools/tower-damage-heal-repair-calculator",
+        enHref: "/en/tools/tower-damage-heal-repair-calculator",
+      },
+      {
+        zhLabel: "房间运行诊断",
+        enLabel: "Room Snapshot Diagnostic",
+        zhHref: "/tools/room-diagnostics",
+        enHref: "/en/tools/room-diagnostics",
+      },
+    ],
+    modules: [
+      {
+        zhLabel: "建设与防御",
+        enLabel: "Construction and Defense",
+        zhHref: "/knowledge/construction-defense",
+        enHref: "/en/knowledge/construction-defense",
+      },
+    ],
+    extraGuides: [
+      {
+        zhLabel: "Tower 自动攻击敌人",
+        enLabel: "Tower automatic hostile targeting",
+        zhHref: "/blog/screeps-tower-auto-attack-hostiles",
+        enHref: "/en/blog/screeps-tower-auto-attack-hostiles",
+      },
+      {
+        zhLabel: "Tower 维修阈值",
+        enLabel: "Tower repair threshold",
+        zhHref: "/blog/screeps-tower-repair-threshold",
+        enHref: "/en/blog/screeps-tower-repair-threshold",
+      },
+      {
+        zhLabel: "Tower 治疗 Creep",
+        enLabel: "Tower healing Creeps",
+        zhHref: "/blog/screeps-tower-heal-creeps",
+        enHref: "/en/blog/screeps-tower-heal-creeps",
+      },
+    ],
+    keywords: ["StructureTower", "Tower", "attack", "heal", "repair", "range falloff", "defense"],
+  },
+  {
+    slug: "structure-terminal",
+    objectName: "StructureTerminal",
+    zhTitle: "StructureTerminal API Hub",
+    enTitle: "StructureTerminal API Hub",
+    zhDescription:
+      "把 Terminal 跨房间发送、交易 Energy、库存、cooldown 与 Market 成本计算连接起来。",
+    enDescription:
+      "A focused hub for Terminal sends, transaction Energy, stock, cooldown, and Market cost planning.",
+    zhScope:
+      "Terminal 发送前要同时检查资源库存、Energy 交易成本、cooldown、目标房间与发送数量。涉及 Market 时，再把订单和 Credits 一起纳入判断。",
+    enScope:
+      "Before a Terminal send, check stock, transaction Energy, cooldown, destination, and amount together. For Market flows, include orders and Credits in the same decision.",
+    entryIds: ["terminal-send"],
+    errorNames: ["ERR_TIRED", "ERR_NOT_ENOUGH_RESOURCES", "ERR_INVALID_ARGS", "ERR_RCL_NOT_ENOUGH"],
+    tools: [
+      {
+        zhLabel: "Market 与 Terminal 成本计算器",
+        enLabel: "Market and Terminal Cost Calculator",
+        zhHref: "/tools/market-terminal-cost-calculator",
+        enHref: "/en/tools/market-terminal-cost-calculator",
+      },
+    ],
+    modules: [
+      {
+        zhLabel: "资源采集与房间经济",
+        enLabel: "Room Economy",
+        zhHref: "/knowledge/room-economy",
+        enHref: "/en/knowledge/room-economy",
+      },
+      {
+        zhLabel: "市场与高级资源",
+        enLabel: "Market and Advanced Resources",
+        zhHref: "/knowledge/market-advanced-resources",
+        enHref: "/en/knowledge/market-advanced-resources",
+      },
+    ],
+    keywords: ["StructureTerminal", "Terminal", "send", "transaction cost", "cooldown", "Market"],
+  },
+  {
+    slug: "structure-lab",
+    objectName: "StructureLab",
+    zhTitle: "StructureLab API Hub",
+    enTitle: "StructureLab API Hub",
+    zhDescription:
+      "集中查看 Lab 反应、Boost、矿物与 Energy 前置条件、cooldown 和生产规划。",
+    enDescription:
+      "A focused hub for Lab reactions, Boosts, mineral and Energy prerequisites, cooldown, and production planning.",
+    zhScope:
+      "Lab 工作流要区分输入 Lab、输出 Lab、化合物配方与 Boost 目标。先确认资源和位置，再执行动作并根据返回值继续排查。",
+    enScope:
+      "Lab workflows distinguish input Labs, output Labs, compound recipes, and Boost targets. Confirm resources and range first, then use the action result to continue debugging.",
+    entryIds: ["lab-run-reaction", "lab-boost-creep"],
+    errorNames: ["ERR_TIRED", "ERR_NOT_IN_RANGE", "ERR_NOT_ENOUGH_RESOURCES", "ERR_INVALID_ARGS", "ERR_INVALID_TARGET", "ERR_FULL", "ERR_RCL_NOT_ENOUGH"],
+    tools: [
+      {
+        zhLabel: "Lab 反应与 Boost 规划器",
+        enLabel: "Lab Reaction and Boost Planner",
+        zhHref: "/tools/lab-reaction-boost-planner",
+        enHref: "/en/tools/lab-reaction-boost-planner",
+      },
+    ],
+    modules: [
+      {
+        zhLabel: "市场与高级资源",
+        enLabel: "Market and Advanced Resources",
+        zhHref: "/knowledge/market-advanced-resources",
+        enHref: "/en/knowledge/market-advanced-resources",
+      },
+    ],
+    keywords: ["StructureLab", "Lab", "runReaction", "boostCreep", "Boost", "compound", "mineral"],
+  },
+  {
+    slug: "path-finder",
+    objectName: "PathFinder",
+    zhTitle: "PathFinder API Hub",
+    enTitle: "PathFinder API Hub",
+    zhDescription:
+      "把格子级 PathFinder、房间级路线、ERR_NO_PATH、CostMatrix 与移动排错放在同一入口。",
+    enDescription:
+      "A focused hub for tile-level PathFinder, room-level routes, ERR_NO_PATH, CostMatrix, and movement debugging.",
+    zhScope:
+      "寻路要先区分房间级路线和房间内格子级搜索。除了 path 本身，还要观察 incomplete、cost、ops，以及 callback 是否意外封死路径。",
+    enScope:
+      "Pathfinding starts by separating room-level routing from tile-level search. Inspect incomplete, cost, ops, and callbacks in addition to the returned path.",
+    entryIds: ["pathfinder-search", "game-map-find-route"],
+    errorNames: ["ERR_NO_PATH", "ERR_INVALID_ARGS"],
+    tools: [
+      {
+        zhLabel: "房间运行诊断",
+        enLabel: "Room Snapshot Diagnostic",
+        zhHref: "/tools/room-diagnostics",
+        enHref: "/en/tools/room-diagnostics",
+      },
+    ],
+    modules: [
+      {
+        zhLabel: "移动、寻路与视野",
+        enLabel: "Movement and Vision",
+        zhHref: "/knowledge/movement-vision",
+        enHref: "/en/knowledge/movement-vision",
+      },
+    ],
+    extraGuides: [
+      {
+        zhLabel: "ERR_NO_PATH 排查",
+        enLabel: "ERR_NO_PATH debugging",
+        zhHref: "/blog/screeps-err-no-path",
+        enHref: "/en/blog/screeps-err-no-path",
+      },
+      {
+        zhLabel: "moveTo 不移动排查",
+        enLabel: "moveTo not moving",
+        zhHref: "/blog/screeps-moveto-not-moving",
+        enHref: "/en/blog/screeps-moveto-not-moving",
+      },
+    ],
+    keywords: ["PathFinder", "PathFinder.search", "CostMatrix", "findRoute", "ERR_NO_PATH", "movement", "route"],
+  },
+  {
+    slug: "store",
+    objectName: "Store",
+    zhTitle: "Store 实践 Hub",
+    enTitle: "Store Practice Hub",
+    zhDescription:
+      "集中理解 Store 的已用、剩余和总容量语义，并连接 Creep 搬运、Storage、Container 与房间经济。",
+    enDescription:
+      "A practical hub for Store used, free, and total capacity semantics across Creep hauling, Storage, Containers, and room economy.",
+    zhScope:
+      "当前快速 Reference 还没有把 Store 容量方法拆成独立条目，因此这里明确作为实践入口，不伪装成完整 API Reference。容量语义由专题教程承载，再连接搬运工具与房间经济模块。",
+    enScope:
+      "The quick reference does not yet expose Store capacity methods as standalone entries, so this page is intentionally a practice hub rather than a fake complete API reference. Focused guides carry the capacity semantics and connect them to hauling tools and room economy.",
+    entryIds: [],
+    errorNames: ["ERR_FULL", "ERR_NOT_ENOUGH_RESOURCES"],
+    tools: [
+      {
+        zhLabel: "运输吞吐量规划器",
+        enLabel: "Hauling Throughput Planner",
+        zhHref: "/tools/hauling-throughput-planner",
+        enHref: "/en/tools/hauling-throughput-planner",
+      },
+      {
+        zhLabel: "房间运行诊断",
+        enLabel: "Room Snapshot Diagnostic",
+        zhHref: "/tools/room-diagnostics",
+        enHref: "/en/tools/room-diagnostics",
+      },
+    ],
+    modules: [
+      {
+        zhLabel: "资源采集与房间经济",
+        enLabel: "Room Economy",
+        zhHref: "/knowledge/room-economy",
+        enHref: "/en/knowledge/room-economy",
+      },
+    ],
+    extraGuides: [
+      {
+        zhLabel: "Store 容量 API：getUsedCapacity / getFreeCapacity / getCapacity",
+        enLabel: "Store capacity API: getUsedCapacity / getFreeCapacity / getCapacity",
+        zhHref: "/blog/screeps-store-capacity-api",
+        enHref: "/en/blog/screeps-store-capacity-api",
+      },
+      {
+        zhLabel: "从 Container withdraw Energy",
+        enLabel: "Withdraw Energy from a Container",
+        zhHref: "/blog/screeps-creep-withdraw-container-energy",
+        enHref: "/en/blog/screeps-creep-withdraw-container-energy",
+      },
+      {
+        zhLabel: "Storage Energy 的使用方式",
+        enLabel: "Using Storage Energy",
+        zhHref: "/blog/screeps-storage-energy-usage",
+        enHref: "/en/blog/screeps-storage-energy-usage",
+      },
+    ],
+    keywords: ["Store", "getUsedCapacity", "getFreeCapacity", "getCapacity", "Storage", "Container", "capacity", "资源容量"],
   },
 ] as const;
 
