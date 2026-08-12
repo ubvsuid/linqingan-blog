@@ -245,6 +245,37 @@
   line-height: 1.7;
 }
 
+.moduleFlow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0 68px;
+  padding: 0;
+  list-style: none;
+}
+
+.moduleFlow li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 11px;
+  background: var(--background);
+  font-size: 12px;
+}
+
+.moduleFlow li > span {
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+}
+
+.moduleFlow li > i {
+  color: var(--muted);
+  font-style: normal;
+}
+
 .previewList {
   display: grid;
   margin: 26px 0 0 68px;
@@ -303,6 +334,7 @@
     flex-direction: column;
   }
 
+  .moduleFlow,
   .previewList,
   .moduleFooter {
     margin-left: 0;
