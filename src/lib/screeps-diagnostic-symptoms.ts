@@ -47,7 +47,7 @@ export const screepsDiagnosticSymptoms = [
     ],
     errorNames: ["ERR_NO_PATH", "ERR_TIRED", "ERR_NOT_IN_RANGE", "ERR_INVALID_TARGET"],
     directApiEntryIds: ["creep-move-to", "game-map-find-route", "pathfinder-search"],
-    directHubSlugs: ["creep", "room"],
+    directHubSlugs: ["creep", "path-finder", "room"],
     tools: [
       { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
     ],
@@ -130,7 +130,7 @@ export const screepsDiagnosticSymptoms = [
     ],
     errorNames: ["ERR_NOT_IN_RANGE", "ERR_INVALID_TARGET", "ERR_NOT_ENOUGH_RESOURCES"],
     directApiEntryIds: ["creep-upgrade-controller", "game-notify"],
-    directHubSlugs: ["controller", "creep", "room"],
+    directHubSlugs: ["controller", "creep", "structure-link", "store", "room"],
     tools: [
       { zhLabel: "Controller 降级与 Upgrader 规划器", enLabel: "Controller Downgrade and Upgrader Planner", zhHref: "/tools/controller-downgrade-planner", enHref: "/en/tools/controller-downgrade-planner" },
       { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
@@ -158,7 +158,7 @@ export const screepsDiagnosticSymptoms = [
     ],
     errorNames: ["ERR_TIRED", "ERR_NOT_ENOUGH_RESOURCES", "ERR_FULL", "ERR_INVALID_TARGET"],
     directApiEntryIds: ["link-transfer-energy"],
-    directHubSlugs: ["room"],
+    directHubSlugs: ["structure-link", "store", "room"],
     tools: [
       { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
       { zhLabel: "运输吞吐规划器", enLabel: "Hauling Throughput Planner", zhHref: "/tools/hauling-throughput-planner", enHref: "/en/tools/hauling-throughput-planner" },
@@ -186,7 +186,7 @@ export const screepsDiagnosticSymptoms = [
     ],
     errorNames: ["ERR_NOT_ENOUGH_RESOURCES", "ERR_INVALID_ARGS"],
     directApiEntryIds: ["market-deal", "market-create-order", "terminal-send"],
-    directHubSlugs: ["market", "room"],
+    directHubSlugs: ["market", "structure-terminal", "store", "room"],
     tools: [
       { zhLabel: "Market 与 Terminal 成本计算器", enLabel: "Market and Terminal Cost Calculator", zhHref: "/tools/market-terminal-cost-calculator", enHref: "/en/tools/market-terminal-cost-calculator" },
     ],
@@ -213,7 +213,7 @@ export const screepsDiagnosticSymptoms = [
     ],
     errorNames: [],
     directApiEntryIds: ["game-cpu-get-used", "pathfinder-search", "room-get-event-log"],
-    directHubSlugs: ["room", "creep"],
+    directHubSlugs: ["room", "path-finder", "creep"],
     tools: [
       { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
     ],
@@ -240,7 +240,7 @@ export const screepsDiagnosticSymptoms = [
     ],
     errorNames: ["ERR_NOT_ENOUGH_RESOURCES", "ERR_FULL", "ERR_NOT_IN_RANGE", "ERR_INVALID_TARGET", "ERR_NO_PATH", "ERR_TIRED"],
     directApiEntryIds: ["creep-withdraw", "creep-pickup", "creep-transfer", "creep-move-to"],
-    directHubSlugs: ["creep", "room"],
+    directHubSlugs: ["creep", "store", "path-finder", "room"],
     tools: [
       { zhLabel: "运输吞吐规划器", enLabel: "Hauling Throughput Planner", zhHref: "/tools/hauling-throughput-planner", enHref: "/en/tools/hauling-throughput-planner" },
       { zhLabel: "房间运行诊断", enLabel: "Room Snapshot Diagnostic", zhHref: "/tools/room-diagnostics", enHref: "/en/tools/room-diagnostics" },
