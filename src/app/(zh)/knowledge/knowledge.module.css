@@ -78,7 +78,7 @@
 .moduleNumber,
 .previewList > li > span {
   color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: SFMono-Regular, Consolas, monospace;
   font-size: 12px;
 }
 
@@ -267,7 +267,7 @@
 
 .moduleFlow li > span {
   color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: SFMono-Regular, Consolas, monospace;
   font-size: 10px;
 }
 
