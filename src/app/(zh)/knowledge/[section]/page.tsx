@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Container } from "@/components/container";
+import { KnowledgeSystemMap } from "@/components/knowledge-system-map";
 import {
   getKnowledgeBaseSection,
   knowledgeBaseSections,
@@ -144,6 +145,8 @@ export default async function KnowledgeSectionPage({
           </div>
         </section>
 
+        <KnowledgeSystemMap moduleNumber={section.number} locale="zh" />
+
         <div className="module-stage-list">
           {section.stages.map((stage, stageIndex) => {
             const stageSlugs = section.slugs.slice(stage.from, stage.to);
@@ -215,7 +218,7 @@ export default async function KnowledgeSectionPage({
         .module-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
         .module-stats span { border: 1px solid var(--border); border-radius: 999px; padding: 9px 14px; color: var(--muted); font-size: 13px; }
         .module-stats strong { color: var(--foreground); font-size: 16px; }
-        .module-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 76px; }
+        .module-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 42px; }
         .module-overview > div { border: 1px solid var(--border); border-radius: 22px; padding: clamp(24px, 4vw, 38px); background: var(--surface); }
         .module-overview h2 { margin: 8px 0 14px; font-size: clamp(26px, 4vw, 38px); letter-spacing: -.04em; }
         .module-overview p:last-child { margin: 0; color: var(--muted); line-height: 1.75; }
