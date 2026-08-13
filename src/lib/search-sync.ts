@@ -33,15 +33,16 @@ async function synchronizeDocuments(): Promise<void> {
   const db = getPlatformDatabase();
   if (!db) return;
 
-  const sourceDocuments = getSearchDocuments({
-    includeArticleText: true,
-    includeSourceMetadata: true,
-  });
   const now = Date.now();
 
   if (now - lastSuccessfulSyncAt < SEARCH_SYNC_CHECK_INTERVAL_MS) {
     return;
   }
+
+  const sourceDocuments = getSearchDocuments({
+    includeArticleText: true,
+    includeSourceMetadata: true,
+  });
 
   const rows = sourceDocuments.map(toDatabaseDocument);
   if (rows.length === 0) return;

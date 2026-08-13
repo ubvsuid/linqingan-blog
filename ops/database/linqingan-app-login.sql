@@ -2,7 +2,8 @@
 --
 -- This script intentionally creates the principal as NOLOGIN with no password.
 -- Set a high-entropy password through an interactive direct PostgreSQL client,
--- validate fresh pooled and direct connections, and only then enable LOGIN.
+-- then enable LOGIN. Validate fresh pooled and direct connections before any
+-- deployment secret is changed.
 -- Never put the password in this file or a recorded SQL command.
 
 DO $$
