@@ -145,7 +145,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
             .map((slug) => screepsApiHubs.find((hub) => hub.slug === slug))
             .filter((hub): hub is NonNullable<typeof hub> => Boolean(hub));
 
-          const symptomGuides = (symptom.guides ?? []).map((link) => localizeDiagnosticLink(link, locale));
+          const symptomGuides = ("guides" in symptom ? symptom.guides : []).map((link) => localizeDiagnosticLink(link, locale));
           const primaryApiGuides = primaryApis.flatMap((entry) =>
             entry.guideHref
               ? [{ label: isEnglish ? `Guide for ${entry.signature}` : `${entry.signature} 对应教程`, href: entry.guideHref }]
