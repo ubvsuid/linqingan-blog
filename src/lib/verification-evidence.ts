@@ -1,8 +1,8 @@
 import { neon } from "@neondatabase/serverless";
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 import { getPlatformDatabase } from "@/db/client";
-import { verificationEvidence } from "@/db/schema";
+import { publicVerificationEvidence } from "@/db/schema";
 
 export type RuntimeVerificationType = "console" | "live";
 
@@ -52,17 +52,9 @@ async function isVerificationGovernanceReady(): Promise<boolean> {
       SELECT
         EXISTS (
           SELECT 1
-          FROM information_schema.columns
+          FROM information_schema.views
           WHERE table_schema = 'public'
-            AND table_name = 'verification_evidence'
-            AND column_name = 'evidence_key'
-        )
-        AND EXISTS (
-          SELECT 1
-          FROM information_schema.columns
-          WHERE table_schema = 'public'
-            AND table_name = 'verification_evidence'
-            AND column_name = 'status'
+            AND table_name = 'verification_evidence_public'
         ) AS ready;
     `;
     governanceReadiness = {
@@ -116,20 +108,20 @@ function mapPublicRows(rows: Array<{
 }
 
 const publicSelection = {
-  id: verificationEvidence.id,
-  evidenceKey: verificationEvidence.evidenceKey,
-  articleSlug: verificationEvidence.articleSlug,
-  language: verificationEvidence.language,
-  verificationType: verificationEvidence.verificationType,
-  gameTime: verificationEvidence.gameTime,
-  shard: verificationEvidence.shard,
-  roomName: verificationEvidence.roomName,
-  apiName: verificationEvidence.apiName,
-  returnCode: verificationEvidence.returnCode,
-  tickStart: verificationEvidence.tickStart,
-  tickEnd: verificationEvidence.tickEnd,
-  evidenceNote: verificationEvidence.evidenceNote,
-  verifiedAt: verificationEvidence.verifiedAt,
+  id: publicVerificationEvidence.id,
+  evidenceKey: publicVerificationEvidence.evidenceKey,
+  articleSlug: publicVerificationEvidence.articleSlug,
+  language: publicVerificationEvidence.language,
+  verificationType: publicVerificationEvidence.verificationType,
+  gameTime: publicVerificationEvidence.gameTime,
+  shard: publicVerificationEvidence.shard,
+  roomName: publicVerificationEvidence.roomName,
+  apiName: publicVerificationEvidence.apiName,
+  returnCode: publicVerificationEvidence.returnCode,
+  tickStart: publicVerificationEvidence.tickStart,
+  tickEnd: publicVerificationEvidence.tickEnd,
+  evidenceNote: publicVerificationEvidence.evidenceNote,
+  verifiedAt: publicVerificationEvidence.verifiedAt,
 };
 
 export async function getPublicVerificationEvidence(
@@ -141,9 +133,8 @@ export async function getPublicVerificationEvidence(
   try {
     const rows = await db
       .select(publicSelection)
-      .from(verificationEvidence)
-      .where(eq(verificationEvidence.status, "accepted"))
-      .orderBy(desc(verificationEvidence.verifiedAt))
+      .from(publicVerificationEvidence)
+      .orderBy(desc(publicVerificationEvidence.verifiedAt))
       .limit(Math.max(1, Math.min(limit, 1000)));
 
     return mapPublicRows(rows);
@@ -163,14 +154,9 @@ export async function getPublicVerificationEvidenceForArticle(
   try {
     const rows = await db
       .select(publicSelection)
-      .from(verificationEvidence)
-      .where(
-        and(
-          eq(verificationEvidence.articleSlug, articleSlug),
-          eq(verificationEvidence.status, "accepted"),
-        ),
-      )
-      .orderBy(desc(verificationEvidence.verifiedAt))
+      .from(publicVerificationEvidence)
+      .where(eq(publicVerificationEvidence.articleSlug, articleSlug))
+      .orderBy(desc(publicVerificationEvidence.verifiedAt))
       .limit(Math.max(1, Math.min(limit, 100)));
 
     return mapPublicRows(rows);

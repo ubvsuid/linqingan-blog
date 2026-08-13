@@ -21,6 +21,7 @@ export interface SearchDocument {
   meta: string;
   keywords: string[];
   text: string;
+  sourceUpdatedAt?: string;
 }
 
 export interface SearchIndexSummary {
@@ -33,6 +34,7 @@ export interface SearchIndexSummary {
 
 interface SearchDocumentOptions {
   includeArticleText?: boolean;
+  includeSourceMetadata?: boolean;
 }
 
 const MAX_ARTICLE_SEARCH_TOKENS = 72;
@@ -177,6 +179,7 @@ export function getSearchDocuments(
   options: SearchDocumentOptions = {},
 ): SearchDocument[] {
   const includeArticleText = options.includeArticleText ?? true;
+  const includeSourceMetadata = options.includeSourceMetadata ?? false;
   const posts: SearchDocument[] = getSearchablePosts().map((post) => {
     const section = getKnowledgeBaseSectionBySlug(post.slug);
     return {
@@ -192,6 +195,9 @@ export function getSearchDocuments(
         ...(section ? [section.title] : []),
       ]),
       text: includeArticleText ? compactArticleSearchText(post.text) : "",
+      ...(includeSourceMetadata
+        ? { sourceUpdatedAt: post.updatedAt ?? post.publishedAt }
+        : {}),
     };
   });
 

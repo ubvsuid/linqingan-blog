@@ -13,6 +13,23 @@ const postsDirectory = path.join(process.cwd(), "content", "posts");
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
+export function parseDateOnlyUtc(value: string): Date | null {
+  if (!datePattern.test(value)) return null;
+
+  const [year, month, day] = value.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return parsed;
+}
+
 export interface PostFrontmatter {
   title: string;
   description: string;
@@ -76,21 +93,18 @@ function parseFrontmatter(
   assertString(data.publishedAt, "publishedAt", filePath);
   assertString(data.category, "category", filePath);
 
-  if (!datePattern.test(data.publishedAt)) {
+  const publishedAtDate = parseDateOnlyUtc(data.publishedAt);
+  if (!publishedAtDate) {
     throw new Error(`${filePath}: publishedAt 必须使用 YYYY-MM-DD`);
   }
 
-  if (
-    data.updatedAt !== undefined &&
-    (typeof data.updatedAt !== "string" || !datePattern.test(data.updatedAt))
-  ) {
+  const updatedAtDate =
+    typeof data.updatedAt === "string" ? parseDateOnlyUtc(data.updatedAt) : null;
+  if (data.updatedAt !== undefined && !updatedAtDate) {
     throw new Error(`${filePath}: updatedAt 必须使用 YYYY-MM-DD`);
   }
 
-  if (
-    typeof data.updatedAt === "string" &&
-    new Date(data.updatedAt).getTime() < new Date(data.publishedAt).getTime()
-  ) {
+  if (updatedAtDate && updatedAtDate.getTime() < publishedAtDate.getTime()) {
     throw new Error(`${filePath}: updatedAt 不能早于 publishedAt`);
   }
 
@@ -118,7 +132,7 @@ function parseFrontmatter(
   }
   if (
     typeof verificationRecord.checkedAt !== "string" ||
-    !datePattern.test(verificationRecord.checkedAt)
+    !parseDateOnlyUtc(verificationRecord.checkedAt)
   ) {
     throw new Error(`${filePath}: verification.checkedAt 必须使用 YYYY-MM-DD`);
   }
@@ -127,7 +141,7 @@ function parseFrontmatter(
   if (hasRuntimeEvidence) {
     if (
       typeof verificationRecord.testedAt !== "string" ||
-      !datePattern.test(verificationRecord.testedAt)
+      !parseDateOnlyUtc(verificationRecord.testedAt)
     ) {
       throw new Error(`${filePath}: 已标记运行验证时必须填写 verification.testedAt`);
     }

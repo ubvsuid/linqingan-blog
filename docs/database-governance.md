@@ -21,9 +21,9 @@ Current runtime capabilities are limited to what the application code requires:
 - `search_clicks`: append click analytics.
 - `article_feedback`: read/insert feedback and update the fields used when the same anonymous visitor revises a response.
 - `tool_events`: append tool telemetry.
-- `verification_evidence`: no website-runtime privileges. Evidence remains an explicit maintenance/review workflow.
+- `verification_evidence_public`: read accepted rows through a security-barrier view containing public fields only. The base Evidence table, internal snapshots, source references, review metadata, lifecycle writes, and the identity sequence remain maintenance-only.
 
-A future production login role should inherit `linqingan_runtime`; the owner role remains for migrations and administrative maintenance only.
+A future production login role should inherit `linqingan_runtime`; the owner role remains for migrations and administrative maintenance only. Create the login with SQL, stage it as `NOLOGIN`, and set its password through an interactive direct client so the secret is not recorded in repository, command, or SQL-tool history. Validate a fresh pooled connection before changing any deployment secret.
 
 ## Data retention policy
 
@@ -62,6 +62,8 @@ The maintenance order deletes expired click rows before query rows. The existing
 - Do not enable network allowlists without a verified production egress strategy.
 - Prefer the longest practical restore window supported by the active Neon plan and budget.
 - Protected-branch controls should be enabled when the active Neon plan supports them and the project is intended to remain production-critical.
+
+As of 2026-08-13 the project uses Neon's Free plan. Its six-hour history window is already at the plan maximum, and protected branches are unavailable. Do not shorten or disable the history window. Re-evaluate a seven-day window and main-branch protection before or immediately after a paid-plan upgrade.
 
 ## Deferred controls
 

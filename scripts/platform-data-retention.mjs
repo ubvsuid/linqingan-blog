@@ -16,6 +16,7 @@ if (APPLY && process.env.PLATFORM_RETENTION_CONFIRM !== CONFIRMATION) {
 
 const sql = neon(DATABASE_URL);
 const DAY_MS = 24 * 60 * 60 * 1000;
+const RUN_STARTED_AT = Date.now();
 
 const policies = [
   { key: "search_clicks", days: 180 },
@@ -25,7 +26,7 @@ const policies = [
 ];
 
 function cutoffIso(days) {
-  return new Date(Date.now() - days * DAY_MS).toISOString();
+  return new Date(RUN_STARTED_AT - days * DAY_MS).toISOString();
 }
 
 async function countExpired(key, cutoff) {

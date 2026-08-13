@@ -1,10 +1,13 @@
+import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   index,
   integer,
   jsonb,
   pgTable,
+  pgView,
   text,
   timestamp,
   uniqueIndex,
@@ -46,7 +49,10 @@ export const searchQueries = pgTable(
     sourcePath: text("source_path"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("search_queries_created_at_idx").on(table.createdAt)],
+  (table) => [
+    index("search_queries_created_at_idx").on(table.createdAt),
+    check("search_queries_result_count_nonnegative", sql`${table.resultCount} >= 0`),
+  ],
 );
 
 export const searchClicks = pgTable(
@@ -69,6 +75,7 @@ export const searchClicks = pgTable(
   (table) => [
     index("search_clicks_created_at_idx").on(table.createdAt),
     index("search_clicks_result_href_idx").on(table.resultHref),
+    check("search_clicks_position_nonnegative", sql`${table.position} >= 0`),
   ],
 );
 
@@ -137,3 +144,23 @@ export const verificationEvidence = pgTable(
     index("verification_evidence_status_idx").on(table.status, table.verifiedAt),
   ],
 );
+
+export const publicVerificationEvidence = pgView(
+  "verification_evidence_public",
+  {
+    id: bigint("id", { mode: "number" }).notNull(),
+    evidenceKey: text("evidence_key").notNull(),
+    articleSlug: text("article_slug").notNull(),
+    language: text("language").notNull(),
+    verificationType: text("verification_type").notNull(),
+    gameTime: bigint("game_time", { mode: "number" }),
+    shard: text("shard"),
+    roomName: text("room_name"),
+    apiName: text("api_name").notNull(),
+    returnCode: text("return_code"),
+    tickStart: bigint("tick_start", { mode: "number" }),
+    tickEnd: bigint("tick_end", { mode: "number" }),
+    evidenceNote: text("evidence_note").notNull(),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
+  },
+).existing();
