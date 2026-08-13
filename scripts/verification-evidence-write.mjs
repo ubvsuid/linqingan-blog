@@ -114,7 +114,7 @@ for (const record of records) {
       ${record.sourceRef},
       ${record.verifiedAt}::timestamptz
     )
-    ON CONFLICT DO NOTHING
+    ON CONFLICT (evidence_key) DO NOTHING
     RETURNING evidence_key;
   `;
 

@@ -61,7 +61,37 @@ const duplicateIdentities = await sql`
   HAVING count(*) > 1;
 `;
 
+const sequenceStateRows = await sql`
+  WITH evidence_state AS (
+    SELECT COALESCE(MAX(id), 0)::bigint AS max_id
+    FROM verification_evidence
+  )
+  SELECT
+    evidence_state.max_id,
+    verification_evidence_id_seq.last_value,
+    verification_evidence_id_seq.is_called,
+    CASE
+      WHEN verification_evidence_id_seq.is_called THEN verification_evidence_id_seq.last_value + 1
+      ELSE verification_evidence_id_seq.last_value
+    END AS next_generated_id,
+    CASE
+      WHEN verification_evidence_id_seq.is_called THEN verification_evidence_id_seq.last_value + 1
+      ELSE verification_evidence_id_seq.last_value
+    END > evidence_state.max_id AS sequence_safe
+  FROM verification_evidence_id_seq
+  CROSS JOIN evidence_state;
+`;
+
 const issues = [];
+const sequenceState = sequenceStateRows[0];
+if (sequenceState && !sequenceState.sequence_safe) {
+  issues.push({
+    severity: "error",
+    evidence: "—",
+    issue: `identity sequence drift: next generated id ${sequenceState.next_generated_id} does not exceed current max id ${sequenceState.max_id}`,
+  });
+}
+
 const acceptedByArticleType = new Map();
 for (const row of rows) {
   const markdown = readMarkdownVerification(row.article_slug);
@@ -122,13 +152,14 @@ const summary = {
   accepted: rows.filter((row) => row.status === "accepted").length,
   rejected: rows.filter((row) => row.status === "rejected").length,
   revoked: rows.filter((row) => row.status === "revoked").length,
+  sequenceSafe: Boolean(sequenceState?.sequence_safe),
   issues: issues.length,
 };
 
 console.log("Verification Evidence Integrity Report");
 console.table(summary);
 if (issues.length === 0) {
-  console.log("Integrity check passed: no evidence lifecycle or Markdown acceptance mismatches found.");
+  console.log("Integrity check passed: no evidence lifecycle, Markdown acceptance, duplicate identity, or identity sequence issues found.");
   process.exit(0);
 }
 
