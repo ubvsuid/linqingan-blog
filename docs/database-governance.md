@@ -44,6 +44,8 @@ These periods are engineering defaults, not a statement of legal requirements. R
 
 `scripts/platform-data-retention.mjs` is report-only by default. It prints aggregate expired-row counts and never prints raw query, session, anonymous-id, or feedback content.
 
+Run retention maintenance with an administrative or dedicated maintenance credential, not with a website login that only inherits `linqingan_runtime`. The runtime permission role intentionally lacks the broad telemetry read/delete privileges required by cleanup operations.
+
 Deletion requires both:
 
 1. the `--apply` command-line flag; and
