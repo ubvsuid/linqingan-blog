@@ -10,6 +10,7 @@ import { siteConfig } from "@/lib/site";
 import "../globals.css";
 import "../improvements.css";
 import "../site-shell.css";
+import "../article-quick-answer.css";
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
