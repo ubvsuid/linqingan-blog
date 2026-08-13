@@ -14,9 +14,12 @@ draft: false
 verification:
   docsChecked: true
   syntaxChecked: true
-  consoleTested: false
+  consoleTested: true
   liveTested: false
   checkedAt: "2026-07-21"
+  testedAt: "2026-08-11"
+  testEnvironment: "shard3 / W39N53"
+  testResult: "Accepted Console evidence: EV-1132EEA6DB475F4BDE4C verified a unique [WORK,CARRY,MOVE] StructureSpawn.spawnCreep() request returned OK (0) and the exact Creep later existed with the expected body; EV-5F64D77F6CEDD1637FA3 verified dryRun duplicate-name ERR_NAME_EXISTS (-3); EV-1EB26EDDC7D65006ADB2 verified dryRun ERR_NOT_ENOUGH_ENERGY (-6) when a 2400-Energy body exceeded the room's 2300 available Energy. The intermediate Spawn.spawning window was not directly observed."
 featured: false
 ---
 
