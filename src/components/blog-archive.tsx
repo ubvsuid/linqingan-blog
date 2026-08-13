@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CollectionPagination } from "@/components/collection-pagination";
 import { Container } from "@/components/container";
 import { PostCard } from "@/components/post-card";
+import { RecentlyViewedArticles } from "@/components/recently-viewed-articles";
 import { paginateBlogPosts } from "@/lib/blog-pagination";
 import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { getAllPosts } from "@/lib/posts";
@@ -44,6 +45,8 @@ export function BlogArchive({ currentPage }: BlogArchiveProps) {
           <Link href="/tags/advanced-development">进阶开发</Link>
           <Link href="/knowledge">专题知识库</Link>
         </nav>
+
+        <RecentlyViewedArticles />
 
         <div className="post-list" aria-label={`文章第 ${currentPage} 页`}>
           {pagination.posts.map((post) => <PostCard key={post.slug} post={post} />)}
