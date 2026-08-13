@@ -1,18 +1,9 @@
 const baseUrl = process.env.BASE_URL || "https://www.linqingan.com";
 const expectedSha = process.env.EXPECTED_DEPLOYMENT_SHA?.trim();
-const expectedRef = process.env.EXPECTED_DEPLOYMENT_REF?.trim();
 const requiredRef = process.env.REQUIRED_PRODUCTION_REF?.trim() || "clean-blog-v1";
 
 if (!expectedSha) {
   throw new Error("EXPECTED_DEPLOYMENT_SHA is required for the production identity check.");
-}
-
-if (!expectedRef) {
-  throw new Error("EXPECTED_DEPLOYMENT_REF is required for the production identity check.");
-}
-
-if (expectedRef !== requiredRef) {
-  throw new Error(`Production deployment came from ${expectedRef}; required branch is ${requiredRef}.`);
 }
 
 const response = await fetch(`${baseUrl}/api/deployment`, {

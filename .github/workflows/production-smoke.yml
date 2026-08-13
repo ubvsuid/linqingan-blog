@@ -33,7 +33,6 @@ jobs:
         env:
           BASE_URL: https://www.linqingan.com
           EXPECTED_DEPLOYMENT_SHA: ${{ github.event.deployment.sha }}
-          EXPECTED_DEPLOYMENT_REF: ${{ github.event.deployment.ref }}
           REQUIRED_PRODUCTION_REF: clean-blog-v1
         run: node scripts/check-production-deployment.mjs
 
