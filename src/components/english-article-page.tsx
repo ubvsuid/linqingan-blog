@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ArticleFeedback } from "@/components/article-feedback";
+import { ArticleQuickAnswer } from "@/components/article-quick-answer";
 import { ArticleRuntimeEvidenceCard } from "@/components/article-runtime-evidence-card";
 import { Container } from "@/components/container";
 import { EnglishArticleLearningTracker } from "@/components/english-learning-progress";
@@ -160,7 +161,7 @@ export async function EnglishArticlePage({
             </nav>
             <p className="eyebrow">{category}</p>
             <h1>{headline}</h1>
-            <p className="article-description">{description}</p>
+            <ArticleQuickAnswer text={description} locale="en" />
             <div className="post-meta">
               <time dateTime={publishedAt}>Published {publishedLabel}</time>
               {visibleModifiedAt ? (

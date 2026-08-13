@@ -52,6 +52,12 @@ export async function ScreepsApiHubPage({
   const errorsHref = isEnglish ? "/en/screeps-errors" : "/screeps-errors";
   const verifiedHref = isEnglish ? "/en/verified" : "/verified";
   const verificationHref = isEnglish ? "/en/verification" : "/verification";
+  const primaryEntries = entries.slice(0, 6);
+  const additionalEntries = entries.slice(6);
+  const primaryErrors = errors.slice(0, 4);
+  const additionalErrors = errors.slice(4);
+  const primaryGuides = guideLinks.slice(0, 5);
+  const additionalGuides = guideLinks.slice(5);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -79,13 +85,16 @@ export async function ScreepsApiHubPage({
         eyebrow: "OBJECT HUB",
         breadcrumb: "API Quick Reference",
         apiTitle: "Covered API surfaces",
-        apiBody: "These entries come from the shared quick-reference dataset. Open the full reference when you need to search across objects.",
+        apiBody: "These entries come from the shared quick-reference dataset. The highest-value surfaces stay visible; secondary entries remain available on demand.",
         apiOpen: "Open in API reference →",
+        moreApis: "Show more API surfaces",
         errorTitle: "High-signal return codes",
         errorBody: "These are the return-code paths already connected to this object in the site's existing guides and error reference.",
         errorOpen: "Open return code →",
+        moreErrors: "Show more return codes",
         guideTitle: "Focused guides",
         guideBody: "Use the focused guides for workflow details instead of duplicating full tutorials on this hub.",
+        moreGuides: "Show more focused guides",
         toolTitle: "Related tools",
         moduleTitle: "Knowledge modules",
         verificationTitle: "Runtime verification",
@@ -102,13 +111,16 @@ export async function ScreepsApiHubPage({
         eyebrow: "OBJECT HUB",
         breadcrumb: "API 快速查询",
         apiTitle: "当前覆盖的 API 入口",
-        apiBody: "这些条目直接来自共享的 API 快速查询数据源。需要跨对象搜索时，继续回到完整 Reference。",
+        apiBody: "这些条目直接来自共享的 API 快速查询数据源。默认保留最常用入口，其余关系按需展开，避免对象 Hub 一次塞入过多信息。",
         apiOpen: "在 API Reference 中打开 →",
+        moreApis: "查看更多 API 入口",
         errorTitle: "高信号返回码",
         errorBody: "这里只列出当前站内已有教程与错误码中心明确连接到这个对象的排查入口。",
         errorOpen: "打开错误码 →",
+        moreErrors: "查看更多返回码",
         guideTitle: "专题教程",
         guideBody: "具体工作流继续由已有专题文章承载，Hub 不重复制造第二套教程。",
+        moreGuides: "查看更多专题教程",
         toolTitle: "相关工具",
         moduleTitle: "知识模块",
         verificationTitle: "Runtime Verification",
@@ -121,6 +133,29 @@ export async function ScreepsApiHubPage({
         official: "官方 API Reference ↗",
         result: "返回值",
       };
+
+  const renderApiCard = (entry: (typeof entries)[number]) => (
+    <article key={entry.id} className={styles.apiCard}>
+      <span>{entry.group}</span>
+      <h3><code>{entry.signature}</code></h3>
+      <p>{entry.summary}</p>
+      <div className={styles.tags}>
+        {entry.keywords.slice(0, 4).map((keyword) => <span key={keyword}>{keyword}</span>)}
+      </div>
+      <Link href={`${apiRootHref}#${entry.id}`}>{copy.apiOpen}</Link>
+    </article>
+  );
+
+  const renderErrorLink = (error: (typeof errors)[number]) => (
+    <Link key={error.name} href={`${errorsHref}#${error.name.toLowerCase()}`}>
+      <span><code>{error.name}</code> <small>{copy.result} {error.value}</small></span>
+      {!isEnglish ? <em>{error.meaning}</em> : null}
+    </Link>
+  );
+
+  const renderGuideLink = (guide: (typeof guideLinks)[number]) => (
+    <Link key={guide.href} href={guide.href}><span>{guide.label}</span></Link>
+  );
 
   return (
     <main className={styles.page} lang={isEnglish ? "en" : "zh-CN"}>
@@ -158,19 +193,13 @@ export async function ScreepsApiHubPage({
               </div>
               <strong>{entries.length}</strong>
             </div>
-            <div className={styles.apiGrid}>
-              {entries.map((entry) => (
-                <article key={entry.id} className={styles.apiCard}>
-                  <span>{entry.group}</span>
-                  <h3><code>{entry.signature}</code></h3>
-                  <p>{entry.summary}</p>
-                  <div className={styles.tags}>
-                    {entry.keywords.slice(0, 4).map((keyword) => <span key={keyword}>{keyword}</span>)}
-                  </div>
-                  <Link href={`${apiRootHref}#${entry.id}`}>{copy.apiOpen}</Link>
-                </article>
-              ))}
-            </div>
+            <div className={styles.apiGrid}>{primaryEntries.map(renderApiCard)}</div>
+            {additionalEntries.length > 0 ? (
+              <details className={styles.disclosure}>
+                <summary>{copy.moreApis} · {additionalEntries.length}</summary>
+                <div className={styles.apiGrid}>{additionalEntries.map(renderApiCard)}</div>
+              </details>
+            ) : null}
           </section>
         ) : null}
 
@@ -179,25 +208,26 @@ export async function ScreepsApiHubPage({
             <p className="eyebrow">RETURN CODES</p>
             <h2>{copy.errorTitle}</h2>
             <p>{copy.errorBody}</p>
-            <div className={styles.linkStack}>
-              {errors.map((error) => (
-                <Link key={error.name} href={`${errorsHref}#${error.name.toLowerCase()}`}>
-                  <span><code>{error.name}</code> <small>{copy.result} {error.value}</small></span>
-                  {!isEnglish ? <em>{error.meaning}</em> : null}
-                </Link>
-              ))}
-            </div>
+            <div className={styles.linkStack}>{primaryErrors.map(renderErrorLink)}</div>
+            {additionalErrors.length > 0 ? (
+              <details className={styles.disclosure}>
+                <summary>{copy.moreErrors} · {additionalErrors.length}</summary>
+                <div className={styles.linkStack}>{additionalErrors.map(renderErrorLink)}</div>
+              </details>
+            ) : null}
           </div>
 
           <div className={styles.panel}>
             <p className="eyebrow">GUIDES</p>
             <h2>{copy.guideTitle}</h2>
             <p>{copy.guideBody}</p>
-            <div className={styles.linkStack}>
-              {guideLinks.map((guide) => (
-                <Link key={guide.href} href={guide.href}><span>{guide.label}</span></Link>
-              ))}
-            </div>
+            <div className={styles.linkStack}>{primaryGuides.map(renderGuideLink)}</div>
+            {additionalGuides.length > 0 ? (
+              <details className={styles.disclosure}>
+                <summary>{copy.moreGuides} · {additionalGuides.length}</summary>
+                <div className={styles.linkStack}>{additionalGuides.map(renderGuideLink)}</div>
+              </details>
+            ) : null}
           </div>
         </section>
 

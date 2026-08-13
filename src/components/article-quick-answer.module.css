@@ -1,0 +1,25 @@
+.answer {
+  display: grid;
+  gap: 8px;
+  margin: 22px 0 24px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--foreground);
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: color-mix(in srgb, var(--surface) 94%, var(--foreground) 2%);
+}
+
+.answer > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: .1em;
+}
+
+.answer :global(.article-description) {
+  margin: 0;
+  max-width: none;
+  color: var(--foreground);
+  font-size: clamp(17px, 2.2vw, 20px);
+  line-height: 1.65;
+}

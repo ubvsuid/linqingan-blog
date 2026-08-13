@@ -15,8 +15,10 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout
+      - name: Checkout deployed revision
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -27,7 +29,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify production deployment
+      - name: Verify production deployment identity
+        env:
+          BASE_URL: https://www.linqingan.com
+          EXPECTED_DEPLOYMENT_SHA: ${{ github.event.deployment.sha }}
+          EXPECTED_DEPLOYMENT_REF: ${{ github.event.deployment.ref }}
+          REQUIRED_PRODUCTION_REF: clean-blog-v1
+        run: node scripts/check-production-deployment.mjs
+
+      - name: Verify production routes and metadata
         env:
           BASE_URL: https://www.linqingan.com
         run: npm run smoke

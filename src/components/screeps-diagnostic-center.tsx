@@ -25,6 +25,10 @@ function uniqueByHref<T extends { href: string }>(items: T[]): T[] {
   });
 }
 
+function uniqueStrings(items: readonly string[]): string[] {
+  return [...new Set(items)];
+}
+
 export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagnosticLocale }) {
   const isEnglish = locale === "en";
   const apiEntries = getLocalizedScreepsApiReference(locale);
@@ -40,13 +44,16 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
     ? {
         eyebrow: "SYMPTOM-FIRST DIAGNOSTICS",
         title: "Start from what you see in the room",
-        body: "You do not need to know the error constant first. Pick the visible symptom, run the quick triage, then continue into return codes, APIs, object hubs, guides, tools, and accepted runtime verification.",
+        body: "You do not need to know the error constant first. Pick the visible symptom, run the quick triage, then continue into the most relevant return codes, APIs, guides, tools, and accepted runtime verification.",
         paths: "symptom paths",
         triage: "Quick triage",
-        errors: "Likely return-code branches",
+        errors: "Most likely return-code branches",
+        moreErrors: "More possible return codes",
         noError: "No single return code defines this symptom; measure the runtime state directly.",
-        apis: "API surfaces",
-        hubs: "Object hubs",
+        apis: "Primary API surfaces",
+        moreApis: "More related APIs",
+        hubs: "Primary object hubs",
+        moreHubs: "More related object hubs",
         guides: "Focused guides",
         tools: "Useful tools",
         verification: "Runtime verification",
@@ -60,13 +67,16 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
     : {
         eyebrow: "SYMPTOM-FIRST DIAGNOSTICS",
         title: "从你在房间里看到的现象开始",
-        body: "不需要先记住错误码。先选择可见症状，执行快速排查，再继续进入返回码、API、对象 Hub、专题教程、工具与已接受 Runtime Verification。",
+        body: "不需要先记住错误码。先选择可见症状，执行快速排查，再进入最相关的返回码、API、专题教程、工具与已接受 Runtime Verification；次要关系按需展开。",
         paths: "条症状路径",
         triage: "快速排查",
-        errors: "可能的返回码分支",
+        errors: "最可能的返回码",
+        moreErrors: "更多可能的返回码",
         noError: "这个症状没有单一返回码可以定义，应直接测量运行时状态。",
-        apis: "相关 API",
-        hubs: "对象 Hub",
+        apis: "主要 API",
+        moreApis: "更多相关 API",
+        hubs: "主要对象 Hub",
+        moreHubs: "更多相关对象 Hub",
         guides: "专题教程",
         tools: "实用工具",
         verification: "Runtime Verification",
@@ -102,37 +112,83 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
           const diagnostics = symptom.errorNames
             .map((name) => getScreepsErrorDiagnostic(name))
             .filter((diagnostic): diagnostic is NonNullable<typeof diagnostic> => Boolean(diagnostic));
-          const apiIds = new Set([
-            ...(symptom.directApiEntryIds ?? []),
-            ...diagnostics.flatMap((diagnostic) => diagnostic.apiEntryIds),
-          ]);
-          const hubSlugs = new Set([
-            ...(symptom.directHubSlugs ?? []),
-            ...diagnostics.flatMap((diagnostic) => diagnostic.hubSlugs),
-          ]);
-          const relatedApis = [...apiIds]
+
+          const directApiIds = uniqueStrings(symptom.directApiEntryIds ?? []);
+          const diagnosticApiIds = uniqueStrings(diagnostics.flatMap((diagnostic) => diagnostic.apiEntryIds));
+          const primaryApiIds = directApiIds.length > 0 ? directApiIds.slice(0, 4) : diagnosticApiIds.slice(0, 3);
+          const primaryApiIdSet = new Set(primaryApiIds);
+          const secondaryApiIds = uniqueStrings([
+            ...directApiIds.slice(primaryApiIds.length),
+            ...diagnosticApiIds,
+          ]).filter((id) => !primaryApiIdSet.has(id)).slice(0, 3);
+
+          const primaryApis = primaryApiIds
             .map((id) => apiEntries.find((entry) => entry.id === id))
             .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
-          const relatedHubs = [...hubSlugs]
+          const secondaryApis = secondaryApiIds
+            .map((id) => apiEntries.find((entry) => entry.id === id))
+            .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
+
+          const directHubSlugs = uniqueStrings(symptom.directHubSlugs ?? []);
+          const diagnosticHubSlugs = uniqueStrings(diagnostics.flatMap((diagnostic) => diagnostic.hubSlugs));
+          const primaryHubSlugs = directHubSlugs.length > 0 ? directHubSlugs.slice(0, 3) : diagnosticHubSlugs.slice(0, 2);
+          const primaryHubSlugSet = new Set(primaryHubSlugs);
+          const secondaryHubSlugs = uniqueStrings([
+            ...directHubSlugs.slice(primaryHubSlugs.length),
+            ...diagnosticHubSlugs,
+          ]).filter((slug) => !primaryHubSlugSet.has(slug)).slice(0, 2);
+
+          const primaryHubs = primaryHubSlugs
             .map((slug) => screepsApiHubs.find((hub) => hub.slug === slug))
             .filter((hub): hub is NonNullable<typeof hub> => Boolean(hub));
-          const guides = uniqueByHref([
-            ...diagnostics.flatMap((diagnostic) =>
-              diagnostic.guides.map((link) => getLocalizedErrorDiagnosticLink(link, locale)),
-            ),
-            ...relatedApis.flatMap((entry) => entry.guideHref
+          const secondaryHubs = secondaryHubSlugs
+            .map((slug) => screepsApiHubs.find((hub) => hub.slug === slug))
+            .filter((hub): hub is NonNullable<typeof hub> => Boolean(hub));
+
+          const symptomGuides = ("guides" in symptom ? symptom.guides : []).map((link) => localizeDiagnosticLink(link, locale));
+          const primaryApiGuides = primaryApis.flatMap((entry) =>
+            entry.guideHref
               ? [{ label: isEnglish ? `Guide for ${entry.signature}` : `${entry.signature} 对应教程`, href: entry.guideHref }]
-              : []),
-          ]);
+              : [],
+          );
+          const diagnosticGuides = diagnostics.flatMap((diagnostic) =>
+            diagnostic.guides.map((link) => getLocalizedErrorDiagnosticLink(link, locale)),
+          );
+          const secondaryApiGuides = secondaryApis.flatMap((entry) =>
+            entry.guideHref
+              ? [{ label: isEnglish ? `Guide for ${entry.signature}` : `${entry.signature} 对应教程`, href: entry.guideHref }]
+              : [],
+          );
+          const guides = uniqueByHref([
+            ...symptomGuides,
+            ...primaryApiGuides,
+            ...diagnosticGuides,
+            ...secondaryApiGuides,
+          ]).slice(0, 4);
+
           const tools = uniqueByHref([
             ...(symptom.tools ?? []).map((link) => localizeDiagnosticLink(link, locale)),
             ...diagnostics.flatMap((diagnostic) =>
               diagnostic.tools.map((link) => getLocalizedErrorDiagnosticLink(link, locale)),
             ),
-          ]);
+          ]).slice(0, 3);
+
+          const primaryErrorNames = symptom.errorNames.slice(0, 3);
+          const secondaryErrorNames = symptom.errorNames.slice(3, 5);
           const verificationHrefSet = new Set(guides.map((guide) => guide.href));
           const relatedVerified = verified.filter((record) => verificationHrefSet.has(record.href));
           const triage = isEnglish ? symptom.enTriage : symptom.zhTriage;
+
+          const renderErrorLink = (name: string) => {
+            const error = errorMap.get(name);
+            const diagnostic = getScreepsErrorDiagnostic(name);
+            const href = `${errorsRootHref}#${diagnostic ? `diagnostic-${name.toLowerCase()}` : name.toLowerCase()}`;
+            return (
+              <Link href={href} key={name}>
+                <code>{name}</code>{error ? <span>{error.value}</span> : null}
+              </Link>
+            );
+          };
 
           return (
             <article className={styles.card} id={symptom.id} key={symptom.id}>
@@ -151,19 +207,16 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
 
               <section className={styles.errors}>
                 <h4>{copy.errors}</h4>
-                {symptom.errorNames.length > 0 ? (
-                  <div className={styles.chips}>
-                    {symptom.errorNames.map((name) => {
-                      const error = errorMap.get(name);
-                      const diagnostic = getScreepsErrorDiagnostic(name);
-                      const href = `${errorsRootHref}#${diagnostic ? `diagnostic-${name.toLowerCase()}` : name.toLowerCase()}`;
-                      return (
-                        <Link href={href} key={name}>
-                          <code>{name}</code>{error ? <span>{error.value}</span> : null}
-                        </Link>
-                      );
-                    })}
-                  </div>
+                {primaryErrorNames.length > 0 ? (
+                  <>
+                    <div className={styles.chips}>{primaryErrorNames.map(renderErrorLink)}</div>
+                    {secondaryErrorNames.length > 0 ? (
+                      <details className={styles.moreRelations}>
+                        <summary>{copy.moreErrors}</summary>
+                        <div className={styles.chips}>{secondaryErrorNames.map(renderErrorLink)}</div>
+                      </details>
+                    ) : null}
+                  </>
                 ) : <p className={styles.muted}>{copy.noError}</p>}
               </section>
 
@@ -171,29 +224,49 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
                 <section>
                   <h4>{copy.apis}</h4>
                   <div className={styles.chips}>
-                    {relatedApis.map((entry) => (
+                    {primaryApis.map((entry) => (
                       <Link href={`${apiRootHref}#${entry.id}`} key={entry.id}><code>{entry.signature}</code></Link>
                     ))}
                   </div>
+                  {secondaryApis.length > 0 ? (
+                    <details className={styles.moreRelations}>
+                      <summary>{copy.moreApis}</summary>
+                      <div className={styles.chips}>
+                        {secondaryApis.map((entry) => (
+                          <Link href={`${apiRootHref}#${entry.id}`} key={entry.id}><code>{entry.signature}</code></Link>
+                        ))}
+                      </div>
+                    </details>
+                  ) : null}
                 </section>
 
                 <section>
                   <h4>{copy.hubs}</h4>
                   <div className={styles.chips}>
-                    {relatedHubs.map((hub) => (
+                    {primaryHubs.map((hub) => (
                       <Link href={getScreepsApiHubHref(hub.slug, locale)} key={hub.slug}>{hub.objectName}</Link>
                     ))}
                   </div>
+                  {secondaryHubs.length > 0 ? (
+                    <details className={styles.moreRelations}>
+                      <summary>{copy.moreHubs}</summary>
+                      <div className={styles.chips}>
+                        {secondaryHubs.map((hub) => (
+                          <Link href={getScreepsApiHubHref(hub.slug, locale)} key={hub.slug}>{hub.objectName}</Link>
+                        ))}
+                      </div>
+                    </details>
+                  ) : null}
                 </section>
 
                 <section>
                   <h4>{copy.guides}</h4>
-                  <div className={styles.linkStack}>{guides.slice(0, 6).map((guide) => <Link href={guide.href} key={guide.href}>{guide.label} →</Link>)}</div>
+                  <div className={styles.linkStack}>{guides.map((guide) => <Link href={guide.href} key={guide.href}>{guide.label} →</Link>)}</div>
                 </section>
 
                 <section>
                   <h4>{copy.tools}</h4>
-                  <div className={styles.linkStack}>{tools.slice(0, 5).map((tool) => <Link href={tool.href} key={tool.href}>{tool.label} →</Link>)}</div>
+                  <div className={styles.linkStack}>{tools.map((tool) => <Link href={tool.href} key={tool.href}>{tool.label} →</Link>)}</div>
                 </section>
               </div>
 
