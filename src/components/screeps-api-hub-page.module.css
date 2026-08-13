@@ -184,6 +184,37 @@
   line-height: 1.55;
 }
 
+.disclosure {
+  margin-top: 18px;
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+}
+
+.disclosure summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.disclosure summary:hover,
+.disclosure[open] summary {
+  color: var(--foreground);
+}
+
+.disclosure summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.disclosure > .apiGrid,
+.disclosure > .linkStack {
+  margin-top: 14px;
+}
+
 .verification {
   background: color-mix(in srgb, var(--surface) 88%, var(--foreground) 3%);
 }
