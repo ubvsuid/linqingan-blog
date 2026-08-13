@@ -85,6 +85,8 @@ for (const requiredSchemaToken of [
   'evidenceKey: text("evidence_key").notNull()',
   'status: text("status").notNull().default("captured")',
   'uniqueIndex("verification_evidence_key_uidx")',
+  'pgView(',
+  '"verification_evidence_public"',
 ]) {
   if (!schemaSource.includes(requiredSchemaToken)) {
     throw new Error(`Verification evidence schema is missing governance token: ${requiredSchemaToken}`);
@@ -95,8 +97,26 @@ const evidenceReaderSource = fs.readFileSync(
   path.join(process.cwd(), "src/lib/verification-evidence.ts"),
   "utf8",
 );
-if (!evidenceReaderSource.includes('eq(verificationEvidence.status, "accepted")')) {
-  throw new Error("Public evidence reads must be restricted to internally accepted rows.");
+if (
+  !evidenceReaderSource.includes("publicVerificationEvidence") ||
+  evidenceReaderSource.includes(".from(verificationEvidence)")
+) {
+  throw new Error("Public evidence reads must use the public view, not the base table.");
+}
+
+const evidenceViewMigration = fs.readFileSync(
+  path.join(process.cwd(), "drizzle/0003_public_verification_evidence_view.sql"),
+  "utf8",
+);
+for (const requiredViewToken of [
+  "verification_evidence_public",
+  "security_barrier = true",
+  "WHERE status = 'accepted'",
+  "REVOKE ALL PRIVILEGES ON TABLE public.verification_evidence_public FROM PUBLIC",
+]) {
+  if (!evidenceViewMigration.includes(requiredViewToken)) {
+    throw new Error(`Public Evidence view is missing governance token: ${requiredViewToken}`);
+  }
 }
 
 const verifiedContentSource = fs.readFileSync(
