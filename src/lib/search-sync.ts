@@ -1,13 +1,13 @@
-import { eq, notInArray, sql } from "drizzle-orm";
+import { notInArray, sql } from "drizzle-orm";
 
 import { getPlatformDatabase } from "@/db/client";
 import { searchDocuments } from "@/db/schema";
+import { parseDateOnlyUtc } from "@/lib/posts";
 import { getSearchDocuments } from "@/lib/search";
 
 const SEARCH_SYNC_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
-let lastCountCheckAt = 0;
-let lastKnownSourceCount = -1;
+let lastSuccessfulSyncAt = 0;
 let syncPromise: Promise<void> | null = null;
 
 function toDatabaseDocument(document: ReturnType<typeof getSearchDocuments>[number]) {
@@ -22,7 +22,9 @@ function toDatabaseDocument(document: ReturnType<typeof getSearchDocuments>[numb
     keywords: document.keywords,
     headings: [] as string[],
     searchText: document.text,
-    sourceUpdatedAt: null,
+    sourceUpdatedAt: document.sourceUpdatedAt
+      ? parseDateOnlyUtc(document.sourceUpdatedAt)
+      : null,
     updatedAt: new Date(),
   };
 }
@@ -31,27 +33,15 @@ async function synchronizeDocuments(): Promise<void> {
   const db = getPlatformDatabase();
   if (!db) return;
 
-  const sourceDocuments = getSearchDocuments({ includeArticleText: true });
-  const sourceCount = sourceDocuments.length;
+  const sourceDocuments = getSearchDocuments({
+    includeArticleText: true,
+    includeSourceMetadata: true,
+  });
   const now = Date.now();
 
-  if (
-    lastKnownSourceCount === sourceCount &&
-    now - lastCountCheckAt < SEARCH_SYNC_CHECK_INTERVAL_MS
-  ) {
+  if (now - lastSuccessfulSyncAt < SEARCH_SYNC_CHECK_INTERVAL_MS) {
     return;
   }
-
-  const [countRow] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(searchDocuments)
-    .where(eq(searchDocuments.language, "zh-CN"));
-  const databaseCount = Number(countRow?.count ?? 0);
-
-  lastCountCheckAt = now;
-  lastKnownSourceCount = sourceCount;
-
-  if (databaseCount === sourceCount && sourceCount > 0) return;
 
   const rows = sourceDocuments.map(toDatabaseDocument);
   if (rows.length === 0) return;
@@ -76,6 +66,18 @@ async function synchronizeDocuments(): Promise<void> {
           sourceUpdatedAt: sql`excluded.source_updated_at`,
           updatedAt: sql`now()`,
         },
+        setWhere: sql`
+          ${searchDocuments.type} IS DISTINCT FROM excluded.type OR
+          ${searchDocuments.language} IS DISTINCT FROM excluded.language OR
+          ${searchDocuments.title} IS DISTINCT FROM excluded.title OR
+          ${searchDocuments.description} IS DISTINCT FROM excluded.description OR
+          ${searchDocuments.href} IS DISTINCT FROM excluded.href OR
+          ${searchDocuments.module} IS DISTINCT FROM excluded.module OR
+          ${searchDocuments.keywords} IS DISTINCT FROM excluded.keywords OR
+          ${searchDocuments.headings} IS DISTINCT FROM excluded.headings OR
+          ${searchDocuments.searchText} IS DISTINCT FROM excluded.search_text OR
+          ${searchDocuments.sourceUpdatedAt} IS DISTINCT FROM excluded.source_updated_at
+        `,
       });
   }
 
@@ -88,6 +90,8 @@ async function synchronizeDocuments(): Promise<void> {
         sourceIds,
       )}`,
     );
+
+  lastSuccessfulSyncAt = Date.now();
 }
 
 export async function ensureSearchDocumentsReady(): Promise<void> {

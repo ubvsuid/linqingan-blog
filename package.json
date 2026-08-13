@@ -73,6 +73,7 @@
     "lighthouse": "npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json",
     "searchconsole:report": "node scripts/search-console-opportunity-report.mjs",
     "platform:search-report": "node scripts/platform-search-report.mjs",
+    "platform:retention-report": "node scripts/platform-data-retention.mjs",
     "verification:report": "node scripts/verification-report.mjs",
     "verification:evidence-validate": "node scripts/verification-evidence-write.mjs",
     "verification:evidence-write": "node scripts/verification-evidence-write.mjs",
