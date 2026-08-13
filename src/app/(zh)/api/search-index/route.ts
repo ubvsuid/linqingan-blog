@@ -6,12 +6,55 @@ import {
   getSearchIndexSummary,
   SEARCH_INDEX_MAX_BYTES,
   SEARCH_INDEX_WARN_BYTES,
+  type SearchDocument,
 } from "@/lib/search";
 
 export const dynamic = "force-static";
 
+const LEGACY_SEARCH_TEXT_MAX_TOKENS = 40;
+const LEGACY_SEARCH_TEXT_MAX_CHARS = 320;
+
+function searchTokens(value: string): string[] {
+  return (
+    value
+      .normalize("NFKC")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/https?:\/\/\S+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .match(/[A-Za-z_][A-Za-z0-9_.:-]*|[\u3400-\u9fff]{1,8}|\d+(?:\.\d+)?/g) ?? []
+  );
+}
+
+function compactLegacySearchText(document: SearchDocument): string {
+  const metadataTokens = new Set(
+    searchTokens(
+      [document.title, document.description, document.meta, ...document.keywords].join(" "),
+    ).map((token) => token.toLocaleLowerCase("zh-CN")),
+  );
+  const seen = new Set<string>();
+  const compactTokens: string[] = [];
+
+  for (const token of searchTokens(document.text)) {
+    const key = token.toLocaleLowerCase("zh-CN");
+    if (metadataTokens.has(key) || seen.has(key)) continue;
+    seen.add(key);
+    compactTokens.push(token);
+    if (compactTokens.length >= LEGACY_SEARCH_TEXT_MAX_TOKENS) break;
+  }
+
+  return compactTokens.join(" ").slice(0, LEGACY_SEARCH_TEXT_MAX_CHARS);
+}
+
+function getLegacySearchIndexDocuments(): SearchDocument[] {
+  return getSearchDocuments().map((document) => ({
+    ...document,
+    text: compactLegacySearchText(document),
+  }));
+}
+
 export function GET() {
-  const documents = getSearchDocuments();
+  const documents = getLegacySearchIndexDocuments();
   const payloadBytes = assertSearchIndexBudget(documents);
   const summary = getSearchIndexSummary(documents);
 
