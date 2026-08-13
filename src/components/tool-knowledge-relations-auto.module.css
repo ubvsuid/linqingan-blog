@@ -1,0 +1,96 @@
+.shell {
+  border-top: 1px solid var(--border);
+  padding: 72px 0 84px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 30px;
+}
+
+.header h2 {
+  margin: 8px 0 0;
+  max-width: 760px;
+  font-size: clamp(30px, 4.2vw, 48px);
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+}
+
+.header > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  background: var(--surface, transparent);
+}
+
+.panel > span {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.links {
+  display: grid;
+  gap: 8px;
+}
+
+.links a {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  border-top: 1px solid var(--border);
+  padding: 12px 0 4px;
+  text-decoration: none;
+}
+
+.links a:first-child {
+  border-top: 0;
+  padding-top: 2px;
+}
+
+.links strong,
+.links code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.links small {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .header,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    gap: 20px;
+  }
+}
