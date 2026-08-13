@@ -67,7 +67,7 @@ export default function HomePage() {
           <p className="eyebrow">SCREEPS · JAVASCRIPT · SYSTEMS</p>
           <h1>构建，运行，迭代</h1>
           <p className={styles.heroDescription}>
-            Screeps 中文教程、API 查询、错误排查与实用工具平台。从按顺序学习的新手路线开始，再用知识库、诊断中心和受控 Runtime Evidence 把代码逐步变成可以持续运行的系统。
+            面向 Screeps 玩家与 JavaScript 开发者的中文教程、API 查询、错误排查、实用工具与 Runtime Evidence 知识站。从按顺序学习的新手路线开始，再用知识库与诊断中心把代码逐步变成可以持续运行的系统。
           </p>
           <p className={styles.heroStats}>
             {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
