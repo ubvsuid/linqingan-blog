@@ -1,21 +1,73 @@
 import type { Metadata } from "next";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
-import { applyEnglishEditorialFourth20260814 } from "@/lib/english-editorial-fourth-apply-20260814";
-import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
+import { publishedEnglishArticles } from "@/lib/english-articles-complete";
+import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { englishEditorialFourthArticleOverrides20260814 } from "@/lib/english-editorial-fourth-20260814";
 import { siteConfig } from "@/lib/site";
 
 const slug = "screeps-creep-harvest-energy";
+const path = "/en/blog/screeps-creep-harvest-energy";
 
-function requireArticle() {
-  const historical = getEnglishEditorialPublished20260731(slug);
-  const value = applyEnglishEditorialFourth20260814(historical);
+function requireArticle(): EnglishBeginnerArticle {
+  const record = publishedEnglishArticles.find(
+    (candidate) => candidate.href === path,
+  );
+  const override = englishEditorialFourthArticleOverrides20260814[slug];
 
-  if (!value) {
-    throw new Error(`Missing historical English article: ${slug}`);
+  if (
+    !record
+    || !override?.title
+    || !override.headline
+    || !override.description
+    || !override.category
+    || !override.readingTime
+    || !override.breadcrumbLabel
+    || !override.tags
+    || !override.keywords
+    || !override.primaryKeyword
+    || !override.searchIntent
+    || typeof override.finalScore !== "number"
+    || !override.verification
+    || !override.toc
+    || !override.faq
+    || !override.articleHtml
+  ) {
+    throw new Error(`Incomplete fourth editorial article: ${slug}`);
   }
 
-  return value;
+  return {
+    slug,
+    path: record.href,
+    chinesePath: record.chinesePath,
+    title: override.title,
+    headline: override.headline,
+    description: override.description,
+    category: override.category,
+    publishedAt: record.publishedAt,
+    publishedLabel: record.publishedLabel,
+    readingTime: override.readingTime,
+    breadcrumbLabel: override.breadcrumbLabel,
+    tags: override.tags,
+    keywords: override.keywords,
+    primaryKeyword: override.primaryKeyword,
+    searchIntent: override.searchIntent,
+    finalScore: override.finalScore,
+    verification: override.verification,
+    toc: override.toc,
+    faq: override.faq,
+    previous: {
+      href: "/en/blog/screeps-tick-game-loop",
+      label: "Previous lesson",
+      title: "Understand Screeps Ticks",
+    },
+    next: {
+      href: "/en/blog/screeps-transfer-energy-to-spawn",
+      label: "Next lesson",
+      title: "Deliver Energy to a Spawn",
+    },
+    articleHtml: override.articleHtml,
+  };
 }
 
 const article = requireArticle();
