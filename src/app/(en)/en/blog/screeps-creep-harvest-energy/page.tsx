@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
-import { getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { applyEnglishEditorialFourth20260814 } from "@/lib/english-editorial-fourth-apply-20260814";
+import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import { siteConfig } from "@/lib/site";
 
 const slug = "screeps-creep-harvest-energy";
 
 function requireArticle() {
-  const value = getEnglishBeginnerArticle(slug);
+  const historical = getEnglishEditorialPublished20260731(slug);
+  const value = applyEnglishEditorialFourth20260814(historical);
 
   if (!value) {
-    throw new Error(`Missing English beginner article: ${slug}`);
+    throw new Error(`Missing historical English article: ${slug}`);
   }
 
   return value;
