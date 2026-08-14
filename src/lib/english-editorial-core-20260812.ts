@@ -1,3 +1,5 @@
+import { getEnglishEditorialThirdUpdatedAt20260814 } from "./english-editorial-third-20260814";
+
 const UPDATED_AT = "2026-08-12";
 
 const selectedSlugs = new Set([
@@ -11,5 +13,6 @@ const selectedSlugs = new Set([
 export function getEnglishEditorialCoreUpdatedAt20260812(
   slug: string,
 ): string | undefined {
-  return selectedSlugs.has(slug) ? UPDATED_AT : undefined;
+  return getEnglishEditorialThirdUpdatedAt20260814(slug)
+    ?? (selectedSlugs.has(slug) ? UPDATED_AT : undefined);
 }
