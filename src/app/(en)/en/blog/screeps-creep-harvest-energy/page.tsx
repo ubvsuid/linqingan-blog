@@ -5,12 +5,18 @@ import { getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { siteConfig } from "@/lib/site";
 
 const slug = "screeps-creep-harvest-energy";
-const article = getEnglishBeginnerArticle(slug);
 
-if (!article) {
-  throw new Error(`Missing English beginner article: ${slug}`);
+function requireArticle() {
+  const value = getEnglishBeginnerArticle(slug);
+
+  if (!value) {
+    throw new Error(`Missing English beginner article: ${slug}`);
+  }
+
+  return value;
 }
 
+const article = requireArticle();
 const modifiedAt = "2026-08-14";
 const articleUrl = `${siteConfig.url}${article.path}`;
 const socialImage = `${siteConfig.url}/opengraph-image`;
