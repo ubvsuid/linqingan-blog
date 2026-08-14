@@ -1,5 +1,6 @@
 import type { EnglishBeginnerArticle } from "./english-beginner-content";
 import { applyEnglishCpuContract20260812 } from "./english-editorial-cpu-contract-20260812";
+import { applyEnglishEditorialThird20260814 } from "./english-editorial-third-20260814";
 
 const errIntentBoundary = String.raw`
 <h2 id="intent-boundary">Choose another guide when</h2>
@@ -93,5 +94,7 @@ export function applyEnglishMovementContract20260812(
     );
   }
 
-  return applyEnglishCpuContract20260812(article);
+  return applyEnglishEditorialThird20260814(
+    applyEnglishCpuContract20260812(article),
+  );
 }
