@@ -17,7 +17,7 @@ const articles = [
   {
     path: "/en/blog/screeps-rawmemory-segments", chinesePath: "/blog/screeps-rawmemory-segments",
     headline: "Use RawMemory Segments Without Same-Tick Assumptions", listingTitle: "Screeps RawMemory Segments: Request, Read, and Write Across Ticks",
-    query: "RawMemory Segments", tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false, modifiedDate: "2026-08-06",
+    query: "RawMemory Segments", tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false, modifiedDate: "2026-08-14",
     signals: ["request-now, read-later lifecycle", "RawMemory.setActiveSegments(activeNextTick)", "segment-unavailable", "100 * 1024", "activation-already-finalized", "Live multi-tick verification", "Pending"],
   },
 ];
