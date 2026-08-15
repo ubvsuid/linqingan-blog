@@ -1,62 +1,80 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const timeoutMs = 15000;
+
+async function request(path) {
+  return fetch(`${baseUrl}${path}`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+}
 
 const articles = [
   {
     path: "/en/blog/screeps-market-create-order",
     chinesePath: "/blog/screeps-market-create-order",
-    headline: "Create One Market Order and Prove Which Order Appeared",
-    title: "Screeps createOrder(): Verify the New Order by ID Difference",
+    headline:
+      "Create One Market Order Without Misattributing a Later Order",
+    title:
+      "Screeps createOrder(): Bind One Request to the New Order ID",
     query: "createOrder",
     signals: [
-      "snapshotOrderIds",
-      "orderIdsBefore",
-      "ambiguous-new-orders",
-      "verified-new-order",
-      "Live order creation, ID-difference, activation and fill test",
+      "buildCreateOrderConfirmation",
+      "calculateCreateOrderFeeCeiling",
+      "creation-slot-reserved",
+      "new-order-identity-ambiguous",
+      "created-order-observed",
     ],
   },
   {
     path: "/en/blog/screeps-market-deal",
     chinesePath: "/blog/screeps-market-deal",
-    headline: "Execute a Market Deal Without Losing Track of the Actual Call",
-    title: "Screeps market.deal(): One Coordinator, One Accepted Request",
+    headline:
+      "Execute One Market Deal Without Assuming the Requested Amount Settled",
+    title:
+      "Screeps market.deal(): Reserve the Terminal and Verify Actual Amount",
     query: "market.deal",
     signals: [
-      "createDealCoordinator",
-      "coordinator.reserveCall",
-      "deferred-deal-limit",
-      "transactionIdsBefore",
-      "Live order race, 10-call coordination, settlement and transaction-ID test",
+      "createTerminalMarketDispatcher",
+      "terminal-already-reserved",
+      "partial-deal-settlement-observed",
+      "full-deal-settlement-observed",
+      "transaction-identity-ambiguous",
     ],
   },
   {
     path: "/en/blog/screeps-terminal-send-resources",
     chinesePath: "/blog/screeps-terminal-send-resources",
-    headline: "Send One Terminal Transfer Without Misidentifying Another Transfer",
-    title: "Screeps Terminal.send(): Verify the Exact Outgoing Transaction",
+    headline:
+      "Send One Terminal Transfer Without Losing Its Exact Operation Identity",
+    title:
+      "Screeps Terminal.send(): Prevent Intent Overwrite and Verify Actual Amount",
     query: "Terminal.send",
     signals: [
-      "destination-is-source-room",
-      "transactionIdsBefore",
-      "ambiguous-transactions",
-      "verified-transaction",
-      "Live transfer, power-effect, concurrent-identical-send and receiving-room test",
+      "normalizeSendDescription",
+      "createTerminalOperationDispatcher",
+      "request?.description",
+      "partial-transfer-observed",
+      "accepted-no-outgoing-transaction-observed",
     ],
   },
 ];
 
 const failures = [];
+const bodies = new Map();
 
 for (const article of articles) {
-  const response = await fetch(`${baseUrl}${article.path}`, {
-    redirect: "manual",
-  });
+  let response;
+  try {
+    response = await request(article.path);
+  } catch (error) {
+    failures.push(`${article.path}: 请求失败 ${error.message}`);
+    continue;
+  }
   const body = await response.text();
+  bodies.set(article.path, body);
 
   if (response.status !== 200) {
-    failures.push(
-      `${article.path}: 预期 200，实际 ${response.status}`,
-    );
+    failures.push(`${article.path}: 预期 200，实际 ${response.status}`);
     continue;
   }
 
@@ -68,18 +86,19 @@ for (const article of articles) {
     "Verification status",
     "Chinese source article",
     "Reviewed in full",
+    "Official engine",
     "Screeps Console test",
-    "Live multi-tick verification",
     "Pending",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#use-this-guide"`,
-    `<h2 id="use-this-guide">Use this guide when</h2>`,
+    `href="#evidence-contract"`,
+    `<h2 id="evidence-contract">`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-01"`,
+    `"datePublished":"2026-07-26"`,
+    `"dateModified":"2026-08-05"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少 “${expected}”`);
@@ -87,13 +106,18 @@ for (const article of articles) {
   }
 
   if (body.includes(`"@type":"FAQPage"`)) {
-    failures.push(`${article.path}: 不应继续输出 FAQPage`);
+    failures.push(`${article.path}: 不应输出 FAQPage`);
   }
 
-  const searchResponse = await fetch(
-    `${baseUrl}/en/search?q=${encodeURIComponent(article.query)}`,
-    { redirect: "manual" },
-  );
+  let searchResponse;
+  try {
+    searchResponse = await request(
+      `/en/search?q=${encodeURIComponent(article.query)}`,
+    );
+  } catch (error) {
+    failures.push(`/en/search?q=${article.query}: 请求失败 ${error.message}`);
+    continue;
+  }
   const searchBody = await searchResponse.text();
   if (searchResponse.status !== 200) {
     failures.push(
@@ -104,106 +128,90 @@ for (const article of articles) {
     && !searchBody.includes(article.title)
   ) {
     failures.push(
-      `/en/search?q=${article.query}: 缺少新标题或 H1`,
+      `/en/search?q=${article.query}: 缺少当前标题或 H1`,
     );
   }
 }
 
-const createBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-market-create-order`,
-)).text();
-if (
-  !createBody.includes("snapshotOrderIds")
-  || !createBody.includes("orderIdsBefore")
-  || !createBody.includes("ambiguous-new-orders")
-  || !createBody.includes("verified-new-order")
-  || createBody.includes("findOrderAfterRequest")
-) {
-  failures.push(
-    "createOrder 页面缺少新 ID 差集验证或仍使用旧的全量字段匹配",
-  );
+const createBody = bodies.get(
+  "/en/blog/screeps-market-create-order",
+) || "";
+for (const signal of [
+  "order.created === pending.submittedAt",
+  "verification-window-missed",
+  "created-order-observed",
+]) {
+  if (!createBody.includes(signal)) {
+    failures.push(`createOrder 页面缺少 ${signal}`);
+  }
+}
+if (createBody.includes("terminal.isActive() === true")) {
+  failures.push("createOrder 页面不应继续要求 Terminal active");
 }
 
-const dealBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-market-deal`,
-)).text();
-if (
-  !dealBody.includes("createDealCoordinator")
-  || !dealBody.includes("coordinator.reserveCall")
-  || !dealBody.includes("deferred-deal-limit")
-  || !dealBody.includes("transactionIdsBefore")
-) {
-  failures.push(
-    "market.deal 页面缺少共享调用协调器或交易 ID 差集验证",
-  );
-}
-
-const sendBody = await (await fetch(
-  `${baseUrl}/en/blog/screeps-terminal-send-resources`,
-)).text();
-if (
-  !sendBody.includes("destination-is-source-room")
-  || !sendBody.includes("transactionIdsBefore")
-  || !sendBody.includes("ambiguous-transactions")
-  || !sendBody.includes("verified-transaction")
-) {
-  failures.push(
-    "Terminal.send 页面缺少同房间保护或精确交易身份验证",
-  );
-}
-
-const blogResponse = await fetch(`${baseUrl}/en/blog-index.json`, {
-  redirect: "manual",
-});
-const blogBody = await blogResponse.text();
-if (blogResponse.status !== 200) {
-  failures.push(
-    `/en/blog-index.json: 预期 200，实际 ${blogResponse.status}`,
-  );
-} else {
-  for (const article of articles) {
-    if (
-      !blogBody.includes(article.headline)
-      && !blogBody.includes(article.title)
-    ) {
-      failures.push(
-        `/en/blog-index.json: 缺少 ${article.path} 新标题`,
-      );
-    }
+const dealBody = bodies.get("/en/blog/screeps-market-deal") || "";
+for (const signal of [
+  "transaction.time === pending.submittedAt",
+  "transaction.amount",
+  "&lt;= pending.requestedAmount",
+  "partial-deal-settlement-observed",
+]) {
+  if (!dealBody.includes(signal)) {
+    failures.push(`market.deal 页面缺少 ${signal}`);
   }
 }
 
-const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`, {
-  redirect: "manual",
-});
-const sitemapBody = await sitemapResponse.text();
-if (sitemapResponse.status !== 200) {
-  failures.push(
-    `/sitemap.xml: 预期 200，实际 ${sitemapResponse.status}`,
-  );
-} else {
+const sendBody = bodies.get(
+  "/en/blog/screeps-terminal-send-resources",
+) || "";
+for (const signal of [
+  "request?.description",
+  "ledgerDescription",
+  "readLedgerDescription(transaction)",
+  "!transaction.order",
+  "partial-transfer-observed",
+]) {
+  if (!sendBody.includes(signal)) {
+    failures.push(`Terminal.send 页面缺少 ${signal}`);
+  }
+}
+
+for (const [path, label] of [
+  ["/en/blog-index.json", "Blog index"],
+  ["/sitemap.xml", "Sitemap"],
+]) {
+  let response;
+  try {
+    response = await request(path);
+  } catch (error) {
+    failures.push(`${path}: 请求失败 ${error.message}`);
+    continue;
+  }
+  const body = await response.text();
+  if (response.status !== 200) {
+    failures.push(`${path}: 预期 200，实际 ${response.status}`);
+    continue;
+  }
   for (const article of articles) {
-    const expected = `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
-      failures.push(`/sitemap.xml: 缺少 ${expected}`);
+    const expected = path.endsWith(".xml")
+      ? `https://www.linqingan.com${article.path}`
+      : article.title;
+    if (!body.includes(expected)) {
+      failures.push(`${label}: 缺少 ${expected}`);
     }
   }
 }
 
 if (failures.length > 0) {
-  failures.forEach((failure) =>
-    console.error(`ERROR: ${failure}`),
-  );
+  failures.forEach((failure) => console.error(`ERROR: ${failure}`));
   console.error(
-    `\n第十批英文市场与 Terminal 生产冒烟测试失败：`
-      + `${failures.length} 项。`,
+    `\n第十批英文市场与 Terminal 生产冒烟测试失败：${failures.length} 项。`,
   );
   process.exit(1);
 }
 
 console.log(
-  "第十批英文市场与 Terminal 生产冒烟测试通过："
-    + `${articles.length} 篇文章、订单与交易 ID 差集、`
-    + "共享 deal 协调器、Pending 证据、Canonical、hreflang、"
-    + "BlogPosting、目录、搜索与 Sitemap。",
+  "第十批英文市场与 Terminal 生产冒烟测试通过：3 篇现有文章、"
+    + "创建订单 ID、共享 Terminal 调度、部分成交与发送、描述规范化、"
+    + "有限超时、Pending 证据、Canonical、hreflang、搜索和 Sitemap。",
 );
