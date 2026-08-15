@@ -5,14 +5,15 @@ import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
 import { applyEnglishEditorialFinal20260812 } from "@/lib/english-editorial-final-20260812";
+import { applyEnglishEditorialFourth20260814 } from "@/lib/english-editorial-fourth-apply-20260814";
 import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { applyEnglishMovementContract20260812 } from "@/lib/english-editorial-movement-contract-20260812";
-import { applyEnglishSpawnVerification20260812 } from "@/lib/english-editorial-spawn-verification-20260812";
 import {
   applyEnglishEditorialSecond20260812,
   getEnglishEditorialSecondUpdatedAt20260812,
 } from "@/lib/english-editorial-second-20260812";
+import { applyEnglishSpawnVerification20260812 } from "@/lib/english-editorial-spawn-verification-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import {
   getEnglishEditorialRuntimeNotifyArticle20260806,
@@ -94,8 +95,10 @@ function getDynamicEnglishArticle(slug: string) {
   const article = getBaseDynamicEnglishArticle(slug);
 
   if (slug === "screeps-memory-basics") {
-    return applyEnglishMemoryContract20260812(
-      applyEnglishMemoryEditorial20260812(article),
+    return applyEnglishEditorialFourth20260814(
+      applyEnglishMemoryContract20260812(
+        applyEnglishMemoryEditorial20260812(article),
+      ),
     );
   }
 
@@ -103,8 +106,9 @@ function getDynamicEnglishArticle(slug: string) {
   const contractedArticle = slug === "screeps-spawn-creep"
     ? applyEnglishSpawnVerification20260812(editorialArticle)
     : applyEnglishMovementContract20260812(editorialArticle);
+  const secondArticle = applyEnglishEditorialSecond20260812(contractedArticle);
 
-  return applyEnglishEditorialSecond20260812(contractedArticle);
+  return applyEnglishEditorialFourth20260814(secondArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {

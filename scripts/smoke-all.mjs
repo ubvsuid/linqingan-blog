@@ -39,6 +39,7 @@ try {
   await import("./smoke-english-observability-9.mjs");
   await import("./smoke-english-market-10.mjs");
   await import("./smoke-english-lab-factory-11.mjs");
+  await import("./smoke-english-editorial-third-20260814.mjs");
   await import("./smoke-english-resources-12.mjs");
   await import("./smoke-english-tower-13.mjs");
   await import("./smoke-english-controller-14.mjs");
@@ -48,6 +49,7 @@ try {
   await import("./smoke-english-link-source-18.mjs");
   await import("./smoke-english-multi-spawn-queue-19.mjs");
   await import("./smoke-english-store-capacity-20.mjs");
+  await import("./smoke-english-editorial-fourth-20260814.mjs");
 } finally {
   globalThis.fetch = originalFetch;
 }
