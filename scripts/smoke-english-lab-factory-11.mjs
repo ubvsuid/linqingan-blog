@@ -9,6 +9,7 @@ const articles = [
     seoTitle:
       "Screeps runReaction(): Verify One Owned Lab Reaction",
     query: "runReaction",
+    modifiedDate: "2026-08-14",
     signals: [
       "exclusiveWindow",
       "verified-exact-reaction",
@@ -26,6 +27,7 @@ const articles = [
     seoTitle:
       "Screeps boostCreep(): Verify Exact Body Part Changes",
     query: "boostCreep",
+    modifiedDate: "2026-08-14",
     signals: [
       "request.creepId",
       "expectedIndexes",
@@ -43,6 +45,7 @@ const articles = [
     seoTitle:
       "Screeps Factory.produce(): Verify One Production Batch",
     query: "Factory.produce",
+    modifiedDate: "2026-08-01",
     signals: [
       "permanent-level-mismatch",
       "operate-effect-missing",
@@ -90,7 +93,7 @@ for (const article of articles) {
     `href="#use-this-guide"`,
     `<h2 id="use-this-guide">Use this guide when</h2>`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-01"`,
+    `"dateModified":"${article.modifiedDate}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(
