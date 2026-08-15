@@ -9,12 +9,13 @@ const articles = [
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     faqExpected: false,
+    modifiedAt: "2026-08-12",
     verification: [
       "Chinese source article",
-      "Reviewed in full",
-      "Technical correction",
-      "Energy phase decisions, Memory writes, branch selection, action return codes, and later-tick outcomes are separated",
-      "Live multi-tick verification",
+      "Static code review",
+      "empty/full hysteresis, partial-state preservation, first-run policy, invalid Store handling, change-only Memory writes, and action/state boundaries reviewed",
+      "Screeps Console test",
+      "Live multi-tick verification pending",
       "Pending",
     ],
   },
@@ -81,6 +82,7 @@ for (const article of articles) {
     `href="#${article.tocId}"`,
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
+    ...(article.modifiedAt ? [`"dateModified":"${article.modifiedAt}"`] : []),
   ]) {
     if (!body.includes(expected)) failures.push(`${article.path}: 缺少页面信号 “${expected}”`);
   }
@@ -96,11 +98,16 @@ for (const expected of [
   "partial-initialized",
   "decision.changed",
   "invalid-store-values",
+  "Write Memory only when the phase changes",
+  "Submitting <code>harvest()</code> does not mean Store is already fuller",
 ]) {
   if (!workingBody.includes(expected)) failures.push(`Working-state page is missing “${expected}”`);
 }
 if (workingBody.includes("function runHarvester")) {
   failures.push("Working-state page still buries the phase contract under a full role framework");
+}
+if (workingBody.includes("lastStateCheckedAt")) {
+  failures.push("Working-state page still teaches a per-tick persistent diagnostic write as part of the core phase pattern");
 }
 
 const targetBody = await (await fetch(`${baseUrl}/en/blog/screeps-get-object-by-id`)).text();
@@ -175,4 +182,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、Energy phase、Saved target与Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
+console.log(`第二批英文专题生产冒烟测试通过：${articles.length} 篇文章、change-only working state、Saved target与Dead Creep Memory边界、Verification、目录锚点、Canonical、hreflang、JSON-LD、搜索与 Sitemap。`);
