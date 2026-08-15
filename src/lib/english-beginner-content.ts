@@ -7,6 +7,7 @@ import { englishBeginnerCreepRolesArticleOverrides } from "./english-beginner-cr
 import { englishBeginnerSpawnCreepArticleOverrides } from "./english-beginner-spawn-creep-override";
 import { englishBeginnerTickArticleOverrides } from "./english-beginner-tick-override";
 import { englishBeginnerUpgradeControllerArticleOverrides } from "./english-beginner-upgrade-controller-override";
+import { englishEditorialFourthArticleOverrides20260814 } from "./english-editorial-fourth-20260814";
 import part1 from "@/lib/english-beginner-data/part-1";
 import part2 from "@/lib/english-beginner-data/part-2";
 import part3 from "@/lib/english-beginner-data/part-3";
@@ -116,7 +117,7 @@ function parseEnglishBeginnerArticles(encoded: string): EnglishBeginnerArticle[]
 
 const parsedEnglishBeginnerArticles = parseEnglishBeginnerArticles(encodedArticleData);
 
-// Keep focused lesson rewrites readable; Lesson 9 loads after the earlier overrides.
+// Keep focused lesson rewrites readable; later editorial passes load last.
 const articleOverrides = {
   ...englishBeginnerArticleOverrides,
   ...englishBeginnerTickArticleOverrides,
@@ -124,6 +125,7 @@ const articleOverrides = {
   ...englishBeginnerSpawnCreepArticleOverrides,
   ...englishBeginnerCreepRolesArticleOverrides,
   ...englishBeginnerUpgradeControllerArticleOverrides,
+  ...englishEditorialFourthArticleOverrides20260814,
 } as unknown as Record<string, Partial<EnglishBeginnerArticle>>;
 
 export const englishBeginnerArticles: EnglishBeginnerArticle[] =

@@ -1,4 +1,7 @@
+import { getEnglishEditorialThirdUpdatedAt20260814 } from "./english-editorial-third-20260814";
+
 const UPDATED_AT = "2026-08-12";
+const FOURTH_UPDATED_AT = "2026-08-14";
 
 const selectedSlugs = new Set([
   "screeps-err-not-in-range",
@@ -8,8 +11,19 @@ const selectedSlugs = new Set([
   "screeps-spawn-creep",
 ]);
 
+const fourthEditorialSlugs = new Set([
+  "screeps-creep-harvest-energy",
+  "screeps-first-extension",
+  "screeps-build-repair",
+]);
+
 export function getEnglishEditorialCoreUpdatedAt20260812(
   slug: string,
 ): string | undefined {
-  return selectedSlugs.has(slug) ? UPDATED_AT : undefined;
+  return getEnglishEditorialThirdUpdatedAt20260814(slug)
+    ?? (fourthEditorialSlugs.has(slug)
+      ? FOURTH_UPDATED_AT
+      : selectedSlugs.has(slug)
+        ? UPDATED_AT
+        : undefined);
 }
