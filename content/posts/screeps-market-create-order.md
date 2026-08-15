@@ -29,7 +29,7 @@ featured: false
 
 > 下一 tick 在 `Game.market.orders` 里看到一笔相似订单时，怎样证明它就是刚才这一次请求创建的，而不是旧订单、另一个模块或 Console 命令创建的？
 
-本文只解决这条创建链：
+本文只处理这条创建链：
 
 ```text
 冻结一次请求
@@ -416,7 +416,7 @@ function submitCreateOrder(request) {
 request.enabled = false;
 ```
 
-即使代码后面报错或 API 返回错误，下一 tick 也不会无条件再次下单。
+即使代码后面报错或 API 返回错误，下一 tick 也不会无条件再次下单。**失败后必须人工**检查本次参数、Credits、Terminal、已有订单和返回值，再决定是否创建新的请求 revision。
 
 ## `OK` 后为什么还必须等下一 tick
 
@@ -631,7 +631,7 @@ Terminal 当前 cooldown 大于 0
 | `ERR_FULL` | 订单数量达到限制 | 停止自动重试，检查当前规则 |
 | `ERR_INVALID_ARGS` | 参数无效 | 检查 type/resource/price/amount/room |
 
-`createOrder()` 当前没有 `ERR_TIRED` 或 `ERR_NOT_IN_RANGE` 这类 Terminal 动作返回值。不要把 `deal()` / `send()` 的错误处理表复制过来。
+创建市场订单不是 Creep 距离动作，也不是 Terminal 的冷却动作，因此不要把 `deal()` / `send()` 的距离或冷却分支复制过来。
 
 ## 官方订单上限说明当前仍然不一致
 
@@ -740,7 +740,7 @@ module.exports.loop = function () {
 
 ### `createOrder()` 前必须等 Terminal cooldown 归零
 
-不是当前 `createOrder()` engine 前置。Terminal cooldown 是 `deal()`、`send()` 等操作的重要边界，不应机械复制到创建订单。
+不是当前 `createOrder()` engine 前置。Terminal cooldown 是直接交易和发送资源等操作的重要边界，不应机械复制到创建订单。
 
 ### 卖单库存不足就不能创建
 
@@ -795,9 +795,8 @@ Live market multi-tick tested: no
 - [Game.market.deal() 怎么安全成交指定市场订单](/blog/screeps-market-deal)
 - [Screeps 市场订单怎么维护：changeOrderPrice()、extendOrder()、cancelOrder()](/blog/screeps-market-order-maintenance)
 - [StructureTerminal.send() 怎么安全跨房间发送资源](/blog/screeps-terminal-send-resources)
-- [Screeps Market 与 Terminal 成本计算器](/tools/market-terminal-cost-calculator)
 - [Screeps Memory 是什么](/blog/screeps-memory-basics)
-- [进入 Screeps Market API Hub](/screeps-api/market)
+- [进入 Screeps 知识库](/knowledge)
 
 ## 官方资料
 
