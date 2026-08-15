@@ -47,7 +47,7 @@ const revised = [
       "controller-not-owned",
       "controller-upgrade-blocked",
       "Repair target policy is not the same as a repair() ownership rule",
-      "does not require the target structure itself to be yours",
+      "do not require the target structure itself to be yours",
       "Official engine source",
       "Pending — no live blocked-site",
     ],
