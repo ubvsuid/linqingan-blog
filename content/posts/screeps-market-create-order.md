@@ -232,7 +232,7 @@ function hasCreateFeeBudget(fee, creditReserve) {
 不要让多个模块直接散落调用：
 
 ```js
-Game.market.createOrder(...);
+// 不要在多个模块里直接散落 createOrder() 调用。
 ```
 
 先建立一笔可审阅请求：
