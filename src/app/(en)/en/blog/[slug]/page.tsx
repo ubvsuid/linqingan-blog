@@ -9,6 +9,10 @@ import { applyEnglishEditorialFourth20260814 } from "@/lib/english-editorial-fou
 import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { applyEnglishMovementContract20260812 } from "@/lib/english-editorial-movement-contract-20260812";
+import {
+  applyEnglishEditorialSecond20260812,
+  getEnglishEditorialSecondUpdatedAt20260812,
+} from "@/lib/english-editorial-second-20260812";
 import { applyEnglishSpawnVerification20260812 } from "@/lib/english-editorial-spawn-verification-20260812";
 import { getEnglishEditorialPublished20260731 } from "@/lib/english-editorial-published-20260731";
 import {
@@ -99,20 +103,17 @@ function getDynamicEnglishArticle(slug: string) {
   }
 
   const editorialArticle = applyEnglishEditorialFinal20260812(article);
+  const contractedArticle = slug === "screeps-spawn-creep"
+    ? applyEnglishSpawnVerification20260812(editorialArticle)
+    : applyEnglishMovementContract20260812(editorialArticle);
+  const secondArticle = applyEnglishEditorialSecond20260812(contractedArticle);
 
-  if (slug === "screeps-spawn-creep") {
-    return applyEnglishEditorialFourth20260814(
-      applyEnglishSpawnVerification20260812(editorialArticle),
-    );
-  }
-
-  return applyEnglishEditorialFourth20260814(
-    applyEnglishMovementContract20260812(editorialArticle),
-  );
+  return applyEnglishEditorialFourth20260814(secondArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialCoreUpdatedAt20260812(slug)
+  return getEnglishEditorialSecondUpdatedAt20260812(slug)
+    ?? getEnglishEditorialCoreUpdatedAt20260812(slug)
     ?? getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
     ?? fallback;
 }
