@@ -19,7 +19,7 @@ verification:
   checkedAt: "2026-08-16"
   testedAt: "2026-08-16"
   testEnvironment: "Node.js 22 离线模拟（名称、身体、默认/显式 Energy 预算、memory 边界、directions 与提交选项一致性，不是 Screeps 官方服务器）"
-  testResult: "Spawn/名称/body 校验、memory 不做对象类型伪限制、默认房间 Energy、显式 energyStructures 子集预算、去重、非法结构、directions 与可提交场景通过。"
+  testResult: "Spawn/名称/body 校验、memory 不做对象类型伪限制、默认房间 Energy、显式 energyStructures 子集预算、去重、inactive/非法结构、directions 与可提交场景通过。"
 featured: false
 ---
 
@@ -30,9 +30,9 @@ featured: false
 1. Spawn 是否存在、属于自己并且空闲；
 2. 名称是否合法且没有重复；
 3. body 是否由 1—50 个合法身体部件组成；
-4. 本次生成真正允许使用的 Energy 是否足够；
-5. `memory`、`energyStructures`、`directions` 等选项到底是官方 API 规则，还是你自己额外规定的项目策略；
-6. `dryRun` 与正式提交为什么必须使用同一组关键选项，并分别保存结果。
+4. 本次请求真正允许使用的 Energy 是否足够；
+5. `memory`、`energyStructures`、`directions` 中，哪些是官方 API 边界，哪些只是自己的工程策略；
+6. `dryRun` 与正式提交为什么要使用同一组关键选项，并分别保存结果。
 
 本文仍使用 `dryRun` 做预检，再执行一次正式提交。两次结果都要保存，因为同一 tick 中其他代码仍可能改变 Spawn 状态、占用同名 Creep，或抢先提交生成意图。
 
@@ -50,27 +50,23 @@ const result = spawn.spawnCreep(
 );
 ```
 
-返回：
+返回 `OK` 表示生成命令已经被接受，不表示 Creep 在当前 tick 已经完成生成。
 
-```text
-OK
-```
-
-表示生成命令已经被接受，不表示 Creep 在当前 tick 已经完成生成。
-
-生成中的状态可以从：
+可以观察：
 
 ```javascript
 spawn.spawning
 ```
 
-观察。真正完成以后，再在后续 tick 重新读取 `Game.creeps[name]`。
+真正完成以后，再在后续 tick 重新读取：
 
-## 二、先区分“官方 API 无效”和“本站不推荐”
+```javascript
+Game.creeps.Worker1
+```
 
-这是这篇最重要的修正。
+## 二、先区分“官方参数无效”和“本站不推荐”
 
-有些条件会让 `spawnCreep()` 返回官方错误码，例如：
+有些条件会直接对应官方返回值，例如：
 
 - body 为空；
 - 名称无效；
@@ -78,41 +74,26 @@ spawn.spawning
 - Energy 不足；
 - 当前 Controller RCL 不足以使用这个 Spawn。
 
-但你也可以在项目里制定更严格的规则，例如：
+但项目也可以自己制定更严格的规则，例如：
 
-- `memory` 必须使用 `{ role, memoryVersion }` 这种对象；
-- `energyStructures` 只能来自当前房间自己的 Spawn / Extension；
-- 一个 tick 只允许一个生成调度器提交；
-- 名称必须包含角色和序号。
+- `memory` 推荐使用 `{ role, memoryVersion }`；
+- `energyStructures` 只允许当前房间自己的 Spawn / Extension；
+- 名称必须包含角色和序号；
+- 一个 Spawn 只允许一个统一调度器提交。
 
-这些**可以是很好的工程规则**，但不能写成“官方 API 本身只接受这种值”。
+这些工程规则可以很有价值，但不能写成“官方 API 本身只接受这种形状”。
 
-特别是 `opts.memory`：当前官方 API 文档把它标记为：
+特别是 `opts.memory`。当前官方 API 文档把它标记为：
 
 ```text
 any
 ```
 
-因此不能因为它不是普通对象，就在通用 `spawnCreep()` 校验器里直接判成 `ERR_INVALID_ARGS` 的等价错误。
+所以不能仅仅因为它不是普通对象，就在通用 API 校验器中声称它属于 `ERR_INVALID_ARGS`。
 
 ## 三、body 为什么必须先校验
 
 官方 API 要求 body 包含 1—50 个合法身体部件。
-
-常见部件包括：
-
-```javascript
-WORK
-MOVE
-CARRY
-ATTACK
-RANGED_ATTACK
-HEAL
-TOUGH
-CLAIM
-```
-
-可以写成纯函数：
 
 ```javascript
 const BODY_PARTS = new Set([
@@ -157,7 +138,7 @@ function validateBody(body) {
 }
 ```
 
-## 四、怎样计算身体成本
+身体成本可以用官方常量计算：
 
 ```javascript
 function getBodyCost(body) {
@@ -181,13 +162,11 @@ function getBodyCost(body) {
 [WORK, CARRY, MOVE]
 ```
 
-成本是：
+成本为 200 Energy。
 
-```text
-100 + 50 + 50 = 200 Energy
-```
+## 四、默认模式看 `room.energyAvailable`
 
-如果没有显式指定 `energyStructures`，当前可用于默认生成的 Energy 通常读取：
+没有显式指定 `energyStructures` 时，当前生成可用 Energy 通常读取：
 
 ```javascript
 spawn.room.energyAvailable
@@ -195,11 +174,21 @@ spawn.room.energyAvailable
 
 它表示房间 Spawn / Extension 当前可用于生成的 Energy，不是 Storage、Container 或 Terminal 的库存。
 
-## 五、显式 `energyStructures` 时，不能继续只看 `room.energyAvailable`
+因此默认模式下可以做一个快速本地预检：
 
-这是第二个重要边界。
+```javascript
+const bodyCost = getBodyCost(body);
 
-如果你这样调用：
+if (spawn.room.energyAvailable < bodyCost) {
+  // 当前默认生成 Energy 不足
+}
+```
+
+但这个判断只适用于**默认取能模式**。
+
+## 五、显式 `energyStructures` 后，真实预算已经变了
+
+如果调用：
 
 ```javascript
 spawn.spawnCreep(
@@ -211,43 +200,37 @@ spawn.spawnCreep(
 );
 ```
 
-那么你已经把本次生成的取能范围限制在这一组选中的结构中。
+你已经把本次请求的取能来源限定到这一组选中结构。
 
-当前官方 engine 在这个分支中，不再使用整个：
+当前官方 engine 在 `energyStructures` 存在时，会按选中结构计算可用 Energy；不会继续把整个：
 
 ```javascript
 spawn.room.energyAvailable
 ```
 
-作为生成 Energy 预算，而是汇总传入 `energyStructures` 对应的可用 Energy。
-
-因此下面这种本地判断可能给出假阳性：
-
-```javascript
-if (spawn.room.energyAvailable >= bodyCost) {
-  // 不能据此断言显式 energyStructures 一定够用
-}
-```
+当成本次请求的 Energy 预算。
 
 例如：
 
 ```text
-整个房间：800 Energy
-显式选中的两个结构：150 Energy
+整个房间当前有：800 Energy
+选中的结构只有：150 Energy
 body 成本：200 Energy
 ```
 
-虽然：
+此时整个房间虽然够 200，但这次显式请求仍然不够。
 
-```text
-room.energyAvailable >= 200
+因此：
+
+```javascript
+spawn.room.energyAvailable >= bodyCost
 ```
 
-但这次显式选择的结构仍然不够支付 200 Energy。
+不能证明显式 `energyStructures` 一定能支付这次生成。
 
-## 六、为显式 Energy 结构做一个本地安全检查
+## 六、显式 Energy 结构的本站安全检查
 
-下面是**本站安全提交器的额外策略**，不是在声称官方 engine 会逐项用完全相同的方式报错。
+下面是**本站安全提交器的额外策略**，不是在声称官方 engine 会逐项使用完全相同的自定义诊断状态。
 
 ```javascript
 function isAllowedEnergyStructure(
@@ -259,6 +242,13 @@ function isAllowedEnergyStructure(
   }
 
   if (structure.room?.name !== spawn.room.name) {
+    return false;
+  }
+
+  if (
+    typeof structure.isActive === 'function'
+    && structure.isActive() !== true
+  ) {
     return false;
   }
 
@@ -327,17 +317,17 @@ function getEnergyBudget(
 
 这个本地规则主动要求：
 
-- 必须是数组；
-- 不能为空；
-- 只使用自己的 Spawn / Extension；
-- 只使用当前 Spawn 房间中的结构；
-- 按结构 ID 去重。
+- 参数必须是非空数组；
+- 只接受自己的 Spawn / Extension；
+- 只接受当前 Spawn 所在房间中的结构；
+- 当前 RCL 下结构必须是 active；
+- 相同结构 ID 只统计一次。
 
-这样做的目的不是复制 engine 的每一个内部细节，而是让你自己的生成请求更容易审查。
+这里检查 `structure.isActive()` 的原因是：本文核对的官方 engine 在显式 Energy 汇总时会排除处于 `off` 状态的结构。这样本地预算就不会把当前不可用结构中的 Energy 错算进去。
 
-## 七、`memory` 的官方类型是 `any`，但仍推荐稳定对象结构
+## 七、`memory` 是 `any`，但仍推荐对象结构
 
-旧版示例曾写过：
+旧版文章曾把下面这种校验当成通用 API 规则：
 
 ```javascript
 if (
@@ -355,15 +345,9 @@ if (
 }
 ```
 
-这个判断不能代表当前官方 `spawnCreep()` 的参数规则，因为官方文档把：
+这会把数组、字符串、数字和布尔值都提前挡掉，但当前官方文档并没有给 `opts.memory` 这样的对象类型限制。
 
-```text
-opts.memory
-```
-
-标成 `any`。
-
-所以通用提交器不应该仅仅因为下面这些值“不是普通对象”就声称 API 参数非法：
+因此通用校验器不应该仅因为下面这些值“不是普通对象”就声称 API 参数非法：
 
 ```javascript
 []
@@ -372,9 +356,9 @@ opts.memory
 true
 ```
 
-但**能传不等于推荐这样设计**。
+不过，**能传不等于推荐这样设计**。
 
-本站仍建议使用：
+本站仍建议生产代码使用：
 
 ```javascript
 memory: {
@@ -383,7 +367,7 @@ memory: {
 }
 ```
 
-原因不是“否则 API 会报错”，而是后续代码通常会继续使用：
+因为后续代码通常会继续读写：
 
 ```javascript
 creep.memory.role
@@ -391,11 +375,11 @@ creep.memory.working
 creep.memory.taskId
 ```
 
-稳定的对象结构更适合长期维护。
+稳定的对象结构更容易维护。
 
-### 一个 engine 级细节：`any` 不等于所有 falsy 值都会原样保存
+### `any` 也不等于所有 falsy 值都会原样持久化
 
-在本文核对的官方 engine 版本中，生成时 Memory 写入使用了类似：
+在本文核对的官方 engine 版本中，创建时的 Memory 写入存在类似：
 
 ```javascript
 options.memory || existingMemory || {}
@@ -412,17 +396,15 @@ false
 null
 ```
 
-这类 falsy 值不能简单理解成“一定会原样成为新 Creep 的 Memory”。
+这类 falsy 值不能简单理解为“一定会原样成为新 Creep 的 Memory”。
 
-所以更准确的结论是：
+更准确的结论是：
 
-> **不要把非对象 memory 预判成官方无效参数；同时，生产代码仍推荐使用明确的对象结构。**
+> 不要把非对象 `memory` 预判成官方无效参数；生产代码仍推荐使用明确的对象结构。
 
-## 八、名称校验
+## 八、名称和 `directions` 的本地检查
 
-官方 API 文档要求显式提供名称，长度上限为 100 个字符。
-
-本站示例保持字符串策略：
+本站示例继续要求名称使用字符串：
 
 ```javascript
 function validateCreepName(name) {
@@ -454,13 +436,7 @@ function validateCreepName(name) {
 }
 ```
 
-正式结果仍然必须处理 `ERR_NAME_EXISTS`，因为同一 tick 的其他生成提交可能与本次请求竞争。
-
-## 九、`directions` 也应该在本地先检查
-
 `directions` 用来限制生成完成后 Creep 可以从 Spawn 的哪些方向离开。
-
-本站提交器使用：
 
 ```javascript
 function validateDirections(directions) {
@@ -474,15 +450,7 @@ function validateDirections(directions) {
   if (
     !Array.isArray(directions)
     || directions.length === 0
-  ) {
-    return {
-      valid: false,
-      reason: 'directions-invalid'
-    };
-  }
-
-  if (
-    directions.some(direction =>
+    || directions.some(direction =>
       !Number.isInteger(direction)
       || direction < 1
       || direction > 8
@@ -501,9 +469,9 @@ function validateDirections(directions) {
 }
 ```
 
-这不会保证出口格一定空闲，只是把明显非法的方向配置挡在提交前。
+这只是本地预检，不会保证出口格在生成完成时仍然空闲。
 
-## 十、`dryRun` 能检查什么
+## 九、`dryRun` 能检查什么
 
 ```javascript
 const check = spawn.spawnCreep(
@@ -516,7 +484,7 @@ const check = spawn.spawnCreep(
 );
 ```
 
-`dryRun: true` 只检查当前调用条件，不开始生成。
+`dryRun: true` 会检查当前调用条件，但不开始生成。
 
 它适合发现：
 
@@ -526,7 +494,7 @@ const check = spawn.spawnCreep(
 - body 或名称参数不合法；
 - RCL 不足；
 - 所有权问题；
-- 当前调用选项导致的其他 API 拒绝。
+- 当前选项导致的其他 API 拒绝。
 
 但：
 
@@ -534,19 +502,11 @@ const check = spawn.spawnCreep(
 dryRun === OK
 ```
 
-不保证紧接着的正式调用一定返回 `OK`。
+不保证紧接着的正式调用也一定返回 `OK`。
 
-同一 tick 中，其他模块可能先一步：
+同一 tick 中其他模块可能先一步占用 Spawn 或创建同名 Creep，所以正式调用仍必须单独保存返回值。
 
-- 占用同一个 Spawn；
-- 创建同名 Creep；
-- 提交其他互相冲突的生成逻辑。
-
-因此正式调用的返回值必须单独保存。
-
-## 十一、完整安全提交函数
-
-下面把前面的边界合并起来。
+## 十、完整安全提交函数
 
 ```javascript
 const BODY_PARTS = new Set([
@@ -613,6 +573,13 @@ function isAllowedEnergyStructure(
   }
 
   if (structure.room?.name !== spawn.room.name) {
+    return false;
+  }
+
+  if (
+    typeof structure.isActive === 'function'
+    && structure.isActive() !== true
+  ) {
     return false;
   }
 
@@ -895,6 +862,7 @@ module.exports.loop = function () {
       filter: structure =>
         structure.structureType
           === STRUCTURE_EXTENSION
+        && structure.isActive()
     })
   ];
 
@@ -923,7 +891,7 @@ module.exports.loop = function () {
 
 这段示例仍然只适合固定名称的单个请求。真正的补员系统还需要配额、唯一命名和单一 Spawn 调度器。
 
-## 十二、为什么 `dryRun` 与正式调用必须传同一组关键选项
+## 十一、为什么 `dryRun` 与正式调用必须使用同一组选项
 
 如果预检时使用：
 
@@ -936,7 +904,7 @@ module.exports.loop = function () {
 }
 ```
 
-正式调用却变成：
+正式调用却只传：
 
 ```javascript
 {
@@ -944,25 +912,25 @@ module.exports.loop = function () {
 }
 ```
 
-那么你验证的根本不是同一个请求条件。
+那么你验证的已经不是同一个请求条件。
 
-本文的：
+本文通过：
 
 ```javascript
 buildSpawnOptions(input, dryRun)
 ```
 
-保证两次调用共享：
+让两次调用共享：
 
 - `memory`；
 - `energyStructures`；
 - `directions`。
 
-只让 `dryRun` 从 `true` 变为 `false`。
+只让 `dryRun` 从 `true` 变成 `false`。
 
-这仍不能消除同 tick 竞争，但至少不会因为你自己漏传选项而让预检和正式请求失去可比性。
+这仍不能消除同 tick 竞争，但可以避免因为自己漏传选项而制造错误结论。
 
-## 十三、返回值排查表
+## 十二、返回值排查表
 
 | 返回值 | 常见原因 | 优先检查 |
 | --- | --- | --- |
@@ -970,57 +938,51 @@ buildSpawnOptions(input, dryRun)
 | `ERR_NOT_OWNER` | Spawn 不属于自己 | Spawn 来源与所有权 |
 | `ERR_NAME_EXISTS` | 已有同名 Creep | 命名与并发请求 |
 | `ERR_BUSY` | Spawn 已在生成 | 顶层调用顺序与 `spawn.spawning` |
-| `ERR_NOT_ENOUGH_ENERGY` | 本次允许使用的 Spawn / Extension Energy 不足 | body 成本；默认模式看房间可用 Energy；显式模式看所选 `energyStructures` |
+| `ERR_NOT_ENOUGH_ENERGY` | 本次允许使用的 Spawn / Extension Energy 不足 | 默认模式看房间 Energy；显式模式看所选 `energyStructures` |
 | `ERR_INVALID_ARGS` | body、名称或部分选项不合法 | 1—50 部件、名称、directions 等 |
 | `ERR_RCL_NOT_ENOUGH` | 当前 Controller RCL 不足以使用这个 Spawn | 房间控制状态与该 Spawn 当前可用性 |
 
-`spawnCreep()` **不会返回** `ERR_NOT_IN_RANGE`。它不是 Creep 对相邻目标执行的动作。
+`spawnCreep()` **不会返回** `ERR_NOT_IN_RANGE`。
 
-同时不要把本站的：
+还要区分官方错误码与本文本地状态，例如：
 
 ```text
 energy-structure-not-allowed
-```
-
-或：
-
-```text
+energy-structures-invalid
 directions-invalid
 ```
 
-误认为 Screeps 官方错误码；它们只是本文本地校验器的诊断状态。
+这些只是本站安全提交器的诊断字符串，不是 Screeps 官方返回码。
 
-## 十四、为什么不能只看 `room.energyCapacityAvailable`
+## 十三、为什么不能只看 `room.energyCapacityAvailable`
 
 ```javascript
 room.energyCapacityAvailable
 ```
 
-表示房间当前 Spawn / Extension 能容纳的最大生成 Energy，不表示此刻已经装入这么多 Energy。
+表示房间 Spawn / Extension 能容纳的最大生成 Energy，不表示此刻已经装入这么多。
 
-默认取能模式下，实际是否能立刻生成更应该看：
+默认模式下，当前预算更接近：
 
 ```javascript
 room.energyAvailable
 ```
 
-但如果请求显式传入：
+但如果请求显式传入 `energyStructures`，还要进一步检查**这组选中结构**当前实际可用的 Energy。
 
-```javascript
-energyStructures
-```
-
-还要进一步看**这组结构本身**当前拥有多少可用 Energy，不能继续把整个房间的 `energyAvailable` 当成这次请求的真实预算。
-
-## 十五、常见错误
+## 十四、常见错误
 
 ### 把 `memory` 不是对象当成官方非法参数
 
-当前官方文档把 `opts.memory` 定义为 `any`。你可以在项目里要求对象，但要明确这是自己的数据规范。
+当前官方文档把 `opts.memory` 定义为 `any`。项目可以要求对象，但要明确那是自己的数据规范。
 
 ### 显式传了 `energyStructures`，仍然只检查 `room.energyAvailable`
 
-这样可能在房间总 Energy 足够、选中子集不足时得到错误的“可以生成”结论。
+这会在房间总 Energy 足够、选中子集不足时得到错误的“可以生成”结论。
+
+### 把 inactive 的 Extension Energy 算进显式预算
+
+本文核对的 engine 会在显式结构汇总时排除当前 `off` 的结构。本地安全预算也应避免把它们算进去。
 
 ### `dryRun === OK` 后忽略正式返回值
 
@@ -1028,7 +990,7 @@ energyStructures
 
 ### dryRun 和正式调用使用不同选项
 
-尤其是漏掉 `energyStructures` 或 `directions`，会让预检失去意义。
+尤其是漏掉 `energyStructures` 或 `directions`，会让预检失去可比性。
 
 ### 名称只使用 `Game.time`
 
@@ -1038,30 +1000,26 @@ energyStructures
 
 动态组装返回空数组后必须停止。
 
-### 把 Storage Energy 算作可生成 Energy
+### 把 Storage Energy 算作生成 Energy
 
 `spawnCreep()` 的生成预算来自 Spawn / Extension，不是 Storage 库存。
 
 ### 多个模块同时控制同一 Spawn
 
-多个模块可能分别 `dryRun === OK`，但正式提交仍会竞争。生产系统应该由单一生成调度器提交。
+多个模块可能分别 `dryRun === OK`，但正式提交仍会竞争。生产系统应由单一生成调度器提交。
 
-### 正常等待每 tick 打印
-
-Energy 不足或 Spawn 忙碌可能持续很多 tick。应记录状态变化或降低日志频率。
-
-## 十六、离线模拟覆盖什么
+## 十五、离线模拟覆盖什么
 
 这篇对应的仓库模拟现在覆盖：
 
 1. Spawn 缺失、非己方和忙碌；
 2. 名称类型、长度与重复；
 3. body 不是数组、为空、超过 50 个部件或包含未知部件；
-4. `memory` 为对象、数组、字符串、数字、布尔值时都不会被通用校验器伪造为官方参数错误；
+4. `memory` 为对象、数组、字符串、数字、布尔值时都不会被通用校验器伪造成官方参数错误；
 5. 默认模式按 `room.energyAvailable` 判断；
 6. 显式 `energyStructures` 只按选中的结构计算 Energy；
 7. 重复结构 ID 去重；
-8. 空数组、跨房间、非己方或非 Spawn / Extension 的本地拒绝策略；
+8. 空数组、跨房间、非己方、inactive 或非 Spawn / Extension 的本地拒绝策略；
 9. `directions` 合法与非法边界；
 10. dryRun 与正式提交选项保持一致。
 
