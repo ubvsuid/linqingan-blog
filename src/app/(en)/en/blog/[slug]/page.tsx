@@ -10,6 +10,10 @@ import {
   applyEnglishEditorialFifth20260816,
   getEnglishEditorialFifthUpdatedAt20260816,
 } from "@/lib/english-editorial-fifth-20260816";
+import {
+  applyEnglishEditorialSixth20260816,
+  getEnglishEditorialSixthUpdatedAt20260816,
+} from "@/lib/english-editorial-sixth-20260816";
 import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { applyEnglishMovementContract20260812 } from "@/lib/english-editorial-movement-contract-20260812";
@@ -99,10 +103,12 @@ function getDynamicEnglishArticle(slug: string) {
   const article = getBaseDynamicEnglishArticle(slug);
 
   if (slug === "screeps-memory-basics") {
-    return applyEnglishEditorialFifth20260816(
-      applyEnglishEditorialFourth20260814(
-        applyEnglishMemoryContract20260812(
-          applyEnglishMemoryEditorial20260812(article),
+    return applyEnglishEditorialSixth20260816(
+      applyEnglishEditorialFifth20260816(
+        applyEnglishEditorialFourth20260814(
+          applyEnglishMemoryContract20260812(
+            applyEnglishMemoryEditorial20260812(article),
+          ),
         ),
       ),
     );
@@ -114,12 +120,14 @@ function getDynamicEnglishArticle(slug: string) {
     : applyEnglishMovementContract20260812(editorialArticle);
   const secondArticle = applyEnglishEditorialSecond20260812(contractedArticle);
   const fourthArticle = applyEnglishEditorialFourth20260814(secondArticle);
+  const fifthArticle = applyEnglishEditorialFifth20260816(fourthArticle);
 
-  return applyEnglishEditorialFifth20260816(fourthArticle);
+  return applyEnglishEditorialSixth20260816(fifthArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialFifthUpdatedAt20260816(slug)
+  return getEnglishEditorialSixthUpdatedAt20260816(slug)
+    ?? getEnglishEditorialFifthUpdatedAt20260816(slug)
     ?? getEnglishEditorialSecondUpdatedAt20260812(slug)
     ?? getEnglishEditorialCoreUpdatedAt20260812(slug)
     ?? getEnglishEditorialRuntimeNotifyUpdatedAt20260806(slug)
