@@ -5,6 +5,7 @@ import {
   getEnglishBeginnerArticle,
   type EnglishBeginnerArticle,
 } from "@/lib/english-beginner-content";
+import { getEnglishEditorialFifthUpdatedAt20260816 } from "@/lib/english-editorial-fifth-20260816";
 import { getEnglishDiscoveryArticle } from "@/lib/english-discovery";
 import { siteConfig } from "@/lib/site";
 
@@ -18,7 +19,9 @@ const article = requireBodyPartsArticle();
 const discovery = getEnglishDiscoveryArticle(article.path);
 const articleUrl = `${siteConfig.url}${article.path}`;
 const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
-const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
+const modifiedTime = getEnglishEditorialFifthUpdatedAt20260816(article.slug)
+  ?? discovery?.updatedAt
+  ?? article.publishedAt;
 
 export const metadata: Metadata = {
   title: { absolute: `${article.title} | Linqingan` },
@@ -88,6 +91,7 @@ export default function EnglishCreepBodyPartsPage() {
       category={article.category}
       publishedAt={article.publishedAt}
       publishedLabel={article.publishedLabel}
+      modifiedAt={modifiedTime}
       readingTime={article.readingTime}
       tags={article.tags}
       verification={article.verification.map(([term, value]) => ({ term, value }))}
