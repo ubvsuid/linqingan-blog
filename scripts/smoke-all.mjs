@@ -50,6 +50,7 @@ try {
   await import("./smoke-english-multi-spawn-queue-19.mjs");
   await import("./smoke-english-store-capacity-20.mjs");
   await import("./smoke-english-editorial-fourth-20260814.mjs");
+  await import("./smoke-english-editorial-fifth-20260816.mjs");
 } finally {
   globalThis.fetch = originalFetch;
 }
