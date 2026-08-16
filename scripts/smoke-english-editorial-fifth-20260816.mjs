@@ -39,8 +39,8 @@ const revised = [
   {
     path: "/en/blog/screeps-map-find-route",
     chinesePath: "/blog/screeps-map-find-route",
-    title: "Screeps Game.map.findRoute(): Cross-Room Routing",
-    headline: "How to Plan and Execute a Cross-Room Route in Screeps",
+    title: "Screeps Game.map.findRoute(): Plan and Execute One Room Step",
+    headline: "Turn a Room Route into One Validated Exit Step",
     signals: [
       "Validate routeCallback policy before the engine sees it",
       "Number(value) || 1",
