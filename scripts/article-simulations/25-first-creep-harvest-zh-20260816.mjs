@@ -116,17 +116,24 @@ for (const requiredText of [
   );
 }
 
+// The article intentionally shows `harvest(source) === ERR_FULL` as a bad
+// example, so the guard targets only executable/recommendation patterns that
+// would teach ERR_FULL as a real Source-harvest capacity result.
 for (const forbiddenText of [
   "result !== ERR_FULL",
   "Store 没有空余空间时，`harvest()` 会返回 `ERR_FULL`",
   "`ERR_FULL` | Creep 的 Store 已经没有空余空间",
-  "harvest(source) === ERR_FULL",
 ]) {
   assert.ok(
     !article.includes(forbiddenText),
     `first harvest article reintroduced stale ERR_FULL teaching: ${forbiddenText}`,
   );
 }
+
+assert.ok(
+  !/^\| `ERR_FULL` \|/m.test(article),
+  "first harvest article must not list ERR_FULL as a harvest return-code row",
+);
 
 console.log(
   "中文 first harvest 模拟通过：Creep/Source 判空、Store 满停止、Source harvest OK/距离/资源不足/异常返回值与 ERR_FULL 防回归均通过。",
