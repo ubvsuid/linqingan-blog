@@ -1,8 +1,8 @@
 ---
 title: "为什么有的 Creep 能采集，有的却不能？认识 WORK、CARRY 和 MOVE"
-description: "写给 Screeps 新手的 Creep 身体部件入门：用简单方式认识 WORK、CARRY 和 MOVE，并把部件与实际动作对应起来。"
+description: "写给 Screeps 新手的 Creep 身体部件入门：认识 WORK、CARRY、MOVE、getActiveBodyparts() 与 Store 容量，并正确区分 harvest() 和 ERR_FULL。"
 publishedAt: "2026-07-16"
-updatedAt: "2026-07-21"
+updatedAt: "2026-08-16"
 category: "Screeps 入门"
 tags:
   - "Screeps"
@@ -16,148 +16,352 @@ verification:
   syntaxChecked: true
   consoleTested: false
   liveTested: false
-  checkedAt: "2026-07-21"
+  checkedAt: "2026-08-16"
+  testedAt: "2026-08-16"
+  testEnvironment: "Node.js 22 离线模拟（active body part、Store 阶段判断与 harvest 返回码边界，不是 Screeps 官方服务器）"
+  testResult: "WORK/CARRY/MOVE 可用部件判断、满 Store 阶段切换、harvest 不使用 ERR_FULL 作为容量信号等边界通过。"
 featured: false
 ---
 
 > **Screeps 新手入门 · 第 6 篇**
-> 建议按照系列顺序阅读；每篇只解决一个新手当前会遇到的问题。
+> 建议按照系列顺序阅读；这一篇只解决一个问题：**为什么一只 Creep 能做某个动作，另一只却不能。**
 
-> **这一篇只需要记住一句话**
-> Creep 能做什么，取决于它拥有哪些可用的身体部件。
+> **先记住一句话**
+> Creep 当前能做什么，取决于它还剩多少**可用身体部件**，而不是只看出生时的 body 配置。
 
-前两篇已经让一只 Creep 完成了[采集](/blog/screeps-first-creep-harvest)和[向 Spawn 运输 Energy](/blog/screeps-creep-deliver-energy)。这一篇不再增加新任务，而是解释这些动作为什么需要不同的身体部件。
+前面的教程已经让 Creep 完成了[采集 Energy](/blog/screeps-first-creep-harvest)和[向 Spawn 运输 Energy](/blog/screeps-creep-deliver-energy)。这一篇不增加新的自动化任务，只把这两件事背后的三个基础部件解释清楚：`WORK`、`CARRY` 和 `MOVE`。
 
-## 一、什么是 Creep 的身体部件
+## 一、身体部件就是 Creep 的能力模块
 
-可以把身体部件理解成 Creep 使用的工具。不同部件提供不同能力：
+一只 Creep 由多个 body part 组成。不同部件负责不同能力。
 
-### `WORK`
+| 部件 | 新手先记住的作用 | 常见相关动作 |
+| --- | --- | --- |
+| `WORK` | 提供“工作”能力 | `harvest()`、`build()`、`repair()`、`upgradeController()` |
+| `CARRY` | 提供资源 Store 容量 | 携带 Energy，再用于 `transfer()`、建造、维修、升级等 |
+| `MOVE` | 提供主动移动能力 | `move()`、`moveTo()` 最终都需要可用的 `MOVE` |
 
-负责采集、建造、维修和升级等工作。
+Screeps 还有 `ATTACK`、`RANGED_ATTACK`、`HEAL`、`CLAIM`、`TOUGH` 等部件，但第一次理解工作 Creep 时不需要全部一起学。
 
-### `CARRY`
+## 二、不要只看 `creep.body`，要看“仍然可用”的部件
 
-提供存放和运输资源的空间。
+身体部件会受到伤害。一个已经完全损坏的部件仍然会出现在 `creep.body` 数组里，但它提供的能力已经失效。
 
-### `MOVE`
+官方 API 提供了专门的方法：
 
-让 Creep 能够主动移动。
+```javascript
+creep.getActiveBodyparts(WORK);
+creep.getActiveBodyparts(CARRY);
+creep.getActiveBodyparts(MOVE);
+```
 
-Screeps 中还有战斗、治疗和占领房间等其他身体部件，但新手现在不需要一次全部学习。
+它返回当前仍然存活、仍可工作的对应部件数量。
 
-## 二、WORK：提供工作能力
+例如：
 
-`WORK` 可以理解成 Creep 的工作工具。它会参与下面这些操作：
+```javascript
+const activeWork = creep.getActiveBodyparts(WORK);
+const activeCarry = creep.getActiveBodyparts(CARRY);
+const activeMove = creep.getActiveBodyparts(MOVE);
+
+console.log({
+  creep: creep.name,
+  activeWork,
+  activeCarry,
+  activeMove
+});
+```
+
+如果一只 Creep 出生时有 2 个 `WORK`，但其中 1 个已经完全损坏，那么：
+
+```javascript
+creep.getActiveBodyparts(WORK)
+```
+
+会返回 `1`，而不是 `2`。
+
+所以排查“为什么不能采集”“为什么不能移动”时，**active body parts 比出生时的 body 模板更有用**。
+
+## 三、WORK：决定它有没有工作能力
+
+`WORK` 是最基础的工作部件。
+
+它参与的常见操作包括：
 
 - 从 Source 采集 Energy；
-- 建造建筑；
-- 维修建筑；
+- 建造 Construction Site；
+- 维修 Structure；
 - 升级 Controller。
 
-> `creep.harvest(source)` 需要可用的 `WORK`
+例如，采集前可以先检查：
 
-如果 Creep 已经到达 Source 旁边，却仍然不能正常采集，可以先检查它是否拥有可用的 `WORK`。
+```javascript
+if (creep.getActiveBodyparts(WORK) === 0) {
+  console.log(`${creep.name}: no active WORK`);
+  return;
+}
+```
 
-> **建造、维修和升级还需要 Energy**
-> `WORK` 提供执行这些工作的能力，但 Creep 还需要通过 `CARRY` 携带 Energy，才能真正进行建造、维修和升级。
+如果 `harvest()` 返回：
 
-身体部件可能因为受到伤害而失效，所以判断能力时要关注“可用部件”，而不只是创建时曾经配置过什么。
+```text
+ERR_NO_BODYPART
+```
 
-## 三、CARRY：提供携带空间
+就应该检查是否已经没有可用的 `WORK`。
 
-`CARRY` 可以理解成 Creep 身上的背包。它为 Creep 的 Store 提供资源容量。
+但要注意：**拥有 WORK 不等于所有工作都能执行。**
 
-上一篇文章中，Creep 从 Source 采集 Energy，再把 Energy 送回 Spawn，这个过程需要 `CARRY`：
+例如：
 
-> 采集到 Energy → 放进 Creep 的 Store → 送到 Spawn
+- `harvest()` 还需要目标合法、Source 有 Energy、距离足够近；
+- `build()`、`repair()`、`upgradeController()` 还需要 Creep 的 Store 中有 Energy；
+- 距离不够时通常还要配合移动逻辑。
 
-更多 `CARRY` 通常意味着一次能够携带更多资源。这一篇不计算具体容量和最优数量。
+所以 body part 只是动作的一个前置条件，不是完整的成功条件。
 
-> **Store 装满以后会怎样？**
-> 对拥有 `CARRY` 的基础工作 Creep 来说，Store 没有空余容量时，继续执行 `harvest()` 会得到 `ERR_FULL`，Creep 携带的 Energy 不会继续增加。接下来需要执行运输或消耗 Energy 的动作。
+## 四、CARRY：给 Creep 一个资源 Store
 
-没有 `CARRY` 的特殊采集方式不属于本篇目标，避免把第一次学习身体部件变成复杂配置讨论。
+`CARRY` 可以理解成资源背包。
 
-## 四、MOVE：提供移动能力
+对于最常见的工作 Creep，采集到的 Energy 会进入：
 
-`MOVE` 让 Creep 能够主动移动。
+```javascript
+creep.store
+```
 
-前面的教程中，我们使用了：
+比起自己计算“有几个 CARRY，所以应该有多少容量”，新手更推荐直接读 Store API：
+
+```javascript
+const energy = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+const free = creep.store.getFreeCapacity(RESOURCE_ENERGY);
+const capacity = creep.store.getCapacity(RESOURCE_ENERGY);
+
+console.log({ energy, free, capacity });
+```
+
+这样读到的是当前对象实际暴露出来的 Store 状态，也更容易和后面的运输逻辑连接起来。
+
+### Store 满了以后，不要等待 `harvest()` 返回 `ERR_FULL`
+
+这里很容易写错。
+
+当前官方 `Creep.harvest()` 返回码中**没有 `ERR_FULL`**。对 Source 采集来说，只要其他前置条件通过，`harvest()` 可以返回 `OK`；如果采集到的资源没有可用 Store 空间，不能装进去的资源会按官方规则掉落到地面，而不是用 `ERR_FULL` 告诉你“背包满了”。
+
+因此，新手工作循环应该在**调用 `harvest()` 之前**用 Store 状态决定是否继续采集：
+
+```javascript
+if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+  const result = creep.harvest(source);
+
+  if (result === ERR_NOT_IN_RANGE) {
+    creep.moveTo(source);
+  }
+} else {
+  // Store 已经没有 Energy 空间，切换到运输或消耗阶段
+}
+```
+
+不要写成：
+
+```javascript
+const result = creep.harvest(source);
+
+if (result === ERR_FULL) {
+  // 切换运输
+}
+```
+
+这个判断不符合当前 `harvest()` API 边界。
+
+### 那 `ERR_FULL` 会在哪里看到？
+
+`ERR_FULL` 并没有消失，只是它属于别的容量边界。
+
+例如：
+
+- `creep.pickup(resource)`：Creep 已不能再接收资源；
+- `creep.withdraw(target, resourceType)`：Creep Store 已满；
+- `creep.transfer(target, resourceType)`：目标对象不能再接收更多资源。
+
+所以看到 `ERR_FULL` 时，先确认**到底是哪一个 API 返回的**，不要把所有容量问题都归到 `harvest()`。
+
+## 五、没有空 CARRY，并不等于没有 WORK
+
+这是理解 body part 时很重要的一点。
+
+`harvest()` 的能力来源是 `WORK`。`CARRY` 负责把资源装进 Creep 的 Store，但它不是 Source `harvest()` 返回 `OK` 的同一个能力判断。
+
+可以把它拆成两层：
+
+```text
+WORK：我有没有采集能力？
+Store：我现在还要不要继续把资源带在身上？
+```
+
+对最普通的“采集 → 运输”工作 Creep 来说，我们通常在 Store 满之前采集，在 Store 满后切换到运输。
+
+这样设计不是因为 `harvest()` 会返回 `ERR_FULL`，而是因为**你的工作状态机不应该继续制造无法装进 Store 的资源**。
+
+如果你还没有写工作状态机，可以继续看：[Creep working 状态怎么切换](/blog/screeps-creep-working-state)。
+
+## 六、MOVE：决定它能不能主动移动
+
+`MOVE` 提供主动移动能力。
+
+前面的教程使用过：
 
 ```javascript
 creep.moveTo(source);
 creep.moveTo(spawn);
 ```
 
-这些移动都需要 Creep 拥有可用的 `MOVE`。如果没有可用的 `MOVE`，Creep 就不能依靠自己正常前往目标。
+如果 Creep 已经没有可用的 `MOVE`，它就不能依靠自己的移动动作正常前往目标。
 
-当身体部件很多，而 `MOVE` 较少时，Creep 可能无法在每个 tick 都移动。携带资源和经过的地形也会影响移动表现。
+排查时可以先看：
 
-具体疲劳计算、道路与沼泽的区别，以及怎样搭配更高效率，会放到后面的专题文章中。遇到“代码调用了 `moveTo()`，但 Creep 仍然不动”时，可以继续查看[`moveTo()` 不移动的排查文章](/blog/screeps-moveto-not-moving)。
+```javascript
+const activeMove = creep.getActiveBodyparts(MOVE);
 
-## 五、最基础的工作 Creep
+if (activeMove === 0) {
+  console.log(`${creep.name}: no active MOVE`);
+}
+```
 
-前几篇中用于移动、采集和运输的基础 Creep，可以由下面三个部件组成：
+有 `MOVE` 也不等于一定每 tick 都能走一格。移动速度还会受到：
+
+- 非 `MOVE` 部件数量；
+- `CARRY` 当前是否装载资源；
+- road / plain / swamp 地形；
+- fatigue；
+- 路径是否存在；
+- 其他 Creep 或结构阻挡；
+- `moveTo()` 返回值
+
+等因素影响。
+
+这些属于下一层问题。遇到“有 MOVE 但还是不走”，继续看：
+
+- [`moveTo()` 调用了但 Creep 不移动](/blog/screeps-moveto-not-moving)
+- [MOVE、fatigue 和身体比例怎么理解](/blog/screeps-move-fatigue-body-ratio)
+
+## 七、最基础的工作 Creep 为什么常写成 `[WORK, CARRY, MOVE]`
+
+前几篇教程中的基础工作 Creep 可以写成：
 
 ```javascript
 [WORK, CARRY, MOVE]
 ```
 
-| 身体部件 | 最简单的作用 | 对应行为 |
-| --- | --- | --- |
-| `WORK` | 提供工作能力 | 从 Source 采集 Energy |
-| `CARRY` | 提供携带空间 | 把 Energy 装进 Store 并带回去 |
-| `MOVE` | 提供移动能力 | 在 Source 和 Spawn 之间移动 |
+它刚好把三个最基础的需求放在一起：
 
-> `WORK` 把 Energy 采出来 → `CARRY` 把 Energy 装起来 → `MOVE` 带着 Creep 返回 Spawn
+```text
+WORK  → 具备采集和工作能力
+CARRY → 有地方保存和运输资源
+MOVE  → 可以主动前往 Source 和 Spawn
+```
 
-方括号中的内容是一张身体部件清单。[下一篇](/blog/screeps-spawn-create-creep)学习创建 Creep 时，就会真正把这张清单交给 `spawnCreep()`。
+所以可以先把它理解成：
 
-## 六、观察自己的 Creep
+> `WORK` 负责做事，`CARRY` 负责装资源，`MOVE` 负责移动。
 
-现在可以回到游戏中，点击正在工作的 Creep，完成下面的检查：
+下一篇学习 [`spawnCreep()` 创建 Creep](/blog/screeps-spawn-create-creep) 时，就会真正把 body 数组交给 Spawn。
 
-1. 找到它的 `WORK`；
-2. 找到它的 `CARRY`；
-3. 找到它的 `MOVE`；
-4. 把每个部件和 Creep 当前的行为对应起来；
-5. 观察某个部件失效时，对应能力是否受到影响。
+## 八、一个很实用的只读诊断函数
 
-**为什么到达 Source 后不能采集？**
+刚开始写自动化时，不需要一上来就做复杂 body 分析。先做一个只读检查就够了：
 
-先检查 Creep 是否拥有可用的 `WORK`，再查看 `harvest()` 的返回结果。
+```javascript
+function inspectWorkerBody(creep) {
+  return {
+    name: creep.name,
+    work: creep.getActiveBodyparts(WORK),
+    carry: creep.getActiveBodyparts(CARRY),
+    move: creep.getActiveBodyparts(MOVE),
+    energy: creep.store.getUsedCapacity(RESOURCE_ENERGY),
+    freeEnergyCapacity:
+      creep.store.getFreeCapacity(RESOURCE_ENERGY),
+    fatigue: creep.fatigue
+  };
+}
 
-**为什么不能把 Energy 带回去？**
+console.log(inspectWorkerBody(creep));
+```
 
-检查 Creep 是否拥有可用的 `CARRY`，以及 Store 是否还有空余容量。
+这个函数只读当前状态，不会修改 Creep 行为。
 
-**为什么 Creep 移动得比较慢？**
+当 Creep 出现问题时，可以先回答四个问题：
 
-`MOVE` 较少时，Creep 可能无法每个 tick 都移动。携带资源和地形也会影响移动表现。
+1. 还有 active `WORK` 吗？
+2. Store 里现在有多少 Energy、还剩多少空间？
+3. 还有 active `MOVE` 吗？
+4. 真正调用的 API 返回了什么？
 
-## 这一篇需要记住什么
+很多新手问题到这里已经可以缩小范围。
 
-| 部件 | 新手只需要记住 |
+## 九、三个最常见的问题
+
+### 为什么 Creep 到了 Source 旁边还是不能采集？
+
+先看：
+
+```javascript
+creep.getActiveBodyparts(WORK)
+```
+
+再看 `harvest()` 的真实返回值。常见方向包括没有 active `WORK`、Source 暂时没有可采集 Energy、距离不对或目标不对。
+
+### 为什么 Store 满了，`harvest()` 没有返回 `ERR_FULL`？
+
+因为当前 `harvest()` API 本来就不使用 `ERR_FULL` 表示 Creep Store 已满。工作循环应该用：
+
+```javascript
+creep.store.getFreeCapacity(RESOURCE_ENERGY)
+```
+
+来决定是否继续采集。
+
+### 为什么有 MOVE 还是走得很慢？
+
+`MOVE` 数量只是一部分。身体重量、装载状态、地形和 fatigue 都会影响实际移动频率。这个问题应该进入专门的移动诊断，而不是继续增加 `moveTo()` 调用次数。
+
+## 十、这一篇真正要记住什么
+
+| 问题 | 正确的第一检查点 |
 | --- | --- |
-| `WORK` | 负责采集、建造、维修和升级 |
-| `CARRY` | 为 Store 提供资源容量 |
-| `MOVE` | 负责主动移动 |
-
-当你能够看着一只 Creep，说出它为什么能采集、为什么能携带、为什么能移动时，这篇文章的目标就已经完成了。
+| 能不能采集 | `creep.getActiveBodyparts(WORK)` + `harvest()` 返回值 |
+| 还能不能装 Energy | `creep.store.getFreeCapacity(RESOURCE_ENERGY)` |
+| 能不能主动移动 | `creep.getActiveBodyparts(MOVE)` + 移动返回值 / fatigue |
+| body 受伤后能力是否还在 | `getActiveBodyparts()`，不要只看出生时 body 数组 |
+| Store 满时怎样停止采集 | 用 Store 状态切换工作阶段，不等待 `harvest() === ERR_FULL` |
 
 ## 总结
 
-Creep 并不是天生拥有所有能力。创建时配置的身体部件决定了它可以执行哪些动作，而受损后仍然可用的部件决定了它当前还能完成什么。
+`WORK`、`CARRY` 和 `MOVE` 不是三个孤立的名词，而是工作 Creep 的三层基础能力：
 
-下一篇将正式学习：怎样让 Spawn 创建一只拥有 `WORK`、`CARRY` 和 `MOVE` 的新 Creep。
+- `WORK` 决定有没有工作能力；
+- `CARRY` 和 `creep.store` 决定能保存、携带多少资源；
+- `MOVE` 决定有没有主动移动能力。
+
+真正排查运行问题时，要看**当前仍然 active 的 body part、当前 Store 状态和真实 API 返回值**。
+
+最需要避免的误区是：**不要用 `harvest() === ERR_FULL` 判断采集阶段结束。** 当前官方 `harvest()` 没有这个返回码；Store 是否满应该直接由 Store API 判断。
+
+## 相关站内内容
+
+- [第一只 Creep 怎么采集 Energy](/blog/screeps-first-creep-harvest)
+- [Creep 怎么把 Energy 送到 Spawn](/blog/screeps-creep-deliver-energy)
+- [Creep working 状态怎么切换](/blog/screeps-creep-working-state)
+- [`moveTo()` 不移动怎么排查](/blog/screeps-moveto-not-moving)
+- [MOVE、fatigue 和身体比例](/blog/screeps-move-fatigue-body-ratio)
+- [`spawnCreep()` 怎么创建 Creep](/blog/screeps-spawn-create-creep)
 
 ## 官方参考资料
 
 1. [Screeps Documentation：Creeps 与身体部件](https://docs.screeps.com/creeps.html)
-2. [Screeps API Reference：Creep.harvest](https://docs.screeps.com/api/#Creep.harvest)
-3. [Screeps API Reference：Creep.build](https://docs.screeps.com/api/#Creep.build)
-4. [Screeps API Reference：Creep.repair](https://docs.screeps.com/api/#Creep.repair)
-5. [Screeps API Reference：Creep.upgradeController](https://docs.screeps.com/api/#Creep.upgradeController)
+2. [Screeps API Reference：Creep.getActiveBodyparts](https://docs.screeps.com/api/#Creep.getActiveBodyparts)
+3. [Screeps API Reference：Creep.harvest](https://docs.screeps.com/api/#Creep.harvest)
+4. [Screeps API Reference：Creep Store](https://docs.screeps.com/api/#Creep.store)
+5. [Screeps API Reference：Creep.move](https://docs.screeps.com/api/#Creep.move)
 
-> 本文是 Screeps 新手入门系列的第六篇，只介绍 `WORK`、`CARRY` 和 `MOVE` 三个基础部件。部件价格、疲劳公式、最优比例、排列顺序与战斗身体会放到进阶分类中。
+资料核对日期：2026-08-16。本文保持新手范围，只解释 `WORK`、`CARRY`、`MOVE`、active body part 与 Store 阶段判断；高级 fatigue 计算、最优身体比例、部件排列和战斗 body 会放在对应专题中。
