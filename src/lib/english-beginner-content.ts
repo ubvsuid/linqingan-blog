@@ -8,6 +8,7 @@ import { englishBeginnerSpawnCreepArticleOverrides } from "./english-beginner-sp
 import { englishBeginnerTickArticleOverrides } from "./english-beginner-tick-override";
 import { englishBeginnerUpgradeControllerArticleOverrides } from "./english-beginner-upgrade-controller-override";
 import { englishEditorialFourthArticleOverrides20260814 } from "./english-editorial-fourth-20260814";
+import { applyEnglishEditorialFifth20260816 } from "./english-editorial-fifth-20260816";
 import part1 from "@/lib/english-beginner-data/part-1";
 import part2 from "@/lib/english-beginner-data/part-2";
 import part3 from "@/lib/english-beginner-data/part-3";
@@ -129,10 +130,12 @@ const articleOverrides = {
 } as unknown as Record<string, Partial<EnglishBeginnerArticle>>;
 
 export const englishBeginnerArticles: EnglishBeginnerArticle[] =
-  parsedEnglishBeginnerArticles.map((article) => ({
-    ...article,
-    ...(articleOverrides[article.slug] ?? {}),
-  }));
+  parsedEnglishBeginnerArticles.map((article) =>
+    applyEnglishEditorialFifth20260816({
+      ...article,
+      ...(articleOverrides[article.slug] ?? {}),
+    }) as EnglishBeginnerArticle,
+  );
 
 export const englishBeginnerArticleBySlug = Object.fromEntries(
   englishBeginnerArticles.map((article) => [article.slug, article]),
