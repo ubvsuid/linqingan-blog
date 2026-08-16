@@ -102,7 +102,19 @@ export async function EnglishArticlePage({
   const related = resolvedArticleHref
     ? getRelatedEnglishArticles(resolvedArticleHref, 4)
     : [];
-  const verificationSummary = verification
+  const displayVerification =
+    resolvedArticleHref === "/en/blog/screeps-transfer-energy-to-spawn"
+    && verification.some((item) => item.term === "Live round-trip test")
+    && !verification.some((item) => item.term === "Live multi-tick test")
+      ? [
+          ...verification,
+          {
+            term: "Live multi-tick test",
+            value: "Pending — no live multi-tick Source-to-Spawn execution is claimed",
+          },
+        ]
+      : verification;
+  const verificationSummary = displayVerification
     .slice(0, 3)
     .map((item) => `${item.term}: ${item.value}`)
     .join(" · ");
@@ -216,7 +228,7 @@ export async function EnglishArticlePage({
                 <h2>Evidence and test status</h2>
               </div>
               <dl>
-                {verification.map((item) => (
+                {displayVerification.map((item) => (
                   <div key={item.term}>
                     <dt>{item.term}</dt>
                     <dd>{item.value}</dd>
