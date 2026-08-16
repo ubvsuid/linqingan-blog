@@ -180,13 +180,22 @@ for (const requiredText of [
   );
 }
 
-for (const stalePattern of [
-  "part.hits <= 0 || part.type === MOVE",
-  "part.hits > 0\n    && part.type !== MOVE\n    && part.type !== CARRY",
-]) {
+// The article intentionally quotes the old hits-based loop as a bad example.
+// Validate the recommended countOrdinaryWeightParts implementations instead
+// of globally forbidding that explanatory snippet.
+const ordinaryWeightFunctions = [
+  ...article.matchAll(
+    /function countOrdinaryWeightParts\([^)]*\) \{([\s\S]*?)\n\}/g,
+  ),
+].map((match) => match[1]);
+assert.ok(
+  ordinaryWeightFunctions.length >= 2,
+  "MOVE/fatigue article should contain both recommended ordinary-weight helpers",
+);
+for (const functionBody of ordinaryWeightFunctions) {
   assert.ok(
-    !article.includes(stalePattern),
-    `MOVE/fatigue article reintroduced stale destroyed-part weight logic: ${stalePattern}`,
+    !functionBody.includes("hits"),
+    "recommended countOrdinaryWeightParts must not filter ordinary weight by hits",
   );
 }
 
