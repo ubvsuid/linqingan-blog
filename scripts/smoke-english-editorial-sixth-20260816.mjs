@@ -21,7 +21,7 @@ const revised = [
   },
   {
     path: "/en/blog/screeps-pickup-dropped-energy",
-    chinesePath: "/blog/screeps-pickup-dropped-energy",
+    chinesePath: "/blog/screeps-creep-pickup-dropped-energy",
     title: "Screeps pickup(): Collect Dropped Energy Safely",
     indexTitle: "How to Make a Screeps Creep Pick Up Dropped Energy",
     headline: "How to Make a Screeps Creep Pick Up Dropped Energy",
