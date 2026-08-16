@@ -1,14 +1,26 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 
 const OK = 0;
 const WORK = "work";
 const CARRY = "carry";
 const MOVE = "move";
+const ATTACK = "attack";
+const RANGED_ATTACK = "ranged_attack";
+const HEAL = "heal";
+const TOUGH = "tough";
 const CLAIM = "claim";
+const STRUCTURE_SPAWN = "spawn";
+const STRUCTURE_EXTENSION = "extension";
 const BODYPART_COST = {
   work: 100,
   carry: 50,
   move: 50,
+  attack: 80,
+  ranged_attack: 150,
+  heal: 250,
+  tough: 10,
   claim: 600,
 };
 const CREEP_SPAWN_TIME = 3;
@@ -32,22 +44,109 @@ function getBodyCost(body) {
 
 record(
   "screeps-spawncreep-return-codes",
-  "覆盖Spawn、名称、身体、Energy、Memory与合法请求校验。",
+  "覆盖Spawn、名称、身体、memory any边界、默认/显式Energy预算、directions与合法请求校验。",
   () => {
-    const bodyParts = new Set([WORK, CARRY, MOVE, CLAIM]);
+    const bodyParts = new Set([
+      WORK,
+      CARRY,
+      MOVE,
+      ATTACK,
+      RANGED_ATTACK,
+      HEAL,
+      TOUGH,
+      CLAIM,
+    ]);
+
+    function isAllowedEnergyStructure(spawnRoomName, structure) {
+      return Boolean(
+        structure
+        && structure.my === true
+        && structure.roomName === spawnRoomName
+        && structure.active === true
+        && (
+          structure.structureType === STRUCTURE_SPAWN
+          || structure.structureType === STRUCTURE_EXTENSION
+        ),
+      );
+    }
+
+    function getEnergyBudget(input) {
+      if (input.energyStructures === undefined) {
+        return {
+          valid: true,
+          reason: "room-default-energy",
+          energyAvailable: input.roomEnergyAvailable,
+          energyStructures: undefined,
+        };
+      }
+
+      if (
+        !Array.isArray(input.energyStructures)
+        || input.energyStructures.length === 0
+      ) {
+        return {
+          valid: false,
+          reason: "energy-structures-invalid",
+        };
+      }
+
+      const unique = [];
+      const seen = new Set();
+      for (const structure of input.energyStructures) {
+        if (!isAllowedEnergyStructure(input.spawnRoomName, structure)) {
+          return {
+            valid: false,
+            reason: "energy-structure-not-allowed",
+          };
+        }
+        if (!seen.has(structure.id)) {
+          seen.add(structure.id);
+          unique.push(structure);
+        }
+      }
+
+      return {
+        valid: true,
+        reason: "explicit-energy-structures",
+        energyAvailable: unique.reduce(
+          (sum, structure) => sum + structure.energy,
+          0,
+        ),
+        energyStructures: unique,
+      };
+    }
+
+    function validateDirections(directions) {
+      if (directions === undefined) return "ready";
+      if (!Array.isArray(directions) || directions.length === 0) {
+        return "directions-invalid";
+      }
+      if (
+        directions.some(
+          (direction) => !Number.isInteger(direction)
+            || direction < 1
+            || direction > 8,
+        )
+      ) {
+        return "directions-invalid";
+      }
+      return "ready";
+    }
 
     function validate(input) {
       const {
         spawnExists,
+        spawnOwned,
         spawnBusy,
         body,
         name,
         nameExists,
-        memory,
-        energyAvailable,
+        roomEnergyAvailable,
+        directions,
       } = input;
 
       if (!spawnExists) return "spawn-missing";
+      if (!spawnOwned) return "spawn-not-owned";
       if (spawnBusy) return "spawn-busy";
       if (typeof name !== "string") return "name-not-string";
       if (name.length < 1 || name.length > 100) {
@@ -61,39 +160,216 @@ record(
       if (body.some((part) => !bodyParts.has(part))) {
         return "unknown-body-part";
       }
-      if (
-        memory !== undefined
-        && (!memory || typeof memory !== "object" || Array.isArray(memory))
-      ) {
-        return "memory-invalid";
+      if (validateDirections(directions) !== "ready") {
+        return "directions-invalid";
       }
-      if (energyAvailable < getBodyCost(body)) {
+
+      // opts.memory is documented as `any`; this generic API validator does
+      // not reject arrays, primitives, or booleans merely for their shape.
+      void input.memory;
+
+      const energyBudget = getEnergyBudget({
+        roomEnergyAvailable,
+        spawnRoomName: input.spawnRoomName,
+        energyStructures: input.energyStructures,
+      });
+      if (!energyBudget.valid) return energyBudget.reason;
+      if (energyBudget.energyAvailable < getBodyCost(body)) {
         return "energy-not-enough";
       }
       return "ready";
     }
 
+    function buildSpawnOptions(input, dryRun) {
+      const options = { dryRun };
+      if (input.memory !== undefined) options.memory = input.memory;
+      if (input.energyStructures !== undefined) {
+        options.energyStructures = input.energyStructures;
+      }
+      if (input.directions !== undefined) {
+        options.directions = input.directions;
+      }
+      return options;
+    }
+
+    const spawnStructure = {
+      id: "spawn-1",
+      my: true,
+      roomName: "W1N1",
+      active: true,
+      structureType: STRUCTURE_SPAWN,
+      energy: 100,
+    };
+    const extensionA = {
+      id: "extension-a",
+      my: true,
+      roomName: "W1N1",
+      active: true,
+      structureType: STRUCTURE_EXTENSION,
+      energy: 100,
+    };
+    const extensionB = {
+      id: "extension-b",
+      my: true,
+      roomName: "W1N1",
+      active: true,
+      structureType: STRUCTURE_EXTENSION,
+      energy: 50,
+    };
+
     const base = {
       spawnExists: true,
+      spawnOwned: true,
       spawnBusy: false,
+      spawnRoomName: "W1N1",
       body: [WORK, CARRY, MOVE],
       name: "Worker1",
       nameExists: false,
       memory: { role: "worker" },
-      energyAvailable: 300,
+      roomEnergyAvailable: 300,
+      energyStructures: undefined,
+      directions: [1, 3, 5, 7],
     };
 
     assert.equal(validate({ ...base, spawnExists: false }), "spawn-missing");
+    assert.equal(validate({ ...base, spawnOwned: false }), "spawn-not-owned");
     assert.equal(validate({ ...base, spawnBusy: true }), "spawn-busy");
+    assert.equal(validate({ ...base, name: 42 }), "name-not-string");
     assert.equal(validate({ ...base, name: "" }), "name-length-invalid");
     assert.equal(validate({ ...base, name: "a".repeat(101) }), "name-length-invalid");
     assert.equal(validate({ ...base, nameExists: true }), "name-exists");
     assert.equal(validate({ ...base, body: [] }), "body-length-invalid");
     assert.equal(validate({ ...base, body: Array(51).fill(MOVE) }), "body-length-invalid");
     assert.equal(validate({ ...base, body: ["unknown"] }), "unknown-body-part");
-    assert.equal(validate({ ...base, memory: [] }), "memory-invalid");
-    assert.equal(validate({ ...base, energyAvailable: 199 }), "energy-not-enough");
+    assert.equal(validate({ ...base, body: [ATTACK], roomEnergyAvailable: 79 }), "energy-not-enough");
+    assert.equal(validate({ ...base, body: [ATTACK], roomEnergyAvailable: 80 }), "ready");
+    assert.equal(validate({ ...base, memory: [] }), "ready");
+    assert.equal(validate({ ...base, memory: "worker" }), "ready");
+    assert.equal(validate({ ...base, memory: 123 }), "ready");
+    assert.equal(validate({ ...base, memory: true }), "ready");
+    assert.equal(validate({ ...base, memory: false }), "ready");
+    assert.equal(validate({ ...base, roomEnergyAvailable: 199 }), "energy-not-enough");
+    assert.equal(validate({ ...base, directions: [] }), "directions-invalid");
+    assert.equal(validate({ ...base, directions: [0] }), "directions-invalid");
+    assert.equal(validate({ ...base, directions: [9] }), "directions-invalid");
+    assert.equal(validate({ ...base, directions: [1.5] }), "directions-invalid");
+
+    assert.equal(
+      validate({
+        ...base,
+        roomEnergyAvailable: 800,
+        energyStructures: [spawnStructure],
+      }),
+      "energy-not-enough",
+    );
+    assert.equal(
+      validate({
+        ...base,
+        roomEnergyAvailable: 0,
+        energyStructures: [spawnStructure, extensionA],
+      }),
+      "ready",
+    );
+    assert.equal(
+      validate({
+        ...base,
+        roomEnergyAvailable: 0,
+        energyStructures: [
+          spawnStructure,
+          extensionA,
+          extensionA,
+          extensionB,
+        ],
+      }),
+      "ready",
+    );
+    assert.equal(
+      getEnergyBudget({
+        roomEnergyAvailable: 999,
+        spawnRoomName: "W1N1",
+        energyStructures: [
+          spawnStructure,
+          extensionA,
+          extensionA,
+          extensionB,
+        ],
+      }).energyAvailable,
+      250,
+    );
+    assert.equal(
+      validate({ ...base, energyStructures: [] }),
+      "energy-structures-invalid",
+    );
+    assert.equal(
+      validate({
+        ...base,
+        energyStructures: [{ ...extensionA, my: false }],
+      }),
+      "energy-structure-not-allowed",
+    );
+    assert.equal(
+      validate({
+        ...base,
+        energyStructures: [{ ...extensionA, roomName: "W2N2" }],
+      }),
+      "energy-structure-not-allowed",
+    );
+    assert.equal(
+      validate({
+        ...base,
+        energyStructures: [{ ...extensionA, active: false }],
+      }),
+      "energy-structure-not-allowed",
+    );
+    assert.equal(
+      validate({
+        ...base,
+        energyStructures: [{ ...extensionA, structureType: "tower" }],
+      }),
+      "energy-structure-not-allowed",
+    );
     assert.equal(validate(base), "ready");
+
+    const dryRunOptions = buildSpawnOptions({
+      memory: ["worker"],
+      energyStructures: [spawnStructure, extensionA],
+      directions: [1, 3],
+    }, true);
+    const actualOptions = buildSpawnOptions({
+      memory: ["worker"],
+      energyStructures: [spawnStructure, extensionA],
+      directions: [1, 3],
+    }, false);
+    assert.deepEqual(
+      { ...dryRunOptions, dryRun: false },
+      actualOptions,
+    );
+
+    const article = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "content",
+        "posts",
+        "screeps-spawncreep-return-codes.md",
+      ),
+      "utf8",
+    );
+    for (const text of [
+      "当前官方 API 文档把它标记为：",
+      "opts.memory",
+      "energyStructures",
+      "structure.isActive()",
+      "energyCheck.energyAvailable",
+      "ERR_RCL_NOT_ENOUGH",
+      "consoleTested: false",
+      "liveTested: false",
+      'checkedAt: "2026-08-16"',
+    ]) {
+      assert.ok(
+        article.includes(text),
+        `spawnCreep article missing corrected boundary: ${text}`,
+      );
+    }
   },
 );
 
