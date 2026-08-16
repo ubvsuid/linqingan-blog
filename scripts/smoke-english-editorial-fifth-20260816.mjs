@@ -23,6 +23,7 @@ const revised = [
     path: "/en/blog/screeps-roomposition-distance",
     chinesePath: "/blog/screeps-roomposition-distance",
     title: "Screeps RoomPosition Distance: Range vs Path",
+    indexTitle: "Which Screeps RoomPosition Distance Method Should You Use?",
     headline: "Which Screeps RoomPosition Distance Method Should You Use?",
     signals: [
       "Cross-room RoomPosition methods do not all behave the same way",
@@ -122,8 +123,9 @@ if (indexResponse.status !== 200) {
   failures.push(`/en/blog-index.json: expected 200, received ${indexResponse.status}`);
 } else {
   for (const article of revised) {
-    if (!indexBody.includes(article.title)) {
-      failures.push(`/en/blog-index.json: missing “${article.title}”`);
+    const expectedIndexTitle = article.indexTitle ?? article.title;
+    if (!indexBody.includes(expectedIndexTitle)) {
+      failures.push(`/en/blog-index.json: missing “${expectedIndexTitle}”`);
     }
   }
 }
