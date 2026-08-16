@@ -179,16 +179,11 @@ function improveMapRoute(article: EnglishBeginnerArticle): EnglishBeginnerArticl
 
   articleHtml = replaceRequired(
     articleHtml,
-    `<p>Lower values are preferred. <code>Infinity</code> rejects the room completely. Values such as 1 and 2.5 are policy weights, not official recommendations and not travel time in ticks.</p>`,
-    `<p>Lower positive values are preferred, and <code>Infinity</code> rejects the room completely. There is an important current-engine normalization boundary: the callback result is converted with <code>Number(value) || 1</code>. Therefore <code>0</code>, <code>false</code>, <code>null</code>, <code>undefined</code>, an empty string, and <code>NaN</code> all become the default entry cost <code>1</code>; they are not a zero-cost route and they do not block a room. Numeric strings are coerced. Negative finite values are not repaired by that expression, so do not feed unvalidated negative policy values into the route search. Values such as 1 and 2.5 remain project policy weights, not travel time in ticks.</p>`,
-    article.slug,
-    "routeCallback normalization paragraph",
-  );
+    `<p>The values are relative policy weights, not travel ticks. A large finite cost keeps a room available as a last resort. <code>Infinity</code> removes it completely. Missing or stale intel is uncertainty, not proof of safety.</p>`,
+    `<p>The values are relative policy weights, not travel ticks. A large finite cost keeps a room available as a last resort. <code>Infinity</code> removes it completely. Missing or stale intel is uncertainty, not proof of safety.</p>
+<p>The current official engine normalizes every non-<code>Infinity</code> callback result with <code>Number(value) || 1</code>. That makes falsy or non-numeric values a subtle trap: <code>0</code>, <code>false</code>, <code>null</code>, <code>undefined</code>, an empty string, and <code>NaN</code> all become room-entry cost <code>1</code>. They are not zero-cost preferences and they do not block the room.</p>
 
-  articleHtml = replaceRequired(
-    articleHtml,
-    `<h2 id="highways">Classify highway rooms</h2>`,
-    `<h2 id="callback-normalization">Validate routeCallback policy before the engine sees it</h2>
+<h2 id="callback-normalization">Validate routeCallback policy before the engine sees it</h2>
 <p>Do not overload callback falsiness with business meaning. Normalize your own configuration into either a positive finite cost or the explicit hard-block sentinel <code>Infinity</code>.</p>
 <pre><code class="language-javascript">function normalizeRoutePolicyCost(value) {
   if (value === Infinity) {
@@ -213,37 +208,25 @@ function getConfiguredRouteCost(roomName) {
     Memory.routeCosts?.[roomName]
   );
 }</code></pre>
-<p>The helper's <code>cost <= 0 → 1</code> rule is deliberate project validation. The current official engine itself uses <code>Number(callbackResult) || 1</code>, which specifically explains why a callback returning <code>0</code> silently behaves like cost 1. Keeping validation in your own code makes that fallback visible instead of accidental.</p>
+<p>The helper's <code>cost <= 0 → 1</code> rule is deliberate project validation. The engine expression itself does not repair negative finite values, so accepting only positive finite numbers or <code>Infinity</code> keeps configuration semantics explicit. Numeric strings such as <code>"2.5"</code> are coerced by the engine, but storing numeric policy as numbers is clearer.</p>
 <div class="table-scroll"><table>
 <thead><tr><th>Callback return</th><th>Current engine entry cost</th><th>Recommended interpretation</th></tr></thead>
 <tbody>
 <tr><td><code>Infinity</code></td><td>Room skipped</td><td>Explicit hard block</td></tr>
 <tr><td><code>0</code>, <code>false</code>, <code>null</code>, <code>undefined</code>, <code>NaN</code></td><td><code>1</code></td><td>Do not use as block or zero-cost preference</td></tr>
-<tr><td><code>"2.5"</code></td><td><code>2.5</code></td><td>Works through numeric coercion, but store numeric policy deliberately</td></tr>
+<tr><td><code>"2.5"</code></td><td><code>2.5</code></td><td>Works through numeric coercion; prefer numeric configuration</td></tr>
 <tr><td>positive finite number</td><td>that number</td><td>Normal room-entry policy cost</td></tr>
-</tbody></table></div>
-
-<h2 id="highways">Classify highway rooms</h2>`,
+</tbody></table></div>`,
     article.slug,
-    "routeCallback normalization section insertion",
+    "final route-policy paragraph",
   );
 
   articleHtml = replaceRequired(
     articleHtml,
-    `<p>Never call <code>[0].exit</code> before checking that the result is an array with a first step. The same-room case is successful completion, not a routing error.</p>`,
-    `<p>Never call <code>[0].exit</code> before checking that the result is an array with a first step. The same-room case is successful completion for <code>findRoute()</code>: the current engine returns an empty array. Keep that distinct from <code>Game.map.findExit()</code>, which calls <code>findRoute()</code> internally and returns <code>ERR_INVALID_ARGS</code> when the resulting route has no first step. Invalid room names return <code>ERR_NO_PATH</code> from <code>findRoute()</code>.</p>`,
+    `<p>Do not read <code>route[0]</code> until the result is confirmed to be an array. An empty array is correct when the current room already equals the target room.</p>`,
+    `<p>Do not read <code>route[0]</code> until the result is confirmed to be an array. An empty array is correct when the current room already equals the target room. That boundary is specific to <code>findRoute()</code>. <code>Game.map.findExit()</code>, which calls <code>findRoute()</code> internally, returns <code>ERR_INVALID_ARGS</code> when there is no first route step; invalid room names return <code>ERR_NO_PATH</code> from <code>findRoute()</code>.</p>`,
     article.slug,
-    "route return-value paragraph",
-  );
-
-  articleHtml = replaceRequired(
-    articleHtml,
-    `<li>Use <code>Infinity</code> only for hard rejection.</li>`,
-    `<li>Use <code>Infinity</code> only for hard rejection.</li>
-<li>Do not return <code>0</code>, <code>false</code>, <code>null</code>, or <code>NaN</code> expecting a special route meaning; the current engine falls those values back to cost 1.</li>
-<li>Validate configured route costs as positive finite numbers or <code>Infinity</code> before calling <code>findRoute()</code>.</li>`,
-    article.slug,
-    "route debugging checklist",
+    "final route array paragraph",
   );
 
   return {
@@ -256,7 +239,7 @@ function getConfiguredRouteCost(roomName) {
       ["Screeps Console test", "Pending — no live routeCallback return-value transcript is claimed"],
       ["Live cross-room movement test", "Pending — no real-shard route traversal is claimed"],
     ]),
-    toc: insertTocAfter(article.toc, "route-cost", [
+    toc: insertTocAfter(article.toc, "route-policy", [
       "callback-normalization",
       "Normalize callback costs",
     ]),
