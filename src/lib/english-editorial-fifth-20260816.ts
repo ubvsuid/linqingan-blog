@@ -77,22 +77,6 @@ function improveBodyParts(article: EnglishBeginnerArticle): EnglishBeginnerArtic
 
   return {
     ...article,
-    title: "Screeps Creep Body Parts: Active WORK, CARRY, and MOVE",
-    headline: "Diagnose Screeps Creep Abilities Without Mixing Body Parts and Store Capacity",
-    description:
-      "Inspect active WORK, CARRY, and MOVE parts, then separate body capability from Store capacity, fatigue, damage, target state, and the real action return code.",
-    keywords: [
-      "Screeps Creep body parts",
-      "Screeps active body parts",
-      "Creep.getActiveBodyparts()",
-      "Screeps harvest ERR_NO_BODYPART",
-      "Screeps Source harvest full Store",
-      "creep.body",
-      "creep.fatigue",
-    ],
-    primaryKeyword: "Screeps Creep body parts",
-    searchIntent:
-      "Diagnose whether a Creep lacks an active ability or is blocked by Store, range, fatigue, target state, or another runtime condition",
     finalScore: 99,
     verification: replaceLastVerified(article.verification, [
       ["Official engine source", "Checked August 16, 2026 — current Creep.harvest() Source submission path has no Store-capacity ERR_FULL preflight"],
@@ -174,21 +158,6 @@ function improveRoomPosition(article: EnglishBeginnerArticle): EnglishBeginnerAr
 
   return {
     ...article,
-    title: "Screeps RoomPosition Distance: Range, Direction, and Path",
-    headline: "Choose the Correct Screeps RoomPosition Distance or Direction Method",
-    description:
-      "Separate same-room range, cross-room Infinity, direction, room distance, and pathfinding so RoomPosition diagnostics do not confuse geometry with reachability.",
-    keywords: [
-      "Screeps RoomPosition distance",
-      "RoomPosition getRangeTo Infinity",
-      "Screeps inRangeTo different room",
-      "Screeps getDirectionTo cross room",
-      "getRangeTo vs findClosestByPath",
-      "Screeps room linear distance",
-    ],
-    primaryKeyword: "Screeps RoomPosition distance",
-    searchIntent:
-      "Choose the exact same-room range, cross-room direction, room-distance, filtering, or pathfinding method for a Screeps position question",
     finalScore: 99,
     verification: replaceLastVerified(article.verification, [
       ["Official engine source", "Checked August 16, 2026 — getRangeTo(), inRangeTo(), isNearTo(), isEqualTo(), getDirectionTo(), findInRange(), and findClosestByRange()"],
@@ -279,21 +248,6 @@ function getConfiguredRouteCost(roomName) {
 
   return {
     ...article,
-    title: "Screeps Game.map.findRoute(): Costs, Callbacks, and Cross-Room Routing",
-    headline: "Build a Screeps Cross-Room Route Without routeCallback Cost Traps",
-    description:
-      "Use Game.map.findRoute() as a room-level plan, normalize routeCallback costs, distinguish Infinity from falsy fallback values, validate exits, and keep routing separate from tile reachability.",
-    keywords: [
-      "Screeps Game.map.findRoute",
-      "Screeps routeCallback cost",
-      "routeCallback Infinity Screeps",
-      "Screeps routeCallback zero",
-      "Screeps cross room movement",
-      "Game.map.findExit ERR_INVALID_ARGS",
-    ],
-    primaryKeyword: "Screeps Game.map.findRoute",
-    searchIntent:
-      "Build and debug a room-level route with exact return values, validated callback costs, explicit hard blocks, and separate tile-level movement",
     finalScore: 99,
     verification: replaceLastVerified(article.verification, [
       ["Official engine source", "Checked August 16, 2026 — Game.map.findRoute(), findExit(), describeExits(), and routeCallback cost handling"],
