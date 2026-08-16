@@ -88,7 +88,7 @@ for (const requiredText of [
   "liveTested: false",
   'testedAt: "2026-08-11"',
   'checkedAt: "2026-08-16"',
-  "源码确认，未新增 Console 证据",
+  "来自当前官方 engine 源码核对，不冒充新的 Console 实测",
 ]) {
   assert.ok(
     article.includes(requiredText),
@@ -99,22 +99,26 @@ for (const requiredText of [
 for (const staleText of [
   "创建完成后，可以通过 `Game.creeps['Worker1']` 找到它",
   "真正完成以后，再在后续 tick 重新读取 `Game.creeps[name]`",
-  "必须等整个生成过程结束以后，`Worker1` 才会出现在 `Game.creeps`。",
 ]) {
-  // The third phrase may appear only inside the explicitly labeled old-model
-  // explanation. The first two must not remain as recommended guidance.
-  if (staleText.startsWith("必须等整个生成过程")) continue;
   assert.ok(
     !article.includes(staleText),
     `spawn-create timing article reintroduced stale completion timing: ${staleText}`,
   );
 }
 
+// The stale model is allowed only as an explicitly introduced misconception
+// that the article immediately corrects.
 assert.ok(
   article.includes(
     "必须等整个生成过程结束以后，`Worker1` 才会出现在 `Game.creeps`。",
   ),
   "article should preserve the stale model only as an explicit correction example",
+);
+assert.ok(
+  article.indexOf(
+    "必须等整个生成过程结束以后，`Worker1` 才会出现在 `Game.creeps`。",
+  ) < article.indexOf("当前官方 engine 不是这样处理的"),
+  "stale timing model must appear before its explicit correction",
 );
 
 console.log(
