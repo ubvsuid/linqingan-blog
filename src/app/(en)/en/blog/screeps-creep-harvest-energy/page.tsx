@@ -8,6 +8,7 @@ import {
   applyEnglishEditorialSeventh20260817,
   getEnglishEditorialSeventhUpdatedAt20260817,
 } from "@/lib/english-editorial-seventh-20260817";
+import { normalizeEnglishEditorialSeventhHtml20260817 } from "@/lib/english-editorial-seventh-html-20260817";
 import { siteConfig } from "@/lib/site";
 
 const slug = "screeps-creep-harvest-energy";
@@ -75,7 +76,8 @@ function requireArticle(): EnglishBeginnerArticle {
 }
 
 const baseArticle = requireArticle();
-const article = applyEnglishEditorialSeventh20260817(baseArticle) ?? baseArticle;
+const seventhArticle = applyEnglishEditorialSeventh20260817(baseArticle) ?? baseArticle;
+const article = normalizeEnglishEditorialSeventhHtml20260817(seventhArticle) ?? seventhArticle;
 const modifiedAt = getEnglishEditorialSeventhUpdatedAt20260817(slug) ?? "2026-08-14";
 const articleUrl = `${siteConfig.url}${article.path}`;
 const socialImage = `${siteConfig.url}/opengraph-image`;
