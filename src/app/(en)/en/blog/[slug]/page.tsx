@@ -14,6 +14,7 @@ import {
   applyEnglishEditorialFifth20260816,
   getEnglishEditorialFifthUpdatedAt20260816,
 } from "@/lib/english-editorial-fifth-20260816";
+import { applyEnglishEditorialNinthFinal20260817 } from "@/lib/english-editorial-ninth-final-20260817";
 import {
   applyEnglishEditorialNinth20260817,
   getEnglishEditorialNinthUpdatedAt20260817,
@@ -140,8 +141,9 @@ function getDynamicEnglishArticle(slug: string) {
   const seventhArticle = applyEnglishEditorialSeventh20260817(sixthArticle);
   const eighthArticle = applyEnglishEditorialEighth20260817(seventhArticle);
   const normalizedArticle = normalizeEnglishEditorialSeventhHtml20260817(eighthArticle);
+  const ninthArticle = applyEnglishEditorialNinth20260817(normalizedArticle);
 
-  return applyEnglishEditorialNinth20260817(normalizedArticle);
+  return applyEnglishEditorialNinthFinal20260817(ninthArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
