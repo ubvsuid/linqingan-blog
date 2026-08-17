@@ -11,8 +11,8 @@ const description =
   "Make one Creep transfer Energy to a named Spawn, preserve delivery mode across ticks, and complete its first Source-to-Spawn round trip.";
 const publishedAt = "2026-07-24";
 const publishedLabel = "July 24, 2026";
-const modifiedAt = "2026-07-27";
-const modifiedLabel = "July 27, 2026";
+const modifiedAt = "2026-08-16";
+const modifiedLabel = "August 16, 2026";
 const articleUrl = `${siteConfig.url}${path}`;
 
 export const metadata: Metadata = {
@@ -122,6 +122,10 @@ module.exports.loop = function () {
 <p>The action rule matches the harvesting lesson:</p>
 <p><strong>try the work action → move only when it returns <code>ERR_NOT_IN_RANGE</code> → retry on a later tick.</strong></p>
 
+<h2 id="transfer-amount-boundary">Omitted transfer amount is convenient, but it is still a snapshot</h2>
+<p>In the checked engine, omitting <code>amount</code> makes <code>transfer()</code> choose the smaller of the Creep's currently carried resource and the target's current free capacity. An explicit numeric <code>0</code> follows the same falsy/default path rather than meaning “transfer nothing”; a negative amount returns <code>ERR_INVALID_ARGS</code>. Treat zero semantics as an implementation boundary and validate your own wrapper explicitly when zero must be a no-op.</p>
+<p>Even an explicit positive amount is a requested amount, not final proof. The transfer processor rechecks the Creep's Store and target capacity. If another same-tick action fills the Spawn before this intent is processed, the actual transfer can be truncated to the remaining capacity. Verify the later Stores or the exact transfer event before reporting an exact delivered amount.</p>
+
 <h2 id="delivery-state">Keep delivery mode until the Creep is empty</h2>
 <p>A rule based only on free capacity is not enough. After a partial unload, the Creep has free capacity again and could turn back toward the Source while still carrying Energy.</p>
 <p>Store one boolean decision in <code>creep.memory.delivering</code>:</p>
@@ -143,6 +147,22 @@ if (usedEnergy === 0) {
 <li>partially full Store → preserve the previous mode.</li>
 </ul>
 <p>That final rule is the important one. A worker that has started delivering remains in delivery mode until its Store reaches zero.</p>
+
+<h2 id="source-overflow">A full-only phase switch can waste the last Source harvest</h2>
+<p>The generic empty/full hysteresis above is useful for stable task state, but Source harvesting has an additional capacity boundary. The current Source <code>harvest()</code> submission path does not return <code>ERR_FULL</code> when the Store lacks enough room for the next harvest batch. During processing, harvested overflow beyond Store capacity is dropped on the ground.</p>
+<p>For this beginner Source-to-Spawn loop, the following is a conservative <strong>project policy</strong>, not an extra Screeps API requirement: begin delivery before harvesting when the remaining Energy capacity is smaller than one full active-WORK harvest batch.</p>
+<pre><code>const harvestBatch =
+  creep.getActiveBodyparts(WORK) * HARVEST_POWER;
+
+if (
+  !creep.memory.delivering
+  && usedEnergy > 0
+  && freeEnergyCapacity > 0
+  && freeEnergyCapacity &lt; harvestBatch
+) {
+  creep.memory.delivering = true;
+}</code></pre>
+<p>This may leave a small amount of unused Creep capacity, but it prevents this simple loop from deliberately submitting a Source harvest that can overflow under the checked engine. More advanced logistics can use a different policy when dropped overflow is intentional.</p>
 
 <h2 id="complete-loop">Run the complete harvesting-and-delivery loop</h2>
 <p>The following version checks both named objects, preserves the delivery state, waits when the Spawn has no free Energy capacity, and records temporary evidence every five ticks.</p>
@@ -182,6 +202,18 @@ module.exports.loop = function () {
   if (usedEnergy === 0) {
     creep.memory.delivering = false;
   } else if (freeEnergyCapacity === 0) {
+    creep.memory.delivering = true;
+  }
+
+  const harvestBatch =
+    creep.getActiveBodyparts(WORK) * HARVEST_POWER;
+
+  if (
+    !creep.memory.delivering
+    && usedEnergy > 0
+    && freeEnergyCapacity > 0
+    && freeEnergyCapacity &lt; harvestBatch
+  ) {
     creep.memory.delivering = true;
   }
 
@@ -253,12 +285,18 @@ module.exports.loop = function () {
     }));
   }
 
+  const expectedActionResult =
+    actionResult === OK
+    || actionResult === ERR_NOT_IN_RANGE
+    || actionResult === ERR_NOT_ENOUGH_RESOURCES
+    || (
+      action === 'transfer'
+      && actionResult === ERR_FULL
+    );
+
   if (
-    actionResult !== null &&
-    actionResult !== OK &&
-    actionResult !== ERR_NOT_IN_RANGE &&
-    actionResult !== ERR_FULL &&
-    actionResult !== ERR_NOT_ENOUGH_RESOURCES
+    actionResult !== null
+    && !expectedActionResult
   ) {
     console.log(
       CREEP_NAME +
@@ -283,7 +321,7 @@ module.exports.loop = function () {
     );
   }
 };</code></pre>
-<p>The explicit <code>amount</code> is the smaller of the Creep's carried Energy and the Spawn's free Energy capacity. This makes a partial unload visible instead of hiding it inside the action call.</p>
+<p>The explicit <code>amount</code> is the smaller of the start-of-tick carried Energy and the Spawn's observed free Energy capacity. That makes the requested partial unload visible, but it is still a snapshot. The processor can move less if the Spawn's remaining capacity changes before this transfer intent is resolved, so later Store or event evidence is required for the actual delivered amount.</p>
 
 <h2 id="tick-cycle">What the round trip looks like across ticks</h2>
 <p>The exact route and tick numbers depend on the room. The expected state sequence is:</p>
@@ -291,22 +329,22 @@ module.exports.loop = function () {
 <thead><tr><th>Start-of-tick state</th><th>Mode</th><th>Expected result</th></tr></thead>
 <tbody>
 <tr><td>The Creep is not full.</td><td>Harvest</td><td>It approaches the Source and collects Energy.</td></tr>
-<tr><td>The Store becomes full.</td><td>Deliver</td><td><code>creep.memory.delivering</code> becomes <code>true</code>.</td></tr>
+<tr><td>The Store reaches the tutorial's delivery boundary.</td><td>Deliver</td><td><code>creep.memory.delivering</code> becomes <code>true</code> at full capacity or at the conservative no-overflow threshold.</td></tr>
 <tr><td>The Spawn is out of range.</td><td>Deliver</td><td><code>transfer()</code> returns <code>ERR_NOT_IN_RANGE</code> and movement is scheduled.</td></tr>
 <tr><td>The Creep is beside the Spawn.</td><td>Deliver</td><td><code>transfer()</code> returns <code>OK</code>; verify the Store on a later tick.</td></tr>
 <tr><td>Some Energy remains after unloading.</td><td>Deliver</td><td>The previous delivery state is preserved.</td></tr>
 <tr><td>The Creep begins a tick with zero Energy.</td><td>Harvest</td><td>The state switches to <code>false</code> and the Creep returns to the Source.</td></tr>
 </tbody>
 </table></div>
-<p>The values read near the start of the loop describe the current tick's state. An action returning <code>OK</code> is scheduled successfully, but the resulting Store change should be verified on a later tick.</p>
+<p>The values read near the start of the loop describe the current tick's state. An action returning <code>OK</code> means the intent was accepted, but the resulting Store change and exact amount should be verified after processing.</p>
 
 <h2 id="common-results">Four transfer results to understand first</h2>
 <div class="table-scroll"><table>
 <thead><tr><th>Return code</th><th>Beginner meaning</th><th>Response in this lesson</th></tr></thead>
 <tbody>
-<tr><td><code>OK</code></td><td>The transfer was scheduled.</td><td>Inspect both Stores on a later tick.</td></tr>
+<tr><td><code>OK</code></td><td>The transfer intent was accepted.</td><td>Inspect both Stores later; do not infer the exact processed amount from <code>OK</code> alone.</td></tr>
 <tr><td><code>ERR_NOT_IN_RANGE</code></td><td>The Creep is not adjacent to the Spawn.</td><td>Call <code>moveTo(spawn)</code>.</td></tr>
-<tr><td><code>ERR_FULL</code></td><td>The target cannot receive more of the resource.</td><td>Check the Spawn's free Energy capacity.</td></tr>
+<tr><td><code>ERR_FULL</code></td><td>The transfer target cannot receive the requested resource amount under the current submission check.</td><td>Check the Spawn's free Energy capacity. This row belongs to <code>transfer()</code>, not Source <code>harvest()</code>.</td></tr>
 <tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>The Creep does not carry the requested amount.</td><td>Re-read its Store and transfer amount.</td></tr>
 </tbody>
 </table></div>
@@ -316,8 +354,8 @@ module.exports.loop = function () {
 <h3>The Creep or Spawn is not found</h3>
 <p>Run <code>Object.keys(Game.creeps)</code> and <code>Object.keys(Game.spawns)</code> again. Replace both tutorial names exactly, including capitalization.</p>
 
-<h3>The full Creep never leaves the Source</h3>
-<p>Log <code>usedEnergy</code>, <code>freeEnergyCapacity</code>, and <code>creep.memory.delivering</code>. The state should become <code>true</code> only when free Energy capacity reaches zero.</p>
+<h3>The Creep keeps harvesting when almost full</h3>
+<p>Log <code>usedEnergy</code>, <code>freeEnergyCapacity</code>, <code>harvestBatch</code>, and <code>creep.memory.delivering</code>. The conservative tutorial guard switches to delivery when the remaining capacity is smaller than one active-WORK Source harvest batch.</p>
 
 <h3>The Creep waits near the Spawn or returns too early</h3>
 <p>First inspect the Spawn's free capacity and <code>actionResult</code>. A full Spawn is a capacity condition, not necessarily a movement failure. When the Spawn accepts only part of the load, do not overwrite delivery mode merely because the Creep has free capacity again.</p>
@@ -327,6 +365,8 @@ module.exports.loop = function () {
 <ul>
 <li>replace both example names with real objects;</li>
 <li>explain why <code>transfer()</code> moves Energy from the Creep to the Spawn;</li>
+<li>distinguish requested transfer amount from the amount actually processed;</li>
+<li>explain why Source harvesting can drop overflow when the Creep is nearly full;</li>
 <li>observe <code>ERR_NOT_IN_RANGE</code> while the Creep approaches the Spawn;</li>
 <li>observe <code>OK</code> when the transfer can be scheduled;</li>
 <li>explain why the delivery state is preserved while the Store is partially full;</li>
@@ -355,7 +395,9 @@ const toc: Array<[string, string]> = [
   ["Worker requirements", "requirements"],
   ["Copy real names", "copy-names"],
   ["Minimal transfer code", "minimal-transfer"],
+  ["Transfer amount boundary", "transfer-amount-boundary"],
   ["Delivery state", "delivery-state"],
+  ["Avoid Source overflow", "source-overflow"],
   ["Complete Energy loop", "complete-loop"],
   ["Expected tick cycle", "tick-cycle"],
   ["Common return codes", "common-results"],
@@ -403,18 +445,22 @@ export default function TransferEnergyPage() {
       category="GETTING STARTED · BEGINNER LESSON 5 OF 12"
       publishedAt={publishedAt}
       publishedLabel={publishedLabel}
-      readingTime="10 min read"
+      modifiedAt={modifiedAt}
+      readingTime="12 min read"
       tags={["Creeps", "Energy", "Spawn"]}
       verification={[
         { term: "Chinese source", value: "Read in full" },
         { term: "Official documentation", value: "Checked" },
-        { term: "API and constants", value: "Checked" },
-        { term: "JavaScript syntax", value: "Checked" },
-        { term: "Offline state logic", value: "Passed" },
-        { term: "Screeps Console", value: "Pending — replace both example names with live objects" },
-        { term: "Live multi-tick test", value: "Pending — no live round-trip result is claimed" },
-        { term: "Last verified", value: modifiedLabel },
-        { term: "Publication status", value: "Ready" },
+        { term: "Official engine source", value: "Checked August 16, 2026 — Creep.transfer() default amount, zero/negative amount handling, target capacity checks, transfer processing, and Source harvest processing" },
+        { term: "Transfer processor", value: "Checked — actual amount can be reduced to the target's remaining capacity after submission" },
+        { term: "Source overflow boundary", value: "Checked — Source harvest has no Store-capacity ERR_FULL preflight and processing drops overflow beyond Creep Store capacity" },
+        { term: "Project policy", value: "The early-delivery threshold is a conservative no-overflow policy for this tutorial, not an official Screeps requirement" },
+        { term: "JavaScript syntax", value: "Checked by the production gate" },
+        { term: "Offline state logic", value: "Passed — delivery hysteresis, no-overflow threshold, action-specific return handling, and partial-transfer evidence boundary" },
+        { term: "Screeps Console test", value: "Pending — no live zero-amount transfer or near-full Source harvest trace is claimed" },
+        { term: "Live round-trip test", value: "Pending — no real-shard partial-transfer or overflow comparison is claimed" },
+        { term: "Last editorial review", value: modifiedLabel },
+        { term: "Publication status", value: "Draft revision" },
       ]}
       toc={toc}
       articleHtml={articleHtml}
