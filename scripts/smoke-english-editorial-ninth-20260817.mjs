@@ -50,8 +50,13 @@ const articles = [
       "previous.tick === Game.time - 1",
       "previous.moveResult === OK",
       "consecutiveAcceptedStalls",
+      "getTargetPosition",
+      "target.pos ?? target",
+      "'debugMoveTo'",
+      "previousAcceptedWithoutProgress",
       "Checks in order before changing path policy",
       "One unchanged tick is diagnostic evidence, not a root-cause label",
+      "The wrapper accepts either a <code>RoomPosition</code> or a game object",
       "Official-documentation review and static code review only",
       "Console test pending",
       "Live multi-tick verification pending",
@@ -97,6 +102,12 @@ const movementBody = await (await fetch(`${baseUrl}/en/blog/screeps-moveto-not-m
 if (movementBody.includes("function recordMovementObservation(creep, moveResult)")) {
   failures.push("Movement page still uses the old unscoped cross-tick observation helper");
 }
+if (movementBody.includes("recordMovementObservation(\n    creep,\n    result")) {
+  failures.push("debugMoveTo still calls the movement observation helper with the obsolete two-argument signature");
+}
+if (movementBody.includes("previousPosition: observation.previousKey")) {
+  failures.push("debugMoveTo still reads the obsolete previousKey field");
+}
 
 const negativeControls = [
   "/en/blog/screeps-err-no-path",
@@ -132,5 +143,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, consecutive accepted-movement evidence, scoped page/Sitemap freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, RoomPosition-aware consecutive accepted-movement evidence, scoped page/Sitemap freshness, canonical/hreflang, structured data, and Pending live evidence.",
 );
