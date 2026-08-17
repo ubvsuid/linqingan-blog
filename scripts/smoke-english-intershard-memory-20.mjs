@@ -112,3 +112,5 @@ if (failures.length > 0) {
 console.log(
   "InterShardMemory production smoke passed: Chinese and English pages, evidence states, Canonical, hreflang, JSON-LD, search, knowledge modules, index, and both Sitemap shards.",
 );
+
+// Temporary preview trigger; reverted in the next commit.
