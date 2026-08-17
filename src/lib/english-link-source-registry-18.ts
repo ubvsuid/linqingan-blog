@@ -304,4 +304,28 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps shard state synchronization",
     ],
   },
+  {
+    href: "/en/blog/screeps-rawmemory-foreign-segment",
+    chinesePath: "/blog/screeps-rawmemory-foreign-segment",
+    category: "MEMORY · PUBLIC FOREIGN SEGMENTS",
+    title:
+      "Screeps RawMemory Foreign Segment: Publish and Read Public Segments Safely",
+    description:
+      "Publish versioned public RawMemory segments, request one foreign segment for the next tick, validate untrusted JSON, rotate subscriptions, and detect stream changes without confusing local, cross-shard, and foreign storage.",
+    publishedAt: "2026-08-17",
+    publishedLabel: "August 17, 2026",
+    readingTime: "19 min read",
+    primaryKeyword: "Screeps RawMemory foreignSegment",
+    searchIntent:
+      "Publish or subscribe to one versioned public Screeps memory segment with next-tick matching, safe parsing, and explicit polling",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps RawMemory foreignSegment",
+      "RawMemory setActiveForeignSegment",
+      "Screeps public memory segment",
+      "RawMemory setPublicSegments",
+      "Screeps foreign segment next tick",
+    ],
+  },
 ];
