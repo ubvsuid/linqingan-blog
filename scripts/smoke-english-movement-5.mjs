@@ -25,7 +25,7 @@ const articles = [
     chinesePath: "/blog/screeps-moveto-not-moving",
     title: "Screeps moveTo() Returns OK but the Creep Stays Put",
     searchQuery: "moveTo",
-    modifiedAt: "2026-08-12",
+    modifiedAt: "2026-08-17",
     requiredBody: [
       "Use this guide when",
       "Screeps Console test",
