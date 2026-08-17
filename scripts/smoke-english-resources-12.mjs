@@ -109,13 +109,20 @@ for (const article of articles) {
 const mineralBody = await (await fetch(
   `${baseUrl}/en/blog/screeps-mineral-extractor-harvest`,
 )).text();
+const hasMineralAmountBoundary =
+  mineralBody.includes("event amount is based on harvest power")
+  || (
+    mineralBody.includes("event amount is based on body harvest power")
+    && mineralBody.includes("actual Mineral removal")
+    && mineralBody.includes("mineralAmount")
+  );
 if (
   !mineralBody.includes(".lookFor(LOOK_STRUCTURES)")
   || !mineralBody.includes("creep.harvest(mineral)")
   || !mineralBody.includes("event.event === EVENT_HARVEST")
   || !mineralBody.includes("event.objectId === pending.creepId")
   || !mineralBody.includes("event.data?.targetId === pending.mineralId")
-  || !mineralBody.includes("event amount is based on harvest power")
+  || !hasMineralAmountBoundary
 ) {
   failures.push("Mineral 页面缺少同格 Extractor、精确 Miner-to-Mineral 事件或金额边界");
 }
