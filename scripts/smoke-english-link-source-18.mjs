@@ -85,16 +85,28 @@ for (const article of articles) {
 }
 
 const linkBody = await (await fetch(`${baseUrl}/en/blog/screeps-link-transfer-energy`)).text();
+const hasLinkCapacityReservation =
+  linkBody.includes("remainingTargetCapacity")
+  && (
+    linkBody.includes("remainingTargetCapacity\n        - estimate.estimatedReceived")
+    || (
+      linkBody.includes("- requestedAmount")
+      && linkBody.includes("does not recycle loss-created capacity")
+    )
+  );
+const hasLinkLossEstimate =
+  linkBody.includes("estimatedReceived")
+  || linkBody.includes("estimateLinkReceipt");
 if (
   !linkBody.includes("link.room.name !== roomName")
-  || !linkBody.includes("remainingTargetCapacity")
-  || !linkBody.includes("estimate.estimatedReceived")
+  || !hasLinkCapacityReservation
+  || !hasLinkLossEstimate
   || !linkBody.includes("source.transferEnergy")
   || !linkBody.includes("event.objectId === pending.sourceId")
   || !linkBody.includes("event.data?.targetId === pending.targetId")
   || !linkBody.includes("state.lastDispatchAt === Game.time")
 ) {
-  failures.push("Link 页面缺少显式房间身份、共享容量预留、传输、源目标事件身份或单 Tick 调度边界");
+  failures.push("Link 页面缺少显式房间身份、共享容量预留、传输、损耗估算、源目标事件身份或单 Tick 调度边界");
 }
 
 const sourceBody = await (await fetch(`${baseUrl}/en/blog/screeps-select-source-by-path`)).text();
