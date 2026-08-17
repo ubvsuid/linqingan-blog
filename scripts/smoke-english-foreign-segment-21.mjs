@@ -129,5 +129,3 @@ if (failures.length > 0) {
 console.log(
   "RawMemory foreign-segment production smoke passed: bilingual pages, timing and evidence states, Canonical, hreflang, JSON-LD, search, knowledge modules, index, and both Sitemap shards.",
 );
-
-// Temporary exact-preview trigger; restored immediately.
