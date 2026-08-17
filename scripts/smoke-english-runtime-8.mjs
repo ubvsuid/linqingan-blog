@@ -5,7 +5,7 @@ const articles = [
   {
     path: "/en/blog/screeps-cpu-getused-bucket", chinesePath: "/blog/screeps-cpu-getused-bucket",
     headline: "Measure Screeps CPU Without Treating Zero as an Environment Test", listingTitle: "Screeps CPU Profiling: Measure Code with Game.cpu.getUsed()",
-    query: "Game.cpu.getUsed", tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false, modifiedDate: "2026-08-12",
+    query: "Game.cpu.getUsed", tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false, modifiedDate: "2026-08-17",
     signals: ["two zero readings do not prove", "zero-sample-inconclusive", "global.cpuProbe", "minimumBucket = 2000", "Live multi-tick verification", "Pending"],
   },
   {
