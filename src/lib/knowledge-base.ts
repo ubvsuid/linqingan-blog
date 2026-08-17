@@ -21,13 +21,13 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
     id: "memory-engineering",
     number: 1,
     title: "Memory 与代码工程",
-    description: "保存跨 tick 状态、恢复对象引用、清理过期数据，并逐步理解模块拆分、segments、跨 Shard 状态与全局缓存。",
+    description: "保存跨 tick 状态、恢复对象引用、清理过期数据，并逐步理解模块拆分、segments、跨 Shard 状态、公开 Foreign Segment 与全局缓存。",
     audience: "已经完成新手路线，准备从固定名称代码进入可维护结构的玩家。",
     learningGoal: "理解哪些数据应该跨 tick 或跨 Shard 保存、怎样安全恢复对象，以及如何把不断增长的主循环拆成清楚的代码模块。",
     stages: [
       { title: "状态基础", description: "先理解 Memory、死亡数据清理和工作状态切换。", from: 0, to: 3 },
       { title: "对象与模块", description: "学习通过 ID 恢复对象，并用 require 拆分代码。", from: 3, to: 5 },
-      { title: "高级存储与缓存", description: "继续了解 segments、InterShardMemory 与全局缓存的使用边界。", from: 5, to: 8 },
+      { title: "高级存储与缓存", description: "继续了解 segments、InterShardMemory、Foreign Segment 与全局缓存的使用边界。", from: 5, to: 9 },
     ],
     slugs: [
       "screeps-memory-basics",
@@ -37,6 +37,7 @@ export const knowledgeBaseSections: readonly KnowledgeBaseSection[] = [
       "screeps-modules-require",
       "screeps-rawmemory-segments",
       "screeps-intershardmemory-sync",
+      "screeps-rawmemory-foreign-segment",
       "screeps-global-cache",
     ],
   },
