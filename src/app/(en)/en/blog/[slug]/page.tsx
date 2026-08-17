@@ -14,6 +14,11 @@ import {
   applyEnglishEditorialFifth20260816,
   getEnglishEditorialFifthUpdatedAt20260816,
 } from "@/lib/english-editorial-fifth-20260816";
+import { applyEnglishEditorialNinthFinal20260817 } from "@/lib/english-editorial-ninth-final-20260817";
+import {
+  applyEnglishEditorialNinth20260817,
+  getEnglishEditorialNinthUpdatedAt20260817,
+} from "@/lib/english-editorial-ninth-20260817";
 import {
   applyEnglishEditorialSixth20260816,
   getEnglishEditorialSixthUpdatedAt20260816,
@@ -112,11 +117,13 @@ function getDynamicEnglishArticle(slug: string) {
   const article = getBaseDynamicEnglishArticle(slug);
 
   if (slug === "screeps-memory-basics") {
-    return applyEnglishEditorialSixth20260816(
-      applyEnglishEditorialFifth20260816(
-        applyEnglishEditorialFourth20260814(
-          applyEnglishMemoryContract20260812(
-            applyEnglishMemoryEditorial20260812(article),
+    return applyEnglishEditorialNinth20260817(
+      applyEnglishEditorialSixth20260816(
+        applyEnglishEditorialFifth20260816(
+          applyEnglishEditorialFourth20260814(
+            applyEnglishMemoryContract20260812(
+              applyEnglishMemoryEditorial20260812(article),
+            ),
           ),
         ),
       ),
@@ -133,12 +140,15 @@ function getDynamicEnglishArticle(slug: string) {
   const sixthArticle = applyEnglishEditorialSixth20260816(fifthArticle);
   const seventhArticle = applyEnglishEditorialSeventh20260817(sixthArticle);
   const eighthArticle = applyEnglishEditorialEighth20260817(seventhArticle);
+  const normalizedArticle = normalizeEnglishEditorialSeventhHtml20260817(eighthArticle);
+  const ninthArticle = applyEnglishEditorialNinth20260817(normalizedArticle);
 
-  return normalizeEnglishEditorialSeventhHtml20260817(eighthArticle);
+  return applyEnglishEditorialNinthFinal20260817(ninthArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialEighthUpdatedAt20260817(slug)
+  return getEnglishEditorialNinthUpdatedAt20260817(slug)
+    ?? getEnglishEditorialEighthUpdatedAt20260817(slug)
     ?? getEnglishEditorialSeventhUpdatedAt20260817(slug)
     ?? getEnglishEditorialSixthUpdatedAt20260816(slug)
     ?? getEnglishEditorialFifthUpdatedAt20260816(slug)
