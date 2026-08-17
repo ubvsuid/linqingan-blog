@@ -4,7 +4,7 @@ const articles = [
     path: "/en/blog/screeps-spawncreep-return-codes", chinesePath: "/blog/screeps-spawncreep-return-codes",
     headline: "How to Diagnose spawnCreep() Return Codes", listingTitle: "Screeps spawnCreep() Errors: Diagnose Every Return Code",
     tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false,
-    reviewedInFullExpected: false, modifiedAt: "2026-08-12",
+    reviewedInFullExpected: false, modifiedAt: "2026-08-17",
     verification: ["Chinese source article", "Screeps Console test", "Pending", "Live multi-tick verification pending"],
     signals: [
       "dryRunResult",
@@ -14,6 +14,10 @@ const articles = [
       "spawn.isActive()",
       "optional <code>memory</code> field is documented as <code>any</code>",
       "explicit <code>energyStructures</code>",
+      "describeSpawnEnergy",
+      "selectedEnergyAvailable",
+      "selectedStructureIds",
+      "not evidence that the Creep has finished spawning",
     ],
   },
   {
@@ -54,10 +58,15 @@ const returnCodeBody = await (await fetch(`${baseUrl}/en/blog/screeps-spawncreep
 if (returnCodeBody.includes("another Spawn operation under the relevant structure limit")) {
   failures.push("spawnCreep return-code page still misstates ERR_RCL_NOT_ENOUGH as a Spawn-count/structure-limit error");
 }
+if (returnCodeBody.includes("explicitEnergyStructureCount")) {
+  failures.push("spawnCreep return-code page still uses count-only explicit Energy diagnostics instead of request-specific Store context");
+}
 for (const expected of [
   "memory</code> field is documented as <code>any</code>",
   "roomEnergyAvailable: spawn.room.energyAvailable",
-  "explicitEnergyStructureCount",
+  "describeSpawnEnergy",
+  "selectedEnergyAvailable",
+  "selectedStructureIds",
   "dryRunResult",
   "spawnResult",
 ]) {
