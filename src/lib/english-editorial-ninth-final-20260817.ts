@@ -26,20 +26,12 @@ export function applyEnglishEditorialNinthFinal20260817(
   return getPositionKey(target.pos);
 }`,
     `function getTargetPosition(target) {
-  if (!target) return null;
+  if (target instanceof RoomPosition) {
+    return target;
+  }
 
-  const pos = target.pos ?? target;
-  if (
-    Number.isInteger(pos.x)
-    && pos.x >= 0
-    && pos.x <= 49
-    && Number.isInteger(pos.y)
-    && pos.y >= 0
-    && pos.y <= 49
-    && typeof pos.roomName === 'string'
-    && pos.roomName.length > 0
-  ) {
-    return pos;
+  if (target?.pos instanceof RoomPosition) {
+    return target.pos;
   }
 
   return null;
@@ -125,7 +117,7 @@ function getTargetKey(target) {
   articleHtml = replaceRequired(
     articleHtml,
     `<p>For a normal Screeps game object, <code>target.pos</code> already follows RoomPosition rules. This guard is useful when your own task system can pass stale, partial, or deserialized target descriptors.</p>`,
-    `<p>The wrapper accepts either a <code>RoomPosition</code> or a game object with a valid <code>.pos</code>. This guard is mainly useful when your own task system can pass stale, partial, or deserialized target descriptors. If your production caller uses the separate numeric <code>x, y</code> overload, normalize those coordinates to a <code>RoomPosition</code> before feeding this diagnostic helper.</p>`,
+    `<p>The wrapper accepts either a real <code>RoomPosition</code> or a game object whose <code>.pos</code> is a <code>RoomPosition</code>. A plain deserialized <code>{x, y, roomName}</code> object is data, not a live RoomPosition; rebuild it with <code>new RoomPosition(x, y, roomName)</code> before using this helper. If your production caller uses the separate numeric <code>x, y</code> overload, normalize those coordinates to a RoomPosition for this diagnostic path.</p>`,
     "movement target scope note",
   );
 
