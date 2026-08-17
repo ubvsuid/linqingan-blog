@@ -112,6 +112,19 @@ for (const path of negativeControls) {
   }
 }
 
+const sitemapResponse = await fetch(`${baseUrl}/sitemap-en.xml`, { redirect: "manual" });
+const sitemapBody = await sitemapResponse.text();
+if (sitemapResponse.status !== 200) {
+  failures.push(`/sitemap-en.xml: expected 200, got ${sitemapResponse.status}`);
+} else {
+  for (const article of articles) {
+    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>2026-08-17T00:00:00.000Z</lastmod>`;
+    if (!sitemapBody.includes(expectedEntry)) {
+      failures.push(`${article.path}: Sitemap lastmod is not aligned with the 2026-08-17 substantive revision`);
+    }
+  }
+}
+
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
   console.error(`\nNinth English editorial smoke failed: ${failures.length} issue(s).`);
@@ -119,5 +132,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, consecutive accepted-movement evidence, scoped freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, consecutive accepted-movement evidence, scoped page/Sitemap freshness, canonical/hreflang, structured data, and Pending live evidence.",
 );
