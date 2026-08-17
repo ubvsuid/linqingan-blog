@@ -621,6 +621,7 @@ function finalizeForeignSegmentTick(
   if (normalized.status !== 'valid') {
     clearForeignRequest();
     state.pending = null;
+    state.cursor = selected.nextCursor;
 
     return {
       previousMatch,
@@ -653,7 +654,7 @@ function finalizeForeignSegmentTick(
 - 调用 `setActiveForeignSegment()` 后立即读取；
 - 多个模块分别调用 `setPublicSegments()`；
 - 把 `setPublicSegments([1])` 当成“追加 1”；
-- 默认 ID 不在公开列表中；
+- 在本文项目策略下，非空默认 ID 未包含在同一份公开列表中；
 - 请求默认 Segment 时错误传入第二个 `null`；
 - 不检查返回对象的用户名与 ID；
 - 默认 Segment ID 切换后继续沿用旧 Revision；
@@ -664,7 +665,7 @@ function finalizeForeignSegmentTick(
 
 ## 验证状态与适用边界
 
-仓库离线模拟覆盖公开列表规范化、覆盖式配置、默认 ID 约束、下一 tick 请求身份、显式与默认 ID 匹配、轮询、UTF-8 容量、Envelope 解析、Revision 回退、发布者重启和本地停滞观察。
+仓库离线模拟覆盖公开列表规范化、覆盖式配置、本文项目策略下的默认 ID 成员关系、下一 tick 请求身份、显式与默认 ID 匹配、无效订阅后的游标推进、轮询、UTF-8 容量、Envelope 解析、Revision 回退、发布者重启和本地停滞观察。
 
 这些检查不能证明官方服务器上的真实公开传播延迟、其他玩家实时修改默认 Segment 的具体时序、私人服务器差异、公开数据的真实性或长期 CPU 成本。因此 `consoleTested` 和 `liveTested` 保持为 `false`。
 

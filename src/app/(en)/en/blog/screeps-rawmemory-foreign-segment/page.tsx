@@ -563,6 +563,7 @@ function writePublicSegment(
   if (normalized.status !== 'valid') {
     clearForeignRequest();
     state.pending = null;
+    state.cursor = selected.nextCursor;
 
     return {
       previousMatch,
@@ -593,7 +594,7 @@ function writePublicSegment(
 <li><strong>Reading immediately after the request:</strong> the data belongs to the previous activation state.</li>
 <li><strong>Scattered public-list calls:</strong> a later module silently replaces an earlier list.</li>
 <li><strong>Treating setPublicSegments as append:</strong> the method submits the complete replacement list.</li>
-<li><strong>Default ID is not public:</strong> readers cannot rely on the default request.</li>
+<li><strong>Project-policy mismatch:</strong> this guide requires a non-null default ID to appear in the same desired public list.</li>
 <li><strong>Default request passes a null ID:</strong> the wrapper no longer represents the documented omitted-ID call.</li>
 <li><strong>No username or ID match:</strong> stale or unrelated data can be attributed to the wrong subscription.</li>
 <li><strong>Default ID changes but revision baseline remains:</strong> two different public streams are conflated.</li>
@@ -603,7 +604,7 @@ function writePublicSegment(
 
 
 <h2 id="evidence">Evidence and production boundary</h2>
-<p>The repository simulation syntax-checks every Chinese and English JavaScript example and runs deterministic cases for ID validation, public-list replacement, default membership, next-tick request identity, explicit and default matching, UTF-8 sizing, envelope parsing, stream restarts, revision regression, stale observation, queue rotation, and single-request coordination.</p>
+<p>The repository simulation syntax-checks every Chinese and English JavaScript example and runs deterministic cases for ID validation, public-list replacement, project-policy default membership, next-tick request identity, explicit and default matching, UTF-8 sizing, envelope parsing, stream restarts, revision regression, stale observation, invalid-subscription cursor progress, queue rotation, and single-request coordination.</p>
 <p>Screeps Console execution, official-server publication delay, live changes to another player's default segment, private-server differences, long-running CPU cost, and the truthfulness of third-party payloads remain Pending. The guide therefore distinguishes <code>activation-requested</code>, <code>local-segment-write-staged</code>, <code>foreign-request-submitted</code>, <code>foreign-segment-matched</code>, and later observed stream states.</p>
 <p>Official references: <a href="https://docs.screeps.com/api/#RawMemory.foreignSegment" rel="nofollow">RawMemory.foreignSegment</a>, <a href="https://docs.screeps.com/api/#RawMemory.setActiveForeignSegment" rel="nofollow">setActiveForeignSegment()</a>, <a href="https://docs.screeps.com/api/#RawMemory.setPublicSegments" rel="nofollow">setPublicSegments()</a>, <a href="https://docs.screeps.com/api/#RawMemory.setDefaultPublicSegment" rel="nofollow">setDefaultPublicSegment()</a>, and <a href="https://docs.screeps.com/api/#RawMemory.segments" rel="nofollow">RawMemory.segments</a>.</p>
 

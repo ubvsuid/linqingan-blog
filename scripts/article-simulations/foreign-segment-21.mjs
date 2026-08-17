@@ -819,6 +819,7 @@ function finalize(state, subscriptionsInput, foreign) {
   );
   if (normalized.status !== "valid") {
     state.pending = null;
+    state.cursor = selected.nextCursor;
     return {
       previousMatch,
       nextRequest: normalized.status,
@@ -863,6 +864,45 @@ assert(
 assert(
   coordinatorCalls.length === 2,
   "Coordinator submitted more or fewer than one request per tick",
+);
+
+const callsBeforeInvalidSubscription = coordinatorCalls.length;
+const invalidSubscriptionState = { cursor: 0, pending: null };
+const invalidThenValidSubscriptions = [
+  { username: "", id: 1 },
+  { username: "good", id: 2 },
+];
+const invalidSubscriptionResult = finalize(
+  invalidSubscriptionState,
+  invalidThenValidSubscriptions,
+  null,
+);
+assert(
+  invalidSubscriptionResult.nextRequest === "invalid-username",
+  "Invalid subscription was not surfaced",
+);
+assert(
+  invalidSubscriptionState.cursor === 1
+  && invalidSubscriptionState.pending === null,
+  "Invalid subscription did not advance the queue cursor",
+);
+const validAfterInvalidResult = finalize(
+  invalidSubscriptionState,
+  invalidThenValidSubscriptions,
+  null,
+);
+assert(
+  validAfterInvalidResult.nextRequest === "foreign-request-submitted"
+  && invalidSubscriptionState.pending.username === "good",
+  "Valid subscription after an invalid entry was starved",
+);
+assert(
+  invalidSubscriptionState.cursor === 0,
+  "Queue did not wrap after recovering from an invalid subscription",
+);
+assert(
+  coordinatorCalls.length === callsBeforeInvalidSubscription + 1,
+  "Invalid subscription unexpectedly submitted a foreign request",
 );
 
 if (failures.length > 0) {
