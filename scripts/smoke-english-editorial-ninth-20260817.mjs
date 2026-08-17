@@ -51,12 +51,14 @@ const articles = [
       "previous.moveResult === OK",
       "consecutiveAcceptedStalls",
       "getTargetPosition",
-      "target.pos ?? target",
+      "target instanceof RoomPosition",
+      "target?.pos instanceof RoomPosition",
       "'debugMoveTo'",
       "previousAcceptedWithoutProgress",
       "Checks in order before changing path policy",
       "One unchanged tick is diagnostic evidence, not a root-cause label",
-      "The wrapper accepts either a <code>RoomPosition</code> or a game object",
+      "The wrapper accepts either a real <code>RoomPosition</code> or a game object",
+      "new RoomPosition(x, y, roomName)",
       "Official-documentation review and static code review only",
       "Console test pending",
       "Live multi-tick verification pending",
@@ -108,6 +110,9 @@ if (movementBody.includes("recordMovementObservation(\n    creep,\n    result"))
 if (movementBody.includes("previousPosition: observation.previousKey")) {
   failures.push("debugMoveTo still reads the obsolete previousKey field");
 }
+if (movementBody.includes("const pos = target.pos ?? target")) {
+  failures.push("Movement target validation still accepts structurally similar plain objects as live RoomPosition values");
+}
 
 const negativeControls = [
   "/en/blog/screeps-err-no-path",
@@ -143,5 +148,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, RoomPosition-aware consecutive accepted-movement evidence, scoped page/Sitemap freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, live-RoomPosition-aware consecutive accepted-movement evidence, scoped page/Sitemap freshness, canonical/hreflang, structured data, and Pending live evidence.",
 );
