@@ -280,4 +280,28 @@ export const englishLinkSourceBatchEighteenRegistry: EnglishArticleRecord[] = [
       "Screeps Lab Store capacity",
     ],
   },
+  {
+    href: "/en/blog/screeps-intershardmemory-sync",
+    chinesePath: "/blog/screeps-intershardmemory-sync",
+    category: "MEMORY · CROSS-SHARD STATE",
+    title:
+      "Screeps InterShardMemory: Versioned Cross-Shard State Without Remote Writes",
+    description:
+      "Publish versioned shard-owned channels, validate remote strings, enforce a conservative UTF-8 project budget, detect writer restarts and revision regressions, and measure freshness with local observation windows.",
+    publishedAt: "2026-08-17",
+    publishedLabel: "August 17, 2026",
+    readingTime: "20 min read",
+    primaryKeyword: "Screeps InterShardMemory",
+    searchIntent:
+      "Synchronize versioned state across Screeps shards without writing remote data or assuming one shared tick clock",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps InterShardMemory",
+      "Screeps cross shard Memory",
+      "InterShardMemory getRemote",
+      "InterShardMemory setLocal",
+      "Screeps shard state synchronization",
+    ],
+  },
 ];
