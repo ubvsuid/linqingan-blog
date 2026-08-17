@@ -460,7 +460,7 @@ export default function TransferEnergyPage() {
         { term: "Screeps Console test", value: "Pending — no live zero-amount transfer or near-full Source harvest trace is claimed" },
         { term: "Live round-trip test", value: "Pending — no real-shard partial-transfer or overflow comparison is claimed" },
         { term: "Last editorial review", value: modifiedLabel },
-        { term: "Publication status", value: "Draft revision" },
+        { term: "Publication status", value: "Published" },
       ]}
       toc={toc}
       articleHtml={articleHtml}
