@@ -6,10 +6,12 @@ const revised = [
     chinesePath: "/blog/screeps-first-creep-harvest",
     title: "Screeps Creep.harvest(): Full Stores, Return Codes, and Safe Energy Loops",
     headline: "Screeps Harvest Energy Without the ERR_FULL Mistake",
+    modifiedAt: "2026-08-17",
     signals: [
       "harvest() does not return ERR_FULL for a Source",
       "FIND_SOURCES_ACTIVE",
-      "status: 'store-full'",
+      "harvestBatch = activeWork * HARVEST_POWER",
+      "ready-for-delivery",
       "overflow is dropped on the ground",
       "Source-specific Creep.harvest() results",
       "Official engine source",
@@ -25,6 +27,7 @@ const revised = [
     chinesePath: "/blog/screeps-first-extension",
     title: "Screeps First Extension: Build It and Diagnose ERR_INVALID_TARGET",
     headline: "Build Your First Screeps Extension Without Missing a Blocked Site",
+    modifiedAt: "2026-08-17",
     signals: [
       "blocking object or Creep occupies the target tile",
       "lookFor(LOOK_CREEPS)",
@@ -41,6 +44,7 @@ const revised = [
     chinesePath: "/blog/screeps-build-and-repair",
     title: "Screeps Builder Priority: Build, Repair, Then Upgrade Safely",
     headline: "Run a Screeps Builder Without Hiding Build, Repair, or Controller Errors",
+    modifiedAt: "2026-08-14",
     signals: [
       "controller.my !== true",
       "controller.upgradeBlocked > 0",
@@ -81,8 +85,8 @@ for (const article of revised) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `property="article:modified_time" content="2026-08-14"`,
-    `"dateModified":"2026-08-14"`,
+    `property="article:modified_time" content="${article.modifiedAt}"`,
+    `"dateModified":"${article.modifiedAt}"`,
     `"@type":"BlogPosting"`,
     "Screeps Console test",
     "Live multi-tick verification",
@@ -167,5 +171,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourth English editorial smoke passed: Source harvest has no ERR_FULL state signal, Extension build blockers remain diagnosable, Builder Controller fallback is ownership/upgradeBlocked guarded, all three pages have scoped August 14 freshness, and live evidence remains Pending.",
+  "Fourth English editorial smoke passed: the original Source ERR_FULL, Extension blocker, and Builder Controller safeguards remain enforced; Build Repair keeps August 14 freshness while Harvest and First Extension carry their later August 17 verified revisions; live evidence remains Pending.",
 );
