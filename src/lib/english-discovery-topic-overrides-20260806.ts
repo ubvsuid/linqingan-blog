@@ -25,4 +25,9 @@ export const additionalArticleTagSlugOverrides = {
     "automation",
     "debugging",
   ],
+  "/en/blog/screeps-rawmemory-foreign-segment": [
+    "memory",
+    "automation",
+    "debugging",
+  ],
 } as const;
