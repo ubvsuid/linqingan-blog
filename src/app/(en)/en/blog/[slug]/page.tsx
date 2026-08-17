@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
+import {
+  applyEnglishEditorialEighth20260817,
+  getEnglishEditorialEighthUpdatedAt20260817,
+} from "@/lib/english-editorial-eighth-20260817";
 import { applyEnglishEditorialFinal20260812 } from "@/lib/english-editorial-final-20260812";
 import { applyEnglishEditorialFourth20260814 } from "@/lib/english-editorial-fourth-apply-20260814";
 import {
@@ -128,12 +132,14 @@ function getDynamicEnglishArticle(slug: string) {
   const fifthArticle = applyEnglishEditorialFifth20260816(fourthArticle);
   const sixthArticle = applyEnglishEditorialSixth20260816(fifthArticle);
   const seventhArticle = applyEnglishEditorialSeventh20260817(sixthArticle);
+  const eighthArticle = applyEnglishEditorialEighth20260817(seventhArticle);
 
-  return normalizeEnglishEditorialSeventhHtml20260817(seventhArticle);
+  return normalizeEnglishEditorialSeventhHtml20260817(eighthArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialSeventhUpdatedAt20260817(slug)
+  return getEnglishEditorialEighthUpdatedAt20260817(slug)
+    ?? getEnglishEditorialSeventhUpdatedAt20260817(slug)
     ?? getEnglishEditorialSixthUpdatedAt20260816(slug)
     ?? getEnglishEditorialFifthUpdatedAt20260816(slug)
     ?? getEnglishEditorialSecondUpdatedAt20260812(slug)
