@@ -8,7 +8,7 @@ const path = "/en/blog/screeps-tombstone-ruin-recovery";
 const chinesePath = "/blog/screeps-tombstone-ruin-recovery";
 const headline = "Screeps Tombstone and Ruin Recovery: Reach the Loot Before It Decays";
 const description =
-  "Recover Tombstone and Ruin resources without chasing doomed targets: reject incomplete paths, compare an optimistic arrival bound with ticksToDecay, preserve target identity, and verify withdraw results later.";
+  "Recover Tombstone and Ruin resources without chasing doomed targets: reject incomplete structure-aware paths, compare an optimistic arrival bound with ticksToDecay, preserve target identity, and verify withdraw results later.";
 const publishedAt = "2026-08-04";
 const publishedLabel = "August 4, 2026";
 const modifiedTime = "2026-08-17";
@@ -68,29 +68,29 @@ const toc: Array<[string, string]> = [
 
 const articleHtml = String.raw`
 <h2 id="why-decay-ranking-fails">Why expiry-first ranking can still fail</h2>
-<p><code>ticksToDecay</code> is useful urgency data, but urgency is not reachability. A recovery Creep can repeatedly prefer the object with the smallest timer even when walls, Ramparts, room geometry, or a long detour make that target a bad rescue attempt.</p>
-<p>The important distinction is:</p>
+<p><code>ticksToDecay</code> is useful urgency data, but urgency is not reachability. A recovery Creep can repeatedly prefer the object with the smallest timer even when terrain, blocking Structures, closed hostile Ramparts, or a long detour make that target a bad rescue attempt.</p>
+<p>The useful distinction is:</p>
 <ul>
   <li><strong>API fact:</strong> visible Tombstones and Ruins expose <code>ticksToDecay</code> and a <code>Store</code>.</li>
-  <li><strong>Path fact:</strong> a path search can fail to produce a complete route to withdrawal range.</li>
-  <li><strong>Project policy:</strong> do not assign a salvage target when even an optimistic path-length bound reaches it too late.</li>
+  <li><strong>Path fact:</strong> a search can be incomplete, and a useful salvage search must model stable blocking Structures rather than treating terrain-only distance as reachability.</li>
+  <li><strong>Project policy:</strong> do not assign a target when even an optimistic complete-path lower bound reaches withdrawal range too late.</li>
 </ul>
-<p>This is deliberately conservative. It prevents obvious doomed assignments; it does not promise that a Creep will actually travel one tile every tick.</p>
+<p>This policy prevents obvious doomed assignments. It does not promise that a Creep will actually travel one path tile every tick.</p>
 
 <h2 id="api-boundary">Tombstone, Ruin, and withdraw() boundaries</h2>
 <p>A dropped <code>Resource</code> uses <code>creep.pickup(resource)</code>. A <code>Tombstone</code> or <code>Ruin</code> exposes a <code>store</code>, so use <code>creep.withdraw(target, resourceType, amount)</code> from range 1.</p>
 <p>Do not persist the JavaScript object itself across ticks. Save the target ID and resource type, recover the object with <code>Game.getObjectById()</code>, and validate it again. The object can decay or its Store can change while the Creep is travelling.</p>
-<p>An accepted <code>withdraw()</code> request is also not a reservation. Another actor can change the target Store before processing. The current engine processor re-reads the target and Creep Store when applying the intent, so the requested amount and the amount you later observe do not have to be identical under contention.</p>
+<p>An accepted <code>withdraw()</code> request is not a resource reservation. In the current engine processor, Creep free capacity and target stock are read again while applying the intent, and the processed transfer event records the applied amount. Under contention, the request amount and processed amount therefore need not be identical.</p>
 
 <h2 id="reachability-policy">Use a conservative reachability policy</h2>
-<p>The policy below uses <code>PathFinder.search()</code> only when choosing or replacing an assignment. A complete path gives a tile-count lower bound to range 1. An incomplete search is rejected.</p>
-<p>Then compare the optimistic path length with <code>ticksToDecay</code>:</p>
+<p>The example builds a one-room <code>CostMatrix</code> for stable Structure obstacles, then calls <code>PathFinder.search()</code> only when selecting or replacing an assignment. Roads are cheap, normal walkable tiles keep the default cost, obstacle Structure types are set to 255, and owned or public Ramparts remain traversable.</p>
+<p>A complete path gives an optimistic tile-count lower bound to range 1. An incomplete search is rejected. Then compare that lower bound with <code>ticksToDecay</code>:</p>
 <pre><code class="language-text">optimistic travel ticks = completePath.length
 minimum safe lifetime = optimistic travel ticks + 1 withdrawal tick + margin</code></pre>
-<p>The extra withdrawal tick avoids treating “arrive at the last possible moment” as safe. The margin is a local engineering choice. Fatigue, traffic, hostile movement, path reuse, and terrain can make real travel slower, so this calculation is a <strong>lower-bound filter</strong>, not an ETA guarantee.</p>
+<p>The extra withdrawal tick avoids treating “reach range 1 at the last possible moment” as safe. The margin is a local engineering choice. Fatigue, swamp movement, traffic, Creeps used as temporary blockers, hostile movement, pulls, and custom path policy can all make real travel slower, so this is a <strong>lower-bound filter</strong>, not an ETA guarantee.</p>
 
 <h2 id="complete-example">Complete recovery example</h2>
-<p>This example scans visible Tombstones and Ruins in one room, rejects blocked or unreachable candidates, refuses targets that cannot survive an optimistic arrival bound, ranks the remaining choices deterministically, stores only stable identity across ticks, and keeps movement, withdrawal, and later verification separate.</p>
+<p>This example scans visible Tombstones and Ruins in one room, rejects protected or unreachable candidates, refuses targets that cannot survive an optimistic arrival bound, ranks the remaining choices deterministically, stores only stable identity across ticks, and keeps movement, withdrawal, and later verification separate.</p>
 
 <pre><code class="language-js">const RESOURCE_PRIORITY = [
   RESOURCE_POWER,
@@ -114,12 +114,38 @@ function resourceRank(resourceType) {
   return index === -1 ? RESOURCE_PRIORITY.length : index;
 }
 
-function isBlockedByClosedHostileRampart(target) {
-  return target.pos.lookFor(LOOK_STRUCTURES).some(structure =&gt;
-    structure.structureType === STRUCTURE_RAMPART
+function isClosedHostileRampart(structure) {
+  return structure.structureType === STRUCTURE_RAMPART
     &amp;&amp; structure.my !== true
-    &amp;&amp; structure.isPublic !== true
-  );
+    &amp;&amp; structure.isPublic !== true;
+}
+
+function isProtectedTarget(target) {
+  return target.pos.lookFor(LOOK_STRUCTURES).some(isClosedHostileRampart);
+}
+
+function buildRecoveryMatrix(room) {
+  const costs = new PathFinder.CostMatrix();
+
+  for (const structure of room.find(FIND_STRUCTURES)) {
+    if (structure.structureType === STRUCTURE_ROAD) {
+      costs.set(structure.pos.x, structure.pos.y, 1);
+      continue;
+    }
+
+    if (
+      structure.structureType === STRUCTURE_RAMPART
+      &amp;&amp; (structure.my === true || structure.isPublic === true)
+    ) {
+      continue;
+    }
+
+    if (OBSTACLE_OBJECT_TYPES.includes(structure.structureType)) {
+      costs.set(structure.pos.x, structure.pos.y, 255);
+    }
+  }
+
+  return costs;
 }
 
 function chooseResourceType(target) {
@@ -133,18 +159,22 @@ function chooseResourceType(target) {
     )[0] ?? null;
 }
 
-function searchToWithdrawRange(creep, target) {
+function searchToWithdrawRange(creep, target, matrix) {
   const search = PathFinder.search(
     creep.pos,
     { pos: target.pos, range: 1 },
-    { maxRooms: 1 }
+    {
+      maxRooms: 1,
+      roomCallback(roomName) {
+        return roomName === creep.room.name ? matrix : false;
+      }
+    }
   );
 
-  if (search.incomplete) return null;
-  return search.path;
+  return search.incomplete ? null : search.path;
 }
 
-function describeCandidate(creep, target) {
+function describeCandidate(creep, target, matrix) {
   const free = creep.store.getFreeCapacity();
   if (
     free &lt;= 0
@@ -152,7 +182,7 @@ function describeCandidate(creep, target) {
     || !target.store
     || !Number.isFinite(target.ticksToDecay)
     || target.ticksToDecay &lt;= 0
-    || isBlockedByClosedHostileRampart(target)
+    || isProtectedTarget(target)
   ) return null;
 
   const resourceType = chooseResourceType(target);
@@ -166,7 +196,7 @@ function describeCandidate(creep, target) {
 
   const path = creep.pos.isNearTo(target)
     ? []
-    : searchToWithdrawRange(creep, target);
+    : searchToWithdrawRange(creep, target, matrix);
   if (path === null) return null;
 
   const optimisticTravelTicks = path.length;
@@ -186,11 +216,13 @@ function describeCandidate(creep, target) {
 }
 
 function selectCandidate(creep) {
+  const matrix = buildRecoveryMatrix(creep.room);
+
   return [
     ...creep.room.find(FIND_TOMBSTONES),
     ...creep.room.find(FIND_RUINS)
   ]
-    .map(target =&gt; describeCandidate(creep, target))
+    .map(target =&gt; describeCandidate(creep, target, matrix))
     .filter(Boolean)
     .sort((left, right) =&gt;
       left.slack - right.slack
@@ -217,19 +249,28 @@ function verifyPrevious(creep) {
     ? target.store.getUsedCapacity(pending.resourceType)
     : null;
 
+  const exactEvent = creep.room.getEventLog().find(event =&gt;
+    event.event === EVENT_TRANSFER
+    &amp;&amp; event.objectId === pending.targetId
+    &amp;&amp; event.data?.targetId === pending.creepId
+    &amp;&amp; event.data?.resourceType === pending.resourceType
+  );
+
   const creepGain = creepNow - pending.creepBefore;
   const targetLoss = targetNow === null
     ? null
     : pending.targetBefore - targetNow;
+  const processedAmount = exactEvent?.data?.amount ?? null;
 
-  const processedLowerBound = Math.max(0, creepGain);
-  const status = creepGain &gt; 0 &amp;&amp; targetLoss !== null &amp;&amp; targetLoss &gt; 0
-    ? 'matching-store-deltas-observed'
-    : creepGain &gt; 0
-      ? 'creep-gain-observed'
-      : target === null
-        ? 'target-unavailable-after-submit'
-        : 'withdraw-not-observed';
+  const status = Number.isFinite(processedAmount) &amp;&amp; processedAmount &gt; 0
+    ? 'exact-transfer-event-observed'
+    : creepGain &gt; 0 &amp;&amp; targetLoss !== null &amp;&amp; targetLoss &gt; 0
+      ? 'matching-store-deltas-observed'
+      : creepGain &gt; 0
+        ? 'creep-gain-observed'
+        : target === null
+          ? 'target-unavailable-after-submit'
+          : 'withdraw-not-observed';
 
   const record = {
     verifiedAt: Game.time,
@@ -238,7 +279,7 @@ function verifyPrevious(creep) {
     targetNow,
     creepGain,
     targetLoss,
-    processedLowerBound,
+    processedAmount,
     status
   };
 
@@ -262,7 +303,10 @@ function runRecoveryCreep(creep) {
   let candidate = null;
   if (creep.memory.recoveryTargetId) {
     const saved = Game.getObjectById(creep.memory.recoveryTargetId);
-    candidate = saved ? describeCandidate(creep, saved) : null;
+    if (saved) {
+      const matrix = buildRecoveryMatrix(creep.room);
+      candidate = describeCandidate(creep, saved, matrix);
+    }
   }
 
   if (!candidate) {
@@ -315,6 +359,7 @@ function runRecoveryCreep(creep) {
   if (result === OK) {
     recoveryMemory().pending[creep.name] = {
       tick: Game.time,
+      creepId: creep.id,
       targetId: candidate.targetId,
       resourceType: candidate.resourceType,
       requestedAmount,
@@ -351,15 +396,15 @@ module.exports.loop = function () {
 };</code></pre>
 
 <h2 id="verification">Verify the processed result later</h2>
-<p><code>withdraw()</code> returning <code>OK</code> means the request passed the submission checks. It does not prove that a same-line Store read already contains the processed result.</p>
-<p>The example records <code>requestedAmount</code> separately from later Store evidence. A Creep gain is useful evidence that some resource was processed, but it is still bounded evidence: another action can change either Store in the same tick, and a vanished target cannot provide a later target delta.</p>
-<p>Do not relabel <code>requestedAmount</code> as “withdrawn amount” unless you have evidence for the processed result.</p>
+<p><code>withdraw()</code> returning <code>OK</code> means the request passed submission checks. It does not prove that a same-line Store read contains the processed result.</p>
+<p>The checked engine emits <code>EVENT_TRANSFER</code> for a processed withdrawal with the Tombstone/Ruin ID as <code>objectId</code>, the Creep ID as <code>targetId</code>, the resource type, and the processed amount. When that exact next-tick event is available, it is stronger evidence than inferring the operation only from aggregate Store deltas.</p>
+<p>The example therefore records <code>requestedAmount</code> separately from <code>processedAmount</code>. Store deltas remain fallback evidence because other same-tick activity can change either Store.</p>
 
 <h2 id="return-codes">withdraw() return-code checklist</h2>
 <table>
   <thead><tr><th>Code</th><th>Meaning in this workflow</th><th>Response</th></tr></thead>
   <tbody>
-    <tr><td><code>OK</code></td><td>Request accepted</td><td>Verify later Store evidence</td></tr>
+    <tr><td><code>OK</code></td><td>Request accepted</td><td>Verify the exact later event or bounded Store evidence</td></tr>
     <tr><td><code>ERR_BUSY</code></td><td>Creep is still spawning</td><td>Wait</td></tr>
     <tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>Requested resource/amount is no longer available</td><td>Re-read target Store and reselect</td></tr>
     <tr><td><code>ERR_INVALID_TARGET</code></td><td>Object is gone or is not withdrawable</td><td>Clear the saved ID</td></tr>
@@ -370,8 +415,8 @@ module.exports.loop = function () {
 </table>
 
 <h2 id="boundaries">Evidence and policy boundaries</h2>
-<p>The current official Screeps engine source was checked at commit <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>. The article deliberately separates API behavior from the local salvage policy.</p>
-<p><strong>Policy boundary:</strong> <code>path.length + 1 + margin</code> is only an optimistic lower-bound filter. It does not model fatigue, swamp/road movement cost as ticks, traffic, hostile blocking, pulls, or every custom CostMatrix rule. For high-value recovery, replace the simple policy with your own movement-time model.</p>
+<p>The current official Screeps engine source was checked at commit <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>, including the current withdrawal processor. The article deliberately separates API/processor behavior from the local salvage policy.</p>
+<p><strong>Policy boundary:</strong> <code>path.length + 1 + margin</code> is only an optimistic lower-bound filter. The matrix models stable Structure obstacles, but it does not convert terrain or fatigue into exact travel ticks, reserve traffic lanes, predict moving Creeps, or reproduce every custom movement system. For high-value recovery, replace the simple policy with your own movement-time model.</p>
 <p><strong>Live evidence:</strong> Screeps Console test: Pending. Live decay-race test: Pending. Multiplayer contention test: Pending. No live result is fabricated here.</p>
 <p>Continue with <a href="/en/blog/screeps-pickup-dropped-energy">pickup() for dropped resources</a>, <a href="/en/blog/screeps-withdraw-container-energy">withdraw() from Containers</a>, or the <a href="/en/blog/screeps-get-object-by-id">cross-tick object ID guide</a>.</p>
 `;
@@ -418,7 +463,7 @@ export default function TombstoneRuinRecoveryPage() {
       tags={["Creeps", "Resources", "Energy", "Pathfinding"]}
       verification={[
         { term: "Engine source", value: "80977824199a596d174d392fd0cf8c458c21fcbd" },
-        { term: "Policy", value: "Optimistic reachability bound, explicitly scoped" },
+        { term: "Policy", value: "Structure-aware optimistic reachability bound" },
         { term: "Screeps Console test", value: "Pending" },
         { term: "Live decay race", value: "Pending" },
       ]}
