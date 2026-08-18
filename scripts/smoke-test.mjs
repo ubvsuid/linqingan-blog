@@ -7,6 +7,13 @@ const checks = [
   ["/blog", ["全部文章", "篇"]],
   ["/changelog", ["更新日志", "新增独立更新日志", "合并资料中心与项目页面"]],
   ["/knowledge", ["Screeps 知识库", "查询与工具", "Creep 身体计算器", "选择你要解决的问题"]],
+  ["/diagnostics", ["先说“哪里不对”，再定位错误码", "第一阶段独立排查页", "Creep 不移动", "Market 交易失败"]],
+  ["/diagnostics/creep-not-moving", ["Creep 不移动怎么排查？", "先按这个顺序快速排查", "把真实返回值接到对应分支", "RUNTIME EVIDENCE"]],
+  ["/diagnostics/spawn-not-spawning", ["Spawn 不生产 Creep怎么排查？", "先按这个顺序快速排查", "ERR_BUSY", "RUNTIME EVIDENCE"]],
+  ["/diagnostics/cpu-too-high", ["CPU 使用过高怎么排查？", "先按这个顺序快速排查", "这类症状没有单一错误码可以定义", "RUNTIME EVIDENCE"]],
+  ["/diagnostics/controller-downgrade", ["Controller 快降级或升级异常怎么排查？", "先按这个顺序快速排查", "ticksToDowngrade", "RUNTIME EVIDENCE"]],
+  ["/diagnostics/resources-not-moving", ["资源运不过去怎么排查？", "先按这个顺序快速排查", "withdraw", "RUNTIME EVIDENCE"]],
+  ["/diagnostics/market-action-failed", ["Market 交易失败怎么排查？", "先按这个顺序快速排查", "Game.market.deal()", "RUNTIME EVIDENCE"]],
   ["/tools/creep-body-calculator", ["Creep 身体计算器", "选择身体部件", "计算结果", "复制身体数组"]],
   ["/tools/room-diagnostics", ["房间运行诊断", "使用边界", "CPU 风险"]],
   ["/search", ["搜索整个网站", "筛选搜索结果", "身体计算器"]],
@@ -50,7 +57,7 @@ const checks = [
   ["/en/blog/screeps-build-repair", ["Run a Screeps Builder Without Hiding Build, Repair, or Controller Errors", "Official engine source", "Live multi-tick verification", "Pending"]],
   ["/en/blog/screeps-first-room-code", ["Combine Your First Screeps Room Loop Without Hiding Failure States", "Technical correction", "Spawning, role execution, Energy phase, current-tick acceptance, later-tick outcomes, and emergency recovery are separated", "Live multi-tick verification", "Pending", "trySpawnFirstMissing", "spawn-dry-run-rejected"]],
   ["/sitemap.xml", ["https://www.linqingan.com/sitemap-zh.xml", "https://www.linqingan.com/sitemap-en.xml", "<sitemapindex"]],
-  ["/sitemap-zh.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/tags/basic-engineering"]],
+  ["/sitemap-zh.xml", ["https://www.linqingan.com/knowledge", "https://www.linqingan.com/diagnostics/creep-not-moving", "https://www.linqingan.com/diagnostics/spawn-not-spawning", "https://www.linqingan.com/diagnostics/cpu-too-high", "https://www.linqingan.com/diagnostics/controller-downgrade", "https://www.linqingan.com/diagnostics/resources-not-moving", "https://www.linqingan.com/diagnostics/market-action-failed", "https://www.linqingan.com/tools/creep-body-calculator", "https://www.linqingan.com/changelog", "https://www.linqingan.com/blog/screeps-memory-basics", "https://www.linqingan.com/tags/basic-engineering"]],
   ["/sitemap-en.xml", ["https://www.linqingan.com/en", "https://www.linqingan.com/en/beginner", "https://www.linqingan.com/en/blog/screeps-introduction", "https://www.linqingan.com/en/blog/screeps-first-room-code"]],
 ];
 
@@ -80,6 +87,8 @@ const metadataPaths = [
   "/beginner",
   "/changelog",
   "/knowledge",
+  "/diagnostics",
+  "/diagnostics/creep-not-moving",
   "/tools/creep-body-calculator",
   "/tools/room-diagnostics",
   "/tags/basic-engineering",
@@ -105,6 +114,15 @@ const requiredEnglishBeginnerPaths = [
   "/en/blog/screeps-first-extension",
   "/en/blog/screeps-build-repair",
   "/en/blog/screeps-first-room-code",
+];
+
+const requiredDiagnosticPaths = [
+  "/diagnostics/creep-not-moving",
+  "/diagnostics/spawn-not-spawning",
+  "/diagnostics/cpu-too-high",
+  "/diagnostics/controller-downgrade",
+  "/diagnostics/resources-not-moving",
+  "/diagnostics/market-action-failed",
 ];
 
 async function waitForServer() {
@@ -315,6 +333,7 @@ for (const requiredPath of [
   "/verification",
   "/changelog",
   "/tools/creep-body-calculator",
+  ...requiredDiagnosticPaths,
   "/en/beginner",
   "/en/blog",
   ...requiredEnglishBeginnerPaths,
