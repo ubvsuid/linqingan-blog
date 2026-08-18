@@ -21,6 +21,8 @@ if (response.status !== 200) {
   const chinese = `https://www.linqingan.com${chinesePath}`;
   const signals = [
     "Do not require <code>roomName</code> for every order",
+    "INTERSHARD_RESOURCES",
+    "resourceType: 'pixel'",
     "nullable-room",
     "fee-boundary",
     "single-writer",
@@ -103,5 +105,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Sixteenth English editorial smoke passed: nullable order room identity, conservative fee reserve, idempotent one-writer control, pending-request serialization, next-tick state evidence, source discrepancy disclosure, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Sixteenth English editorial smoke passed: nullable account-bound order identity, conservative fee reserve, idempotent one-writer control, pending-request serialization, next-tick state evidence, source discrepancy disclosure, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
 );
