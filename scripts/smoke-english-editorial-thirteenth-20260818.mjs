@@ -76,7 +76,7 @@ if (introBody.includes("permanently reliable JavaScript process")) {
 if (introBody.includes("runtime cache persists across ticks")) {
   failures.push("Introduction presents rebuildable runtime cache as guaranteed durable state");
 }
-if (!introBody.includes("Game object is created from scratch")) {
+if (!introBody.includes("object is created from scratch and filled with current data on every tick")) {
   failures.push("Introduction does not explain the per-tick Game snapshot boundary");
 }
 
@@ -84,7 +84,7 @@ const { body: roomBody } = await fetchText("/en/blog/screeps-first-room");
 if (roomBody.includes("Game.rooms is your owned rooms")) {
   failures.push("First Room still conflates Game.rooms visibility with ownership");
 }
-if (!roomBody.includes("no live Room object is available")) {
+if (!roomBody.includes("no live <code>Room</code> object is available")) {
   failures.push("First Room does not preserve the current-visibility evidence boundary");
 }
 
