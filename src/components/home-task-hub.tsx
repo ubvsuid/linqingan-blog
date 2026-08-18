@@ -78,32 +78,32 @@ export function HomeTaskHub() {
       <div className={styles.heading}>
         <p className="eyebrow">CHOOSE YOUR NEXT STEP</p>
         <h2 id="home-task-title">你现在想完成什么？</h2>
-        <p>按当前状态进入学习路线、直接解决问题，或系统查阅专题知识。</p>
+        <p>按当前状态选一个入口，不需要先理解整个站点结构。</p>
       </div>
 
       <div className={styles.grid}>
         <article className={`${styles.card} ${styles.primary}`}>
           <span className={styles.number}>01</span>
-          <p className="eyebrow">按顺序学习</p>
+          <p className="eyebrow">刚开始玩</p>
           <h3>{hasProgress ? "继续上次的新手路线" : "从零开始学习 Screeps"}</h3>
           <p>
             {hasProgress
               ? `已完成 ${progress.completedSlugs.length} / ${beginnerSeriesSlugs.length} 篇，从第 ${resumeIndex} 篇继续。`
-              : "从游戏界面、tick 和第一只 Creep 开始，逐步写出可运行的房间基础代码。"}
+              : "从 tick、第一只 Creep 和基础房间循环开始。"}
           </p>
           <Link
             href={`/blog/${resumeSlug}`}
             onClick={() => trackHomeAction(hasProgress ? "resume_beginner" : "start_beginner")}
           >
-            {hasProgress ? "继续学习" : "开始新手路线"} <span aria-hidden="true">→</span>
+            {hasProgress ? "继续学习" : "开始学习"} <span aria-hidden="true">→</span>
           </Link>
         </article>
 
         <article className={styles.card}>
           <span className={styles.number}>02</span>
-          <p className="eyebrow">解决当前问题</p>
-          <h3>搜索错误码、API 或中文问题</h3>
-          <p>支持 Creep、Memory、ERR_NOT_IN_RANGE、Spawn 失败、CPU bucket 等常见说法。</p>
+          <p className="eyebrow">代码出了问题</p>
+          <h3>直接描述你看到的现象</h3>
+          <p>搜索错误码、API、Creep、Spawn、CPU 或中文问题。</p>
           <form
             action="/search"
             role="search"
@@ -119,11 +119,11 @@ export function HomeTaskHub() {
 
         <article className={styles.card}>
           <span className={styles.number}>03</span>
-          <p className="eyebrow">按主题查阅</p>
-          <h3>进入系统知识库与工具</h3>
-          <p>按 Memory、Spawn、经济、寻路、防御、市场和运行诊断查找专题内容。</p>
+          <p className="eyebrow">已经有基础</p>
+          <h3>查专题知识与工程工具</h3>
+          <p>从 Memory、Spawn、寻路、市场到运行诊断，直接进入对应模块。</p>
           <div className={styles.links}>
-            <Link href="/knowledge" onClick={() => trackHomeAction("open_knowledge")}>浏览知识库 →</Link>
+            <Link href="/knowledge" onClick={() => trackHomeAction("open_knowledge")}>进入知识库 →</Link>
             <Link href="/tools" onClick={() => trackHomeAction("open_tools")}>打开工具中心 →</Link>
           </div>
         </article>
