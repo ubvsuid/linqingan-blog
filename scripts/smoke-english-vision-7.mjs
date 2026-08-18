@@ -14,7 +14,7 @@ const articles = [
     signals: [
       "Memory.rooms is not a live Room object",
       "status: 'room-not-visible'",
-      "Live multi-tick visibility test",
+      "Live multi-tick verification pending",
       "Pending",
     ],
   },
