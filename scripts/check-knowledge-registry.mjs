@@ -13,16 +13,50 @@ const difficultyValues = new Set(["beginner", "intermediate", "advanced"]);
 const keywordRoleValues = new Set(["owner", "supporting"]);
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const spawnPilot = [
-  ["screeps-spawncreep-return-codes", "create-queue", 10],
-  ["screeps-spawn-exit-blocked-directions", "create-queue", 20],
-  ["screeps-dynamic-creep-body-energy", "create-queue", 30],
-  ["screeps-room-energyavailable-stuck", "create-queue", 40],
-  ["screeps-multi-spawn-queue", "create-queue", 50],
-  ["screeps-creep-prespawn-replacement", "replacement-retirement", 60],
-  ["screeps-spawn-renew-creep", "replacement-retirement", 70],
-  ["screeps-spawn-recycle-creep", "replacement-retirement", 80],
-  ["screeps-spawn-emergency-recovery", "emergency-recovery", 90],
+const parityContracts = [
+  {
+    label: "Spawn",
+    moduleId: "spawn-lifecycle",
+    nextModuleId: "room-economy",
+    expected: [
+      ["screeps-spawncreep-return-codes", "create-queue", 10],
+      ["screeps-spawn-exit-blocked-directions", "create-queue", 20],
+      ["screeps-dynamic-creep-body-energy", "create-queue", 30],
+      ["screeps-room-energyavailable-stuck", "create-queue", 40],
+      ["screeps-multi-spawn-queue", "create-queue", 50],
+      ["screeps-creep-prespawn-replacement", "replacement-retirement", 60],
+      ["screeps-spawn-renew-creep", "replacement-retirement", 70],
+      ["screeps-spawn-recycle-creep", "replacement-retirement", 80],
+      ["screeps-spawn-emergency-recovery", "emergency-recovery", 90],
+    ],
+    stageCounts: new Map([
+      ["create-queue", 5],
+      ["replacement-retirement", 3],
+      ["emergency-recovery", 1],
+    ]),
+  },
+  {
+    label: "Movement / Vision",
+    moduleId: "movement-vision",
+    nextModuleId: "controller-control",
+    expected: [
+      ["screeps-err-not-in-range", "common-errors", 10],
+      ["screeps-moveto-not-moving", "common-errors", 20],
+      ["screeps-err-no-path", "common-errors", 30],
+      ["screeps-pathfinder-costmatrix", "path-costs", 40],
+      ["screeps-map-find-route", "path-costs", 50],
+      ["screeps-roomposition-distance", "path-costs", 60],
+      ["screeps-move-fatigue-body-ratio", "path-costs", 70],
+      ["screeps-room-visibility", "vision-visualization", 80],
+      ["screeps-observer-observe-room", "vision-visualization", 90],
+      ["screeps-roomvisual-debug", "vision-visualization", 100],
+    ],
+    stageCounts: new Map([
+      ["common-errors", 3],
+      ["path-costs", 4],
+      ["vision-visualization", 3],
+    ]),
+  },
 ];
 
 function addError(message) {
@@ -141,62 +175,66 @@ for (const record of records) {
   }
 }
 
-const spawnRecords = records
-  .filter((record) => record.knowledge.module === "spawn-lifecycle")
-  .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
-
-if (spawnRecords.length !== spawnPilot.length) {
-  addError(`Spawn pilot 数量错误：预期 ${spawnPilot.length}，实际 ${spawnRecords.length}`);
-}
-
-for (let index = 0; index < spawnPilot.length; index += 1) {
-  const expected = spawnPilot[index];
-  const actual = spawnRecords[index];
-  if (!actual) continue;
-
-  if (
-    actual.slug !== expected[0] ||
-    actual.knowledge.stage !== expected[1] ||
-    actual.knowledge.order !== expected[2]
-  ) {
-    addError(
-      `Spawn parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
-    );
-  }
-}
-
-const expectedStageCounts = new Map([
-  ["create-queue", 5],
-  ["replacement-retirement", 3],
-  ["emergency-recovery", 1],
-]);
-for (const [stage, expectedCount] of expectedStageCounts) {
-  const actualCount = spawnRecords.filter((record) => record.knowledge.stage === stage).length;
-  if (actualCount !== expectedCount) {
-    addError(`Spawn stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
-  }
-}
-
-const spawnOrders = spawnRecords.map((record) => record.knowledge.order);
-if (new Set(spawnOrders).size !== spawnOrders.length) {
-  addError("Spawn pilot 存在重复 knowledge.order");
-}
-
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
-const spawnModuleStart = moduleRegistrySource.indexOf('id: "spawn-lifecycle"');
-const roomModuleStart = moduleRegistrySource.indexOf('id: "room-economy"');
-if (spawnModuleStart < 0 || roomModuleStart < 0 || roomModuleStart <= spawnModuleStart) {
-  addError("knowledge-module-registry.ts 无法定位 Spawn module block");
-} else {
-  const spawnBlock = moduleRegistrySource.slice(spawnModuleStart, roomModuleStart);
-  if (!spawnBlock.includes('articleSource: "metadata"')) {
-    addError("Spawn module 尚未切换到 metadata articleSource");
+const paritySummaries = [];
+
+for (const contract of parityContracts) {
+  const moduleRecords = records
+    .filter((record) => record.knowledge.module === contract.moduleId)
+    .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
+
+  if (moduleRecords.length !== contract.expected.length) {
+    addError(`${contract.label} parity 数量错误：预期 ${contract.expected.length}，实际 ${moduleRecords.length}`);
   }
-  for (const [slug] of spawnPilot) {
-    if (spawnBlock.includes(`"${slug}"`)) {
-      addError(`Spawn module 仍硬编码文章 slug：${slug}`);
+
+  for (let index = 0; index < contract.expected.length; index += 1) {
+    const expected = contract.expected[index];
+    const actual = moduleRecords[index];
+    if (!actual) continue;
+
+    if (
+      actual.slug !== expected[0] ||
+      actual.knowledge.stage !== expected[1] ||
+      actual.knowledge.order !== expected[2]
+    ) {
+      addError(
+        `${contract.label} parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
+      );
     }
   }
+
+  for (const [stage, expectedCount] of contract.stageCounts) {
+    const actualCount = moduleRecords.filter((record) => record.knowledge.stage === stage).length;
+    if (actualCount !== expectedCount) {
+      addError(`${contract.label} stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
+    }
+  }
+
+  const orders = moduleRecords.map((record) => record.knowledge.order);
+  if (new Set(orders).size !== orders.length) {
+    addError(`${contract.label} parity 存在重复 knowledge.order`);
+  }
+
+  const moduleStart = moduleRegistrySource.indexOf(`id: "${contract.moduleId}"`);
+  const nextModuleStart = moduleRegistrySource.indexOf(`id: "${contract.nextModuleId}"`);
+  if (moduleStart < 0 || nextModuleStart < 0 || nextModuleStart <= moduleStart) {
+    addError(`knowledge-module-registry.ts 无法定位 ${contract.label} module block`);
+  } else {
+    const moduleBlock = moduleRegistrySource.slice(moduleStart, nextModuleStart);
+    if (!moduleBlock.includes('articleSource: "metadata"')) {
+      addError(`${contract.label} module 尚未切换到 metadata articleSource`);
+    }
+    for (const [slug] of contract.expected) {
+      if (moduleBlock.includes(`"${slug}"`)) {
+        addError(`${contract.label} module 仍硬编码文章 slug：${slug}`);
+      }
+    }
+  }
+
+  const stageSummary = [...contract.stageCounts.values()].join("/");
+  paritySummaries.push(
+    `${contract.label} ${moduleRecords.length}/${contract.expected.length} (${stageSummary})`,
+  );
 }
 
 if (errors.length > 0) {
@@ -206,5 +244,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, stage counts 5/3/1, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} metadata article(s), ${paritySummaries.join(", ")}, Keyword Owner conflicts 0.`,
 );
