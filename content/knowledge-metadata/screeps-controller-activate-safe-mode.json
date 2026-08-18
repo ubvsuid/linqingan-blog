@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "controller-control",
+    "stage": "safety-lifecycle",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps activateSafeMode",
+    "searchIntent": "安全调用 StructureController.activateSafeMode()，理解可用次数、cooldown、房间限制与返回码",
+    "keywordRole": "owner"
+  }
+}

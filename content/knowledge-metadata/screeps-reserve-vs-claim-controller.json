@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "controller-control",
+    "stage": "reservation-claim",
+    "order": 40,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps reserveController vs claimController",
+    "searchIntent": "比较 reserveController() 与 claimController() 的用途、持续方式、CLAIM 条件、GCL 边界与返回值",
+    "keywordRole": "owner"
+  }
+}
