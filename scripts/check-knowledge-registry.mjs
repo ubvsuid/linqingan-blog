@@ -80,6 +80,22 @@ const parityContracts = [
       ["vision-visualization", 3],
     ]),
   },
+  {
+    label: "Controller",
+    moduleId: "controller-control",
+    nextModuleId: "construction-defense",
+    expected: [
+      ["screeps-upgrader-controller-link-not-upgrading", "fixed-upgrade", 10],
+      ["screeps-controller-activate-safe-mode", "safety-lifecycle", 20],
+      ["screeps-controller-downgrade", "safety-lifecycle", 30],
+      ["screeps-reserve-vs-claim-controller", "reservation-claim", 40],
+    ],
+    stageCounts: new Map([
+      ["fixed-upgrade", 1],
+      ["safety-lifecycle", 2],
+      ["reservation-claim", 1],
+    ]),
+  },
 ];
 
 function addError(message) {
