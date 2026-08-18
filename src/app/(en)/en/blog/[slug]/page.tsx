@@ -36,6 +36,7 @@ import {
   applyEnglishEditorialTenth20260818,
   getEnglishEditorialTenthUpdatedAt20260818,
 } from "@/lib/english-editorial-tenth-20260818";
+import { getEnglishEditorialTwelfthUpdatedAt20260818 } from "@/lib/english-editorial-twelfth-20260818";
 import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { applyEnglishMovementContract20260812 } from "@/lib/english-editorial-movement-contract-20260812";
@@ -157,7 +158,8 @@ function getDynamicEnglishArticle(slug: string) {
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialEleventhUpdatedAt20260818(slug)
+  return getEnglishEditorialTwelfthUpdatedAt20260818(slug)
+    ?? getEnglishEditorialEleventhUpdatedAt20260818(slug)
     ?? getEnglishEditorialTenthUpdatedAt20260818(slug)
     ?? getEnglishEditorialNinthUpdatedAt20260817(slug)
     ?? getEnglishEditorialEighthUpdatedAt20260817(slug)
