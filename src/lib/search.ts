@@ -3,6 +3,10 @@ import { projects } from "@/lib/projects";
 import { getSearchablePosts } from "@/lib/posts";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsApiReference } from "@/lib/screeps-api-reference";
+import {
+  chineseDiagnosticDetailIds,
+  getChineseDiagnosticDetailSymptom,
+} from "@/lib/screeps-diagnostic-detail-pages";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { getScreepsErrorDiagnostic } from "@/lib/screeps-error-diagnostics";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
@@ -125,6 +129,31 @@ const diagnosticCenterDocument: SearchDocument = {
     .join(" "),
 };
 
+const diagnosticDetailDocuments: SearchDocument[] = chineseDiagnosticDetailIds.flatMap((id) => {
+  const symptom = getChineseDiagnosticDetailSymptom(id);
+  if (!symptom) return [];
+  return [{
+    id: `diagnostic:${symptom.id}`,
+    type: "工具" as const,
+    title: `${symptom.zhTitle}怎么排查`,
+    description: symptom.zhSummary,
+    href: `/diagnostics/${symptom.id}`,
+    meta: "独立症状排查页",
+    keywords: compactKeywords([
+      symptom.zhTitle,
+      ...symptom.zhSearchTerms,
+      ...symptom.errorNames,
+      ...(symptom.directApiEntryIds ?? []),
+    ]),
+    text: [
+      ...symptom.zhTriage,
+      ...symptom.errorNames,
+      ...(symptom.directApiEntryIds ?? []),
+      ...(symptom.directHubSlugs ?? []),
+    ].join(" "),
+  }];
+});
+
 const verificationCoverageDocument: SearchDocument = {
   id: "reference:verification-coverage",
   type: "工具",
@@ -158,6 +187,7 @@ const toolDocuments: SearchDocument[] = [
     text: "Screeps 免费工具 身体 房间 Market Terminal Controller Lab Boost Spawn 运输 Tower 计算 诊断 规划",
   },
   diagnosticCenterDocument,
+  ...diagnosticDetailDocuments,
   verificationCoverageDocument,
   apiReferenceDocument,
   ...apiHubDocuments,
