@@ -33,6 +33,7 @@ const articles = [
       "Treat <code>OK</code> as same-tick request evidence, not outcome proof",
       "Multiple same-tick requests can change which command wins",
       "A minimal checklist for multi-tick debugging",
+      "const creep = Game.creeps[creepName]",
       "const first = creep.moveTo(source)",
       "const second = creep.moveTo(spawn)",
       "Official-documentation review, Chinese-source review, and static editorial/code review only",
@@ -77,7 +78,12 @@ const negativeControls = [
 ];
 
 for (const path of negativeControls) {
-  const body = await (await fetch(`${baseUrl}${path}`)).text();
+  const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
+  const body = await response.text();
+  if (response.status !== 200) {
+    failures.push(`${path}: expected 200, got ${response.status}`);
+    continue;
+  }
   if (
     body.includes("Automation is repeated conditional decision-making")
     || body.includes("Capture one bounded read-only room snapshot")
