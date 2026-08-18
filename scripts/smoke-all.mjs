@@ -57,6 +57,7 @@ try {
   await import("./smoke-english-intershard-memory-20.mjs");
   await import("./smoke-english-foreign-segment-21.mjs");
   await import("./smoke-english-editorial-ninth-20260817.mjs");
+  await import("./smoke-english-editorial-tenth-20260818.mjs");
 } finally {
   globalThis.fetch = originalFetch;
 }
