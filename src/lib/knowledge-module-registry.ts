@@ -171,17 +171,11 @@ export const knowledgeModuleRegistry: readonly KnowledgeModuleConfig[] = [
     description: "从固定 Upgrader 与 Controller Link 供能诊断，继续处理 Safe Mode、Controller 降级、预订与占领边界。",
     audience: "开始使用固定升级站位、Controller Link，或管理 Controller 安全、降级风险和远程控制权的玩家。",
     learningGoal: "先建立可诊断的固定升级链路，再理解 Controller 安全、降级、所有权、预订和扩张边界。",
-    articleSource: "legacy",
+    articleSource: "metadata",
     stages: [
-      { id: "fixed-upgrade", title: "固定升级链路", description: "先排查 anchor、Controller Link、Energy、身体部件和升级返回值。", legacyFrom: 0, legacyTo: 1 },
-      { id: "safety-lifecycle", title: "安全与生命周期", description: "继续理解 Safe Mode 和 Controller 降级。", legacyFrom: 1, legacyTo: 3 },
-      { id: "reservation-claim", title: "预订与占领", description: "最后区分 reserveController() 与 claimController()。", legacyFrom: 3, legacyTo: 4 },
-    ],
-    legacySlugs: [
-      "screeps-upgrader-controller-link-not-upgrading",
-      "screeps-controller-activate-safe-mode",
-      "screeps-controller-downgrade",
-      "screeps-reserve-vs-claim-controller",
+      { id: "fixed-upgrade", title: "固定升级链路", description: "先排查 anchor、Controller Link、Energy、身体部件和升级返回值。" },
+      { id: "safety-lifecycle", title: "安全与生命周期", description: "继续理解 Safe Mode 和 Controller 降级。" },
+      { id: "reservation-claim", title: "预订与占领", description: "最后区分 reserveController() 与 claimController()。" },
     ],
     systemMap: {
       zhTitle: "Controller 控制与升级链",
