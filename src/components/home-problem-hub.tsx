@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { getChineseDiagnosticDetailHref } from "@/lib/screeps-diagnostic-detail-pages";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 
 import styles from "./home-problem-hub.module.css";
@@ -45,7 +46,11 @@ export function HomeProblemHub() {
 
       <div className={styles.grid}>
         {featuredSymptoms.map((symptom) => (
-          <Link className={styles.card} href={`/diagnostics#${symptom.id}`} key={symptom.id}>
+          <Link
+            className={styles.card}
+            href={getChineseDiagnosticDetailHref(symptom.id) ?? `/diagnostics#${symptom.id}`}
+            key={symptom.id}
+          >
             <span className={styles.kind}>症状</span>
             <strong>{symptom.zhTitle}</strong>
             <p className={styles.checks}>
