@@ -400,10 +400,10 @@ function improveConstruction(
 
   articleHtml = replaceRequired(
     articleHtml,
-    `<h2 id="verify-next-tick">`,
+    `<h2 id="after-ok">`,
     `<p><code>ERR_FULL</code> is an account-wide Construction Site limit boundary. The planner's <code>Object.keys(Game.constructionSites).length</code> check is intentionally global; a low site count in only the target room cannot rule out the global limit.</p>
 
-<h2 id="verify-next-tick">`,
+<h2 id="after-ok">`,
     article.slug,
     "Construction global site-limit note",
   );
