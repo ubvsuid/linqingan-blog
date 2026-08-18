@@ -8,22 +8,25 @@ const path = "/en/blog/screeps-room-energyavailable-stuck";
 const chinesePath = "/blog/screeps-room-energyavailable-stuck";
 const headline = "Why room.energyAvailable Stays Below Capacity in Screeps";
 const description =
-  "Diagnose room.energyAvailable below energyCapacityAvailable by inspecting Spawn and Extension Stores, selecting one fill target, recording transfer() results, and verifying later deltas.";
+  "Diagnose room.energyAvailable below energyCapacityAvailable by reconciling active Spawn and Extension Stores, holding one stable fill target, preserving transfer() results, and matching the processed Energy transfer on the next tick.";
 const publishedAt = "2026-08-04";
 const publishedLabel = "August 4, 2026";
+const modifiedTime = "2026-08-18";
+const articleTags = ["Spawn", "Energy", "Debugging", "Events"];
 const discovery = getEnglishDiscoveryArticle(path);
 const articleUrl = `${siteConfig.url}${path}`;
-const modifiedTime = discovery?.updatedAt ?? publishedAt;
 
 export const metadata: Metadata = {
   title: { absolute: `${headline} | Linqingan` },
   description,
   keywords: [
     "Screeps room.energyAvailable",
-    "energyCapacityAvailable",
+    "Screeps energyCapacityAvailable",
     "Screeps Extension not filling",
     "Screeps Spawn energy",
     "Creep.transfer Extension",
+    "Screeps EVENT_TRANSFER",
+    "Screeps room energy stuck",
   ],
   alternates: {
     canonical: path,
@@ -44,7 +47,7 @@ export const metadata: Metadata = {
     description,
     publishedTime: publishedAt,
     modifiedTime,
-    tags: discovery?.tags ?? ["Spawn", "Energy", "Debugging"],
+    tags: articleTags,
     images: [{ url: `${siteConfig.url}${path}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
@@ -56,29 +59,36 @@ export const metadata: Metadata = {
 };
 
 const toc: Array<[string, string]> = [
-  ["two-room-values", "What the two Room values measure"],
-  ["real-gap-or-demand", "Separate a fill failure from normal demand"],
-  ["inspect-structures", "Inspect every active Spawn and Extension"],
-  ["complete-example", "Complete filler and later verification"],
+  ["room-aggregate", "What the two Room values actually measure"],
+  ["demand-vs-delivery", "Separate production demand from delivery failure"],
+  ["reconcile-structures", "Reconcile the exact Spawn and Extension Stores"],
+  ["stable-target", "Keep one fill target stable while moving"],
+  ["complete-example", "Complete filler with exact next-tick evidence"],
   ["return-codes", "transfer() return-code checklist"],
-  ["boundaries", "Verification boundaries"],
+  ["boundaries", "Evidence and engine boundaries"],
 ];
 
 const articleHtml = String.raw`
-<h2 id="two-room-values">What the two Room values measure</h2>
-<p><code>room.energyAvailable</code> is the Energy currently stored in the room's Spawns and Extensions. <code>room.energyCapacityAvailable</code> is their total Energy capacity. The difference tells you how much spawn-network capacity is empty, but not which structure is empty or why delivery failed.</p>
-<p>Energy in Storage, Containers, Terminals, or Links does not directly raise <code>room.energyAvailable</code>. A normal <code>spawnCreep()</code> request spends Energy that is already inside same-room Spawns and Extensions.</p>
+<h2 id="room-aggregate">What the two Room values actually measure</h2>
+<p><code>room.energyAvailable</code> is the current Energy available in your room's Spawn-and-Extension network. <code>room.energyCapacityAvailable</code> is the corresponding total capacity. Energy in Storage, Containers, Terminals, Links, Towers, Labs, or a Creep's Store does not directly increase either Room aggregate.</p>
+<p>The official Room API describes these values in terms of Spawns and Extensions. The current checked engine goes one step deeper: while creating the runtime Room snapshot, it adds owned Spawn/Extension Energy and capacity only when the underlying object is not marked <code>off</code>. That is why an action-oriented diagnostic should inspect <strong>owned active</strong> Spawns and Extensions instead of blindly summing every visible structure.</p>
+<p>This is a current-engine implementation boundary, not a promise that player code should depend on a private <code>off</code> field. Use the public <code>structure.isActive()</code> check in your script.</p>
 
-<h2 id="real-gap-or-demand">Separate a fill failure from normal demand</h2>
-<p>A low value can indicate a broken filler, but it can also be normal production demand. A hauler may add 50 Energy to one Extension while a Spawn request consumes 50 Energy elsewhere. The target Store increased and the Creep Store decreased, yet the room total stayed flat.</p>
-<p>Do not use only <code>room.energyAvailable &gt; previousValue</code> as proof. Prefer a bounded later observation of the exact target Store, the Creep Store, the room total, and concurrent spawning activity.</p>
+<h2 id="demand-vs-delivery">Separate production demand from delivery failure</h2>
+<p>A Room aggregate below capacity does not automatically mean the filler is broken. A valid delivery and a valid Spawn consumption can happen around the same period. The target Extension can gain Energy while <code>room.energyAvailable</code> stays flat or even falls because another Spawn/Extension simultaneously funds production.</p>
+<p>That creates an important evidence hierarchy:</p>
+<ol>
+  <li><strong>Strongest for one submitted fill:</strong> the exact processed <code>EVENT_TRANSFER</code> for the sending Creep, target structure, resource type, and amount.</li>
+  <li><strong>Useful fallback:</strong> matching target gain and Creep loss on the next snapshot.</li>
+  <li><strong>Context only:</strong> the room-level Energy delta, because other Spawn-network activity can change it.</li>
+</ol>
+<p>Do not require <code>room.energyAvailable &gt; previousValue</code> as proof that one <code>transfer()</code> worked.</p>
 
-<h2 id="inspect-structures">Inspect every active Spawn and Extension</h2>
+<h2 id="reconcile-structures">Reconcile the exact Spawn and Extension Stores</h2>
+<p>Start with a read-only same-tick snapshot. It tells you which active owned structure has free capacity and whether the structure-level totals agree with the Room aggregate you are trying to diagnose.</p>
 <pre><code class="language-js">function isSpawnEnergyStructure(structure) {
-  return (
-    structure.structureType === STRUCTURE_SPAWN
-    || structure.structureType === STRUCTURE_EXTENSION
-  );
+  return structure.structureType === STRUCTURE_SPAWN
+    || structure.structureType === STRUCTURE_EXTENSION;
 }
 
 function getActiveSpawnEnergyStructures(room) {
@@ -91,7 +101,7 @@ function getActiveSpawnEnergyStructures(room) {
 }
 
 function describeRoomEnergy(room) {
-  const details = getActiveSpawnEnergyStructures(room)
+  const structures = getActiveSpawnEnergyStructures(room)
     .map(structure =&gt; ({
       id: structure.id,
       type: structure.structureType,
@@ -104,7 +114,17 @@ function describeRoomEnergy(room) {
       || left.id.localeCompare(right.id)
     );
 
+  const measuredUsed = structures.reduce(
+    (sum, item) =&gt; sum + item.used,
+    0
+  );
+  const measuredCapacity = structures.reduce(
+    (sum, item) =&gt; sum + item.capacity,
+    0
+  );
+
   return {
+    tick: Game.time,
     roomName: room.name,
     roomEnergyAvailable: room.energyAvailable,
     roomEnergyCapacityAvailable: room.energyCapacityAvailable,
@@ -112,31 +132,49 @@ function describeRoomEnergy(room) {
       0,
       room.energyCapacityAvailable - room.energyAvailable
     ),
-    measuredUsed: details.reduce((sum, item) =&gt; sum + item.used, 0),
-    measuredCapacity: details.reduce((sum, item) =&gt; sum + item.capacity, 0),
-    structures: details
+    measuredUsed,
+    measuredCapacity,
+    usedDifference: room.energyAvailable - measuredUsed,
+    capacityDifference:
+      room.energyCapacityAvailable - measuredCapacity,
+    structures
   };
 }</code></pre>
-<p>This snapshot identifies whether the gap is in a Spawn or Extension and whether one remote structure remains empty. If your measured active Store totals disagree with the Room values, preserve the full same-tick snapshot and Controller state before claiming an engine defect.</p>
+<p>On the checked engine, an unexplained difference is worth preserving as evidence, but do not jump straight to “engine bug.” First record the full snapshot, Controller level/ownership, every relevant structure's <code>isActive()</code> result, and the exact tick. A stale assumption about which Extensions are active is a much more ordinary diagnosis.</p>
 
-<h2 id="complete-example">Complete filler and later verification</h2>
-<p>The example below accepts one Creep that already carries Energy. It does not choose a withdrawal source. It filters active owned Spawns and Extensions, ranks by range, free capacity, and stable ID, submits one final transfer decision, and records a later observation.</p>
-<pre><code class="language-js">function getFillCandidates(creep) {
-  return getActiveSpawnEnergyStructures(creep.room)
-    .map(target =&gt; ({
-      target,
-      free: target.store.getFreeCapacity(RESOURCE_ENERGY),
-      range: creep.pos.getRangeTo(target)
-    }))
-    .filter(candidate =&gt;
-      Number.isFinite(candidate.free) &amp;&amp; candidate.free &gt; 0
-    )
-    .sort((left, right) =&gt;
-      left.range - right.range
-      || right.free - left.free
-      || left.target.id.localeCompare(right.target.id)
-    );
+<h2 id="stable-target">Keep one fill target stable while moving</h2>
+<p>A common filler anti-pattern is to sort all empty Extensions every tick and immediately chase whichever one looks closest now. When several haulers are filling the same network, that can cause target churn: a Creep walks toward Extension A, another hauler changes the free-capacity ordering, and the first Creep turns toward B before it ever delivers.</p>
+<p>Use a stable target ID while the target remains valid. Re-resolve the object each tick, require the same room, ownership, active state, supported structure type, and positive Energy capacity, then clear the ID when it becomes full or invalid.</p>
+<pre><code class="language-js">function resolveFillTarget(creep, targetId) {
+  if (!targetId) return null;
+
+  const target = Game.getObjectById(targetId);
+  if (
+    !target
+    || target.room?.name !== creep.room.name
+    || target.my !== true
+    || !isSpawnEnergyStructure(target)
+    || !target.isActive()
+    || target.store.getFreeCapacity(RESOURCE_ENERGY) &lt;= 0
+  ) return null;
+
+  return target;
 }
+
+function selectFillTarget(creep) {
+  const candidates = getActiveSpawnEnergyStructures(creep.room)
+    .filter(target =&gt;
+      target.store.getFreeCapacity(RESOURCE_ENERGY) &gt; 0
+    )
+    .sort((left, right) =&gt; left.id.localeCompare(right.id));
+
+  return creep.pos.findClosestByPath(candidates) ?? null;
+}</code></pre>
+<p><code>findClosestByPath()</code> is a project choice here because a straight range ranking can repeatedly prefer a structure that the current pathfinder cannot reach. A production traffic system may use a shared CostMatrix or reservation layer instead; the article does not claim this helper is a universal scheduler.</p>
+
+<h2 id="complete-example">Complete filler with exact next-tick evidence</h2>
+<p>The complete example accepts one Creep that already carries Energy. It does not choose a withdrawal source. It keeps one target stable while moving, records movement separately, recomputes the transferable amount at adjacent range, submits one <code>transfer()</code>, and verifies the previous tick on the next run.</p>
+<pre><code class="language-js">const HISTORY_LIMIT = 20;
 
 function getEnergyFillMemory() {
   Memory.energyFill ??= { pending: {}, history: [] };
@@ -156,6 +194,15 @@ function verifyPreviousEnergyFill(creep) {
   const creepNow = creep.store.getUsedCapacity(RESOURCE_ENERGY);
   const roomNow = room ? room.energyAvailable : null;
 
+  // Room.getEventLog() exposes the previous tick's processed events.
+  const exactEvent = creep.room.getEventLog().find(event =&gt;
+    event.event === EVENT_TRANSFER
+    &amp;&amp; event.objectId === pending.creepId
+    &amp;&amp; event.data?.targetId === pending.targetId
+    &amp;&amp; event.data?.resourceType === RESOURCE_ENERGY
+  );
+
+  const processedAmount = exactEvent?.data?.amount ?? null;
   const targetGain = targetNow === null
     ? null
     : targetNow - pending.targetBefore;
@@ -164,25 +211,23 @@ function verifyPreviousEnergyFill(creep) {
     ? null
     : roomNow - pending.roomBefore;
 
-  let status = "not-observed";
-  if (targetGain !== null &amp;&amp; targetGain &gt; 0 &amp;&amp; creepLoss &gt; 0) {
+  let status = "transfer-not-observed";
+  if (Number.isFinite(processedAmount) &amp;&amp; processedAmount &gt; 0) {
+    status = "exact-transfer-event-observed";
+  } else if (targetGain !== null &amp;&amp; targetGain &gt; 0 &amp;&amp; creepLoss &gt; 0) {
     status = "matching-target-and-creep-delta";
   } else if (targetGain !== null &amp;&amp; targetGain &gt; 0) {
     status = "target-gain-observed";
   } else if (creepLoss &gt; 0) {
     status = "creep-loss-observed";
-  } else if (roomDelta !== null &amp;&amp; roomDelta &gt; 0) {
-    status = "room-increase-observed";
   } else if (target === null) {
-    status = "target-unavailable";
-  } else if (Game.time &gt; pending.tick + 1) {
-    status = "late-observation";
+    status = "target-unavailable-after-submit";
   }
 
   const record = {
     verifiedAt: Game.time,
-    creepName: creep.name,
     ...pending,
+    processedAmount,
     targetNow,
     creepNow,
     roomNow,
@@ -193,7 +238,7 @@ function verifyPreviousEnergyFill(creep) {
   };
 
   memory.history.push(record);
-  memory.history = memory.history.slice(-20);
+  memory.history = memory.history.slice(-HISTORY_LIMIT);
   delete memory.pending[creep.name];
   return record;
 }
@@ -201,69 +246,102 @@ function verifyPreviousEnergyFill(creep) {
 function runSpawnEnergyFiller(creep) {
   const verification = verifyPreviousEnergyFill(creep);
 
-  if (creep.spawning) return { status: "creep-spawning", verification };
+  if (creep.spawning) {
+    return { status: "creep-spawning", verification };
+  }
   if (creep.getActiveBodyparts(CARRY) &lt;= 0) {
     return { status: "no-active-carry-part", verification };
   }
 
   const carried = creep.store.getUsedCapacity(RESOURCE_ENERGY);
-  if (carried &lt;= 0) return { status: "no-carried-energy", verification };
+  if (carried &lt;= 0) {
+    return { status: "no-carried-energy", verification };
+  }
 
   const roomState = describeRoomEnergy(creep.room);
   if (roomState.missingEnergy &lt;= 0) {
+    creep.memory.energyFillTargetId = null;
     return { status: "room-energy-full", roomState, verification };
   }
 
-  if (creep.memory.energyFillDecisionTick === Game.time) {
-    return { status: "already-decided-this-tick", roomState, verification };
-  }
-  creep.memory.energyFillDecisionTick = Game.time;
+  let target = resolveFillTarget(
+    creep,
+    creep.memory.energyFillTargetId
+  );
 
-  const candidate = getFillCandidates(creep)[0];
-  if (!candidate) {
+  if (!target) {
+    target = selectFillTarget(creep);
+    creep.memory.energyFillTargetId = target?.id ?? null;
+  }
+
+  if (!target) {
     return {
-      status: "no-fillable-active-structure",
+      status: "no-reachable-fill-target",
       roomState,
       verification
     };
   }
 
-  if (!creep.pos.isNearTo(candidate.target)) {
+  if (!creep.pos.isNearTo(target)) {
+    const moveResult = creep.moveTo(target, {
+      range: 1,
+      reusePath: 5
+    });
+
+    if (moveResult !== OK) {
+      creep.memory.energyFillTargetId = null;
+    }
+
     return {
       status: "moving-to-energy-target",
-      targetId: candidate.target.id,
-      moveResult: creep.moveTo(candidate.target, { range: 1, reusePath: 5 }),
+      targetId: target.id,
+      moveResult,
       roomState,
       verification
     };
   }
 
-  const amount = Math.min(carried, candidate.free);
-  const targetBefore =
-    candidate.target.store.getUsedCapacity(RESOURCE_ENERGY);
+  const targetBefore = target.store.getUsedCapacity(RESOURCE_ENERGY);
+  const freeNow = target.store.getFreeCapacity(RESOURCE_ENERGY);
+  const carriedNow = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+  const requestedAmount = Math.min(carriedNow, freeNow);
+
+  if (requestedAmount &lt;= 0) {
+    creep.memory.energyFillTargetId = null;
+    return {
+      status: "target-changed-before-transfer",
+      targetId: target.id,
+      roomState,
+      verification
+    };
+  }
+
   const result = creep.transfer(
-    candidate.target,
+    target,
     RESOURCE_ENERGY,
-    amount
+    requestedAmount
   );
 
   if (result === OK) {
     getEnergyFillMemory().pending[creep.name] = {
       tick: Game.time,
       roomName: creep.room.name,
-      targetId: candidate.target.id,
-      requestedAmount: amount,
+      creepId: creep.id,
+      targetId: target.id,
+      requestedAmount,
       targetBefore,
-      creepBefore: carried,
+      creepBefore: carriedNow,
       roomBefore: creep.room.energyAvailable
     };
+  } else {
+    creep.memory.energyFillTargetId = null;
   }
 
   return {
     status: result === OK ? "transfer-submitted" : "transfer-failed",
     result,
-    targetId: candidate.target.id,
-    requestedAmount: amount,
+    targetId: target.id,
+    requestedAmount,
     roomState,
     verification
   };
@@ -276,7 +354,7 @@ module.exports.loop = function () {
   const outcome = runSpawnEnergyFiller(creep);
   if (
     outcome.status === "transfer-failed"
-    || outcome.status === "no-fillable-active-structure"
+    || outcome.status === "no-reachable-fill-target"
   ) {
     console.log(JSON.stringify({
       type: "spawn-energy-fill-problem",
@@ -286,25 +364,30 @@ module.exports.loop = function () {
     }));
   }
 };</code></pre>
+<p>The checked engine's <code>transfer</code> processor re-reads the target's current capacity while processing the intent and can reduce the processed amount if the target filled in the meantime. The processor records the actual amount in <code>EVENT_TRANSFER</code>. For this reason, keep <code>requestedAmount</code> and <code>processedAmount</code> as different fields.</p>
+<p>An <code>OK</code> return is submission evidence. The exact next-tick event is processed-result evidence. The room aggregate is operational context, not proof of that one transfer.</p>
 
 <h2 id="return-codes">transfer() return-code checklist</h2>
 <table>
-  <thead><tr><th>Code</th><th>Likely cause</th><th>Response</th></tr></thead>
+  <thead><tr><th>Code</th><th>Meaning in this workflow</th><th>Response</th></tr></thead>
   <tbody>
-    <tr><td><code>OK</code></td><td>Transfer accepted</td><td>Observe target and Creep Stores later</td></tr>
-    <tr><td><code>ERR_BUSY</code></td><td>Creep still spawning</td><td>Wait</td></tr>
-    <tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>Creep lacks the requested Energy</td><td>Re-read carried amount</td></tr>
-    <tr><td><code>ERR_INVALID_TARGET</code></td><td>Target cannot receive Energy</td><td>Rebuild the Spawn/Extension candidate list</td></tr>
-    <tr><td><code>ERR_FULL</code></td><td>Another action filled the target</td><td>Reselect next tick</td></tr>
-    <tr><td><code>ERR_NOT_IN_RANGE</code></td><td>Range exceeds one</td><td>Record movement separately</td></tr>
-    <tr><td><code>ERR_INVALID_ARGS</code></td><td>Invalid resource or amount</td><td>Validate Energy and amount</td></tr>
+    <tr><td><code>OK</code></td><td>The transfer was scheduled successfully.</td><td>Match the exact previous-tick event on the next tick.</td></tr>
+    <tr><td><code>ERR_NOT_OWNER</code></td><td>The sending Creep is not yours.</td><td>Stop; do not retry ownership failures as logistics.</td></tr>
+    <tr><td><code>ERR_BUSY</code></td><td>The Creep is still spawning.</td><td>Wait.</td></tr>
+    <tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>The Creep lacks the requested Energy.</td><td>Re-read carried Energy and recompute the amount.</td></tr>
+    <tr><td><code>ERR_INVALID_TARGET</code></td><td>The target cannot receive this transfer.</td><td>Clear the saved ID and rebuild the candidate set.</td></tr>
+    <tr><td><code>ERR_FULL</code></td><td>The target has no free capacity in the current snapshot.</td><td>Clear the target and select again.</td></tr>
+    <tr><td><code>ERR_NOT_IN_RANGE</code></td><td>The target is not adjacent.</td><td>Keep the movement result separate from the transfer result.</td></tr>
+    <tr><td><code>ERR_INVALID_ARGS</code></td><td>The resource type or amount is invalid.</td><td>Recompute from current Stores.</td></tr>
   </tbody>
 </table>
 
-<h2 id="boundaries">Verification boundaries</h2>
-<p>Offline tests covered a full room, Spawn and Extension gaps, exclusion of hostile and inactive structures, range ordering, larger-gap tie breaking, stable ID ordering, amount caps, and a successful target delta while the room total stayed flat. The complete JavaScript example passed a syntax check.</p>
-<p>These checks do not prove live traffic, multi-hauler contention, the exact settlement interaction with spawning, Power Creep effects, complex CostMatrix reachability, or minimum CPU cost. Console and live-shard evidence remain pending.</p>
-<p>Continue with <a href="/en/blog/screeps-dynamic-creep-body">dynamic Creep bodies</a>, <a href="/en/blog/screeps-spawncreep-return-codes">spawnCreep() return codes</a>, or <a href="/en/blog/screeps-storage-energy-usage">Storage Energy policy</a>.</p>
+<h2 id="boundaries">Evidence and engine boundaries</h2>
+<p>The official Room API, <code>Creep.transfer()</code>, <code>Room.getEventLog()</code>, and current <code>screeps/engine</code> 4.3.2 source were rechecked on August 18, 2026. The engine master checked for this revision is <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>.</p>
+<p><strong>Engine-source boundary:</strong> the current runtime builds <code>room.energyAvailable</code> and <code>room.energyCapacityAvailable</code> from owned Spawn/Extension objects that are not <code>off</code>. The article uses public <code>isActive()</code> rather than relying on that internal field.</p>
+<p><strong>Concurrency boundary:</strong> a transfer event proves that one transfer processed, but it does not prove the room total had to rise by the same amount. Spawn consumption or other transfers can change the same aggregate around the observation window.</p>
+<p><strong>Live evidence:</strong> Screeps Console test: Pending. Live multi-hauler contention trace: Pending. Live transfer-plus-spawn-consumption trace: Pending. No live result is fabricated.</p>
+<p>Continue with <a href="/en/blog/screeps-dynamic-creep-body">dynamic Creep bodies</a>, <a href="/en/blog/screeps-spawncreep-return-codes">spawnCreep() return codes</a>, <a href="/en/blog/screeps-room-event-log">Room event logs</a>, or <a href="/en/blog/screeps-storage-energy-usage">Storage Energy policy</a>.</p>
 `;
 
 export default function RoomEnergyAvailableStuckPage() {
@@ -318,10 +401,11 @@ export default function RoomEnergyAvailableStuckPage() {
       dateModified: modifiedTime,
       inLanguage: "en-US",
       mainEntityOfPage: articleUrl,
-      author: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about` },
-      publisher: { "@type": "Organization", name: "Linqingan", url: siteConfig.url },
+      url: articleUrl,
+      author: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about`, sameAs: [siteConfig.links.github] },
+      publisher: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about` },
       isBasedOn: `${siteConfig.url}${chinesePath}`,
-      about: discovery?.tags,
+      about: articleTags,
       articleSection: discovery?.moduleTitle,
     },
     {
@@ -345,13 +429,16 @@ export default function RoomEnergyAvailableStuckPage() {
       category="SPAWN SYSTEM · ENERGY DIAGNOSTICS"
       publishedAt={publishedAt}
       publishedLabel={publishedLabel}
-      readingTime="15 min read"
-      tags={["Spawn", "Energy", "Debugging"]}
+      modifiedAt={modifiedTime}
+      readingTime="19 min read"
+      tags={articleTags}
       verification={[
-        { term: "Documentation", value: "Official API references checked" },
-        { term: "Syntax", value: "Complete JavaScript example checked offline" },
-        { term: "Offline cases", value: "10 passed" },
-        { term: "Live shard", value: "Pending" },
+        { term: "Official documentation", value: "Checked August 18, 2026 — Room.energyAvailable, Room.energyCapacityAvailable, Structure.isActive(), Creep.transfer(), and Room.getEventLog()" },
+        { term: "Engine source", value: "screeps/engine 4.3.2 · 80977824199a596d174d392fd0cf8c458c21fcbd" },
+        { term: "Static code review", value: "Passed — active structure reconciliation, stable target identity, path-aware target selection, exact transfer-event matching, and requested-versus-processed amount separation" },
+        { term: "Evidence model", value: "Exact EVENT_TRANSFER first; matching Store deltas second; room aggregate only as concurrent-demand context" },
+        { term: "Screeps Console test", value: "Pending — no real-account Console transcript was collected for this revision" },
+        { term: "Live multi-tick verification pending", value: "Pending — no live multi-hauler contention or transfer-plus-spawn-consumption trace was collected" },
       ]}
       toc={toc}
       articleHtml={articleHtml}
