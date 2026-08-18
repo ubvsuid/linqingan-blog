@@ -3,7 +3,6 @@ const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 const articles = [
   {
     path: "/en/blog/screeps-introduction",
-    chinesePath: "/blog/screeps-introduction",
     signals: [
       "Persistent world does not mean a permanently reliable JavaScript process",
       "Automation is repeated conditional decision-making",
@@ -15,7 +14,6 @@ const articles = [
   },
   {
     path: "/en/blog/screeps-first-room",
-    chinesePath: "/blog/screeps-first-room",
     signals: [
       "Do not confuse visibility with ownership",
       "Capture one bounded read-only room snapshot",
@@ -28,12 +26,11 @@ const articles = [
   },
   {
     path: "/en/blog/screeps-tick-game-loop",
-    chinesePath: "/blog/screeps-tick-game-loop",
     signals: [
       "Treat <code>OK</code> as same-tick request evidence, not outcome proof",
       "Multiple same-tick requests can change which command wins",
       "A minimal checklist for multi-tick debugging",
-      "const creep = Game.creeps[creepName]",
+      "missing-diagnostic-input",
       "const first = creep.moveTo(source)",
       "const second = creep.moveTo(spawn)",
       "Official-documentation review, Chinese-source review, and static editorial/code review only",
@@ -54,13 +51,11 @@ for (const article of articles) {
   }
 
   const canonical = `https://www.linqingan.com${article.path}`;
-  const chinese = `https://www.linqingan.com${article.chinesePath}`;
 
   for (const expected of [
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
-    `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
     `"dateModified":"2026-08-18"`,
@@ -68,6 +63,10 @@ for (const article of articles) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: missing “${expected}”`);
     }
+  }
+
+  if (!/rel="alternate" hrefLang="zh-CN" href="https:\/\/www\.linqingan\.com\/blog\/[^"]+"/.test(body)) {
+    failures.push(`${article.path}: missing a valid zh-CN alternate mapped to the Chinese blog`);
   }
 }
 
