@@ -27,6 +27,9 @@ if (response.status !== 200) {
     "repair-window-misses-deadline",
     "one-step path is already too late",
     "starting position snapshot",
+    "not-owned-creep",
+    "not-container",
+    "STRUCTURE_CONTAINER",
     "EVENT_REPAIR",
     "processedHits",
     "energySpent",
@@ -75,6 +78,7 @@ for (const negativePath of [
     "event-window-missed",
     "estimateUnboostedRepairEnergy",
     "repair-window-misses-deadline",
+    "not-owned-creep",
   ]) {
     if (negativeBody.includes(signal)) {
       failures.push(`${negativePath}: received seventeenth-batch signal “${signal}”`);
@@ -111,5 +115,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Seventeenth English editorial smoke passed: Container decay runway, explicit repair-submission tick, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Seventeenth English editorial smoke passed: Container decay runway, explicit repair-submission tick, fail-closed actor/target identity, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
 );
