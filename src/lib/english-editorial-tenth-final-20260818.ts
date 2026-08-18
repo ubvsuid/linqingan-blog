@@ -1,5 +1,6 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { applyEnglishEditorialEleventh20260818 } from "@/lib/english-editorial-eleventh-20260818";
+import { applyEnglishEditorialTwelfth20260818 } from "@/lib/english-editorial-twelfth-20260818";
 
 function replaceRequired(
   html: string,
@@ -53,5 +54,7 @@ export function applyEnglishEditorialTenthFinal20260818(
     };
   }
 
-  return applyEnglishEditorialEleventh20260818(finalizedArticle);
+  return applyEnglishEditorialTwelfth20260818(
+    applyEnglishEditorialEleventh20260818(finalizedArticle),
+  );
 }
