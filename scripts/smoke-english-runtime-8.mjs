@@ -11,7 +11,7 @@ const articles = [
   {
     path: "/en/blog/screeps-global-cache", chinesePath: "/blog/screeps-global-cache",
     headline: "Build a Global Cache That Can Disappear Safely", listingTitle: "Screeps Global Cache: Rebuildable Data Across Runtime Ticks",
-    query: "global cache", tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false, modifiedDate: "2026-07-31",
+    query: "global cache", tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false, modifiedDate: "2026-08-18",
     signals: ["global.roomIndexCache ??= new Map()", "sourceIds: [...entry.sourceIds]", "Game.getObjectById(id)", "Live multi-tick verification", "Pending"],
   },
   {
