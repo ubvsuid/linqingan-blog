@@ -9,6 +9,7 @@
         "http://localhost:3000/beginner",
         "http://localhost:3000/knowledge",
         "http://localhost:3000/diagnostics",
+        "http://localhost:3000/diagnostics/creep-not-moving",
         "http://localhost:3000/verification/coverage",
         "http://localhost:3000/tags",
         "http://localhost:3000/tags/memory",
