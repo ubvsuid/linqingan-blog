@@ -6,37 +6,57 @@ const REVIEWED_AT = "August 18, 2026";
 const SELECTED_SLUGS = new Set([
   "screeps-first-room-code",
   "screeps-room-visibility",
-  "screeps-pathfinder-costmatrix",
   "screeps-global-cache",
 ]);
 
-function insertBeforeFirst(
+function insertSection(
   html: string,
-  anchors: string[],
   addition: string,
-  slug: string,
-  label: string,
+  firstId: string,
+  preferredAnchors: string[],
 ): string {
-  for (const anchor of anchors) {
+  if (html.includes(`id="${firstId}"`)) return html;
+
+  const fallbackAnchors = [
+    `<h2 id="official-docs">`,
+    `<h2 id="official-sources">`,
+    `<h2 id="scope">`,
+    `<h2 id="limitations">`,
+    `<h2 id="links">`,
+    `<h2 id="sources">`,
+  ];
+
+  for (const anchor of [...preferredAnchors, ...fallbackAnchors]) {
     if (html.includes(anchor)) {
       return html.replace(anchor, `${addition}\n\n${anchor}`);
     }
   }
 
-  throw new Error(`English editorial eleventh pass could not find ${label} in ${slug}`);
+  return `${html}\n\n${addition}`;
 }
 
-function insertTocBefore(
+function insertToc(
   toc: Array<[string, string]>,
-  beforeIds: string[],
   items: Array<[string, string]>,
+  beforeIds: string[],
 ): Array<[string, string]> {
   const missing = items.filter(
     ([id]) => !toc.some(([currentId]) => currentId === id),
   );
   if (missing.length === 0) return toc;
 
-  const index = toc.findIndex(([id]) => beforeIds.includes(id));
+  const fallbackIds = [
+    "official-docs",
+    "official-sources",
+    "scope",
+    "limitations",
+    "links",
+    "sources",
+  ];
+  const index = toc.findIndex(([id]) =>
+    [...beforeIds, ...fallbackIds].includes(id),
+  );
+
   if (index < 0) return [...toc, ...missing];
   return [...toc.slice(0, index), ...missing, ...toc.slice(index)];
 }
@@ -54,6 +74,7 @@ function refreshVerification(
     "Verification status",
     "Console test pending",
     "Screeps Console test",
+    "Live multi-tick verification",
     "Live multi-tick verification pending",
     "Last verified",
     "Last editorial review",
@@ -80,9 +101,9 @@ function refreshVerification(
 function improveFirstRoomCode(
   article: EnglishBeginnerArticle,
 ): EnglishBeginnerArticle {
-  const addition = String.raw`<h2 id="orchestration-contract">Treat the first room loop as an orchestrator</h2>
-<p>This page is the integration layer for the beginner series. Its job is to decide <strong>which existing Creep handler runs, whether one missing fixed-name Creep should be requested, and what evidence to inspect afterward</strong>. It is not another full reference for <code>harvest()</code>, <code>transfer()</code>, <code>upgradeController()</code>, <code>build()</code>, <code>repair()</code>, or <code>spawnCreep()</code>.</p>
-<p>For a beginner room, use one explicit owner for each decision. The engine can schedule methods from compatible action pipelines in the same tick, so “one role handler per Creep per tick” is a <strong>project policy for predictability</strong>, not a Screeps API limit. It prevents two unrelated modules from issuing competing movement or work decisions and makes the saved return code easier to interpret.</p>
+  const addition = String.raw`<h2 id="orchestration-contract">Treat this page as the beginner-room orchestrator</h2>
+<p>This guide is the integration layer for the beginner series. It should decide <strong>which existing role handler runs, whether one fixed-name Creep is missing, and what evidence to inspect afterward</strong>. It should not duplicate the full <code>harvest()</code>, <code>transfer()</code>, <code>upgradeController()</code>, <code>build()</code>, <code>repair()</code>, or <code>spawnCreep()</code> references.</p>
+<p>For this small teaching loop, give each Creep one role owner per tick. That is a project policy for predictable debugging, not a Screeps rule that forbids every compatible action combination. The benefit is practical: one module owns the movement/work decision and one captured return code explains the branch that actually ran.</p>
 <pre><code class="language-javascript">const BEGINNER_ROLES = [
   'Harvester1',
   'Upgrader1',
@@ -137,12 +158,12 @@ function requestOneMissingCreep(spawn) {
     result
   };
 }</code></pre>
-<p><code>dryRun</code> checks the current request without starting production. A later real call can still be rejected if another part of the tick changes the usable conditions, so preserve the real return code as the final submission result.</p>
+<p><code>dryRun</code> validates a request without starting production. An <code>OK</code> dry run is not evidence that a new Creep exists or has finished spawning. Preserve the real <code>spawnCreep()</code> result, then inspect <code>spawn.spawning</code> and <code>Game.creeps[name]</code> on later ticks.</p>
 
 <h2 id="tick-evidence">Separate accepted commands from later room state</h2>
-<p>The current <code>Game</code> snapshot does not mutate in place when a command returns <code>OK</code>. Screeps processes submitted commands after scripts run, and changed positions, stores, progress, newly created objects, and other outcomes become observable through later game state. For this integrated loop, log the request now and inspect the relevant object again on a later tick.</p>
+<p>The <code>Game</code> snapshot read by the script is the current tick. Submitted game actions are resolved after the script phase, so an <code>OK</code> return is not permission to rewrite the current snapshot into a claimed outcome. Record the request now and compare the relevant object state on a later tick.</p>
 <pre><code class="language-javascript">function describeBeginnerRoomTick(spawn) {
-  const describeCreep = name => {
+  const creeps = BEGINNER_ROLES.map(name => {
     const creep = Game.creeps[name];
 
     if (!creep) {
@@ -156,17 +177,18 @@ function requestOneMissingCreep(spawn) {
       energy: creep.store.getUsedCapacity(
         RESOURCE_ENERGY
       ),
-      roomName: creep.room.name,
-      x: creep.pos.x,
-      y: creep.pos.y
+      position: [
+        creep.pos.roomName,
+        creep.pos.x,
+        creep.pos.y
+      ].join(':')
     };
-  };
+  });
 
   return {
     tick: Game.time,
-    spawnName: spawn?.name || null,
     spawningName: spawn?.spawning?.name || null,
-    creeps: BEGINNER_ROLES.map(describeCreep)
+    creeps
   };
 }
 
@@ -196,28 +218,21 @@ module.exports.loop = function () {
     }));
   }
 };</code></pre>
-<p>Do not read this sample as a promise that a room will recover from every collapse. It still uses fixed names, one basic body, one room, and the simple role logic taught earlier. If the room cannot afford the minimum worker after losing its workforce, continue to the <a href="/en/blog/screeps-emergency-harvester-recovery">emergency harvester recovery guide</a>. For detailed spawning failures use <a href="/en/blog/screeps-spawncreep-return-codes">the spawnCreep() return-code guide</a>; for a scalable module router use <a href="/en/blog/screeps-require-modules">the modules guide</a>.</p>`;
+<p>This is still intentionally a one-room teaching loop with fixed names and one basic body. It is not a prespawn scheduler, task system, multi-room framework, or guaranteed collapse-recovery system. If the room cannot recover its harvesting workforce, use the <a href="/en/blog/screeps-emergency-harvester-recovery">emergency recovery guide</a>. For a rejected spawn request, use <a href="/en/blog/screeps-spawncreep-return-codes">the spawnCreep() return-code guide</a>. For module boundaries, continue to <a href="/en/blog/screeps-require-modules">the require() guide</a>.</p>`;
 
-  const articleHtml = insertBeforeFirst(
+  const articleHtml = insertSection(
     article.articleHtml,
-    [
-      `<h2 id="limitations">`,
-      `<h2 id="scope">`,
-      `<h2 id="official-sources">`,
-      `<h2 id="official-docs">`,
-    ],
     addition,
-    article.slug,
-    "first-room integration boundary",
+    "orchestration-contract",
+    [`<h2 id="limitations">`, `<h2 id="next">`],
   );
-
-  const toc = insertTocBefore(
+  const toc = insertToc(
     article.toc,
-    ["limitations", "scope", "official-sources", "official-docs"],
     [
-      ["orchestration-contract", "Treat the loop as an orchestrator"],
+      ["orchestration-contract", "Treat the page as an orchestrator"],
       ["tick-evidence", "Separate commands from later state"],
     ],
+    ["limitations", "next"],
   );
 
   return {
@@ -229,22 +244,22 @@ module.exports.loop = function () {
       [
         [
           "Chinese source article",
-          "Reviewed in full — the fixed-name, one-room beginner scope and documented collapse limitations are preserved",
+          "Reviewed in full — fixed names, one-room scope, simple role ownership, and documented collapse limits are preserved",
         ],
         [
           "Official documentation",
-          "Checked August 18, 2026 — game-loop timing, simultaneous Creep action pipelines, Game.creeps, StructureSpawn.spawnCreep(), dryRun, spawning state, and current return-code boundaries",
+          "Checked August 18, 2026 — game-loop timing, simultaneous action boundaries, Game.creeps, StructureSpawn.spawnCreep(), dryRun, and spawning state",
         ],
         [
           "Static code review",
-          "Passed — one missing Creep request per loop, dryRun separated from the real spawn result, spawning Creeps excluded from role execution, fixed beginner role ownership, and current-tick snapshots remain explicit",
+          "Passed — only one missing fixed-name Creep is requested, dryRun stays separate from the real result, spawning Creeps do not run role handlers, and current-tick snapshots are not presented as later outcomes",
         ],
         [
           "Intent boundary",
-          "This page integrates the beginner room loop; dedicated guides remain responsible for API-specific spawning, movement, harvesting, building, and recovery diagnosis",
+          "This page integrates the beginner room loop; API-specific spawning, movement, harvesting, building, and recovery diagnosis stay in dedicated guides",
         ],
       ],
-      "No live fixed-name workforce replacement, accepted spawn request, next-tick Creep availability, multi-action conflict, full-room collapse, or recovery trace was collected for this revision",
+      "No live workforce replacement, accepted spawn request, next-tick Creep availability, competing intent, collapse, or recovery trace was collected for this revision",
     ),
     articleHtml,
   };
@@ -253,15 +268,15 @@ module.exports.loop = function () {
 function improveRoomVisibility(
   article: EnglishBeginnerArticle,
 ): EnglishBeginnerArticle {
-  const addition = String.raw`<h2 id="name-position-map-live-room">Do not confuse a room name, position, map data, and live vision</h2>
-<p>A valid room name is not the same thing as a live <code>Room</code>. Code can hold a room-name string, construct a <code>RoomPosition</code>, or use <code>Game.map</code> methods without proving that <code>Game.rooms[roomName]</code> exists in this tick. Use the live <code>Game.rooms</code> entry as the gate before calling Room methods or reading current room objects.</p>
+  const addition = String.raw`<h2 id="name-position-map-live-room">Separate room names, positions, map data, and live Rooms</h2>
+<p>A valid room name is not the same thing as a live <code>Room</code>. Code can store a room-name string, construct a <code>RoomPosition</code>, or ask <code>Game.map</code> for map-level information without proving that <code>Game.rooms[roomName]</code> exists in this tick. Gate current Room methods and current Room objects on the live <code>Game.rooms</code> entry.</p>
 <div class="table-scroll"><table>
 <thead><tr><th>Value</th><th>What it proves</th><th>What it does not prove</th></tr></thead>
 <tbody>
-<tr><td>Room-name string</td><td>Your code has an identifier</td><td>Current vision</td></tr>
-<tr><td><code>RoomPosition</code></td><td>A coordinate can be represented</td><td>A live Room or current objects at that coordinate</td></tr>
-<tr><td><code>Game.map</code> result</td><td>Map-level information for the requested operation</td><td>That <code>room.find()</code> or <code>room.controller</code> can be read</td></tr>
-<tr><td><code>Game.rooms[roomName]</code></td><td>A live Room object is available now</td><td>Why that vision exists or how long it will remain</td></tr>
+<tr><td>Room-name string</td><td>Your code has an identifier.</td><td>Current vision.</td></tr>
+<tr><td><code>RoomPosition</code></td><td>A room coordinate can be represented.</td><td>A live Room or current objects at that coordinate.</td></tr>
+<tr><td><code>Game.map</code> result</td><td>Map-level information for that map operation.</td><td>That <code>room.find()</code> or <code>room.controller</code> is readable now.</td></tr>
+<tr><td><code>Game.rooms[roomName]</code></td><td>A live Room object is available this tick.</td><td>Why vision exists or how long it will remain.</td></tr>
 </tbody></table></div>
 <pre><code class="language-javascript">function describeRoomHandle(roomName) {
   if (typeof roomName !== 'string') {
@@ -288,28 +303,25 @@ function improveRoomVisibility(
     liveRoom: Boolean(room)
   };
 }</code></pre>
-<p>The position object is useful for coordinates and routing APIs, but it is not a replacement for room vision.</p>
 
-<h2 id="visibility-attribution">Keep visibility attribution separate from visibility itself</h2>
-<p>If <code>Game.rooms[roomName]</code> exists, you may safely say the room is currently available. Do not automatically say an Observer caused that visibility: one of your Creeps or structures may already provide it, or another supported game mechanism may be involved. When attribution matters, keep the request tick and Observer ID as separate evidence.</p>
-<p>The same evidence rule applies to saved object IDs. <code>Game.getObjectById(id) === null</code> while the target room is not visible is an <strong>unknown object state</strong>, not proof of deletion. Once the room is visible, a missing object becomes stronger evidence that the saved ID is stale or the object is gone.</p>
-<p>For the full request/next-tick Observer state machine, continue to <a href="/en/blog/screeps-observer-observe-room">the Observer guide</a>. For ID restoration, use <a href="/en/blog/screeps-get-object-by-id">the saved-target guide</a>.</p>`;
+<h2 id="visibility-attribution">Do not infer why vision exists</h2>
+<p>If <code>Game.rooms[roomName]</code> exists, you can safely say the room is available to the current script. Do not automatically say an Observer caused that vision: your Creeps, structures, or another supported visibility source may already expose the room. When attribution matters, keep the Observer ID, requested room, and request tick as separate evidence.</p>
+<p>Apply the same evidence discipline to saved object IDs. If <code>Game.getObjectById(id)</code> returns <code>null</code> while the expected room is not visible, classify the object state as unknown rather than deleted. Once the expected room is visible, a missing ID is stronger evidence that the saved target is stale or absent; mobile-object assumptions still need their own identity check.</p>
+<p>Use <a href="/en/blog/screeps-observer-observe-room">the Observer guide</a> for the request/next-tick vision lifecycle and <a href="/en/blog/screeps-get-object-by-id">the saved-target guide</a> for ID restoration.</p>`;
 
-  const articleHtml = insertBeforeFirst(
+  const articleHtml = insertSection(
     article.articleHtml,
-    [`<h2 id="multi-tick-proof">`, `<h2 id="debugging">`],
     addition,
-    article.slug,
-    "room visibility evidence section",
+    "name-position-map-live-room",
+    [`<h2 id="multi-tick-proof">`, `<h2 id="debugging">`],
   );
-
-  const toc = insertTocBefore(
+  const toc = insertToc(
     article.toc,
-    ["multi-tick-proof", "debugging"],
     [
       ["name-position-map-live-room", "Separate names, positions, map data, and live Rooms"],
-      ["visibility-attribution", "Separate visibility from its cause"],
+      ["visibility-attribution", "Do not infer why vision exists"],
     ],
+    ["multi-tick-proof", "debugging"],
   );
 
   return {
@@ -321,142 +333,18 @@ function improveRoomVisibility(
       [
         [
           "Chinese source article",
-          "Reviewed in full — the August 15 visibility, saved-ID, lastSeenAt, and Observer timing boundaries are preserved",
+          "Reviewed in full — the August 15 current-vision, saved-ID, lastSeenAt, and Observer timing boundaries are preserved",
         ],
         [
           "Official documentation",
-          "Checked August 18, 2026 — Game.rooms current visibility, Game.getObjectById() visible-room access, RoomPosition, Game.map, Game object tick lifetime, and Observer next-tick semantics",
+          "Checked August 18, 2026 — Game.rooms visibility, Game.getObjectById(), RoomPosition, Game.map, current-tick Game objects, and Observer next-tick semantics",
         ],
         [
           "Static code review",
-          "Passed — room-name and RoomPosition representation no longer imply vision, live Room access is explicitly gated, unknown saved-object state is distinct from confirmed absence, and Observer attribution is not inferred from visibility alone",
+          "Passed — room-name and RoomPosition representation do not imply vision, live Room access is explicitly gated, unknown saved-object state is distinct from confirmed absence, and Observer attribution is not inferred from visibility alone",
         ],
       ],
-      "No live Creep/structure/Observer visibility transition, saved-object disappearance, or multi-tick attribution trace was collected for this revision",
-    ),
-    articleHtml,
-  };
-}
-
-function improveCostMatrix(
-  article: EnglishBeginnerArticle,
-): EnglishBeginnerArticle {
-  const addition = String.raw`<h2 id="matrix-lifecycle">Use a static base, then clone before current-tick traffic</h2>
-<p>A reusable matrix needs a lifecycle contract. Slow-changing structure and policy costs may form a static base, but current Creep positions and temporary traffic rules belong to the active tick. Clone the base before writing those dynamic costs so one search cannot poison the matrix reused by another Creep or a later search.</p>
-<pre><code class="language-javascript">function buildStaticRoomMatrix(room) {
-  const costs = new PathFinder.CostMatrix();
-
-  for (const structure of room.find(FIND_STRUCTURES)) {
-    const cost = getStructureCost(structure);
-
-    if (cost > 0) {
-      costs.set(
-        structure.pos.x,
-        structure.pos.y,
-        cost
-      );
-    }
-  }
-
-  return costs;
-}
-
-function addCurrentTraffic(
-  staticMatrix,
-  room,
-  movingCreepId
-) {
-  const costs = staticMatrix.clone();
-
-  for (const other of room.find(FIND_CREEPS)) {
-    if (other.id !== movingCreepId) {
-      const current = costs.get(
-        other.pos.x,
-        other.pos.y
-      );
-
-      if (current < 255) {
-        costs.set(
-          other.pos.x,
-          other.pos.y,
-          255
-        );
-      }
-    }
-  }
-
-  return costs;
-}</code></pre>
-<p><code>PathFinder.CostMatrix.clone()</code> creates a separate matrix with the same data. That copy boundary matters when a shared base matrix is cached or reused. The cache still needs a version or invalidation signal when roads, Ramparts, Containers, other structures, or static policy costs change.</p>
-
-<h2 id="callback-contract">Make every roomCallback result intentional</h2>
-<pre><code class="language-javascript">function createSearchRoomCallback(
-  blockedRooms,
-  movingCreepId,
-  getStaticMatrix
-) {
-  return function roomCallback(roomName) {
-    if (blockedRooms.has(roomName)) {
-      return false;
-    }
-
-    const room = Game.rooms[roomName];
-    if (!room) {
-      return undefined;
-    }
-
-    const staticMatrix = getStaticMatrix(room);
-    return addCurrentTraffic(
-      staticMatrix,
-      room,
-      movingCreepId
-    );
-  };
-}</code></pre>
-<p>Here <code>false</code> is a deliberate route policy: PathFinder must not search that room. <code>undefined</code> means this callback supplies no custom matrix, so the search can continue with its normal terrain handling. Keep this matrix-construction contract here; use <a href="/en/blog/screeps-err-no-path">the ERR_NO_PATH guide</a> when the user problem is a failed or incomplete search rather than matrix design.</p>`;
-
-  const articleHtml = insertBeforeFirst(
-    article.articleHtml,
-    [`<h2 id="serialization">`, `<h2 id="move-result">`],
-    addition,
-    article.slug,
-    "CostMatrix lifecycle section",
-  );
-
-  const toc = insertTocBefore(
-    article.toc,
-    ["serialization", "move-result"],
-    [
-      ["matrix-lifecycle", "Clone the static base before traffic"],
-      ["callback-contract", "Make roomCallback results intentional"],
-    ],
-  );
-
-  return {
-    ...article,
-    finalScore: 99,
-    toc,
-    verification: refreshVerification(
-      article,
-      [
-        [
-          "Chinese source article",
-          "Reviewed in full — static/dynamic matrix separation, incomplete-search handling, and offline-test limits are preserved",
-        ],
-        [
-          "Official documentation",
-          "Checked August 18, 2026 — PathFinder.search(), roomCallback, CostMatrix 0/1-254/255 semantics, CostMatrix.clone(), serialize()/deserialize(), goal range, incomplete, ops, cost, and moveByPath()",
-        ],
-        [
-          "Static code review",
-          "Passed — static structure costs are cloned before current-tick Creep overlays, 255 obstacles are preserved, invisible rooms are not automatically forbidden, blocked rooms remain explicit policy, and search completeness stays separate from movement submission",
-        ],
-        [
-          "Intent boundary",
-          "This page owns CostMatrix construction and lifecycle; ERR_NO_PATH remains the dedicated failed-search diagnosis page",
-        ],
-      ],
-      "No live PathFinder route-quality, CostMatrix cache invalidation, multi-Creep traffic, CPU, incomplete-search, or moveByPath() trace was collected for this revision",
+      "No live Creep, structure, or Observer visibility transition, saved-object disappearance, or multi-tick attribution trace was collected for this revision",
     ),
     articleHtml,
   };
@@ -465,8 +353,8 @@ function addCurrentTraffic(
 function improveGlobalCache(
   article: EnglishBeginnerArticle,
 ): EnglishBeginnerArticle {
-  const addition = String.raw`<h2 id="cache-key-contract">Make the cache key describe the inputs that can change the answer</h2>
-<p>A cache can be perfectly implemented and still return the wrong answer when its key omits part of the input. A room name is enough only for data whose result depends on that room alone. Add explicit schema, configuration, shard, policy, or layout revisions when those values change the derived result.</p>
+  const addition = String.raw`<h2 id="cache-key-contract">Make the cache key describe the inputs that change the answer</h2>
+<p>A cache can be internally consistent and still return the wrong answer when its key omits part of the input. A room name is enough only for a value that depends on that room alone. Add explicit schema, configuration, policy, or layout revisions when those inputs change the derived result.</p>
 <pre><code class="language-javascript">function makeRoomCacheKey(input) {
   if (
     typeof input.roomName !== 'string'
@@ -477,16 +365,15 @@ function improveGlobalCache(
   }
 
   return [
-    Game.shard.name,
     input.roomName,
     'schema=' + input.schemaVersion,
     'config=' + input.configRevision
   ].join('|');
 }</code></pre>
-<p>The revision numbers are application data, not Screeps constants. Increment them when the inputs represented by the cached result change. For room layouts, an event-driven or explicit layout revision may be more accurate than an arbitrary TTL.</p>
+<p>The revision numbers are application data, not Screeps constants. Change them when the represented inputs change. For structure layouts, an explicit layout revision or event-driven invalidation can be more accurate than treating an arbitrary TTL as the only source of truth.</p>
 
-<h2 id="missing-cache-evidence">A missing global cache does not tell you why it disappeared</h2>
-<p>Code must handle an empty cache after a new runtime context, code reload, manual heap clearing, or any other condition that recreates the relevant JavaScript state. From <code>global.someCache === undefined</code> alone, do not invent a reset cause. Treat the cache miss as the observable fact and rebuild from current or persistent sources.</p>
+<h2 id="missing-cache-evidence">A missing cache does not prove why the runtime state disappeared</h2>
+<p>Code must handle an empty module/global cache after a fresh runtime context, code reload, explicit heap clearing, or another event that recreates JavaScript state. From <code>global.exampleCache === undefined</code> alone, do not invent the cause. The observable fact is a cache miss; the engineering response is to rebuild from current or durable inputs.</p>
 <pre><code class="language-javascript">function getOrBuild(key, builder) {
   global.exampleCache ??= new Map();
 
@@ -505,10 +392,10 @@ function improveGlobalCache(
     value
   };
 }</code></pre>
-<p>The builder is the recovery path. If correctness depends on data that cannot be reconstructed after this miss, that data does not belong only in global cache.</p>
+<p>If correctness depends on data that cannot be reconstructed after a miss, that state should not live only in disposable global cache.</p>
 
-<h2 id="measure-cold-warm">Measure cold and warm paths as different samples</h2>
-<p>Do not publish a CPU improvement because one cached call looked cheaper. Measure the same boundary repeatedly and label whether each sample rebuilt or hit the cache. Room visibility, input size, bucket state, code path, and cache state can all change the comparison.</p>
+<h2 id="measure-cold-warm">Measure cold rebuilds and warm hits separately</h2>
+<p>Do not publish a CPU improvement because one cached call looked cheaper. Measure the same boundary repeatedly and label whether each sample rebuilt or hit the cache. Input size, room visibility, bucket state, code path, and cache state can all change the comparison.</p>
 <pre><code class="language-javascript">function measureCacheCall(label, read) {
   const before = Game.cpu.getUsed();
   const outcome = read();
@@ -523,24 +410,22 @@ function improveGlobalCache(
     limit: Game.cpu.limit
   };
 }</code></pre>
-<p>This helper only records one section delta. It does not prove a long-run CPU benefit. Keep cold rebuilds and warm hits in separate groups, collect multiple comparable samples, and retain the live-performance conclusion as Pending until real shard data exists. For measurement boundaries, continue to <a href="/en/blog/screeps-cpu-getused-bucket">the CPU profiling guide</a>; for static navigation caches, use <a href="/en/blog/screeps-pathfinder-costmatrix">the CostMatrix guide</a>.</p>`;
+<p>This records one section delta; it does not prove a long-run CPU benefit. Keep cold rebuilds and warm hits in separate groups, collect multiple comparable server samples, and leave the performance conclusion Pending until real-shard data exists. Use <a href="/en/blog/screeps-cpu-getused-bucket">the CPU profiling guide</a> for measurement boundaries.</p>`;
 
-  const articleHtml = insertBeforeFirst(
+  const articleHtml = insertSection(
     article.articleHtml,
-    [`<h2 id="warm-reset">`, `<h2 id="debugging">`],
     addition,
-    article.slug,
-    "global cache contract section",
+    "cache-key-contract",
+    [`<h2 id="warm-reset">`, `<h2 id="debugging">`],
   );
-
-  const toc = insertTocBefore(
+  const toc = insertToc(
     article.toc,
-    ["warm-reset", "debugging"],
     [
-      ["cache-key-contract", "Make cache keys describe changing inputs"],
+      ["cache-key-contract", "Key every input that changes the answer"],
       ["missing-cache-evidence", "Treat a missing cache as evidence, not a cause"],
       ["measure-cold-warm", "Measure cold and warm paths separately"],
     ],
+    ["warm-reset", "debugging"],
   );
 
   return {
@@ -556,15 +441,15 @@ function improveGlobalCache(
         ],
         [
           "Official documentation",
-          "Checked August 18, 2026 — Game object current-tick lifetime, Memory persistence, runtime global-context reuse/reset behavior, Game.getObjectById(), Game.cpu.getUsed(), bucket, limit, and tickLimit",
+          "Checked August 18, 2026 — current-tick Game objects, Memory persistence, global-context reuse/reset behavior, Game.getObjectById(), Game.cpu.getUsed(), bucket, limit, and tickLimit",
         ],
         [
           "Static code review",
-          "Passed — cache identity includes changing inputs, cache absence is not assigned an invented cause, durable state remains outside disposable global cache, live game objects are resolved in the active tick, and cold/warm CPU samples are labeled separately",
+          "Passed — cache identity includes changing inputs, cache absence is not assigned an invented cause, durable state stays outside disposable cache, live game objects are resolved from the active tick, and cold/warm CPU samples are labeled separately",
         ],
         [
           "Performance boundary",
-          "No claim is made that the example cache reduces real-shard CPU; the revision only defines a measurement plan",
+          "No claim is made that the example cache reduces real-shard CPU; the revision only defines a reproducible measurement plan",
         ],
       ],
       "No live global-reset, cold/warm CPU, heap-pressure, cache-invalidation, ID-resolution, or multi-room performance trace was collected for this revision",
@@ -583,8 +468,6 @@ export function applyEnglishEditorialEleventh20260818(
       return improveFirstRoomCode(article);
     case "screeps-room-visibility":
       return improveRoomVisibility(article);
-    case "screeps-pathfinder-costmatrix":
-      return improveCostMatrix(article);
     case "screeps-global-cache":
       return improveGlobalCache(article);
     default:
