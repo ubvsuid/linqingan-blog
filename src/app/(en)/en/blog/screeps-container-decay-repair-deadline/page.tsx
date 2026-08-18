@@ -8,7 +8,7 @@ const path = "/en/blog/screeps-container-decay-repair-deadline";
 const chinesePath = "/blog/screeps-container-decay-repair-deadline";
 const headline = "Screeps Container Decay: Repair Before the Next Fatal Tick";
 const description =
-  "Treat ticksToDecay as the next decay pulse, reject unsafe deadlines, preserve repair() results, and verify the processed EVENT_REPAIR amount and Energy cost on the next tick.";
+  "Treat ticksToDecay as the next decay pulse, reserve time to submit repair(), reject unsafe deadlines, and verify processed EVENT_REPAIR amount and Energy cost on the next tick.";
 const publishedAt = "2026-08-06";
 const publishedLabel = "August 6, 2026";
 const discovery = getEnglishDiscoveryArticle(path);
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 const toc: Array<[string, string]> = [
   ["meaning", "ticksToDecay is the next decay pulse"],
   ["estimate", "Estimate the visible decay runway"],
-  ["deadline", "Treat path length as a lower bound"],
+  ["deadline", "Reserve a repair submission tick"],
   ["priority", "Rank the most urgent Container"],
   ["action", "Submit one repair decision"],
   ["same-tick-ordering", "Current-engine same-tick ordering"],
@@ -91,32 +91,42 @@ const articleHtml = String.raw`
 }</code></pre>
 <p>This is a state-derived forecast, not a timer reservation. Incoming damage, another repairer, a change in room control, a private-server constant, or losing visibility can invalidate an older estimate. Re-resolve the Container by ID and recalculate before making the next maintenance decision.</p>
 
-<h2 id="deadline">Treat path length as a lower bound, not an arrival guarantee</h2>
-<p><code>Creep.repair()</code> works at range 3. If a repairer is not already in range, your scheduler needs enough time to reach that range before the dangerous pulse. A complete path length is still only a lower bound unless your movement model also accounts for fatigue, terrain, traffic, hostile blockers, Ramparts, room edges, and any route changes.</p>
+<h2 id="deadline">Reserve a repair submission tick after the travel lower bound</h2>
+<p><code>Creep.repair()</code> works at range 3. If a repairer is outside that range, movement consumes earlier tick opportunities; reaching range 3 does not let later JavaScript in the same tick observe the moved position. Your deadline therefore needs room for the movement lower bound <em>and</em> at least one tick window in which the repair intent can be submitted before the dangerous pulse.</p>
 <pre><code class="language-js">function classifyRepairDeadline(container, pathResult, safetyTicks) {
   if (!pathResult || pathResult.incomplete) {
     return { actionable: false, reason: 'incomplete-path' };
   }
 
   const travelLowerBound = pathResult.path.length;
-  const deadlineSlack =
+  const repairSubmissionTicks = 1;
+  const normalizedSafetyTicks =
+    Number.isInteger(safetyTicks) &amp;&amp; safetyTicks &gt;= 0
+      ? safetyTicks
+      : 1;
+
+  const repairSubmissionSlack =
     container.ticksToDecay
     - travelLowerBound
-    - safetyTicks;
+    - repairSubmissionTicks
+    - normalizedSafetyTicks;
 
   return {
-    actionable: deadlineSlack &gt;= 0,
-    reason: deadlineSlack &gt;= 0
-      ? 'lower-bound-fits'
-      : 'lower-bound-misses-deadline',
+    actionable: repairSubmissionSlack &gt;= 0,
+    reason: repairSubmissionSlack &gt;= 0
+      ? 'repair-window-fits'
+      : 'repair-window-misses-deadline',
     travelLowerBound,
-    deadlineSlack
+    repairSubmissionTicks,
+    safetyTicks: normalizedSafetyTicks,
+    repairSubmissionSlack
   };
 }</code></pre>
-<p>Do not turn an incomplete PathFinder result into a numeric ETA. If the lower bound already misses the deadline, the target is unsafe for that repairer. If the lower bound fits, it only means the plan is worth considering; it does not prove the Creep will arrive on time.</p>
+<p>This catches a dangerous off-by-one case. With zero policy safety margin, <code>ticksToDecay = 1</code> and a one-step path is already too late: the current tick can submit movement, but the Creep cannot use its post-move position to submit an in-range repair before that pulse. A Creep already in range has a travel lower bound of zero, which is the separate same-tick edge case discussed below.</p>
+<p>Do not turn an incomplete PathFinder result into a numeric ETA. Even a complete path length is only a lower bound unless your movement model also accounts for fatigue, terrain, traffic, hostile blockers, Ramparts, room edges, and route changes.</p>
 
 <h2 id="priority">Rank the most urgent Container without target churn</h2>
-<p>Current hits alone are a weak priority signal. Prefer a Container whose next pulse is fatal, then smaller deadline slack, shorter estimated lifetime, lower hits, shorter travel lower bound, and finally a stable ID. Persist the selected Container ID while the assignment remains valid instead of re-ranking every tick and making the repairer oscillate between similar targets.</p>
+<p>Current hits alone are a weak priority signal. Prefer a Container whose next pulse is fatal, then smaller repair-submission slack, shorter estimated lifetime, lower hits, shorter travel lower bound, and finally a stable ID. Persist the selected Container ID while the assignment remains valid instead of re-ranking every tick and making the repairer oscillate between similar targets.</p>
 <p>A maintenance policy does not have to repair every Container to full health. You can target a local hit ratio plus a buffer of several decay pulses. That ratio and buffer are project policy, not official Screeps recommendations; name them as policy so readers do not confuse your risk tolerance with an engine rule.</p>
 
 <h2 id="action">Submit one repair decision and preserve the raw result</h2>
@@ -165,11 +175,11 @@ const articleHtml = String.raw`
 
 <h2 id="same-tick-ordering">Current-engine same-tick ordering is useful context, not an API contract</h2>
 <p>In the checked <code>screeps/engine</code> 4.3.2 room processor, Creep intents are processed before the later object-tick pass that applies Container decay. The checked repair processor can therefore add repair hits before that Container's decay handler runs in the same processor cycle.</p>
-<p>This matters for understanding an emergency edge case: if a Creep is already in range and its repair is still valid, current-engine ordering can raise the Container above a fatal decay threshold before the decay pass. But this is an implementation observation from the checked engine revision, not a documented API guarantee for every future engine version or private server.</p>
-<p>Do not build normal maintenance around a zero-margin rescue. Keep a positive safety buffer and treat same-tick rescue as an emergency implementation detail. Live official-shard evidence for the exact fatal-pulse ordering remains pending in this article.</p>
+<p>This matters for the already-in-range edge case: if a Creep starts the tick within repair range and its repair is still valid, current-engine ordering can raise the Container above a fatal decay threshold before the decay pass. This does <em>not</em> rescue a Creep that still needs to move into range during that same tick, because action checks use the tick's starting position snapshot.</p>
+<p>The ordering statement is an implementation observation from the checked engine revision, not a documented API guarantee for every future engine version or private server. Do not build normal maintenance around a zero-margin rescue; keep a positive safety buffer. Live official-shard evidence for the exact fatal-pulse ordering remains pending.</p>
 
 <h2 id="evidence">Verify the processed repair on the exact next tick</h2>
-<p><code>Room.getEventLog()</code> gives you the evidence needed to separate a scheduled repair from the amount actually processed. On the exact next tick, match <code>EVENT_REPAIR</code> by both the Creep ID and Container ID, then retain <code>event.data.amount</code> and <code>event.data.energySpent</code>.</p>
+<p><code>Room.getEventLog()</code> returns events from the previous tick. Use that exact window to separate a scheduled repair from the amount actually processed: match <code>EVENT_REPAIR</code> by both the Creep ID and Container ID, then retain <code>event.data.amount</code> and <code>event.data.energySpent</code>.</p>
 <pre><code class="language-js">function verifyPreviousRepair(pending) {
   if (!pending) return { status: 'no-pending-repair' };
 
@@ -257,8 +267,8 @@ const articleHtml = String.raw`
 </table>
 
 <h2 id="boundaries">Evidence and engine boundaries</h2>
-<p>The current official Container decay constants, <code>Creep.repair()</code> range, and Room repair-event fields were rechecked on August 18, 2026. The implementation notes in this revision were checked against <code>screeps/engine</code> 4.3.2 at commit <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>.</p>
-<p><strong>Timing boundary:</strong> the “repair intent before Container decay tick” statement is current-engine source behavior, not a permanent API contract. Use safety margin instead of depending on a last-tick rescue.</p>
+<p>The current official Container decay constants, <code>Creep.repair()</code> range, scheduled-return semantics, and Room repair-event fields were rechecked on August 18, 2026. The implementation notes in this revision were checked against <code>screeps/engine</code> 4.3.2 at commit <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>.</p>
+<p><strong>Timing boundary:</strong> the “repair intent before Container decay tick” statement is current-engine source behavior, not a permanent API contract. The deadline planner still reserves an explicit repair-submission window and a configurable safety margin.</p>
 <p><strong>Cost boundary:</strong> the unboosted helper estimates Energy for a fixed missing-hit amount with the current repair constants. Damage, decay, other repairers, changed constants, or boosts can change the real work remaining. The processed event remains the best per-action evidence.</p>
 <p><strong>Observation boundary:</strong> Screeps Console execution, official-shard fatal-pulse repair ordering, boosted WORK traces, hostile pressure, traffic delays, and multi-repairer locking remain Pending. No live result is fabricated.</p>
 `;
@@ -305,9 +315,9 @@ export default function ContainerDecayRepairDeadlinePage() {
       readingTime="19 min read"
       tags={["Resources", "Construction", "Debugging"]}
       verification={[
-        { term: "Official documentation", value: "Checked August 18, 2026 — Container decay, Creep.repair(), repair range, constants, and EVENT_REPAIR fields" },
+        { term: "Official documentation", value: "Checked August 18, 2026 — Container decay, Creep.repair(), range, scheduled return code, constants, and previous-tick EVENT_REPAIR fields" },
         { term: "Engine source", value: "screeps/engine 4.3.2 · 80977824199a596d174d392fd0cf8c458c21fcbd" },
-        { term: "Static code review", value: "Passed — decay runway, incomplete-path boundary, partial-action Energy estimate, exact event identity, and event-window handling" },
+        { term: "Static code review", value: "Passed — decay runway, repair-submission tick, incomplete-path boundary, partial-action Energy estimate, exact event identity, and event-window handling" },
         { term: "Live same-tick verification", value: "Pending — no official-shard fatal-pulse repair trace or boosted WORK event transcript was collected" },
       ]}
       toc={toc}
