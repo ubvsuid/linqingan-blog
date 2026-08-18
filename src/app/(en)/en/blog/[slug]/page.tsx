@@ -28,6 +28,7 @@ import {
   getEnglishEditorialSeventhUpdatedAt20260817,
 } from "@/lib/english-editorial-seventh-20260817";
 import { normalizeEnglishEditorialSeventhHtml20260817 } from "@/lib/english-editorial-seventh-html-20260817";
+import { applyEnglishEditorialTenthFinal20260818 } from "@/lib/english-editorial-tenth-final-20260818";
 import {
   applyEnglishEditorialTenth20260818,
   getEnglishEditorialTenthUpdatedAt20260818,
@@ -147,8 +148,9 @@ function getDynamicEnglishArticle(slug: string) {
   const normalizedArticle = normalizeEnglishEditorialSeventhHtml20260817(eighthArticle);
   const ninthArticle = applyEnglishEditorialNinth20260817(normalizedArticle);
   const ninthFinalArticle = applyEnglishEditorialNinthFinal20260817(ninthArticle);
+  const tenthArticle = applyEnglishEditorialTenth20260818(ninthFinalArticle);
 
-  return applyEnglishEditorialTenth20260818(ninthFinalArticle);
+  return applyEnglishEditorialTenthFinal20260818(tenthArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
@@ -241,7 +243,7 @@ export default async function EnglishArticleRoute({ params }: EnglishArticlePage
       mainEntityOfPage: articleUrl,
       url: articleUrl,
       author: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about`, sameAs: [siteConfig.links.github] },
-      publisher: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about` },
+      publisher: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about" },
       isBasedOn: `${siteConfig.url}${article.chinesePath}`,
       about: discovery?.tags,
       articleSection: discovery?.moduleTitle,
