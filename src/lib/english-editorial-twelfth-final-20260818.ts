@@ -10,6 +10,22 @@ function upsertVerification(
   ];
 }
 
+function finalizeTickExample(article: EnglishBeginnerArticle): string {
+  const search = `<pre><code class="language-javascript">const first = creep.moveTo(source);\nconst second = creep.moveTo(spawn);`;
+  const replacement = `<pre><code class="language-javascript">const creepName = Object.keys(Game.creeps)[0];\nconst creep = creepName ? Game.creeps[creepName] : null;\nconst spawnName = Object.keys(Game.spawns)[0];\nconst spawn = spawnName ? Game.spawns[spawnName] : null;\nconst source = creep?.room.find(FIND_SOURCES)[0] ?? null;\n\nif (!creep || !source || !spawn) {\n  console.log(JSON.stringify({\n    tick: Game.time,\n    reason: 'missing-diagnostic-input',\n    creepName,\n    spawnName,\n    sourceFound: Boolean(source)\n  }));\n} else {\n  const first = creep.moveTo(source);\n  const second = creep.moveTo(spawn);`;
+
+  if (!article.articleHtml.includes(search)) {
+    throw new Error("Twelfth English editorial finalizer could not find the competing movement example");
+  }
+
+  return article.articleHtml
+    .replace(search, replacement)
+    .replace(
+      `  ]\n}));</code></pre>`,
+      `  ]\n}));\n}</code></pre>`,
+    );
+}
+
 export function applyEnglishEditorialTwelfthFinal20260818(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
@@ -32,6 +48,7 @@ export function applyEnglishEditorialTwelfthFinal20260818(
         article.verification,
         ["Game-loop model", "Checked"],
       ),
+      articleHtml: finalizeTickExample(article),
     };
   }
 
