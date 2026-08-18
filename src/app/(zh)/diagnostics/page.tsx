@@ -2,6 +2,10 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { ScreepsDiagnosticCenter } from "@/components/screeps-diagnostic-center";
+import {
+  chineseDiagnosticDetailIds,
+  getChineseDiagnosticDetailSymptom,
+} from "@/lib/screeps-diagnostic-detail-pages";
 import { createPageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
@@ -63,6 +67,21 @@ export default function DiagnosticsPage() {
         <aside className="error-tip">
           <strong>推荐使用方式</strong>
           <p>先选最接近的症状，按“快速排查”保存真实返回值和运行状态；只有拿到证据后，再进入对应错误码与 API 分支。</p>
+        </aside>
+        <aside className="error-tip">
+          <strong>第一阶段独立排查页</strong>
+          <p>
+            {chineseDiagnosticDetailIds.map((id, index) => {
+              const symptom = getChineseDiagnosticDetailSymptom(id);
+              if (!symptom) return null;
+              return (
+                <span key={id}>
+                  {index > 0 ? " · " : ""}
+                  <Link href={`/diagnostics/${id}`}>{symptom.zhTitle}</Link>
+                </span>
+              );
+            })}
+          </p>
         </aside>
         <ScreepsDiagnosticCenter locale="zh" />
       </Container>
