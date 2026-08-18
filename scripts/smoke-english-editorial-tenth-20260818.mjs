@@ -10,6 +10,7 @@ const articles = [
       "describeRecoveryRunway",
       "invalid-runway-input",
       "ERR_ACCESS_DENIED",
+      "restricted shard",
       "controller-upgrade-blocked",
       "Official-documentation review and static code review only",
       "Console test pending",
@@ -104,7 +105,13 @@ const { body: controllerBody } = await fetchText(
   "/en/blog/screeps-controller-downgrade",
 );
 if (!controllerBody.includes("ERR_ACCESS_DENIED")) {
-  failures.push("Controller downgrade page still omits ERR_ACCESS_DENIED");
+  failures.push("Controller downgrade page still omits the current ERR_ACCESS_DENIED return code");
+}
+if (!controllerBody.includes("You do not have access to the restricted shard")) {
+  failures.push("Controller downgrade page does not bind ERR_ACCESS_DENIED to restricted-shard access");
+}
+if (controllerBody.includes("ERR_ACCESS_DENIED</code></td><td>The Controller is owned or reserved by another player")) {
+  failures.push("Controller downgrade page misclassifies ERR_ACCESS_DENIED as a Controller ownership/reservation failure");
 }
 if (controllerBody.includes("5,000 is an official") || controllerBody.includes("5000 is an official")) {
   failures.push("Controller downgrade page presents a project threshold as an official value");
@@ -177,5 +184,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Tenth English editorial smoke passed: Controller runway and return-code boundaries, module result-contract isolation, immutable Flag identity with vision-aware saved targets, exact next-tick Construction Site evidence, scoped freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Tenth English editorial smoke passed: Controller runway and restricted-shard return-code boundary, module result-contract isolation, immutable Flag identity with vision-aware saved targets, exact next-tick Construction Site evidence, scoped freshness, canonical/hreflang, structured data, and Pending live evidence.",
 );
