@@ -22,6 +22,11 @@ if (response.status !== 200) {
   const signals = [
     "same-tick-ordering",
     "Current-engine same-tick ordering",
+    "repairSubmissionTicks = 1",
+    "repairSubmissionSlack",
+    "repair-window-misses-deadline",
+    "one-step path is already too late",
+    "starting position snapshot",
     "EVENT_REPAIR",
     "processedHits",
     "energySpent",
@@ -30,7 +35,6 @@ if (response.status !== 200) {
     "finalPartialHits",
     "estimateUnboostedRepairEnergy",
     "incomplete-path",
-    "lower-bound-misses-deadline",
     "implementation observation",
     "Live same-tick verification",
     "Pending — no official-shard fatal-pulse repair trace",
@@ -54,6 +58,7 @@ if (response.status !== 200) {
     "actionsNeeded\n    * repairPower\n    * REPAIR_COST",
     "same-tick repair is guaranteed before decay",
     "Thirty-one offline cases passed",
+    "container.ticksToDecay\n    - travelLowerBound\n    - safetyTicks",
   ]) {
     if (body.includes(forbidden)) {
       failures.push(`${path}: contains forbidden regression “${forbidden}”`);
@@ -69,7 +74,7 @@ for (const negativePath of [
   for (const signal of [
     "event-window-missed",
     "estimateUnboostedRepairEnergy",
-    "lower-bound-misses-deadline",
+    "repair-window-misses-deadline",
   ]) {
     if (negativeBody.includes(signal)) {
       failures.push(`${negativePath}: received seventeenth-batch signal “${signal}”`);
@@ -106,5 +111,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Seventeenth English editorial smoke passed: Container decay runway, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Seventeenth English editorial smoke passed: Container decay runway, explicit repair-submission tick, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
 );
