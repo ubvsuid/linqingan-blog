@@ -243,7 +243,7 @@ export default async function EnglishArticleRoute({ params }: EnglishArticlePage
       mainEntityOfPage: articleUrl,
       url: articleUrl,
       author: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about`, sameAs: [siteConfig.links.github] },
-      publisher: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about" },
+      publisher: { "@type": "Person", name: "Linqingan", url: `${siteConfig.url}/en/about` },
       isBasedOn: `${siteConfig.url}${article.chinesePath}`,
       about: discovery?.tags,
       articleSection: discovery?.moduleTitle,
