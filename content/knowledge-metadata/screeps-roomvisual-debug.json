@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "vision-visualization",
+    "order": 100,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps RoomVisual debugging",
+    "searchIntent": "用 RoomVisual 绘制状态、目标与路径，让移动和寻路问题更容易观察与验证",
+    "keywordRole": "owner"
+  }
+}

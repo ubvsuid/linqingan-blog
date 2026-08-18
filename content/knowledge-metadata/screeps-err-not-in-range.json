@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "common-errors",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps ERR_NOT_IN_RANGE",
+    "searchIntent": "排查 Screeps 动作因距离不足返回 ERR_NOT_IN_RANGE，并判断何时先移动再执行动作",
+    "keywordRole": "owner"
+  }
+}

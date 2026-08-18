@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "path-costs",
+    "order": 70,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps MOVE fatigue body ratio",
+    "searchIntent": "根据 fatigue、地形、负载和身体组成判断 Screeps MOVE 部件比例与移动效率",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "path-costs",
+    "order": 50,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.map.findRoute",
+    "searchIntent": "规划 Screeps 跨房间路线并理解 Game.map.findRoute 与格子级寻路的职责边界",
+    "keywordRole": "owner"
+  }
+}

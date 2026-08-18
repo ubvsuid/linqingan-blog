@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "vision-visualization",
+    "order": 80,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps room visibility",
+    "searchIntent": "排查 Game.rooms[roomName] 为 undefined，并理解房间视野何时存在、何时消失",
+    "keywordRole": "owner"
+  }
+}

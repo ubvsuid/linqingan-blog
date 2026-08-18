@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "path-costs",
+    "order": 40,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps PathFinder CostMatrix",
+    "searchIntent": "使用 PathFinder CostMatrix 设置道路、障碍和高成本格子并控制实际寻路偏好",
+    "keywordRole": "owner"
+  }
+}

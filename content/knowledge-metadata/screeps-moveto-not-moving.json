@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "common-errors",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps moveTo not moving",
+    "searchIntent": "排查 moveTo() 返回正常或被持续调用但 Creep 实际位置不变化的问题",
+    "keywordRole": "owner"
+  }
+}

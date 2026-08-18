@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "common-errors",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps ERR_NO_PATH",
+    "searchIntent": "排查 Screeps 返回 ERR_NO_PATH 的目标范围、路径回调、障碍与跨房间路线问题",
+    "keywordRole": "owner"
+  }
+}
