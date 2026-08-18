@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "operations-debugging",
+    "stage": "config-performance",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Flag configuration",
+    "searchIntent": "使用 Screeps Flag 作为可验证的房间配置入口，并处理版本、任务、目标、视野与过期状态",
+    "keywordRole": "owner"
+  }
+}

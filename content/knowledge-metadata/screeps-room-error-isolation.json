@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "operations-debugging",
+    "stage": "isolation-recovery",
+    "order": 60,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps room error isolation",
+    "searchIntent": "为 Screeps 房间和模块建立异常隔离、限频日志、暂停、冷却与自动恢复，避免单点异常拖垮其他房间",
+    "keywordRole": "owner"
+  }
+}

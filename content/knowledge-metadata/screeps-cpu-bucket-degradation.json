@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "operations-debugging",
+    "stage": "config-performance",
+    "order": 30,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps CPU Bucket degradation",
+    "searchIntent": "当 Game.cpu.bucket 持续下降时按任务等级自动降载、保护核心任务，并用迟滞与恢复状态避免振荡",
+    "keywordRole": "owner"
+  }
+}
