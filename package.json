@@ -7,7 +7,7 @@
   },
   "scripts": {
     "fix": "node scripts/apply-defense-17-template-corrections.mjs && node scripts/apply-runtime-8-corrections.mjs && node scripts/apply-market-10-corrections.mjs && node scripts/apply-p0-guards.mjs && node scripts/apply-p0-guard-corrections.mjs && node scripts/apply-p0-smoke-corrections.mjs && node scripts/apply-p1-content-fixes.mjs && node scripts/prepare-p2-layout.mjs && node scripts/prepare-p2-static-assets.mjs && node scripts/apply-p2-enhancements.mjs && node scripts/apply-final-design-overhaul.mjs && node scripts/apply-final-design-corrections.mjs && node scripts/apply-article-learning-context.mjs && node scripts/apply-lazy-search-index.mjs && node scripts/apply-site-audit-fixes.mjs && node scripts/apply-site-audit-corrections.mjs && node scripts/apply-audit-completion.mjs && node scripts/apply-navigation-labels.mjs",
-    "predev": "npm run contentcheck && npm run knowledgegenerate",
+    "predev": "npm run contentcheck && npm run knowledgegenerate && npm run knowledgecheck",
     "dev": "next dev",
     "build": "next build && node scripts/run-smoke.mjs",
     "start": "next start",
