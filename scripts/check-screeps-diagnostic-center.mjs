@@ -26,9 +26,21 @@ const expectedSymptoms = [
   "tower-not-acting",
 ];
 
+const expectedChineseDetailSymptoms = [
+  "creep-not-moving",
+  "spawn-not-spawning",
+  "cpu-too-high",
+  "controller-downgrade",
+  "resources-not-moving",
+  "market-action-failed",
+];
+
 const registry = read("src/lib/screeps-diagnostic-symptoms.ts");
+const detailRegistry = read("src/lib/screeps-diagnostic-detail-pages.ts");
 const component = read("src/components/screeps-diagnostic-center.tsx");
+const homeProblemHub = read("src/components/home-problem-hub.tsx");
 const chineseRoute = read("src/app/(zh)/diagnostics/page.tsx");
+const chineseDetailRoute = read("src/app/(zh)/diagnostics/[slug]/page.tsx");
 const englishRoute = read("src/app/(en)/en/diagnostics/page.tsx");
 const diagnostics = read("src/lib/screeps-error-diagnostics.ts");
 const errors = read("src/lib/screeps-errors.ts");
@@ -47,6 +59,32 @@ if (configuredSymptoms.length !== expectedSymptoms.length) {
 }
 for (const id of expectedSymptoms) {
   if (!configuredSymptoms.includes(id)) failures.push(`Missing symptom config: ${id}`);
+}
+
+for (const id of expectedChineseDetailSymptoms) {
+  if (!detailRegistry.includes(`"${id}"`)) failures.push(`Missing Chinese diagnostic detail route id: ${id}`);
+  if (!revisions[`/diagnostics/${id}`]) failures.push(`Missing static page revision for /diagnostics/${id}.`);
+}
+if (!chineseDetailRoute.includes("generateStaticParams") || !chineseDetailRoute.includes("getChineseDiagnosticDetailSymptom")) {
+  failures.push("Chinese standalone diagnostic route must statically enumerate the approved detail registry and resolve through the shared symptom data.");
+}
+if (!chineseDetailRoute.includes("createPageMetadata") || !chineseDetailRoute.includes("BreadcrumbList")) {
+  failures.push("Chinese standalone diagnostic pages must expose canonical metadata and breadcrumb structured data.");
+}
+if (!chineseDetailRoute.includes("/verification/coverage#coverage-") || !chineseDetailRoute.includes("没有 accepted Evidence")) {
+  failures.push("Chinese standalone diagnostic pages must keep the Runtime Evidence boundary explicit.");
+}
+if (!homeProblemHub.includes("getChineseDiagnosticDetailHref")) {
+  failures.push("Homepage symptom cards must route to the approved standalone Chinese diagnostic pages.");
+}
+if (!chineseRoute.includes("chineseDiagnosticDetailIds")) {
+  failures.push("Chinese Diagnostic Center must expose the approved standalone detail paths without removing the full symptom hub.");
+}
+if (!chineseSearch.includes("diagnosticDetailDocuments") || !chineseSearch.includes("/diagnostics/${symptom.id}")) {
+  failures.push("Chinese Search must index each standalone diagnostic detail page directly.");
+}
+if (!sitemap.includes("chineseDiagnosticDetailIds") || !sitemap.includes("chineseDiagnosticDetailPaths")) {
+  failures.push("Chinese sitemap must include all approved standalone diagnostic detail pages.");
 }
 
 const diagnosticNames = new Set([...diagnostics.matchAll(/name: "(ERR_[A-Z_]+)"/g)].map((match) => match[1]));
@@ -131,4 +169,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Screeps Diagnostic Center check passed: ${expectedSymptoms.length} bilingual symptom paths reuse Error/API/Hub relations, Search, Sitemap, navigation, and the accepted Verification boundary.`);
+console.log(`Screeps Diagnostic Center check passed: ${expectedSymptoms.length} bilingual symptom paths plus ${expectedChineseDetailSymptoms.length} standalone Chinese detail pages reuse Error/API/Hub relations, Search, Sitemap, navigation, and the accepted Verification boundary.`);
