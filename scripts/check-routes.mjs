@@ -6,6 +6,7 @@ import fixedTagSlugs from "../src/lib/tag-slugs.json" with { type: "json" };
 
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
+const migrationMetadataDirectory = path.join(root, "content", "knowledge-metadata");
 const errors = [];
 
 function addError(message) {
@@ -24,7 +25,9 @@ function tagToSlug(tag) {
 }
 
 function extractConfiguredSlugs(source) {
-  const blocks = [...source.matchAll(/slugs:\s*\[([\s\S]*?)\]/g)];
+  const blocks = [
+    ...source.matchAll(/(?:legacySlugs|slugs):\s*\[([\s\S]*?)\]/g),
+  ];
 
   return blocks.flatMap((block) =>
     [...block[1].matchAll(/["']([^"']+)["']/g)].map((match) => match[1]),
@@ -32,9 +35,11 @@ function extractConfiguredSlugs(source) {
 }
 
 function extractKnowledgeSectionIds(source) {
-  return [...source.matchAll(/\bid:\s*["']([a-z0-9-]+)["']/g)].map(
-    (match) => match[1],
-  );
+  return [
+    ...source.matchAll(
+      /\{\s*id:\s*["']([a-z0-9-]+)["']\s*,\s*number:\s*\d+/g,
+    ),
+  ].map((match) => match[1]);
 }
 
 const requiredTagSlugs = {
@@ -57,6 +62,7 @@ const files = fs
   .filter((fileName) => fileName.endsWith(".md"))
   .sort();
 const postSlugs = new Set();
+const frontmatterKnowledgeSlugs = new Set();
 const tagOwners = new Map();
 const knownRoutes = new Set([
   "/",
@@ -95,6 +101,15 @@ for (const fileName of files) {
   postSlugs.add(slug);
   knownRoutes.add(`/blog/${slug}`);
 
+  if (
+    data.knowledge &&
+    typeof data.knowledge === "object" &&
+    !Array.isArray(data.knowledge) &&
+    typeof data.knowledge.module === "string"
+  ) {
+    frontmatterKnowledgeSlugs.add(slug);
+  }
+
   for (const tag of data.tags ?? []) {
     const tagSlug = tagToSlug(tag);
     if (!tagSlug) {
@@ -120,14 +135,24 @@ for (const [tagSlug, names] of tagOwners) {
 }
 
 const knowledgeSource = fs.readFileSync(
-  path.join(root, "src", "lib", "knowledge-base.ts"),
+  path.join(root, "src", "lib", "knowledge-module-registry.ts"),
   "utf8",
 );
 const beginnerSource = fs.readFileSync(
   path.join(root, "src", "lib", "beginner-series.ts"),
   "utf8",
 );
-const knowledgeSlugs = extractConfiguredSlugs(knowledgeSource);
+const migrationKnowledgeSlugs = fs.existsSync(migrationMetadataDirectory)
+  ? fs
+      .readdirSync(migrationMetadataDirectory)
+      .filter((fileName) => fileName.endsWith(".json"))
+      .map((fileName) => fileName.replace(/\.json$/, ""))
+  : [];
+const knowledgeSlugs = [
+  ...extractConfiguredSlugs(knowledgeSource),
+  ...frontmatterKnowledgeSlugs,
+  ...migrationKnowledgeSlugs,
+];
 const beginnerSlugs = extractConfiguredSlugs(beginnerSource);
 const knowledgeSectionIds = extractKnowledgeSectionIds(knowledgeSource);
 const knowledgeSet = new Set(knowledgeSlugs);

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "create-queue",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps dynamic Creep body Energy",
+    "searchIntent": "根据当前房间生成 Energy、角色最低能力与 50 部件上限生成可用 Creep body",
+    "keywordRole": "owner"
+  }
+}

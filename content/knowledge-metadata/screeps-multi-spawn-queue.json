@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "create-queue",
+    "order": 50,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps multi Spawn queue",
+    "searchIntent": "为多个 Spawn 建立统一请求去重、优先级、共享 Energy 预算和跨 tick 验证的调度队列",
+    "keywordRole": "owner"
+  }
+}

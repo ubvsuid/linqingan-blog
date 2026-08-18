@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "replacement-retirement",
+    "order": 60,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep prespawn replacement",
+    "searchIntent": "用 ticksToLive、Spawn 等待、生成时间、到岗路程和安全余量计算提前补员时机",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "emergency-recovery",
+    "order": 90,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Spawn emergency recovery",
+    "searchIntent": "房间断代后用最小可用身体和单一 Spawn 入口恢复第一只采集者",
+    "keywordRole": "owner"
+  }
+}

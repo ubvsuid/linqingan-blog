@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "replacement-retirement",
+    "order": 70,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps renewCreep",
+    "searchIntent": "判断何时安全使用 renewCreep()，并处理 TTL、Energy、Boost、CLAIM 与 Spawn 占用边界",
+    "keywordRole": "owner"
+  }
+}
