@@ -25,6 +25,7 @@ if (response.status !== 200) {
     "repairSubmissionTicks = 1",
     "repairSubmissionSlack",
     "repair-window-misses-deadline",
+    "ticksToDecay = 1",
     "one-step path is already too late",
     "starting position snapshot",
     "not-owned-creep",
@@ -62,6 +63,7 @@ if (response.status !== 200) {
     "same-tick repair is guaranteed before decay",
     "Thirty-one offline cases passed",
     "container.ticksToDecay\n    - travelLowerBound\n    - safetyTicks",
+    "lower-bound-fits",
   ]) {
     if (body.includes(forbidden)) {
       failures.push(`${path}: contains forbidden regression “${forbidden}”`);
@@ -115,5 +117,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Seventeenth English editorial smoke passed: Container decay runway, explicit repair-submission tick, fail-closed actor/target identity, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Seventeenth English editorial smoke passed: Container decay runway, explicit repair-submission tick, fatal-pulse off-by-one guard, fail-closed actor/target identity, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
 );
