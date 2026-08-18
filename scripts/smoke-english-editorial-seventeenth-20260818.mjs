@@ -10,6 +10,21 @@ async function fetchText(path) {
   return { response, body: await response.text() };
 }
 
+function deadlineSlackForSmoke(ticksToDecay, travelLowerBound, safetyTicks = 0) {
+  const repairSubmissionTicks = 1;
+  return ticksToDecay - travelLowerBound - repairSubmissionTicks - safetyTicks;
+}
+
+if (deadlineSlackForSmoke(1, 1, 0) >= 0) {
+  failures.push("deadline math: ticksToDecay=1 with one movement step must miss the repair window");
+}
+if (deadlineSlackForSmoke(1, 0, 0) !== 0) {
+  failures.push("deadline math: an already-in-range Creep at ticksToDecay=1 should be the zero-slack current-engine edge case");
+}
+if (deadlineSlackForSmoke(3, 1, 1) !== 0) {
+  failures.push("deadline math: one travel step + one repair tick + one safety tick should exactly consume a three-tick runway");
+}
+
 const path = "/en/blog/screeps-container-decay-repair-deadline";
 const chinesePath = "/blog/screeps-container-decay-repair-deadline";
 const { response, body } = await fetchText(path);
@@ -117,5 +132,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Seventeenth English editorial smoke passed: Container decay runway, explicit repair-submission tick, fatal-pulse off-by-one guard, fail-closed actor/target identity, incomplete-path deadline boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Seventeenth English editorial smoke passed: executable fatal-pulse deadline math, Container decay runway, explicit repair-submission tick, fail-closed actor/target identity, incomplete-path boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
 );
