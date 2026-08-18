@@ -5,6 +5,7 @@ import {
   englishTags,
 } from "@/lib/english-discovery";
 import { getEnglishEditorialTenthUpdatedAt20260818 } from "@/lib/english-editorial-tenth-20260818";
+import { getEnglishEditorialTwelfthUpdatedAt20260818 } from "@/lib/english-editorial-twelfth-20260818";
 import { englishKnowledgeSections } from "@/lib/english-knowledge";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
@@ -62,7 +63,9 @@ function staticPageEntry(
 
 function getEnglishArticleUpdatedAt(article: { href: string; updatedAt: string }): string {
   const slug = article.href.split("/").filter(Boolean).at(-1) ?? "";
-  return getEnglishEditorialTenthUpdatedAt20260818(slug) ?? article.updatedAt;
+  return getEnglishEditorialTwelfthUpdatedAt20260818(slug)
+    ?? getEnglishEditorialTenthUpdatedAt20260818(slug)
+    ?? article.updatedAt;
 }
 
 export function getChineseSitemapEntries(): SitemapEntry[] {
