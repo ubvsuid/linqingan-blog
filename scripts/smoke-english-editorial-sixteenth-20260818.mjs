@@ -29,6 +29,7 @@ if (response.status !== 200) {
     "ceilToMilliCredit",
     "duplicate-request-id",
     "attemptedRequestIds",
+    "awaiting-next-tick-verification",
     "request-scheduled",
     "creditsDelta",
     "Source discrepancy",
@@ -53,6 +54,7 @@ if (response.status !== 200) {
     "OK proves the market mutation settled",
     "creditsDelta is the exact maintenance fee",
     "all market orders require a roomName",
+    "request-accepted",
   ]) {
     if (body.includes(forbidden)) {
       failures.push(`${path}: contains forbidden regression “${forbidden}”`);
@@ -101,5 +103,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Sixteenth English editorial smoke passed: nullable order room identity, conservative fee reserve, idempotent one-writer control, next-tick state evidence, source discrepancy disclosure, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Sixteenth English editorial smoke passed: nullable order room identity, conservative fee reserve, idempotent one-writer control, pending-request serialization, next-tick state evidence, source discrepancy disclosure, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
 );
