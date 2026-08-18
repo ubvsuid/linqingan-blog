@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "defense-structures",
+    "order": 90,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Wall Rampart repair limit",
+    "searchIntent": "为 Wall 与 Rampart 设置阶段性维修上限，根据房间阶段和 Energy 预算控制防御维护成本",
+    "keywordRole": "owner"
+  }
+}

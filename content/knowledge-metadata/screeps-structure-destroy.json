@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "construction-management",
+    "order": 40,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Structure.destroy",
+    "searchIntent": "使用 Structure.destroy() 安全拆除建错或不再需要的建筑，并确认所有权、目标和后果",
+    "keywordRole": "owner"
+  }
+}

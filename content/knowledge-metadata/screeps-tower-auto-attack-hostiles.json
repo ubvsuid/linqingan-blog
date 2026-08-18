@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "tower-actions",
+    "order": 50,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Tower attack hostiles",
+    "searchIntent": "让 Tower 自动攻击敌对目标，并理解距离衰减、目标选择、集火与 attack() 返回值验证",
+    "keywordRole": "owner"
+  }
+}

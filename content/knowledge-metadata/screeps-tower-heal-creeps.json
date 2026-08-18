@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "tower-actions",
+    "order": 70,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Tower heal creeps",
+    "searchIntent": "让 Tower 自动治疗受伤己方 Creep，处理目标排序、距离、Energy 与 heal() 返回值",
+    "keywordRole": "owner"
+  }
+}

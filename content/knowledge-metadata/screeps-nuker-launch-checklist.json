@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "defense-structures",
+    "order": 100,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureNuker.launchNuke",
+    "searchIntent": "调用 StructureNuker.launchNuke() 前检查视野、资源、cooldown、目标范围与返回值，避免不可逆误操作",
+    "keywordRole": "owner"
+  }
+}

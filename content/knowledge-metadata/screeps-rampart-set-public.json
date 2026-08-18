@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "defense-structures",
+    "order": 80,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureRampart.setPublic",
+    "searchIntent": "安全使用 StructureRampart.setPublic() 切换 Rampart 通行状态，并理解所有权和防御边界",
+    "keywordRole": "owner"
+  }
+}
