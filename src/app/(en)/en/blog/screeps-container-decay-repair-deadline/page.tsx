@@ -130,10 +130,14 @@ const articleHtml = String.raw`
 <p>A maintenance policy does not have to repair every Container to full health. You can target a local hit ratio plus a buffer of several decay pulses. That ratio and buffer are project policy, not official Screeps recommendations; name them as policy so readers do not confuse your risk tolerance with an engine rule.</p>
 
 <h2 id="action">Submit one repair decision and preserve the raw result</h2>
-<p>Before calling <code>repair()</code>, re-resolve the exact Container ID and validate the Creep. It should be fully spawned, owned by you, have active WORK parts, carry Energy, and be within range 3. If it is outside range, preserve the movement result separately and do not also label the repair as successful.</p>
+<p>Before calling <code>repair()</code>, re-resolve the exact Container ID and validate the Creep. Fail closed if the supplied Creep is not yours or the stored ID no longer resolves to a Container. The repairer should be fully spawned, have active WORK parts, carry Energy, and be within range 3. If it is outside range, preserve the movement result separately and do not also label the repair as successful.</p>
 <pre><code class="language-js">function submitContainerRepair(creep, containerId) {
+  if (!creep?.my) return { status: 'not-owned-creep' };
+
   const container = Game.getObjectById(containerId);
-  if (!container) return { status: 'container-unavailable' };
+  if (!container || container.structureType !== STRUCTURE_CONTAINER) {
+    return { status: 'not-container' };
+  }
   if (creep.spawning) return { status: 'creep-spawning' };
   if (creep.getActiveBodyparts(WORK) &lt;= 0) {
     return { status: 'no-active-work' };
@@ -317,7 +321,7 @@ export default function ContainerDecayRepairDeadlinePage() {
       verification={[
         { term: "Official documentation", value: "Checked August 18, 2026 — Container decay, Creep.repair(), range, scheduled return code, constants, and previous-tick EVENT_REPAIR fields" },
         { term: "Engine source", value: "screeps/engine 4.3.2 · 80977824199a596d174d392fd0cf8c458c21fcbd" },
-        { term: "Static code review", value: "Passed — decay runway, repair-submission tick, incomplete-path boundary, partial-action Energy estimate, exact event identity, and event-window handling" },
+        { term: "Static code review", value: "Passed — decay runway, repair-submission tick, identity checks, incomplete-path boundary, partial-action Energy estimate, exact event identity, and event-window handling" },
         { term: "Live same-tick verification", value: "Pending — no official-shard fatal-pulse repair trace or boosted WORK event transcript was collected" },
       ]}
       toc={toc}
