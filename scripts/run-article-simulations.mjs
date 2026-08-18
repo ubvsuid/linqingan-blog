@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import matter from "gray-matter";
+
 await import("./simulate-core-articles.mjs");
 
 const root = process.cwd();
@@ -23,9 +25,10 @@ const files = fs
 
 // Temporary migration bridge for older article simulations that inspect the
 // Knowledge source as plain text. Runtime code already resolves the public
-// Knowledge model through knowledge-base.ts + knowledge-module-registry.ts,
-// so static simulations should inspect the same combined source while modules
-// are migrated from legacy slug lists to article metadata one at a time.
+// Knowledge model through knowledge-base.ts + knowledge-module-registry.ts +
+// article metadata, so static simulations should inspect the same combined
+// identity while modules migrate from legacy slug lists to metadata one at a
+// time.
 const knowledgeBasePath = path.join(root, "src", "lib", "knowledge-base.ts");
 const knowledgeModuleRegistryPath = path.join(
   root,
@@ -33,10 +36,49 @@ const knowledgeModuleRegistryPath = path.join(
   "lib",
   "knowledge-module-registry.ts",
 );
+const postsDirectory = path.join(root, "content", "posts");
+const migrationMetadataDirectory = path.join(
+  root,
+  "content",
+  "knowledge-metadata",
+);
 const originalReadFileSync = fs.readFileSync;
+
+const metadataKnowledgeSlugs = new Set();
+if (fs.existsSync(migrationMetadataDirectory)) {
+  for (const fileName of fs
+    .readdirSync(migrationMetadataDirectory)
+    .filter((name) => name.endsWith(".json"))) {
+    metadataKnowledgeSlugs.add(fileName.replace(/\.json$/, ""));
+  }
+}
+if (fs.existsSync(postsDirectory)) {
+  for (const fileName of fs
+    .readdirSync(postsDirectory)
+    .filter((name) => name.endsWith(".md"))) {
+    const source = originalReadFileSync(
+      path.join(postsDirectory, fileName),
+      "utf8",
+    );
+    const { data } = matter(source);
+    if (
+      data.draft !== true
+      && data.knowledge
+      && typeof data.knowledge === "object"
+      && !Array.isArray(data.knowledge)
+    ) {
+      metadataKnowledgeSlugs.add(fileName.replace(/\.md$/, ""));
+    }
+  }
+}
+
 const combinedKnowledgeStaticSource = [
   originalReadFileSync(knowledgeBasePath, "utf8"),
   originalReadFileSync(knowledgeModuleRegistryPath, "utf8"),
+  [...metadataKnowledgeSlugs]
+    .sort()
+    .map((slug) => JSON.stringify(slug))
+    .join("\n"),
 ].join("\n");
 
 function isKnowledgeBaseRead(target) {
