@@ -110,15 +110,14 @@ function buildMetadataSection(config: KnowledgeModuleConfig): KnowledgeBaseSecti
   const slugs: string[] = [];
   let cursor = 0;
   const stages = config.stages.map((stage): KnowledgeBaseStage => {
-    const stageRecords = records
-      .filter((record) => record.knowledge.stage === stage.id)
-      .sort(
-        (left, right) =>
-          left.knowledge.order - right.knowledge.order ||
-          left.slug.localeCompare(right.slug),
-      );
-    const from = cursor;
+    const stageRecords = records.filter(
+      (record) => record.knowledge.stage === stage.id,
+    );
+    if (stageRecords.length === 0) {
+      throw new Error(`${config.id}/${stage.id}: metadata Knowledge stage 没有文章`);
+    }
 
+    const from = cursor;
     slugs.push(...stageRecords.map((record) => record.slug));
     cursor = slugs.length;
 
