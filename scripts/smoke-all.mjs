@@ -63,6 +63,7 @@ try {
   await import("./smoke-english-editorial-thirteenth-20260818.mjs");
   await import("./smoke-english-editorial-fourteenth-20260818.mjs");
   await import("./smoke-english-editorial-fifteenth-20260818.mjs");
+  await import("./smoke-english-editorial-sixteenth-20260818.mjs");
 } finally {
   globalThis.fetch = originalFetch;
 }
