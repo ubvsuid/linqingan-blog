@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "advanced-storage-cache",
+    "order": 90,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps global cache",
+    "searchIntent": "理解 Screeps 全局缓存的生命周期、重建与过期策略，并避免把临时对象误当作永久状态",
+    "keywordRole": "owner"
+  }
+}

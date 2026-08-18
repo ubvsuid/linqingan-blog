@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "advanced-storage-cache",
+    "order": 60,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps RawMemory segments",
+    "searchIntent": "使用 RawMemory segments 跨 tick 读取和写回大块状态，并理解激活与下一 tick 可用边界",
+    "keywordRole": "owner"
+  }
+}

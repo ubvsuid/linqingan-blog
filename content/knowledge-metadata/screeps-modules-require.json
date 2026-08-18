@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "objects-modules",
+    "order": 50,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps require module.exports",
+    "searchIntent": "使用 require 和 module.exports 拆分 Screeps 代码模块，并保持依赖边界与导出接口清晰",
+    "keywordRole": "owner"
+  }
+}
