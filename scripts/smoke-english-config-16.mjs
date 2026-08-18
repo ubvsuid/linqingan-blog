@@ -18,7 +18,8 @@ const articles = [
       "fallback-forbidden",
       "configured-target-required",
       "recordConfigurationChange",
-      "Live multi-tick verification",
+      "expectedRoomName",
+      "Live multi-tick verification pending",
       "Pending",
     ],
   },
@@ -39,7 +40,8 @@ const articles = [
       "module.exports = { run }",
       "getCurrentCreepNames",
       "global.roleCountCache",
-      "Live multi-tick verification",
+      "invalid-role-result",
+      "Live multi-tick verification pending",
       "Pending",
     ],
   },
@@ -65,7 +67,7 @@ for (const article of articles) {
     article.headline,
     "Verification status",
     "Chinese source article",
-    "Reviewed in full",
+    "Existing bilingual mapping retained",
     "Screeps Console test",
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
@@ -90,9 +92,9 @@ for (const article of articles) {
 
   if (
     article.modifiedExpected
-    && !body.includes(`"dateModified":"2026-07-31"`)
+    && !body.includes(`"dateModified":"2026-08-18"`)
   ) {
-    failures.push(`${article.path}: 缺少 2026-07-31 dateModified`);
+    failures.push(`${article.path}: 缺少 2026-08-18 dateModified`);
   }
 
   const searchResponse = await fetch(
@@ -125,6 +127,7 @@ for (const expected of [
   "configured-target-required",
   "recordConfigurationChange",
   "object.pos.roomName !== flag.pos.roomName",
+  "Game.rooms[expectedRoomName]",
 ]) {
   if (!flagsBody.includes(expected)) {
     failures.push(`Flags 页面缺少 “${expected}”`);
@@ -136,6 +139,9 @@ if (flagsBody.includes("nearest-visible-fallback")) {
     "Flags 页面仍会在配置 ID 失败后自动切换目标",
   );
 }
+if (flagsBody.includes("Live Flag rename")) {
+  failures.push("Flags 页面仍保留不存在的 Flag rename 实机验证项");
+}
 
 const modulesBody = await (
   await fetch(`${baseUrl}/en/blog/screeps-require-modules`)
@@ -146,6 +152,7 @@ for (const expected of [
   "validateRoles",
   "getCurrentCreepNames",
   "global.roleCountCache",
+  "invalid-role-result",
   "role-threw",
   "Circular dependencies",
 ]) {
@@ -255,7 +262,7 @@ if (failures.length > 0) {
 
 console.log(
   "第十六批英文配置与模块生产冒烟测试通过："
-    + "Flag 房间与目标身份绑定、模块 tick 边界、"
+    + "Flag 房间与目标身份绑定、模块 tick 与返回契约边界、"
     + "Memory 旧 URL 永久跳转、Verification、Canonical、"
     + "hreflang、JSON-LD、目录、搜索与 Sitemap。",
 );

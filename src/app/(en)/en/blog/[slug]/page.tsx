@@ -28,6 +28,11 @@ import {
   getEnglishEditorialSeventhUpdatedAt20260817,
 } from "@/lib/english-editorial-seventh-20260817";
 import { normalizeEnglishEditorialSeventhHtml20260817 } from "@/lib/english-editorial-seventh-html-20260817";
+import { applyEnglishEditorialTenthFinal20260818 } from "@/lib/english-editorial-tenth-final-20260818";
+import {
+  applyEnglishEditorialTenth20260818,
+  getEnglishEditorialTenthUpdatedAt20260818,
+} from "@/lib/english-editorial-tenth-20260818";
 import { applyEnglishMemoryContract20260812 } from "@/lib/english-editorial-memory-contract-20260812";
 import { applyEnglishMemoryEditorial20260812 } from "@/lib/english-editorial-memory-20260812";
 import { applyEnglishMovementContract20260812 } from "@/lib/english-editorial-movement-contract-20260812";
@@ -142,12 +147,15 @@ function getDynamicEnglishArticle(slug: string) {
   const eighthArticle = applyEnglishEditorialEighth20260817(seventhArticle);
   const normalizedArticle = normalizeEnglishEditorialSeventhHtml20260817(eighthArticle);
   const ninthArticle = applyEnglishEditorialNinth20260817(normalizedArticle);
+  const ninthFinalArticle = applyEnglishEditorialNinthFinal20260817(ninthArticle);
+  const tenthArticle = applyEnglishEditorialTenth20260818(ninthFinalArticle);
 
-  return applyEnglishEditorialNinthFinal20260817(ninthArticle);
+  return applyEnglishEditorialTenthFinal20260818(tenthArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialNinthUpdatedAt20260817(slug)
+  return getEnglishEditorialTenthUpdatedAt20260818(slug)
+    ?? getEnglishEditorialNinthUpdatedAt20260817(slug)
     ?? getEnglishEditorialEighthUpdatedAt20260817(slug)
     ?? getEnglishEditorialSeventhUpdatedAt20260817(slug)
     ?? getEnglishEditorialSixthUpdatedAt20260816(slug)

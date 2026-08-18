@@ -4,6 +4,7 @@ import {
   englishDiscoveryArticles,
   englishTags,
 } from "@/lib/english-discovery";
+import { getEnglishEditorialTenthUpdatedAt20260818 } from "@/lib/english-editorial-tenth-20260818";
 import { englishKnowledgeSections } from "@/lib/english-knowledge";
 import { knowledgeBaseSections } from "@/lib/knowledge-base";
 import { nowEntries } from "@/lib/now-entries";
@@ -57,6 +58,11 @@ function staticPageEntry(
     url: pathname === "/" ? siteConfig.url : `${siteConfig.url}${pathname}`,
     lastModified: getStaticPageLastModified(pathname, dependentContentDates),
   };
+}
+
+function getEnglishArticleUpdatedAt(article: { href: string; updatedAt: string }): string {
+  const slug = article.href.split("/").filter(Boolean).at(-1) ?? "";
+  return getEnglishEditorialTenthUpdatedAt20260818(slug) ?? article.updatedAt;
 }
 
 export function getChineseSitemapEntries(): SitemapEntry[] {
@@ -160,7 +166,7 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
 
 export function getEnglishSitemapEntries(): SitemapEntry[] {
   const englishArticleDates = englishDiscoveryArticles.map(
-    (article) => article.updatedAt,
+    (article) => getEnglishArticleUpdatedAt(article),
   );
   const englishChangelogDates = changelogEntries.map((entry) => entry.date);
   const englishBeginnerHrefs = new Set([
@@ -179,7 +185,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
   ]);
   const englishBeginnerDates = englishDiscoveryArticles
     .filter((article) => englishBeginnerHrefs.has(article.href))
-    .map((article) => article.updatedAt);
+    .map((article) => getEnglishArticleUpdatedAt(article));
   const englishToolPaths: StaticPagePath[] = [
     "/en/tools/creep-body-calculator",
     "/en/tools/room-diagnostics",
@@ -233,7 +239,9 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
           const discovery = englishDiscoveryArticles.find(
             (item) => item.href === article.href,
           );
-          return discovery?.updatedAt ?? article.publishedAt;
+          return discovery
+            ? getEnglishArticleUpdatedAt(discovery)
+            : article.publishedAt;
         }),
       ),
     }),
@@ -241,7 +249,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
 
   const articles: SitemapEntry[] = englishDiscoveryArticles.map((article) => ({
     url: `${siteConfig.url}${article.href}`,
-    lastModified: new Date(article.updatedAt),
+    lastModified: new Date(getEnglishArticleUpdatedAt(article)),
   }));
 
   const tagPages: SitemapEntry[] = englishTags
@@ -251,7 +259,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
       lastModified: latestDate(
         englishDiscoveryArticles
           .filter((article) => article.tagSlugs.includes(tag.slug))
-          .map((article) => article.updatedAt),
+          .map((article) => getEnglishArticleUpdatedAt(article)),
       ),
     }));
 
