@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "interroom-minerals",
+    "order": 100,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Mineral harvesting",
+    "searchIntent": "在 RCL6 后使用 Extractor 和 Creep 开采 Mineral，并处理 cooldown、储量、容量和返回值",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "store-container",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Container ticksToDecay",
+    "searchIntent": "理解 Container ticksToDecay 与腐化节奏，并计算维修截止时间和 Builder 调度优先级",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "interroom-minerals",
+    "order": 90,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureTerminal.send",
+    "searchIntent": "使用 StructureTerminal.send() 跨房间发送资源，并校验库存、交易 Energy、保留线与返回码",
+    "keywordRole": "owner"
+  }
+}

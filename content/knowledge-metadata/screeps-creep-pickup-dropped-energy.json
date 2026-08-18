@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "resource-recovery",
+    "order": 40,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep pickup dropped Energy",
+    "searchIntent": "使用 Creep.pickup() 安全回收地面掉落 Energy，并处理容量、衰减、距离和目标失效",
+    "keywordRole": "owner"
+  }
+}

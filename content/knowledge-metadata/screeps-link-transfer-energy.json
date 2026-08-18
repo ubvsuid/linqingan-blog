@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "room-storage-transfer",
+    "order": 80,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureLink.transferEnergy",
+    "searchIntent": "安全使用 StructureLink.transferEnergy() 传输 Energy，并处理 cooldown、容量、损耗与返回值",
+    "keywordRole": "owner"
+  }
+}

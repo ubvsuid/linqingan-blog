@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "room-storage-transfer",
+    "order": 70,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Room.storage Energy",
+    "searchIntent": "围绕 Room.storage 建立 Energy 取用、配送和库存保留线，避免房间物流过度抽空库存",
+    "keywordRole": "owner"
+  }
+}
