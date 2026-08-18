@@ -15,6 +15,27 @@ const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const parityContracts = [
   {
+    label: "Memory / Engineering",
+    moduleId: "memory-engineering",
+    nextModuleId: "spawn-lifecycle",
+    expected: [
+      ["screeps-memory-basics", "state-basics", 10],
+      ["screeps-clean-dead-creep-memory", "state-basics", 20],
+      ["screeps-creep-working-state", "state-basics", 30],
+      ["screeps-game-get-object-by-id", "objects-modules", 40],
+      ["screeps-modules-require", "objects-modules", 50],
+      ["screeps-rawmemory-segments", "advanced-storage-cache", 60],
+      ["screeps-intershardmemory-sync", "advanced-storage-cache", 70],
+      ["screeps-rawmemory-foreign-segment", "advanced-storage-cache", 80],
+      ["screeps-global-cache", "advanced-storage-cache", 90],
+    ],
+    stageCounts: new Map([
+      ["state-basics", 3],
+      ["objects-modules", 2],
+      ["advanced-storage-cache", 4],
+    ]),
+  },
+  {
     label: "Spawn",
     moduleId: "spawn-lifecycle",
     nextModuleId: "room-economy",
