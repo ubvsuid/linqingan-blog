@@ -4,7 +4,7 @@ const requestTimeoutMs = 15_000;
 const articles = [
   {
     path: "/en/blog/screeps-tick-game-loop",
-    chinesePath: "/blog/screeps-tick-game-loop",
+    chinesePath: "/blog/screeps-tick-and-game-loop",
     signals: [
       "One tick has one starting snapshot, but not one universal action slot",
       "firstMove",
