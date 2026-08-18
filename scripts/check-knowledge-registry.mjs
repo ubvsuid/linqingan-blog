@@ -96,6 +96,28 @@ const parityContracts = [
       ["reservation-claim", 1],
     ]),
   },
+  {
+    label: "Construction / Defense",
+    moduleId: "construction-defense",
+    nextModuleId: "market-advanced-resources",
+    expected: [
+      ["screeps-room-create-construction-site", "construction-management", 10],
+      ["screeps-construction-site-progress", "construction-management", 20],
+      ["screeps-construction-site-remove", "construction-management", 30],
+      ["screeps-structure-destroy", "construction-management", 40],
+      ["screeps-tower-auto-attack-hostiles", "tower-actions", 50],
+      ["screeps-tower-repair-threshold", "tower-actions", 60],
+      ["screeps-tower-heal-creeps", "tower-actions", 70],
+      ["screeps-rampart-set-public", "defense-structures", 80],
+      ["screeps-wall-rampart-repair-limit", "defense-structures", 90],
+      ["screeps-nuker-launch-checklist", "defense-structures", 100],
+    ],
+    stageCounts: new Map([
+      ["construction-management", 4],
+      ["tower-actions", 3],
+      ["defense-structures", 3],
+    ]),
+  },
 ];
 
 function addError(message) {
