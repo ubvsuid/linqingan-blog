@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "market-operations",
+    "order": 30,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps market order maintenance",
+    "searchIntent": "维护 Screeps 市场订单的价格、剩余数量与生命周期，正确使用 changeOrderPrice、extendOrder 和 cancelOrder",
+    "keywordRole": "owner"
+  }
+}

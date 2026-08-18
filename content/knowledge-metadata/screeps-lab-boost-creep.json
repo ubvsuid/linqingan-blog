@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "lab-boost",
+    "order": 50,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureLab.boostCreep",
+    "searchIntent": "安全使用 StructureLab.boostCreep() 强化指定身体部件，并检查矿物、Energy、距离、部件状态与返回值",
+    "keywordRole": "owner"
+  }
+}

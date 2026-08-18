@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "market-operations",
+    "order": 10,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.market.deal",
+    "searchIntent": "使用 Game.market.deal() 安全成交指定市场订单，并校验订单、数量、Terminal、交易 Energy、Credits 与返回值",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "market-operations",
+    "order": 20,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.market.createOrder",
+    "searchIntent": "使用 Game.market.createOrder() 安全创建市场订单，并检查参数、手续费、Credits 与新订单 ID",
+    "keywordRole": "owner"
+  }
+}

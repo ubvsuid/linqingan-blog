@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "lab-boost",
+    "order": 40,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureLab.runReaction",
+    "searchIntent": "安全使用 StructureLab.runReaction() 执行矿物反应，并检查输入 Lab、资源、cooldown、容量和返回值",
+    "keywordRole": "owner"
+  }
+}
