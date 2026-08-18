@@ -1,12 +1,12 @@
 .hub {
   width: min(100%, 1120px);
-  margin: 52px auto 0;
+  margin: 46px auto 0;
   text-align: left;
 }
 
 .heading {
   max-width: 720px;
-  margin: 0 auto 24px;
+  margin: 0 auto 20px;
   text-align: center;
 }
 
@@ -18,7 +18,7 @@
 }
 
 .heading > p:last-child {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   color: var(--muted);
 }
 
@@ -31,12 +31,12 @@
 .card {
   position: relative;
   display: flex;
-  min-height: 310px;
+  min-height: 250px;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 22px;
-  padding: 28px;
+  padding: 24px;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   box-shadow: 0 18px 50px rgb(20 20 16 / 5%);
 }
@@ -70,21 +70,21 @@
 }
 
 .card :global(.eyebrow) {
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
 .card h3 {
   margin: 0;
-  font-size: clamp(24px, 2.7vw, 31px);
+  font-size: clamp(22px, 2.5vw, 28px);
   line-height: 1.2;
   letter-spacing: -.035em;
 }
 
 .card > p:not(:global(.eyebrow)) {
-  margin: 14px 0 24px;
+  margin: 10px 0 18px;
   color: var(--muted);
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .card > a,
@@ -121,7 +121,7 @@
 
 .card input,
 .card button {
-  min-height: 46px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--background);
