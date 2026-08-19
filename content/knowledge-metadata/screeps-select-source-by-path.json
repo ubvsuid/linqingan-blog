@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "resource-recovery",
+    "order": 60,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Source selection by path",
+    "searchIntent": "在多个 Source 中按真实可达路径选择目标，并稳定保存与恢复 Source 身份",
+    "keywordRole": "owner"
+  }
+}

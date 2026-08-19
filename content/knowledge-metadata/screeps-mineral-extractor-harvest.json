@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "interroom-minerals",
+    "order": 100,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Mineral harvesting",
+    "searchIntent": "理解 Mineral、Extractor、cooldown 和 harvest 返回值，建立稳定的矿物采集流程",
+    "keywordRole": "owner"
+  }
+}

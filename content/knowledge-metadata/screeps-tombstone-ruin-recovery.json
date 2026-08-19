@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "resource-recovery",
+    "order": 50,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Tombstone Ruin recovery",
+    "searchIntent": "从 Tombstone 与 Ruin 安全回收资源，并按剩余时间、距离和资源价值安排抢救优先级",
+    "keywordRole": "owner"
+  }
+}

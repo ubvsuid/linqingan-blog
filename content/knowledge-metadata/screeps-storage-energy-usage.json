@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "room-storage-transfer",
+    "order": 70,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Room.storage Energy",
+    "searchIntent": "安全读取和调度 Room.storage 中的 Energy，并为取能、配送与保留线建立稳定规则",
+    "keywordRole": "owner"
+  }
+}
