@@ -111,7 +111,7 @@ const checks = [
     forbidden: [],
   },
   {
-    path: "src/app/blog/[slug]/opengraph-image.tsx",
+    path: "src/app/(zh)/blog/[slug]/opengraph-image.tsx",
     required: ["ImageResponse", "SCREEPS · 中文知识库", "1200"],
     forbidden: [],
   },
