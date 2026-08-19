@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "production-power",
+    "order": 60,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureFactory.produce",
+    "searchIntent": "使用 StructureFactory.produce() 安全生产指定商品，并检查等级、配方、库存、cooldown、容量和返回值",
+    "keywordRole": "owner"
+  }
+}
