@@ -55,6 +55,7 @@ export function CollectionPagination({
           <Link
             className={`${styles.link} ${styles.previous}`}
             href={getCollectionPageHref(basePath, previousPage)}
+            prefetch={false}
           >
             ← 上一页
           </Link>
@@ -74,6 +75,7 @@ export function CollectionPagination({
           <Link
             className={`${styles.link} ${styles.next}`}
             href={getCollectionPageHref(basePath, nextPage)}
+            prefetch={false}
           >
             下一页 →
           </Link>
