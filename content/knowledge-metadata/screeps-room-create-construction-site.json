@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "construction-management",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Room.createConstructionSite",
+    "searchIntent": "安全使用 Room.createConstructionSite() 放置工地，并检查坐标、RCL、结构限制与返回值",
+    "keywordRole": "owner"
+  }
+}
