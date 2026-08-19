@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "create-queue",
+    "order": 40,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps room energyAvailable stuck",
+    "searchIntent": "诊断 room.energyAvailable 长期低于 energyCapacityAvailable 的 Spawn、Extension 与配送链路问题",
+    "keywordRole": "owner"
+  }
+}

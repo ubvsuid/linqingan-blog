@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "create-queue",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Spawn exit blocked directions",
+    "searchIntent": "排查生成请求已接受但 Creep 在出生结算时无法离开 Spawn 的问题",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "create-queue",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps spawnCreep return codes",
+    "searchIntent": "排查 spawnCreep() 请求为什么失败，并按 dryRun、参数与官方返回码定位原因",
+    "keywordRole": "owner"
+  }
+}

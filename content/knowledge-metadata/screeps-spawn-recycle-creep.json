@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "spawn-lifecycle",
+    "stage": "replacement-retirement",
+    "order": 80,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps recycleCreep",
+    "searchIntent": "安全回收明确指定且已完成交接的 Creep，并处理距离、所有权与不可逆操作边界",
+    "keywordRole": "owner"
+  }
+}
