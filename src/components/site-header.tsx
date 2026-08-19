@@ -104,15 +104,15 @@ export function SiteHeader() {
           </nav>
 
           <div className="header-controls">
-            <Link className="language-switch" href={languageTarget} hrefLang={english ? "zh-CN" : "en"} lang={english ? "zh-CN" : "en"} aria-label={english ? "Switch to Chinese" : "Switch to English"} title={english ? "Switch to Chinese" : "Switch to English"} onClick={() => setMenuOpen(false)}>
+            <Link className="language-switch" href={languageTarget} hrefLang={english ? "zh-CN" : "en"} lang={english ? "zh-CN" : "en"} aria-label={english ? "Switch to Chinese" : "Switch to English"} title={english ? "Switch to Chinese" : "Switch to English"} prefetch={false} onClick={() => setMenuOpen(false)}>
               {english ? "中文" : "EN"}
             </Link>
-            <Link className="header-icon-link" href={searchHref} aria-label={english ? "Search the English site" : "搜索网站"} title={english ? "Search" : "搜索网站"} onClick={() => setMenuOpen(false)}>
+            <Link className="header-icon-link" href={searchHref} aria-label={english ? "Search the English site" : "搜索网站"} title={english ? "Search" : "搜索网站"} prefetch={false} onClick={() => setMenuOpen(false)}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
             </Link>
             <ThemeToggle />
             {!english ? (
-              <Link className="profile-shortcut" href={aboutHref} aria-label="查看临清安的个人主页" title="个人主页" onClick={() => setMenuOpen(false)}>
+              <Link className="profile-shortcut" href={aboutHref} aria-label="查看临清安的个人主页" title="个人主页" prefetch={false} onClick={() => setMenuOpen(false)}>
                 <Image src="/profile-avatar.webp" alt="" width={36} height={36} sizes="36px" />
               </Link>
             ) : null}
