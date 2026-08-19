@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "store-container",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep withdraw Container Energy",
+    "searchIntent": "让 Creep 从 Container 安全 withdraw Energy，并处理距离、容量、资源量和返回码",
+    "keywordRole": "owner"
+  }
+}
