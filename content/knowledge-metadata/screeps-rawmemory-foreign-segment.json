@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "advanced-storage-cache",
+    "order": 80,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps RawMemory Foreign Segment",
+    "searchIntent": "读取其他玩家公开的 RawMemory Foreign Segment，并理解公开、下一 tick 读取和轮询调度机制",
+    "keywordRole": "owner"
+  }
+}

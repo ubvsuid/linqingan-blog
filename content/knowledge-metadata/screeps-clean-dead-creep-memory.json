@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "state-basics",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps clean dead Creep Memory",
+    "searchIntent": "安全清理已经死亡 Creep 的 Memory 条目，避免残留状态长期累积并误删仍存在的单位数据",
+    "keywordRole": "owner"
+  }
+}

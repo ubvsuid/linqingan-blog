@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "state-basics",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep working state",
+    "searchIntent": "用 Memory 状态让 Creep 在取能和工作之间稳定切换，并避免边界条件导致频繁抖动",
+    "keywordRole": "owner"
+  }
+}
