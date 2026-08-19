@@ -167,7 +167,7 @@ const records = rows.slice(1).map((row) => {
   const inferred = asset ? null : inferSiteNode(pagePath);
   const system = asset?.system ?? inferred?.system ?? "unmapped";
   const nodeType = asset?.nodeType ?? inferred?.nodeType ?? (query ? "query" : "unknown");
-  const module = asset?.module ?? inferred?.module ?? "";
+  const moduleId = asset?.module ?? inferred?.module ?? "";
   const stage = asset?.stage ?? inferred?.stage ?? "";
   const ownerKeyword = asset?.ownerKeyword ?? queryResolution.asset?.ownerKeyword ?? "";
 
@@ -191,7 +191,7 @@ const records = rows.slice(1).map((row) => {
     action,
     system,
     nodeType,
-    module,
+    module: moduleId,
     stage,
     ownerKeyword,
     ownerStatus,
