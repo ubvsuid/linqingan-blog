@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "vision-visualization",
+    "order": 80,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.rooms undefined",
+    "searchIntent": "排查 Game.rooms[roomName] 为 undefined 的房间视野问题，并理解当前可见性与远程观察边界",
+    "keywordRole": "owner"
+  }
+}
