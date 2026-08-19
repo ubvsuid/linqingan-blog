@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "construction-management",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps ConstructionSite remove",
+    "searchIntent": "安全删除放错或不再需要的 ConstructionSite，并在删除前确认目标身份与后续重建计划",
+    "keywordRole": "owner"
+  }
+}

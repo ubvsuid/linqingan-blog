@@ -58,6 +58,19 @@ const controllerPilot = [
   ["screeps-reserve-vs-claim-controller", "reservation-claim", 40],
 ];
 
+const constructionDefensePilot = [
+  ["screeps-room-create-construction-site", "construction-management", 10],
+  ["screeps-construction-site-progress", "construction-management", 20],
+  ["screeps-construction-site-remove", "construction-management", 30],
+  ["screeps-structure-destroy", "construction-management", 40],
+  ["screeps-tower-auto-attack-hostiles", "tower-actions", 50],
+  ["screeps-tower-repair-threshold", "tower-actions", 60],
+  ["screeps-tower-heal-creeps", "tower-actions", 70],
+  ["screeps-rampart-set-public", "defense-structures", 80],
+  ["screeps-wall-rampart-repair-limit", "defense-structures", 90],
+  ["screeps-nuker-launch-checklist", "defense-structures", 100],
+];
+
 function addError(message) {
   errors.push(message);
 }
@@ -243,6 +256,7 @@ const spawnRecords = sortedModuleRecords(records, "spawn-lifecycle");
 const movementRecords = sortedModuleRecords(records, "movement-vision");
 const roomEconomyRecords = sortedModuleRecords(records, "room-economy");
 const controllerRecords = sortedModuleRecords(records, "controller-control");
+const constructionDefenseRecords = sortedModuleRecords(records, "construction-defense");
 
 validateParity(
   "Spawn",
@@ -289,6 +303,17 @@ validateParity(
   ]),
 );
 
+validateParity(
+  "Construction / Defense",
+  constructionDefenseRecords,
+  constructionDefensePilot,
+  new Map([
+    ["construction-management", 4],
+    ["tower-actions", 3],
+    ["defense-structures", 3],
+  ]),
+);
+
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
 validateMetadataModuleBlock(
   moduleRegistrySource,
@@ -318,6 +343,13 @@ validateMetadataModuleBlock(
   "construction-defense",
   controllerPilot,
 );
+validateMetadataModuleBlock(
+  moduleRegistrySource,
+  "Construction / Defense",
+  "construction-defense",
+  "market-advanced-resources",
+  constructionDefensePilot,
+);
 
 if (errors.length > 0) {
   for (const error of errors) console.error(`ERROR: ${error}`);
@@ -326,5 +358,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Room Economy parity ${roomEconomyRecords.length}/${roomEconomyPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Controller parity ${controllerRecords.length}/${controllerPilot.length}, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Room Economy parity ${roomEconomyRecords.length}/${roomEconomyPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Controller parity ${controllerRecords.length}/${controllerPilot.length}, Construction / Defense parity ${constructionDefenseRecords.length}/${constructionDefensePilot.length}, Keyword Owner conflicts 0.`,
 );

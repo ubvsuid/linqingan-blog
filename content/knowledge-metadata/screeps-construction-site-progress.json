@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "construction-management",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps ConstructionSite progress",
+    "searchIntent": "读取 ConstructionSite.progress 与 progressTotal，计算剩余施工量并判断 Builder 推进状态",
+    "keywordRole": "owner"
+  }
+}

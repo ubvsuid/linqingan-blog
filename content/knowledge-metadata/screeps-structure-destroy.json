@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "construction-management",
+    "order": 40,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Structure destroy",
+    "searchIntent": "安全调用 Structure.destroy() 拆除建错或不再需要的己方建筑，并确认所有权、目标身份和后续影响",
+    "keywordRole": "owner"
+  }
+}

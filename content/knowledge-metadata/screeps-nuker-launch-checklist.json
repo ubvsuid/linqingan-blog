@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "defense-structures",
+    "order": 100,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Nuker launchNuke",
+    "searchIntent": "在调用 StructureNuker.launchNuke() 前检查资源、cooldown、目标房间、距离和一次性发射条件",
+    "keywordRole": "owner"
+  }
+}
