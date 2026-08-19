@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "controller-control",
+    "stage": "fixed-upgrade",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Upgrader not upgrading",
+    "searchIntent": "排查固定 Upgrader 到达 Controller 后仍不升级的问题，并核对 Controller Link、Energy、WORK、距离与返回值",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "controller-control",
+    "stage": "safety-lifecycle",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureController activateSafeMode",
+    "searchIntent": "安全调用 StructureController.activateSafeMode()，检查可用次数、冷却、Controller 状态和一次性触发条件",
+    "keywordRole": "owner"
+  }
+}

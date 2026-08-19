@@ -51,6 +51,13 @@ const roomEconomyPilot = [
   ["screeps-mineral-extractor-harvest", "interroom-minerals", 100],
 ];
 
+const controllerPilot = [
+  ["screeps-upgrader-controller-link-not-upgrading", "fixed-upgrade", 10],
+  ["screeps-controller-activate-safe-mode", "safety-lifecycle", 20],
+  ["screeps-controller-downgrade", "safety-lifecycle", 30],
+  ["screeps-reserve-vs-claim-controller", "reservation-claim", 40],
+];
+
 function addError(message) {
   errors.push(message);
 }
@@ -82,7 +89,7 @@ function validateMetadata(data, sourcePath) {
     addError(`${sourcePath}: knowledge.module 必须是小写 slug`);
   }
   if (typeof knowledge.stage !== "string" || !slugPattern.test(knowledge.stage)) {
-    addError(`${sourcePath}: knowledge.stage 必须是小写 slug`);
+    addError(`${sourcePath}: knowledge.stage 必须使用小写 slug`);
   }
   if (!Number.isInteger(knowledge.order) || knowledge.order <= 0) {
     addError(`${sourcePath}: knowledge.order 必须是正整数`);
@@ -235,6 +242,7 @@ for (const record of records) {
 const spawnRecords = sortedModuleRecords(records, "spawn-lifecycle");
 const movementRecords = sortedModuleRecords(records, "movement-vision");
 const roomEconomyRecords = sortedModuleRecords(records, "room-economy");
+const controllerRecords = sortedModuleRecords(records, "controller-control");
 
 validateParity(
   "Spawn",
@@ -270,6 +278,17 @@ validateParity(
   ]),
 );
 
+validateParity(
+  "Controller",
+  controllerRecords,
+  controllerPilot,
+  new Map([
+    ["fixed-upgrade", 1],
+    ["safety-lifecycle", 2],
+    ["reservation-claim", 1],
+  ]),
+);
+
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
 validateMetadataModuleBlock(
   moduleRegistrySource,
@@ -292,6 +311,13 @@ validateMetadataModuleBlock(
   "controller-control",
   movementPilot,
 );
+validateMetadataModuleBlock(
+  moduleRegistrySource,
+  "Controller",
+  "controller-control",
+  "construction-defense",
+  controllerPilot,
+);
 
 if (errors.length > 0) {
   for (const error of errors) console.error(`ERROR: ${error}`);
@@ -300,5 +326,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Room Economy parity ${roomEconomyRecords.length}/${roomEconomyPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Room Economy parity ${roomEconomyRecords.length}/${roomEconomyPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Controller parity ${controllerRecords.length}/${controllerPilot.length}, Keyword Owner conflicts 0.`,
 );
