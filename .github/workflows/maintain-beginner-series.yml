@@ -39,6 +39,9 @@ jobs:
       - name: Apply pending exact fixes
         run: node scripts/apply-maintenance-fixes.mjs
 
+      - name: Refresh Beginner Roadmap registry
+        run: npm run knowledgegenerate && npm run roadmapgenerate && npm run roadmapcheck
+
       - name: Maintain beginner batch 12
         run: node scripts/maintain-beginner-batch.mjs 0 5 12
 
