@@ -139,6 +139,25 @@ const parityContracts = [
       ["defense-structures", 3],
     ]),
   },
+  {
+    label: "Market / Advanced Resources",
+    moduleId: "market-advanced-resources",
+    nextModuleId: "operations-debugging",
+    expected: [
+      ["screeps-market-deal", "market-operations", 10],
+      ["screeps-market-create-order", "market-operations", 20],
+      ["screeps-market-order-maintenance", "market-operations", 30],
+      ["screeps-lab-run-reaction", "lab-boost", 40],
+      ["screeps-lab-boost-creep", "lab-boost", 50],
+      ["screeps-factory-produce", "production-power", 60],
+      ["screeps-power-spawn-process-power", "production-power", 70],
+    ],
+    stageCounts: new Map([
+      ["market-operations", 3],
+      ["lab-boost", 2],
+      ["production-power", 2],
+    ]),
+  },
 ];
 
 function addError(message) {
