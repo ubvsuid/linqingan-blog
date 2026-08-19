@@ -1,182 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import matter from "gray-matter";
-
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
 const migrationMetadataDirectory = path.join(root, "content", "knowledge-metadata");
+const generatedRegistryPath = path.join(root, "src", "generated", "knowledge-article-registry.json");
 const moduleRegistryPath = path.join(root, "src", "lib", "knowledge-module-registry.ts");
 const errors = [];
 
 const difficultyValues = new Set(["beginner", "intermediate", "advanced"]);
 const keywordRoleValues = new Set(["owner", "supporting"]);
+const sourceValues = new Set(["migration-sidecar", "frontmatter"]);
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-const parityContracts = [
-  {
-    label: "Memory / Engineering",
-    moduleId: "memory-engineering",
-    nextModuleId: "spawn-lifecycle",
-    expected: [
-      ["screeps-memory-basics", "state-basics", 10],
-      ["screeps-clean-dead-creep-memory", "state-basics", 20],
-      ["screeps-creep-working-state", "state-basics", 30],
-      ["screeps-game-get-object-by-id", "objects-modules", 40],
-      ["screeps-modules-require", "objects-modules", 50],
-      ["screeps-rawmemory-segments", "advanced-storage-cache", 60],
-      ["screeps-intershardmemory-sync", "advanced-storage-cache", 70],
-      ["screeps-rawmemory-foreign-segment", "advanced-storage-cache", 80],
-      ["screeps-global-cache", "advanced-storage-cache", 90],
-    ],
-    stageCounts: new Map([
-      ["state-basics", 3],
-      ["objects-modules", 2],
-      ["advanced-storage-cache", 4],
-    ]),
-  },
-  {
-    label: "Spawn",
-    moduleId: "spawn-lifecycle",
-    nextModuleId: "room-economy",
-    expected: [
-      ["screeps-spawncreep-return-codes", "create-queue", 10],
-      ["screeps-spawn-exit-blocked-directions", "create-queue", 20],
-      ["screeps-dynamic-creep-body-energy", "create-queue", 30],
-      ["screeps-room-energyavailable-stuck", "create-queue", 40],
-      ["screeps-multi-spawn-queue", "create-queue", 50],
-      ["screeps-creep-prespawn-replacement", "replacement-retirement", 60],
-      ["screeps-spawn-renew-creep", "replacement-retirement", 70],
-      ["screeps-spawn-recycle-creep", "replacement-retirement", 80],
-      ["screeps-spawn-emergency-recovery", "emergency-recovery", 90],
-    ],
-    stageCounts: new Map([
-      ["create-queue", 5],
-      ["replacement-retirement", 3],
-      ["emergency-recovery", 1],
-    ]),
-  },
-  {
-    label: "Room Economy",
-    moduleId: "room-economy",
-    nextModuleId: "movement-vision",
-    expected: [
-      ["screeps-store-capacity-api", "store-container", 10],
-      ["screeps-creep-withdraw-container-energy", "store-container", 20],
-      ["screeps-container-decay-repair-deadline", "store-container", 30],
-      ["screeps-creep-pickup-dropped-energy", "resource-recovery", 40],
-      ["screeps-tombstone-ruin-recovery", "resource-recovery", 50],
-      ["screeps-select-source-by-path", "resource-recovery", 60],
-      ["screeps-storage-energy-usage", "room-storage-transfer", 70],
-      ["screeps-link-transfer-energy", "room-storage-transfer", 80],
-      ["screeps-terminal-send-resources", "interroom-minerals", 90],
-      ["screeps-mineral-extractor-harvest", "interroom-minerals", 100],
-    ],
-    stageCounts: new Map([
-      ["store-container", 3],
-      ["resource-recovery", 3],
-      ["room-storage-transfer", 2],
-      ["interroom-minerals", 2],
-    ]),
-  },
-  {
-    label: "Movement / Vision",
-    moduleId: "movement-vision",
-    nextModuleId: "controller-control",
-    expected: [
-      ["screeps-err-not-in-range", "common-errors", 10],
-      ["screeps-moveto-not-moving", "common-errors", 20],
-      ["screeps-err-no-path", "common-errors", 30],
-      ["screeps-pathfinder-costmatrix", "path-costs", 40],
-      ["screeps-map-find-route", "path-costs", 50],
-      ["screeps-roomposition-distance", "path-costs", 60],
-      ["screeps-move-fatigue-body-ratio", "path-costs", 70],
-      ["screeps-room-visibility", "vision-visualization", 80],
-      ["screeps-observer-observe-room", "vision-visualization", 90],
-      ["screeps-roomvisual-debug", "vision-visualization", 100],
-    ],
-    stageCounts: new Map([
-      ["common-errors", 3],
-      ["path-costs", 4],
-      ["vision-visualization", 3],
-    ]),
-  },
-  {
-    label: "Controller",
-    moduleId: "controller-control",
-    nextModuleId: "construction-defense",
-    expected: [
-      ["screeps-upgrader-controller-link-not-upgrading", "fixed-upgrade", 10],
-      ["screeps-controller-activate-safe-mode", "safety-lifecycle", 20],
-      ["screeps-controller-downgrade", "safety-lifecycle", 30],
-      ["screeps-reserve-vs-claim-controller", "reservation-claim", 40],
-    ],
-    stageCounts: new Map([
-      ["fixed-upgrade", 1],
-      ["safety-lifecycle", 2],
-      ["reservation-claim", 1],
-    ]),
-  },
-  {
-    label: "Construction / Defense",
-    moduleId: "construction-defense",
-    nextModuleId: "market-advanced-resources",
-    expected: [
-      ["screeps-room-create-construction-site", "construction-management", 10],
-      ["screeps-construction-site-progress", "construction-management", 20],
-      ["screeps-construction-site-remove", "construction-management", 30],
-      ["screeps-structure-destroy", "construction-management", 40],
-      ["screeps-tower-auto-attack-hostiles", "tower-actions", 50],
-      ["screeps-tower-repair-threshold", "tower-actions", 60],
-      ["screeps-tower-heal-creeps", "tower-actions", 70],
-      ["screeps-rampart-set-public", "defense-structures", 80],
-      ["screeps-wall-rampart-repair-limit", "defense-structures", 90],
-      ["screeps-nuker-launch-checklist", "defense-structures", 100],
-    ],
-    stageCounts: new Map([
-      ["construction-management", 4],
-      ["tower-actions", 3],
-      ["defense-structures", 3],
-    ]),
-  },
-  {
-    label: "Market / Advanced Resources",
-    moduleId: "market-advanced-resources",
-    nextModuleId: "operations-debugging",
-    expected: [
-      ["screeps-market-deal", "market-operations", 10],
-      ["screeps-market-create-order", "market-operations", 20],
-      ["screeps-market-order-maintenance", "market-operations", 30],
-      ["screeps-lab-run-reaction", "lab-boost", 40],
-      ["screeps-lab-boost-creep", "lab-boost", 50],
-      ["screeps-factory-produce", "production-power", 60],
-      ["screeps-power-spawn-process-power", "production-power", 70],
-    ],
-    stageCounts: new Map([
-      ["market-operations", 3],
-      ["lab-boost", 2],
-      ["production-power", 2],
-    ]),
-  },
-  {
-    label: "Operations / Diagnostics",
-    moduleId: "operations-debugging",
-    nextModuleId: null,
-    expected: [
-      ["screeps-flags-config", "config-performance", 10],
-      ["screeps-cpu-getused-bucket", "config-performance", 20],
-      ["screeps-cpu-bucket-degradation", "config-performance", 30],
-      ["screeps-game-notify", "notifications-events", 40],
-      ["screeps-room-event-log", "notifications-events", 50],
-      ["screeps-room-error-isolation", "isolation-recovery", 60],
-    ],
-    stageCounts: new Map([
-      ["config-performance", 3],
-      ["notifications-events", 2],
-      ["isolation-recovery", 1],
-    ]),
-  },
-];
 
 function addError(message) {
   errors.push(message);
@@ -186,91 +21,160 @@ function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function validateMetadata(data, sourcePath) {
-  const hasKnowledge = data.knowledge !== undefined;
-  const hasSeo = data.seo !== undefined;
-
-  if (!hasKnowledge && !hasSeo) return null;
-  if (hasKnowledge !== hasSeo) {
-    addError(`${sourcePath}: knowledge 与 seo 必须同时声明`);
-    return null;
-  }
-  if (!isRecord(data.knowledge)) {
-    addError(`${sourcePath}: knowledge 必须是对象`);
-    return null;
-  }
-  if (!isRecord(data.seo)) {
-    addError(`${sourcePath}: seo 必须是对象`);
-    return null;
-  }
-
-  const { knowledge, seo } = data;
-  if (typeof knowledge.module !== "string" || !slugPattern.test(knowledge.module)) {
-    addError(`${sourcePath}: knowledge.module 必须是小写 slug`);
-  }
-  if (typeof knowledge.stage !== "string" || !slugPattern.test(knowledge.stage)) {
-    addError(`${sourcePath}: knowledge.stage 必须使用小写 slug`);
-  }
-  if (!Number.isInteger(knowledge.order) || knowledge.order <= 0) {
-    addError(`${sourcePath}: knowledge.order 必须是正整数`);
-  }
-  if (!difficultyValues.has(knowledge.difficulty)) {
-    addError(`${sourcePath}: knowledge.difficulty 无效`);
-  }
-  if (typeof seo.primaryKeyword !== "string" || seo.primaryKeyword.trim() === "") {
-    addError(`${sourcePath}: seo.primaryKeyword 必须是非空字符串`);
-  }
-  if (typeof seo.searchIntent !== "string" || seo.searchIntent.trim() === "") {
-    addError(`${sourcePath}: seo.searchIntent 必须是非空字符串`);
-  }
-  if (!keywordRoleValues.has(seo.keywordRole)) {
-    addError(`${sourcePath}: seo.keywordRole 无效`);
-  }
-
-  return { knowledge, seo };
+function normalizeKeyword(value) {
+  return String(value).normalize("NFKC").trim().toLowerCase();
 }
 
 function readJson(filePath) {
   try {
-    const parsed = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    if (!isRecord(parsed)) {
-      addError(`${filePath}: migration sidecar 必须是 JSON 对象`);
-      return null;
-    }
-    return parsed;
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch (error) {
     addError(`${filePath}: JSON 解析失败：${String(error)}`);
     return null;
   }
 }
 
-const records = [];
-const articleFiles = fs
-  .readdirSync(postsDirectory)
-  .filter((fileName) => fileName.endsWith(".md"))
-  .sort();
+function parseModuleSchema(source) {
+  const schema = new Map();
+  const matches = [...source.matchAll(/^    id: "([a-z0-9-]+)",$/gm)];
 
-for (const fileName of articleFiles) {
-  const slug = fileName.replace(/\.md$/, "");
-  const articlePath = path.join(postsDirectory, fileName);
-  const { data } = matter(fs.readFileSync(articlePath, "utf8"));
-  if (data.draft === true) continue;
+  for (let index = 0; index < matches.length; index += 1) {
+    const match = matches[index];
+    const moduleId = match[1];
+    const start = match.index ?? 0;
+    const end = matches[index + 1]?.index ?? source.length;
+    const block = source.slice(start, end);
+    const stages = new Set(
+      [...block.matchAll(/\{ id: "([a-z0-9-]+)", title:/g)].map((item) => item[1]),
+    );
 
-  const inline = validateMetadata(data, articlePath);
-  const sidecarPath = path.join(migrationMetadataDirectory, `${slug}.json`);
-  const hasSidecar = fs.existsSync(sidecarPath);
+    if (!block.includes('articleSource: "metadata"')) {
+      addError(`${moduleId}: Knowledge module 必须使用 metadata articleSource`);
+    }
+    if (/\blegacySlugs\s*:/.test(block)) {
+      addError(`${moduleId}: metadata module 不得重新声明 legacySlugs`);
+    }
+    if (/\blegacy(?:From|To)\s*:/.test(block)) {
+      addError(`${moduleId}: metadata module 不得重新声明 legacy stage range`);
+    }
+    if (stages.size === 0) {
+      addError(`${moduleId}: 没有可用的 learning stage`);
+    }
 
-  if (inline && hasSidecar) {
-    addError(`${slug}: frontmatter 与 migration sidecar 同时存在，违反单一 Source of Truth`);
+    schema.set(moduleId, stages);
+  }
+
+  if (schema.size === 0) {
+    addError("knowledge-module-registry.ts 未解析到任何 Knowledge module");
+  }
+
+  return schema;
+}
+
+if (!fs.existsSync(generatedRegistryPath)) {
+  addError("缺少生成后的 knowledge-article-registry.json，请先运行 knowledgegenerate");
+}
+
+const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
+const moduleSchema = parseModuleSchema(moduleRegistrySource);
+const records = fs.existsSync(generatedRegistryPath) ? readJson(generatedRegistryPath) : [];
+
+if (!Array.isArray(records)) {
+  addError("knowledge-article-registry.json 必须是数组");
+}
+
+const publishedSlugs = new Set(
+  fs
+    .readdirSync(postsDirectory)
+    .filter((name) => name.endsWith(".md"))
+    .map((name) => name.replace(/\.md$/, "")),
+);
+const seenSlugs = new Set();
+const ownerByKeyword = new Map();
+const ordersByModule = new Map();
+const countsByModule = new Map();
+const countsByModuleStage = new Map();
+
+for (const record of Array.isArray(records) ? records : []) {
+  if (!isRecord(record)) {
+    addError("Knowledge registry record 必须是对象");
     continue;
   }
 
-  const sidecarData = hasSidecar ? readJson(sidecarPath) : null;
-  const sidecar = sidecarData ? validateMetadata(sidecarData, sidecarPath) : null;
-  const metadata = inline ?? sidecar;
-  if (!metadata) continue;
+  const { slug, knowledge, seo, source } = record;
+  if (typeof slug !== "string" || !slugPattern.test(slug)) {
+    addError(`Knowledge record slug 无效：${String(slug)}`);
+    continue;
+  }
+  if (seenSlugs.has(slug)) {
+    addError(`Knowledge registry 重复 slug：${slug}`);
+  }
+  seenSlugs.add(slug);
 
-  records.push({ slug, ...metadata, source: inline ? "frontmatter" : "migration-sidecar" });
+  if (!publishedSlugs.has(slug)) {
+    addError(`${slug}: Knowledge registry 没有对应文章`);
+  }
+  if (!isRecord(knowledge) || !isRecord(seo)) {
+    addError(`${slug}: knowledge 与 seo 必须是对象`);
+    continue;
+  }
+  if (!sourceValues.has(source)) {
+    addError(`${slug}: source 必须是 migration-sidecar 或 frontmatter`);
+  }
+
+  const moduleId = knowledge.module;
+  const stageId = knowledge.stage;
+  if (typeof moduleId !== "string" || !moduleSchema.has(moduleId)) {
+    addError(`${slug}: knowledge.module 不存在：${String(moduleId)}`);
+  } else {
+    const stages = moduleSchema.get(moduleId);
+    if (typeof stageId !== "string" || !stages.has(stageId)) {
+      addError(`${slug}: ${moduleId} 中不存在 knowledge.stage：${String(stageId)}`);
+    }
+  }
+
+  if (!Number.isInteger(knowledge.order) || knowledge.order <= 0) {
+    addError(`${slug}: knowledge.order 必须是正整数`);
+  }
+  if (!difficultyValues.has(knowledge.difficulty)) {
+    addError(`${slug}: knowledge.difficulty 无效`);
+  }
+  if (typeof seo.primaryKeyword !== "string" || seo.primaryKeyword.trim() === "") {
+    addError(`${slug}: seo.primaryKeyword 必须是非空字符串`);
+  }
+  if (typeof seo.searchIntent !== "string" || seo.searchIntent.trim() === "") {
+    addError(`${slug}: seo.searchIntent 必须是非空字符串`);
+  }
+  if (!keywordRoleValues.has(seo.keywordRole)) {
+    addError(`${slug}: seo.keywordRole 无效`);
+  }
+
+  if (typeof moduleId === "string" && Number.isInteger(knowledge.order)) {
+    const orders = ordersByModule.get(moduleId) ?? new Map();
+    const previous = orders.get(knowledge.order);
+    if (previous) {
+      addError(`${moduleId}: knowledge.order ${knowledge.order} 同时属于 ${previous} 与 ${slug}`);
+    } else {
+      orders.set(knowledge.order, slug);
+    }
+    ordersByModule.set(moduleId, orders);
+  }
+
+  if (typeof moduleId === "string" && typeof stageId === "string") {
+    countsByModule.set(moduleId, (countsByModule.get(moduleId) ?? 0) + 1);
+    const stageKey = `${moduleId}/${stageId}`;
+    countsByModuleStage.set(stageKey, (countsByModuleStage.get(stageKey) ?? 0) + 1);
+  }
+
+  if (seo.keywordRole === "owner" && typeof seo.primaryKeyword === "string") {
+    const key = normalizeKeyword(seo.primaryKeyword);
+    const previous = ownerByKeyword.get(key);
+    if (previous) {
+      addError(`Keyword Owner 冲突：${seo.primaryKeyword} 同时属于 ${previous} 与 ${slug}`);
+    } else {
+      ownerByKeyword.set(key, slug);
+    }
+  }
 }
 
 if (fs.existsSync(migrationMetadataDirectory)) {
@@ -282,86 +186,17 @@ if (fs.existsSync(migrationMetadataDirectory)) {
   }
 }
 
-const ownerByKeyword = new Map();
-for (const record of records) {
-  if (record.seo.keywordRole !== "owner") continue;
-  const key = record.seo.primaryKeyword.normalize("NFKC").trim().toLowerCase();
-  const previous = ownerByKeyword.get(key);
-  if (previous) {
-    addError(`Keyword Owner 冲突：${record.seo.primaryKeyword} 同时属于 ${previous} 与 ${record.slug}`);
-  } else {
-    ownerByKeyword.set(key, record.slug);
+for (const [moduleId, stages] of moduleSchema) {
+  const moduleCount = countsByModule.get(moduleId) ?? 0;
+  if (moduleCount === 0) {
+    addError(`${moduleId}: metadata module 没有任何文章`);
   }
-}
-
-const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
-const paritySummaries = [];
-
-for (const contract of parityContracts) {
-  const moduleRecords = records
-    .filter((record) => record.knowledge.module === contract.moduleId)
-    .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
-
-  if (moduleRecords.length !== contract.expected.length) {
-    addError(`${contract.label} parity 数量错误：预期 ${contract.expected.length}，实际 ${moduleRecords.length}`);
-  }
-
-  for (let index = 0; index < contract.expected.length; index += 1) {
-    const expected = contract.expected[index];
-    const actual = moduleRecords[index];
-    if (!actual) continue;
-
-    if (
-      actual.slug !== expected[0] ||
-      actual.knowledge.stage !== expected[1] ||
-      actual.knowledge.order !== expected[2]
-    ) {
-      addError(
-        `${contract.label} parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
-      );
+  for (const stageId of stages) {
+    const count = countsByModuleStage.get(`${moduleId}/${stageId}`) ?? 0;
+    if (count === 0) {
+      addError(`${moduleId}/${stageId}: learning stage 不能为空`);
     }
   }
-
-  for (const [stage, expectedCount] of contract.stageCounts) {
-    const actualCount = moduleRecords.filter((record) => record.knowledge.stage === stage).length;
-    if (actualCount !== expectedCount) {
-      addError(`${contract.label} stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
-    }
-  }
-
-  const orders = moduleRecords.map((record) => record.knowledge.order);
-  if (new Set(orders).size !== orders.length) {
-    addError(`${contract.label} parity 存在重复 knowledge.order`);
-  }
-
-  const moduleStart = moduleRegistrySource.indexOf(`id: "${contract.moduleId}"`);
-  const nextModuleStart = contract.nextModuleId
-    ? moduleRegistrySource.indexOf(`id: "${contract.nextModuleId}"`)
-    : moduleRegistrySource.length;
-  if (moduleStart < 0 || nextModuleStart <= moduleStart) {
-    addError(`knowledge-module-registry.ts 无法定位 ${contract.label} module block`);
-  } else {
-    const moduleBlock = moduleRegistrySource.slice(moduleStart, nextModuleStart);
-    if (!moduleBlock.includes('articleSource: "metadata"')) {
-      addError(`${contract.label} module 尚未切换到 metadata articleSource`);
-    }
-    if (/\blegacySlugs\s*:/.test(moduleBlock)) {
-      addError(`${contract.label} module 仍声明 legacySlugs`);
-    }
-    if (/\blegacy(?:From|To)\s*:/.test(moduleBlock)) {
-      addError(`${contract.label} module 仍声明 legacy stage range`);
-    }
-    for (const [slug] of contract.expected) {
-      if (moduleBlock.includes(`"${slug}"`)) {
-        addError(`${contract.label} module 仍硬编码文章 slug：${slug}`);
-      }
-    }
-  }
-
-  const stageSummary = [...contract.stageCounts.values()].join("/");
-  paritySummaries.push(
-    `${contract.label} ${moduleRecords.length}/${contract.expected.length} (${stageSummary})`,
-  );
 }
 
 if (errors.length > 0) {
@@ -370,6 +205,9 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
+const moduleSummary = [...moduleSchema.keys()]
+  .map((moduleId) => `${moduleId}=${countsByModule.get(moduleId) ?? 0}`)
+  .join(", ");
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), ${paritySummaries.join(", ")}, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} article(s), ${moduleSchema.size} module(s), ${moduleSummary}, Keyword Owner conflicts 0. New valid metadata articles are allowed without checker edits.`,
 );

@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import matter from "gray-matter";
+
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
 const roadmapMetadataDirectory = path.join(root, "content", "roadmap-metadata");
@@ -9,27 +11,7 @@ const generatedKnowledgePath = path.join(root, "src", "generated", "knowledge-ar
 const beginnerSeriesPath = path.join(root, "src", "lib", "beginner-series.ts");
 const errors = [];
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-const expected = [
-  ["screeps-introduction", "understand-screeps", 10],
-  ["screeps-first-room", "understand-screeps", 20],
-  ["screeps-tick-and-game-loop", "understand-screeps", 30],
-  ["screeps-first-creep-harvest", "control-first-creep", 40],
-  ["screeps-creep-deliver-energy", "control-first-creep", 50],
-  ["screeps-creep-body-parts", "control-first-creep", 60],
-  ["screeps-spawn-create-creep", "build-room-team", 70],
-  ["screeps-creep-roles", "build-room-team", 80],
-  ["screeps-upgrade-controller", "build-room-team", 90],
-  ["screeps-first-extension", "complete-room-loop", 100],
-  ["screeps-build-and-repair", "complete-room-loop", 110],
-  ["screeps-first-room-code", "complete-room-loop", 120],
-];
-const stageCounts = new Map([
-  ["understand-screeps", 3],
-  ["control-first-creep", 3],
-  ["build-room-team", 3],
-  ["complete-room-loop", 3],
-]);
+const sourceValues = new Set(["migration-sidecar", "frontmatter"]);
 
 function addError(message) {
   errors.push(message);
@@ -43,116 +25,116 @@ function normalizeKeyword(value) {
   return String(value).normalize("NFKC").trim().toLowerCase();
 }
 
-const records = [];
-for (const fileName of fs
-  .readdirSync(roadmapMetadataDirectory)
-  .filter((name) => name.endsWith(".json"))
-  .sort()) {
-  const slug = fileName.replace(/\.json$/, "");
-  const filePath = path.join(roadmapMetadataDirectory, fileName);
-  const postPath = path.join(postsDirectory, `${slug}.md`);
-  if (!fs.existsSync(postPath)) {
-    addError(`${fileName}: roadmap sidecar 没有对应文章`);
-    continue;
-  }
-
-  let parsed;
+function readJson(filePath) {
   try {
-    parsed = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch (error) {
-    addError(`${fileName}: JSON 解析失败：${String(error)}`);
-    continue;
-  }
-
-  if (!isRecord(parsed) || !isRecord(parsed.roadmap) || !isRecord(parsed.seo)) {
-    addError(`${fileName}: roadmap 与 seo 必须同时为对象`);
-    continue;
-  }
-
-  const { roadmap, seo } = parsed;
-  if (roadmap.id !== "beginner") addError(`${fileName}: roadmap.id 必须是 beginner`);
-  if (typeof roadmap.stage !== "string" || !slugPattern.test(roadmap.stage)) {
-    addError(`${fileName}: roadmap.stage 必须是小写 slug`);
-  }
-  if (!Number.isInteger(roadmap.order) || roadmap.order <= 0) {
-    addError(`${fileName}: roadmap.order 必须是正整数`);
-  }
-  if (roadmap.difficulty !== "beginner") {
-    addError(`${fileName}: Beginner Roadmap difficulty 必须是 beginner`);
-  }
-  if (typeof seo.primaryKeyword !== "string" || seo.primaryKeyword.trim() === "") {
-    addError(`${fileName}: seo.primaryKeyword 必须是非空字符串`);
-  }
-  if (typeof seo.searchIntent !== "string" || seo.searchIntent.trim() === "") {
-    addError(`${fileName}: seo.searchIntent 必须是非空字符串`);
-  }
-  if (seo.keywordRole !== "owner") {
-    addError(`${fileName}: Beginner Roadmap 当前每篇必须声明 keywordRole=owner`);
-  }
-
-  records.push({ slug, roadmap, seo, source: "migration-sidecar" });
-}
-
-records.sort(
-  (left, right) => left.roadmap.order - right.roadmap.order || left.slug.localeCompare(right.slug),
-);
-
-if (records.length !== expected.length) {
-  addError(`Beginner Roadmap 数量错误：预期 ${expected.length}，实际 ${records.length}`);
-}
-for (let index = 0; index < expected.length; index += 1) {
-  const actual = records[index];
-  const row = expected[index];
-  if (!actual) continue;
-  if (actual.slug !== row[0] || actual.roadmap.stage !== row[1] || actual.roadmap.order !== row[2]) {
-    addError(
-      `Beginner parity #${index + 1} 失败：预期 ${row.join(" / ")}，实际 ${actual.slug} / ${actual.roadmap.stage} / ${actual.roadmap.order}`,
-    );
-  }
-}
-for (const [stage, expectedCount] of stageCounts) {
-  const actualCount = records.filter((record) => record.roadmap.stage === stage).length;
-  if (actualCount !== expectedCount) {
-    addError(`Beginner stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
-  }
-}
-const orders = records.map((record) => record.roadmap.order);
-if (new Set(orders).size !== orders.length) addError("Beginner Roadmap 存在重复 roadmap.order");
-
-if (!fs.existsSync(generatedRoadmapPath)) {
-  addError("缺少生成后的 beginner-roadmap-registry.json");
-} else {
-  const generated = JSON.parse(fs.readFileSync(generatedRoadmapPath, "utf8"));
-  if (JSON.stringify(generated) !== JSON.stringify(records)) {
-    addError("beginner-roadmap-registry.json 与 roadmap sidecar 不一致，请先运行 roadmapgenerate");
+    addError(`${filePath}: JSON 解析失败：${String(error)}`);
+    return null;
   }
 }
 
 const beginnerSeriesSource = fs.readFileSync(beginnerSeriesPath, "utf8");
+const stageIds = new Set(
+  [...beginnerSeriesSource.matchAll(/^    id: "([a-z0-9-]+)",$/gm)].map((match) => match[1]),
+);
+if (stageIds.size === 0) {
+  addError("beginner-series.ts 未解析到任何 Beginner stage");
+}
 if (/["']screeps-[a-z0-9-]+["']/.test(beginnerSeriesSource)) {
-  addError("beginner-series.ts 仍硬编码 Beginner 文章 slug；路线成员/顺序必须来自生成 Registry");
+  addError("beginner-series.ts 仍硬编码 Beginner 文章 slug；成员和顺序必须来自生成 Registry");
+}
+
+const roadmapRecords = fs.existsSync(generatedRoadmapPath) ? readJson(generatedRoadmapPath) : [];
+const knowledgeRecords = fs.existsSync(generatedKnowledgePath) ? readJson(generatedKnowledgePath) : [];
+if (!Array.isArray(roadmapRecords)) addError("beginner-roadmap-registry.json 必须是数组");
+if (!Array.isArray(knowledgeRecords)) addError("knowledge-article-registry.json 必须是数组");
+
+const publishedSlugs = new Set();
+for (const fileName of fs.readdirSync(postsDirectory).filter((name) => name.endsWith(".md"))) {
+  const slug = fileName.replace(/\.md$/, "");
+  const { data } = matter(fs.readFileSync(path.join(postsDirectory, fileName), "utf8"));
+  if (data.draft !== true) publishedSlugs.add(slug);
+}
+
+const roadmapSlugs = new Set();
+const roadmapOrders = new Map();
+const stageCounts = new Map();
+for (const record of Array.isArray(roadmapRecords) ? roadmapRecords : []) {
+  if (!isRecord(record)) {
+    addError("Beginner roadmap record 必须是对象");
+    continue;
+  }
+  const { slug, roadmap, seo, source } = record;
+  if (typeof slug !== "string" || !slugPattern.test(slug)) {
+    addError(`Beginner roadmap slug 无效：${String(slug)}`);
+    continue;
+  }
+  if (roadmapSlugs.has(slug)) addError(`Beginner Roadmap 重复 slug：${slug}`);
+  roadmapSlugs.add(slug);
+  if (!publishedSlugs.has(slug)) addError(`${slug}: Beginner Roadmap 没有对应已发布文章`);
+  if (!isRecord(roadmap) || !isRecord(seo)) {
+    addError(`${slug}: roadmap 与 seo 必须是对象`);
+    continue;
+  }
+  if (!sourceValues.has(source)) addError(`${slug}: source 必须是 migration-sidecar 或 frontmatter`);
+  if (roadmap.id !== "beginner") addError(`${slug}: roadmap.id 必须是 beginner`);
+  if (typeof roadmap.stage !== "string" || !stageIds.has(roadmap.stage)) {
+    addError(`${slug}: Beginner stage 不存在：${String(roadmap.stage)}`);
+  }
+  if (!Number.isInteger(roadmap.order) || roadmap.order <= 0) {
+    addError(`${slug}: roadmap.order 必须是正整数`);
+  } else {
+    const previous = roadmapOrders.get(roadmap.order);
+    if (previous) addError(`Beginner roadmap.order ${roadmap.order} 同时属于 ${previous} 与 ${slug}`);
+    else roadmapOrders.set(roadmap.order, slug);
+  }
+  if (roadmap.difficulty !== "beginner") addError(`${slug}: Beginner difficulty 必须是 beginner`);
+  if (typeof seo.primaryKeyword !== "string" || seo.primaryKeyword.trim() === "") {
+    addError(`${slug}: seo.primaryKeyword 必须是非空字符串`);
+  }
+  if (typeof seo.searchIntent !== "string" || seo.searchIntent.trim() === "") {
+    addError(`${slug}: seo.searchIntent 必须是非空字符串`);
+  }
+  if (seo.keywordRole !== "owner") addError(`${slug}: Beginner Roadmap 当前必须声明 keywordRole=owner`);
+  if (typeof roadmap.stage === "string") {
+    stageCounts.set(roadmap.stage, (stageCounts.get(roadmap.stage) ?? 0) + 1);
+  }
+}
+
+for (const stageId of stageIds) {
+  if ((stageCounts.get(stageId) ?? 0) === 0) addError(`Beginner stage ${stageId} 不能为空`);
+}
+
+if (fs.existsSync(roadmapMetadataDirectory)) {
+  for (const fileName of fs.readdirSync(roadmapMetadataDirectory).filter((name) => name.endsWith(".json"))) {
+    const slug = fileName.replace(/\.json$/, "");
+    if (!fs.existsSync(path.join(postsDirectory, `${slug}.md`))) {
+      addError(`${fileName}: roadmap sidecar 没有对应文章`);
+    }
+  }
+}
+
+const knowledgeSlugs = new Set((Array.isArray(knowledgeRecords) ? knowledgeRecords : []).map((record) => record.slug));
+for (const slug of roadmapSlugs) {
+  if (knowledgeSlugs.has(slug)) addError(`${slug}: 同时进入 Beginner Roadmap 与 Knowledge Module`);
 }
 
 const ownerByKeyword = new Map();
-const knowledgeRecords = fs.existsSync(generatedKnowledgePath)
-  ? JSON.parse(fs.readFileSync(generatedKnowledgePath, "utf8"))
-  : [];
-for (const record of [...knowledgeRecords, ...records]) {
+for (const record of [...(Array.isArray(knowledgeRecords) ? knowledgeRecords : []), ...(Array.isArray(roadmapRecords) ? roadmapRecords : [])]) {
   if (!record?.seo || record.seo.keywordRole !== "owner") continue;
   const key = normalizeKeyword(record.seo.primaryKeyword);
   const previous = ownerByKeyword.get(key);
-  if (previous) {
-    addError(`全站 Keyword Owner 冲突：${record.seo.primaryKeyword} 同时属于 ${previous} 与 ${record.slug}`);
-  } else {
-    ownerByKeyword.set(key, record.slug);
-  }
+  if (previous) addError(`全站 Keyword Owner 冲突：${record.seo.primaryKeyword} 同时属于 ${previous} 与 ${record.slug}`);
+  else ownerByKeyword.set(key, record.slug);
 }
 
-const knowledgeSlugs = new Set(knowledgeRecords.map((record) => record.slug));
-for (const record of records) {
-  if (knowledgeSlugs.has(record.slug)) {
-    addError(`${record.slug}: 同时进入 Beginner Roadmap 与 Knowledge Module`);
-  }
+const classifiedSlugs = new Set([...knowledgeSlugs, ...roadmapSlugs]);
+for (const slug of publishedSlugs) {
+  if (!classifiedSlugs.has(slug)) addError(`${slug}: 已发布文章未进入 Knowledge Module 或 Beginner Roadmap`);
+}
+for (const slug of classifiedSlugs) {
+  if (!publishedSlugs.has(slug)) addError(`${slug}: Registry 中存在但当前不是已发布文章`);
 }
 
 if (errors.length > 0) {
@@ -161,6 +143,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
+const stageSummary = [...stageIds].map((stageId) => `${stageId}=${stageCounts.get(stageId) ?? 0}`).join(", ");
 console.log(
-  `Beginner roadmap check passed: ${records.length}/${expected.length} articles, stages 3/3/3/3, combined Owner conflicts 0.`,
+  `Beginner roadmap check passed: ${roadmapRecords.length} roadmap article(s), ${stageSummary}, ${publishedSlugs.size}/${publishedSlugs.size} published articles classified, combined Owner conflicts 0. New valid roadmap metadata is allowed without checker edits.`,
 );

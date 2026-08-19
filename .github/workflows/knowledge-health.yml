@@ -1,0 +1,86 @@
+name: Knowledge health
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 1 * * *"
+  push:
+    branches:
+      - clean-blog-v1
+    paths:
+      - "content/posts/**"
+      - "content/knowledge-metadata/**"
+      - "content/roadmap-metadata/**"
+      - "src/lib/knowledge-module-registry.ts"
+      - "src/lib/beginner-series.ts"
+      - "src/generated/knowledge-article-registry.json"
+      - "src/generated/beginner-roadmap-registry.json"
+      - "scripts/generate-knowledge-article-registry.mjs"
+      - "scripts/generate-beginner-roadmap-registry.mjs"
+      - "scripts/check-knowledge-registry.mjs"
+      - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/knowledge-health-report.mjs"
+      - ".github/workflows/knowledge-health.yml"
+  pull_request:
+    branches:
+      - clean-blog-v1
+    paths:
+      - "content/posts/**"
+      - "content/knowledge-metadata/**"
+      - "content/roadmap-metadata/**"
+      - "src/lib/knowledge-module-registry.ts"
+      - "src/lib/beginner-series.ts"
+      - "src/generated/knowledge-article-registry.json"
+      - "src/generated/beginner-roadmap-registry.json"
+      - "scripts/generate-knowledge-article-registry.mjs"
+      - "scripts/generate-beginner-roadmap-registry.mjs"
+      - "scripts/check-knowledge-registry.mjs"
+      - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/knowledge-health-report.mjs"
+      - ".github/workflows/knowledge-health.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild Knowledge registry
+        run: npm run knowledgegenerate
+
+      - name: Validate Knowledge registry
+        run: npm run knowledgecheck
+
+      - name: Rebuild Beginner Roadmap registry
+        run: npm run roadmapgenerate
+
+      - name: Validate Beginner Roadmap and full classification
+        run: npm run roadmapcheck
+
+      - name: Generate Knowledge Health report
+        env:
+          KNOWLEDGE_HEALTH_OUTPUT: ${{ runner.temp }}/knowledge-health.json
+        run: node scripts/knowledge-health-report.mjs
+
+      - name: Upload Knowledge Health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-health-${{ github.run_id }}
+          path: ${{ runner.temp }}/knowledge-health.json
+          if-no-files-found: warn
+          retention-days: 30
