@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "interroom-minerals",
+    "order": 90,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureTerminal send",
+    "searchIntent": "用 StructureTerminal.send() 安全跨房间发送资源，并检查 cooldown、目标房间、库存和交易 Energy 成本",
+    "keywordRole": "owner"
+  }
+}
