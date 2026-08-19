@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "advanced-storage-cache",
+    "order": 70,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps InterShardMemory",
+    "searchIntent": "使用 InterShardMemory 在多个 Shard 间同步状态，并处理版本、过期数据与读写边界",
+    "keywordRole": "owner"
+  }
+}
