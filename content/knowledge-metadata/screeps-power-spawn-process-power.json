@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "market-advanced-resources",
+    "stage": "production-power",
+    "order": 70,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructurePowerSpawn.processPower",
+    "searchIntent": "安全使用 StructurePowerSpawn.processPower() 处理 Power，并检查 Power、Energy、容量、房间条件和返回值",
+    "keywordRole": "owner"
+  }
+}
