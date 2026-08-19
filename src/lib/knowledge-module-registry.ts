@@ -241,19 +241,11 @@ export const knowledgeModuleRegistry: readonly KnowledgeModuleConfig[] = [
     description: "使用 Flag、CPU 指标、自动降载、通知、事件日志和房间级异常隔离观察系统，把配置、性能保护和故障恢复从具体业务动作中分离出来。",
     audience: "代码已经开始变长，希望知道系统为什么变慢、报错或停止工作，并在 CPU 储备恶化或单个房间异常时保住关键任务的玩家。",
     learningGoal: "建立配置、CPU 测量、任务降载、通知、事件观察和异常隔离能力，把运行指标与错误记录转成可恢复的执行策略。",
-    articleSource: "legacy",
+    articleSource: "metadata",
     stages: [
-      { id: "config-performance", title: "配置与性能保护", description: "先使用 Flag 配置，观察 CPU 和 bucket，再按任务等级自动降载与恢复。", legacyFrom: 0, legacyTo: 3 },
-      { id: "notifications-events", title: "通知与事件", description: "继续使用 Game.notify() 和 Room Event Log。", legacyFrom: 3, legacyTo: 5 },
-      { id: "isolation-recovery", title: "异常隔离与恢复", description: "最后为房间和独立模块建立错误边界、限频日志、冷却和自动重试。", legacyFrom: 5, legacyTo: 6 },
-    ],
-    legacySlugs: [
-      "screeps-flags-config",
-      "screeps-cpu-getused-bucket",
-      "screeps-cpu-bucket-degradation",
-      "screeps-game-notify",
-      "screeps-room-event-log",
-      "screeps-room-error-isolation",
+      { id: "config-performance", title: "配置与性能保护", description: "先使用 Flag 配置，观察 CPU 和 bucket，再按任务等级自动降载与恢复。" },
+      { id: "notifications-events", title: "通知与事件", description: "继续使用 Game.notify() 和 Room Event Log。" },
+      { id: "isolation-recovery", title: "异常隔离与恢复", description: "最后为房间和独立模块建立错误边界、限频日志、冷却和自动重试。" },
     ],
     systemMap: {
       zhTitle: "运行诊断与恢复闭环",
