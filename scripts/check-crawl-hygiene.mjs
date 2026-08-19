@@ -35,6 +35,7 @@ const footer = "src/components/site-footer.tsx";
 const postCard = "src/components/post-card.tsx";
 const pagination = "src/components/collection-pagination.tsx";
 const englishBrowser = "src/components/english-article-browser.tsx";
+const siteSearch = "src/components/site-search-v2.tsx";
 const englishBlog = "src/app/(en)/en/blog/page.tsx";
 const chineseTag = "src/app/(zh)/tags/[tag]/page.tsx";
 const sitemap = "src/lib/sitemaps.ts";
@@ -44,6 +45,7 @@ requireOccurrences(footer, "prefetch={false}", 5, "footer-cluster prefetch suppr
 requireOccurrences(postCard, "prefetch={false}", 2, "blog-card prefetch suppression");
 requireOccurrences(pagination, "prefetch={false}", 2, "pagination prefetch suppression");
 requireOccurrences(englishBrowser, "prefetch={false}", 5, "English result-list prefetch suppression");
+requireOccurrences(siteSearch, "prefetch={false}", 3, "site-search result prefetch suppression");
 requireOccurrences(chineseTag, "prefetch={false}", 2, "Chinese tag-archive prefetch suppression");
 
 requireText(postCard, "getTagArchiveHref(tag, publicTags)", "Tag archive threshold routing");
@@ -91,5 +93,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Crawl hygiene check passed: dense link clusters suppress automatic prefetch, clean English pagination is self-canonical, filter states stay non-indexable, Tag thresholds are respected, Sitemap URLs remain clean, and application code does not manually interfere with _rsc.",
+  "Crawl hygiene check passed: dense link clusters and search results suppress automatic prefetch, clean English pagination is self-canonical, filter states stay non-indexable, Tag thresholds are respected, Sitemap URLs remain clean, and application code does not manually interfere with _rsc.",
 );
