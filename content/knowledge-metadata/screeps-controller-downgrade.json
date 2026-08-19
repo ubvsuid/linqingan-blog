@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "controller-control",
+    "stage": "safety-lifecycle",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Controller downgrade",
+    "searchIntent": "监控 Controller.ticksToDowngrade，在降级风险出现时提高升级优先级，并在风险解除后恢复正常调度",
+    "keywordRole": "owner"
+  }
+}
