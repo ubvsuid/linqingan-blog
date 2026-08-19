@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "store-container",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Store capacity API",
+    "searchIntent": "理解 Store 的 getUsedCapacity、getFreeCapacity、getCapacity 语义，并区分 0、null 与容量限制",
+    "keywordRole": "owner"
+  }
+}
