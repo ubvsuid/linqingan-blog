@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "room-economy",
+    "stage": "store-container",
+    "order": 30,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Container ticksToDecay",
+    "searchIntent": "根据 Container ticksToDecay、hits 和维修吞吐量判断何时开始维修，避免腐化损毁",
+    "keywordRole": "owner"
+  }
+}
