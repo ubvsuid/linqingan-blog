@@ -156,6 +156,12 @@ function validateMetadataModuleBlock(moduleRegistrySource, label, moduleId, next
   if (!moduleBlock.includes('articleSource: "metadata"')) {
     addError(`${label} module 尚未切换到 metadata articleSource`);
   }
+  if (/\blegacySlugs\s*:/.test(moduleBlock)) {
+    addError(`${label} module 仍声明 legacySlugs`);
+  }
+  if (/\blegacy(?:From|To)\s*:/.test(moduleBlock)) {
+    addError(`${label} module 仍声明 legacy stage range`);
+  }
   for (const [slug] of expectedRows) {
     if (moduleBlock.includes(`"${slug}"`)) {
       addError(`${label} module 仍硬编码文章 slug：${slug}`);
