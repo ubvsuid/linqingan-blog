@@ -1,12 +1,7 @@
 name: Maintain beginner series
 
 on:
-  push:
-    branches:
-      - clean-blog-v1
-    paths:
-      - scripts/maintain-beginner-batch.mjs
-      - .github/workflows/maintain-beginner-series.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
