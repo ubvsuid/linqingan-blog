@@ -21,6 +21,23 @@ on:
       - "scripts/check-beginner-roadmap.mjs"
       - "scripts/knowledge-health-report.mjs"
       - ".github/workflows/knowledge-health.yml"
+  pull_request:
+    branches:
+      - clean-blog-v1
+    paths:
+      - "content/posts/**"
+      - "content/knowledge-metadata/**"
+      - "content/roadmap-metadata/**"
+      - "src/lib/knowledge-module-registry.ts"
+      - "src/lib/beginner-series.ts"
+      - "src/generated/knowledge-article-registry.json"
+      - "src/generated/beginner-roadmap-registry.json"
+      - "scripts/generate-knowledge-article-registry.mjs"
+      - "scripts/generate-beginner-roadmap-registry.mjs"
+      - "scripts/check-knowledge-registry.mjs"
+      - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/knowledge-health-report.mjs"
+      - ".github/workflows/knowledge-health.yml"
 
 permissions:
   contents: read
