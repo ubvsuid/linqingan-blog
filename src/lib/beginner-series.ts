@@ -1,4 +1,6 @@
-export const beginnerStages = [
+import { getBeginnerRoadmapRegistry } from "@/lib/beginner-roadmap-registry";
+
+const beginnerStageDefinitions = [
   {
     id: "understand-screeps",
     number: 1,
@@ -8,11 +10,6 @@ export const beginnerStages = [
       "能在界面中找到自己的房间、Spawn、Controller 与 Creep",
       "能解释 tick 与主循环为什么会重复执行",
       "知道 Console、代码与房间状态分别用来观察什么",
-    ],
-    slugs: [
-      "screeps-introduction",
-      "screeps-first-room",
-      "screeps-tick-and-game-loop",
     ],
   },
   {
@@ -25,11 +22,6 @@ export const beginnerStages = [
       "能完成 Source → Creep → Spawn/Extension 的基础 Energy 流",
       "能根据 WORK、CARRY、MOVE 判断一只基础 Creep 能做什么",
     ],
-    slugs: [
-      "screeps-first-creep-harvest",
-      "screeps-creep-deliver-energy",
-      "screeps-creep-body-parts",
-    ],
   },
   {
     id: "build-room-team",
@@ -40,11 +32,6 @@ export const beginnerStages = [
       "能使用 spawnCreep() 创建指定身体和名称的 Creep",
       "能区分 Harvester、Hauler、Upgrader 等基础职责",
       "能让 Upgrader 获得 Energy 并调用 upgradeController()",
-    ],
-    slugs: [
-      "screeps-spawn-create-creep",
-      "screeps-creep-roles",
-      "screeps-upgrade-controller",
     ],
   },
   {
@@ -57,16 +44,20 @@ export const beginnerStages = [
       "能让 Builder 在 build() 与 repair() 场景中工作",
       "能把采集、运输、升级和建造整理成第一份可持续房间循环",
     ],
-    slugs: [
-      "screeps-first-extension",
-      "screeps-build-and-repair",
-      "screeps-first-room-code",
-    ],
   },
 ] as const;
 
-export const beginnerSeriesSlugs: readonly string[] = beginnerStages.flatMap(
-  (stage) => [...stage.slugs],
+const beginnerRoadmapRegistry = getBeginnerRoadmapRegistry();
+
+export const beginnerStages = beginnerStageDefinitions.map((stage) => ({
+  ...stage,
+  slugs: beginnerRoadmapRegistry
+    .filter((record) => record.roadmap.stage === stage.id)
+    .map((record) => record.slug),
+}));
+
+export const beginnerSeriesSlugs: readonly string[] = beginnerRoadmapRegistry.map(
+  (record) => record.slug,
 );
 
 export function getBeginnerSeriesIndex(slug: string): number {
