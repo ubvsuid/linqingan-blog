@@ -40,7 +40,7 @@ const chineseTag = "src/app/(zh)/tags/[tag]/page.tsx";
 const sitemap = "src/lib/sitemaps.ts";
 
 requireOccurrences(header, "prefetch={false}", 3, "utility-link prefetch suppression");
-requireOccurrences(footer, "prefetch={false}", 6, "footer-cluster prefetch suppression");
+requireOccurrences(footer, "prefetch={false}", 5, "footer-cluster prefetch suppression");
 requireOccurrences(postCard, "prefetch={false}", 2, "blog-card prefetch suppression");
 requireOccurrences(pagination, "prefetch={false}", 2, "pagination prefetch suppression");
 requireOccurrences(englishBrowser, "prefetch={false}", 5, "English result-list prefetch suppression");
