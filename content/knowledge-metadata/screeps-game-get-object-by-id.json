@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "objects-modules",
+    "order": 40,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.getObjectById",
+    "searchIntent": "把对象 ID 保存进 Memory，并用 Game.getObjectById() 在后续 tick 安全恢复目标和处理失效对象",
+    "keywordRole": "owner"
+  }
+}
