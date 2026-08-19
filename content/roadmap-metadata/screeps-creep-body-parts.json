@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "control-first-creep",
+    "order": 60,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep body parts",
+    "searchIntent": "理解 WORK、CARRY、MOVE 等基础 Creep 身体部件如何决定采集、携带与移动能力",
+    "keywordRole": "owner"
+  }
+}

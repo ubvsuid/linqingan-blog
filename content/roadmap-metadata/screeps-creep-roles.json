@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "build-room-team",
+    "order": 80,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep roles",
+    "searchIntent": "理解 Harvester、Hauler、Upgrader、Builder 等基础角色分工，以及角色职责与身体部件的区别",
+    "keywordRole": "owner"
+  }
+}

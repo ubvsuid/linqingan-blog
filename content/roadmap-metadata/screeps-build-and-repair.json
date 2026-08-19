@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "complete-room-loop",
+    "order": 110,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep build repair",
+    "searchIntent": "让 Builder 在建造、维修和升级之间选择基础工作，并正确调用 build() 与 repair()",
+    "keywordRole": "owner"
+  }
+}

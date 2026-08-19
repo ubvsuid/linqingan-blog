@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "control-first-creep",
+    "order": 50,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Creep transfer Energy to Spawn",
+    "searchIntent": "让装满 Energy 的 Creep 返回 Spawn 并使用 transfer() 交付资源，再回到 Source 继续基础运输循环",
+    "keywordRole": "owner"
+  }
+}

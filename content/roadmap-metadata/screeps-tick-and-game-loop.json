@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "understand-screeps",
+    "order": 30,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps tick game loop",
+    "searchIntent": "理解 Screeps tick、Game.time 与 module.exports.loop，知道代码为什么会持续运行以及动作结果为何跨 tick 出现",
+    "keywordRole": "owner"
+  }
+}

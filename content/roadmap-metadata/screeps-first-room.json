@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "understand-screeps",
+    "order": 20,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps first room",
+    "searchIntent": "第一次进入 Screeps 时认识房间界面、Scripts、Console，并找到 Room、Spawn、Source、Controller 与 Creep",
+    "keywordRole": "owner"
+  }
+}

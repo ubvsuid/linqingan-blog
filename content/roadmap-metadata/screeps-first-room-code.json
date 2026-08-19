@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "complete-room-loop",
+    "order": 120,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps first room code",
+    "searchIntent": "把采集、运输、生成、升级、建造与维修整理成第一份可持续运行的新手房间基础代码",
+    "keywordRole": "owner"
+  }
+}

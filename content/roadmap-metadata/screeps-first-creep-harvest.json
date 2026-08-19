@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "control-first-creep",
+    "order": 40,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps first Creep harvest",
+    "searchIntent": "让第一只 Creep 找到 Source、移动到范围内并调用 harvest() 采集 Energy，同时检查 Store 与返回值",
+    "keywordRole": "owner"
+  }
+}

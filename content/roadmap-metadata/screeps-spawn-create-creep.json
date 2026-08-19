@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "build-room-team",
+    "order": 70,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps spawnCreep()",
+    "searchIntent": "使用 Spawn.spawnCreep() 创建第一只指定身体和名称的 Creep，并理解基础返回值与 spawning 状态",
+    "keywordRole": "owner"
+  }
+}
