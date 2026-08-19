@@ -30,15 +30,19 @@ for (const fileName of fs.readdirSync(postsDirectory).filter((name) => name.ends
   const sidecar = readSidecar(slug);
   const inlineHasRoadmap = data.roadmap !== undefined;
   const inlineHasSeo = data.seo !== undefined;
+
   if (sidecar && (inlineHasRoadmap || inlineHasSeo)) {
     throw new Error(`${filePath}: 已存在 frontmatter roadmap/seo，请删除对应 migration sidecar，保持单一 Source of Truth`);
   }
 
+  // `seo` is shared by multiple metadata namespaces. An inline Knowledge article
+  // may legitimately have `knowledge + seo` without belonging to a Roadmap.
+  if (!sidecar && !inlineHasRoadmap) continue;
+
   const source = sidecar ?? data;
   const hasRoadmap = source.roadmap !== undefined;
   const hasSeo = source.seo !== undefined;
-  if (!hasRoadmap && !hasSeo) continue;
-  if (hasRoadmap !== hasSeo) throw new Error(`${filePath}: roadmap 与 seo 必须同时声明`);
+  if (!hasRoadmap || !hasSeo) throw new Error(`${filePath}: roadmap 与 seo 必须同时声明`);
   if (!isRecord(source.roadmap) || !isRecord(source.seo)) {
     throw new Error(`${filePath}: roadmap 与 seo 必须是对象`);
   }
