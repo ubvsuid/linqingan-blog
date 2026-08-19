@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "controller-control",
+    "stage": "reservation-claim",
+    "order": 40,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps reserveController vs claimController",
+    "searchIntent": "比较 reserveController() 与 claimController() 的目标、GCL 边界和 Controller 条件，为远程房间选择正确控制动作",
+    "keywordRole": "owner"
+  }
+}
