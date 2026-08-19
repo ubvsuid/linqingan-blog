@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "memory-engineering",
+    "stage": "state-basics",
+    "order": 10,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Memory",
+    "searchIntent": "理解 Screeps Memory 的跨 tick 持久化、JSON 边界、读取写入方式与使用成本",
+    "keywordRole": "owner"
+  }
+}

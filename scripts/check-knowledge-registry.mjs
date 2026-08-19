@@ -13,62 +13,132 @@ const difficultyValues = new Set(["beginner", "intermediate", "advanced"]);
 const keywordRoleValues = new Set(["owner", "supporting"]);
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const spawnPilot = [
-  ["screeps-spawncreep-return-codes", "create-queue", 10],
-  ["screeps-spawn-exit-blocked-directions", "create-queue", 20],
-  ["screeps-dynamic-creep-body-energy", "create-queue", 30],
-  ["screeps-room-energyavailable-stuck", "create-queue", 40],
-  ["screeps-multi-spawn-queue", "create-queue", 50],
-  ["screeps-creep-prespawn-replacement", "replacement-retirement", 60],
-  ["screeps-spawn-renew-creep", "replacement-retirement", 70],
-  ["screeps-spawn-recycle-creep", "replacement-retirement", 80],
-  ["screeps-spawn-emergency-recovery", "emergency-recovery", 90],
-];
-
-const movementPilot = [
-  ["screeps-err-not-in-range", "common-errors", 10],
-  ["screeps-moveto-not-moving", "common-errors", 20],
-  ["screeps-err-no-path", "common-errors", 30],
-  ["screeps-pathfinder-costmatrix", "path-costs", 40],
-  ["screeps-map-find-route", "path-costs", 50],
-  ["screeps-roomposition-distance", "path-costs", 60],
-  ["screeps-move-fatigue-body-ratio", "path-costs", 70],
-  ["screeps-room-visibility", "vision-visualization", 80],
-  ["screeps-observer-observe-room", "vision-visualization", 90],
-  ["screeps-roomvisual-debug", "vision-visualization", 100],
-];
-
-const roomEconomyPilot = [
-  ["screeps-store-capacity-api", "store-container", 10],
-  ["screeps-creep-withdraw-container-energy", "store-container", 20],
-  ["screeps-container-decay-repair-deadline", "store-container", 30],
-  ["screeps-creep-pickup-dropped-energy", "resource-recovery", 40],
-  ["screeps-tombstone-ruin-recovery", "resource-recovery", 50],
-  ["screeps-select-source-by-path", "resource-recovery", 60],
-  ["screeps-storage-energy-usage", "room-storage-transfer", 70],
-  ["screeps-link-transfer-energy", "room-storage-transfer", 80],
-  ["screeps-terminal-send-resources", "interroom-minerals", 90],
-  ["screeps-mineral-extractor-harvest", "interroom-minerals", 100],
-];
-
-const controllerPilot = [
-  ["screeps-upgrader-controller-link-not-upgrading", "fixed-upgrade", 10],
-  ["screeps-controller-activate-safe-mode", "safety-lifecycle", 20],
-  ["screeps-controller-downgrade", "safety-lifecycle", 30],
-  ["screeps-reserve-vs-claim-controller", "reservation-claim", 40],
-];
-
-const constructionDefensePilot = [
-  ["screeps-room-create-construction-site", "construction-management", 10],
-  ["screeps-construction-site-progress", "construction-management", 20],
-  ["screeps-construction-site-remove", "construction-management", 30],
-  ["screeps-structure-destroy", "construction-management", 40],
-  ["screeps-tower-auto-attack-hostiles", "tower-actions", 50],
-  ["screeps-tower-repair-threshold", "tower-actions", 60],
-  ["screeps-tower-heal-creeps", "tower-actions", 70],
-  ["screeps-rampart-set-public", "defense-structures", 80],
-  ["screeps-wall-rampart-repair-limit", "defense-structures", 90],
-  ["screeps-nuker-launch-checklist", "defense-structures", 100],
+const parityContracts = [
+  {
+    label: "Memory / Engineering",
+    moduleId: "memory-engineering",
+    nextModuleId: "spawn-lifecycle",
+    expected: [
+      ["screeps-memory-basics", "state-basics", 10],
+      ["screeps-clean-dead-creep-memory", "state-basics", 20],
+      ["screeps-creep-working-state", "state-basics", 30],
+      ["screeps-game-get-object-by-id", "objects-modules", 40],
+      ["screeps-modules-require", "objects-modules", 50],
+      ["screeps-rawmemory-segments", "advanced-storage-cache", 60],
+      ["screeps-intershardmemory-sync", "advanced-storage-cache", 70],
+      ["screeps-rawmemory-foreign-segment", "advanced-storage-cache", 80],
+      ["screeps-global-cache", "advanced-storage-cache", 90],
+    ],
+    stageCounts: new Map([
+      ["state-basics", 3],
+      ["objects-modules", 2],
+      ["advanced-storage-cache", 4],
+    ]),
+  },
+  {
+    label: "Spawn",
+    moduleId: "spawn-lifecycle",
+    nextModuleId: "room-economy",
+    expected: [
+      ["screeps-spawncreep-return-codes", "create-queue", 10],
+      ["screeps-spawn-exit-blocked-directions", "create-queue", 20],
+      ["screeps-dynamic-creep-body-energy", "create-queue", 30],
+      ["screeps-room-energyavailable-stuck", "create-queue", 40],
+      ["screeps-multi-spawn-queue", "create-queue", 50],
+      ["screeps-creep-prespawn-replacement", "replacement-retirement", 60],
+      ["screeps-spawn-renew-creep", "replacement-retirement", 70],
+      ["screeps-spawn-recycle-creep", "replacement-retirement", 80],
+      ["screeps-spawn-emergency-recovery", "emergency-recovery", 90],
+    ],
+    stageCounts: new Map([
+      ["create-queue", 5],
+      ["replacement-retirement", 3],
+      ["emergency-recovery", 1],
+    ]),
+  },
+  {
+    label: "Room Economy",
+    moduleId: "room-economy",
+    nextModuleId: "movement-vision",
+    expected: [
+      ["screeps-store-capacity-api", "store-container", 10],
+      ["screeps-creep-withdraw-container-energy", "store-container", 20],
+      ["screeps-container-decay-repair-deadline", "store-container", 30],
+      ["screeps-creep-pickup-dropped-energy", "resource-recovery", 40],
+      ["screeps-tombstone-ruin-recovery", "resource-recovery", 50],
+      ["screeps-select-source-by-path", "resource-recovery", 60],
+      ["screeps-storage-energy-usage", "room-storage-transfer", 70],
+      ["screeps-link-transfer-energy", "room-storage-transfer", 80],
+      ["screeps-terminal-send-resources", "interroom-minerals", 90],
+      ["screeps-mineral-extractor-harvest", "interroom-minerals", 100],
+    ],
+    stageCounts: new Map([
+      ["store-container", 3],
+      ["resource-recovery", 3],
+      ["room-storage-transfer", 2],
+      ["interroom-minerals", 2],
+    ]),
+  },
+  {
+    label: "Movement / Vision",
+    moduleId: "movement-vision",
+    nextModuleId: "controller-control",
+    expected: [
+      ["screeps-err-not-in-range", "common-errors", 10],
+      ["screeps-moveto-not-moving", "common-errors", 20],
+      ["screeps-err-no-path", "common-errors", 30],
+      ["screeps-pathfinder-costmatrix", "path-costs", 40],
+      ["screeps-map-find-route", "path-costs", 50],
+      ["screeps-roomposition-distance", "path-costs", 60],
+      ["screeps-move-fatigue-body-ratio", "path-costs", 70],
+      ["screeps-room-visibility", "vision-visualization", 80],
+      ["screeps-observer-observe-room", "vision-visualization", 90],
+      ["screeps-roomvisual-debug", "vision-visualization", 100],
+    ],
+    stageCounts: new Map([
+      ["common-errors", 3],
+      ["path-costs", 4],
+      ["vision-visualization", 3],
+    ]),
+  },
+  {
+    label: "Controller",
+    moduleId: "controller-control",
+    nextModuleId: "construction-defense",
+    expected: [
+      ["screeps-upgrader-controller-link-not-upgrading", "fixed-upgrade", 10],
+      ["screeps-controller-activate-safe-mode", "safety-lifecycle", 20],
+      ["screeps-controller-downgrade", "safety-lifecycle", 30],
+      ["screeps-reserve-vs-claim-controller", "reservation-claim", 40],
+    ],
+    stageCounts: new Map([
+      ["fixed-upgrade", 1],
+      ["safety-lifecycle", 2],
+      ["reservation-claim", 1],
+    ]),
+  },
+  {
+    label: "Construction / Defense",
+    moduleId: "construction-defense",
+    nextModuleId: "market-advanced-resources",
+    expected: [
+      ["screeps-room-create-construction-site", "construction-management", 10],
+      ["screeps-construction-site-progress", "construction-management", 20],
+      ["screeps-construction-site-remove", "construction-management", 30],
+      ["screeps-structure-destroy", "construction-management", 40],
+      ["screeps-tower-auto-attack-hostiles", "tower-actions", 50],
+      ["screeps-tower-repair-threshold", "tower-actions", 60],
+      ["screeps-tower-heal-creeps", "tower-actions", 70],
+      ["screeps-rampart-set-public", "defense-structures", 80],
+      ["screeps-wall-rampart-repair-limit", "defense-structures", 90],
+      ["screeps-nuker-launch-checklist", "defense-structures", 100],
+    ],
+    stageCounts: new Map([
+      ["construction-management", 4],
+      ["tower-actions", 3],
+      ["defense-structures", 3],
+    ]),
+  },
 ];
 
 function addError(message) {
@@ -137,71 +207,6 @@ function readJson(filePath) {
   }
 }
 
-function sortedModuleRecords(records, moduleId) {
-  return records
-    .filter((record) => record.knowledge.module === moduleId)
-    .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
-}
-
-function validateParity(label, records, expectedRows, expectedStageCounts) {
-  if (records.length !== expectedRows.length) {
-    addError(`${label} pilot 数量错误：预期 ${expectedRows.length}，实际 ${records.length}`);
-  }
-
-  for (let index = 0; index < expectedRows.length; index += 1) {
-    const expected = expectedRows[index];
-    const actual = records[index];
-    if (!actual) continue;
-
-    if (
-      actual.slug !== expected[0] ||
-      actual.knowledge.stage !== expected[1] ||
-      actual.knowledge.order !== expected[2]
-    ) {
-      addError(
-        `${label} parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
-      );
-    }
-  }
-
-  for (const [stage, expectedCount] of expectedStageCounts) {
-    const actualCount = records.filter((record) => record.knowledge.stage === stage).length;
-    if (actualCount !== expectedCount) {
-      addError(`${label} stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
-    }
-  }
-
-  const orders = records.map((record) => record.knowledge.order);
-  if (new Set(orders).size !== orders.length) {
-    addError(`${label} pilot 存在重复 knowledge.order`);
-  }
-}
-
-function validateMetadataModuleBlock(moduleRegistrySource, label, moduleId, nextModuleId, expectedRows) {
-  const moduleStart = moduleRegistrySource.indexOf(`id: "${moduleId}"`);
-  const nextModuleStart = moduleRegistrySource.indexOf(`id: "${nextModuleId}"`);
-  if (moduleStart < 0 || nextModuleStart < 0 || nextModuleStart <= moduleStart) {
-    addError(`knowledge-module-registry.ts 无法定位 ${label} module block`);
-    return;
-  }
-
-  const moduleBlock = moduleRegistrySource.slice(moduleStart, nextModuleStart);
-  if (!moduleBlock.includes('articleSource: "metadata"')) {
-    addError(`${label} module 尚未切换到 metadata articleSource`);
-  }
-  if (/\blegacySlugs\s*:/.test(moduleBlock)) {
-    addError(`${label} module 仍声明 legacySlugs`);
-  }
-  if (/\blegacy(?:From|To)\s*:/.test(moduleBlock)) {
-    addError(`${label} module 仍声明 legacy stage range`);
-  }
-  for (const [slug] of expectedRows) {
-    if (moduleBlock.includes(`"${slug}"`)) {
-      addError(`${label} module 仍硬编码文章 slug：${slug}`);
-    }
-  }
-}
-
 const records = [];
 const articleFiles = fs
   .readdirSync(postsDirectory)
@@ -252,104 +257,73 @@ for (const record of records) {
   }
 }
 
-const spawnRecords = sortedModuleRecords(records, "spawn-lifecycle");
-const movementRecords = sortedModuleRecords(records, "movement-vision");
-const roomEconomyRecords = sortedModuleRecords(records, "room-economy");
-const controllerRecords = sortedModuleRecords(records, "controller-control");
-const constructionDefenseRecords = sortedModuleRecords(records, "construction-defense");
-
-validateParity(
-  "Spawn",
-  spawnRecords,
-  spawnPilot,
-  new Map([
-    ["create-queue", 5],
-    ["replacement-retirement", 3],
-    ["emergency-recovery", 1],
-  ]),
-);
-
-validateParity(
-  "Movement",
-  movementRecords,
-  movementPilot,
-  new Map([
-    ["common-errors", 3],
-    ["path-costs", 4],
-    ["vision-visualization", 3],
-  ]),
-);
-
-validateParity(
-  "Room Economy",
-  roomEconomyRecords,
-  roomEconomyPilot,
-  new Map([
-    ["store-container", 3],
-    ["resource-recovery", 3],
-    ["room-storage-transfer", 2],
-    ["interroom-minerals", 2],
-  ]),
-);
-
-validateParity(
-  "Controller",
-  controllerRecords,
-  controllerPilot,
-  new Map([
-    ["fixed-upgrade", 1],
-    ["safety-lifecycle", 2],
-    ["reservation-claim", 1],
-  ]),
-);
-
-validateParity(
-  "Construction / Defense",
-  constructionDefenseRecords,
-  constructionDefensePilot,
-  new Map([
-    ["construction-management", 4],
-    ["tower-actions", 3],
-    ["defense-structures", 3],
-  ]),
-);
-
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
-validateMetadataModuleBlock(
-  moduleRegistrySource,
-  "Spawn",
-  "spawn-lifecycle",
-  "room-economy",
-  spawnPilot,
-);
-validateMetadataModuleBlock(
-  moduleRegistrySource,
-  "Room Economy",
-  "room-economy",
-  "movement-vision",
-  roomEconomyPilot,
-);
-validateMetadataModuleBlock(
-  moduleRegistrySource,
-  "Movement",
-  "movement-vision",
-  "controller-control",
-  movementPilot,
-);
-validateMetadataModuleBlock(
-  moduleRegistrySource,
-  "Controller",
-  "controller-control",
-  "construction-defense",
-  controllerPilot,
-);
-validateMetadataModuleBlock(
-  moduleRegistrySource,
-  "Construction / Defense",
-  "construction-defense",
-  "market-advanced-resources",
-  constructionDefensePilot,
-);
+const paritySummaries = [];
+
+for (const contract of parityContracts) {
+  const moduleRecords = records
+    .filter((record) => record.knowledge.module === contract.moduleId)
+    .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
+
+  if (moduleRecords.length !== contract.expected.length) {
+    addError(`${contract.label} parity 数量错误：预期 ${contract.expected.length}，实际 ${moduleRecords.length}`);
+  }
+
+  for (let index = 0; index < contract.expected.length; index += 1) {
+    const expected = contract.expected[index];
+    const actual = moduleRecords[index];
+    if (!actual) continue;
+
+    if (
+      actual.slug !== expected[0] ||
+      actual.knowledge.stage !== expected[1] ||
+      actual.knowledge.order !== expected[2]
+    ) {
+      addError(
+        `${contract.label} parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
+      );
+    }
+  }
+
+  for (const [stage, expectedCount] of contract.stageCounts) {
+    const actualCount = moduleRecords.filter((record) => record.knowledge.stage === stage).length;
+    if (actualCount !== expectedCount) {
+      addError(`${contract.label} stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
+    }
+  }
+
+  const orders = moduleRecords.map((record) => record.knowledge.order);
+  if (new Set(orders).size !== orders.length) {
+    addError(`${contract.label} parity 存在重复 knowledge.order`);
+  }
+
+  const moduleStart = moduleRegistrySource.indexOf(`id: "${contract.moduleId}"`);
+  const nextModuleStart = moduleRegistrySource.indexOf(`id: "${contract.nextModuleId}"`);
+  if (moduleStart < 0 || nextModuleStart < 0 || nextModuleStart <= moduleStart) {
+    addError(`knowledge-module-registry.ts 无法定位 ${contract.label} module block`);
+  } else {
+    const moduleBlock = moduleRegistrySource.slice(moduleStart, nextModuleStart);
+    if (!moduleBlock.includes('articleSource: "metadata"')) {
+      addError(`${contract.label} module 尚未切换到 metadata articleSource`);
+    }
+    if (/\blegacySlugs\s*:/.test(moduleBlock)) {
+      addError(`${contract.label} module 仍声明 legacySlugs`);
+    }
+    if (/\blegacy(?:From|To)\s*:/.test(moduleBlock)) {
+      addError(`${contract.label} module 仍声明 legacy stage range`);
+    }
+    for (const [slug] of contract.expected) {
+      if (moduleBlock.includes(`"${slug}"`)) {
+        addError(`${contract.label} module 仍硬编码文章 slug：${slug}`);
+      }
+    }
+  }
+
+  const stageSummary = [...contract.stageCounts.values()].join("/");
+  paritySummaries.push(
+    `${contract.label} ${moduleRecords.length}/${contract.expected.length} (${stageSummary})`,
+  );
+}
 
 if (errors.length > 0) {
   for (const error of errors) console.error(`ERROR: ${error}`);
@@ -358,5 +332,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Room Economy parity ${roomEconomyRecords.length}/${roomEconomyPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Controller parity ${controllerRecords.length}/${controllerPilot.length}, Construction / Defense parity ${constructionDefenseRecords.length}/${constructionDefensePilot.length}, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} metadata article(s), ${paritySummaries.join(", ")}, Keyword Owner conflicts 0.`,
 );
