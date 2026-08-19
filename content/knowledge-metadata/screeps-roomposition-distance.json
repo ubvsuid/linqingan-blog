@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "path-costs",
+    "order": 60,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps RoomPosition distance",
+    "searchIntent": "比较 RoomPosition 的 range、相邻、同格与路径距离方法，选择适合动作判断和寻路的距离语义",
+    "keywordRole": "owner"
+  }
+}
