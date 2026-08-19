@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "understand-screeps",
+    "order": 10,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps programming game",
+    "searchIntent": "了解 Screeps 是什么、它与普通策略游戏的区别，以及 Room、Creep、Spawn、Source 和 Controller 如何组成基础循环",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "complete-room-loop",
+    "order": 100,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps first Extension",
+    "searchIntent": "在 RCL 2 房间放置第一个 Extension Construction Site，并让 Builder 完成建造",
+    "keywordRole": "owner"
+  }
+}

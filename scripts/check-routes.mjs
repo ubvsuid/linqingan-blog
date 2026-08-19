@@ -7,6 +7,12 @@ import fixedTagSlugs from "../src/lib/tag-slugs.json" with { type: "json" };
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
 const migrationMetadataDirectory = path.join(root, "content", "knowledge-metadata");
+const beginnerRoadmapRegistryPath = path.join(
+  root,
+  "src",
+  "generated",
+  "beginner-roadmap-registry.json",
+);
 const errors = [];
 
 function addError(message) {
@@ -138,10 +144,6 @@ const knowledgeSource = fs.readFileSync(
   path.join(root, "src", "lib", "knowledge-module-registry.ts"),
   "utf8",
 );
-const beginnerSource = fs.readFileSync(
-  path.join(root, "src", "lib", "beginner-series.ts"),
-  "utf8",
-);
 const migrationKnowledgeSlugs = fs.existsSync(migrationMetadataDirectory)
   ? fs
       .readdirSync(migrationMetadataDirectory)
@@ -153,7 +155,31 @@ const knowledgeSlugs = [
   ...frontmatterKnowledgeSlugs,
   ...migrationKnowledgeSlugs,
 ];
-const beginnerSlugs = extractConfiguredSlugs(beginnerSource);
+
+let beginnerRoadmapRecords = [];
+if (!fs.existsSync(beginnerRoadmapRegistryPath)) {
+  addError("缺少生成后的 Beginner Roadmap Registry");
+} else {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(beginnerRoadmapRegistryPath, "utf8"));
+    if (!Array.isArray(parsed)) {
+      addError("Beginner Roadmap Registry 必须是数组");
+    } else {
+      beginnerRoadmapRecords = parsed;
+    }
+  } catch (error) {
+    addError(`Beginner Roadmap Registry 无法解析：${String(error)}`);
+  }
+}
+
+const beginnerSlugs = beginnerRoadmapRecords
+  .filter((record) => record?.roadmap?.id === "beginner")
+  .sort(
+    (left, right) =>
+      Number(left.roadmap.order) - Number(right.roadmap.order) ||
+      String(left.slug).localeCompare(String(right.slug)),
+  )
+  .map((record) => String(record.slug));
 const knowledgeSectionIds = extractKnowledgeSectionIds(knowledgeSource);
 const knowledgeSet = new Set(knowledgeSlugs);
 const beginnerSet = new Set(beginnerSlugs);

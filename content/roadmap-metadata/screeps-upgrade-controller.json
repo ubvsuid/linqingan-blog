@@ -1,0 +1,13 @@
+{
+  "roadmap": {
+    "id": "beginner",
+    "stage": "build-room-team",
+    "order": 90,
+    "difficulty": "beginner"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps upgrade Controller",
+    "searchIntent": "让 Upgrader 获得 Energy、移动到 Controller 附近并调用 upgradeController()，建立基础自动升级循环",
+    "keywordRole": "owner"
+  }
+}

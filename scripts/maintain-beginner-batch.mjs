@@ -6,7 +6,12 @@ import matter from "gray-matter";
 
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
-const seriesPath = path.join(root, "src", "lib", "beginner-series.ts");
+const roadmapRegistryPath = path.join(
+  root,
+  "src",
+  "generated",
+  "beginner-roadmap-registry.json",
+);
 const auditDirectory = path.join(root, "docs", "article-maintenance");
 const checkedAt = "2026-07-23";
 const start = Number.parseInt(process.argv[2] || "0", 10);
@@ -21,51 +26,36 @@ if (!Number.isInteger(count) || count < 1 || count > 5) {
   throw new Error(`Batch size must be between 1 and 5: ${process.argv[3]}`);
 }
 
-function unique(items) {
-  return [...new Set(items)];
-}
-
 function getBeginnerSlugs() {
-  const source = fs.readFileSync(seriesPath, "utf8");
-  const candidates = [
-    ...[...source.matchAll(/slug\s*:\s*["']([a-z0-9-]+)["']/g)].map((match) => match[1]),
-    ...[...source.matchAll(/\/blog\/([a-z0-9-]+)/g)].map((match) => match[1]),
-    ...[...source.matchAll(/["'](screeps-[a-z0-9-]+)["']/g)].map((match) => match[1]),
-  ];
-  const existing = unique(candidates).filter((slug) =>
-    fs.existsSync(path.join(postsDirectory, `${slug}.md`)),
-  );
-
-  if (existing.length === 12) {
-    return existing;
-  }
-
-  const fallback = fs.readdirSync(postsDirectory)
-    .filter((name) => name.endsWith(".md"))
-    .map((name) => {
-      const sourceText = fs.readFileSync(path.join(postsDirectory, name), "utf8");
-      const parsed = matter(sourceText);
-      return {
-        slug: name.replace(/\.md$/, ""),
-        category: String(parsed.data.category || ""),
-        publishedAt: String(parsed.data.publishedAt || ""),
-        title: String(parsed.data.title || ""),
-      };
-    })
-    .filter((post) => post.category.includes("新手"))
-    .sort((left, right) =>
-      left.publishedAt.localeCompare(right.publishedAt)
-      || left.title.localeCompare(right.title, "zh-CN"),
-    )
-    .map((post) => post.slug);
-
-  if (fallback.length !== 12) {
+  if (!fs.existsSync(roadmapRegistryPath)) {
     throw new Error(
-      `Expected 12 beginner articles, found series=${existing.length}, fallback=${fallback.length}`,
+      "Missing generated Beginner Roadmap registry. Run npm run roadmapgenerate first.",
     );
   }
 
-  return fallback;
+  const records = JSON.parse(fs.readFileSync(roadmapRegistryPath, "utf8"));
+  const slugs = records
+    .filter((record) => record?.roadmap?.id === "beginner")
+    .sort(
+      (left, right) =>
+        Number(left.roadmap.order) - Number(right.roadmap.order) ||
+        String(left.slug).localeCompare(String(right.slug)),
+    )
+    .map((record) => String(record.slug));
+
+  if (slugs.length !== 12 || new Set(slugs).size !== 12) {
+    throw new Error(
+      `Expected 12 Beginner Roadmap articles, found ${slugs.length}`,
+    );
+  }
+
+  for (const slug of slugs) {
+    if (!fs.existsSync(path.join(postsDirectory, `${slug}.md`))) {
+      throw new Error(`Beginner Roadmap article is missing: ${slug}`);
+    }
+  }
+
+  return slugs;
 }
 
 function getProfile(slug, title) {

@@ -5,7 +5,7 @@ import matter from "gray-matter";
 
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
-const beginnerSeriesPath = path.join(root, "src", "lib", "beginner-series.ts");
+const roadmapMetadataDirectory = path.join(root, "content", "roadmap-metadata");
 const sitePath = path.join(root, "src", "lib", "site.ts");
 const errors = [];
 const warnings = [];
@@ -609,23 +609,37 @@ for (const fileName of files) {
   }
 }
 
-const beginnerSource = fs.readFileSync(beginnerSeriesPath, "utf8");
-const stageSlugBlocks = [...beginnerSource.matchAll(/slugs:\s*\[([\s\S]*?)\]/g)];
-if (stageSlugBlocks.length === 0) {
-  addError("无法读取 beginnerStages 中的 slugs");
+const beginnerSlugs = [];
+if (!fs.existsSync(roadmapMetadataDirectory)) {
+  addError("缺少 Beginner Roadmap metadata 目录");
 } else {
-  const beginnerSlugs = stageSlugBlocks.flatMap((block) =>
-    [...block[1].matchAll(/["']([^"']+)["']/g)].map((match) => match[1]),
-  );
-  const duplicates = beginnerSlugs.filter(
-    (slug, index) => beginnerSlugs.indexOf(slug) !== index,
-  );
-  if (duplicates.length > 0) {
-    addError(`入门系列存在重复 slug：${duplicates.join(", ")}`);
+  for (const fileName of fs
+    .readdirSync(roadmapMetadataDirectory)
+    .filter((name) => name.endsWith(".json"))
+    .sort()) {
+    const slug = fileName.replace(/\.json$/, "");
+    try {
+      const parsed = JSON.parse(
+        fs.readFileSync(path.join(roadmapMetadataDirectory, fileName), "utf8"),
+      );
+      if (parsed?.roadmap?.id === "beginner") beginnerSlugs.push(slug);
+    } catch (error) {
+      addError(`${fileName}: Beginner Roadmap metadata 无法解析：${String(error)}`);
+    }
   }
-  for (const slug of beginnerSlugs) {
-    if (!slugs.has(slug)) addError(`入门系列文章不存在：${slug}`);
-  }
+}
+
+const duplicates = beginnerSlugs.filter(
+  (slug, index) => beginnerSlugs.indexOf(slug) !== index,
+);
+if (duplicates.length > 0) {
+  addError(`入门系列存在重复 slug：${duplicates.join(", ")}`);
+}
+if (beginnerSlugs.length !== 12) {
+  addError(`入门系列应有 12 篇，实际为 ${beginnerSlugs.length}`);
+}
+for (const slug of beginnerSlugs) {
+  if (!slugs.has(slug)) addError(`入门系列文章不存在：${slug}`);
 }
 
 const siteSource = fs.readFileSync(sitePath, "utf8");
