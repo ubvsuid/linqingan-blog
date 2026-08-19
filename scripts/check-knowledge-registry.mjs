@@ -38,6 +38,19 @@ const movementPilot = [
   ["screeps-roomvisual-debug", "vision-visualization", 100],
 ];
 
+const roomEconomyPilot = [
+  ["screeps-store-capacity-api", "store-container", 10],
+  ["screeps-creep-withdraw-container-energy", "store-container", 20],
+  ["screeps-container-decay-repair-deadline", "store-container", 30],
+  ["screeps-creep-pickup-dropped-energy", "resource-recovery", 40],
+  ["screeps-tombstone-ruin-recovery", "resource-recovery", 50],
+  ["screeps-select-source-by-path", "resource-recovery", 60],
+  ["screeps-storage-energy-usage", "room-storage-transfer", 70],
+  ["screeps-link-transfer-energy", "room-storage-transfer", 80],
+  ["screeps-terminal-send-resources", "interroom-minerals", 90],
+  ["screeps-mineral-extractor-harvest", "interroom-minerals", 100],
+];
+
 function addError(message) {
   errors.push(message);
 }
@@ -221,6 +234,7 @@ for (const record of records) {
 
 const spawnRecords = sortedModuleRecords(records, "spawn-lifecycle");
 const movementRecords = sortedModuleRecords(records, "movement-vision");
+const roomEconomyRecords = sortedModuleRecords(records, "room-economy");
 
 validateParity(
   "Spawn",
@@ -244,6 +258,18 @@ validateParity(
   ]),
 );
 
+validateParity(
+  "Room Economy",
+  roomEconomyRecords,
+  roomEconomyPilot,
+  new Map([
+    ["store-container", 3],
+    ["resource-recovery", 3],
+    ["room-storage-transfer", 2],
+    ["interroom-minerals", 2],
+  ]),
+);
+
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
 validateMetadataModuleBlock(
   moduleRegistrySource,
@@ -251,6 +277,13 @@ validateMetadataModuleBlock(
   "spawn-lifecycle",
   "room-economy",
   spawnPilot,
+);
+validateMetadataModuleBlock(
+  moduleRegistrySource,
+  "Room Economy",
+  "room-economy",
+  "movement-vision",
+  roomEconomyPilot,
 );
 validateMetadataModuleBlock(
   moduleRegistrySource,
@@ -267,5 +300,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Room Economy parity ${roomEconomyRecords.length}/${roomEconomyPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Keyword Owner conflicts 0.`,
 );
