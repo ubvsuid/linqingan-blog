@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "path-costs",
+    "order": 70,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps MOVE fatigue body ratio",
+    "searchIntent": "理解 MOVE 部件、fatigue、地形与负载之间的关系，并据此配置 Creep 的移动比例",
+    "keywordRole": "owner"
+  }
+}
