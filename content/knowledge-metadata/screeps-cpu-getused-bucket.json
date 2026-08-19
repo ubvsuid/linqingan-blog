@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "operations-debugging",
+    "stage": "config-performance",
+    "order": 20,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.cpu.getUsed bucket",
+    "searchIntent": "使用 Game.cpu.getUsed()、limit、tickLimit 与 bucket 监控 Screeps CPU，并建立稳定的采样窗口",
+    "keywordRole": "owner"
+  }
+}

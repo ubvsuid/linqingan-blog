@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "operations-debugging",
+    "stage": "notifications-events",
+    "order": 40,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Game.notify",
+    "searchIntent": "使用 Game.notify() 发送可靠的限频提醒，并处理消息长度、每 tick 限制、groupInterval 与重复状态",
+    "keywordRole": "owner"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "operations-debugging",
+    "stage": "notifications-events",
+    "order": 50,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Room.getEventLog",
+    "searchIntent": "使用 Room.getEventLog() 读取上一 tick 的房间事件，并正确理解事件时序、数据结构、筛选和长期记录边界",
+    "keywordRole": "owner"
+  }
+}

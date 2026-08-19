@@ -158,6 +158,24 @@ const parityContracts = [
       ["production-power", 2],
     ]),
   },
+  {
+    label: "Operations / Diagnostics",
+    moduleId: "operations-debugging",
+    nextModuleId: null,
+    expected: [
+      ["screeps-flags-config", "config-performance", 10],
+      ["screeps-cpu-getused-bucket", "config-performance", 20],
+      ["screeps-cpu-bucket-degradation", "config-performance", 30],
+      ["screeps-game-notify", "notifications-events", 40],
+      ["screeps-room-event-log", "notifications-events", 50],
+      ["screeps-room-error-isolation", "isolation-recovery", 60],
+    ],
+    stageCounts: new Map([
+      ["config-performance", 3],
+      ["notifications-events", 2],
+      ["isolation-recovery", 1],
+    ]),
+  },
 ];
 
 function addError(message) {
@@ -317,8 +335,10 @@ for (const contract of parityContracts) {
   }
 
   const moduleStart = moduleRegistrySource.indexOf(`id: "${contract.moduleId}"`);
-  const nextModuleStart = moduleRegistrySource.indexOf(`id: "${contract.nextModuleId}"`);
-  if (moduleStart < 0 || nextModuleStart < 0 || nextModuleStart <= moduleStart) {
+  const nextModuleStart = contract.nextModuleId
+    ? moduleRegistrySource.indexOf(`id: "${contract.nextModuleId}"`)
+    : moduleRegistrySource.length;
+  if (moduleStart < 0 || nextModuleStart <= moduleStart) {
     addError(`knowledge-module-registry.ts 无法定位 ${contract.label} module block`);
   } else {
     const moduleBlock = moduleRegistrySource.slice(moduleStart, nextModuleStart);
