@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "construction-defense",
+    "stage": "tower-actions",
+    "order": 60,
+    "difficulty": "intermediate"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps Tower repair threshold",
+    "searchIntent": "按结构耐久比例、优先级和 Tower Energy 保留线自动维修建筑，避免无上限消耗 Energy",
+    "keywordRole": "owner"
+  }
+}
