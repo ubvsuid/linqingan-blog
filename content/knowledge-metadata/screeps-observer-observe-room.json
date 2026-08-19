@@ -1,0 +1,13 @@
+{
+  "knowledge": {
+    "module": "movement-vision",
+    "stage": "vision-visualization",
+    "order": 90,
+    "difficulty": "advanced"
+  },
+  "seo": {
+    "primaryKeyword": "Screeps StructureObserver.observeRoom",
+    "searchIntent": "学习用 StructureObserver.observeRoom() 获取远方房间视野，并正确理解下一 tick 可见性",
+    "keywordRole": "owner"
+  }
+}
