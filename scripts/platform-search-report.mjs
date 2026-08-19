@@ -1,14 +1,36 @@
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+
 import { neon } from "@neondatabase/serverless";
 
+import { loadContentAssetIndex } from "./lib/content-asset-index.mjs";
+import { buildPlatformSearchAnalysis, renderPlatformSearchMarkdown } from "./lib/platform-search-opportunities.mjs";
+
+const root = process.cwd();
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) {
   console.error("DATABASE_URL is required to generate the platform search report.");
   process.exit(1);
 }
 
-const daysArg = Number.parseInt(process.argv[2] ?? "30", 10);
+const daysArg = Number.parseInt(process.argv[2] ?? process.env.PLATFORM_REPORT_DAYS ?? "30", 10);
 const days = Number.isFinite(daysArg) ? Math.max(1, Math.min(daysArg, 365)) : 30;
+const markdownOutputPath = process.argv[3] ?? null;
+const jsonOutputPath = process.argv[4] ?? null;
 const sql = neon(databaseUrl);
+
+function refreshContentRegistries() {
+  for (const script of [
+    "scripts/generate-knowledge-article-registry.mjs",
+    "scripts/generate-beginner-roadmap-registry.mjs",
+  ]) {
+    execFileSync(process.execPath, [path.join(root, script)], {
+      cwd: root,
+      stdio: ["ignore", "ignore", "inherit"],
+    });
+  }
+}
 
 const [summary] = await sql`
   WITH period_queries AS (
@@ -85,16 +107,21 @@ const topClicked = await sql`
   LIMIT 15;
 `;
 
-const totalQueries = Number(summary?.total_queries ?? 0);
-const clickedQueries = Number(summary?.clicked_queries ?? 0);
-const zeroResultQueries = Number(summary?.zero_result_queries ?? 0);
-const clickThroughRate = totalQueries > 0 ? (clickedQueries / totalQueries) * 100 : 0;
-const zeroResultRate = totalQueries > 0 ? (zeroResultQueries / totalQueries) * 100 : 0;
+refreshContentRegistries();
+const assetIndex = loadContentAssetIndex(root);
+const analysis = buildPlatformSearchAnalysis({
+  summary: summary ?? {},
+  topSearches,
+  zeroResults,
+  noClickQueries,
+  topClicked,
+  assetIndex,
+});
 
 console.log(`Platform Search Analytics — last ${days} day(s)`);
-console.log(`Queries: ${totalQueries}`);
-console.log(`Zero-result queries: ${zeroResultQueries} (${zeroResultRate.toFixed(1)}%)`);
-console.log(`Queries with a tracked click: ${clickedQueries} (${clickThroughRate.toFixed(1)}%)`);
+console.log(`Queries: ${analysis.summary.totalQueries}`);
+console.log(`Zero-result queries: ${analysis.summary.zeroResultQueries} (${analysis.summary.zeroResultRate.toFixed(1)}%)`);
+console.log(`Queries with a tracked click: ${analysis.summary.clickedQueries} (${analysis.summary.clickThroughRate.toFixed(1)}%)`);
 
 function printRows(title, rows, columns) {
   console.log(`\n${title}`);
@@ -105,17 +132,57 @@ function printRows(title, rows, columns) {
   console.table(rows.map((row) => Object.fromEntries(columns.map((column) => [column, row[column]]))));
 }
 
-printRows("Top searches", topSearches, [
-  "example_query",
+printRows("Action queue", analysis.actionQueue, [
+  "priority",
+  "signal",
+  "query",
   "searches",
-  "zero_results",
-  "avg_results",
+  "system",
+  "module",
+  "stage",
+  "ownerKeyword",
+  "action",
 ]);
-printRows("Top zero-result searches", zeroResults, ["example_query", "searches"]);
-printRows("Top no-click searches with results", noClickQueries, ["example_query", "searches"]);
-printRows("Top clicked results", topClicked, [
-  "result_href",
-  "result_type",
+printRows("Top searches", analysis.topSearches, [
+  "query",
+  "searches",
+  "zeroResults",
+  "zeroResultRate",
+  "avgResults",
+  "ownerKeyword",
+  "module",
+  "stage",
+]);
+printRows("Top clicked results", analysis.topClicked, [
+  "href",
+  "resultType",
   "clicks",
-  "avg_position",
+  "avgPosition",
+  "system",
+  "nodeType",
+  "module",
+  "stage",
 ]);
+
+const generatedAt = new Date().toISOString();
+if (markdownOutputPath) {
+  const absoluteMarkdownOutput = path.resolve(markdownOutputPath);
+  fs.mkdirSync(path.dirname(absoluteMarkdownOutput), { recursive: true });
+  fs.writeFileSync(
+    absoluteMarkdownOutput,
+    renderPlatformSearchMarkdown(analysis, { days, generatedAt }),
+    "utf8",
+  );
+  console.log(`Platform Search Markdown report written to ${absoluteMarkdownOutput}`);
+}
+
+if (jsonOutputPath) {
+  const absoluteJsonOutput = path.resolve(jsonOutputPath);
+  fs.mkdirSync(path.dirname(absoluteJsonOutput), { recursive: true });
+  fs.writeFileSync(
+    absoluteJsonOutput,
+    `${JSON.stringify({ generatedAt, days, ...analysis }, null, 2)}\n`,
+    "utf8",
+  );
+  console.log(`Platform Search JSON report written to ${absoluteJsonOutput}`);
+}
