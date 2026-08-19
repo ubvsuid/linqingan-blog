@@ -25,6 +25,19 @@ const spawnPilot = [
   ["screeps-spawn-emergency-recovery", "emergency-recovery", 90],
 ];
 
+const movementPilot = [
+  ["screeps-err-not-in-range", "common-errors", 10],
+  ["screeps-moveto-not-moving", "common-errors", 20],
+  ["screeps-err-no-path", "common-errors", 30],
+  ["screeps-pathfinder-costmatrix", "path-costs", 40],
+  ["screeps-map-find-route", "path-costs", 50],
+  ["screeps-roomposition-distance", "path-costs", 60],
+  ["screeps-move-fatigue-body-ratio", "path-costs", 70],
+  ["screeps-room-visibility", "vision-visualization", 80],
+  ["screeps-observer-observe-room", "vision-visualization", 90],
+  ["screeps-roomvisual-debug", "vision-visualization", 100],
+];
+
 function addError(message) {
   errors.push(message);
 }
@@ -91,6 +104,65 @@ function readJson(filePath) {
   }
 }
 
+function sortedModuleRecords(records, moduleId) {
+  return records
+    .filter((record) => record.knowledge.module === moduleId)
+    .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
+}
+
+function validateParity(label, records, expectedRows, expectedStageCounts) {
+  if (records.length !== expectedRows.length) {
+    addError(`${label} pilot 数量错误：预期 ${expectedRows.length}，实际 ${records.length}`);
+  }
+
+  for (let index = 0; index < expectedRows.length; index += 1) {
+    const expected = expectedRows[index];
+    const actual = records[index];
+    if (!actual) continue;
+
+    if (
+      actual.slug !== expected[0] ||
+      actual.knowledge.stage !== expected[1] ||
+      actual.knowledge.order !== expected[2]
+    ) {
+      addError(
+        `${label} parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
+      );
+    }
+  }
+
+  for (const [stage, expectedCount] of expectedStageCounts) {
+    const actualCount = records.filter((record) => record.knowledge.stage === stage).length;
+    if (actualCount !== expectedCount) {
+      addError(`${label} stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
+    }
+  }
+
+  const orders = records.map((record) => record.knowledge.order);
+  if (new Set(orders).size !== orders.length) {
+    addError(`${label} pilot 存在重复 knowledge.order`);
+  }
+}
+
+function validateMetadataModuleBlock(moduleRegistrySource, label, moduleId, nextModuleId, expectedRows) {
+  const moduleStart = moduleRegistrySource.indexOf(`id: "${moduleId}"`);
+  const nextModuleStart = moduleRegistrySource.indexOf(`id: "${nextModuleId}"`);
+  if (moduleStart < 0 || nextModuleStart < 0 || nextModuleStart <= moduleStart) {
+    addError(`knowledge-module-registry.ts 无法定位 ${label} module block`);
+    return;
+  }
+
+  const moduleBlock = moduleRegistrySource.slice(moduleStart, nextModuleStart);
+  if (!moduleBlock.includes('articleSource: "metadata"')) {
+    addError(`${label} module 尚未切换到 metadata articleSource`);
+  }
+  for (const [slug] of expectedRows) {
+    if (moduleBlock.includes(`"${slug}"`)) {
+      addError(`${label} module 仍硬编码文章 slug：${slug}`);
+    }
+  }
+}
+
 const records = [];
 const articleFiles = fs
   .readdirSync(postsDirectory)
@@ -141,63 +213,46 @@ for (const record of records) {
   }
 }
 
-const spawnRecords = records
-  .filter((record) => record.knowledge.module === "spawn-lifecycle")
-  .sort((left, right) => left.knowledge.order - right.knowledge.order || left.slug.localeCompare(right.slug));
+const spawnRecords = sortedModuleRecords(records, "spawn-lifecycle");
+const movementRecords = sortedModuleRecords(records, "movement-vision");
 
-if (spawnRecords.length !== spawnPilot.length) {
-  addError(`Spawn pilot 数量错误：预期 ${spawnPilot.length}，实际 ${spawnRecords.length}`);
-}
+validateParity(
+  "Spawn",
+  spawnRecords,
+  spawnPilot,
+  new Map([
+    ["create-queue", 5],
+    ["replacement-retirement", 3],
+    ["emergency-recovery", 1],
+  ]),
+);
 
-for (let index = 0; index < spawnPilot.length; index += 1) {
-  const expected = spawnPilot[index];
-  const actual = spawnRecords[index];
-  if (!actual) continue;
-
-  if (
-    actual.slug !== expected[0] ||
-    actual.knowledge.stage !== expected[1] ||
-    actual.knowledge.order !== expected[2]
-  ) {
-    addError(
-      `Spawn parity #${index + 1} 失败：预期 ${expected.join(" / ")}，实际 ${actual.slug} / ${actual.knowledge.stage} / ${actual.knowledge.order}`,
-    );
-  }
-}
-
-const expectedStageCounts = new Map([
-  ["create-queue", 5],
-  ["replacement-retirement", 3],
-  ["emergency-recovery", 1],
-]);
-for (const [stage, expectedCount] of expectedStageCounts) {
-  const actualCount = spawnRecords.filter((record) => record.knowledge.stage === stage).length;
-  if (actualCount !== expectedCount) {
-    addError(`Spawn stage ${stage} 数量错误：预期 ${expectedCount}，实际 ${actualCount}`);
-  }
-}
-
-const spawnOrders = spawnRecords.map((record) => record.knowledge.order);
-if (new Set(spawnOrders).size !== spawnOrders.length) {
-  addError("Spawn pilot 存在重复 knowledge.order");
-}
+validateParity(
+  "Movement",
+  movementRecords,
+  movementPilot,
+  new Map([
+    ["common-errors", 3],
+    ["path-costs", 4],
+    ["vision-visualization", 3],
+  ]),
+);
 
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
-const spawnModuleStart = moduleRegistrySource.indexOf('id: "spawn-lifecycle"');
-const roomModuleStart = moduleRegistrySource.indexOf('id: "room-economy"');
-if (spawnModuleStart < 0 || roomModuleStart < 0 || roomModuleStart <= spawnModuleStart) {
-  addError("knowledge-module-registry.ts 无法定位 Spawn module block");
-} else {
-  const spawnBlock = moduleRegistrySource.slice(spawnModuleStart, roomModuleStart);
-  if (!spawnBlock.includes('articleSource: "metadata"')) {
-    addError("Spawn module 尚未切换到 metadata articleSource");
-  }
-  for (const [slug] of spawnPilot) {
-    if (spawnBlock.includes(`"${slug}"`)) {
-      addError(`Spawn module 仍硬编码文章 slug：${slug}`);
-    }
-  }
-}
+validateMetadataModuleBlock(
+  moduleRegistrySource,
+  "Spawn",
+  "spawn-lifecycle",
+  "room-economy",
+  spawnPilot,
+);
+validateMetadataModuleBlock(
+  moduleRegistrySource,
+  "Movement",
+  "movement-vision",
+  "controller-control",
+  movementPilot,
+);
 
 if (errors.length > 0) {
   for (const error of errors) console.error(`ERROR: ${error}`);
@@ -206,5 +261,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, stage counts 5/3/1, Keyword Owner conflicts 0.`,
+  `Knowledge registry check passed: ${records.length} metadata article(s), Spawn parity ${spawnRecords.length}/${spawnPilot.length}, Movement parity ${movementRecords.length}/${movementPilot.length}, Keyword Owner conflicts 0.`,
 );
