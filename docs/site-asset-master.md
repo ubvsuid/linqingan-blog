@@ -1,97 +1,43 @@
-# Site Asset Master
+# Site Asset Master V2
 
-The Site Asset Master is the read-only composition layer for Linqingan's website knowledge assets. It does not replace the existing Knowledge metadata, Beginner Roadmap metadata, tool catalog, diagnostic registry, or API Hub registry. Those remain the source of truth for their own domains.
+The Site Asset Master is the read-only identity and composition layer for Linqingan's operational assets. Domain registries remain the source of truth; Asset Master gives downstream intelligence one stable identity model.
 
-## Purpose
+## Coverage
 
-The Asset Master gives SEO, internal-search, verification, and future Action Queue reports one stable asset identity model instead of making every report infer the site independently.
+V2 composes:
 
-Each asset has stable fields such as:
+- Chinese Knowledge / Beginner articles from generated metadata registries;
+- English articles from the established English article registry chain, including their `chinesePath` pair;
+- Knowledge modules and core hubs;
+- Tools from `src/lib/tool-catalog.ts`;
+- Diagnostic symptom fragments from `src/lib/screeps-diagnostic-symptoms.ts`;
+- API object hubs from `src/lib/screeps-api-hubs.ts`;
+- Error Code fragments from `src/lib/screeps-errors.ts`;
+- Glossary Term fragments from `src/lib/screeps-glossary.ts`.
 
-- `assetId`
-- `assetType`
-- `language`
-- `path`
-- `canonicalPath`
-- `routeKind`
-- `title`
-- `contentSystem`
-- `module` / `roadmap`
-- `stage`
-- `order`
-- `difficulty`
-- `primaryKeyword`
-- `keywordRole`
-- `searchIntent`
-- `metadataSource`
-- `sourceOfTruth`
-- `parentPath`
-- `joinKeys`
-- `decision`
+English article IDs use `en:article:*`; Chinese assets retain `zh-CN:*`. Error and Glossary items use fragment paths but canonicalize to their hub page, matching the Diagnostics model.
 
-## Source-of-truth rules
+## Language pairs
 
-The Asset Master must compose existing sources rather than duplicate them:
+Every registered English article retains:
 
-- Knowledge articles: generated Knowledge registry + article frontmatter title
-- Beginner articles: generated Beginner Roadmap registry + article frontmatter title
-- Tools: `src/lib/tool-catalog.ts`
-- Diagnostic symptom nodes: `src/lib/screeps-diagnostic-symptoms.ts`
-- API object hubs: `src/lib/screeps-api-hubs.ts`
-- Core hubs: canonical application routes
+- its own English Asset ID and `/en/blog/...` path;
+- `languagePairPath` pointing to the Chinese source path;
+- `languagePairAssetId` pointing to the Chinese Article Asset;
+- its own English primary keyword and search intent.
 
-A diagnostic symptom is a `fragment` asset under `/diagnostics`, not an independent indexable page. This distinction is intentional.
+This allows GSC Owner mapping to be language-scoped instead of comparing an English page directly against a Chinese Owner.
 
-## Decision hooks
+## Decision boundary
 
-Version 1 exposes empty machine-readable decision hooks:
+Asset Master does not calculate SEO scores or infer opportunity. Its decision hooks remain empty until real Signals are joined downstream.
 
-```json
-{
-  "health": {
-    "content": "not-scored",
-    "evidence": "not-scored",
-    "indexation": "not-scored"
-  },
-  "opportunity": {
-    "priority": null,
-    "reasons": []
-  }
-}
-```
-
-These values must not be filled with guessed scores. Later work can join real GSC, internal-search, verification, tool-use, and feedback signals by `joinKeys.path` and `joinKeys.ownerKeyword`.
-
-## Commands
-
-Validate integrity:
+Validate and report:
 
 ```bash
+npm run knowledgegenerate
+npm run roadmapgenerate
+node scripts/check-english-article-mapping.mjs
 node scripts/check-site-asset-master.mjs
-```
-
-Print a Markdown summary:
-
-```bash
-node scripts/site-asset-master-report.mjs
-```
-
-Write machine-readable JSON and Markdown:
-
-```bash
 node scripts/site-asset-master-report.mjs reports/site-assets.json reports/site-assets.md
 ```
-
-## Version 1 boundary
-
-This foundation deliberately does not:
-
-- calculate SEO Opportunity scores;
-- read private Search Console data directly;
-- read Neon behavior data;
-- change article content, title, URL, or `updatedAt`;
-- change frontend rendering;
-- invent standalone routes for fragment-only diagnostic nodes;
-- duplicate Error or Glossary item registries before a stable canonical source is wired in.
-
-The next layer should consume the Asset Master and the existing GSC/internal-search/verification reports to build an evidence-backed Action Queue.

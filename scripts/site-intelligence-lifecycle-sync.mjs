@@ -16,9 +16,17 @@ const windowDays = Math.max(1, Math.min(365, Number.parseInt(argValue("--window-
 const sql = neon(databaseUrl);
 const signalSnapshot = snapshotSeed("signals", signals.data, { windowDays });
 const queueSnapshot = snapshotSeed("action_queue", queue.data, { windowDays });
+const actionSeeds = (queue.data.actions ?? []).map(actionSeed);
 
-async function persistSnapshot(seed) {
-  await sql`
+const existingRows = actionSeeds.length
+  ? await sql`SELECT action_id FROM site_intelligence_actions WHERE action_id = ANY(${actionSeeds.map((seed) => seed.actionId)}::text[]);`
+  : [];
+const existingIds = new Set(existingRows.map((row) => row.action_id));
+const snapshotMeta = { snapshotId: queueSnapshot.snapshotId, sourceGeneratedAt: queue.data.sourceGeneratedAt ?? null };
+const queries = [];
+
+function snapshotQuery(seed) {
+  return sql`
     INSERT INTO site_intelligence_snapshots
       (snapshot_id, snapshot_type, generated_at, source_generated_at, window_days, summary, payload, input_fingerprint)
     VALUES
@@ -27,25 +35,27 @@ async function persistSnapshot(seed) {
   `;
 }
 
-async function syncAction(action) {
-  const seed = actionSeed(action);
-  const [existing] = await sql`SELECT action_id FROM site_intelligence_actions WHERE action_id = ${seed.actionId};`;
-  const snapshotMeta = { snapshotId: queueSnapshot.snapshotId, sourceGeneratedAt: queue.data.sourceGeneratedAt ?? null };
-  if (!existing) {
-    await sql`
+queries.push(snapshotQuery(signalSnapshot), snapshotQuery(queueSnapshot));
+let created = 0;
+let seen = 0;
+
+for (const seed of actionSeeds) {
+  if (!existingIds.has(seed.actionId)) {
+    queries.push(sql`
       INSERT INTO site_intelligence_actions
         (action_id, asset_id, path, category, recommended_action, priority, before_metrics, source_signal_ids, metadata)
       VALUES
         (${seed.actionId}, ${seed.assetId}, ${seed.path}, ${seed.category}, ${seed.recommendedAction}, ${seed.priority}, ${json(seed.beforeMetrics)}::jsonb, ${json(seed.sourceSignalIds)}::jsonb, ${json(seed.metadata)}::jsonb);
-    `;
-    await sql`
+    `);
+    queries.push(sql`
       INSERT INTO site_intelligence_action_events (action_id, event_type, metrics, metadata)
       VALUES (${seed.actionId}, 'created', ${json(seed.beforeMetrics)}::jsonb, ${json(snapshotMeta)}::jsonb);
-    `;
-    return "created";
+    `);
+    created += 1;
+    continue;
   }
 
-  await sql`
+  queries.push(sql`
     UPDATE site_intelligence_actions
     SET asset_id = ${seed.assetId},
         path = ${seed.path},
@@ -57,8 +67,8 @@ async function syncAction(action) {
         metadata = ${json(seed.metadata)}::jsonb,
         updated_at = now()
     WHERE action_id = ${seed.actionId};
-  `;
-  await sql`
+  `);
+  queries.push(sql`
     INSERT INTO site_intelligence_action_events (action_id, event_type, metrics, metadata)
     SELECT ${seed.actionId}, 'seen', ${json(seed.beforeMetrics)}::jsonb, ${json(snapshotMeta)}::jsonb
     WHERE NOT EXISTS (
@@ -67,20 +77,16 @@ async function syncAction(action) {
         AND event_type = 'seen'
         AND metadata ->> 'snapshotId' = ${queueSnapshot.snapshotId}
     );
-  `;
-  return "seen";
+  `);
+  seen += 1;
 }
 
-await persistSnapshot(signalSnapshot);
-await persistSnapshot(queueSnapshot);
-let created = 0, seen = 0;
-for (const action of queue.data.actions ?? []) {
-  const result = await syncAction(action);
-  if (result === "created") created += 1; else seen += 1;
-}
+// Snapshot persistence and every machine-owned Action/Event write are one atomic unit.
+// If any statement fails, Neon rolls the full sync back and no partial snapshot/action state remains.
+await sql.transaction(queries);
 
-console.log("Site Intelligence lifecycle sync completed.");
-console.log(`Queue actions: ${(queue.data.actions ?? []).length}`);
+console.log("Site Intelligence lifecycle sync completed atomically.");
+console.log(`Queue actions: ${actionSeeds.length}`);
 console.log(`Created actions: ${created}`);
 console.log(`Previously known actions seen again: ${seen}`);
 console.log(`Signals snapshot: ${signalSnapshot.snapshotId}`);

@@ -1,128 +1,50 @@
 import assert from "node:assert/strict";
 
+import { buildSiteIntelligenceSignals } from "./lib/site-intelligence-signals.mjs";
 import { buildSiteIntelligenceActionQueue, renderSiteIntelligenceActionQueueMarkdown } from "./lib/site-intelligence-action-queue.mjs";
 
-function sig(overrides) {
-  return {
-    signalId: "signal:base",
-    source: "gsc",
-    kind: "gsc-monitor",
-    assetId: "zh-CN:article:a",
-    relatedAssetId: null,
-    sampleGate: "report-classified",
-    rankingEligible: false,
-    observedAt: null,
-    payload: {},
-    ...overrides,
-  };
+const assetMaster = { assets: [
+  { assetId:"zh-CN:article:move", assetType:"article", language:"zh-CN", routeKind:"page", path:"/blog/move", canonicalPath:"/blog/move", slug:"move", title:"Move ZH", contentSystem:"knowledge", module:"movement", roadmap:null, stage:null, primaryKeyword:"Screeps moveTo", keywordRole:"owner" },
+  { assetId:"en:article:move", assetType:"article", language:"en", routeKind:"page", path:"/en/blog/move", canonicalPath:"/en/blog/move", slug:"move", title:"Move EN", contentSystem:"knowledge", module:"movement", roadmap:null, stage:null, primaryKeyword:"Screeps moveTo", keywordRole:"owner" },
+  { assetId:"zh-CN:tool:calc", assetType:"tool", language:"zh-CN", routeKind:"page", path:"/tools/calc", canonicalPath:"/tools/calc", slug:"calc", title:"Calc", contentSystem:"utility", module:null, roadmap:null, stage:null, primaryKeyword:null, keywordRole:null },
+] };
+
+const gsc = [
+  { pagePath:"/blog/move", query:"Screeps moveTo", ownerKeyword:"Screeps moveTo", ownerStatus:"owner-match", priority:"P0", action:"Improve title and description", clicks:2, impressions:200, ctr:0.01, position:6.5 },
+  { pagePath:"/en/blog/move", query:"Screeps moveTo", ownerKeyword:"Screeps moveTo", ownerStatus:"owner-mismatch", expectedOwnerHref:"/blog/move", priority:"P0", action:"Review keyword ownership / cannibalization", clicks:1, impressions:150, ctr:0.008, position:7.0 },
+];
+const searchRows = [
+  { language:"zh-CN", normalized_query:"screeps moveto", example_query:"Screeps moveTo", searches:25, zero_results:0, clicks:0 },
+  { language:"zh-CN", normalized_query:"tiny", example_query:"tiny", searches:1, zero_results:1, clicks:0 },
+];
+const toolRows = [
+  { language:"zh-CN", tool_id:"calc", action:"view", events:30 },
+  { language:"zh-CN", tool_id:"calc", action:"use", events:1 },
+];
+const evidenceRows = [
+  { language:"zh-CN", article_slug:"move", verification_type:"live", status:"accepted", evidence:2 },
+  { language:"zh-CN", article_slug:"move", verification_type:"console", status:"rejected", evidence:1 },
+];
+
+function build(records) {
+  const signals = buildSiteIntelligenceSignals({ assetMaster, gscRecords:records, internalSearchRows:searchRows, toolUsageRows:toolRows, evidenceRows, generatedAt:"2026-08-20T00:00:00.000Z" });
+  return buildSiteIntelligenceActionQueue(signals, { generatedAt:"2026-08-20T00:01:00.000Z" });
 }
-
-const snapshot = {
-  generatedAt: "2026-08-20T00:00:00.000Z",
-  policy: {
-    behavioralRule: "Below 20 observations per source, behavioral signals are observe-only and cannot independently rank an asset.",
-  },
-  assets: [
-    {
-      assetId: "zh-CN:article:a",
-      assetType: "article",
-      path: "/blog/a",
-      title: "A",
-      signals: [
-        sig({
-          signalId: "gsc:mismatch",
-          kind: "gsc-owner-mismatch",
-          relatedAssetId: "zh-CN:article:b",
-          rankingEligible: true,
-          payload: { priority: "P0", pagePath: "/blog/a", expectedOwnerHref: "/blog/b", query: "Screeps moveTo", impressions: 140, ctr: 1.2, position: 7.1 },
-        }),
-        sig({
-          signalId: "search:low-sample",
-          source: "internal-search",
-          kind: "internal-search-zero-result",
-          sampleGate: "observe-only",
-          rankingEligible: false,
-          payload: { query: "Screeps moveTo", searches: 5, zeroResults: 5, clicks: 0 },
-        }),
-        sig({
-          signalId: "evidence:accepted",
-          source: "runtime-evidence",
-          kind: "runtime-evidence-accepted",
-          sampleGate: "direct-evidence",
-          rankingEligible: false,
-          payload: { status: "accepted", evidence: 2 },
-        }),
-        sig({
-          signalId: "evidence:rejected",
-          source: "runtime-evidence",
-          kind: "runtime-evidence-rejected",
-          sampleGate: "direct-evidence",
-          rankingEligible: false,
-          payload: { status: "rejected", evidence: 1 },
-        }),
-      ],
-    },
-    {
-      assetId: "zh-CN:article:b",
-      assetType: "article",
-      path: "/blog/b",
-      title: "B",
-      signals: [
-        sig({
-          signalId: "gsc:intent",
-          assetId: "zh-CN:article:b",
-          kind: "gsc-intent-review",
-          rankingEligible: true,
-          payload: { priority: "P1", query: "B query", impressions: 45, position: 33 },
-        }),
-        sig({
-          signalId: "search:mature",
-          source: "internal-search",
-          assetId: "zh-CN:article:b",
-          kind: "internal-search-no-click",
-          sampleGate: "eligible-for-ranking",
-          rankingEligible: true,
-          payload: { query: "B query", searches: 28, zeroResults: 0, clicks: 0 },
-        }),
-      ],
-    },
-    {
-      assetId: "zh-CN:tool:calc",
-      assetType: "tool",
-      path: "/tools/calc",
-      title: "Calc",
-      signals: [
-        sig({ signalId: "tool:view", source: "tool-usage", assetId: "zh-CN:tool:calc", kind: "tool-view", sampleGate: "eligible-for-ranking", rankingEligible: true, payload: { action: "view", events: 30 } }),
-        sig({ signalId: "tool:use", source: "tool-usage", assetId: "zh-CN:tool:calc", kind: "tool-use", sampleGate: "eligible-for-ranking", rankingEligible: true, payload: { action: "use", events: 1 } }),
-      ],
-    },
-  ],
-  unmappedSignals: [
-    sig({ signalId: "gsc:unmapped", assetId: null, kind: "gsc-unmapped-article", payload: { priority: "P1", pagePath: "/blog/ghost", query: "ghost" } }),
-    sig({ signalId: "search:unowned-low", source: "internal-search", assetId: null, kind: "internal-search-zero-result", sampleGate: "observe-only", payload: { query: "tiny", searches: 5 } }),
-    sig({ signalId: "search:unowned-mature", source: "internal-search", assetId: null, kind: "internal-search-zero-result", sampleGate: "eligible-for-ranking", payload: { query: "new concept", searches: 25 } }),
-  ],
-};
-
-const queue = buildSiteIntelligenceActionQueue(snapshot);
-assert.ok(queue.actions.length >= 6);
-assert.equal(queue.actions[0].priority, "P0");
-assert.equal(queue.actions[0].category, "keyword-ownership");
-assert.ok(queue.actions.some((row) => row.action === "Resolve conflicting Runtime Evidence" && row.priority === "P1"));
-assert.ok(!queue.actions.some((row) => row.sourceSignalIds.includes("search:low-sample")));
-assert.ok(queue.actions.some((row) => row.action === "Review owned internal-search ranking and result snippet" && row.priority === "P1"));
-assert.ok(queue.actions.some((row) => row.action === "Review tool activation path and task clarity"));
-assert.ok(queue.actions.some((row) => row.action === "Review unmapped GSC article URL"));
-assert.ok(queue.actions.some((row) => row.action === "Research an unowned internal-search vocabulary or content gap"));
-assert.ok(!queue.actions.some((row) => row.sourceSignalIds.includes("search:unowned-low")));
-assert.ok(queue.actions.every((row) => row.sourceSignalIds.length > 0));
-assert.equal(queue.policy.mode, "rule-based-no-composite-score");
-
-const markdown = renderSiteIntelligenceActionQueueMarkdown(queue);
-assert.match(markdown, /P0 is reserved|P0:/);
-assert.match(markdown, /rule-based operating queue/);
-assert.match(markdown, /Review keyword ownership/);
-
-console.log("Site Intelligence Action Queue validation passed.");
-console.log(`Actions: ${queue.summary.actions}`);
-console.log(`P0/P1/P2: ${queue.summary.P0}/${queue.summary.P1}/${queue.summary.P2}`);
+const first = build(gsc);
+const second = build([...gsc].reverse());
+assert.deepEqual(first.actions.map((row)=>row.actionId).sort(), second.actions.map((row)=>row.actionId).sort(), "Action IDs must be stable across GSC input ordering");
+assert.ok(first.actions.every((row)=>row.actionId.startsWith("act:")));
+assert.ok(first.actions.some((row)=>row.category === "serp-snippet" && row.priority === "P0"));
+assert.ok(!first.actions.some((row)=>row.category === "keyword-ownership" && row.path?.startsWith("/en/")), "Cross-language page must not produce cannibalization P0");
+assert.ok(first.actions.some((row)=>row.category === "internal-search" && row.metrics.searches === 25));
+assert.ok(!first.actions.some((row)=>row.metrics?.query === "tiny"), "One-query sample must stay observe-only even when source total is mature");
+assert.ok(first.actions.some((row)=>row.category === "evidence-conflict"));
+assert.ok(first.actions.some((row)=>row.category === "tool-activation"));
+assert.equal(first.policy.mode, "rule-based-no-composite-score");
+assert.match(first.policy.identityRule, /semantic/i);
+const markdown = renderSiteIntelligenceActionQueueMarkdown(first);
+assert.match(markdown, /1\.00%/);
+assert.match(markdown, /semantic/i);
+console.log("Site Intelligence Action Queue V2 validation passed.");
+console.log(`Actions: ${first.summary.actions}`);
+console.log(`P0/P1/P2: ${first.summary.P0}/${first.summary.P1}/${first.summary.P2}`);

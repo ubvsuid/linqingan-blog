@@ -1,43 +1,25 @@
 # GSC Historical Data Contract V1
 
-The Site Intelligence historical warehouse intentionally uses one stable Search Console grain so period comparisons and the uniqueness key cannot mix incompatible exports.
-
-## Contract
-
-Contract version: `gsc-page-query-v1`
+Contract version: `gsc-page-query-v1`.
 
 Accepted input:
 
-- Google Search type: **Web**
+- Search type: **Web**
 - Country: **All**
 - Device: **All**
-- Dimensions: **Page + Query**, in that order
-- one observation represents one period + page + query fact
+- Dimensions: **Page + Query**
+- one fact = one period + page + query
 
-Rejected before persistence:
+Device/country/search-type/date/search-appearance segmentation is rejected before persistence.
 
-- Mobile/Desktop/Tablet segmentation;
-- country-specific rows;
-- Image, Video, News, Discover, or other search types;
-- Date, Search Appearance, or extra dimensions;
-- page-only rows with no query.
+## Metrics
 
-## Why the contract is strict
+CTR is normalized internally as a ratio between 0 and 1. `1.2%` becomes `0.012`; reports display that ratio as `1.20%`. Clicks cannot exceed impressions and position must be null or positive.
 
-The V1 warehouse uniqueness key is period + page + query. Allowing device or country segmentation without adding those dimensions to the key would collapse different facts into one row and corrupt trend totals.
+## Authoritative ingestion
 
-The contract therefore rejects segmented data instead of silently aggregating or overwriting it.
+Use `scripts/site-intelligence-gsc-import.mjs` or the safe end-to-end runner. The importer is dry-run by default and writes only with `--commit`.
 
-## Metric invariants
+`search-console-opportunity-report.mjs` remains a compatibility/preview report. It uses the same ratio and language-scoped Owner semantics but does not persist historical facts.
 
-Database hardening also enforces basic GSC facts:
-
-- CTR is between 0 and 1;
-- clicks cannot exceed impressions;
-- average position is null or positive.
-
-These checks catch column-mapping errors early. They do not validate Google Search Console methodology or claim statistical significance.
-
-## Future expansion
-
-If device/country/search-type analysis becomes operationally necessary, do not overload V1. Introduce a new grain version and migrate the uniqueness model explicitly first.
+If segmented analysis becomes necessary, introduce a new grain version before changing the uniqueness model.

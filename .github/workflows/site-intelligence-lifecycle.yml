@@ -5,6 +5,7 @@ on:
     paths:
       - "scripts/lib/site-intelligence-lifecycle.mjs"
       - "scripts/check-site-intelligence-lifecycle.mjs"
+      - "scripts/check-site-intelligence-transaction-boundary.mjs"
       - "scripts/site-intelligence-lifecycle-sync.mjs"
       - "scripts/site-intelligence-action-update.mjs"
       - "scripts/site-intelligence-lifecycle-report.mjs"
@@ -26,6 +27,8 @@ jobs:
           node-version: 22
       - name: Validate lifecycle state machine and snapshot identity
         run: node scripts/check-site-intelligence-lifecycle.mjs
+      - name: Validate transactional write boundary
+        run: node scripts/check-site-intelligence-transaction-boundary.mjs
       - name: Syntax check Neon lifecycle entrypoints
         run: |
           node --check scripts/site-intelligence-lifecycle-sync.mjs

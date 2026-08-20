@@ -3,6 +3,8 @@ name: Site Intelligence Action Queue
 on:
   pull_request:
     paths:
+      - "scripts/lib/site-intelligence-identity.mjs"
+      - "scripts/lib/site-intelligence-gsc.mjs"
       - "scripts/lib/site-intelligence-action-queue.mjs"
       - "scripts/check-site-intelligence-action-queue.mjs"
       - "scripts/site-intelligence-action-queue-report.mjs"
@@ -23,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate rule ordering, source gates, evidence conflicts, and corroboration
+      - name: Validate semantic Action identity, rule ordering, gates, evidence and corroboration
         run: node scripts/check-site-intelligence-action-queue.mjs
       - name: Syntax check Action Queue report entrypoint
         run: node --check scripts/site-intelligence-action-queue-report.mjs

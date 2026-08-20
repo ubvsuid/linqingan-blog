@@ -8,26 +8,18 @@ const jsonOutput = process.argv[2] ? path.resolve(process.argv[2]) : null;
 const markdownOutput = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const master = buildSiteAssetMaster(root);
 
-const typeCounts = Object.fromEntries(
-  [...new Set(master.assets.map((asset) => asset.assetType))]
-    .sort()
-    .map((type) => [type, master.assets.filter((asset) => asset.assetType === type).length]),
-);
-const systemCounts = Object.fromEntries(
-  [...new Set(master.assets.map((asset) => asset.contentSystem))]
-    .sort()
-    .map((system) => [system, master.assets.filter((asset) => asset.contentSystem === system).length]),
-);
+const countBy = (key) => Object.fromEntries([...new Set(master.assets.map((asset) => asset[key]))].sort().map((value) => [value, master.assets.filter((asset) => asset[key] === value).length]));
+const typeCounts = countBy("assetType");
+const systemCounts = countBy("contentSystem");
+const languageCounts = countBy("language");
+const pairedEnglish = master.assets.filter((asset) => asset.assetType === "article" && asset.language === "en" && asset.languagePairAssetId).length;
 
 const payload = {
   schemaVersion: master.schemaVersion,
   generatedAt: new Date().toISOString(),
   generatedFrom: master.generatedFrom,
-  summary: {
-    assets: master.assets.length,
-    byType: typeCounts,
-    bySystem: systemCounts,
-  },
+  coverage: master.coverage ?? {},
+  summary: { assets: master.assets.length, byType: typeCounts, bySystem: systemCounts, byLanguage: languageCounts, pairedEnglishArticles: pairedEnglish },
   assets: master.assets,
 };
 
@@ -36,10 +28,17 @@ const markdown = [
   "",
   `- Schema version: ${master.schemaVersion}`,
   `- Total assets: ${master.assets.length}`,
-  `- Article assets: ${typeCounts.article ?? 0}`,
-  `- Tool assets: ${typeCounts.tool ?? 0}`,
-  `- Diagnostic nodes: ${typeCounts.diagnostic ?? 0}`,
-  `- API Hub assets: ${typeCounts["api-hub"] ?? 0}`,
+  `- Chinese assets: ${languageCounts["zh-CN"] ?? 0}`,
+  `- English assets: ${languageCounts.en ?? 0}`,
+  `- English article pairs: ${pairedEnglish}`,
+  `- Error fragments: ${typeCounts["error-code"] ?? 0}`,
+  `- Glossary fragments: ${typeCounts["glossary-term"] ?? 0}`,
+  "",
+  "## Languages",
+  "",
+  "| Language | Count |",
+  "| --- | ---: |",
+  ...Object.entries(languageCounts).map(([language, count]) => `| ${language} | ${count} |`),
   "",
   "## Asset types",
   "",
@@ -55,18 +54,11 @@ const markdown = [
   "",
   "## Decision-layer status",
   "",
-  "This foundation intentionally leaves health and opportunity values as `not-scored` / `null`. GSC, internal-search, verification and behavior signals are joined in later decision-layer work rather than guessed from sparse data.",
+  "The Asset Master is an identity/composition layer. It does not invent SEO scores. English Owner assets remain language-scoped, and Error/Glossary items are fragment assets under their canonical hub pages.",
   "",
 ].join("\n");
 
-if (jsonOutput) {
-  fs.mkdirSync(path.dirname(jsonOutput), { recursive: true });
-  fs.writeFileSync(jsonOutput, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
-}
-if (markdownOutput) {
-  fs.mkdirSync(path.dirname(markdownOutput), { recursive: true });
-  fs.writeFileSync(markdownOutput, markdown, "utf8");
-}
-
+if (jsonOutput) { fs.mkdirSync(path.dirname(jsonOutput), { recursive: true }); fs.writeFileSync(jsonOutput, `${JSON.stringify(payload, null, 2)}\n`, "utf8"); }
+if (markdownOutput) { fs.mkdirSync(path.dirname(markdownOutput), { recursive: true }); fs.writeFileSync(markdownOutput, markdown, "utf8"); }
 if (!jsonOutput && !markdownOutput) process.stdout.write(markdown);
 else console.log(`Site Asset Master report generated: ${master.assets.length} assets`);

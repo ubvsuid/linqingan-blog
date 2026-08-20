@@ -7,10 +7,14 @@ on:
       - "content/knowledge-metadata/**"
       - "content/roadmap-metadata/**"
       - "src/generated/**"
+      - "src/lib/english-*.ts"
+      - "src/lib/screeps-errors.ts"
+      - "src/lib/screeps-glossary.ts"
       - "src/lib/tool-catalog.ts"
       - "src/lib/screeps-diagnostic-symptoms.ts"
       - "src/lib/screeps-api-hubs.ts"
       - "scripts/lib/content-asset-index.mjs"
+      - "scripts/lib/site-asset-extensions.mjs"
       - "scripts/lib/site-asset-master.mjs"
       - "scripts/check-site-asset-master.mjs"
       - "scripts/site-asset-master-report.mjs"
@@ -35,7 +39,9 @@ jobs:
         run: |
           npm run knowledgegenerate
           npm run roadmapgenerate
-      - name: Validate Site Asset Master
+      - name: Validate English route mapping
+        run: node scripts/check-english-article-mapping.mjs
+      - name: Validate Site Asset Master V2
         run: node scripts/check-site-asset-master.mjs
       - name: Generate report smoke test
         run: node scripts/site-asset-master-report.mjs /tmp/site-assets.json /tmp/site-assets.md

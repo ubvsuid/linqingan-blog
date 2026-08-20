@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { parseGscCtr,classifyGscMetrics,classifyWarehouseObservation,formatGscCtr } from './lib/site-intelligence-gsc.mjs';
+import { parseGscCsv } from './lib/site-intelligence-gsc-csv.mjs';
+assert.equal(parseGscCtr('1.2%'),0.012);
+assert.equal(parseGscCtr(0.012,{unit:'ratio'}),0.012);
+assert.throws(()=>parseGscCtr(1.2,{unit:'ratio'}),/ratio between 0 and 1/);
+assert.equal(formatGscCtr(0.012),'1.20%');
+assert.equal(parseGscCsv('Page,Query,Clicks,Impressions,CTR,Position\nhttps://www.linqingan.com/blog/a,q,1,100,1.2%,7',{requirePageQuery:true})[0].ctr,0.012);
+assert.equal(parseGscCsv('Page,Query,Clicks,Impressions,CTR,Position\nhttps://www.linqingan.com/blog/a,q,1,100,0.012,7',{requirePageQuery:true})[0].ctr,0.012);
+assert.equal(classifyGscMetrics({clicks:1,impressions:200,ctr:0.012,position:7}),'Improve title and description');
+const row=classifyWarehouseObservation({page_path:'/blog/a',query:'q',clicks:1,impressions:200,ctr:'0.012',position:'7',owner_status:'owner-match',asset_id:'zh-CN:article:a',period_start:'2026-07-01',period_end:'2026-07-28'});
+assert.equal(row.ctr,0.012); assert.equal(row.priority,'P0');
+console.log('GSC ratio contract and warehouse classifier validation passed.');
