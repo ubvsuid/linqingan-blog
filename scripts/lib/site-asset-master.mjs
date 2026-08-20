@@ -20,6 +20,14 @@ function articleTitle(root, slug) {
   return typeof data.title === "string" && data.title.trim() ? data.title.trim() : slug;
 }
 
+function titleFromSlug(value) {
+  return String(value)
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 function extractToolCatalog(root) {
   const source = readText(path.join(root, "src", "lib", "tool-catalog.ts"));
   const records = [];
@@ -75,7 +83,7 @@ function withDecisionHooks(asset) {
   };
 }
 
-function pageAsset({ id, type, path: href, title, system, parentPath = "/", sourceOfTruth }) {
+function pageAsset({ id, type, path: href, title, system, parentPath = "/", sourceOfTruth, module = null, order = null }) {
   return withDecisionHooks({
     assetId: `zh-CN:${type}:${id}`,
     assetType: type,
@@ -85,10 +93,10 @@ function pageAsset({ id, type, path: href, title, system, parentPath = "/", sour
     routeKind: "page",
     title,
     contentSystem: system,
-    module: null,
+    module,
     roadmap: null,
     stage: null,
-    order: null,
+    order,
     difficulty: null,
     primaryKeyword: null,
     keywordRole: null,
@@ -137,6 +145,23 @@ export function buildSiteAssetMaster(root = process.cwd()) {
     });
   });
 
+  const knowledgeModules = [...new Set(
+    articleAssets
+      .filter((asset) => asset.contentSystem === "knowledge" && asset.module)
+      .map((asset) => asset.module),
+  )];
+  const knowledgeModuleAssets = knowledgeModules.map((module, index) => pageAsset({
+    id: module,
+    type: "knowledge-module",
+    path: `/knowledge/${module}`,
+    title: titleFromSlug(module),
+    system: "knowledge",
+    parentPath: "/knowledge",
+    sourceOfTruth: "generated-knowledge-registry",
+    module,
+    order: (index + 1) * 10,
+  }));
+
   const hubAssets = [
     pageAsset({ id: "beginner", type: "roadmap-hub", path: "/beginner", title: "Screeps Beginner Roadmap", system: "roadmap", sourceOfTruth: "route" }),
     pageAsset({ id: "knowledge", type: "knowledge-hub", path: "/knowledge", title: "Screeps Knowledge", system: "knowledge", sourceOfTruth: "route" }),
@@ -144,6 +169,7 @@ export function buildSiteAssetMaster(root = process.cwd()) {
     pageAsset({ id: "diagnostics", type: "diagnostics-hub", path: "/diagnostics", title: "Screeps 故障诊断中心", system: "diagnostics", sourceOfTruth: "route" }),
     pageAsset({ id: "screeps-api", type: "api-hub-index", path: "/screeps-api", title: "Screeps API", system: "reference", sourceOfTruth: "route" }),
     pageAsset({ id: "screeps-errors", type: "errors-hub", path: "/screeps-errors", title: "Screeps Errors", system: "reference", sourceOfTruth: "route" }),
+    pageAsset({ id: "glossary", type: "glossary-hub", path: "/glossary", title: "Screeps Glossary", system: "reference", sourceOfTruth: "route" }),
     pageAsset({ id: "verification", type: "verification-hub", path: "/verification", title: "Runtime Verification", system: "evidence", sourceOfTruth: "route" }),
   ];
 
@@ -217,7 +243,14 @@ export function buildSiteAssetMaster(root = process.cwd()) {
     parentPath: "/screeps-api",
   }));
 
-  const assets = [...articleAssets, ...hubAssets, ...toolAssets, ...diagnosticAssets, ...apiHubAssets];
+  const assets = [
+    ...articleAssets,
+    ...knowledgeModuleAssets,
+    ...hubAssets,
+    ...toolAssets,
+    ...diagnosticAssets,
+    ...apiHubAssets,
+  ];
   const byId = new Map(assets.map((asset) => [asset.assetId, asset]));
   const byPath = new Map();
   for (const asset of assets) {
@@ -235,6 +268,7 @@ export function buildSiteAssetMaster(root = process.cwd()) {
       "src/lib/tool-catalog.ts",
       "src/lib/screeps-diagnostic-symptoms.ts",
       "src/lib/screeps-api-hubs.ts",
+      "canonical application routes",
     ],
     assets,
     resolveId(assetId) {
