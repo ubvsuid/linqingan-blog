@@ -4,10 +4,10 @@ Contract version: `gsc-page-query-v1`.
 
 Accepted input:
 
-- Search type: Web
-- Country: All
-- Device: All
-- Dimensions: Page + Query
+- Search type: **Web**
+- Country: **All**
+- Device: **All**
+- Dimensions: **Page + Query**
 - one fact = one period + page + query
 
 Device/country/search-type/date/search-appearance segmentation is rejected before persistence.
