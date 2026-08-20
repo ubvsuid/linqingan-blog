@@ -22,6 +22,8 @@ This is the final foundation layer before historical-data ingestion. It is inten
 
 `site_intelligence_gsc_period_summary` is a read-only aggregate view for period-level trend checks.
 
+The V1 warehouse is governed by `gsc-page-query-v1`: Web search, Country=All, Device=All, and exactly Page + Query dimensions. Segmented exports are rejected before persistence. See `docs/gsc-historical-data-contract.md`.
+
 ### Relationship graph
 
 `site_intelligence_relationships` stores explainable relationships between Assets, keywords, and paths. Relationship basis is explicit (`metadata`, `registry`, `content_link`, `keyword_owner`, `runtime_evidence`, or `manual`) instead of an invented confidence score.
@@ -37,6 +39,30 @@ Examples include:
 ### Action relationship graph
 
 `site_intelligence_action_links` stores operational links between Actions: `related`, `blocks`, `duplicate_of`, and `follow_up`.
+
+## Database reconstruction baseline
+
+The production schema is versioned under `database/migrations/`.
+
+- `0001a` + `0001b` + `0001c` form the factual production baseline captured before hardening.
+- `0002_site_intelligence_hardening.sql` is the first incremental migration.
+
+The migration chain was replay-tested on an empty Neon database. The rebuilt schema matched the target temporary branch by table names, view names, index names, and non-NOT-NULL constraint names.
+
+Future production schema changes must add a new sequential migration instead of editing an already-applied migration.
+
+## Hardening invariants
+
+Database-level checks protect the minimum invariants that should remain true even when a write bypasses the normal CLI:
+
+- a Done Action has a completion timestamp;
+- an Action result can exist only on Done;
+- a Superseded Action references its replacement;
+- GSC CTR is at most 1;
+- GSC clicks do not exceed impressions;
+- GSC position is null or positive.
+
+More detailed workflow policy remains in the application layer to avoid over-constraining the database.
 
 ## Safety boundaries
 

@@ -13,6 +13,38 @@ function nonnegative(value, name) {
   return number;
 }
 
+export const GSC_GRAIN_CONTRACT = Object.freeze({
+  version: "gsc-page-query-v1",
+  searchType: "web",
+  country: "all",
+  device: "all",
+  dimensions: Object.freeze(["page", "query"]),
+});
+
+function normalizeDimension(value) { return text(value).toLowerCase().replaceAll("_", "-"); }
+
+export function validateGscGrain({
+  searchType = GSC_GRAIN_CONTRACT.searchType,
+  country = GSC_GRAIN_CONTRACT.country,
+  device = GSC_GRAIN_CONTRACT.device,
+  dimensions = GSC_GRAIN_CONTRACT.dimensions,
+} = {}) {
+  const normalized = {
+    version: GSC_GRAIN_CONTRACT.version,
+    searchType: normalizeDimension(searchType),
+    country: normalizeDimension(country),
+    device: normalizeDimension(device),
+    dimensions: [...(Array.isArray(dimensions) ? dimensions : [])].map(normalizeDimension),
+  };
+  if (normalized.searchType !== "web") throw new Error("GSC historical warehouse V1 accepts Web search only.");
+  if (normalized.country !== "all") throw new Error("GSC historical warehouse V1 does not accept country-segmented rows.");
+  if (normalized.device !== "all") throw new Error("GSC historical warehouse V1 does not accept device-segmented rows.");
+  if (normalized.dimensions.length !== 2 || normalized.dimensions[0] !== "page" || normalized.dimensions[1] !== "query") {
+    throw new Error("GSC historical warehouse V1 requires exactly Page + Query dimensions in that order.");
+  }
+  return normalized;
+}
+
 export function validateImportCounts({ rowsReceived = 0, rowsAccepted = 0, rowsRejected = 0, rowsUnmapped = 0 } = {}) {
   const result = {
     rowsReceived: nonnegative(rowsReceived, "rowsReceived"),
@@ -37,9 +69,10 @@ export function makeDataQualityFingerprint({ source, issueType, entityKind = nul
   return hash({ source: text(source), issueType: text(issueType), entityKind: text(entityKind) || null, entityKey: text(entityKey) || null });
 }
 
-export function makeGscRowFingerprint({ periodStart, periodEnd, pagePath, query = "" }) {
-  if (!text(periodStart) || !text(periodEnd) || !text(pagePath)) throw new Error("GSC periodStart, periodEnd, and pagePath are required.");
-  return hash({ periodStart: text(periodStart), periodEnd: text(periodEnd), pagePath: text(pagePath), query: text(query) });
+export function makeGscRowFingerprint({ periodStart, periodEnd, pagePath, query, searchType, country, device, dimensions } = {}) {
+  if (!text(periodStart) || !text(periodEnd) || !text(pagePath) || !text(query)) throw new Error("GSC periodStart, periodEnd, pagePath, and query are required.");
+  const grain = validateGscGrain({ searchType, country, device, dimensions });
+  return hash({ periodStart: text(periodStart), periodEnd: text(periodEnd), pagePath: text(pagePath), query: text(query), grainVersion: grain.version });
 }
 
 export function makeRelationshipId({ fromKind, fromKey, relationshipType, toKind, toKey }) {
@@ -101,6 +134,7 @@ export function renderFoundationMarkdown({ generatedAt, actionSummary = [], impo
     "|---|---:|",
     ...actionLinks.map((row) => `| ${row.relationship_type} | ${row.links} |`),
     "",
+    `GSC warehouse grain: ${GSC_GRAIN_CONTRACT.version} (Web, Country=All, Device=All, dimensions=Page+Query). Segmented GSC rows must be rejected before persistence.`,
     "This report is read-only. It does not create, close, reprioritize, publish, redirect, or modify site content automatically.",
     "",
   ];

@@ -1,11 +1,18 @@
 import assert from "node:assert/strict";
-import { makeDataQualityFingerprint, makeGscRowFingerprint, makeImportId, makeRelationshipId, validateImportCounts } from "./lib/site-intelligence-foundation.mjs";
+import { GSC_GRAIN_CONTRACT, makeDataQualityFingerprint, makeGscRowFingerprint, makeImportId, makeRelationshipId, validateGscGrain, validateImportCounts } from "./lib/site-intelligence-foundation.mjs";
 import { ACTION_AGING_POLICY_DAYS, actionTiming } from "./lib/site-intelligence-lifecycle.mjs";
 
 assert.deepEqual(validateImportCounts({ rowsReceived: 100, rowsAccepted: 96, rowsRejected: 4, rowsUnmapped: 7 }), { rowsReceived: 100, rowsAccepted: 96, rowsRejected: 4, rowsUnmapped: 7 });
 assert.throws(() => validateImportCounts({ rowsReceived: 10, rowsAccepted: 8, rowsRejected: 3 }), /cannot exceed/);
 assert.equal(makeDataQualityFingerprint({ source: "gsc", issueType: "unknown_url", entityKind: "page", entityKey: "/blog/x" }), makeDataQualityFingerprint({ entityKey: "/blog/x", issueType: "unknown_url", source: "gsc", entityKind: "page" }));
-assert.equal(makeGscRowFingerprint({ periodStart: "2026-07-01", periodEnd: "2026-07-28", pagePath: "/blog/x", query: "spawn" }), makeGscRowFingerprint({ pagePath: "/blog/x", query: "spawn", periodEnd: "2026-07-28", periodStart: "2026-07-01" }));
+assert.deepEqual(GSC_GRAIN_CONTRACT, { version: "gsc-page-query-v1", searchType: "web", country: "all", device: "all", dimensions: ["page", "query"] });
+assert.deepEqual(validateGscGrain(), GSC_GRAIN_CONTRACT);
+assert.throws(() => validateGscGrain({ device: "mobile" }), /device-segmented/);
+assert.throws(() => validateGscGrain({ country: "usa" }), /country-segmented/);
+assert.throws(() => validateGscGrain({ searchType: "image" }), /Web search only/);
+assert.throws(() => validateGscGrain({ dimensions: ["page", "query", "date"] }), /exactly Page \+ Query/);
+assert.throws(() => makeGscRowFingerprint({ periodStart: "2026-07-01", periodEnd: "2026-07-28", pagePath: "/blog/x", query: "" }), /query are required/);
+assert.equal(makeGscRowFingerprint({ periodStart: "2026-07-01", periodEnd: "2026-07-28", pagePath: "/blog/x", query: "spawn" }), makeGscRowFingerprint({ pagePath: "/blog/x", query: "spawn", periodEnd: "2026-07-28", periodStart: "2026-07-01", searchType: "web", country: "all", device: "all", dimensions: ["page", "query"] }));
 assert.match(makeImportId({ source: "gsc", fingerprint: "abcdef1234567890", startedAt: "2026-08-20T00:00:00Z" }), /^import:gsc:20260820000000:abcdef123456$/);
 assert.match(makeRelationshipId({ fromKind: "keyword", fromKey: "spawn queue", relationshipType: "owned_by", toKind: "asset", toKey: "article:spawn-guide" }), /^rel:[a-f0-9]{24}$/);
 assert.throws(() => makeRelationshipId({ fromKind: "asset", fromKey: "a", relationshipType: "related_to", toKind: "asset", toKey: "a" }), /Self relationships/);

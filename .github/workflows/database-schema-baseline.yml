@@ -1,0 +1,29 @@
+name: Database Schema Baseline
+
+on:
+  pull_request:
+    paths:
+      - "database/**"
+      - "docs/gsc-historical-data-contract.md"
+      - "scripts/check-database-schema-baseline.mjs"
+      - "scripts/check-site-intelligence-foundation.mjs"
+      - "scripts/lib/site-intelligence-foundation.mjs"
+      - ".github/workflows/database-schema-baseline.yml"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate versioned database baseline
+        run: node scripts/check-database-schema-baseline.mjs
+      - name: Validate GSC grain contract and foundation helpers
+        run: node scripts/check-site-intelligence-foundation.mjs
+      - name: Syntax check helpers
+        run: |
+          node --check scripts/lib/site-intelligence-foundation.mjs
+          node --check scripts/check-database-schema-baseline.mjs
