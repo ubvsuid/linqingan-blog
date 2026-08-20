@@ -2,58 +2,42 @@
 
 This layer closes the operating loop above Site Asset Master, Site Intelligence Signals, and Action Queue V1.
 
-It stores operational state in Neon so changing an action from Open to In Progress or Done does not require a Git commit and does not trigger a Vercel deployment.
+Operational state lives in Neon so changing an Action from Open to In Progress or Done does not require a Git commit and does not trigger a Vercel deployment.
 
-## Production schema
+## Lifecycle and timing
 
-Migration `4083947e-3fe5-4402-8c73-c2d1f61c03ea` introduced three persistent stores:
-
-- `site_intelligence_actions`: current operational state for each stable Action Queue `actionId`.
-- `site_intelligence_action_events`: append-only action history such as created, seen, status changes, notes, after snapshots, and reviews.
-- `site_intelligence_snapshots`: historical Signals and Action Queue snapshots used for weekly/monthly comparison.
-
-GitHub remains the source of truth for rules and asset identity. Neon is the source of truth for action state, history, snapshots, and before/after outcomes.
-
-## Lifecycle
-
-Supported action statuses:
+Supported statuses:
 
 `open -> in_progress -> done`
 
-Actions may also be explicitly rejected or superseded. Completed, rejected, or superseded actions can be reopened through an explicit transition. The lifecycle helper rejects unsafe jumps such as `open -> done`.
+Actions may also be explicitly rejected or superseded. Reopening a done, rejected, or superseded Action requires an explicit reopen reason. Unsafe jumps such as `open -> done` remain rejected.
 
-Completing an action requires an `action_taken` description so the system never records a successful-looking Done state without knowing what was actually changed.
+An Action may have an explicit `due_at`. If no Due Date is supplied, the operating report uses a reminder policy based on first-seen age:
+
+- P0: 7 days
+- P1: 21 days
+- P2: 45 days
+
+These thresholds never change priority or status automatically. They only classify active work as `on_track`, `aging`, `scheduled`, or `overdue`.
+
+## Action relationships
+
+Each Action may point to:
+
+- `parent_action_id`: a broader Action it belongs under;
+- `superseded_by_action_id`: the replacement Action when a task is explicitly superseded.
+
+Many-to-many Action links are stored in `site_intelligence_action_links` using `related`, `blocks`, `duplicate_of`, or `follow_up`.
+
+Relationship changes and reopen events are appended to Action history instead of overwriting historical context.
 
 ## Before and after metrics
 
-When a queue action is first synced, its current Action Queue metrics are captured as `before_metrics` and then preserved.
-
-After metrics are recorded only by an explicit lifecycle update. A result (`improved`, `neutral`, `declined`, or `mixed`) requires after metrics.
+When a queue Action is first synced, its current Action Queue metrics are captured as `before_metrics` and preserved. After metrics and a result (`improved`, `neutral`, `declined`, `mixed`) are recorded only through explicit lifecycle review.
 
 A result is an internal operating classification, not a Google score or ranking guarantee.
 
-## Sync a generated queue
-
-Generate Signals and Action Queue JSON first, then persist them:
-
-```bash
-DATABASE_URL=... node scripts/site-intelligence-lifecycle-sync.mjs \
-  --signals reports/site-intelligence-signals.json \
-  --queue reports/site-intelligence-action-queue.json \
-  --window-days 30
-```
-
-Sync behavior is conservative:
-
-- new Action IDs are created as `open`;
-- known Action IDs keep their existing status;
-- `last_seen_at`, recommendation text, priority, and source evidence are refreshed;
-- the same queue snapshot does not create duplicate `seen` events;
-- actions missing from a later snapshot are not automatically closed or superseded.
-
-The last rule prevents incomplete GSC or behavior inputs from silently closing real work.
-
-## Update an action
+## Update an Action
 
 Start work:
 
@@ -61,7 +45,8 @@ Start work:
 DATABASE_URL=... node scripts/site-intelligence-action-update.mjs \
   --action-id '<action-id>' \
   --status in_progress \
-  --note 'Started content overlap review'
+  --due-at '2026-08-27T00:00:00Z' \
+  --note 'Started review'
 ```
 
 Complete work:
@@ -74,26 +59,39 @@ DATABASE_URL=... node scripts/site-intelligence-action-update.mjs \
   --review-after '2026-09-17T00:00:00Z'
 ```
 
-Record the later review:
+Reopen work:
 
 ```bash
 DATABASE_URL=... node scripts/site-intelligence-action-update.mjs \
   --action-id '<action-id>' \
-  --result improved \
-  --metrics-json '{"impressions":180,"position":5.9}' \
-  --note '28-day GSC review'
+  --status in_progress \
+  --reopen-reason 'New GSC evidence changed the conclusion'
 ```
 
-Rejecting an action requires a rejection reason or note.
+Supersede work:
 
-## Lifecycle report
+```bash
+DATABASE_URL=... node scripts/site-intelligence-action-update.mjs \
+  --action-id '<old-action-id>' \
+  --status superseded \
+  --superseded-by-action-id '<replacement-action-id>'
+```
+
+Link Actions:
+
+```bash
+DATABASE_URL=... node scripts/site-intelligence-action-link.mjs \
+  --from-action-id '<action-a>' \
+  --to-action-id '<action-b>' \
+  --type related
+```
+
+## Reports
 
 ```bash
 DATABASE_URL=... node scripts/site-intelligence-lifecycle-report.mjs
 ```
 
-The report shows current actions, active work, reviews due, recent snapshot history, and event summary.
+The report shows active Actions, age/timing state, overdue work, reviews due, and snapshot history.
 
-## Vercel budget boundary
-
-Lifecycle writes happen in Neon and do not require a site deployment. Git/Vercel is only used when lifecycle rules or code change. Ordinary operations such as starting, completing, rejecting, or reviewing an action should never create a Vercel Preview.
+Lifecycle writes happen in Neon. Git/Vercel is used only when lifecycle rules or code change.

@@ -1,0 +1,36 @@
+name: Site Intelligence Database Foundation
+
+on:
+  pull_request:
+    paths:
+      - "scripts/lib/site-intelligence-foundation.mjs"
+      - "scripts/lib/site-intelligence-lifecycle.mjs"
+      - "scripts/check-site-intelligence-foundation.mjs"
+      - "scripts/check-site-intelligence-lifecycle.mjs"
+      - "scripts/site-intelligence-foundation-report.mjs"
+      - "scripts/site-intelligence-lifecycle-report.mjs"
+      - "scripts/site-intelligence-action-update.mjs"
+      - "scripts/site-intelligence-action-link.mjs"
+      - "docs/site-intelligence-database-foundation.md"
+      - "docs/site-intelligence-lifecycle.md"
+      - ".github/workflows/site-intelligence-foundation.yml"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run foundation regression checks
+        run: |
+          node scripts/check-site-intelligence-lifecycle.mjs
+          node scripts/check-site-intelligence-foundation.mjs
+      - name: Check runtime entrypoint syntax
+        run: |
+          node --check scripts/site-intelligence-action-update.mjs
+          node --check scripts/site-intelligence-action-link.mjs
+          node --check scripts/site-intelligence-lifecycle-report.mjs
+          node --check scripts/site-intelligence-foundation-report.mjs

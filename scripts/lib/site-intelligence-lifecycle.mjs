@@ -10,9 +10,17 @@ const TRANSITIONS = {
   superseded: new Set(["open", "in_progress"]),
 };
 
+export const ACTION_AGING_POLICY_DAYS = Object.freeze({ P0: 7, P1: 21, P2: 45 });
+
 function text(value) { return String(value ?? "").trim(); }
 function object(value) { return value && typeof value === "object" && !Array.isArray(value) ? value : {}; }
 function unique(values) { return [...new Set((values ?? []).map(text).filter(Boolean))]; }
+function dateOrNull(value) {
+  if (value === null || value === undefined || text(value) === "") return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) throw new Error(`Invalid date: ${value}`);
+  return date;
+}
 
 export function normalizeLifecycleStatus(value) {
   const status = text(value);
@@ -27,12 +35,46 @@ export function normalizeLifecycleResult(value) {
   return result;
 }
 
+export function normalizeOptionalIsoDate(value) {
+  const date = dateOrNull(value);
+  return date ? date.toISOString() : null;
+}
+
 export function validateLifecycleTransition(fromStatus, toStatus) {
   const from = normalizeLifecycleStatus(fromStatus);
   const to = normalizeLifecycleStatus(toStatus);
   if (from === to) return { allowed: true, noop: true, from, to };
   if (!TRANSITIONS[from]?.has(to)) throw new Error(`Invalid action transition: ${from} -> ${to}`);
   return { allowed: true, noop: false, from, to };
+}
+
+export function actionTiming(action, { now = new Date() } = {}) {
+  const current = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(current.getTime())) throw new Error("Invalid current time.");
+  const status = normalizeLifecycleStatus(action.status);
+  const priority = ["P0", "P1", "P2"].includes(text(action.priority)) ? text(action.priority) : "P2";
+  const firstSeen = dateOrNull(action.first_seen_at ?? action.firstSeenAt) ?? current;
+  const dueAt = dateOrNull(action.due_at ?? action.dueAt);
+  const reviewAfter = dateOrNull(action.review_after ?? action.reviewAfter);
+  const agingDays = Math.max(0, Math.floor((current.getTime() - firstSeen.getTime()) / 86_400_000));
+  const policyDays = ACTION_AGING_POLICY_DAYS[priority];
+  const policyTargetAt = new Date(firstSeen.getTime() + policyDays * 86_400_000);
+  const active = status === "open" || status === "in_progress";
+  let agingState = "closed";
+  if (active) {
+    if (dueAt && dueAt < current) agingState = "overdue";
+    else if (dueAt) agingState = "scheduled";
+    else if (current >= policyTargetAt) agingState = "aging";
+    else agingState = "on_track";
+  }
+  return {
+    agingDays,
+    agingState,
+    dueAt: dueAt?.toISOString() ?? null,
+    policyDays,
+    policyTargetAt: policyTargetAt.toISOString(),
+    reviewDue: status === "done" && !action.result && Boolean(reviewAfter && reviewAfter <= current),
+  };
 }
 
 function stable(value) {
@@ -90,9 +132,14 @@ export function snapshotSeed(type, payload, { windowDays = null } = {}) {
   };
 }
 
+function esc(value) { return String(value ?? "").replaceAll("|", "\\|").replaceAll("\n", " "); }
+
 export function renderLifecycleMarkdown({ actions = [], snapshotSummary = [], generatedAt = new Date().toISOString() } = {}) {
   const statusCounts = Object.fromEntries([...VALID_STATUSES].map((status) => [status, actions.filter((row) => row.status === status).length]));
-  const due = actions.filter((row) => row.review_after && !row.result && new Date(row.review_after) <= new Date(generatedAt) && row.status === "done");
+  const decorated = actions.map((row) => ({ ...row, timing: actionTiming(row, { now: generatedAt }) }));
+  const dueReviews = decorated.filter((row) => row.timing.reviewDue);
+  const overdue = decorated.filter((row) => row.timing.agingState === "overdue");
+  const aging = decorated.filter((row) => row.timing.agingState === "aging");
   const lines = [
     "# Site Intelligence Lifecycle",
     "",
@@ -105,19 +152,21 @@ export function renderLifecycleMarkdown({ actions = [], snapshotSummary = [], ge
     `- Done: ${statusCounts.done}`,
     `- Rejected: ${statusCounts.rejected}`,
     `- Superseded: ${statusCounts.superseded}`,
-    `- Reviews due: ${due.length}`,
+    `- Overdue: ${overdue.length}`,
+    `- Aging without explicit due date: ${aging.length}`,
+    `- Reviews due: ${dueReviews.length}`,
     "",
     "## Active actions",
     "",
-    "| Priority | Status | Path | Category | Recommended action | Last seen |",
-    "|---|---|---|---|---|---|",
-    ...actions.filter((row) => ["open", "in_progress"].includes(row.status)).map((row) => `| ${row.priority} | ${row.status} | ${String(row.path ?? row.asset_id ?? "unmapped").replaceAll("|", "\\|")} | ${row.category} | ${String(row.recommended_action).replaceAll("|", "\\|")} | ${row.last_seen_at ?? "—"} |`),
+    "| Priority | Status | Path | Age | Timing | Due | Recommended action |",
+    "|---|---|---|---:|---|---|---|",
+    ...decorated.filter((row) => ["open", "in_progress"].includes(row.status)).map((row) => `| ${row.priority} | ${row.status} | ${esc(row.path ?? row.asset_id ?? "unmapped")} | ${row.timing.agingDays}d | ${row.timing.agingState} | ${row.timing.dueAt ?? "policy"} | ${esc(row.recommended_action)} |`),
     "",
     "## Reviews due",
     "",
     "| Action | Path | Review after | Result |",
     "|---|---|---|---|",
-    ...due.map((row) => `| ${row.action_id} | ${row.path ?? row.asset_id ?? "unmapped"} | ${row.review_after} | ${row.result ?? "pending"} |`),
+    ...dueReviews.map((row) => `| ${esc(row.action_id)} | ${esc(row.path ?? row.asset_id ?? "unmapped")} | ${row.review_after} | ${row.result ?? "pending"} |`),
     "",
     "## Snapshot history",
     "",
@@ -125,6 +174,7 @@ export function renderLifecycleMarkdown({ actions = [], snapshotSummary = [], ge
     "|---|---|---:|",
     ...snapshotSummary.map((row) => `| ${row.snapshot_type} | ${row.generated_at} | ${row.window_days ?? "—"} |`),
     "",
+    `Aging policy without an explicit due date: P0=${ACTION_AGING_POLICY_DAYS.P0}d, P1=${ACTION_AGING_POLICY_DAYS.P1}d, P2=${ACTION_AGING_POLICY_DAYS.P2}d. These are operating reminders only; they never change status automatically.`,
     "Lifecycle status is operational state, not an SEO score. Before metrics are captured when an action is first seen; after metrics and result are recorded only after an explicit review.",
     "",
   ];
