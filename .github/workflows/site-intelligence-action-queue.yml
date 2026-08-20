@@ -1,0 +1,29 @@
+name: Site Intelligence Action Queue
+
+on:
+  pull_request:
+    paths:
+      - "scripts/lib/site-intelligence-action-queue.mjs"
+      - "scripts/check-site-intelligence-action-queue.mjs"
+      - "scripts/site-intelligence-action-queue-report.mjs"
+      - "scripts/lib/site-intelligence-signals.mjs"
+      - "docs/site-intelligence-action-queue.md"
+      - ".github/workflows/site-intelligence-action-queue.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate rule ordering, source gates, evidence conflicts, and corroboration
+        run: node scripts/check-site-intelligence-action-queue.mjs
+      - name: Syntax check Action Queue report entrypoint
+        run: node --check scripts/site-intelligence-action-queue-report.mjs
