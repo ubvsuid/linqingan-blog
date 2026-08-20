@@ -52,7 +52,7 @@ const records = rows.map((row) => {
     language: ownership.pageLanguage,
     system: asset?.contentSystem ?? inferred?.system ?? "unmapped",
     nodeType: asset?.assetType ?? inferred?.nodeType ?? (row.query ? "query" : "unknown"),
-    module: asset?.module ?? inferred?.module ?? "",
+    module: asset?.module ?? asset?.roadmap ?? inferred?.module ?? "",
     stage: asset?.stage ?? inferred?.stage ?? "",
     ownerKeyword: ownership.expectedAsset?.primaryKeyword ?? "",
     ownerStatus: ownership.ownerStatus ?? "owner-unmapped",
