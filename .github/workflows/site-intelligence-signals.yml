@@ -1,0 +1,28 @@
+name: Site Intelligence Signals
+
+on:
+  pull_request:
+    paths:
+      - "scripts/lib/site-intelligence-signals.mjs"
+      - "scripts/check-site-intelligence-signals.mjs"
+      - "scripts/site-intelligence-signals-report.mjs"
+      - "docs/site-intelligence-signals.md"
+      - ".github/workflows/site-intelligence-signals.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate pure signal mapping and sample gates
+        run: node scripts/check-site-intelligence-signals.mjs
+      - name: Syntax check Neon/GSC report entrypoint
+        run: node --check scripts/site-intelligence-signals-report.mjs
