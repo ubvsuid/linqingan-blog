@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import matter from "gray-matter";
+
 import { buildSiteAssetMaster } from "./lib/site-asset-master.mjs";
 
 const root = process.cwd();
@@ -16,6 +18,27 @@ function countGeneratedArticles() {
   const knowledge = JSON.parse(fs.readFileSync(path.join(root, "src", "generated", "knowledge-article-registry.json"), "utf8"));
   const roadmap = JSON.parse(fs.readFileSync(path.join(root, "src", "generated", "beginner-roadmap-registry.json"), "utf8"));
   return knowledge.length + roadmap.length;
+}
+
+function countSourceMetadataArticles() {
+  const postsDirectory = path.join(root, "content", "posts");
+  const knowledgeMetadataDirectory = path.join(root, "content", "knowledge-metadata");
+  const roadmapMetadataDirectory = path.join(root, "content", "roadmap-metadata");
+  let count = 0;
+
+  for (const fileName of fs.readdirSync(postsDirectory).filter((name) => name.endsWith(".md"))) {
+    const slug = fileName.replace(/\.md$/, "");
+    const { data } = matter(fs.readFileSync(path.join(postsDirectory, fileName), "utf8"));
+    if (data.draft === true) continue;
+
+    const hasInlineKnowledge = Boolean(data.knowledge && data.seo);
+    const hasInlineRoadmap = Boolean(data.roadmap && data.seo);
+    const hasKnowledgeSidecar = fs.existsSync(path.join(knowledgeMetadataDirectory, `${slug}.json`));
+    const hasRoadmapSidecar = fs.existsSync(path.join(roadmapMetadataDirectory, `${slug}.json`));
+    if (hasInlineKnowledge || hasInlineRoadmap || hasKnowledgeSidecar || hasRoadmapSidecar) count += 1;
+  }
+
+  return count;
 }
 
 const idSet = new Set();
@@ -53,10 +76,24 @@ for (const asset of assets) {
   }
 }
 
-const expectedArticleCount = countGeneratedArticles();
+const generatedArticleCount = countGeneratedArticles();
+const sourceArticleCount = countSourceMetadataArticles();
 const articleCount = assets.filter((asset) => asset.assetType === "article").length;
-if (articleCount !== expectedArticleCount) {
-  addError(`文章资产数量不一致：Asset Master=${articleCount}，generated registries=${expectedArticleCount}`);
+if (generatedArticleCount !== sourceArticleCount) {
+  addError(`generated registries 已过期：generated=${generatedArticleCount}，metadata sources=${sourceArticleCount}。请先运行 knowledgegenerate 与 roadmapgenerate`);
+}
+if (articleCount !== generatedArticleCount) {
+  addError(`文章资产数量不一致：Asset Master=${articleCount}，generated registries=${generatedArticleCount}`);
+}
+
+const knowledgeModuleCount = assets.filter((asset) => asset.assetType === "knowledge-module").length;
+const sourceKnowledgeModuleCount = new Set(
+  assets
+    .filter((asset) => asset.assetType === "article" && asset.contentSystem === "knowledge")
+    .map((asset) => asset.module),
+).size;
+if (knowledgeModuleCount !== sourceKnowledgeModuleCount) {
+  addError(`Knowledge Module 资产数量不一致：Asset Master=${knowledgeModuleCount}，文章引用=${sourceKnowledgeModuleCount}`);
 }
 
 const toolCount = assets.filter((asset) => asset.assetType === "tool").length;
@@ -80,5 +117,6 @@ const typeCounts = Object.fromEntries(
 
 console.log("Site Asset Master validation passed.");
 console.log(`Assets: ${assets.length}`);
-console.log(`Articles: ${articleCount}/${expectedArticleCount}`);
+console.log(`Articles: ${articleCount}/${sourceArticleCount}`);
+console.log(`Knowledge modules: ${knowledgeModuleCount}`);
 console.log(`Types: ${JSON.stringify(typeCounts)}`);
