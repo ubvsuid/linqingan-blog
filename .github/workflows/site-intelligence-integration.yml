@@ -1,0 +1,72 @@
+name: Site Intelligence Integration
+
+on:
+  pull_request:
+    paths:
+      - "src/lib/english-*.ts"
+      - "src/lib/screeps-errors.ts"
+      - "src/lib/screeps-glossary.ts"
+      - "scripts/lib/site-asset-extensions.mjs"
+      - "scripts/lib/site-asset-master.mjs"
+      - "scripts/lib/site-intelligence-identity.mjs"
+      - "scripts/lib/site-intelligence-mapping.mjs"
+      - "scripts/lib/site-intelligence-gsc.mjs"
+      - "scripts/lib/site-intelligence-gsc-csv.mjs"
+      - "scripts/lib/site-intelligence-gsc-import.mjs"
+      - "scripts/lib/site-intelligence-signals.mjs"
+      - "scripts/lib/site-intelligence-action-queue.mjs"
+      - "scripts/site-intelligence-gsc-import.mjs"
+      - "scripts/site-intelligence-signals-report.mjs"
+      - "scripts/search-console-opportunity-report.mjs"
+      - "scripts/site-intelligence-lifecycle-sync.mjs"
+      - "scripts/site-intelligence-action-update.mjs"
+      - "scripts/site-intelligence-run.mjs"
+      - "scripts/check-site-asset-master.mjs"
+      - "scripts/check-site-intelligence-signals.mjs"
+      - "scripts/check-site-intelligence-action-queue.mjs"
+      - "scripts/check-site-intelligence-integration.mjs"
+      - "docs/site-asset-master.md"
+      - "docs/site-intelligence-*.md"
+      - "docs/gsc-historical-data-contract.md"
+      - ".github/workflows/site-intelligence-integration.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Refresh canonical content registries once
+        run: |
+          npm run knowledgegenerate
+          npm run roadmapgenerate
+      - name: Validate Asset Master V2
+        run: |
+          node scripts/check-english-article-mapping.mjs
+          node scripts/check-site-asset-master.mjs
+      - name: Validate Signals and semantic Action Queue
+        run: |
+          node scripts/check-site-intelligence-signals.mjs
+          node scripts/check-site-intelligence-action-queue.mjs
+      - name: Validate existing lifecycle state machine
+        run: node scripts/check-site-intelligence-lifecycle.mjs
+      - name: Validate end-to-end identity, GSC, importer and transactional boundaries
+        run: node scripts/check-site-intelligence-integration.mjs
+      - name: Syntax-check operational entrypoints
+        run: |
+          node --check scripts/site-intelligence-gsc-import.mjs
+          node --check scripts/search-console-opportunity-report.mjs
+          node --check scripts/site-intelligence-signals-report.mjs
+          node --check scripts/site-intelligence-action-queue-report.mjs
+          node --check scripts/site-intelligence-lifecycle-sync.mjs
+          node --check scripts/site-intelligence-action-update.mjs
+          node --check scripts/site-intelligence-run.mjs

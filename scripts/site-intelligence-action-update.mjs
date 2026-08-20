@@ -59,6 +59,7 @@ async function requireOtherAction(candidate, label) {
   if (!row) throw new Error(`Unknown ${label}: ${candidate}`);
   return candidate;
 }
+
 const parentAction = parentActionInput ? await requireOtherAction(parentActionInput, "parent action") : (clearParentAction ? null : current.parent_action_id);
 const supersededByAction = supersededByInput ? await requireOtherAction(supersededByInput, "superseded action") : (clearSupersededBy ? null : current.superseded_by_action_id);
 const nextDueAt = clearDueAt ? null : (dueAtInput ? normalizeOptionalIsoDate(dueAtInput) : current.due_at);
@@ -69,8 +70,11 @@ const nextAfterMetrics = metrics && transition.to === "done" ? metrics : (reopen
 const nextResult = result ?? (transition.to === "done" ? current.result : null);
 const startedAt = transition.to === "in_progress" ? (current.started_at ?? new Date().toISOString()) : current.started_at;
 const completedAt = transition.to === "done" ? (current.completed_at ?? new Date().toISOString()) : (transition.from === "done" && transition.to !== "done" ? null : current.completed_at);
+const currentDueAt = current.due_at ? normalizeOptionalIsoDate(current.due_at) : null;
+const dueChanged = currentDueAt !== nextDueAt;
+const relationshipChanged = String(current.parent_action_id ?? "") !== String(parentAction ?? "") || String(current.superseded_by_action_id ?? "") !== String(supersededByAction ?? "");
 
-await sql`
+const queries = [sql`
   UPDATE site_intelligence_actions
   SET status = ${transition.to},
       started_at = ${startedAt},
@@ -85,63 +89,64 @@ await sql`
       result = ${nextResult},
       updated_at = now()
   WHERE action_id = ${actionId};
-`;
+`];
 
 let eventsWritten = 0;
 if (!transition.noop) {
-  await sql`
+  queries.push(sql`
     INSERT INTO site_intelligence_action_events
       (action_id, event_type, from_status, to_status, note, metrics, metadata)
     VALUES
       (${actionId}, ${reopening ? "reopened" : "status_change"}, ${transition.from}, ${transition.to}, ${reopening ? reopenReason : note}, '{}'::jsonb,
        ${json({ actionTaken: actionTaken ?? null, rejectionReason: rejectionReason ?? null, reviewAfter: reviewAfter ?? null, reopenReason: reopenReason ?? null, supersededByActionId: supersededByInput ?? null })}::jsonb);
-  `;
+  `);
   eventsWritten += 1;
 }
 if (metrics && transition.to === "done") {
-  await sql`
+  queries.push(sql`
     INSERT INTO site_intelligence_action_events
       (action_id, event_type, from_status, to_status, note, metrics, metadata)
     VALUES
       (${actionId}, ${result ? "review" : "after_snapshot"}, ${transition.from}, ${transition.to}, ${note}, ${json(metrics)}::jsonb,
        ${json({ result, reviewAfter: reviewAfter ?? null })}::jsonb);
-  `;
+  `);
   eventsWritten += 1;
 }
-const currentDueAt = current.due_at ? normalizeOptionalIsoDate(current.due_at) : null;
-const dueChanged = currentDueAt !== nextDueAt;
 if (dueChanged) {
-  await sql`
+  queries.push(sql`
     INSERT INTO site_intelligence_action_events
       (action_id, event_type, from_status, to_status, note, metrics, metadata)
     VALUES
       (${actionId}, 'due_date_change', ${transition.from}, ${transition.to}, ${note}, '{}'::jsonb,
        ${json({ from: currentDueAt, to: nextDueAt })}::jsonb);
-  `;
+  `);
   eventsWritten += 1;
 }
-const relationshipChanged = String(current.parent_action_id ?? "") !== String(parentAction ?? "") || String(current.superseded_by_action_id ?? "") !== String(supersededByAction ?? "");
 if (relationshipChanged) {
-  await sql`
+  queries.push(sql`
     INSERT INTO site_intelligence_action_events
       (action_id, event_type, from_status, to_status, note, metrics, metadata)
     VALUES
       (${actionId}, 'relationship_change', ${transition.from}, ${transition.to}, ${note}, '{}'::jsonb,
        ${json({ parentActionId: parentAction, supersededByActionId: supersededByAction })}::jsonb);
-  `;
+  `);
   eventsWritten += 1;
 }
 if (eventsWritten === 0 && (note || actionTaken || reviewAfter || rejectionReason || reopenReason)) {
-  await sql`
+  queries.push(sql`
     INSERT INTO site_intelligence_action_events
       (action_id, event_type, from_status, to_status, note, metrics, metadata)
     VALUES
       (${actionId}, 'note', ${transition.from}, ${transition.to}, ${note ?? reopenReason}, '{}'::jsonb,
        ${json({ actionTaken: actionTaken ?? null, rejectionReason: rejectionReason ?? null, reviewAfter: reviewAfter ?? null })}::jsonb);
-  `;
+  `);
 }
 
-console.log(`Updated ${actionId}: ${transition.from} -> ${transition.to}`);
+// Human lifecycle state and every audit event are committed together.
+// A failed event write therefore cannot leave an unaudited status/metric mutation behind.
+await sql.transaction(queries);
+
+console.log(`Updated ${actionId} atomically: ${transition.from} -> ${transition.to}`);
 if (dueChanged) console.log(`Due at: ${nextDueAt ?? "cleared"}`);
 if (reviewAfter) console.log(`Review after: ${nextReviewAfter}`);
 if (result) console.log(`Review result: ${result}`);
