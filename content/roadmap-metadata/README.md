@@ -2,6 +2,8 @@
 
 This directory stores migration sidecars for existing article learning-roadmap metadata. The permanent identity for Beginner articles is stored separately in `content/roadmap-identities.json`.
 
+The shared field contract for article frontmatter, `knowledge`, `roadmap`, `seo`, and `verification` is governed by `docs/content-metadata-schema-v1.md`. This README documents Beginner-specific ownership and migration behavior only; it must not redefine the shared schema independently.
+
 For the Beginner Roadmap, roadmap metadata declares:
 
 - `roadmap.id`: roadmap identifier, currently `beginner`
@@ -30,7 +32,7 @@ Identity rules:
 - `contentGroupId` is the immutable identity of the underlying knowledge concept and is reserved for future verified language pairing.
 - `slug` is only the current locator. A slug rename updates the locator but must preserve both IDs.
 - IDs are never regenerated because a title, URL, category, roadmap stage, SEO field, or article body changes.
-- `roadmapgenerate` attaches the IDs to the generated Beginner registry.
+- `roadmapgenerate` validates Content Metadata Schema V1 and attaches the IDs to the generated Beginner registry.
 - `roadmapcheck` rejects missing, malformed, duplicate, orphaned, or mismatched Beginner identities and also checks global ID collisions against Knowledge articles.
 
 Existing migrated articles may keep a JSON sidecar so metadata migration does not create artificial article freshness changes. New Beginner articles, or existing articles receiving a substantive editorial update, may declare the same `roadmap` + `seo` objects directly in frontmatter instead.
