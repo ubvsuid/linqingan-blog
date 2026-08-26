@@ -5,7 +5,8 @@
   },
   "git": {
     "deploymentEnabled": {
-      "gpt-work": false
+      "*": false,
+      "clean-blog-v1": true
     }
   }
 }
