@@ -80,6 +80,19 @@ jobs:
         run: npm ci
       - name: Validate repository integrity
         run: npm run integritycheck
+      - name: Regenerate registries for stale-artifact diagnostics
+        if: failure()
+        run: npm run knowledgegenerate && npm run roadmapgenerate
+      - name: Upload generated registry diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-registry-diagnostics-${{ github.run_id }}
+          path: |
+            src/generated/knowledge-article-registry.json
+            src/generated/beginner-roadmap-registry.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Validate Content Metadata Schema V1 contract
         run: node scripts/check-content-metadata-schema-contract.mjs
       - name: Validate Content Metadata Schema V1
