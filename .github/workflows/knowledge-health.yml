@@ -18,13 +18,18 @@ on:
       - "src/lib/beginner-series.ts"
       - "src/generated/knowledge-article-registry.json"
       - "src/generated/beginner-roadmap-registry.json"
+      - "package.json"
       - "scripts/lib/content-metadata-schema.mjs"
+      - "scripts/check-integrity.mjs"
       - "scripts/check-content-metadata-schema.mjs"
       - "scripts/check-content-metadata-schema-contract.mjs"
       - "scripts/generate-knowledge-article-registry.mjs"
       - "scripts/generate-beginner-roadmap-registry.mjs"
       - "scripts/check-knowledge-registry.mjs"
       - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/check-internal-links.mjs"
+      - "scripts/check-verification-coverage.mjs"
+      - "scripts/check-evidence-capture-kit.mjs"
       - "scripts/knowledge-health-report.mjs"
       - ".github/workflows/knowledge-health.yml"
   pull_request:
@@ -41,13 +46,18 @@ on:
       - "src/lib/beginner-series.ts"
       - "src/generated/knowledge-article-registry.json"
       - "src/generated/beginner-roadmap-registry.json"
+      - "package.json"
       - "scripts/lib/content-metadata-schema.mjs"
+      - "scripts/check-integrity.mjs"
       - "scripts/check-content-metadata-schema.mjs"
       - "scripts/check-content-metadata-schema-contract.mjs"
       - "scripts/generate-knowledge-article-registry.mjs"
       - "scripts/generate-beginner-roadmap-registry.mjs"
       - "scripts/check-knowledge-registry.mjs"
       - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/check-internal-links.mjs"
+      - "scripts/check-verification-coverage.mjs"
+      - "scripts/check-evidence-capture-kit.mjs"
       - "scripts/knowledge-health-report.mjs"
       - ".github/workflows/knowledge-health.yml"
 
@@ -68,6 +78,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Validate repository integrity
+        run: npm run integritycheck
       - name: Validate Content Metadata Schema V1 contract
         run: node scripts/check-content-metadata-schema-contract.mjs
       - name: Validate Content Metadata Schema V1

@@ -13,6 +13,7 @@ const outputPath = path.join(root, "src", "generated", "beginner-roadmap-registr
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const contentIdPattern = /^article_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const contentGroupIdPattern = /^group_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const checkOnly = process.argv.includes("--check");
 
 assertContentMetadataSchemaV1(root);
 
@@ -69,7 +70,14 @@ if (fs.existsSync(roadmapMetadataDirectory)) {
 }
 for (const slug of identitiesBySlug.keys()) if (!consumedIdentitySlugs.has(slug)) throw new Error(`${identityRegistryPath}: ${slug} 没有对应的已发布 Beginner article`);
 records.sort((left, right) => String(left.roadmap.id).localeCompare(String(right.roadmap.id)) || Number(left.roadmap.order) - Number(right.roadmap.order) || left.slug.localeCompare(right.slug));
-fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-const nextOutput = `${JSON.stringify(records, null, 2)}\n`, previousOutput = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, "utf8") : null;
-if (previousOutput !== nextOutput) { fs.writeFileSync(outputPath, nextOutput, "utf8"); console.log(`Beginner roadmap registry generated: ${records.length} record(s), Metadata Schema V1 + Content Identity V1 validated, file updated.`); }
-else console.log(`Beginner roadmap registry generated: ${records.length} record(s), Metadata Schema V1 + Content Identity V1 validated, already current.`);
+const nextOutput = `${JSON.stringify(records, null, 2)}\n`;
+const previousOutput = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, "utf8") : null;
+if (checkOnly) {
+  if (previousOutput === null) throw new Error(`${outputPath}: generated registry 不存在。请运行 npm run roadmapgenerate 并提交生成文件。`);
+  if (previousOutput !== nextOutput) throw new Error(`${outputPath}: generated registry 已过期。请运行 npm run roadmapgenerate 并提交最新生成结果。`);
+  console.log(`Beginner roadmap registry integrity check passed: ${records.length} record(s), generated artifact is current.`);
+} else {
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  if (previousOutput !== nextOutput) { fs.writeFileSync(outputPath, nextOutput, "utf8"); console.log(`Beginner roadmap registry generated: ${records.length} record(s), Metadata Schema V1 + Content Identity V1 validated, file updated.`); }
+  else console.log(`Beginner roadmap registry generated: ${records.length} record(s), Metadata Schema V1 + Content Identity V1 validated, already current.`);
+}
