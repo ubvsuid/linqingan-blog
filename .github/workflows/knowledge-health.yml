@@ -20,6 +20,7 @@ on:
       - "src/generated/beginner-roadmap-registry.json"
       - "scripts/lib/content-metadata-schema.mjs"
       - "scripts/check-content-metadata-schema.mjs"
+      - "scripts/check-content-metadata-schema-contract.mjs"
       - "scripts/generate-knowledge-article-registry.mjs"
       - "scripts/generate-beginner-roadmap-registry.mjs"
       - "scripts/check-knowledge-registry.mjs"
@@ -42,6 +43,7 @@ on:
       - "src/generated/beginner-roadmap-registry.json"
       - "scripts/lib/content-metadata-schema.mjs"
       - "scripts/check-content-metadata-schema.mjs"
+      - "scripts/check-content-metadata-schema-contract.mjs"
       - "scripts/generate-knowledge-article-registry.mjs"
       - "scripts/generate-beginner-roadmap-registry.mjs"
       - "scripts/check-knowledge-registry.mjs"
@@ -66,6 +68,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Validate Content Metadata Schema V1 contract
+        run: node scripts/check-content-metadata-schema-contract.mjs
       - name: Validate Content Metadata Schema V1
         run: node scripts/check-content-metadata-schema.mjs
       - name: Rebuild Knowledge registry
