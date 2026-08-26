@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "slug": "screeps-introduction",
+      "contentId": "article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9",
+      "contentGroupId": "group_efa17721-1ec1-4e2f-b586-3e1672c0a25e"
+    },
+    {
+      "slug": "screeps-first-room",
+      "contentId": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+      "contentGroupId": "group_00a5ef2b-7c56-484e-928b-7dc32613fdba"
+    },
+    {
+      "slug": "screeps-tick-and-game-loop",
+      "contentId": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+      "contentGroupId": "group_c55973c9-c0ad-4fad-9b7b-7770c0b5c43e"
+    },
+    {
+      "slug": "screeps-first-creep-harvest",
+      "contentId": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02",
+      "contentGroupId": "group_da58ec67-6dbf-4637-ab70-22dfa908861d"
+    },
+    {
+      "slug": "screeps-creep-deliver-energy",
+      "contentId": "article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "contentGroupId": "group_d8877d50-345f-4036-9dc1-4e1b2f845085"
+    },
+    {
+      "slug": "screeps-creep-body-parts",
+      "contentId": "article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
+      "contentGroupId": "group_7e4ff4ba-ed68-4de5-a45e-c1e41cbcbd8f"
+    },
+    {
+      "slug": "screeps-spawn-create-creep",
+      "contentId": "article_05115243-96ad-452e-b184-dd17cf8b09a7",
+      "contentGroupId": "group_92e6d4a7-8a6b-4763-a788-070c8beee498"
+    },
+    {
+      "slug": "screeps-creep-roles",
+      "contentId": "article_58082347-eca6-468d-9386-0f91c5474c2f",
+      "contentGroupId": "group_a19287a4-a5e1-448c-bf02-1cd0c0b73834"
+    },
+    {
+      "slug": "screeps-upgrade-controller",
+      "contentId": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+      "contentGroupId": "group_4e646ba0-1717-4c11-b8cd-c756a2c9d78f"
+    },
+    {
+      "slug": "screeps-first-extension",
+      "contentId": "article_1648e4f3-b6e3-4a91-af85-fe2f9016128b",
+      "contentGroupId": "group_860f36ed-bbeb-4461-802f-273be95e430f"
+    },
+    {
+      "slug": "screeps-build-and-repair",
+      "contentId": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "contentGroupId": "group_5c63a599-fa5e-4d3f-82d3-6f7d86bc450b"
+    },
+    {
+      "slug": "screeps-first-room-code",
+      "contentId": "article_e3b60f0f-e950-41fb-b469-7e802b589e38",
+      "contentGroupId": "group_7aad8f39-ceab-4a1e-a596-b13ba6509bc2"
+    }
+  ]
+}

@@ -10,6 +10,7 @@ on:
     paths:
       - "content/posts/**"
       - "content/knowledge-identities.json"
+      - "content/roadmap-identities.json"
       - "content/knowledge-metadata/**"
       - "content/roadmap-metadata/**"
       - "src/lib/knowledge-module-registry.ts"
@@ -28,6 +29,7 @@ on:
     paths:
       - "content/posts/**"
       - "content/knowledge-identities.json"
+      - "content/roadmap-identities.json"
       - "content/knowledge-metadata/**"
       - "content/roadmap-metadata/**"
       - "src/lib/knowledge-module-registry.ts"
