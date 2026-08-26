@@ -2,5 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "github": {
     "autoJobCancelation": true
+  },
+  "git": {
+    "deploymentEnabled": {
+      "gpt-work": false
+    }
   }
 }
