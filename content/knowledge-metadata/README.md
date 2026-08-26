@@ -2,6 +2,8 @@
 
 This directory is a temporary compatibility layer for articles migrated to the Knowledge Registry without rewriting their Markdown files solely to move metadata.
 
+The shared field contract for article frontmatter, `knowledge`, `roadmap`, `seo`, and `verification` is governed by `docs/content-metadata-schema-v1.md`. This README documents Knowledge-specific ownership and migration behavior only; it must not redefine the shared schema independently.
+
 ## Source-of-truth boundaries
 
 Knowledge now has two deliberately separate metadata authorities:
@@ -22,7 +24,7 @@ Runtime rules:
 - `contentGroupId` identifies the underlying knowledge topic. A future confirmed translation receives its own `contentId` and may share the source article's `contentGroupId`.
 - On a slug rename, update the identity record's `slug` locator but preserve both permanent IDs.
 - Never infer translation groups from similar titles or slugs. Use the established English article mapping as the confirmation boundary.
-- `npm run knowledgegenerate` converts inline/sidecar metadata plus Content Identity V1 into the generated static article registry used by the site.
+- `npm run knowledgegenerate` validates Content Metadata Schema V1, then converts inline/sidecar metadata plus Content Identity V1 into the generated static article registry used by the site.
 - `npm run knowledgecheck` validates Content Identity V1, module/stage membership, unique module ordering, metadata shape, Owner keyword uniqueness, and prevents metadata modules from returning to legacy slug/range ownership.
 - New valid Knowledge articles may be added without editing the checker; the module and stage must already exist, the new `knowledge.order` must not conflict inside that module, and a permanent identity must be allocated before generation succeeds.
 
