@@ -1,0 +1,43 @@
+name: Refresh Integrity generated registries
+
+on:
+  push:
+    branches:
+      - feat/integrity-gate-v1
+    paths:
+      - ".github/workflows/refresh-integrity-generated.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/integrity-gate-v1
+          fetch-depth: 0
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Regenerate committed registries
+        run: npm run knowledgegenerate && npm run roadmapgenerate
+      - name: Commit generated baselines
+        run: |
+          if git diff --quiet -- src/generated/knowledge-article-registry.json src/generated/beginner-roadmap-registry.json; then
+            echo "Generated registries already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/generated/knowledge-article-registry.json src/generated/beginner-roadmap-registry.json
+          git commit -m "Refresh generated registries for Integrity Gate"
+          git push origin HEAD:feat/integrity-gate-v1
