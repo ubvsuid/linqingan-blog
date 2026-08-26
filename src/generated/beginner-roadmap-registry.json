@@ -1,74 +1,206 @@
 [
   {
+    "contentId": "article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9",
+    "contentGroupId": "group_efa17721-1ec1-4e2f-b586-3e1672c0a25e",
     "slug": "screeps-introduction",
-    "roadmap": { "id": "beginner", "stage": "understand-screeps", "order": 10, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps programming game", "searchIntent": "了解 Screeps 是什么、它与普通策略游戏的区别，以及 Room、Creep、Spawn、Source 和 Controller 如何组成基础循环", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "understand-screeps",
+      "order": 10,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps programming game",
+      "searchIntent": "了解 Screeps 是什么、它与普通策略游戏的区别，以及 Room、Creep、Spawn、Source 和 Controller 如何组成基础循环",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+    "contentGroupId": "group_00a5ef2b-7c56-484e-928b-7dc32613fdba",
     "slug": "screeps-first-room",
-    "roadmap": { "id": "beginner", "stage": "understand-screeps", "order": 20, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps first room", "searchIntent": "第一次进入 Screeps 时认识房间界面、Scripts、Console，并找到 Room、Spawn、Source、Controller 与 Creep", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "understand-screeps",
+      "order": 20,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps first room",
+      "searchIntent": "第一次进入 Screeps 时认识房间界面、Scripts、Console，并找到 Room、Spawn、Source、Controller 与 Creep",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+    "contentGroupId": "group_c55973c9-c0ad-4fad-9b7b-7770c0b5c43e",
     "slug": "screeps-tick-and-game-loop",
-    "roadmap": { "id": "beginner", "stage": "understand-screeps", "order": 30, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps tick game loop", "searchIntent": "理解 Screeps tick、Game.time 与 module.exports.loop，知道代码为什么会持续运行以及动作结果为何跨 tick 出现", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "understand-screeps",
+      "order": 30,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps tick game loop",
+      "searchIntent": "理解 Screeps tick、Game.time 与 module.exports.loop，知道代码为什么会持续运行以及动作结果为何跨 tick 出现",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02",
+    "contentGroupId": "group_da58ec67-6dbf-4637-ab70-22dfa908861d",
     "slug": "screeps-first-creep-harvest",
-    "roadmap": { "id": "beginner", "stage": "control-first-creep", "order": 40, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps first Creep harvest", "searchIntent": "让第一只 Creep 找到 Source、移动到范围内并调用 harvest() 采集 Energy，同时检查 Store 与返回值", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "control-first-creep",
+      "order": 40,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps first Creep harvest",
+      "searchIntent": "让第一只 Creep 找到 Source、移动到范围内并调用 harvest() 采集 Energy，同时检查 Store 与返回值",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_90c42c4f-238e-4009-80e6-378621655ebf",
+    "contentGroupId": "group_d8877d50-345f-4036-9dc1-4e1b2f845085",
     "slug": "screeps-creep-deliver-energy",
-    "roadmap": { "id": "beginner", "stage": "control-first-creep", "order": 50, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps Creep transfer Energy to Spawn", "searchIntent": "让装满 Energy 的 Creep 返回 Spawn 并使用 transfer() 交付资源，再回到 Source 继续基础运输循环", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "control-first-creep",
+      "order": 50,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep transfer Energy to Spawn",
+      "searchIntent": "让装满 Energy 的 Creep 返回 Spawn 并使用 transfer() 交付资源，再回到 Source 继续基础运输循环",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
+    "contentGroupId": "group_7e4ff4ba-ed68-4de5-a45e-c1e41cbcbd8f",
     "slug": "screeps-creep-body-parts",
-    "roadmap": { "id": "beginner", "stage": "control-first-creep", "order": 60, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps Creep body parts", "searchIntent": "理解 WORK、CARRY、MOVE 等基础 Creep 身体部件如何决定采集、携带与移动能力", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "control-first-creep",
+      "order": 60,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep body parts",
+      "searchIntent": "理解 WORK、CARRY、MOVE 等基础 Creep 身体部件如何决定采集、携带与移动能力",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_05115243-96ad-452e-b184-dd17cf8b09a7",
+    "contentGroupId": "group_92e6d4a7-8a6b-4763-a788-070c8beee498",
     "slug": "screeps-spawn-create-creep",
-    "roadmap": { "id": "beginner", "stage": "build-room-team", "order": 70, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps spawnCreep()", "searchIntent": "使用 Spawn.spawnCreep() 创建第一只指定身体和名称的 Creep，并理解基础返回值与 spawning 状态", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "build-room-team",
+      "order": 70,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps spawnCreep()",
+      "searchIntent": "使用 Spawn.spawnCreep() 创建第一只指定身体和名称的 Creep，并理解基础返回值与 spawning 状态",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_58082347-eca6-468d-9386-0f91c5474c2f",
+    "contentGroupId": "group_a19287a4-a5e1-448c-bf02-1cd0c0b73834",
     "slug": "screeps-creep-roles",
-    "roadmap": { "id": "beginner", "stage": "build-room-team", "order": 80, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps Creep roles", "searchIntent": "理解 Harvester、Hauler、Upgrader、Builder 等基础角色分工，以及角色职责与身体部件的区别", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "build-room-team",
+      "order": 80,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep roles",
+      "searchIntent": "理解 Harvester、Hauler、Upgrader、Builder 等基础角色分工，以及角色职责与身体部件的区别",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+    "contentGroupId": "group_4e646ba0-1717-4c11-b8cd-c756a2c9d78f",
     "slug": "screeps-upgrade-controller",
-    "roadmap": { "id": "beginner", "stage": "build-room-team", "order": 90, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps upgrade Controller", "searchIntent": "让 Upgrader 获得 Energy、移动到 Controller 附近并调用 upgradeController()，建立基础自动升级循环", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "build-room-team",
+      "order": 90,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps upgrade Controller",
+      "searchIntent": "让 Upgrader 获得 Energy、移动到 Controller 附近并调用 upgradeController()，建立基础自动升级循环",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_1648e4f3-b6e3-4a91-af85-fe2f9016128b",
+    "contentGroupId": "group_860f36ed-bbeb-4461-802f-273be95e430f",
     "slug": "screeps-first-extension",
-    "roadmap": { "id": "beginner", "stage": "complete-room-loop", "order": 100, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps first Extension", "searchIntent": "在 RCL 2 房间放置第一个 Extension Construction Site，并让 Builder 完成建造", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "complete-room-loop",
+      "order": 100,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps first Extension",
+      "searchIntent": "在 RCL 2 房间放置第一个 Extension Construction Site，并让 Builder 完成建造",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+    "contentGroupId": "group_5c63a599-fa5e-4d3f-82d3-6f7d86bc450b",
     "slug": "screeps-build-and-repair",
-    "roadmap": { "id": "beginner", "stage": "complete-room-loop", "order": 110, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps Creep build repair", "searchIntent": "让 Builder 在建造、维修和升级之间选择基础工作，并正确调用 build() 与 repair()", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "complete-room-loop",
+      "order": 110,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep build repair",
+      "searchIntent": "让 Builder 在建造、维修和升级之间选择基础工作，并正确调用 build() 与 repair()",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_e3b60f0f-e950-41fb-b469-7e802b589e38",
+    "contentGroupId": "group_7aad8f39-ceab-4a1e-a596-b13ba6509bc2",
     "slug": "screeps-first-room-code",
-    "roadmap": { "id": "beginner", "stage": "complete-room-loop", "order": 120, "difficulty": "beginner" },
-    "seo": { "primaryKeyword": "Screeps first room code", "searchIntent": "把采集、运输、生成、升级、建造与维修整理成第一份可持续运行的新手房间基础代码", "keywordRole": "owner" },
+    "roadmap": {
+      "id": "beginner",
+      "stage": "complete-room-loop",
+      "order": 120,
+      "difficulty": "beginner"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps first room code",
+      "searchIntent": "把采集、运输、生成、升级、建造与维修整理成第一份可持续运行的新手房间基础代码",
+      "keywordRole": "owner"
+    },
     "source": "migration-sidecar"
   }
 ]

@@ -1,5 +1,959 @@
 [
   {
+    "contentId": "article_e07e2933-5b54-43e7-a940-6ac2619e76b0",
+    "contentGroupId": "group_ec621525-b34b-4f4a-9f3c-3e4f2dbbe358",
+    "slug": "screeps-room-create-construction-site",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "construction-management",
+      "order": 10,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Room.createConstructionSite",
+      "searchIntent": "安全使用 Room.createConstructionSite() 放置工地，并检查坐标、RCL、结构限制与返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+    "contentGroupId": "group_7e2dc1d3-7c4b-4ea4-9e93-5c8128bea59a",
+    "slug": "screeps-construction-site-progress",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "construction-management",
+      "order": 20,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps ConstructionSite progress",
+      "searchIntent": "读取 ConstructionSite.progress 与 progressTotal，计算剩余施工量并判断 Builder 推进状态",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+    "contentGroupId": "group_efe63460-2eee-412b-b6ec-80cb447cd794",
+    "slug": "screeps-construction-site-remove",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "construction-management",
+      "order": 30,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps ConstructionSite remove",
+      "searchIntent": "安全删除放错或不再需要的 ConstructionSite，并在删除前确认目标身份与后续重建计划",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
+    "contentGroupId": "group_efad9829-2bce-4125-ab78-ddcc89af2975",
+    "slug": "screeps-structure-destroy",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "construction-management",
+      "order": 40,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Structure destroy",
+      "searchIntent": "安全调用 Structure.destroy() 拆除建错或不再需要的己方建筑，并确认所有权、目标身份和后续影响",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+    "contentGroupId": "group_6608932d-b6c6-4317-904a-c61a1a5a7f86",
+    "slug": "screeps-tower-auto-attack-hostiles",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "tower-actions",
+      "order": 50,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Tower attack hostiles",
+      "searchIntent": "让 Tower 自动选择并攻击敌对目标，并结合距离衰减、集火与下一 tick 事件验证实际伤害",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+    "contentGroupId": "group_da13bebf-3118-4996-85df-f5fce6bf0a6f",
+    "slug": "screeps-tower-repair-threshold",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "tower-actions",
+      "order": 60,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Tower repair threshold",
+      "searchIntent": "按结构耐久比例、优先级和 Tower Energy 保留线自动维修建筑，避免无上限消耗 Energy",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+    "contentGroupId": "group_d644e48b-707d-4794-8183-52d2efef17e7",
+    "slug": "screeps-tower-heal-creeps",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "tower-actions",
+      "order": 70,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Tower heal Creeps",
+      "searchIntent": "让 Tower 自动治疗受伤的己方 Creep，并按伤势、距离和防御优先级选择治疗目标",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_00651b28-9573-49a1-ab03-d77c76cf4220",
+    "contentGroupId": "group_518122d9-a4d1-40bf-9334-aa160f8e08af",
+    "slug": "screeps-rampart-set-public",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "defense-structures",
+      "order": 80,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Rampart setPublic",
+      "searchIntent": "安全使用 StructureRampart.setPublic() 切换 Rampart 通行状态，并避免错误开放或阻断关键通道",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+    "contentGroupId": "group_bb5d2716-2b01-4cf0-a544-13476936a4c3",
+    "slug": "screeps-wall-rampart-repair-limit",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "defense-structures",
+      "order": 90,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Wall Rampart repair limit",
+      "searchIntent": "为 Wall 和 Rampart 设置阶段性维修上限与优先级，控制防御耐久增长和 Energy 消耗",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_c1fe2f0b-4b28-44d2-9295-a47863be9ad1",
+    "contentGroupId": "group_f66aa2de-09dd-437a-b5fe-c65757640e20",
+    "slug": "screeps-nuker-launch-checklist",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "defense-structures",
+      "order": 100,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Nuker launchNuke",
+      "searchIntent": "在调用 StructureNuker.launchNuke() 前检查资源、cooldown、目标房间、距离和一次性发射条件",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_663184a4-c0a3-4bf5-b166-ff0a1bb205ba",
+    "contentGroupId": "group_e199b05b-c9d1-4736-8c65-7ce14995b8ff",
+    "slug": "screeps-upgrader-controller-link-not-upgrading",
+    "knowledge": {
+      "module": "controller-control",
+      "stage": "fixed-upgrade",
+      "order": 10,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Upgrader not upgrading",
+      "searchIntent": "排查固定 Upgrader 到达 Controller 后仍不升级的问题，并核对 Controller Link、Energy、WORK、距离与返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_c3e8034a-03fc-431c-9c49-43b129e4a9cb",
+    "contentGroupId": "group_7fef915e-9ee6-48df-a214-8f4d1094b524",
+    "slug": "screeps-controller-activate-safe-mode",
+    "knowledge": {
+      "module": "controller-control",
+      "stage": "safety-lifecycle",
+      "order": 20,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureController activateSafeMode",
+      "searchIntent": "安全调用 StructureController.activateSafeMode()，检查可用次数、冷却、Controller 状态和一次性触发条件",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_6846ad93-d52a-4b03-8c6d-2d6cc6ad90e9",
+    "contentGroupId": "group_7113eb89-8c6c-467b-866b-68bbe34eecf5",
+    "slug": "screeps-controller-downgrade",
+    "knowledge": {
+      "module": "controller-control",
+      "stage": "safety-lifecycle",
+      "order": 30,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Controller downgrade",
+      "searchIntent": "监控 Controller.ticksToDowngrade，在降级风险出现时提高升级优先级，并在风险解除后恢复正常调度",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_ad28a5da-d98b-4935-a70b-c8e89d68f326",
+    "contentGroupId": "group_090c4f36-d7bd-4275-95fb-1f0edc8f2d1e",
+    "slug": "screeps-reserve-vs-claim-controller",
+    "knowledge": {
+      "module": "controller-control",
+      "stage": "reservation-claim",
+      "order": 40,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps reserveController vs claimController",
+      "searchIntent": "比较 reserveController() 与 claimController() 的目标、GCL 边界和 Controller 条件，为远程房间选择正确控制动作",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_950688b6-2702-4b3e-b1f1-850cf583ab94",
+    "contentGroupId": "group_e594152c-29fe-4ef0-b440-c0624d062c30",
+    "slug": "screeps-market-deal",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "market-operations",
+      "order": 10,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.market.deal",
+      "searchIntent": "使用 Game.market.deal() 安全成交指定市场订单，并校验订单、数量、Terminal、交易 Energy、Credits 与返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_b332171b-7207-44fd-964b-46ca864c7aa2",
+    "contentGroupId": "group_a3b12115-78b8-4851-a79b-e04f63cf4ce7",
+    "slug": "screeps-market-create-order",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "market-operations",
+      "order": 20,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.market.createOrder",
+      "searchIntent": "使用 Game.market.createOrder() 安全创建市场订单，并检查参数、手续费、Credits 与新订单 ID",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
+    "contentGroupId": "group_b301a79c-64dc-4f18-b898-44738a69326c",
+    "slug": "screeps-market-order-maintenance",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "market-operations",
+      "order": 30,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps market order maintenance",
+      "searchIntent": "维护 Screeps 市场订单的价格、剩余数量与生命周期，正确使用 changeOrderPrice、extendOrder 和 cancelOrder",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_f4f272e7-80a8-491c-99e0-35db11d49d65",
+    "contentGroupId": "group_c627181c-7213-4c12-9407-4eb5515583f1",
+    "slug": "screeps-lab-run-reaction",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "lab-boost",
+      "order": 40,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureLab.runReaction",
+      "searchIntent": "安全使用 StructureLab.runReaction() 执行矿物反应，并检查输入 Lab、资源、cooldown、容量和返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+    "contentGroupId": "group_eb492d66-6109-40ff-9be7-dfd67f4a0886",
+    "slug": "screeps-lab-boost-creep",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "lab-boost",
+      "order": 50,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureLab.boostCreep",
+      "searchIntent": "安全使用 StructureLab.boostCreep() 强化指定身体部件，并检查矿物、Energy、距离、部件状态与返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
+    "contentGroupId": "group_b19e57d0-a17b-4f31-a480-d76d520252cb",
+    "slug": "screeps-factory-produce",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "production-power",
+      "order": 60,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureFactory.produce",
+      "searchIntent": "使用 StructureFactory.produce() 安全生产指定商品，并检查等级、配方、库存、cooldown、容量和返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_f98e73c3-aa63-480e-a0a7-5f042af8a55e",
+    "contentGroupId": "group_ed2aee55-a28c-4e82-93d8-18472378ef02",
+    "slug": "screeps-power-spawn-process-power",
+    "knowledge": {
+      "module": "market-advanced-resources",
+      "stage": "production-power",
+      "order": 70,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructurePowerSpawn.processPower",
+      "searchIntent": "安全使用 StructurePowerSpawn.processPower() 处理 Power，并检查 Power、Energy、容量、房间条件和返回值",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d",
+    "contentGroupId": "group_9a79c2be-b8c1-4218-8195-dc8181c00f4e",
+    "slug": "screeps-memory-basics",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "state-basics",
+      "order": 10,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Memory",
+      "searchIntent": "理解 Screeps Memory 的跨 tick 持久化、JSON 边界、读取写入方式与使用成本",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_82cce7d7-5166-4f51-b44d-539ea1343282",
+    "contentGroupId": "group_a1e5c5c3-cf7e-4cec-a1d0-55382d3fa988",
+    "slug": "screeps-clean-dead-creep-memory",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "state-basics",
+      "order": 20,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps clean dead Creep Memory",
+      "searchIntent": "安全清理已经死亡 Creep 的 Memory 条目，避免残留状态长期累积并误删仍存在的单位数据",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
+    "contentGroupId": "group_de263935-7bf3-4f3d-8fc3-615087571bc2",
+    "slug": "screeps-creep-working-state",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "state-basics",
+      "order": 30,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep working state",
+      "searchIntent": "用 Memory 状态让 Creep 在取能和工作之间稳定切换，并避免边界条件导致频繁抖动",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_c5110a68-fbba-4709-805c-70709e0eb420",
+    "contentGroupId": "group_0f004c0b-83f3-441a-82c1-2d6fe34129b5",
+    "slug": "screeps-game-get-object-by-id",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "objects-modules",
+      "order": 40,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.getObjectById",
+      "searchIntent": "把对象 ID 保存进 Memory，并用 Game.getObjectById() 在后续 tick 安全恢复目标和处理失效对象",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_2c43c180-8c10-424e-bc7e-a47b08a3c5aa",
+    "contentGroupId": "group_5c8cab66-2912-4b71-b857-a71b9cbb0ef3",
+    "slug": "screeps-modules-require",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "objects-modules",
+      "order": 50,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps require module.exports",
+      "searchIntent": "使用 require 和 module.exports 拆分 Screeps 代码模块，并保持依赖边界与导出接口清晰",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
+    "contentGroupId": "group_5da0221f-1368-42c0-a1e1-71d90b8c3a80",
+    "slug": "screeps-rawmemory-segments",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "advanced-storage-cache",
+      "order": 60,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps RawMemory segments",
+      "searchIntent": "使用 RawMemory segments 跨 tick 读取和写回大块状态，并理解激活与下一 tick 可用边界",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+    "contentGroupId": "group_1891dd52-ca33-4d86-be7a-d52365dcbe38",
+    "slug": "screeps-intershardmemory-sync",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "advanced-storage-cache",
+      "order": 70,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps InterShardMemory",
+      "searchIntent": "使用 InterShardMemory 在多个 Shard 间同步状态，并处理版本、过期数据与读写边界",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+    "contentGroupId": "group_a1fc89f9-339f-4939-9760-0a6bed74facd",
+    "slug": "screeps-rawmemory-foreign-segment",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "advanced-storage-cache",
+      "order": 80,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps RawMemory Foreign Segment",
+      "searchIntent": "读取其他玩家公开的 RawMemory Foreign Segment，并理解公开、下一 tick 读取和轮询调度机制",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_6625380b-414a-402b-9807-1705554155ee",
+    "contentGroupId": "group_b3328d5d-c77a-4419-83e3-e232d70dd384",
+    "slug": "screeps-global-cache",
+    "knowledge": {
+      "module": "memory-engineering",
+      "stage": "advanced-storage-cache",
+      "order": 90,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps global cache",
+      "searchIntent": "理解 Screeps 全局缓存的生命周期、重建与过期策略，并避免把临时对象误当作永久状态",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_1089aaf2-bb8f-47c6-b9a6-032391c22bdb",
+    "contentGroupId": "group_cf291e3c-4dd2-442a-8ad8-51998336fb83",
+    "slug": "screeps-err-not-in-range",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "common-errors",
+      "order": 10,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps ERR_NOT_IN_RANGE",
+      "searchIntent": "排查 Creep 动作因距离不足返回 ERR_NOT_IN_RANGE，并建立移动后重试的正确处理流程",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+    "contentGroupId": "group_eac58bb1-c898-469d-99d7-d1e05e3903bd",
+    "slug": "screeps-moveto-not-moving",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "common-errors",
+      "order": 20,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps moveTo not moving",
+      "searchIntent": "排查 moveTo() 返回 OK 但 Creep 没有实际位移的问题，并结合 fatigue、阻挡与后续 tick 验证",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_f2aa1354-170d-4244-8abd-55bb7309cc95",
+    "contentGroupId": "group_c4df855e-2394-4b2e-be1b-a3aa2b493819",
+    "slug": "screeps-err-no-path",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "common-errors",
+      "order": 30,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps ERR_NO_PATH",
+      "searchIntent": "排查 Screeps 寻路返回 ERR_NO_PATH 的目标范围、路径回调、阻挡与跨房间路线问题",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
+    "contentGroupId": "group_44f2d1d6-250b-4b3d-8e93-3fccb70fb509",
+    "slug": "screeps-pathfinder-costmatrix",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 40,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps PathFinder CostMatrix",
+      "searchIntent": "学习用 PathFinder CostMatrix 设置道路、障碍和高成本格子，并理解路径成本如何影响寻路",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+    "contentGroupId": "group_3988ab25-c506-47a0-be7d-cec989e1110a",
+    "slug": "screeps-map-find-route",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 50,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.map.findRoute",
+      "searchIntent": "学习用 Game.map.findRoute() 规划跨房间路线，并把房间级路线与格子级寻路正确衔接",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+    "contentGroupId": "group_cf9d5b1d-e8f3-4997-bf66-0ac54db9f28c",
+    "slug": "screeps-roomposition-distance",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 60,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps RoomPosition distance",
+      "searchIntent": "比较 RoomPosition 的 range、相邻、同格与路径距离方法，选择适合动作判断和寻路的距离语义",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+    "contentGroupId": "group_7e10583e-f12a-4ecb-a793-ac68573485e8",
+    "slug": "screeps-move-fatigue-body-ratio",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 70,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps MOVE fatigue body ratio",
+      "searchIntent": "理解 MOVE 部件、fatigue、地形与负载之间的关系，并据此配置 Creep 的移动比例",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62",
+    "contentGroupId": "group_7bbe340b-beea-459c-b106-aa715cff4008",
+    "slug": "screeps-room-visibility",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "vision-visualization",
+      "order": 80,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.rooms undefined",
+      "searchIntent": "排查 Game.rooms[roomName] 为 undefined 的房间视野问题，并理解当前可见性与远程观察边界",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+    "contentGroupId": "group_5555b711-8bca-411a-a721-5123e9abe2a3",
+    "slug": "screeps-observer-observe-room",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "vision-visualization",
+      "order": 90,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureObserver.observeRoom",
+      "searchIntent": "学习用 StructureObserver.observeRoom() 获取远方房间视野，并正确理解下一 tick 可见性",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
+    "contentGroupId": "group_b68f608e-e1fb-4b4d-b72f-c2071e4693ae",
+    "slug": "screeps-roomvisual-debug",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "vision-visualization",
+      "order": 100,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps RoomVisual debug",
+      "searchIntent": "学习用 RoomVisual 绘制状态、目标和路径，把移动与寻路问题变成可观察的调试信息",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_5cf8ef1f-9881-4483-9bad-922ccca36c95",
+    "contentGroupId": "group_0c5010f3-0ca6-4088-ae6a-6a445b278631",
+    "slug": "screeps-flags-config",
+    "knowledge": {
+      "module": "operations-debugging",
+      "stage": "config-performance",
+      "order": 10,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Flag configuration",
+      "searchIntent": "使用 Screeps Flag 作为可验证的房间配置入口，并处理版本、任务、目标、视野与过期状态",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+    "contentGroupId": "group_d672957f-92c4-4774-9084-86b811d45e2a",
+    "slug": "screeps-cpu-getused-bucket",
+    "knowledge": {
+      "module": "operations-debugging",
+      "stage": "config-performance",
+      "order": 20,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.cpu.getUsed bucket",
+      "searchIntent": "使用 Game.cpu.getUsed()、limit、tickLimit 与 bucket 监控 Screeps CPU，并建立稳定的采样窗口",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
+    "contentGroupId": "group_00ad44d9-79c8-4575-b6c3-5972c6e9a170",
+    "slug": "screeps-cpu-bucket-degradation",
+    "knowledge": {
+      "module": "operations-debugging",
+      "stage": "config-performance",
+      "order": 30,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps CPU Bucket degradation",
+      "searchIntent": "当 Game.cpu.bucket 持续下降时按任务等级自动降载、保护核心任务，并用迟滞与恢复状态避免振荡",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3",
+    "contentGroupId": "group_2019067b-167f-409e-b647-fc024638f24b",
+    "slug": "screeps-game-notify",
+    "knowledge": {
+      "module": "operations-debugging",
+      "stage": "notifications-events",
+      "order": 40,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Game.notify",
+      "searchIntent": "使用 Game.notify() 发送可靠的限频提醒，并处理消息长度、每 tick 限制、groupInterval 与重复状态",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+    "contentGroupId": "group_c63302d8-79cb-4ada-8405-131e0f6f3578",
+    "slug": "screeps-room-event-log",
+    "knowledge": {
+      "module": "operations-debugging",
+      "stage": "notifications-events",
+      "order": 50,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Room.getEventLog",
+      "searchIntent": "使用 Room.getEventLog() 读取上一 tick 的房间事件，并正确理解事件时序、数据结构、筛选和长期记录边界",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_a15ce91c-30a0-4eb3-b89e-5d333095a80f",
+    "contentGroupId": "group_1153083c-9913-4806-8a4e-86068dd025db",
+    "slug": "screeps-room-error-isolation",
+    "knowledge": {
+      "module": "operations-debugging",
+      "stage": "isolation-recovery",
+      "order": 60,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps room error isolation",
+      "searchIntent": "为 Screeps 房间和模块建立异常隔离、限频日志、暂停、冷却与自动恢复，避免单点异常拖垮其他房间",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
+    "contentGroupId": "group_4469ba29-be3a-413e-aee6-59954358f5e7",
+    "slug": "screeps-store-capacity-api",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "store-container",
+      "order": 10,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Store capacity API",
+      "searchIntent": "理解 Store 的 getUsedCapacity、getFreeCapacity、getCapacity 语义，并区分 0、null 与容量限制",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+    "contentGroupId": "group_9ba2af33-fde4-4e13-85d5-8e11645a3548",
+    "slug": "screeps-creep-withdraw-container-energy",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "store-container",
+      "order": 20,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep withdraw Container Energy",
+      "searchIntent": "让 Creep 从 Container 安全 withdraw Energy，并处理距离、容量、资源量和返回码",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+    "contentGroupId": "group_8c02892a-756a-4a42-a1fc-c0a17d31fe38",
+    "slug": "screeps-container-decay-repair-deadline",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "store-container",
+      "order": 30,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Container ticksToDecay",
+      "searchIntent": "根据 Container ticksToDecay、hits 和维修吞吐量判断何时开始维修，避免腐化损毁",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+    "contentGroupId": "group_b3f4eec2-cce3-410c-8fb4-98c0b891d3df",
+    "slug": "screeps-creep-pickup-dropped-energy",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "resource-recovery",
+      "order": 40,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep pickup dropped Energy",
+      "searchIntent": "让 Creep 安全 pickup 地面掉落 Energy，并处理容量、距离和目标消失等边界",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+    "contentGroupId": "group_4eea8a6d-50de-4f7a-8026-c477912bd646",
+    "slug": "screeps-tombstone-ruin-recovery",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "resource-recovery",
+      "order": 50,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Tombstone Ruin recovery",
+      "searchIntent": "从 Tombstone 与 Ruin 安全回收资源，并按剩余时间、距离和资源价值安排抢救优先级",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc",
+    "contentGroupId": "group_fad3044f-05de-4913-b91f-1be46377835b",
+    "slug": "screeps-select-source-by-path",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "resource-recovery",
+      "order": 60,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Source selection by path",
+      "searchIntent": "在多个 Source 中按真实可达路径选择目标，并稳定保存与恢复 Source 身份",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
+    "contentGroupId": "group_a1f265a0-6c8d-45a6-b276-7231d3f36c01",
+    "slug": "screeps-storage-energy-usage",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "room-storage-transfer",
+      "order": 70,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Room.storage Energy",
+      "searchIntent": "安全读取和调度 Room.storage 中的 Energy，并为取能、配送与保留线建立稳定规则",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+    "contentGroupId": "group_c7fa64b6-8e6d-4fe1-a90b-e6cfe28c4e1b",
+    "slug": "screeps-link-transfer-energy",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "room-storage-transfer",
+      "order": 80,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureLink transferEnergy",
+      "searchIntent": "用 StructureLink.transferEnergy() 安全传输 Energy，并处理 cooldown、容量与链路调度",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+    "contentGroupId": "group_13050ba0-b03d-4977-9831-71123ee90f78",
+    "slug": "screeps-terminal-send-resources",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "interroom-minerals",
+      "order": 90,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps StructureTerminal send",
+      "searchIntent": "用 StructureTerminal.send() 安全跨房间发送资源，并检查 cooldown、目标房间、库存和交易 Energy 成本",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+    "contentGroupId": "group_5cfb240e-71d7-45a9-b7e8-df76494f914f",
+    "slug": "screeps-mineral-extractor-harvest",
+    "knowledge": {
+      "module": "room-economy",
+      "stage": "interroom-minerals",
+      "order": 100,
+      "difficulty": "advanced"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Mineral harvesting",
+      "searchIntent": "理解 Mineral、Extractor、cooldown 和 harvest 返回值，建立稳定的矿物采集流程",
+      "keywordRole": "owner"
+    },
+    "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_cb41c144-290c-4258-817b-91763313600f",
+    "contentGroupId": "group_022ae8c7-7542-4602-b245-6673fc0c63e2",
     "slug": "screeps-spawncreep-return-codes",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -15,6 +969,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+    "contentGroupId": "group_70ed5388-39cc-4920-94cc-bd7ccaee4f46",
     "slug": "screeps-spawn-exit-blocked-directions",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -30,6 +986,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_32219971-b044-4240-8f28-25ccc9920ca3",
+    "contentGroupId": "group_1974a6b4-3107-4241-ae74-4fd8d8994fab",
     "slug": "screeps-dynamic-creep-body-energy",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -45,6 +1003,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_958be26d-2666-4b94-8d23-5cb625074032",
+    "contentGroupId": "group_01770c84-dff9-4f24-a39e-6c63cb9693a2",
     "slug": "screeps-room-energyavailable-stuck",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -60,6 +1020,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+    "contentGroupId": "group_4a737419-cbad-4efe-a815-b43e747cdf0f",
     "slug": "screeps-multi-spawn-queue",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -75,6 +1037,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+    "contentGroupId": "group_22e0066c-5dde-40c4-a3e0-0893210f5a9c",
     "slug": "screeps-creep-prespawn-replacement",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -90,6 +1054,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+    "contentGroupId": "group_91057dbf-0034-4722-97e1-af62d001f6f2",
     "slug": "screeps-spawn-renew-creep",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -105,6 +1071,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_f131df21-2d5a-4357-86f0-51812915f662",
+    "contentGroupId": "group_729b8fc9-c44c-4673-8a65-9b79f8e8f1ed",
     "slug": "screeps-spawn-recycle-creep",
     "knowledge": {
       "module": "spawn-lifecycle",
@@ -120,6 +1088,8 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_764e6035-6293-4af0-871b-965eb2e8cb53",
+    "contentGroupId": "group_9788259c-6b94-41ff-96a2-82b8ce962eee",
     "slug": "screeps-spawn-emergency-recovery",
     "knowledge": {
       "module": "spawn-lifecycle",
