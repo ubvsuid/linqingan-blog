@@ -6,6 +6,7 @@ import matter from "gray-matter";
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
 const migrationMetadataDirectory = path.join(root, "content", "knowledge-metadata");
+const identityRegistryPath = path.join(root, "content", "knowledge-identities.json");
 const outputPath = path.join(root, "src", "generated", "knowledge-article-registry.json");
 
 function isRecord(value) {
@@ -20,7 +21,33 @@ function readSidecar(slug) {
   return parsed;
 }
 
+function loadIdentityRegistry() {
+  if (!fs.existsSync(identityRegistryPath)) {
+    throw new Error(`${identityRegistryPath}: 缺少 Knowledge Content Identity V1 registry`);
+  }
+
+  const parsed = JSON.parse(fs.readFileSync(identityRegistryPath, "utf8"));
+  if (!isRecord(parsed) || parsed.schemaVersion !== 1 || !Array.isArray(parsed.records)) {
+    throw new Error(`${identityRegistryPath}: 必须是 schemaVersion=1 且包含 records 数组`);
+  }
+
+  const bySlug = new Map();
+  for (const record of parsed.records) {
+    if (!isRecord(record) || typeof record.slug !== "string") {
+      throw new Error(`${identityRegistryPath}: identity record 必须包含 slug`);
+    }
+    if (bySlug.has(record.slug)) {
+      throw new Error(`${identityRegistryPath}: 重复 identity slug：${record.slug}`);
+    }
+    bySlug.set(record.slug, record);
+  }
+  return bySlug;
+}
+
+const identitiesBySlug = loadIdentityRegistry();
+const consumedIdentitySlugs = new Set();
 const records = [];
+
 for (const fileName of fs.readdirSync(postsDirectory).filter((name) => name.endsWith(".md")).sort()) {
   const slug = fileName.replace(/\.md$/, "");
   const filePath = path.join(postsDirectory, fileName);
@@ -47,7 +74,15 @@ for (const fileName of fs.readdirSync(postsDirectory).filter((name) => name.ends
     throw new Error(`${filePath}: knowledge 与 seo 必须是对象`);
   }
 
+  const identity = identitiesBySlug.get(slug);
+  if (!identity) {
+    throw new Error(`${filePath}: 缺少 Content Identity。请先在 content/knowledge-identities.json 中分配永久 ID`);
+  }
+  consumedIdentitySlugs.add(slug);
+
   records.push({
+    contentId: identity.contentId,
+    contentGroupId: identity.contentGroupId,
     slug,
     knowledge: source.knowledge,
     seo: source.seo,
@@ -64,6 +99,12 @@ if (fs.existsSync(migrationMetadataDirectory)) {
   }
 }
 
+for (const slug of identitiesBySlug.keys()) {
+  if (!consumedIdentitySlugs.has(slug)) {
+    throw new Error(`${identityRegistryPath}: ${slug} 没有对应的已发布 Knowledge article`);
+  }
+}
+
 records.sort(
   (left, right) =>
     String(left.knowledge.module).localeCompare(String(right.knowledge.module)) ||
@@ -76,7 +117,7 @@ const nextOutput = `${JSON.stringify(records, null, 2)}\n`;
 const previousOutput = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, "utf8") : null;
 if (previousOutput !== nextOutput) {
   fs.writeFileSync(outputPath, nextOutput, "utf8");
-  console.log(`Knowledge article registry generated: ${records.length} record(s), file updated.`);
+  console.log(`Knowledge article registry generated: ${records.length} record(s), Content Identity V1 attached, file updated.`);
 } else {
-  console.log(`Knowledge article registry generated: ${records.length} record(s), already current.`);
+  console.log(`Knowledge article registry generated: ${records.length} record(s), Content Identity V1 attached, already current.`);
 }
