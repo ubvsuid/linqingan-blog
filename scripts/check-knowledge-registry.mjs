@@ -102,6 +102,7 @@ const publishedSlugs = new Set(
 
 const identityBySlug = new Map();
 const identitySlugByContentId = new Map();
+const identitySlugByContentGroupId = new Map();
 for (const identity of Array.isArray(identityDocument?.records) ? identityDocument.records : []) {
   if (!isRecord(identity)) {
     addError("Content Identity record 必须是对象");
@@ -126,6 +127,10 @@ for (const identity of Array.isArray(identityDocument?.records) ? identityDocume
   }
   if (typeof contentGroupId !== "string" || !contentGroupIdPattern.test(contentGroupId)) {
     addError(`${slug}: contentGroupId 必须是 group_ + UUID`);
+  } else {
+    const previousSlug = identitySlugByContentGroupId.get(contentGroupId);
+    if (previousSlug) addError(`Content Identity 重复 contentGroupId：${contentGroupId} 同时属于 ${previousSlug} 与 ${slug}`);
+    else identitySlugByContentGroupId.set(contentGroupId, slug);
   }
   if (!publishedSlugs.has(slug)) {
     addError(`${slug}: Content Identity 没有对应文章`);

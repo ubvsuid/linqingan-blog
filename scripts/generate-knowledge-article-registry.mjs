@@ -8,6 +8,9 @@ const postsDirectory = path.join(root, "content", "posts");
 const migrationMetadataDirectory = path.join(root, "content", "knowledge-metadata");
 const identityRegistryPath = path.join(root, "content", "knowledge-identities.json");
 const outputPath = path.join(root, "src", "generated", "knowledge-article-registry.json");
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const contentIdPattern = /^article_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const contentGroupIdPattern = /^group_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -32,14 +35,30 @@ function loadIdentityRegistry() {
   }
 
   const bySlug = new Map();
+  const seenContentIds = new Set();
+  const seenContentGroupIds = new Set();
   for (const record of parsed.records) {
-    if (!isRecord(record) || typeof record.slug !== "string") {
-      throw new Error(`${identityRegistryPath}: identity record 必须包含 slug`);
+    if (!isRecord(record) || typeof record.slug !== "string" || !slugPattern.test(record.slug)) {
+      throw new Error(`${identityRegistryPath}: identity record 必须包含合法 slug`);
+    }
+    if (!contentIdPattern.test(record.contentId ?? "")) {
+      throw new Error(`${identityRegistryPath}: ${record.slug} 的 contentId 必须是 article_ + UUID`);
+    }
+    if (!contentGroupIdPattern.test(record.contentGroupId ?? "")) {
+      throw new Error(`${identityRegistryPath}: ${record.slug} 的 contentGroupId 必须是 group_ + UUID`);
     }
     if (bySlug.has(record.slug)) {
       throw new Error(`${identityRegistryPath}: 重复 identity slug：${record.slug}`);
     }
+    if (seenContentIds.has(record.contentId)) {
+      throw new Error(`${identityRegistryPath}: 重复 contentId：${record.contentId}`);
+    }
+    if (seenContentGroupIds.has(record.contentGroupId)) {
+      throw new Error(`${identityRegistryPath}: 中文 Knowledge V1 中重复 contentGroupId：${record.contentGroupId}`);
+    }
     bySlug.set(record.slug, record);
+    seenContentIds.add(record.contentId);
+    seenContentGroupIds.add(record.contentGroupId);
   }
   return bySlug;
 }
