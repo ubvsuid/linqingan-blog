@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
 const migrationMetadataDirectory = path.join(root, "content", "knowledge-metadata");
+const identityRegistryPath = path.join(root, "content", "knowledge-identities.json");
 const generatedRegistryPath = path.join(root, "src", "generated", "knowledge-article-registry.json");
 const moduleRegistryPath = path.join(root, "src", "lib", "knowledge-module-registry.ts");
 const errors = [];
@@ -12,6 +13,8 @@ const difficultyValues = new Set(["beginner", "intermediate", "advanced"]);
 const keywordRoleValues = new Set(["owner", "supporting"]);
 const sourceValues = new Set(["migration-sidecar", "frontmatter"]);
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const contentIdPattern = /^article_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const contentGroupIdPattern = /^group_[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function addError(message) {
   errors.push(message);
@@ -74,13 +77,20 @@ function parseModuleSchema(source) {
 if (!fs.existsSync(generatedRegistryPath)) {
   addError("缺少生成后的 knowledge-article-registry.json，请先运行 knowledgegenerate");
 }
+if (!fs.existsSync(identityRegistryPath)) {
+  addError("缺少 content/knowledge-identities.json");
+}
 
 const moduleRegistrySource = fs.readFileSync(moduleRegistryPath, "utf8");
 const moduleSchema = parseModuleSchema(moduleRegistrySource);
 const records = fs.existsSync(generatedRegistryPath) ? readJson(generatedRegistryPath) : [];
+const identityDocument = fs.existsSync(identityRegistryPath) ? readJson(identityRegistryPath) : null;
 
 if (!Array.isArray(records)) {
   addError("knowledge-article-registry.json 必须是数组");
+}
+if (!isRecord(identityDocument) || identityDocument?.schemaVersion !== 1 || !Array.isArray(identityDocument?.records)) {
+  addError("knowledge-identities.json 必须是 schemaVersion=1 且包含 records 数组");
 }
 
 const publishedSlugs = new Set(
@@ -89,7 +99,46 @@ const publishedSlugs = new Set(
     .filter((name) => name.endsWith(".md"))
     .map((name) => name.replace(/\.md$/, "")),
 );
+
+const identityBySlug = new Map();
+const identitySlugByContentId = new Map();
+const identitySlugByContentGroupId = new Map();
+for (const identity of Array.isArray(identityDocument?.records) ? identityDocument.records : []) {
+  if (!isRecord(identity)) {
+    addError("Content Identity record 必须是对象");
+    continue;
+  }
+  const { slug, contentId, contentGroupId } = identity;
+  if (typeof slug !== "string" || !slugPattern.test(slug)) {
+    addError(`Content Identity slug 无效：${String(slug)}`);
+    continue;
+  }
+  if (identityBySlug.has(slug)) {
+    addError(`Content Identity 重复 slug：${slug}`);
+  } else {
+    identityBySlug.set(slug, identity);
+  }
+  if (typeof contentId !== "string" || !contentIdPattern.test(contentId)) {
+    addError(`${slug}: contentId 必须是 article_ + UUID`);
+  } else {
+    const previousSlug = identitySlugByContentId.get(contentId);
+    if (previousSlug) addError(`Content Identity 重复 contentId：${contentId} 同时属于 ${previousSlug} 与 ${slug}`);
+    else identitySlugByContentId.set(contentId, slug);
+  }
+  if (typeof contentGroupId !== "string" || !contentGroupIdPattern.test(contentGroupId)) {
+    addError(`${slug}: contentGroupId 必须是 group_ + UUID`);
+  } else {
+    const previousSlug = identitySlugByContentGroupId.get(contentGroupId);
+    if (previousSlug) addError(`Content Identity 重复 contentGroupId：${contentGroupId} 同时属于 ${previousSlug} 与 ${slug}`);
+    else identitySlugByContentGroupId.set(contentGroupId, slug);
+  }
+  if (!publishedSlugs.has(slug)) {
+    addError(`${slug}: Content Identity 没有对应文章`);
+  }
+}
+
 const seenSlugs = new Set();
+const seenContentIds = new Set();
 const ownerByKeyword = new Map();
 const ordersByModule = new Map();
 const countsByModule = new Map();
@@ -101,7 +150,7 @@ for (const record of Array.isArray(records) ? records : []) {
     continue;
   }
 
-  const { slug, knowledge, seo, source } = record;
+  const { contentId, contentGroupId, slug, knowledge, seo, source } = record;
   if (typeof slug !== "string" || !slugPattern.test(slug)) {
     addError(`Knowledge record slug 无效：${String(slug)}`);
     continue;
@@ -110,6 +159,29 @@ for (const record of Array.isArray(records) ? records : []) {
     addError(`Knowledge registry 重复 slug：${slug}`);
   }
   seenSlugs.add(slug);
+
+  if (typeof contentId !== "string" || !contentIdPattern.test(contentId)) {
+    addError(`${slug}: generated contentId 无效`);
+  } else if (seenContentIds.has(contentId)) {
+    addError(`${slug}: generated contentId 重复：${contentId}`);
+  } else {
+    seenContentIds.add(contentId);
+  }
+  if (typeof contentGroupId !== "string" || !contentGroupIdPattern.test(contentGroupId)) {
+    addError(`${slug}: generated contentGroupId 无效`);
+  }
+
+  const identity = identityBySlug.get(slug);
+  if (!identity) {
+    addError(`${slug}: generated registry 没有对应 Content Identity`);
+  } else {
+    if (identity.contentId !== contentId) {
+      addError(`${slug}: generated contentId 与 Content Identity Source of Truth 不一致`);
+    }
+    if (identity.contentGroupId !== contentGroupId) {
+      addError(`${slug}: generated contentGroupId 与 Content Identity Source of Truth 不一致`);
+    }
+  }
 
   if (!publishedSlugs.has(slug)) {
     addError(`${slug}: Knowledge registry 没有对应文章`);
@@ -177,6 +249,17 @@ for (const record of Array.isArray(records) ? records : []) {
   }
 }
 
+for (const [slug] of identityBySlug) {
+  if (!seenSlugs.has(slug)) {
+    addError(`${slug}: Content Identity 没有对应的已发布 Knowledge registry record`);
+  }
+}
+for (const slug of seenSlugs) {
+  if (!identityBySlug.has(slug)) {
+    addError(`${slug}: Knowledge registry 缺少 Content Identity`);
+  }
+}
+
 if (fs.existsSync(migrationMetadataDirectory)) {
   for (const fileName of fs.readdirSync(migrationMetadataDirectory).filter((name) => name.endsWith(".json"))) {
     const slug = fileName.replace(/\.json$/, "");
@@ -209,5 +292,5 @@ const moduleSummary = [...moduleSchema.keys()]
   .map((moduleId) => `${moduleId}=${countsByModule.get(moduleId) ?? 0}`)
   .join(", ");
 console.log(
-  `Knowledge registry check passed: ${records.length} article(s), ${moduleSchema.size} module(s), ${moduleSummary}, Keyword Owner conflicts 0. New valid metadata articles are allowed without checker edits.`,
+  `Knowledge registry check passed: ${records.length} article(s), ${identityBySlug.size} Content Identity V1 record(s), ${moduleSchema.size} module(s), ${moduleSummary}, Keyword Owner conflicts 0.`,
 );

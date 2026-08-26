@@ -9,16 +9,27 @@ on:
       - clean-blog-v1
     paths:
       - "content/posts/**"
+      - "content/knowledge-identities.json"
+      - "content/roadmap-identities.json"
       - "content/knowledge-metadata/**"
       - "content/roadmap-metadata/**"
+      - "docs/content-metadata-schema-v1.md"
       - "src/lib/knowledge-module-registry.ts"
       - "src/lib/beginner-series.ts"
       - "src/generated/knowledge-article-registry.json"
       - "src/generated/beginner-roadmap-registry.json"
+      - "package.json"
+      - "scripts/lib/content-metadata-schema.mjs"
+      - "scripts/check-integrity.mjs"
+      - "scripts/check-content-metadata-schema.mjs"
+      - "scripts/check-content-metadata-schema-contract.mjs"
       - "scripts/generate-knowledge-article-registry.mjs"
       - "scripts/generate-beginner-roadmap-registry.mjs"
       - "scripts/check-knowledge-registry.mjs"
       - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/check-internal-links.mjs"
+      - "scripts/check-verification-coverage.mjs"
+      - "scripts/check-evidence-capture-kit.mjs"
       - "scripts/knowledge-health-report.mjs"
       - ".github/workflows/knowledge-health.yml"
   pull_request:
@@ -26,16 +37,27 @@ on:
       - clean-blog-v1
     paths:
       - "content/posts/**"
+      - "content/knowledge-identities.json"
+      - "content/roadmap-identities.json"
       - "content/knowledge-metadata/**"
       - "content/roadmap-metadata/**"
+      - "docs/content-metadata-schema-v1.md"
       - "src/lib/knowledge-module-registry.ts"
       - "src/lib/beginner-series.ts"
       - "src/generated/knowledge-article-registry.json"
       - "src/generated/beginner-roadmap-registry.json"
+      - "package.json"
+      - "scripts/lib/content-metadata-schema.mjs"
+      - "scripts/check-integrity.mjs"
+      - "scripts/check-content-metadata-schema.mjs"
+      - "scripts/check-content-metadata-schema-contract.mjs"
       - "scripts/generate-knowledge-article-registry.mjs"
       - "scripts/generate-beginner-roadmap-registry.mjs"
       - "scripts/check-knowledge-registry.mjs"
       - "scripts/check-beginner-roadmap.mjs"
+      - "scripts/check-internal-links.mjs"
+      - "scripts/check-verification-coverage.mjs"
+      - "scripts/check-evidence-capture-kit.mjs"
       - "scripts/knowledge-health-report.mjs"
       - ".github/workflows/knowledge-health.yml"
 
@@ -49,33 +71,31 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - name: Install dependencies
         run: npm ci
-
+      - name: Validate repository integrity
+        run: npm run integritycheck
+      - name: Validate Content Metadata Schema V1 contract
+        run: node scripts/check-content-metadata-schema-contract.mjs
+      - name: Validate Content Metadata Schema V1
+        run: node scripts/check-content-metadata-schema.mjs
       - name: Rebuild Knowledge registry
         run: npm run knowledgegenerate
-
       - name: Validate Knowledge registry
         run: npm run knowledgecheck
-
       - name: Rebuild Beginner Roadmap registry
         run: npm run roadmapgenerate
-
       - name: Validate Beginner Roadmap and full classification
         run: npm run roadmapcheck
-
       - name: Generate Knowledge Health report
         env:
           KNOWLEDGE_HEALTH_OUTPUT: ${{ runner.temp }}/knowledge-health.json
         run: node scripts/knowledge-health-report.mjs
-
       - name: Upload Knowledge Health report
         if: always()
         uses: actions/upload-artifact@v4
