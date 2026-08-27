@@ -46,7 +46,7 @@ async function isVerificationGovernanceReady(): Promise<boolean> {
   }
 
   try {
-    const [row] = await sql`
+    const result = await sql`
       SELECT
         EXISTS (
           SELECT 1
@@ -55,6 +55,9 @@ async function isVerificationGovernanceReady(): Promise<boolean> {
             AND table_name = 'verification_evidence_public'
         ) AS ready;
     `;
+    const row = Array.isArray(result)
+      ? (result[0] as { ready?: boolean } | undefined)
+      : undefined;
     governanceReadiness = {
       checkedAt: now,
       ready: Boolean(row?.ready),

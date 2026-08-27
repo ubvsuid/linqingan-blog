@@ -2,7 +2,9 @@ import environmentPolicy from "../../database/environment-policy.json";
 
 type DatabaseRuntime = "production" | "non-production";
 
-type RuntimeEnvironment = Pick<NodeJS.ProcessEnv, "VERCEL_ENV">;
+type RuntimeEnvironment = {
+  VERCEL_ENV?: string;
+};
 
 function isApprovedNeonHost(hostname: string, endpointId: string): boolean {
   const normalizedHostname = hostname.toLowerCase();
