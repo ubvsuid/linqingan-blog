@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import { neon } from "@neondatabase/serverless";
+
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { normalizeLifecycleResult, normalizeOptionalIsoDate, validateLifecycleTransition } from "./lib/site-intelligence-lifecycle.mjs";
 
 const args = process.argv.slice(2);
@@ -39,7 +40,7 @@ if (parentActionInput && clearParentAction) throw new Error("Use only one of --p
 if (supersededByInput && clearSupersededBy) throw new Error("Use only one of --superseded-by-action-id or --clear-superseded-by.");
 if (!targetStatus && !note && !actionTaken && !reviewAfter && !result && !metrics && !rejectionReason && !reopenReason && !dueAtInput && !clearDueAt && !parentActionInput && !clearParentAction && !supersededByInput && !clearSupersededBy) throw new Error("No lifecycle update was requested.");
 
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 const [current] = await sql`SELECT * FROM site_intelligence_actions WHERE action_id = ${actionId};`;
 if (!current) throw new Error(`Unknown action_id: ${actionId}`);
 let transition = { from: current.status, to: current.status, noop: true };

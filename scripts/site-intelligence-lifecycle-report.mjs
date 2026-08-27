@@ -1,13 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
-import { neon } from "@neondatabase/serverless";
+
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { renderLifecycleMarkdown } from "./lib/site-intelligence-lifecycle.mjs";
 
 const args = process.argv.slice(2);
 function argValue(name, fallback = null) { const i = args.indexOf(name); return i >= 0 ? args[i + 1] ?? fallback : fallback; }
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) throw new Error("DATABASE_URL is required.");
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 const actions = await sql`
   SELECT action_id, asset_id, path, category, recommended_action, priority, status,
          first_seen_at, last_seen_at, started_at, completed_at, review_after, due_at,

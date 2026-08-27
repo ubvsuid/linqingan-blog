@@ -1,7 +1,6 @@
-import { neon } from "@neondatabase/serverless";
 import { desc, eq } from "drizzle-orm";
 
-import { getPlatformDatabase } from "@/db/client";
+import { getPlatformDatabase, getPlatformSql } from "@/db/client";
 import { publicVerificationEvidence } from "@/db/schema";
 
 export type RuntimeVerificationType = "console" | "live";
@@ -38,8 +37,8 @@ let governanceReadiness = {
 };
 
 async function isVerificationGovernanceReady(): Promise<boolean> {
-  const databaseUrl = process.env.DATABASE_URL?.trim();
-  if (!databaseUrl) return false;
+  const sql = getPlatformSql();
+  if (!sql) return false;
 
   const now = Date.now();
   if (now - governanceReadiness.checkedAt < 60_000) {
@@ -47,7 +46,6 @@ async function isVerificationGovernanceReady(): Promise<boolean> {
   }
 
   try {
-    const sql = neon(databaseUrl);
     const [row] = await sql`
       SELECT
         EXISTS (
