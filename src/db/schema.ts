@@ -114,6 +114,9 @@ export const verificationEvidence = pgTable(
   {
     id: bigint("id", { mode: "number" }).primaryKey().generatedByDefaultAsIdentity(),
     evidenceKey: text("evidence_key").notNull(),
+    identityVersion: integer("identity_version").notNull().default(2),
+    contentId: text("content_id").notNull(),
+    contentGroupId: text("content_group_id").notNull(),
     articleSlug: text("article_slug").notNull(),
     language: text("language").notNull().default("zh-CN"),
     verificationType: text("verification_type").notNull(),
@@ -140,8 +143,12 @@ export const verificationEvidence = pgTable(
   (table) => [
     uniqueIndex("verification_evidence_key_uidx").on(table.evidenceKey),
     index("verification_evidence_article_idx").on(table.articleSlug, table.verifiedAt),
+    index("verification_evidence_content_idx").on(table.contentId, table.verifiedAt),
     index("verification_evidence_type_idx").on(table.verificationType, table.verifiedAt),
     index("verification_evidence_status_idx").on(table.status, table.verifiedAt),
+    check("verification_evidence_identity_version_check", sql`${table.identityVersion} in (1, 2)`),
+    check("verification_evidence_type_check", sql`${table.verificationType} in ('console', 'live')`),
+    check("verification_evidence_language_check", sql`${table.language} in ('zh-CN', 'en')`),
   ],
 );
 
@@ -162,5 +169,8 @@ export const publicVerificationEvidence = pgView(
     tickEnd: bigint("tick_end", { mode: "number" }),
     evidenceNote: text("evidence_note").notNull(),
     verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
+    identityVersion: integer("identity_version").notNull(),
+    contentId: text("content_id").notNull(),
+    contentGroupId: text("content_group_id").notNull(),
   },
 ).existing();

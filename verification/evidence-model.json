@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "linqingan-evidence-model/v1",
+  "identity": {
+    "canonicalOwner": "contentId",
+    "groupKey": "contentGroupId",
+    "locator": "articleSlug",
+    "currentEvidenceKeyIdentityVersion": 2,
+    "legacyEvidenceKeyIdentityVersion": 1,
+    "registryFiles": [
+      "content/knowledge-identities.json",
+      "content/roadmap-identities.json"
+    ],
+    "slugIsMutable": true
+  },
+  "publicEvidenceLevels": [
+    {
+      "id": "docs",
+      "claimField": "docsChecked",
+      "structuredRuntimeEvidence": false,
+      "meaning": "Official/documented claims checked against cited documentation."
+    },
+    {
+      "id": "offline",
+      "claimField": "syntaxChecked",
+      "structuredRuntimeEvidence": false,
+      "meaning": "Offline syntax/simulation evidence only; never implies Screeps runtime verification."
+    },
+    {
+      "id": "console",
+      "claimField": "consoleTested",
+      "structuredRuntimeEvidence": true,
+      "verificationType": "console",
+      "meaning": "Single-runtime observation tied to Game.time and controlled capture provenance."
+    },
+    {
+      "id": "live",
+      "claimField": "liveTested",
+      "structuredRuntimeEvidence": true,
+      "verificationType": "live",
+      "meaning": "Multi-tick runtime observation with an explicit tick window."
+    }
+  ],
+  "runtimeEvidence": {
+    "supportedVerificationTypes": [
+      "console",
+      "live"
+    ],
+    "lifecycleStates": [
+      "captured",
+      "reviewed",
+      "accepted",
+      "rejected",
+      "revoked"
+    ],
+    "publicDatabaseStatus": "accepted",
+    "publicRequiresMarkdownAcceptance": true,
+    "controlledSourceRefPrefix": "capture:CAP-",
+    "publicWriteApiAllowed": false
+  },
+  "invariants": [
+    "contentId is the durable evidence owner; articleSlug is only the current locator.",
+    "Evidence keys created by identity version 2 do not depend on articleSlug.",
+    "Database acceptance alone is not public truth; the matching Markdown verification flag must also be accepted.",
+    "Rejected and revoked evidence remain internal audit history and are never public.",
+    "Console and live claims require structured accepted runtime evidence; docs/offline claims do not enter verification_evidence.",
+    "A slug rename must preserve contentId/contentGroupId and update only the locator stored with evidence."
+  ]
+}
