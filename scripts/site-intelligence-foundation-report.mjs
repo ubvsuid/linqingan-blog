@@ -1,13 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
-import { neon } from "@neondatabase/serverless";
+
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { renderFoundationMarkdown } from "./lib/site-intelligence-foundation.mjs";
 
 const args = process.argv.slice(2);
 function argValue(name, fallback = null) { const i = args.indexOf(name); return i >= 0 ? args[i + 1] ?? fallback : fallback; }
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) throw new Error("DATABASE_URL is required.");
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 
 const actionSummary = await sql`
   SELECT aging_state, count(*)::int AS actions

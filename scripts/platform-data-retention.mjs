@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const APPLY = process.argv.includes("--apply");
@@ -14,7 +14,7 @@ if (APPLY && process.env.PLATFORM_RETENTION_CONFIRM !== CONFIRMATION) {
   );
 }
 
-const sql = neon(DATABASE_URL);
+const sql = createIsolatedNeon(DATABASE_URL);
 const DAY_MS = 24 * 60 * 60 * 1000;
 const RUN_STARTED_AT = Date.now();
 

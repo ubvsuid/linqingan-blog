@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "production": {
+    "neonBranch": "main",
+    "endpointId": "ep-steep-hall-a6btsowh"
+  },
+  "nonProduction": {
+    "neonBranch": "gpt-work-dev",
+    "endpointId": "ep-misty-cloud-a6ldmtis"
+  }
+}

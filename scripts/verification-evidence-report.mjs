@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) {
@@ -6,7 +6,7 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 
 const [summary] = await sql`
   SELECT

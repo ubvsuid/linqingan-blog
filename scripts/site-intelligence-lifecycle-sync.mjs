@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { neon } from "@neondatabase/serverless";
+
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { actionSeed, snapshotSeed } from "./lib/site-intelligence-lifecycle.mjs";
 
 const args = process.argv.slice(2);
@@ -13,7 +14,7 @@ if (!databaseUrl) throw new Error("DATABASE_URL is required to persist Site Inte
 const signals = readJson("--signals");
 const queue = readJson("--queue");
 const windowDays = Math.max(1, Math.min(365, Number.parseInt(argValue("--window-days", "30"), 10) || 30));
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 const signalSnapshot = snapshotSeed("signals", signals.data, { windowDays });
 const queueSnapshot = snapshotSeed("action_queue", queue.data, { windowDays });
 const actionSeeds = (queue.data.actions ?? []).map(actionSeed);

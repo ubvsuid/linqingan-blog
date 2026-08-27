@@ -2,8 +2,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-import { neon } from "@neondatabase/serverless";
-
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { buildSiteAssetMaster } from "./lib/site-asset-master.mjs";
 import { classifyWarehouseObservation, resolveGscSource } from "./lib/site-intelligence-gsc.mjs";
 import { buildSiteIntelligenceSignals, renderSiteIntelligenceSignalsMarkdown } from "./lib/site-intelligence-signals.mjs";
@@ -92,7 +91,7 @@ async function readNeonSignals(days, gscOptions) {
     };
   }
 
-  const sql = neon(databaseUrl);
+  const sql = createIsolatedNeon(databaseUrl);
   const internalSearchRows = await sql`
     WITH query_clicks AS (
       SELECT search_query_id, count(*)::int AS clicks

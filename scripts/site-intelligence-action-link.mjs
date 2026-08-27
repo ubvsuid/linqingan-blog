@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 
 const args = process.argv.slice(2);
 function argValue(name, fallback = null) { const i = args.indexOf(name); return i >= 0 ? args[i + 1] ?? fallback : fallback; }
@@ -16,7 +16,7 @@ if (!fromActionId || !toActionId) throw new Error("--from-action-id and --to-act
 if (fromActionId === toActionId) throw new Error("An action cannot link to itself.");
 if (!VALID_TYPES.has(relationshipType)) throw new Error(`Invalid relationship type: ${relationshipType}`);
 
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 const existing = await sql`SELECT action_id FROM site_intelligence_actions WHERE action_id IN (${fromActionId}, ${toActionId});`;
 if (existing.length !== 2) throw new Error("Both action IDs must exist before creating a link.");
 

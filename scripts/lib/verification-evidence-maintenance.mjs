@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { neon } from "@neondatabase/serverless";
+import { createIsolatedNeon } from "./database-environment-isolation.mjs";
 
 const evidenceKeyPattern = /^EV-[A-F0-9]{20}$/;
 
@@ -14,7 +14,7 @@ export function requireDatabaseUrl() {
 }
 
 export function getEvidenceSql() {
-  return neon(requireDatabaseUrl());
+  return createIsolatedNeon(requireDatabaseUrl());
 }
 
 export function normalizeEvidenceKey(value) {

@@ -2,8 +2,8 @@ import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { neon } from "@neondatabase/serverless";
 
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { buildSiteAssetMaster } from "./lib/site-asset-master.mjs";
 import { GSC_GRAIN_CONTRACT, makeImportId } from "./lib/site-intelligence-foundation.mjs";
 import { parseGscCsv } from "./lib/site-intelligence-gsc-csv.mjs";
@@ -62,7 +62,7 @@ if (!commit) {
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) throw new Error("DATABASE_URL is required with --commit.");
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 const completedAt = new Date().toISOString();
 const observations = plan.accepted.map((row) => ({
   source_import_id: importId, period_start: row.periodStart, period_end: row.periodEnd,

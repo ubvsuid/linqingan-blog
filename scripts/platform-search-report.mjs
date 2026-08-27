@@ -2,8 +2,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-import { neon } from "@neondatabase/serverless";
-
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { loadContentAssetIndex } from "./lib/content-asset-index.mjs";
 import { buildPlatformSearchAnalysis, renderPlatformSearchMarkdown } from "./lib/platform-search-opportunities.mjs";
 
@@ -18,7 +17,7 @@ const daysArg = Number.parseInt(process.argv[2] ?? process.env.PLATFORM_REPORT_D
 const days = Number.isFinite(daysArg) ? Math.max(1, Math.min(daysArg, 365)) : 30;
 const markdownOutputPath = process.argv[3] ?? null;
 const jsonOutputPath = process.argv[4] ?? null;
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 
 function refreshContentRegistries() {
   for (const script of [

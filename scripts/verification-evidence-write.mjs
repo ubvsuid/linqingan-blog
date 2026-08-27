@@ -1,8 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { neon } from "@neondatabase/serverless";
-
+import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
 import { validateVerificationEvidencePayload } from "./lib/verification-evidence-validation.mjs";
 
 const args = process.argv.slice(2);
@@ -68,7 +67,7 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-const sql = neon(databaseUrl);
+const sql = createIsolatedNeon(databaseUrl);
 let inserted = 0;
 let skipped = 0;
 
