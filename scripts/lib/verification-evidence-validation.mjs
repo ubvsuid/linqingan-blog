@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 
+import { resolveContentIdentity } from "./content-identity-registry.mjs";
+
 export const VERIFICATION_EVIDENCE_BUNDLE_SCHEMA_VERSION = "linqingan-evidence-bundle/v1";
+export const VERIFICATION_EVIDENCE_IDENTITY_VERSION = 2;
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const captureRefPattern = /^capture:CAP-\d{8}-[A-Z0-9][A-Z0-9-]{2,80}$/;
@@ -114,8 +117,13 @@ function unwrapVerificationEvidencePayload(payload) {
 }
 
 export function buildVerificationEvidenceIdentity(record) {
+  const identityVersion = record.identityVersion ?? (record.contentId ? 2 : 1);
+  const owner = identityVersion >= 2 ? record.contentId : record.articleSlug;
+  if (!owner) throw new Error("Evidence identity requires contentId for v2 or articleSlug for legacy v1");
+
   return [
-    record.articleSlug,
+    `v${identityVersion}`,
+    owner,
     record.verificationType,
     record.apiName,
     record.sourceRef,
@@ -152,6 +160,7 @@ export function validateVerificationEvidenceRecord(input) {
 
   const articleSlug = requiredString(input.articleSlug, "articleSlug", 160);
   if (!slugPattern.test(articleSlug)) throw new Error("articleSlug must use the repository slug format");
+  const { contentId, contentGroupId } = resolveContentIdentity(articleSlug);
 
   const language = requiredString(input.language ?? "zh-CN", "language", 12);
   if (!supportedLanguages.has(language)) throw new Error("language must be zh-CN or en");
@@ -186,6 +195,9 @@ export function validateVerificationEvidenceRecord(input) {
 
   const sourceRef = validateCaptureSourceRef(requiredString(input.sourceRef, "sourceRef", 240));
   const normalized = {
+    identityVersion: VERIFICATION_EVIDENCE_IDENTITY_VERSION,
+    contentId,
+    contentGroupId,
     articleSlug,
     language,
     verificationType,

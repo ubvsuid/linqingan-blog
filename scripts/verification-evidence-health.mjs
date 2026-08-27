@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { resolveContentIdentity } from "./lib/content-identity-registry.mjs";
+import { createVerificationEvidenceKey } from "./lib/verification-evidence-validation.mjs";
 import { getEvidenceSql } from "./lib/verification-evidence-maintenance.mjs";
 
 const captureRefPattern = /^capture:CAP-\d{8}-[A-Z0-9][A-Z0-9-]{2,80}$/;
@@ -25,6 +27,9 @@ const sql = getEvidenceSql();
 const rows = await sql`
   SELECT
     evidence_key,
+    identity_version,
+    content_id,
+    content_group_id,
     article_slug,
     verification_type,
     status,
@@ -36,12 +41,12 @@ const rows = await sql`
     verified_at,
     revoked_at
   FROM verification_evidence
-  ORDER BY article_slug, verification_type, verified_at DESC;
+  ORDER BY content_id, verification_type, verified_at DESC;
 `;
 
 const duplicateIdentities = await sql`
   SELECT
-    article_slug,
+    content_id,
     verification_type,
     api_name,
     source_ref,
@@ -51,7 +56,7 @@ const duplicateIdentities = await sql`
     count(*)::int AS count
   FROM verification_evidence
   GROUP BY
-    article_slug,
+    content_id,
     verification_type,
     api_name,
     source_ref,
@@ -98,6 +103,43 @@ for (const row of rows) {
   if (!markdown) {
     issues.push({ severity: "error", evidence: row.evidence_key, issue: `orphan evidence: article ${row.article_slug} does not exist` });
   }
+
+  try {
+    const identity = resolveContentIdentity(row.article_slug);
+    if (identity.contentId !== row.content_id || identity.contentGroupId !== row.content_group_id) {
+      issues.push({
+        severity: "error",
+        evidence: row.evidence_key,
+        issue: `content identity mismatch for locator ${row.article_slug}`,
+      });
+    }
+  } catch (error) {
+    issues.push({
+      severity: "error",
+      evidence: row.evidence_key,
+      issue: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  if (![1, 2].includes(row.identity_version)) {
+    issues.push({ severity: "error", evidence: row.evidence_key, issue: `unsupported identity_version ${row.identity_version}` });
+  }
+  if (row.identity_version === 2) {
+    const expectedKey = createVerificationEvidenceKey({
+      identityVersion: 2,
+      contentId: row.content_id,
+      verificationType: row.verification_type,
+      apiName: row.api_name,
+      sourceRef: row.source_ref,
+      gameTime: row.game_time === null ? null : Number(row.game_time),
+      tickStart: row.tick_start === null ? null : Number(row.tick_start),
+      tickEnd: row.tick_end === null ? null : Number(row.tick_end),
+    });
+    if (expectedKey !== row.evidence_key) {
+      issues.push({ severity: "error", evidence: row.evidence_key, issue: `v2 evidence key does not match durable content identity (expected ${expectedKey})` });
+    }
+  }
+
   if (!captureRefPattern.test(row.source_ref ?? "")) {
     issues.push({ severity: "error", evidence: row.evidence_key, issue: `invalid source_ref: ${row.source_ref ?? "null"}` });
   }
@@ -141,12 +183,14 @@ for (const duplicate of duplicateIdentities) {
   issues.push({
     severity: "error",
     evidence: "—",
-    issue: `duplicate identity (${duplicate.count} rows): ${duplicate.article_slug} / ${duplicate.verification_type} / ${duplicate.api_name} / ${duplicate.source_ref}`,
+    issue: `duplicate durable identity (${duplicate.count} rows): ${duplicate.content_id} / ${duplicate.verification_type} / ${duplicate.api_name} / ${duplicate.source_ref}`,
   });
 }
 
 const summary = {
   rows: rows.length,
+  identityV1: rows.filter((row) => row.identity_version === 1).length,
+  identityV2: rows.filter((row) => row.identity_version === 2).length,
   captured: rows.filter((row) => row.status === "captured").length,
   reviewed: rows.filter((row) => row.status === "reviewed").length,
   accepted: rows.filter((row) => row.status === "accepted").length,
@@ -159,7 +203,7 @@ const summary = {
 console.log("Verification Evidence Integrity Report");
 console.table(summary);
 if (issues.length === 0) {
-  console.log("Integrity check passed: no evidence lifecycle, Markdown acceptance, duplicate identity, or identity sequence issues found.");
+  console.log("Integrity check passed: durable Content Identity ownership, evidence lifecycle, Markdown acceptance, duplicate identity, and identity sequence are consistent.");
   process.exit(0);
 }
 

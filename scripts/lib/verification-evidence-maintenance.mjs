@@ -30,6 +30,9 @@ export async function getEvidenceByKey(sql, evidenceKey) {
     SELECT
       id,
       evidence_key,
+      identity_version,
+      content_id,
+      content_group_id,
       article_slug,
       language,
       verification_type,
@@ -135,7 +138,9 @@ export function printEvidenceSummary(evidence) {
       ? `${evidence.tick_start}-${evidence.tick_end}`
       : "—";
   console.log(`Evidence: ${evidence.evidence_key}`);
-  console.log(`Article: ${evidence.article_slug}`);
+  console.log(`Identity: v${evidence.identity_version} ${evidence.content_id}`);
+  console.log(`Content group: ${evidence.content_group_id}`);
+  console.log(`Article locator: ${evidence.article_slug}`);
   console.log(`Type: ${evidence.verification_type}`);
   console.log(`Status: ${evidence.status}`);
   console.log(`API: ${evidence.api_name}`);

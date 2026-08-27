@@ -52,7 +52,7 @@ for (const record of records) {
       : "";
   const gameTime = record.gameTime !== null ? ` Game.time=${record.gameTime}` : "";
   console.log(
-    `- ${record.evidenceKey} | ${record.articleSlug} | captured | ${record.verificationType} | ${record.apiName}${gameTime}${tickWindow} | ${record.sourceRef} | ${record.verifiedAt}`,
+    `- ${record.evidenceKey} | identity=v${record.identityVersion} ${record.contentId} | ${record.articleSlug} | captured | ${record.verificationType} | ${record.apiName}${gameTime}${tickWindow} | ${record.sourceRef} | ${record.verifiedAt}`,
   );
 }
 
@@ -78,6 +78,9 @@ for (const record of records) {
   const created = await sql`
     INSERT INTO verification_evidence (
       evidence_key,
+      identity_version,
+      content_id,
+      content_group_id,
       article_slug,
       language,
       verification_type,
@@ -96,6 +99,9 @@ for (const record of records) {
       verified_at
     ) VALUES (
       ${record.evidenceKey},
+      ${record.identityVersion},
+      ${record.contentId},
+      ${record.contentGroupId},
       ${record.articleSlug},
       ${record.language},
       ${record.verificationType},
@@ -113,13 +119,13 @@ for (const record of records) {
       ${record.sourceRef},
       ${record.verifiedAt}::timestamptz
     )
-    ON CONFLICT (evidence_key) DO NOTHING
+    ON CONFLICT DO NOTHING
     RETURNING evidence_key;
   `;
 
   if (created.length === 0) {
     skipped += 1;
-    console.log(`Skipped existing evidence: ${record.evidenceKey}`);
+    console.log(`Skipped existing evidence identity: ${record.evidenceKey}`);
     continue;
   }
 

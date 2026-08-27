@@ -5,6 +5,7 @@ const root = process.cwd();
 const checks = [
   ["Environment isolation", "scripts/check-environment-isolation.mjs"],
   ["Backup / Recovery", "scripts/check-backup-recovery.mjs"],
+  ["Evidence Model", "scripts/check-evidence-model.mjs"],
   ["Knowledge generated registry freshness", "scripts/generate-knowledge-article-registry.mjs", "--check"],
   ["Beginner generated registry freshness", "scripts/generate-beginner-roadmap-registry.mjs", "--check"],
   ["Content Metadata Schema V1 contract", "scripts/check-content-metadata-schema-contract.mjs"],

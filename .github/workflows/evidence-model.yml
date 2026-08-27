@@ -1,0 +1,35 @@
+name: Evidence Model
+
+on:
+  pull_request:
+  push:
+    branches:
+      - clean-blog-v1
+      - gpt-work
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify canonical Evidence Model
+        run: node scripts/check-evidence-model.mjs
+
+      - name: Verify existing Evidence pipeline compatibility
+        run: node scripts/check-verification-evidence-pipeline.mjs
