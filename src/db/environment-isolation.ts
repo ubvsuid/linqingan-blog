@@ -2,10 +2,6 @@ import environmentPolicy from "../../database/environment-policy.json";
 
 type DatabaseRuntime = "production" | "non-production";
 
-type RuntimeEnvironment = {
-  VERCEL_ENV?: string;
-};
-
 function isApprovedNeonHost(hostname: string, endpointId: string): boolean {
   const normalizedHostname = hostname.toLowerCase();
   const normalizedEndpointId = endpointId.toLowerCase();
@@ -19,7 +15,7 @@ function isApprovedNeonHost(hostname: string, endpointId: string): boolean {
 }
 
 export function getDatabaseRuntime(
-  environment: RuntimeEnvironment = process.env,
+  environment: NodeJS.ProcessEnv = process.env,
 ): DatabaseRuntime {
   const vercelEnvironment = environment.VERCEL_ENV?.trim().toLowerCase();
 
@@ -34,7 +30,7 @@ export function getDatabaseRuntime(
 
 export function assertDatabaseEnvironment(
   databaseUrl: string,
-  environment: RuntimeEnvironment = process.env,
+  environment: NodeJS.ProcessEnv = process.env,
 ): void {
   const runtime = getDatabaseRuntime(environment);
   const target =
