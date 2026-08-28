@@ -11,9 +11,9 @@ import {
 import styles from "./verified.module.css";
 
 export const metadata = createPageMetadata({
-  title: "最近验证的 Screeps 内容",
+  title: "Runtime Evidence Hub | Screeps 运行证据",
   description:
-    "查看已经获得 Screeps Console 或真实主循环验证证据的文章，并按验证级别、API 和返回码筛选受控 Runtime Evidence。",
+    "查看已接受的 Screeps Console 与真实主循环 Runtime Evidence，并按验证级别、API、返回码和时间筛选可核对的文章结论。",
   path: "/verified",
 });
 
@@ -32,14 +32,19 @@ export default async function VerifiedPage() {
           <span aria-hidden="true">/</span>
           <Link href="/verification">验证方法</Link>
           <span aria-hidden="true">/</span>
-          <span>最近验证</span>
+          <span>Runtime Evidence Hub</span>
         </nav>
 
         <header className="page-header">
-          <p className="eyebrow">RECENTLY VERIFIED</p>
-          <h1>最近验证的 Screeps 内容</h1>
+          <p className="eyebrow">RUNTIME EVIDENCE HUB</p>
+          <h1>这条 Screeps 结论，实际跑过吗？</h1>
           <p>
-            这里不会把“文档核对”或“离线模拟”自动升级成真实环境验证。只有文章验证字段已经明确接受 Screeps Console 或真实主循环证据时，才会进入这个列表；结构化证据只负责补充可核对的运行细节。
+            这里把文章结论和已接受的 Screeps Console / Live Runtime Evidence 连起来。你可以直接看到证据来自哪个运行级别、涉及哪个 API 和返回码、什么时候验证，以及当时记录了什么；文档核对和离线模拟不会被冒充成真实 Runtime。
+          </p>
+          <p>
+            <Link href="/diagnostics">从症状开始诊断 →</Link>{" · "}
+            <Link href="/search">搜索 API / 错误码 →</Link>{" · "}
+            <Link href="/verification">了解验证边界 →</Link>
           </p>
         </header>
 
