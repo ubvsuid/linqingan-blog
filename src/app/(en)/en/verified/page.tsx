@@ -11,9 +11,9 @@ import {
 import styles from "../english.module.css";
 
 export const metadata = createEnglishPageMetadata({
-  title: "Recently Verified Screeps Guides",
+  title: "Screeps Runtime Evidence Hub",
   description:
-    "Browse English Screeps guides whose shared source records include accepted Console testing or live multi-tick room verification.",
+    "Inspect accepted Screeps Console and live multi-tick runtime evidence with API, return-code, environment, verification-time, and linked-guide context.",
   path: "/en/verified",
   chinesePath: "/verified",
 });
@@ -28,18 +28,22 @@ function formatEnglishDate(value: string): string {
 }
 
 function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
-  const parts: string[] = [evidence.evidenceKey, evidence.apiName];
+  const parts: string[] = [evidence.type === "live" ? "Live Runtime" : "Screeps Console", evidence.apiName];
   if (evidence.returnCode) parts.push(`returned ${evidence.returnCode}`);
+  if (evidence.shard) parts.push(evidence.shard);
+  if (evidence.roomName) parts.push(evidence.roomName);
   if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
   if (evidence.tickStart !== null && evidence.tickEnd !== null) {
     parts.push(`ticks ${evidence.tickStart}–${evidence.tickEnd}`);
   }
+  parts.push(`verified ${formatEnglishDate(evidence.verifiedAt.slice(0, 10))}`);
   return parts.join(" · ");
 }
 
 export default async function EnglishVerifiedPage() {
   const verifiedPosts = await getVerifiedContentWithEvidence("en");
   const { liveCount, consoleCount } = getVerifiedContentSummary(verifiedPosts);
+  const evidenceCount = verifiedPosts.reduce((total, post) => total + post.evidenceCount, 0);
 
   return (
     <main className={styles.page} lang="en">
@@ -49,14 +53,19 @@ export default async function EnglishVerifiedPage() {
           <span aria-hidden="true">/</span>
           <Link href="/en/verification">Verification</Link>
           <span aria-hidden="true">/</span>
-          <span>Recently verified</span>
+          <span>Runtime Evidence Hub</span>
         </nav>
 
         <header className={styles.header}>
-          <p className="eyebrow">RECENTLY VERIFIED</p>
-          <h1>Screeps guides with recorded runtime evidence</h1>
+          <p className="eyebrow">RUNTIME EVIDENCE HUB</p>
+          <h1>Was this Screeps conclusion actually run?</h1>
           <p>
-            Documentation review and offline simulation do not automatically count as live proof. A guide appears here only after its shared Markdown verification state explicitly accepts Console or live multi-tick evidence; structured evidence then adds bounded runtime detail.
+            This hub connects accepted guide claims to Screeps Console or live multi-tick runtime evidence. You can inspect the runtime level, API, return code, environment, verification time, and recorded observation instead of treating documentation review or offline simulation as live proof.
+          </p>
+          <p>
+            <Link href="/en/diagnostics">Start from a symptom →</Link>{" · "}
+            <Link href="/en/search">Search APIs and return codes →</Link>{" · "}
+            <Link href="/en/verification">Read the verification boundary →</Link>
           </p>
         </header>
 
@@ -71,10 +80,15 @@ export default async function EnglishVerifiedPage() {
             <h2>{liveCount}</h2>
             <p>English guides mapped to source articles with accepted live multi-tick room evidence.</p>
           </article>
+          <article className={styles.card}>
+            <p className="eyebrow">ACCEPTED EVIDENCE</p>
+            <h2>{evidenceCount}</h2>
+            <p>Structured runtime records that also pass the guide-level Markdown acceptance boundary.</p>
+          </article>
         </section>
 
         {verifiedPosts.length > 0 ? (
-          <section className={styles.knowledgeModules} aria-label="Verified guides">
+          <section className={styles.knowledgeModules} aria-label="Runtime evidence records">
             {verifiedPosts.map((post, index) => (
               <article className={styles.knowledgeModule} key={post.id}>
                 <div className={styles.knowledgeModuleHeader}>
@@ -90,13 +104,25 @@ export default async function EnglishVerifiedPage() {
                       {post.testEnvironment ? ` · ${post.testEnvironment}` : ""}
                       {post.evidenceCount > 0 ? ` · ${post.evidenceCount} structured evidence record${post.evidenceCount === 1 ? "" : "s"}` : ""}
                     </small>
-                    {post.latestEvidence ? (
+                    {post.evidence.length > 0 ? (
+                      <div>
+                        <strong>Accepted Runtime Evidence</strong>
+                        {post.evidence.slice(0, 4).map((evidence) => (
+                          <p key={evidence.evidenceKey}>
+                            {formatEvidencePreview(evidence)}{evidence.note ? ` · ${evidence.note}` : ""}
+                          </p>
+                        ))}
+                      </div>
+                    ) : post.latestEvidence ? (
                       <p>
-                        <strong>Latest structured evidence:</strong>{" "}
-                        {formatEvidencePreview(post.latestEvidence)} · {post.latestEvidence.note}
+                        <strong>Latest Runtime Evidence:</strong>{" "}
+                        {formatEvidencePreview(post.latestEvidence)}{post.latestEvidence.note ? ` · ${post.latestEvidence.note}` : ""}
                       </p>
                     ) : null}
-                    <p><Link href={post.href}>Open guide verification status →</Link></p>
+                    <p>
+                      <Link href={post.href}>Open guide verification status →</Link>{" · "}
+                      <Link href={`/en/search?q=${encodeURIComponent(post.evidence[0]?.apiName ?? post.title)}`}>Continue troubleshooting →</Link>
+                    </p>
                   </div>
                 </div>
               </article>

@@ -22,6 +22,7 @@ export interface VerifiedEvidencePreview {
   tickStart: number | null;
   tickEnd: number | null;
   note: string;
+  verifiedAt: string;
 }
 
 export interface VerifiedContentRecord {
@@ -114,6 +115,7 @@ function toEvidencePreview(record: PublicVerificationEvidenceRecord): VerifiedEv
     tickStart: record.tickStart,
     tickEnd: record.tickEnd,
     note: record.evidenceNote,
+    verifiedAt: record.verifiedAt,
   };
 }
 

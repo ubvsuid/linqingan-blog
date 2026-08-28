@@ -116,8 +116,10 @@
 .verification { display: grid; gap: 14px; padding: 24px 28px; background: color-mix(in srgb, var(--surface) 94%, var(--text)); }
 .verification > div:first-child { display: flex; justify-content: space-between; gap: 18px; }
 .verification span { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.verifiedLinks { display: grid; gap: 8px; }
+.verifiedLinks { display: grid; gap: 10px; }
+.verifiedLinks > div { display: grid; gap: 4px; padding-left: 12px; border-left: 2px solid var(--border); }
 .verifiedLinks a { width: fit-content; font-size: 13px; }
+.verifiedLinks span { font-size: 12px; overflow-wrap: anywhere; }
 .verification nav { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; }
 
 @media (max-width: 760px) {

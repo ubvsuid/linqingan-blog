@@ -8,8 +8,8 @@ import { getEnglishInitialSearchDocuments } from "@/lib/english-search";
 import styles from "../english.module.css";
 
 export const metadata = createEnglishPageMetadata({
-  title: "Search the English Screeps Section",
-  description: "Search English Screeps guides, references, tools, roadmap pages, and knowledge topics on Linqingan.",
+  title: "Search and Diagnose Screeps Problems",
+  description: "Search English Screeps guides, return codes, APIs, tools, and then continue through symptom diagnostics and accepted Runtime Evidence.",
   path: "/en/search",
   chinesePath: "/search",
   noindex: true,
@@ -31,10 +31,22 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
           <Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Search</span>
         </nav>
         <header className={styles.header}>
-          <p className="eyebrow">SEARCH</p>
-          <h1>Search the English section</h1>
-          <p>Search published English guides, the beginner roadmap, knowledge topics, glossary, error codes, verification method, and working tools.</p>
+          <p className="eyebrow">SEARCH + DIAGNOSTICS</p>
+          <h1>Start with the problem, not just a page title</h1>
+          <p>Search discovers the most relevant guides, references, return codes, and tools. When the answer is still uncertain, continue through symptom diagnostics, API surfaces, and accepted Runtime Evidence.</p>
         </header>
+
+        <div className={styles.notice}>
+          <strong>Problem-solving path</strong>
+          <p>Problem → likely cause → return code / API → guide / tool → accepted Runtime Evidence.</p>
+          <p>
+            <Link href="/en/diagnostics">Symptom diagnostics →</Link>{" · "}
+            <Link href="/en/screeps-api">API reference →</Link>{" · "}
+            <Link href="/en/screeps-errors">Return codes →</Link>{" · "}
+            <Link href="/en/verified">Runtime Evidence Hub →</Link>
+          </p>
+        </div>
+
         <EnglishSiteSearch initialQuery={initialQuery} initialDocuments={initialDocuments} />
       </Container>
     </main>
