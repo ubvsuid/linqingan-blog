@@ -12,7 +12,10 @@ import {
 import { getLocalizedScreepsApiReference } from "@/lib/screeps-api-reference-localized";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
-import { getVerifiedContentWithEvidence } from "@/lib/verified-content";
+import {
+  getVerifiedContentWithEvidence,
+  type VerifiedEvidencePreview,
+} from "@/lib/verified-content";
 
 import styles from "./screeps-diagnostic-center.module.css";
 
@@ -29,6 +32,23 @@ function uniqueStrings(items: readonly string[]): string[] {
   return [...new Set(items)];
 }
 
+function formatRuntimeEvidence(
+  evidence: VerifiedEvidencePreview,
+  isEnglish: boolean,
+): string {
+  const parts = [
+    evidence.type === "live" ? "LIVE" : "CONSOLE",
+    evidence.apiName,
+  ];
+  if (evidence.returnCode) {
+    parts.push(isEnglish ? `return ${evidence.returnCode}` : `返回 ${evidence.returnCode}`);
+  }
+  if (evidence.shard) parts.push(evidence.shard);
+  if (evidence.roomName) parts.push(evidence.roomName);
+  parts.push(evidence.verifiedAt.slice(0, 10));
+  return parts.join(" · ");
+}
+
 export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagnosticLocale }) {
   const isEnglish = locale === "en";
   const apiEntries = getLocalizedScreepsApiReference(locale);
@@ -36,6 +56,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
   const errorMap = new Map(screepsErrorCodes.map((error) => [error.name, error] as const));
   const apiRootHref = isEnglish ? "/en/screeps-api" : "/screeps-api";
   const errorsRootHref = isEnglish ? "/en/screeps-errors" : "/screeps-errors";
+  const searchRootHref = isEnglish ? "/en/search" : "/search";
   const verificationHref = isEnglish ? "/en/verification" : "/verification";
   const coverageHref = isEnglish ? "/en/verification/coverage" : "/verification/coverage";
   const verifiedHref = isEnglish ? "/en/verified" : "/verified";
@@ -44,7 +65,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
     ? {
         eyebrow: "SYMPTOM-FIRST DIAGNOSTICS",
         title: "Start from what you see in the room",
-        body: "You do not need to know the error constant first. Pick the visible symptom, run the quick triage, then continue into the most relevant return codes, APIs, guides, tools, and accepted runtime verification.",
+        body: "You do not need to know the error constant first. Pick the visible symptom, run the quick triage, then continue through return codes, APIs, focused guides, tools, and accepted Runtime Evidence as one problem-solving path.",
         paths: "symptom paths",
         triage: "Quick triage",
         errors: "Most likely return-code branches",
@@ -56,18 +77,20 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
         moreHubs: "More related object hubs",
         guides: "Focused guides",
         tools: "Useful tools",
-        verification: "Runtime verification",
+        verification: "Accepted Runtime Evidence",
         noVerified: "No related public Console/live verified guide is accepted yet.",
         verifiedCount: "accepted verified guide(s)",
+        evidenceDetail: "Evidence detail",
+        searchProblem: "Search this symptom",
         verificationMethod: "Verification method",
         coverage: "Verification coverage",
-        recentlyVerified: "Recently verified",
+        recentlyVerified: "Runtime Evidence Hub",
         errorReference: "All error codes",
       }
     : {
         eyebrow: "SYMPTOM-FIRST DIAGNOSTICS",
         title: "从你在房间里看到的现象开始",
-        body: "不需要先记住错误码。先选择可见症状，执行快速排查，再进入最相关的返回码、API、专题教程、工具与已接受 Runtime Verification；次要关系按需展开。",
+        body: "不需要先记住错误码。先选择可见症状，执行快速排查，再沿着“返回码 → API → 教程/工具 → accepted Runtime Evidence”完成同一条问题解决路径；次要关系按需展开。",
         paths: "条症状路径",
         triage: "快速排查",
         errors: "最可能的返回码",
@@ -79,12 +102,14 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
         moreHubs: "更多相关对象 Hub",
         guides: "专题教程",
         tools: "实用工具",
-        verification: "Runtime Verification",
+        verification: "已接受 Runtime Evidence",
         noVerified: "当前还没有与这条症状路径相关的公开 Console / Live 已接受验证文章。",
         verifiedCount: "篇已接受验证文章",
+        evidenceDetail: "证据细节",
+        searchProblem: "搜索这个症状",
         verificationMethod: "验证方法",
         coverage: "验证覆盖",
-        recentlyVerified: "最近验证",
+        recentlyVerified: "Runtime Evidence Hub",
         errorReference: "全部错误码",
       };
 
@@ -178,6 +203,8 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
           const verificationHrefSet = new Set(guides.map((guide) => guide.href));
           const relatedVerified = verified.filter((record) => verificationHrefSet.has(record.href));
           const triage = isEnglish ? symptom.enTriage : symptom.zhTriage;
+          const symptomTitle = isEnglish ? symptom.enTitle : symptom.zhTitle;
+          const symptomSearchHref = `${searchRootHref}?q=${encodeURIComponent(symptomTitle)}`;
 
           const renderErrorLink = (name: string) => {
             const error = errorMap.get(name);
@@ -195,7 +222,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
               <header className={styles.cardHead}>
                 <div>
                   <span>{isEnglish ? "SYMPTOM" : "症状"}</span>
-                  <h3>{isEnglish ? symptom.enTitle : symptom.zhTitle}</h3>
+                  <h3>{symptomTitle}</h3>
                 </div>
                 <p>{isEnglish ? symptom.enSummary : symptom.zhSummary}</p>
               </header>
@@ -278,11 +305,19 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
                 {relatedVerified.length > 0 ? (
                   <div className={styles.verifiedLinks}>
                     {relatedVerified.slice(0, 3).map((record) => (
-                      <Link href={record.href} key={record.href}>{record.liveTested ? "LIVE" : "CONSOLE"} · {record.title}</Link>
+                      <div key={record.href}>
+                        <Link href={record.href}>{record.liveTested ? "LIVE" : "CONSOLE"} · {record.title}</Link>
+                        {record.evidence.slice(0, 2).map((evidence) => (
+                          <span key={evidence.evidenceKey}>
+                            {formatRuntimeEvidence(evidence, isEnglish)}{evidence.note ? ` · ${evidence.note}` : ""}
+                          </span>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 ) : null}
                 <nav aria-label={copy.verification}>
+                  <Link href={symptomSearchHref}>{copy.searchProblem}</Link>
                   <Link href={verificationHref}>{copy.verificationMethod}</Link>
                   <Link href={`${coverageHref}#coverage-${symptom.id}`}>{copy.coverage}</Link>
                   <Link href={verifiedHref}>{copy.recentlyVerified}</Link>
