@@ -8,13 +8,20 @@ import type { VerifiedContentRecord, VerifiedEvidencePreview } from "@/lib/verif
 
 import styles from "./verified-content-explorer.module.css";
 
+function formatEvidenceType(evidence: VerifiedEvidencePreview): string {
+  return evidence.type === "live" ? "Live Runtime" : "Screeps Console";
+}
+
 function formatEvidencePreview(evidence: VerifiedEvidencePreview): string {
-  const parts: string[] = [evidence.evidenceKey, evidence.apiName];
+  const parts: string[] = [formatEvidenceType(evidence), evidence.apiName];
   if (evidence.returnCode) parts.push(`返回 ${evidence.returnCode}`);
+  if (evidence.shard) parts.push(evidence.shard);
+  if (evidence.roomName) parts.push(evidence.roomName);
   if (evidence.gameTime !== null) parts.push(`Game.time ${evidence.gameTime}`);
   if (evidence.tickStart !== null && evidence.tickEnd !== null) {
     parts.push(`Tick ${evidence.tickStart}–${evidence.tickEnd}`);
   }
+  parts.push(`验证于 ${formatDate(evidence.verifiedAt.slice(0, 10))}`);
   return parts.join(" · ");
 }
 
@@ -65,9 +72,9 @@ export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecor
     <section className={styles.explorer} aria-labelledby="verified-explorer-title">
       <div className={styles.filterPanel}>
         <div>
-          <p className="eyebrow">FILTER EVIDENCE</p>
-          <h2 id="verified-explorer-title">按验证级别、API、返回码或时间筛选</h2>
-          <p>筛选只使用已经通过文章验证边界并进入公开列表的 accepted Evidence。</p>
+          <p className="eyebrow">RUNTIME EVIDENCE HUB</p>
+          <h2 id="verified-explorer-title">从运行证据反查 API、返回码与文章结论</h2>
+          <p>这里只展示同时通过 Evidence 审核和文章 Markdown 验证状态的 accepted Evidence。Console 与 Live 是运行证据；文档核对、离线推演不会被冒充成真实 Runtime。</p>
         </div>
         <div className={styles.filters}>
           <label>
@@ -121,7 +128,7 @@ export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecor
       </p>
 
       {filteredPosts.length > 0 ? (
-        <div className={styles.list} aria-label="筛选后的已验证文章">
+        <div className={styles.list} aria-label="筛选后的 Runtime Evidence">
           {filteredPosts.map((post) => (
             <article key={post.id}>
               <div className={styles.evidenceMeta}>
@@ -135,18 +142,22 @@ export function VerifiedContentExplorer({ posts }: { posts: VerifiedContentRecor
                 <p>{post.description}</p>
                 {post.evidence.length > 0 ? (
                   <div className={styles.runtimeEvidence}>
-                    <strong>已接受的结构化证据</strong>
+                    <strong>已接受的 Runtime Evidence</strong>
                     {post.evidence.slice(0, 4).map((evidence) => (
-                      <span key={evidence.evidenceKey}>{formatEvidencePreview(evidence)}</span>
+                      <span key={evidence.evidenceKey}>
+                        {formatEvidencePreview(evidence)}
+                        {evidence.note ? ` · ${evidence.note}` : ""}
+                      </span>
                     ))}
                   </div>
                 ) : post.latestEvidence ? (
                   <div className={styles.runtimeEvidence}>
-                    <strong>最近一条结构化证据</strong>
-                    <span>{formatEvidencePreview(post.latestEvidence)}</span>
+                    <strong>最近一条 Runtime Evidence</strong>
+                    <span>{formatEvidencePreview(post.latestEvidence)}{post.latestEvidence.note ? ` · ${post.latestEvidence.note}` : ""}</span>
                   </div>
                 ) : null}
                 <Link className={styles.articleLink} href={post.href}>查看文章验证状态 →</Link>
+                <Link className={styles.articleLink} href={`/search?q=${encodeURIComponent(post.evidence[0]?.apiName ?? post.title)}`}>用搜索继续排查 →</Link>
               </div>
             </article>
           ))}
