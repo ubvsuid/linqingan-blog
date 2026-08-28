@@ -1,0 +1,30 @@
+name: Product Experience V1
+
+on:
+  push:
+    branches:
+      - gpt-work
+  pull_request:
+    branches:
+      - clean-blog-v1
+
+permissions:
+  contents: read
+
+jobs:
+  product-experience:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Product experience gate
+        run: node scripts/check-product-experience-v1.mjs
+      - name: Dependency security audit
+        run: npm audit --audit-level=high
+      - name: Type check
+        run: npm run typecheck
