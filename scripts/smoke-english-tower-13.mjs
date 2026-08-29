@@ -12,6 +12,15 @@ const articles = [
     seoTitle:
       "Screeps Tower.attack(): Verify One Multi-Tower Volley",
     query: "Tower.attack event",
+    modifiedAt: "2026-08-01",
+    tocAnchor: "use-this-guide",
+    tocHeading: "Use this guide when",
+    expectsFaq: false,
+    verificationSignals: [
+      "Screeps Console test",
+      "Live multi-tick verification",
+      "Pending",
+    ],
     signals: [
       "EVENT_ATTACK_TYPE_RANGED",
       "verified-tower-volley",
@@ -27,17 +36,27 @@ const articles = [
     chinesePath:
       "/blog/screeps-tower-heal-creeps",
     headline:
-      "Heal Owned Creeps and Power Creeps Without Guessing the Result",
+      "How to Make Towers Heal the Creep That Needs It Most",
     seoTitle:
-      "Screeps Tower.heal(): Verify Exact Heal Events",
-    query: "Tower.heal event",
+      "Screeps Tower Healing: Injury Ratio, Missing Hits, and Range",
+    query: "Tower heal Creeps",
+    modifiedAt: "2026-08-28",
+    tocAnchor: "quick-answer",
+    tocHeading: "Quick answer",
+    expectsFaq: true,
+    verificationSignals: [
+      "Screeps Console test",
+      "Live Tower heal, falloff, Tower power effects, over-heal and multi-target allocation test",
+      "Pending",
+    ],
     signals: [
-      "FIND_MY_POWER_CREEPS",
-      "EVENT_HEAL_TYPE_RANGED",
-      "verified-tower-healing",
-      "allocateTowerHealing",
-      "room.getEventLog()",
-      "Live Power Creep, falloff, Power effect, incoming damage, over-heal and multi-target event test",
+      "FIND_MY_CREEPS",
+      "TOWER_ENERGY_COST",
+      "heal-partial",
+      "Memory.towerHealing",
+      "targetVisible",
+      "hitsBefore",
+      "hitsNow",
     ],
   },
   {
@@ -50,6 +69,15 @@ const articles = [
     seoTitle:
       "Screeps Tower.repair(): Verify Exact Repair Events",
     query: "Tower.repair event",
+    modifiedAt: "2026-08-01",
+    tocAnchor: "use-this-guide",
+    tocHeading: "Use this guide when",
+    expectsFaq: false,
+    verificationSignals: [
+      "Screeps Console test",
+      "Live multi-tick verification",
+      "Pending",
+    ],
     signals: [
       "EVENT_REPAIR",
       "energySpent",
@@ -86,19 +114,17 @@ for (const article of articles) {
     article.headline,
     article.seoTitle,
     "Verification status",
-    "Screeps Console test",
-    "Live multi-tick verification",
-    "Pending",
+    ...article.verificationSignals,
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `href="#use-this-guide"`,
-    `<h2 id="use-this-guide">Use this guide when</h2>`,
+    `href="#${article.tocAnchor}"`,
+    `<h2 id="${article.tocAnchor}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
     `"datePublished":"2026-07-26"`,
-    `"dateModified":"2026-08-01"`,
+    `"dateModified":"${article.modifiedAt}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(
@@ -107,15 +133,29 @@ for (const article of articles) {
     }
   }
 
-  for (const prohibited of [
-    `"@type":"FAQPage"`,
-    `href="#quick-answer"`,
-    `<h2 id="faq">`,
-  ]) {
-    if (body.includes(prohibited)) {
-      failures.push(
-        `${article.path}: still contains “${prohibited}”`,
-      );
+  if (article.expectsFaq) {
+    for (const expected of [
+      `"@type":"FAQPage"`,
+      `href="#faq"`,
+      `<h2 id="faq">Frequently asked questions</h2>`,
+    ]) {
+      if (!body.includes(expected)) {
+        failures.push(
+          `${article.path}: missing “${expected}”`,
+        );
+      }
+    }
+  } else {
+    for (const prohibited of [
+      `"@type":"FAQPage"`,
+      `href="#quick-answer"`,
+      `<h2 id="faq">`,
+    ]) {
+      if (body.includes(prohibited)) {
+        failures.push(
+          `${article.path}: still contains “${prohibited}”`,
+        );
+      }
     }
   }
 
@@ -159,13 +199,26 @@ const healBody = await (
   )
 ).text();
 if (
-  !healBody.includes("FIND_MY_POWER_CREEPS")
-  || !healBody.includes("EVENT_HEAL_TYPE_RANGED")
-  || !healBody.includes("verified-tower-healing")
+  !healBody.includes("FIND_MY_CREEPS")
+  || !healBody.includes("heal-partial")
+  || !healBody.includes("Memory.towerHealing")
+  || !healBody.includes("targetVisible")
 ) {
   failures.push(
-    "Tower heal page lacks Power Creep or exact event boundaries",
+    "Tower heal page lacks the current regular-Creep priority or later-observation workflow",
   );
+}
+for (const superseded of [
+  "FIND_MY_POWER_CREEPS",
+  "verified-tower-healing",
+  "EVENT_HEAL_TYPE_RANGED",
+  "allocateTowerHealing",
+]) {
+  if (healBody.includes(superseded)) {
+    failures.push(
+      `Tower heal page still exposes superseded 2026-08-01 signal: ${superseded}`,
+    );
+  }
 }
 
 const repairBody = await (
@@ -230,11 +283,11 @@ if (failures.length > 0) {
     console.error(`ERROR: ${failure}`),
   );
   console.error(
-    `\nDeep Tower event production smoke failed: ${failures.length} issue(s).`,
+    `\nTower 13 production smoke failed: ${failures.length} issue(s).`,
   );
   process.exit(1);
 }
 
 console.log(
-  "Deep Tower event production smoke passed: 3 existing pages, exact prior-tick attack/heal/repair actor-target events, Power Creep healing, Pending live evidence, Canonical, hreflang, BlogPosting, search, and Sitemap.",
+  "Tower 13 production smoke passed: attack and repair preserve exact-event workflows; Tower heal uses the current regular-Creep priority and later-observation workflow; canonical, hreflang, structured data, search, blog index, and Sitemap are current.",
 );
