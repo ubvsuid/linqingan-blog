@@ -207,6 +207,29 @@ const curatedRelatedArticleHrefs: Record<string, string[]> = {
   ],
 };
 
+const editorialMetadataOverrides: Record<string, Partial<EnglishArticleRecord>> = {
+  "/en/blog/screeps-first-room": {
+    description:
+      "Open a Screeps Room, switch to the code editor and player Console, then use read-only checks to match exact Room, Spawn, Creep, Source, and Controller data.",
+    readingTime: "7 min read",
+    searchIntent:
+      "Beginner interface orientation that opens the Room view, code editor, and player Console before using read-only current-tick checks for real account object names and visibility",
+    updatedAt: "2026-08-28",
+  },
+  "/en/blog/screeps-spawn-exit-blocked-directions": {
+    description:
+      "Confirm a blocked Screeps Spawn exit from current spawning state and all eight adjacent tiles, then fix direction policy without confusing accepted intents with observed birth.",
+    readingTime: "14 min read",
+    updatedAt: "2026-08-28",
+  },
+  "/en/blog/screeps-cpu-bucket-degradation": {
+    description:
+      "Build a four-mode Screeps CPU degradation scheduler with hysteresis, consecutive-tick confirmation, critical-first task tiers, stable staggering, CPU headroom guards, and gradual recovery.",
+    readingTime: "22 min read",
+    updatedAt: "2026-08-29",
+  },
+};
+
 function articleText(article: EnglishArticleRecord): string {
   return [
     article.category,
@@ -257,23 +280,27 @@ function getTags(article: EnglishArticleRecord): TagRule[] {
 }
 
 export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEnglishArticles.map((article) => {
-  const moduleNumber = getEnglishKnowledgeModuleNumber(article);
+  const editorialArticle: EnglishArticleRecord = {
+    ...article,
+    ...(editorialMetadataOverrides[article.href] ?? {}),
+  };
+  const moduleNumber = getEnglishKnowledgeModuleNumber(editorialArticle);
   const knowledgeModuleTitle = englishKnowledgeModules.find((module) => module.number === moduleNumber)?.title ?? "Operations and Debugging";
-  const isGettingStartedArticle = gettingStartedArticleHrefs.has(article.href);
+  const isGettingStartedArticle = gettingStartedArticleHrefs.has(editorialArticle.href);
   const moduleTitle = isGettingStartedArticle ? "Getting Started" : knowledgeModuleTitle;
   const moduleHref = isGettingStartedArticle
     ? "/en/beginner"
     : `/en/blog?module=${encodeURIComponent(moduleTitle)}`;
-  const tags = getTags(article);
-  const updatedAt = (article as EnglishArticleRecord & { updatedAt?: string }).updatedAt ?? article.publishedAt;
+  const tags = getTags(editorialArticle);
+  const updatedAt = editorialArticle.updatedAt ?? editorialArticle.publishedAt;
 
   return {
-    ...article,
+    ...editorialArticle,
     moduleNumber,
     moduleTitle,
     moduleHref,
-    difficulty: getDifficulty(article),
-    contentType: getContentType(article),
+    difficulty: getDifficulty(editorialArticle),
+    contentType: getContentType(editorialArticle),
     tags: tags.map((tag) => tag.label),
     tagSlugs: tags.map((tag) => tag.slug),
     updatedAt,
