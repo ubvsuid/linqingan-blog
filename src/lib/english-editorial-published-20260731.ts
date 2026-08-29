@@ -16,6 +16,7 @@ import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-ru
 import { englishEditorialSpawnRouteMemoryOverrides20260731 } from "./english-editorial-spawn-route-memory-overrides-20260731";
 import { englishEditorialTargetsVisualModulesOverrides20260731 } from "./english-editorial-targets-visual-modules-overrides-20260731";
 import { englishEditorialTowerEventsOverrides20260801 } from "./english-editorial-tower-events-overrides-20260801";
+import { englishTowerHealArticle } from "./english-tower-heal-13";
 
 function insertBeforeOfficialDocs(
   articleHtml: string,
@@ -170,6 +171,7 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialControllerRenewNukerOverrides20260803,
   ...englishEditorialAccessRecycleDestroyOverrides20260804,
   ...englishEditorialObservabilityEvidenceOverrides20260805,
+  [englishTowerHealArticle.slug]: englishTowerHealArticle,
 };
 
 export function getEnglishEditorialPublished20260731(
