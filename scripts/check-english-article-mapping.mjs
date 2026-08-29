@@ -15,6 +15,7 @@ const numberedContentFiles = fs.readdirSync(libDirectory)
   )
   .sort();
 const records = [];
+const standaloneHrefs = [];
 const failures = [];
 
 for (const fileName of registryFiles) {
@@ -29,9 +30,17 @@ for (const fileName of registryFiles) {
     /["']?chinesePath["']?\s*:\s*["'](\/blog\/[a-z0-9-]+)["']/g,
   )];
 
+  if (chineseMatches.length === 0 && hrefMatches.length > 0 && fileName !== "english-articles.ts") {
+    standaloneHrefs.push(...hrefMatches.map((match) => ({
+      fileName,
+      href: match[1],
+    })));
+    continue;
+  }
+
   if (hrefMatches.length !== chineseMatches.length) {
     failures.push(
-      `${fileName}: href 数量 ${hrefMatches.length} 与 chinesePath 数量 ${chineseMatches.length} 不一致`,
+      `${fileName}: href 数量 ${hrefMatches.length} 与 chinesePath 数量 ${chineseMatches.length} 不一致；同一 registry 不应混合双语映射与英文原创记录`,
     );
     continue;
   }
@@ -45,10 +54,10 @@ for (const fileName of registryFiles) {
   }
 }
 
-function findDuplicates(key) {
+function findDuplicates(items, key) {
   const grouped = new Map();
 
-  for (const record of records) {
+  for (const record of items) {
     const value = record[key];
     const current = grouped.get(value) || [];
     current.push(record.fileName);
@@ -59,12 +68,41 @@ function findDuplicates(key) {
     .filter(([, files]) => files.length > 1);
 }
 
-for (const [href, files] of findDuplicates("href")) {
+const allEnglishRecords = [
+  ...records.map(({ fileName, href }) => ({ fileName, href })),
+  ...standaloneHrefs,
+];
+
+for (const [href, files] of findDuplicates(allEnglishRecords, "href")) {
   failures.push(`英文路径重复 ${href}: ${files.join(", ")}`);
 }
 
-for (const [chinesePath, files] of findDuplicates("chinesePath")) {
+for (const [chinesePath, files] of findDuplicates(records, "chinesePath")) {
   failures.push(`中文来源路径重复 ${chinesePath}: ${files.join(", ")}`);
+}
+
+for (const record of standaloneHrefs) {
+  const slug = record.href.slice("/en/blog/".length);
+  const staticPagePath = path.join(
+    root,
+    "src",
+    "app",
+    "(en)",
+    "en",
+    "blog",
+    slug,
+    "page.tsx",
+  );
+
+  if (!fs.existsSync(staticPagePath)) {
+    failures.push(`${record.fileName}: 英文原创缺少静态页面 ${record.href}`);
+    continue;
+  }
+
+  const staticPageSource = fs.readFileSync(staticPagePath, "utf8");
+  if (staticPageSource.includes('"zh-CN"') || staticPageSource.includes("isBasedOn")) {
+    failures.push(`${record.fileName}: 英文原创页面不应声明不存在的中文 alternate 或 isBasedOn ${record.href}`);
+  }
 }
 
 for (const record of records) {
@@ -126,5 +164,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `英文文章映射检查通过：${records.length} 条中英文配对、${registryFiles.length} 个登记文件、${numberedContentFiles.length} 个动态内容批次；路径唯一、来源存在且统一接入完整。`,
+  `英文文章映射检查通过：${records.length} 条中英文配对、${standaloneHrefs.length} 条英文原创、${registryFiles.length} 个登记文件、${numberedContentFiles.length} 个动态内容批次；路径唯一、双语来源存在且统一接入完整。`,
 );
