@@ -85,13 +85,15 @@ if (sitemapResponse.status !== 200) {
     failures.push(`${path}: Sitemap lastmod is not aligned with the 2026-08-18 substantive revision`);
   }
 
-  for (const preservedPath of [
-    "/en/blog/screeps-room-energyavailable-stuck",
-    "/en/blog/screeps-tombstone-ruin-recovery",
-    "/en/blog/screeps-introduction",
-    "/en/blog/screeps-first-room",
-  ]) {
-    const preserved = `<loc>https://www.linqingan.com${preservedPath}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+  const preservedFreshness = new Map([
+    ["/en/blog/screeps-room-energyavailable-stuck", "2026-08-18"],
+    ["/en/blog/screeps-tombstone-ruin-recovery", "2026-08-18"],
+    ["/en/blog/screeps-introduction", "2026-08-18"],
+    ["/en/blog/screeps-first-room", "2026-08-28"],
+  ]);
+
+  for (const [preservedPath, modifiedAt] of preservedFreshness) {
+    const preserved = `<loc>https://www.linqingan.com${preservedPath}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(preserved)) {
       failures.push(`${preservedPath}: prior editorial freshness regressed`);
     }
@@ -105,5 +107,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Sixteenth English editorial smoke passed: nullable account-bound order identity, conservative fee reserve, idempotent one-writer control, pending-request serialization, next-tick state evidence, source discrepancy disclosure, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Sixteenth English editorial smoke passed: nullable account-bound order identity, conservative fee reserve, idempotent one-writer control, pending-request serialization, next-tick state evidence, source discrepancy disclosure, canonical/hreflang, structured data, scoped freshness with the First Room August 28 supersession, and Pending live evidence.",
 );
