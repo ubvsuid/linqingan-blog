@@ -94,6 +94,7 @@ const articleTagSlugOverrides: Record<string, string[]> = {
   "/en/blog/screeps-moveto-not-moving": ["movement", "debugging", "pathfinding"],
   "/en/blog/screeps-err-no-path": ["movement", "pathfinding", "debugging"],
   "/en/blog/screeps-move-fatigue-body-ratio": ["movement", "creeps"],
+  "/en/blog/screeps-creep-pull": ["movement", "creeps", "debugging"],
   "/en/blog/screeps-roomposition-distance": ["movement", "pathfinding"],
   "/en/blog/screeps-map-find-route": ["movement", "pathfinding", "rooms"],
   "/en/blog/screeps-room-visibility": ["rooms", "debugging"],
