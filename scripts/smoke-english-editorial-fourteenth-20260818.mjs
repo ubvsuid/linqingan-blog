@@ -75,14 +75,16 @@ if (sitemapResponse.status !== 200) {
     failures.push(`${path}: Sitemap lastmod is not aligned with the 2026-08-18 substantive revision`);
   }
 
-  for (const preservedPath of [
-    "/en/blog/screeps-introduction",
-    "/en/blog/screeps-first-room",
-    "/en/blog/screeps-tick-game-loop",
-    "/en/blog/screeps-creep-roles",
-    "/en/blog/screeps-clean-dead-creep-memory",
-  ]) {
-    const preserved = `<loc>https://www.linqingan.com${preservedPath}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+  const preservedFreshness = new Map([
+    ["/en/blog/screeps-introduction", "2026-08-18"],
+    ["/en/blog/screeps-first-room", "2026-08-28"],
+    ["/en/blog/screeps-tick-game-loop", "2026-08-18"],
+    ["/en/blog/screeps-creep-roles", "2026-08-18"],
+    ["/en/blog/screeps-clean-dead-creep-memory", "2026-08-18"],
+  ]);
+
+  for (const [preservedPath, modifiedAt] of preservedFreshness) {
+    const preserved = `<loc>https://www.linqingan.com${preservedPath}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(preserved)) {
       failures.push(`${preservedPath}: prior editorial freshness regressed`);
     }
@@ -96,5 +98,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourteenth English editorial smoke passed: hostile-Rampart reachability, complete-path decay lower bound, processed withdraw event evidence, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Fourteenth English editorial smoke passed: hostile-Rampart reachability, complete-path decay lower bound, processed withdraw event evidence, canonical/hreflang, structured data, scoped freshness with the First Room August 28 supersession, and Pending live evidence.",
 );
