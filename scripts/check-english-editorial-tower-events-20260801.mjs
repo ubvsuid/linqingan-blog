@@ -91,6 +91,11 @@ const expected = [
       "Heal Owned Creeps and Power Creeps Without Guessing the Result",
     intent:
       "Allocate Tower healing to owned Creeps or Power Creeps and verify every accepted ranged-heal event",
+    registryTitle:
+      "Screeps Tower Healing: Injury Ratio, Missing Hits, and Range",
+    registryIntent:
+      "Heal the most urgent owned injured Creep with deterministic Tower priorities",
+    registryUpdatedAt: "2026-08-28",
     signals: [
       "FIND_MY_POWER_CREEPS",
       "EVENT_HEAL",
@@ -344,13 +349,17 @@ for (const text of [
 }
 
 for (const item of expected) {
+  const registryTitle = item.registryTitle ?? item.title;
+  const registryIntent = item.registryIntent ?? item.intent;
+  const registryUpdatedAt = item.registryUpdatedAt ?? "2026-08-01";
+
   for (const text of [
     `href: "${item.path}"`,
     `chinesePath: "${item.chinesePath}"`,
-    item.title,
-    item.intent,
+    registryTitle,
+    registryIntent,
     'publishedAt: "2026-07-26"',
-    'updatedAt: "2026-08-01"',
+    `updatedAt: "${registryUpdatedAt}"`,
     "finalScore: 98",
   ]) {
     if (!registry.includes(text)) {
@@ -377,13 +386,14 @@ for (const text of [
 
 for (const text of [
   "verified-tower-volley",
-  "verified-tower-healing",
   "verified-tower-repair",
-  "FIND_MY_POWER_CREEPS",
+  "FIND_MY_CREEPS",
+  "heal-partial",
+  "Memory.towerHealing",
   "EVENT_ATTACK_TYPE_RANGED",
-  "EVENT_HEAL_TYPE_RANGED",
   "energySpent",
-  '"dateModified":"2026-08-01"',
+  'modifiedAt: "2026-08-01"',
+  'modifiedAt: "2026-08-28"',
   '"@type":"BlogPosting"',
   '"@type":"FAQPage"',
 ]) {
@@ -425,5 +435,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Deep Tower event editorial gate passed: 3 existing routes, 35 TOC anchors, 18 JavaScript blocks, exact prior-tick attack/heal/repair event identity, 98-point internal thresholds, and explicit Pending live evidence.",
+  "Deep Tower event editorial gate passed: historical 2026-08-01 payloads remain intact, current registry supersession is explicit, and production smoke covers the current Tower heal workflow separately.",
 );

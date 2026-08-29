@@ -63,6 +63,39 @@ for (const forbidden of [
   );
 }
 
+for (const required of [
+  "spawn.spawning?.name",
+  "spawn.spawning?.remainingTime",
+  "spawn.spawning?.directions",
+  "Game.creeps[name]",
+  "script-visible diagnostic approximation",
+  "Hostile occupancy is a verified engine-source exception",
+  "spawn-stomp",
+  "Live hostile occupancy / spawn-stomp",
+  "Pending — engine-source behavior is not presented as a live reproduction",
+  "delete Memory.spawnExitChecks[name]",
+  "if (result !== OK)",
+  "spawn-submit-rejected",
+  "Retest after the fix",
+]) {
+  assert(
+    english.includes(required),
+    `English article is missing LOCAL ENHANCEMENT boundary: ${required}`,
+  );
+}
+
+for (const forbidden of [
+  "repository integration",
+  "lightweight equivalent of the engine checks",
+  "then append the remaining directions",
+  "A true one-exit layout can still pass one direction deliberately",
+]) {
+  assert(
+    !english.includes(forbidden),
+    `English article retained stale or overstrong wording: ${forbidden}`,
+  );
+}
+
 function decodeHtml(code) {
   return code
     .replaceAll("&lt;", "<")
@@ -111,6 +144,8 @@ for (const [index, code] of codeBlocks.entries()) {
 }
 
 const modelSource = `
+const OK = 0;
+const ERR_BUSY = -4;
 const TOP = 1;
 const TOP_RIGHT = 2;
 const RIGHT = 3;
@@ -131,24 +166,19 @@ const ALL_SPAWN_DIRECTIONS = [
 ];
 
 function normalizeSpawnDirections(input) {
-  const preferred = Array.isArray(input) ? input : [];
+  const source = Array.isArray(input)
+    ? input
+    : ALL_SPAWN_DIRECTIONS;
   const valid = [];
   const seen = new Set();
 
-  for (const direction of preferred) {
+  for (const direction of source) {
     if (
       Number.isInteger(direction)
       && direction >= TOP
       && direction <= TOP_LEFT
       && !seen.has(direction)
     ) {
-      seen.add(direction);
-      valid.push(direction);
-    }
-  }
-
-  for (const direction of ALL_SPAWN_DIRECTIONS) {
-    if (!seen.has(direction)) {
       seen.add(direction);
       valid.push(direction);
     }
@@ -195,6 +225,28 @@ function planFromSnapshots(
       ...open,
       ...occupied
     ].map(item => item.direction)
+  };
+}
+
+function submitModel({ finalResult, records, name = 'Worker42' }) {
+  delete records[name];
+
+  if (finalResult !== OK) {
+    return {
+      status: 'spawn-submit-rejected',
+      result: finalResult
+    };
+  }
+
+  records[name] = {
+    name,
+    acceptedResult: finalResult,
+    directions: [RIGHT, BOTTOM]
+  };
+
+  return {
+    status: 'spawn-scheduled',
+    result: finalResult
   };
 }
 
@@ -275,7 +327,11 @@ function observeModel({
 }
 `;
 
-const context = vm.createContext({ Map, Set, Number });
+const context = vm.createContext({
+  Map,
+  Set,
+  Number,
+});
 vm.runInContext(modelSource, context);
 
 function run(expression) {
@@ -287,8 +343,24 @@ const normalized = run(
 );
 assert(
   JSON.stringify(normalized) ===
-    JSON.stringify([3, 1, 2, 4, 5, 6, 7, 8]),
-  "Direction normalization did not deduplicate, reject invalid values, or append fallbacks",
+    JSON.stringify([3, 1]),
+  "Explicit direction normalization did not preserve only valid unique supplied directions",
+);
+
+const strictOneExit = run(
+  "normalizeSpawnDirections([3])",
+);
+assert(
+  JSON.stringify(strictOneExit) === JSON.stringify([3]),
+  "Strict one-exit input was silently widened",
+);
+
+const explicitEmpty = run(
+  "normalizeSpawnDirections([])",
+);
+assert(
+  explicitEmpty.length === 0,
+  "Explicit empty direction policy was silently widened",
 );
 
 const defaultOrder = run(
@@ -297,7 +369,7 @@ const defaultOrder = run(
 assert(
   JSON.stringify(defaultOrder) ===
     JSON.stringify([1, 2, 3, 4, 5, 6, 7, 8]),
-  "Missing direction input did not use the default order",
+  "Missing direction input did not use all eight defaults",
 );
 
 context.snapshots = [
@@ -337,11 +409,23 @@ assert(
 assert(
   JSON.stringify(readyPlan.directions) ===
     JSON.stringify([4, 3, 2]),
-  "Open directions were not ordered before temporary occupancy while preserving preference",
+  "Open directions were not ordered before temporary occupancy while preserving explicit preference",
 );
 assert(
   !readyPlan.directions.includes(1),
   "A stable obstacle direction was retained",
+);
+
+const strictPlan = run(
+  "planFromSnapshots(snapshots, [2])",
+);
+assert(
+  strictPlan.status === "temporary-occupancy-only",
+  "Strict occupied direction did not remain a temporary-only plan",
+);
+assert(
+  JSON.stringify(strictPlan.directions) === JSON.stringify([2]),
+  "Strict one-exit plan was widened to other open directions",
 );
 
 context.snapshots = [
@@ -367,7 +451,7 @@ assert(
 assert(
   JSON.stringify(occupiedPlan.directions) ===
     JSON.stringify([8, 7]),
-  "Temporary-only directions did not preserve preference order",
+  "Temporary-only directions did not preserve explicit order",
 );
 
 context.snapshots = [
@@ -388,6 +472,42 @@ assert(
 assert(
   blockedPlan.directions.length === 0,
   "No-stable-exit state retained a direction",
+);
+
+context.records = {
+  Worker42: {
+    name: "Worker42",
+    acceptedResult: 0,
+    directions: [1],
+  },
+};
+
+const rejectedSubmission = run(
+  "submitModel({ finalResult: ERR_BUSY, records })",
+);
+assert(
+  rejectedSubmission.status === "spawn-submit-rejected",
+  "Rejected final submission did not preserve rejected status",
+);
+assert(
+  rejectedSubmission.result === -4,
+  "Rejected final submission did not preserve the real return code",
+);
+assert(
+  !context.records.Worker42,
+  "Rejected final submission left an active lifecycle record",
+);
+
+const acceptedSubmission = run(
+  "submitModel({ finalResult: OK, records })",
+);
+assert(
+  acceptedSubmission.status === "spawn-scheduled",
+  "Accepted final submission did not enter scheduled state",
+);
+assert(
+  context.records.Worker42?.acceptedResult === 0,
+  "Accepted final submission did not create the lifecycle record",
 );
 
 context.record = {
@@ -437,7 +557,7 @@ const retry = run(
 );
 assert(
   retry.status === "completion-retry-observed",
-  "Two near-complete observations did not expose the retry state",
+  "Two near-complete observations did not expose the observed retry state",
 );
 assert(
   retry.nearCompleteTicks === 2,
@@ -558,6 +678,20 @@ assert(
 assert(
   english.includes('value: "Pending"'),
   "English page does not keep live evidence Pending",
+);
+assert(
+  english.includes('modifiedTime = "2026-08-28"'),
+  "English page did not update the editorial modification date",
+);
+assert(
+  english.includes('/en/blog/screeps-moveto-not-moving'),
+  "English page lost the movement learning-path link",
+);
+assert(
+  english.includes(
+    "80977824199a596d174d392fd0cf8c458c21fcbd/src/processor/intents/spawns/_born-creep.js",
+  ),
+  "English page is missing the pinned official engine completion source",
 );
 
 if (failures.length > 0) {

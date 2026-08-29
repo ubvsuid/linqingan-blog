@@ -256,7 +256,7 @@ export async function EnglishArticlePage({
             <div>
               <p className="eyebrow">SOURCE AND SCOPE</p>
               <h2 id={`english-source-title-${articleSlug}`}>Review the source, evidence, or next system</h2>
-              <p>This English guide is rewritten for a focused search intent while preserving the technical scope and verification boundaries of its Chinese source. Live-room evidence is claimed only when the verification record says it exists.</p>
+              <p>This English guide keeps the technical scope and verification boundaries of its Chinese source. The verification record shows which checks were completed and which runtime observations are still pending.</p>
             </div>
             <div>
               <Link href={resolvedChinesePath} hrefLang="zh-CN">Open the Chinese source →</Link>

@@ -32,8 +32,8 @@ export const englishTowerHealArticle = {
     ["JavaScript syntax", "Passed"],
     ["Offline healing review", "Passed — valid injuries, hit ratio, missing hits, nearest-Tower range, stable ties, Energy and activity states"],
     ["Screeps Console test", "Pending"],
-    ["Live Tower heal, falloff, boost, over-heal and multi-target allocation test", "Pending"],
-    ["Last verified", "July 26, 2026"],
+    ["Live Tower heal, falloff, Tower power effects, over-heal and multi-target allocation test", "Pending"],
+    ["Last verified", "August 28, 2026"],
   ],
   toc: [
     ["quick-answer", "Quick answer"],
@@ -81,7 +81,15 @@ export const englishTowerHealArticle = {
   },
   articleHtml: String.raw`
 <h2 id="quick-answer">Quick answer</h2>
-<p>Find owned regular Creeps with <code>0 &lt; hits &lt; hitsMax</code>, select the lowest hit ratio first, then the largest missing-hit count, nearest available Tower range and name as a stable tie-breaker. Let only owned active Towers with at least <code>TOWER_ENERGY_COST</code> Energy call <code>tower.heal(target)</code>, save every result, and verify target hits on a later tick.</p>
+<p>Find owned regular Creeps with <code>0 &lt; hits &lt; hitsMax</code>, select the lowest hit ratio first, then the largest missing-hit count, nearest available Tower range and name as a stable tie-breaker. Let only owned active Towers with at least <code>TOWER_ENERGY_COST</code> Energy call <code>tower.heal(target)</code>, keep each raw result, and verify target hits on a later tick.</p>
+<pre><code class="language-javascript">const result = tower.heal(target);
+
+if (result === OK) {
+  // The heal action was scheduled.
+}
+</code></pre>
+<p>Keep the returned code even when it is <code>OK</code>. <code>OK</code> means the action was accepted and scheduled; it does not prove how many hits the target will have after tick resolution.</p>
+<p>The current Tower-heal baseline costs <code>TOWER_ENERGY_COST = 10</code> Energy per action. Healing is 400 at range 5 or less, falls linearly through range 20, and is 100 at range 20 or farther. A Tower can target valid Creeps across its room, so distance does not produce <code>ERR_NOT_IN_RANGE</code>.</p>
 
 <h2 id="valid-injuries">Filter valid injured Creeps</h2>
 <pre><code class="language-javascript">function getInjuredOwnedCreeps(room) {
@@ -94,7 +102,7 @@ export const englishTowerHealArticle = {
       && creep.hits < creep.hitsMax
   });
 }</code></pre>
-<p>This scope excludes Power Creeps intentionally. It also ignores dead or malformed objects and avoids wasting actions on full-health targets.</p>
+<p><code>StructureTower.heal()</code> itself accepts a Creep or PowerCreep in the same room. This controller intentionally queries owned regular Creeps only with <code>FIND_MY_CREEPS</code>; it also ignores dead or malformed objects and avoids spending actions on full-health targets.</p>
 
 <h2 id="priority">Rank urgency before distance</h2>
 <pre><code class="language-javascript">function selectTowerHealTarget(towers, creeps) {
@@ -196,40 +204,115 @@ export const englishTowerHealArticle = {
     ),
     result: tower.heal(target)
   }));
+  const acceptedCount = results.filter(
+    item => item.result === OK
+  ).length;
 
   return {
-    status: results.some(item => item.result === OK)
+    status: acceptedCount === results.length
       ? 'heal-scheduled'
-      : 'heal-rejected',
+      : acceptedCount > 0
+        ? 'heal-partial'
+        : 'heal-rejected',
     snapshot,
     results
   };
 }</code></pre>
-<pre><code class="language-javascript">module.exports.loop = function () {
-  const room = Game.rooms.W1N1;
+<p>The aggregate status never replaces the raw Tower results: <code>heal-partial</code> means at least one Tower returned <code>OK</code> and at least one did not.</p>
+<pre><code class="language-javascript">function getTowerHealingState() {
+  if (!Memory.towerHealing) {
+    Memory.towerHealing = {};
+  }
+
+  return Memory.towerHealing;
+}
+
+function saveTowerHealingAttempt(state, room, outcome) {
+  if (!outcome.snapshot || !outcome.results) {
+    return;
+  }
+
+  state.pendingObservation = {
+    tick: outcome.snapshot.gameTick,
+    roomName: room.name,
+    targetId: outcome.snapshot.targetId,
+    targetName: outcome.snapshot.targetName,
+    hitsBefore: outcome.snapshot.hits,
+    results: outcome.results.map(item => ({
+      towerId: item.towerId,
+      range: item.range,
+      result: item.result
+    }))
+  };
+}
+
+function reviewPreviousTowerHealing(state) {
+  const pending = state.pendingObservation;
+  if (!pending || pending.tick >= Game.time) {
+    return null;
+  }
+
+  const target = Game.getObjectById(pending.targetId);
+  const observation = {
+    scheduledTick: pending.tick,
+    observedTick: Game.time,
+    roomName: pending.roomName,
+    targetId: pending.targetId,
+    targetName: pending.targetName,
+    hitsBefore: pending.hitsBefore,
+    hitsNow: target ? target.hits : null,
+    targetVisible: Boolean(target),
+    results: pending.results
+  };
+
+  state.lastObservation = observation;
+  delete state.pendingObservation;
+  return observation;
+}
+
+module.exports.loop = function () {
+  const state = getTowerHealingState();
+  reviewPreviousTowerHealing(state);
+
+  const roomName = state.roomName;
+  if (typeof roomName !== 'string' || roomName.length === 0) {
+    console.log(
+      'Tower healing is not configured. Set '
+      + 'Memory.towerHealing.roomName to a visible owned room name.'
+    );
+    return;
+  }
+
+  const room = Game.rooms[roomName];
   if (!room) {
+    console.log(
+      'Tower healing room is not visible: ' + roomName
+    );
     return;
   }
 
   const outcome = runTowerHealing(room);
+  saveTowerHealingAttempt(state, room, outcome);
+
   if (
-    outcome.status === 'heal-rejected'
-    || Game.time % 100 === 0
+    outcome.status === 'heal-partial'
+    || outcome.status === 'heal-rejected'
   ) {
     console.log(JSON.stringify({
-      type: 'tower-heal-status',
-      roomName: room.name,
+      type: 'tower-heal-action',
+      roomName,
       ...outcome
     }));
   }
 };</code></pre>
+<p>Set <code>Memory.towerHealing.roomName</code> to your own visible owned room name before enabling this loop; the example does not assume any specific room. The tracker keeps only one pending heal attempt and one latest later-tick observation. It stores IDs, hit snapshots and raw return codes rather than caching a Creep object across ticks.</p>
 
 <h2 id="overheal">Understand multi-Tower over-heal</h2>
 <p>This baseline focuses every available Tower on the same injured Creep. That is easy to inspect but can spend more Energy than necessary when one Tower would fill the missing hits.</p>
 <pre><code class="language-javascript">function getMissingHits(creep) {
   return Math.max(0, creep.hitsMax - creep.hits);
 }</code></pre>
-<p>A more advanced allocator needs the range-adjusted healing amount, active power effects, already assigned healing and expected incoming damage. This article does not claim focus healing is optimal.</p>
+<p>A more advanced allocator can use range-adjusted healing, active Tower power effects and already assigned healing. If it is trying to predict combat outcomes rather than only current missing hits, expected incoming damage is another useful input. This article does not claim focus healing is optimal.</p>
 
 <h2 id="dispatcher">Keep one Tower action dispatcher</h2>
 <p>A common room policy is attack before heal before repair. That order is not enforced by the Tower API; your code must select one action for each Tower.</p>
@@ -253,7 +336,7 @@ export const englishTowerHealArticle = {
 <p>The target may heal to full, die, leave the room, move closer to another Tower or receive new damage. Save only IDs and snapshots for diagnostics; run the selection again from current visible objects.</p>
 
 <h2 id="after-ok">Verify healing later</h2>
-<p>Compare the saved hit count with the recovered Creep on a later tick. Healing may be partly or fully offset by damage in the same resolution window, so a final hit difference is evidence of net state rather than a perfect measurement of one Tower's contribution.</p>
+<p>The complete example moves the previous attempt into <code>Memory.towerHealing.lastObservation</code> on a later tick. Compare <code>hitsBefore</code> with <code>hitsNow</code> only when <code>targetVisible</code> is true; a missing target does not prove the heal failed. Healing may also be partly or fully offset by damage in the same resolution window, so a final hit difference is evidence of net state rather than a perfect measurement of one Tower's contribution.</p>
 
 <h2 id="return-codes">Handle return codes</h2>
 <div class="table-scroll"><table>
@@ -261,14 +344,14 @@ export const englishTowerHealArticle = {
 <tbody>
 <tr><td><code>OK</code></td><td>Healing scheduled</td><td>Target hits later</td></tr>
 <tr><td><code>ERR_NOT_OWNER</code></td><td>Tower not yours</td><td>Selection and ownership</td></tr>
-<tr><td><code>ERR_NOT_ENOUGH_ENERGY</code></td><td>Insufficient Energy</td><td>Store and competing Tower actions</td></tr>
+<tr><td><code>ERR_NOT_ENOUGH_ENERGY</code></td><td>Insufficient Energy</td><td>Tower Store / Energy</td></tr>
 <tr><td><code>ERR_INVALID_TARGET</code></td><td>Creep invalid</td><td>Refresh current target</td></tr>
 <tr><td><code>ERR_RCL_NOT_ENOUGH</code></td><td>Tower inactive</td><td>RCL and <code>isActive()</code></td></tr>
 </tbody></table></div>
 
 <h2 id="debugging">Debugging checklist</h2>
 <ul>
-<li>Use <code>FIND_MY_CREEPS</code> for this scope.</li>
+<li>Use <code>FIND_MY_CREEPS</code> for this controller scope.</li>
 <li>Require valid positive hits and hitsMax.</li>
 <li>Exclude full-health Creeps.</li>
 <li>Document the hit-ratio policy.</li>
@@ -276,12 +359,12 @@ export const englishTowerHealArticle = {
 <li>Require active owned Towers.</li>
 <li>Check <code>TOWER_ENERGY_COST</code>.</li>
 <li>Use one action dispatcher.</li>
-<li>Save every heal return code.</li>
-<li>Verify net hits later.</li>
+<li>Inspect every raw heal return code, including partial failure.</li>
+<li>Compare later net hits only when the target is observable.</li>
 </ul>
 
 <h2 id="scope">Scope and next steps</h2>
-<p>This guide does not include Power Creeps, exact range healing, boost effects, incoming-damage prediction, split healing or over-heal prevention. Continue with <a href="/en/blog/screeps-tower-repair-threshold">Tower repair thresholds and reserves</a>.</p>
+<p>This guide does not integrate Power Creeps into the controller, build a full range-adjusted healing allocator, calculate Tower power effects, predict incoming damage, split healing or prevent over-heal. Continue with <a href="/en/blog/screeps-tower-repair-threshold">Tower repair thresholds and reserves</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 <h3>Why not always heal the nearest Creep?</h3>

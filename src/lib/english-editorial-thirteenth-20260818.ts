@@ -1,6 +1,7 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
 
 const UPDATED_AT = "2026-08-18";
+const FIRST_ROOM_UPDATED_AT = "2026-08-28";
 const REVIEWED_AT = "August 18, 2026";
 
 const SELECTED_SLUGS = new Set([
@@ -31,6 +32,26 @@ function insertSection(
   }
 
   return `${html}\n\n${addition}`;
+}
+
+function replaceSection(
+  html: string,
+  startId: string,
+  endId: string,
+  replacement: string,
+): string {
+  const start = `<h2 id="${startId}">`;
+  const end = `<h2 id="${endId}">`;
+  const startIndex = html.indexOf(start);
+  const endIndex = html.indexOf(end, startIndex + start.length);
+
+  if (startIndex < 0 || endIndex < 0) {
+    throw new Error(
+      `English editorial thirteenth pass could not replace ${startId} before ${endId}`,
+    );
+  }
+
+  return `${html.slice(0, startIndex)}${replacement}\n\n${html.slice(endIndex)}`;
 }
 
 function insertToc(
@@ -173,93 +194,113 @@ function improveIntroduction(
 function improveFirstRoom(
   article: EnglishBeginnerArticle,
 ): EnglishBeginnerArticle {
-  const addition = String.raw`<h2 id="visibility-ownership-boundary">Do not confuse visibility with ownership</h2>
-<p><code>Game.rooms</code> contains Rooms currently available to your script. The API defines room visibility through current vision, not ownership. A visible Room can therefore be neutral, hostile, reserved, observed, or otherwise not owned by you; ownership must be checked separately on the relevant game object.</p>
-<div class="table-scroll"><table>
-<thead><tr><th>Read</th><th>What it tells you</th><th>Do not infer</th></tr></thead>
-<tbody>
-<tr><td><code>Object.keys(Game.rooms)</code></td><td>Room names with a live Room object in the current tick.</td><td>That every listed Room is owned by you.</td></tr>
-<tr><td><code>Object.keys(Game.spawns)</code></td><td>Your current Spawn structures keyed by exact Spawn name.</td><td>That the tutorial name <code>Spawn1</code> exists.</td></tr>
-<tr><td><code>Object.keys(Game.creeps)</code></td><td>Your current Creeps keyed by exact Creep name.</td><td>That a guessed example name exists.</td></tr>
-<tr><td><code>room.controller?.my</code></td><td>Whether the visible Room Controller is owned by you.</td><td>That every visible object in the Room is yours.</td></tr>
-</tbody></table></div>
-<p>This keeps two beginner questions separate: “can my script currently inspect this Room?” and “do I own the Controller or object I am about to act on?” It also prevents copied tutorial names from becoming fake evidence about your account.</p>
+  const workAreas = String.raw`<h2 id="three-work-areas">Find and open the three work areas</h2>
+<p>The Screeps client can rearrange navigation over time, so use the destination checks below instead of relying on one fixed button position.</p>
+<ol>
+<li><strong>Open the room view.</strong> From the game interface, open a Room you can currently see. You have reached the room view when the main game area shows the room grid, terrain, and game objects such as Sources, Creeps, structures, or a Controller.</li>
+<li><strong>Open the code editor.</strong> Switch to the part of the Screeps client where your game script is shown. You have reached the editor when you can see JavaScript code and the modules or files that make up the script. Do not change code yet.</li>
+<li><strong>Open the player Console.</strong> Open Screeps' in-game Console or log area, not the browser developer-tools console. You have reached the right Console when game log output and a command input are available. Run <code>Object.keys(Game.rooms)</code>; the expression evaluates to an array, and Room names appear when your script currently has vision.</li>
+</ol>
+<p><strong>Use each area for one job:</strong> observe the world in the room view, edit persistent game code in the editor, and run temporary inspection commands in the Console.</p>
+<p>These are semantic arrival checks, not a claim about an exact 2026 button location or screenshot. If the client layout changes, the checks still tell you whether you opened the right area.</p>`;
 
-<h2 id="bounded-room-snapshot">Capture one bounded read-only room snapshot</h2>
-<p>The following Console probe does not issue movement, harvesting, spawning, or Controller commands. It chooses one currently visible Room and records exact names and IDs that later lessons can reuse.</p>
-<pre><code class="language-javascript">const roomName = Object.keys(Game.rooms)[0];
-const room = roomName ? Game.rooms[roomName] : null;
+  const visibilityBoundary = String.raw`<h2 id="visibility-ownership-boundary">Visibility is not ownership</h2>
+<p><code>Game.rooms</code> contains Rooms available to your script in the current tick. That does not mean every visible Room is yours. <code>Game.spawns</code> and <code>Game.creeps</code> list your owned Spawns and Creeps by exact name, while <code>room.controller?.my</code> tells you whether the visible Room Controller is owned by you.</p>
+<p>For this lesson, keep the rule simple: first confirm that a live <code>Room</code> exists before reading deeper Room state, then check ownership on the specific object before a later lesson tries to act on it. If a Room disappears from <code>Game.rooms</code>, use the <a href="/en/blog/screeps-room-visibility">Room visibility guide</a> for the deeper vision-loss and reacquisition cases.</p>`;
 
-const snapshot = room ? {
-  tick: Game.time,
-  roomName: room.name,
-  controller: room.controller ? {
-    id: room.controller.id,
-    my: room.controller.my === true,
-    level: room.controller.level,
-    position: [
-      room.controller.pos.x,
-      room.controller.pos.y
-    ]
-  } : null,
-  mySpawns: room.find(FIND_MY_SPAWNS).map(spawn => ({
-    name: spawn.name,
-    spawning: spawn.spawning?.name || null
-  })),
-  myCreeps: room.find(FIND_MY_CREEPS).map(creep => ({
-    name: creep.name,
-    spawning: creep.spawning === true
-  })),
-  sourceIds: room.find(FIND_SOURCES).map(source => source.id)
-} : {
-  tick: Game.time,
-  roomName: null,
-  reason: 'no-currently-visible-room'
-};
+  let articleHtml = replaceSection(
+    article.articleHtml,
+    "three-work-areas",
+    "objects-in-the-room",
+    workAreas,
+  );
 
-console.log(JSON.stringify(snapshot, null, 2));</code></pre>
-<p>A successful print proves only what the current tick exposes. It does not prove future visibility, task completion, or that a later Spawn or Creep action will succeed. Carry exact names and IDs forward, then re-read the current object when a later lesson needs it.</p>
-<p>If a room-name string exists in Memory or configuration but <code>Game.rooms[roomName]</code> is absent, the safe conclusion is only that no live <code>Room</code> object is available through <code>Game.rooms</code> for that name in the current snapshot. Do not turn that absence into proof that the room disappeared. The focused <a href="/en/blog/screeps-room-visibility">room-visibility guide</a> covers vision loss and reacquisition in detail.</p>`;
+  articleHtml = articleHtml.replace(
+    "<p>The Screeps client can change over time, so this guide focuses on what each area does rather than promising that a button will always remain in one exact position.</p>",
+    "<p>The Screeps client can change over time. This guide therefore uses visible arrival checks — what you can see or do after opening each area — instead of promising a fixed button position.</p>",
+  );
+  articleHtml = articleHtml.replace(
+    "<p>Open a Room that you currently control or can see through your game objects. Look for these four object types.</p>",
+    "<p>In the room view you just opened, look for these four object types. The Console checks below will tell you which Rooms and owned objects are available to your script in the current tick.</p>",
+  );
+  articleHtml = articleHtml.replace(
+    "<li>Click each owned Spawn and compare its name with <code>spawnNames</code>.</li>",
+    "<li>Select each owned Spawn and compare its name with <code>spawnNames</code>.</li>",
+  );
+  articleHtml = articleHtml.replace(
+    "<li>Click the Controller and compare its level and coordinates with the <code>controller</code> object.</li>",
+    "<li>Select the Controller and compare its level and coordinates with the <code>controller</code> object.</li>",
+  );
+  articleHtml = articleHtml.replace(
+    "<li>explain the difference between the room view, code editor, and Console;</li>",
+    "<li>open the room view, code editor, and player Console, and explain what each area is for;</li>",
+  );
+  articleHtml = articleHtml.replace(
+    '<li><a href="https://docs.screeps.com/scripting-basics.html" rel="nofollow noopener noreferrer">Screeps Documentation: Scripting Basics</a></li>',
+    '<li><a href="https://docs.screeps.com/scripting-basics.html" rel="nofollow noopener noreferrer">Screeps Documentation: Scripting Basics</a></li>\n<li><a href="https://docs.screeps.com/debugging.html" rel="nofollow noopener noreferrer">Screeps Documentation: Debugging</a></li>',
+  );
+
+  articleHtml = insertSection(
+    articleHtml,
+    visibilityBoundary,
+    "visibility-ownership-boundary",
+    [`<h2 id="completion-check">`, `<h2 id="next-lesson">`],
+  );
+
+  const toc = insertToc(
+    article.toc
+      .filter(([id]) => id !== "bounded-room-snapshot")
+      .map(([id, label]) =>
+        id === "three-work-areas"
+          ? [id, "Find and open the three work areas"] as [string, string]
+          : [id, label] as [string, string]
+      ),
+    [["visibility-ownership-boundary", "Visibility is not ownership"]],
+    ["completion-check", "next-lesson", "official-sources"],
+  );
 
   return {
     ...article,
     description:
-      "Find your first Screeps Room, editor, and Console, then separate current room visibility from ownership and capture exact Spawn, Creep, Source, and Controller identifiers with a read-only probe.",
+      "Open a Screeps Room, switch to the code editor and player Console, then use read-only checks to match exact Room, Spawn, Creep, Source, and Controller data.",
     searchIntent:
-      "Beginner interface orientation and read-only inspection of current Screeps vision, with explicit separation between visible Rooms, owned objects, and copied tutorial names",
-    finalScore: 99,
-    toc: insertToc(
-      article.toc,
+      "Beginner interface orientation that opens the Room view, code editor, and player Console before using read-only current-tick checks for real account object names and visibility",
+    readingTime: "7 min read",
+    finalScore: 98,
+    toc,
+    verification: [
+      ["Chinese source", "Read in full"],
       [
-        ["visibility-ownership-boundary", "Visibility is not ownership"],
-        ["bounded-room-snapshot", "Capture a room snapshot"],
+        "Official documentation",
+        "Checked August 28, 2026 — Scripting Basics, Debugging, Game.rooms, Game.spawns, Game.creeps, Game.time, and Room.find()",
       ],
-      ["completion-check", "next-lesson", "official-sources"],
-    ),
-    verification: refreshVerification(
-      article,
+      ["JavaScript syntax", "Checked — both Console probes use valid JavaScript syntax"],
       [
-        [
-          "Official documentation",
-          "Checked August 18, 2026 — Game.rooms visibility, Game.spawns, Game.creeps, Game.time, Room.find(), and current-object access boundaries",
-        ],
-        [
-          "Static code review",
-          "Passed — the probe is read-only, handles no visible Room, preserves exact names and IDs, and keeps Controller ownership separate from Room visibility",
-        ],
-        [
-          "Client-layout boundary",
-          "The guide describes the roles of room view, editor, and Console without asserting a fixed 2026 button position or unverified current-client screenshot",
-        ],
+        "Static code review",
+        "Passed — the probes are read-only, use real account values instead of guessed names, and check Room existence before deeper reads",
       ],
-      "No real-account room inventory, remote-vision transition, current-client screenshot, or multi-tick Console trace was collected",
-    ),
-    articleHtml: insertSection(
-      article.articleHtml,
-      addition,
-      "visibility-ownership-boundary",
-      [`<h2 id="completion-check">`, `<h2 id="next-lesson">`],
-    ),
+      [
+        "Client navigation",
+        "Semantic navigation only — no fixed 2026 button position or current-client screenshot is claimed; each destination is identified by what is visible or executable after it opens",
+      ],
+      [
+        "Evidence level",
+        "Official-documentation, Chinese-source, and static code/content review; no real-account execution is claimed",
+      ],
+      [
+        "Screeps Console test",
+        "Pending — no real-account Console transcript was collected for this revision",
+      ],
+      [
+        "Live multi-tick verification",
+        "Not required for these read-only current-tick probes; no later-tick outcome is claimed",
+      ],
+      [
+        "Current-client screenshot",
+        "Pending — no screenshot is used as evidence for interface placement",
+      ],
+    ],
+    articleHtml,
   };
 }
 
@@ -276,5 +317,6 @@ export function applyEnglishEditorialThirteenth20260818(
 export function getEnglishEditorialThirteenthUpdatedAt20260818(
   slug: string,
 ): string | undefined {
+  if (slug === "screeps-first-room") return FIRST_ROOM_UPDATED_AT;
   return SELECTED_SLUGS.has(slug) ? UPDATED_AT : undefined;
 }

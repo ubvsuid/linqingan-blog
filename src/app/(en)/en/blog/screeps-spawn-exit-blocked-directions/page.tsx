@@ -9,10 +9,10 @@ const chinesePath = "/blog/screeps-spawn-exit-blocked-directions";
 const headline =
   "Screeps Spawn Exit Blocked: Diagnose Directions and Occupied Tiles";
 const description =
-  "Inspect all eight Spawn-adjacent tiles, separate stable obstacles from temporary occupancy, submit one ordered directions list, refresh it near completion, and verify the Creep's later birth state.";
+  "Confirm a blocked Screeps Spawn exit from current spawning state and all eight adjacent tiles, then fix direction policy without confusing accepted intents with observed birth.";
 const publishedAt = "2026-08-06";
 const publishedLabel = "August 6, 2026";
-const modifiedTime = "2026-08-06";
+const modifiedTime = "2026-08-28";
 const discovery = getEnglishDiscoveryArticle(path);
 const articleUrl = `${siteConfig.url}${path}`;
 
@@ -63,36 +63,21 @@ export const metadata: Metadata = {
 };
 
 const toc: Array<[string, string]> = [
-  ["intent-boundary", "Use this guide after spawnCreep() succeeds"],
-  ["engine-boundary", "What the completion step actually checks"],
-  ["direction-order", "Normalize preferred and fallback directions"],
-  ["tile-snapshot", "Separate stable blockers from temporary occupancy"],
+  ["fast-path", "Debugging fast path"],
+  ["likely-causes", "Likely causes: symptom to fix"],
+  ["engine-boundary", "What Spawn completion actually does"],
+  ["direction-order", "Keep the directions contract explicit"],
   ["plan", "Build one deterministic exit plan"],
-  ["submit", "Reuse the same plan for dryRun and submission"],
+  ["submit", "Keep dryRun and real submission separate"],
   ["refresh", "Refresh directions near completion"],
-  ["observe", "Verify retries and the first visible birth state"],
-  ["failure-modes", "Common failure modes"],
-  ["evidence", "Evidence and production boundary"],
+  ["observe", "Observe completion across ticks"],
+  ["retest", "Retest after the fix"],
+  ["evidence", "Evidence boundary and official sources"],
 ];
 
 const articleHtml = String.raw`
-<h2 id="intent-boundary">Use this guide after spawnCreep() succeeds</h2>
-<p>Use this page when the final <code>spawnCreep()</code> call returned <code>OK</code>, the named Creep exists in the spawning lifecycle, but completion appears delayed or the Creep does not become available on an adjacent tile. Use <a href="/en/blog/screeps-spawncreep-return-codes">the return-code guide</a> when the request itself was rejected. Use <a href="/en/blog/screeps-moveto-not-moving">the movement guide</a> only after the Creep has finished spawning and ordinary movement code is running.</p>
-<p>The useful model is not “the Spawn is done, therefore the Creep must already be outside.” The completion step still needs one allowed adjacent tile that is usable during settlement.</p>
-
-<h2 id="engine-boundary">What the completion step actually checks</h2>
-<p>The public API accepts an ordered <code>directions</code> array containing direction constants from <code>TOP</code> through <code>TOP_LEFT</code>. The pinned public engine source checks those directions in order, rejects stable obstacle objects and blocking construction sites, consults movement occupancy, and retries completion on a later tick when no permitted tile succeeds. A direction list changes the search order and allowed set; it does not remove an obstacle or reserve a tile.</p>
-<div class="table-scroll"><table>
-<thead><tr><th>Observation</th><th>What it supports</th><th>What it does not prove</th></tr></thead>
-<tbody>
-<tr><td><code>spawnCreep() === OK</code></td><td>The spawn request was scheduled</td><td>The Creep already exited</td></tr>
-<tr><td><code>setDirections() === OK</code></td><td>The update intent was accepted</td><td>Any listed tile is now free</td></tr>
-<tr><td>One empty-looking tile</td><td>A current script-visible candidate</td><td>No same-tick movement contention</td></tr>
-<tr><td>Repeated near-complete observations</td><td>The process did not finish immediately</td><td>The exact blocking object without a tile snapshot</td></tr>
-</tbody></table></div>
-
-<h2 id="direction-order">Normalize preferred and fallback directions</h2>
-<p>Do not let an invalid or single-direction configuration silently remove every fallback. Preserve the player's preferred order, discard invalid values and duplicates, then append the remaining directions.</p>
+<h2 id="fast-path">Debugging fast path: confirm the symptom first</h2>
+<p>Start here before changing a production planner. Read the active Spawn lifecycle, the named Creep, and all eight adjacent tiles in the same tick. This is read-only diagnostic evidence.</p>
 <pre><code class="language-javascript">const ALL_SPAWN_DIRECTIONS = [
   TOP,
   TOP_RIGHT,
@@ -115,39 +100,7 @@ const SPAWN_DIRECTION_OFFSETS = {
   [TOP_LEFT]: [-1, -1]
 };
 
-function normalizeSpawnDirections(input) {
-  const preferred = Array.isArray(input)
-    ? input
-    : [];
-  const valid = [];
-  const seen = new Set();
-
-  for (const direction of preferred) {
-    if (
-      Number.isInteger(direction)
-      &amp;&amp; direction &gt;= TOP
-      &amp;&amp; direction &lt;= TOP_LEFT
-      &amp;&amp; !seen.has(direction)
-    ) {
-      seen.add(direction);
-      valid.push(direction);
-    }
-  }
-
-  for (const direction of ALL_SPAWN_DIRECTIONS) {
-    if (!seen.has(direction)) {
-      seen.add(direction);
-      valid.push(direction);
-    }
-  }
-
-  return valid;
-}</code></pre>
-<p>A true one-exit layout can still pass one direction deliberately. That is a policy choice with an explicit waiting risk, not a safe default for every room.</p>
-
-<h2 id="tile-snapshot">Separate stable blockers from temporary occupancy</h2>
-<p>A terrain wall or obstacle structure is a stable layout problem. A Creep or Power Creep on an otherwise passable tile is usually temporary. Keep those states separate so a unit standing beside the Spawn now does not permanently remove a direction needed many spawning ticks later.</p>
-<pre><code class="language-javascript">function structureBlocksSpawnExit(structure) {
+function structureBlocksSpawnExit(structure) {
   if (structure.structureType === STRUCTURE_RAMPART) {
     return !structure.my &amp;&amp; !structure.isPublic;
   }
@@ -204,7 +157,7 @@ function inspectSpawnExitTile(spawn, direction) {
     y
   );
   const hasRoad = structures.some(
-    structure =&gt;
+    structure =>
       structure.structureType === STRUCTURE_ROAD
   );
   const terrain = spawn.room.getTerrain().get(x, y);
@@ -214,7 +167,7 @@ function inspectSpawnExitTile(spawn, direction) {
   const stableBlocked =
     terrainBlocked
     || structures.some(structureBlocksSpawnExit)
-    || sites.some(site =&gt;
+    || sites.some(site =>
       OBSTACLE_OBJECT_TYPES.includes(
         site.structureType
       )
@@ -233,31 +186,98 @@ function inspectSpawnExitTile(spawn, direction) {
         ? 'temporarily-occupied'
         : 'open-now',
     stablePassable: !stableBlocked,
-    currentlyOpen: !stableBlocked &amp;&amp; !occupied
+    currentlyOpen: !stableBlocked &amp;&amp; !occupied,
+    creepNames: creeps.map(creep => creep.name),
+    powerCreepNames: powerCreeps.map(creep => creep.name)
   };
+}
+
+const spawn = Object.values(Game.spawns)[0];
+
+if (!spawn) {
+  console.log('No owned Spawn is visible.');
+} else {
+  const name = spawn.spawning?.name ?? null;
+
+  console.log(JSON.stringify({
+    tick: Game.time,
+    spawn: spawn.name,
+    name,
+    remainingTime:
+      spawn.spawning?.remainingTime ?? null,
+    directions:
+      spawn.spawning?.directions ?? null,
+    creepVisible:
+      name ? Boolean(Game.creeps[name]) : false,
+    tiles: ALL_SPAWN_DIRECTIONS.map(direction =>
+      inspectSpawnExitTile(spawn, direction)
+    )
+  }, null, 2));
 }</code></pre>
-<p>This is a script-visible snapshot, not the engine's internal movement reservation table. Same-tick movement can change the result before settlement, so keep uncertainty visible.</p>
+<p>If there is no active <code>spawn.spawning</code>, this is not an active Spawn-completion wait. If there is an active name, compare <code>remainingTime</code>, <code>directions</code>, <code>Game.creeps[name]</code>, and the eight tile states before deciding what to change.</p>
+<p>The tile scan is a <strong>script-visible diagnostic approximation</strong>, not the engine's private movement-reservation state. Same-tick movement can change occupancy before completion is processed.</p>
+
+<h2 id="likely-causes">Likely causes: symptom → evidence → cause → fix</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Symptom</th><th>Evidence to read</th><th>Likely cause</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td>Allowed tiles stay <code>stable-obstacle</code></td><td>Terrain, structures, construction sites</td><td>Layout blocks the configured exits</td><td>Change the layout or permit a structurally usable direction.</td></tr>
+<tr><td>Allowed tiles are structurally valid but occupied</td><td>Creep/Power Creep names on the eight tiles</td><td>Temporary traffic</td><td>Move traffic away or keep additional valid directions available.</td></tr>
+<tr><td>Only one allowed direction waits while another adjacent tile is open</td><td><code>spawn.spawning.directions</code> plus tile scan</td><td>Deliberately strict direction policy</td><td>Add fallback directions if strict one-exit behavior is not intentional.</td></tr>
+<tr><td>The final real <code>spawnCreep()</code> returned an error</td><td>Exact final return code</td><td>The request never entered this lifecycle</td><td>Fix the rejection with <a href="/en/blog/screeps-spawncreep-return-codes">the return-code guide</a>; do not start a birth observer.</td></tr>
+<tr><td>The Creep is already born but later does not move</td><td><code>Game.creeps[name]</code>, <code>creep.spawning</code>, later position</td><td>Ordinary movement/pathing problem</td><td>Switch to <a href="/en/blog/screeps-moveto-not-moving">the movement guide</a>.</td></tr>
+</tbody></table></div>
+
+<h2 id="engine-boundary">What Spawn completion actually does</h2>
+<p><code>spawnCreep() === OK</code> means the request was scheduled. It does not prove that the Creep has completed spawning or appeared on an adjacent tile. Likewise, <code>setDirections() === OK</code> means the direction update intent was accepted, not that a listed tile is free at settlement time.</p>
+<p>In the pinned public engine source, completion checks the configured directions in order against stable obstacles, blocking construction sites, terrain, and movement occupancy. When an allowed tile succeeds, the Creep is moved there and <code>spawning</code> becomes false. If no allowed tile succeeds, the ordinary path can remain incomplete for a later tick.</p>
+<p><strong>Hostile occupancy is a verified engine-source exception.</strong> While checking the allowed directions, the engine remembers the first hostile Creep it finds. If all allowed directions fail and there is no usable opening among the directions that were excluded by policy, the engine can spawn-stomp that hostile Creep and complete the new Creep on that tile. If an excluded direction is actually open, the engine does not use the stomp shortcut and leaves completion unfinished. This behavior is verified from the pinned engine source; a controlled real-shard hostile-occupancy/spawn-stomp reproduction has <strong>not</strong> been collected for this article.</p>
+
+<h2 id="direction-order">Keep the directions contract explicit</h2>
+<p>The helper below has one simple contract: when you pass an array, it keeps only the valid unique directions from that array and preserves their order. When you omit the array, it defaults to all eight directions. It does not silently add fallbacks to an explicit policy.</p>
+<pre><code class="language-javascript">function normalizeSpawnDirections(input) {
+  const source = Array.isArray(input)
+    ? input
+    : ALL_SPAWN_DIRECTIONS;
+  const valid = [];
+  const seen = new Set();
+
+  for (const direction of source) {
+    if (
+      Number.isInteger(direction)
+      &amp;&amp; direction &gt;= TOP
+      &amp;&amp; direction &lt;= TOP_LEFT
+      &amp;&amp; !seen.has(direction)
+    ) {
+      seen.add(direction);
+      valid.push(direction);
+    }
+  }
+
+  return valid;
+}</code></pre>
+<p>Therefore <code>[RIGHT]</code> is a deliberate strict one-exit policy, while omitted input means “consider all eight.” An explicit empty or all-invalid array produces no allowed direction, which the planner rejects instead of silently widening the policy.</p>
 
 <h2 id="plan">Build one deterministic exit plan</h2>
-<p>Exclude stable blockers, place currently open tiles before temporarily occupied tiles, and preserve normalized preference order inside each group.</p>
+<p>After the fast diagnostic confirms an exit problem, reuse the same tile inspection for a small deterministic plan. Stable blockers are excluded. Currently open tiles come before temporarily occupied but structurally valid tiles, while the explicit direction order remains stable inside each group.</p>
 <pre><code class="language-javascript">function planSpawnExitDirections(
   spawn,
   preferredDirections
 ) {
   const snapshots = normalizeSpawnDirections(
     preferredDirections
-  ).map(direction =&gt;
+  ).map(direction =>
     inspectSpawnExitTile(spawn, direction)
   );
 
   const stable = snapshots.filter(
-    item =&gt; item.stablePassable
+    item => item.stablePassable
   );
   const open = stable.filter(
-    item =&gt; item.currentlyOpen
+    item => item.currentlyOpen
   );
   const occupied = stable.filter(
-    item =&gt; !item.currentlyOpen
+    item => !item.currentlyOpen
   );
 
   return {
@@ -269,14 +289,14 @@ function inspectSpawnExitTile(spawn, direction) {
     directions: [
       ...open,
       ...occupied
-    ].map(item =&gt; item.direction),
+    ].map(item => item.direction),
     snapshots
   };
 }</code></pre>
-<p>Keeping temporarily occupied but structurally valid tiles at the end matters because the request may complete much later. Removing every currently occupied direction can turn a short traffic conflict into a self-imposed permanent restriction.</p>
+<p>Keeping temporarily occupied but structurally valid directions at the end is useful for non-strict policies because current traffic may move before a long spawn finishes. The planner still respects a deliberately narrow explicit array.</p>
 
-<h2 id="submit">Reuse the same plan for dryRun and submission</h2>
-<p>Use one immutable plan for the preflight and final request. Recomputing between calls makes the recorded preflight evidence describe a different request.</p>
+<h2 id="submit">Keep dryRun and real submission separate</h2>
+<p>Use one plan for both calls. <code>dryRun</code> checks the request without scheduling it; only the final real call can create an active lifecycle record. The final return code can still differ because same-tick code may consume the Spawn, Energy, or name between calls.</p>
 <pre><code class="language-javascript">function submitSpawnWithExitPlan({
   spawn,
   body,
@@ -325,35 +345,43 @@ function inspectSpawnExitTile(spawn, direction) {
     };
   }
 
+  Memory.spawnExitChecks ??= {};
+  delete Memory.spawnExitChecks[name];
+
   const result = spawn.spawnCreep(
     body,
     name,
     options
   );
 
-  Memory.spawnExitChecks ??= {};
+  if (result !== OK) {
+    return {
+      status: 'spawn-submit-rejected',
+      result,
+      plan
+    };
+  }
+
   Memory.spawnExitChecks[name] = {
     spawnId: spawn.id,
     name,
     submittedAt: Game.time,
     directions: [...plan.directions],
-    result,
+    acceptedResult: result,
     lastObservedAt: Game.time,
     nearCompleteTicks: 0
   };
 
   return {
-    status: result === OK
-      ? 'spawn-scheduled'
-      : 'spawn-submit-rejected',
+    status: 'spawn-scheduled',
     result,
     plan
   };
 }</code></pre>
-<p>The final call can still differ from <code>dryRun</code> because another same-tick module may consume the Spawn, name, or Energy first. Preserve the final return code.</p>
+<p>A rejected final submission preserves the real return code in the returned result but does not enter the “waiting for birth” observer state.</p>
 
 <h2 id="refresh">Refresh directions near completion</h2>
-<p>For a long body, the tile that was open at submission may be occupied at completion. One Spawn coordinator may refresh the ordered list shortly before completion:</p>
+<p>If room traffic changes during a long spawn, one Spawn coordinator can refresh the same policy near completion. Do not let unrelated role modules compete to overwrite the list.</p>
 <pre><code class="language-javascript">function refreshSpawnExitDirections(
   spawn,
   preferredDirections,
@@ -411,10 +439,10 @@ function inspectSpawnExitTile(spawn, direction) {
     plan
   };
 }</code></pre>
-<p>Do not let role modules compete to call <code>setDirections()</code>. The final direction state should come from one coordinator with one observable result.</p>
+<p>The same evidence rule applies here: an accepted <code>setDirections()</code> call records an accepted intent, not a completed exit.</p>
 
-<h2 id="observe">Verify retries and the first visible birth state</h2>
-<p>Observe the same Spawn and Creep name across ticks. A repeated near-complete process supports a local “completion retry observed” diagnosis. It does not identify the blocker without the corresponding tile snapshots.</p>
+<h2 id="observe">Observe completion across ticks</h2>
+<p>Only observe names that have an active record created after a real <code>spawnCreep() === OK</code>. Repeated near-complete observations can support the local label <code>completion-retry-observed</code>; they do not identify the blocker without the corresponding tile state.</p>
 <pre><code class="language-javascript">function observeSpawnExit(name) {
   Memory.spawnExitChecks ??= {};
   const record = Memory.spawnExitChecks[name];
@@ -448,6 +476,8 @@ function inspectSpawnExitTile(spawn, direction) {
         : 'still-spawning',
       remainingTime:
         spawn.spawning.remainingTime,
+      directions:
+        spawn.spawning.directions ?? null,
       nearCompleteTicks:
         record.nearCompleteTicks
     };
@@ -464,7 +494,7 @@ function inspectSpawnExitTile(spawn, direction) {
     const dy = creep.pos.y - spawn.pos.y;
     const direction = Object.entries(
       SPAWN_DIRECTION_OFFSETS
-    ).find(([, offset]) =&gt;
+    ).find(([, offset]) =>
       offset[0] === dx
       &amp;&amp; offset[1] === dy
     )?.[0];
@@ -489,21 +519,18 @@ function inspectSpawnExitTile(spawn, direction) {
     lastObservedAt: record.lastObservedAt
   };
 }</code></pre>
-<p>The Creep may receive a movement intent immediately after birth. If it has already left range 1 before observation, record that the birth direction was missed instead of inferring it from a later position.</p>
+<p>The Creep may receive a movement intent immediately after birth. If it has already left range 1 before your later observation, record that the birth direction was missed instead of inventing one from a later position.</p>
 
-<h2 id="failure-modes">Common failure modes</h2>
-<ul>
-<li><strong>Only one direction is allowed:</strong> a temporary occupant can force the process to wait even while another adjacent tile is free.</li>
-<li><strong>Current occupancy is treated as permanent:</strong> a Hauler present at submission may leave long before completion.</li>
-<li><strong>Every module refreshes directions:</strong> the final order depends on module execution order rather than one policy.</li>
-<li><strong><code>OK</code> is renamed “born”:</strong> accepted requests and observed birth are different evidence states.</li>
-<li><strong>Spawn diagnostics continue after birth:</strong> once <code>creep.spawning === false</code>, ordinary movement and pathfinding guides own the next problem.</li>
-</ul>
+<h2 id="retest">Retest after the fix</h2>
+<ol>
+<li><strong>Same tick:</strong> record the exact <code>dryRun</code>, real <code>spawnCreep()</code>, or <code>setDirections()</code> return code. That is call evidence only.</li>
+<li><strong>Later tick:</strong> re-read <code>spawn.spawning?.name</code>, <code>spawn.spawning?.remainingTime</code>, <code>spawn.spawning?.directions</code>, <code>Game.creeps[name]</code>, and any adjacent tile state needed to explain the result.</li>
+<li>Do not rename an accepted request or direction update as “Creep born.” The observed later world state is separate evidence.</li>
+</ol>
 
-<h2 id="evidence">Evidence and production boundary</h2>
-<p>This revision checks the public API and pinned engine source, syntax-checks every JavaScript block, and runs 53 offline assertions covering direction normalization, fallback order, stable blockers, temporary occupancy, deterministic planning, no-exit states, completion retries, observable adjacent birth, missed direction windows, and invalid observations.</p>
-<p>Genuine Screeps Console output, official-shard completion retries, same-tick traffic, Power Creeps, hostile occupancy and spawnstomp, screenshots, and long-running production evidence remain pending.</p>
-<p>Official references: <a href="https://docs.screeps.com/api/#StructureSpawn.spawnCreep" rel="nofollow">StructureSpawn.spawnCreep()</a>, <a href="https://docs.screeps.com/api/#StructureSpawn.Spawning" rel="nofollow">StructureSpawn.Spawning</a>, <a href="https://docs.screeps.com/api/#StructureSpawn.Spawning.setDirections" rel="nofollow">setDirections()</a>, and <a href="https://docs.screeps.com/scripting-basics.html" rel="nofollow">the game-loop model</a>.</p>
+<h2 id="evidence">Evidence boundary and official sources</h2>
+<p>The public API contract and the pinned Screeps engine source were checked for direction ordering, completion occupancy, and the hostile-Creep spawn-stomp branch. JavaScript blocks and deterministic planner/lifecycle cases are checked statically. Genuine Screeps Console output, controlled official-shard completion retries, same-tick traffic races, Power Creep occupancy, and a live hostile-occupancy/spawn-stomp reproduction remain <strong>Pending</strong>.</p>
+<p>Official references: <a href="https://docs.screeps.com/api/#StructureSpawn.spawnCreep" rel="nofollow noopener noreferrer">StructureSpawn.spawnCreep()</a>, <a href="https://docs.screeps.com/api/#StructureSpawn.Spawning" rel="nofollow noopener noreferrer">StructureSpawn.Spawning</a>, <a href="https://docs.screeps.com/api/#StructureSpawn.Spawning.setDirections" rel="nofollow noopener noreferrer">setDirections()</a>, <a href="https://docs.screeps.com/scripting-basics.html" rel="nofollow noopener noreferrer">the game-loop model</a>, and <a href="https://github.com/screeps/engine/blob/80977824199a596d174d392fd0cf8c458c21fcbd/src/processor/intents/spawns/_born-creep.js" rel="nofollow noopener noreferrer">the pinned Spawn completion source</a>.</p>
 `;
 
 export default function SpawnExitBlockedDirectionsPage() {
@@ -570,7 +597,7 @@ export default function SpawnExitBlockedDirectionsPage() {
       publishedAt={publishedAt}
       publishedLabel={publishedLabel}
       modifiedAt={modifiedTime}
-      readingTime="17 min read"
+      readingTime="14 min read"
       tags={["Spawn", "Movement", "Debugging"]}
       verification={[
         {
@@ -579,17 +606,18 @@ export default function SpawnExitBlockedDirectionsPage() {
             "Checked — spawnCreep directions and Spawning.setDirections boundaries",
         },
         {
-          term: "Public engine source",
+          term: "Pinned engine source",
           value:
-            "Checked — ordered exit search, obstacle checks and later-tick completion retry",
+            "Checked — ordered completion search plus hostile-Creep spawn-stomp exception",
         },
         {
           term: "JavaScript syntax",
-          value: "Passed by the article simulation gate",
+          value: "Checked by deterministic article simulation",
         },
         {
-          term: "Offline cases",
-          value: "53 direction-planning and observation assertions passed",
+          term: "Offline deterministic cases",
+          value:
+            "Checked — explicit direction contract, planning, submission tracking, and later-tick observation",
         },
         {
           term: "Screeps Console test",
@@ -600,9 +628,13 @@ export default function SpawnExitBlockedDirectionsPage() {
           value: "Pending",
         },
         {
+          term: "Live hostile occupancy / spawn-stomp",
+          value: "Pending — engine-source behavior is not presented as a live reproduction",
+        },
+        {
           term: "Evidence level",
           value:
-            "Official source review, repository integration, syntax checks and offline simulation only",
+            "Official API and pinned engine source, static source review, syntax checks, and offline deterministic simulation",
         },
       ]}
       toc={toc}

@@ -1,253 +1,106 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import vm from "node:vm";
+import { spawnSync } from "node:child_process";
 
-const CPU_MODE = Object.freeze({
-  NORMAL: "NORMAL",
-  CONSERVE: "CONSERVE",
-  EMERGENCY: "EMERGENCY",
-  RECOVERY: "RECOVERY",
-});
+const root = process.cwd();
+const articlePath = path.join(
+  root,
+  "src",
+  "app",
+  "(en)",
+  "en",
+  "blog",
+  "screeps-cpu-bucket-degradation",
+  "page.tsx",
+);
+const source = fs.readFileSync(articlePath, "utf8");
+const htmlMatch = source.match(
+  /const articleHtml = String\.raw`([\s\S]*?)`;\s*\n\s*export default/,
+);
 
-const CPU_POLICY = Object.freeze({
-  hardEmergencyBucket: 500,
-  conserveBelow: 7000,
-  emergencyBelow: 2000,
-  recoveryAbove: 4500,
-  normalAbove: 8500,
-  conserveUsedRatio: 0.7,
-  hardUsedRatio: 0.9,
-  recoveryUsedRatio: 0.55,
-  normalUsedRatio: 0.45,
-  degradeConfirmTicks: 3,
-  recoverConfirmTicks: 20,
-  minimumModeTicks: 25,
-});
+assert.ok(htmlMatch, "English CPU articleHtml must be extractable");
 
-const MODE_SEVERITY = Object.freeze({
-  [CPU_MODE.NORMAL]: 0,
-  [CPU_MODE.RECOVERY]: 1,
-  [CPU_MODE.CONSERVE]: 2,
-  [CPU_MODE.EMERGENCY]: 3,
-});
+const decodeHtml = (value) => value
+  .replaceAll("&lt;", "<")
+  .replaceAll("&gt;", ">")
+  .replaceAll("&amp;", "&")
+  .replaceAll("&quot;", '"')
+  .replaceAll("&#39;", "'");
 
-function validMode(mode) {
-  return Object.prototype.hasOwnProperty.call(MODE_SEVERITY, mode);
+const jsBlocks = [
+  ...htmlMatch[1].matchAll(
+    /<pre><code class="language-js">([\s\S]*?)<\/code><\/pre>/g,
+  ),
+].map((match) => decodeHtml(match[1]));
+
+assert.equal(
+  jsBlocks.length,
+  3,
+  "English CPU guide must expose state machine, scheduler, and loop integration blocks",
+);
+
+const temporaryDirectory = fs.mkdtempSync(
+  path.join(os.tmpdir(), "linqingan-cpu-en-"),
+);
+
+try {
+  jsBlocks.forEach((block, index) => {
+    const temporaryPath = path.join(
+      temporaryDirectory,
+      `english-cpu-${index + 1}.js`,
+    );
+    fs.writeFileSync(temporaryPath, block, "utf8");
+    const result = spawnSync(process.execPath, ["--check", temporaryPath], {
+      encoding: "utf8",
+    });
+    assert.equal(
+      result.status,
+      0,
+      `English CPU JavaScript block ${index + 1} syntax failed:\n${result.stderr || result.stdout}`,
+    );
+  });
+} finally {
+  fs.rmSync(temporaryDirectory, { recursive: true, force: true });
 }
 
-function normalizeCpuState(value, gameTime) {
-  const mode = validMode(value?.mode) ? value.mode : CPU_MODE.NORMAL;
-  return {
-    mode,
-    modeSince: Number.isInteger(value?.modeSince) ? value.modeSince : gameTime,
-    candidateMode: validMode(value?.candidateMode) ? value.candidateMode : null,
-    candidateTicks:
-      Number.isInteger(value?.candidateTicks) && value.candidateTicks >= 0
-        ? value.candidateTicks
-        : 0,
-  };
-}
+let usedCpu = 10;
+const context = {
+  module: { exports: {} },
+  exports: {},
+  Memory: {},
+  Game: {
+    time: 100,
+    cpu: {
+      bucket: 9000,
+      tickLimit: 100,
+      getUsed: () => usedCpu,
+    },
+  },
+  console,
+  Error,
+};
+vm.runInNewContext(
+  `${jsBlocks[0]}\n${jsBlocks[1]}`,
+  context,
+  { filename: "english-cpu-visible-implementation.js" },
+);
 
-function selectDesiredCpuMode(state, metrics, policy = CPU_POLICY) {
-  const { bucket, usedRatio } = metrics;
-
-  if (!Number.isFinite(bucket) || !Number.isFinite(usedRatio) || usedRatio < 0) {
-    return {
-      mode: CPU_MODE.EMERGENCY,
-      reason: "invalid-cpu-metrics",
-      immediate: true,
-    };
-  }
-
-  if (
-    bucket <= policy.hardEmergencyBucket
-    || usedRatio >= policy.hardUsedRatio
-  ) {
-    return {
-      mode: CPU_MODE.EMERGENCY,
-      reason: "hard-cpu-risk",
-      immediate: true,
-    };
-  }
-
-  if (bucket <= policy.emergencyBelow) {
-    return {
-      mode: CPU_MODE.EMERGENCY,
-      reason: "bucket-emergency",
-      immediate: false,
-    };
-  }
-
-  switch (state.mode) {
-    case CPU_MODE.NORMAL:
-      if (
-        bucket < policy.conserveBelow
-        || usedRatio >= policy.conserveUsedRatio
-      ) {
-        return {
-          mode: CPU_MODE.CONSERVE,
-          reason: "conserve-threshold",
-          immediate: false,
-        };
-      }
-      return { mode: CPU_MODE.NORMAL, reason: "healthy", immediate: false };
-
-    case CPU_MODE.CONSERVE:
-      if (
-        bucket >= policy.normalAbove
-        && usedRatio <= policy.normalUsedRatio
-      ) {
-        return {
-          mode: CPU_MODE.NORMAL,
-          reason: "normal-threshold",
-          immediate: false,
-        };
-      }
-      return {
-        mode: CPU_MODE.CONSERVE,
-        reason: "conserve-hold",
-        immediate: false,
-      };
-
-    case CPU_MODE.EMERGENCY:
-      if (
-        bucket >= policy.recoveryAbove
-        && usedRatio <= policy.recoveryUsedRatio
-      ) {
-        return {
-          mode: CPU_MODE.RECOVERY,
-          reason: "recovery-threshold",
-          immediate: false,
-        };
-      }
-      return {
-        mode: CPU_MODE.EMERGENCY,
-        reason: "emergency-hold",
-        immediate: false,
-      };
-
-    case CPU_MODE.RECOVERY:
-      if (
-        bucket < policy.conserveBelow
-        || usedRatio >= policy.conserveUsedRatio
-      ) {
-        return {
-          mode: CPU_MODE.CONSERVE,
-          reason: "recovery-regressed",
-          immediate: false,
-        };
-      }
-      if (
-        bucket >= policy.normalAbove
-        && usedRatio <= policy.normalUsedRatio
-      ) {
-        return {
-          mode: CPU_MODE.NORMAL,
-          reason: "recovery-complete",
-          immediate: false,
-        };
-      }
-      return {
-        mode: CPU_MODE.RECOVERY,
-        reason: "recovery-hold",
-        immediate: false,
-      };
-
-    default:
-      return {
-        mode: CPU_MODE.EMERGENCY,
-        reason: "invalid-state-mode",
-        immediate: true,
-      };
-  }
-}
-
-function updateCpuMode(previous, metrics, gameTime, policy = CPU_POLICY) {
-  const state = normalizeCpuState(previous, gameTime);
-  const desired = selectDesiredCpuMode(state, metrics, policy);
-
-  if (desired.mode === state.mode) {
-    return {
-      ...state,
-      candidateMode: null,
-      candidateTicks: 0,
-      changed: false,
-      reason: desired.reason,
-    };
-  }
-
-  if (desired.immediate) {
-    return {
-      mode: desired.mode,
-      modeSince: gameTime,
-      candidateMode: null,
-      candidateTicks: 0,
-      changed: true,
-      reason: desired.reason,
-    };
-  }
-
-  const candidateTicks = state.candidateMode === desired.mode
-    ? state.candidateTicks + 1
-    : 1;
-  const degrading = MODE_SEVERITY[desired.mode] > MODE_SEVERITY[state.mode];
-  const requiredTicks = degrading
-    ? policy.degradeConfirmTicks
-    : policy.recoverConfirmTicks;
-  const heldLongEnough = degrading
-    || gameTime - state.modeSince >= policy.minimumModeTicks;
-
-  if (candidateTicks >= requiredTicks && heldLongEnough) {
-    return {
-      mode: desired.mode,
-      modeSince: gameTime,
-      candidateMode: null,
-      candidateTicks: 0,
-      changed: true,
-      reason: desired.reason,
-    };
-  }
-
-  return {
-    ...state,
-    candidateMode: desired.mode,
-    candidateTicks,
-    changed: false,
-    reason: `confirm-${desired.reason}`,
-  };
-}
-
-const TASK_TIER = Object.freeze({
-  CRITICAL: "critical",
-  IMPORTANT: "important",
-  OPTIONAL: "optional",
-});
-
-function taskIntervalFor(
-  mode,
-  tier,
-  baseInterval,
-  recoveryAge,
-  recoveryWarmupTicks = 50,
-) {
-  if (!Number.isInteger(baseInterval) || baseInterval < 1) return null;
-  if (tier === TASK_TIER.CRITICAL) return baseInterval;
-
-  if (tier === TASK_TIER.IMPORTANT) {
-    if (mode === CPU_MODE.NORMAL) return baseInterval;
-    if (mode === CPU_MODE.CONSERVE) return Math.max(baseInterval, 2);
-    if (mode === CPU_MODE.EMERGENCY) return Math.max(baseInterval, 10);
-    return Math.max(baseInterval, 2);
-  }
-
-  if (tier === TASK_TIER.OPTIONAL) {
-    if (mode === CPU_MODE.NORMAL) return baseInterval;
-    if (mode === CPU_MODE.CONSERVE) return Math.max(baseInterval, 20);
-    if (mode === CPU_MODE.EMERGENCY) return null;
-    if (recoveryAge < recoveryWarmupTicks) return null;
-    return Math.max(baseInterval, 10);
-  }
-
-  return null;
-}
+const {
+  CPU_MODE,
+  CPU_POLICY,
+  TASK_TIER,
+  runCpuScheduler,
+  selectDesiredCpuMode,
+  updateCpuMode,
+  taskIntervalFor,
+  taskOffsetFor,
+  isCadenceTick,
+  hasNonCriticalHeadroom,
+  partitionTasks,
+} = context.module.exports;
 
 const results = [];
 function check(name, callback) {
@@ -264,163 +117,423 @@ const state = (
 
 check("healthy-normal", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: 9000, usedRatio: 0.3 }).mode,
-    "NORMAL",
+    selectDesiredCpuMode(
+      state(CPU_MODE.NORMAL),
+      { bucket: 9000, usedRatio: 0.3 },
+    ).mode,
+    CPU_MODE.NORMAL,
   );
 });
-check("low-bucket-conserve", () => {
+
+check("low-bucket-conserve-candidate", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: 6500, usedRatio: 0.3 }).mode,
-    "CONSERVE",
+    selectDesiredCpuMode(
+      state(CPU_MODE.NORMAL),
+      { bucket: 6500, usedRatio: 0.3 },
+    ).mode,
+    CPU_MODE.CONSERVE,
   );
 });
-check("high-used-ratio-conserve", () => {
+
+check("high-used-ratio-conserve-candidate", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: 9000, usedRatio: 0.75 }).mode,
-    "CONSERVE",
+    selectDesiredCpuMode(
+      state(CPU_MODE.NORMAL),
+      { bucket: 9000, usedRatio: 0.75 },
+    ).mode,
+    CPU_MODE.CONSERVE,
   );
 });
-check("emergency-threshold", () => {
+
+check("emergency-threshold-candidate", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: 1500, usedRatio: 0.3 }).mode,
-    "EMERGENCY",
+    selectDesiredCpuMode(
+      state(CPU_MODE.CONSERVE),
+      { bucket: 1500, usedRatio: 0.3 },
+    ).mode,
+    CPU_MODE.EMERGENCY,
   );
 });
+
 check("hard-bucket-immediate", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: 500, usedRatio: 0.2 }).immediate,
+    selectDesiredCpuMode(
+      state(CPU_MODE.NORMAL),
+      { bucket: 500, usedRatio: 0.2 },
+    ).immediate,
     true,
   );
 });
+
 check("hard-ratio-emergency", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: 9000, usedRatio: 0.95 }).mode,
-    "EMERGENCY",
+    selectDesiredCpuMode(
+      state(CPU_MODE.NORMAL),
+      { bucket: 9000, usedRatio: 0.95 },
+    ).mode,
+    CPU_MODE.EMERGENCY,
   );
 });
+
 check("invalid-metrics-fail-safe", () => {
   assert.equal(
-    selectDesiredCpuMode(state("NORMAL"), { bucket: Number.NaN, usedRatio: 0.2 }).reason,
+    selectDesiredCpuMode(
+      state(CPU_MODE.NORMAL),
+      { bucket: Number.NaN, usedRatio: 0.2 },
+    ).reason,
     "invalid-cpu-metrics",
   );
 });
+
 check("first-degrade-sample", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.NORMAL, 0),
+    { bucket: 6500, usedRatio: 0.2 },
+    100,
+  );
+  assert.equal(next.mode, CPU_MODE.NORMAL);
+  assert.equal(next.candidateTicks, 1);
+});
+
+check("second-degrade-sample", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.NORMAL, 0, CPU_MODE.CONSERVE, 1),
+    { bucket: 6500, usedRatio: 0.2 },
+    101,
+  );
+  assert.equal(next.changed, false);
+  assert.equal(next.candidateTicks, 2);
+});
+
+check("third-degrade-commits", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.NORMAL, 0, CPU_MODE.CONSERVE, 2),
+    { bucket: 6500, usedRatio: 0.2 },
+    102,
+  );
+  assert.equal(next.mode, CPU_MODE.CONSERVE);
+  assert.equal(next.changed, true);
+});
+
+check("candidate-reset", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.NORMAL, 0, CPU_MODE.CONSERVE, 2),
+    { bucket: 9000, usedRatio: 0.2 },
+    102,
+  );
+  assert.equal(next.mode, CPU_MODE.NORMAL);
+  assert.equal(next.candidateMode, null);
+  assert.equal(next.candidateTicks, 0);
+});
+
+check("hard-emergency-bypasses-confirmation", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.NORMAL, 0),
+    { bucket: 400, usedRatio: 0.2 },
+    100,
+  );
+  assert.equal(next.mode, CPU_MODE.EMERGENCY);
+  assert.equal(next.changed, true);
+});
+
+check("emergency-starts-recovery-candidate", () => {
   assert.equal(
-    updateCpuMode(state("NORMAL", 0), { bucket: 6500, usedRatio: 0.2 }, 100).candidateTicks,
+    selectDesiredCpuMode(
+      state(CPU_MODE.EMERGENCY),
+      { bucket: 5000, usedRatio: 0.4 },
+    ).mode,
+    CPU_MODE.RECOVERY,
+  );
+});
+
+check("nineteen-recovery-samples-do-not-commit", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.EMERGENCY, 80, CPU_MODE.RECOVERY, 18),
+    { bucket: 5000, usedRatio: 0.4 },
+    120,
+  );
+  assert.equal(next.mode, CPU_MODE.EMERGENCY);
+  assert.equal(next.candidateTicks, 19);
+});
+
+check("twentieth-recovery-sample-commits", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.EMERGENCY, 80, CPU_MODE.RECOVERY, 19),
+    { bucket: 5000, usedRatio: 0.4 },
+    120,
+  );
+  assert.equal(next.mode, CPU_MODE.RECOVERY);
+  assert.equal(next.changed, true);
+});
+
+check("minimum-hold-blocks-recovery", () => {
+  const next = updateCpuMode(
+    state(CPU_MODE.CONSERVE, 100, CPU_MODE.NORMAL, 19),
+    { bucket: 9000, usedRatio: 0.3 },
+    110,
+  );
+  assert.equal(next.mode, CPU_MODE.CONSERVE);
+  assert.equal(next.candidateTicks, 20);
+});
+
+check("recovery-regression-targets-conserve", () => {
+  assert.equal(
+    selectDesiredCpuMode(
+      state(CPU_MODE.RECOVERY),
+      { bucket: 6500, usedRatio: 0.3 },
+    ).mode,
+    CPU_MODE.CONSERVE,
+  );
+});
+
+check("recovery-complete-targets-normal", () => {
+  assert.equal(
+    selectDesiredCpuMode(
+      state(CPU_MODE.RECOVERY),
+      { bucket: 9000, usedRatio: 0.3 },
+    ).mode,
+    CPU_MODE.NORMAL,
+  );
+});
+
+check("invalid-state-normalizes-safely", () => {
+  assert.equal(
+    updateCpuMode(
+      { mode: "BAD" },
+      { bucket: 9000, usedRatio: 0.2 },
+      10,
+    ).mode,
+    CPU_MODE.NORMAL,
+  );
+});
+
+check("critical-normal-preserves-interval", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.NORMAL, TASK_TIER.CRITICAL, 1, 0),
     1,
   );
 });
-check("second-degrade-sample", () => {
+
+check("critical-emergency-preserves-interval", () => {
   assert.equal(
-    updateCpuMode(
-      state("NORMAL", 0, "CONSERVE", 1),
-      { bucket: 6500, usedRatio: 0.2 },
-      101,
-    ).changed,
+    taskIntervalFor(CPU_MODE.EMERGENCY, TASK_TIER.CRITICAL, 1, 0),
+    1,
+  );
+});
+
+check("important-conserve-throttles", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.CONSERVE, TASK_TIER.IMPORTANT, 1, 0),
+    2,
+  );
+});
+
+check("important-emergency-throttles-further", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.EMERGENCY, TASK_TIER.IMPORTANT, 1, 0),
+    10,
+  );
+});
+
+check("optional-conserve-throttles", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.CONSERVE, TASK_TIER.OPTIONAL, 1, 0),
+    20,
+  );
+});
+
+check("optional-emergency-disabled", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.EMERGENCY, TASK_TIER.OPTIONAL, 1, 0),
+    null,
+  );
+});
+
+check("optional-recovery-warmup-disabled", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.RECOVERY, TASK_TIER.OPTIONAL, 1, 49),
+    null,
+  );
+});
+
+check("optional-recovery-after-warmup-throttled", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.RECOVERY, TASK_TIER.OPTIONAL, 1, 50),
+    10,
+  );
+});
+
+check("normal-mode-preserves-base-interval", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.NORMAL, TASK_TIER.OPTIONAL, 5, 0),
+    5,
+  );
+});
+
+check("unknown-tier-rejected", () => {
+  assert.equal(
+    taskIntervalFor(CPU_MODE.NORMAL, "unknown", 1, 0),
+    null,
+  );
+});
+
+check("stable-task-offset", () => {
+  assert.equal(
+    taskOffsetFor("market-scan", 100),
+    taskOffsetFor("market-scan", 100),
+  );
+});
+
+check("cadence-uses-stable-offset", () => {
+  const offset = taskOffsetFor("path-planner", 100);
+  assert.equal(isCadenceTick("path-planner", 100, offset), true);
+  assert.equal(
+    isCadenceTick("path-planner", 100, (offset + 1) % 100),
     false,
   );
 });
-check("third-degrade-commits", () => {
-  assert.equal(
-    updateCpuMode(
-      state("NORMAL", 0, "CONSERVE", 2),
-      { bucket: 6500, usedRatio: 0.2 },
-      102,
-    ).mode,
-    "CONSERVE",
+
+check("null-task-isolated-before-sort", () => {
+  const output = partitionTasks([
+    null,
+    { name: "spawn", tier: TASK_TIER.CRITICAL, run() {} },
+  ]);
+  assert.deepEqual(
+    Array.from(output.results, (item) => item.status),
+    ["invalid-task"],
   );
-});
-check("candidate-reset", () => {
-  assert.equal(
-    updateCpuMode(
-      state("NORMAL", 0, "CONSERVE", 2),
-      { bucket: 9000, usedRatio: 0.2 },
-      102,
-    ).candidateTicks,
-    0,
+  assert.deepEqual(
+    Array.from(output.validTasks, (task) => task.name),
+    ["spawn"],
   );
-});
-check("hard-emergency-bypasses-confirmation", () => {
-  assert.equal(
-    updateCpuMode(state("NORMAL", 0), { bucket: 400, usedRatio: 0.2 }, 100).mode,
-    "EMERGENCY",
-  );
-});
-check("emergency-can-recover", () => {
-  assert.equal(
-    selectDesiredCpuMode(state("EMERGENCY"), { bucket: 5000, usedRatio: 0.4 }).mode,
-    "RECOVERY",
-  );
-});
-check("recovery-commits", () => {
-  assert.equal(
-    updateCpuMode(
-      state("EMERGENCY", 90, "RECOVERY", 19),
-      { bucket: 5000, usedRatio: 0.4 },
-      120,
-    ).mode,
-    "RECOVERY",
-  );
-});
-check("recovery-regresses", () => {
-  assert.equal(
-    selectDesiredCpuMode(state("RECOVERY"), { bucket: 6500, usedRatio: 0.3 }).mode,
-    "CONSERVE",
-  );
-});
-check("recovery-completes", () => {
-  assert.equal(
-    selectDesiredCpuMode(state("RECOVERY"), { bucket: 9000, usedRatio: 0.3 }).mode,
-    "NORMAL",
-  );
-});
-check("minimum-hold-blocks-recovery", () => {
-  assert.equal(
-    updateCpuMode(
-      state("CONSERVE", 100, "NORMAL", 19),
-      { bucket: 9000, usedRatio: 0.3 },
-      110,
-    ).mode,
-    "CONSERVE",
-  );
-});
-check("invalid-state-normalizes", () => {
-  assert.equal(
-    updateCpuMode({ mode: "BAD" }, { bucket: 9000, usedRatio: 0.2 }, 10).mode,
-    "NORMAL",
-  );
-});
-check("critical-normal-cadence", () => {
-  assert.equal(taskIntervalFor("NORMAL", "critical", 1, 0), 1);
-});
-check("critical-emergency-cadence", () => {
-  assert.equal(taskIntervalFor("EMERGENCY", "critical", 1, 0), 1);
-});
-check("important-conserve-throttle", () => {
-  assert.equal(taskIntervalFor("CONSERVE", "important", 1, 0), 2);
-});
-check("important-emergency-throttle", () => {
-  assert.equal(taskIntervalFor("EMERGENCY", "important", 1, 0), 10);
-});
-check("optional-emergency-disabled", () => {
-  assert.equal(taskIntervalFor("EMERGENCY", "optional", 1, 0), null);
-});
-check("optional-recovery-warmup-disabled", () => {
-  assert.equal(taskIntervalFor("RECOVERY", "optional", 1, 49), null);
-});
-check("optional-recovery-staggered", () => {
-  assert.equal(taskIntervalFor("RECOVERY", "optional", 1, 50), 10);
-});
-check("optional-normal-preserves-base", () => {
-  assert.equal(taskIntervalFor("NORMAL", "optional", 5, 0), 5);
-});
-check("unknown-tier-rejected", () => {
-  assert.equal(taskIntervalFor("NORMAL", "unknown", 1, 0), null);
 });
 
+check("missing-fields-and-unknown-tier-isolated", () => {
+  const output = partitionTasks([
+    { name: "missing-run", tier: TASK_TIER.CRITICAL },
+    { name: "unknown-tier", tier: "background", run() {} },
+    { tier: TASK_TIER.CRITICAL, run() {} },
+  ]);
+  assert.deepEqual(
+    Array.from(output.results, (item) => item.status),
+    ["invalid-task", "invalid-task", "invalid-task"],
+  );
+  assert.equal(output.validTasks.length, 0);
+});
+
+check("critical-first-ordering", () => {
+  const output = partitionTasks([
+    { name: "visual", tier: TASK_TIER.OPTIONAL, run() {} },
+    { name: "economy", tier: TASK_TIER.IMPORTANT, run() {} },
+    { name: "spawn", tier: TASK_TIER.CRITICAL, run() {} },
+    { name: "defense", tier: TASK_TIER.CRITICAL, run() {} },
+  ]);
+  assert.deepEqual(
+    Array.from(output.validTasks, (task) => task.name),
+    ["defense", "spawn", "economy", "visual"],
+  );
+});
+
+check("headroom-cutoff-below-threshold", () => {
+  usedCpu = 86;
+  context.Game.cpu.tickLimit = 100;
+  assert.equal(hasNonCriticalHeadroom(CPU_POLICY), false);
+});
+
+check("headroom-allows-work-above-threshold", () => {
+  usedCpu = 84;
+  context.Game.cpu.tickLimit = 100;
+  assert.equal(hasNonCriticalHeadroom(CPU_POLICY), true);
+});
+
+check("critical-runs-while-noncritical-stops-on-headroom", () => {
+  const execution = [];
+  context.Memory.cpuScheduler = {
+    mode: CPU_MODE.NORMAL,
+    modeSince: 0,
+    candidateMode: null,
+    candidateTicks: 0,
+    transitions: [],
+    failures: [],
+  };
+  context.Game.time = 200;
+  context.Game.cpu.bucket = 9000;
+  context.Game.cpu.tickLimit = 100;
+  usedCpu = 86;
+
+  const summary = runCpuScheduler([
+    {
+      name: "important-work",
+      tier: TASK_TIER.IMPORTANT,
+      interval: 1,
+      run() {
+        execution.push("important");
+      },
+    },
+    {
+      name: "critical-work",
+      tier: TASK_TIER.CRITICAL,
+      interval: 1,
+      run() {
+        execution.push("critical");
+      },
+    },
+  ]);
+
+  assert.deepEqual(execution, ["critical"]);
+  assert.equal(
+    summary.results.find((item) => item.name === "important-work").status,
+    "insufficient-headroom",
+  );
+});
+
+check("task-exception-isolated", () => {
+  context.Memory.cpuScheduler = {
+    mode: CPU_MODE.NORMAL,
+    modeSince: 0,
+    candidateMode: null,
+    candidateTicks: 0,
+    transitions: [],
+    failures: [],
+  };
+  context.Game.time = 201;
+  context.Game.cpu.bucket = 9000;
+  context.Game.cpu.tickLimit = 100;
+  usedCpu = 10;
+
+  const summary = runCpuScheduler([
+    {
+      name: "a-critical-fails",
+      tier: TASK_TIER.CRITICAL,
+      interval: 1,
+      run() {
+        throw new Error("expected test failure");
+      },
+    },
+    {
+      name: "b-critical-runs",
+      tier: TASK_TIER.CRITICAL,
+      interval: 1,
+      run() {
+        return "ok";
+      },
+    },
+  ]);
+
+  assert.equal(summary.results[0].status, "failed");
+  assert.equal(summary.results[1].status, "ran");
+  assert.equal(context.Memory.cpuScheduler.failures.length, 1);
+});
+
+assert.equal(
+  results.length,
+  38,
+  `Expected 38 deterministic English scheduler cases, got ${results.length}`,
+);
+
 console.log(
-  `批次模拟通过：screeps-cpu-bucket-degradation — ${results.length}个模式转换、迟滞、确认周期与任务许可场景通过。`,
+  `批次模拟通过：screeps-cpu-bucket-degradation — 英文可见实现 ${results.length} 个 deterministic cases PASS；3 个英文 JavaScript blocks syntax PASS。`,
 );
 console.log(
-  "CPU降载文章离线模拟通过。真实Screeps CPU单位、bucket趋势与官方shard主循环仍待环境验证。",
+  "覆盖连续降载/恢复确认、minimum hold、candidate reset、四模式转换、任务 interval、稳定 offset、损坏任务隔离、critical-first、headroom cutoff 与任务异常隔离。Console/Live 仍为 Pending。",
 );

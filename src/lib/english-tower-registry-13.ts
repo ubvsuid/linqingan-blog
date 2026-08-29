@@ -34,26 +34,26 @@ export const englishTowerBatchThirteenRegistry:
   {
     href: "/en/blog/screeps-tower-heal-creeps",
     chinesePath: "/blog/screeps-tower-heal-creeps",
-    category: "DEFENSE · TOWER HEAL EVENTS",
+    category: "DEFENSE · TOWER HEAL PRIORITY",
     title:
-      "Screeps Tower.heal(): Verify Exact Heal Events",
+      "Screeps Tower Healing: Injury Ratio, Missing Hits, and Range",
     description:
-      "Include injured owned Creeps and Power Creeps, rank urgency deterministically, estimate range-adjusted healing to limit over-heal, submit one intent per Tower, and verify exact prior-tick ranged-heal events.",
+      "Find injured owned Creeps, rank lower hit ratios before missing hits and nearest-Tower range, require active owned Towers with TOWER_ENERGY_COST, save heal() results, avoid caching stale targets, and leave over-heal optimization to a later dispatcher.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    updatedAt: "2026-08-01",
-    readingTime: "15 min read",
-    primaryKeyword: "Screeps StructureTower heal",
+    updatedAt: "2026-08-28",
+    readingTime: "17 min read",
+    primaryKeyword: "Screeps Tower heal Creeps",
     searchIntent:
-      "Allocate Tower healing to owned Creeps or Power Creeps and verify every accepted ranged-heal event",
+      "Heal the most urgent owned injured Creep with deterministic Tower priorities",
     status: "published",
     finalScore: 98,
     keywords: [
+      "Screeps Tower heal Creeps",
       "Screeps StructureTower heal",
-      "Screeps Tower heal event",
-      "FIND_MY_POWER_CREEPS",
-      "EVENT_HEAL_TYPE_RANGED",
-      "Screeps Tower over heal",
+      "Screeps injured Creep priority",
+      "Screeps Tower heal range falloff",
+      "Screeps TOWER_ENERGY_COST",
     ],
   },
   {
