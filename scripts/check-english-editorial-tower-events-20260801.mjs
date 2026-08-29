@@ -91,6 +91,11 @@ const expected = [
       "Heal Owned Creeps and Power Creeps Without Guessing the Result",
     intent:
       "Allocate Tower healing to owned Creeps or Power Creeps and verify every accepted ranged-heal event",
+    registryTitle:
+      "Screeps Tower Healing: Injury Ratio, Missing Hits, and Range",
+    registryIntent:
+      "Heal the most urgent owned injured Creep with deterministic Tower priorities",
+    registryUpdatedAt: "2026-08-28",
     signals: [
       "FIND_MY_POWER_CREEPS",
       "EVENT_HEAL",
@@ -344,13 +349,17 @@ for (const text of [
 }
 
 for (const item of expected) {
+  const registryTitle = item.registryTitle ?? item.title;
+  const registryIntent = item.registryIntent ?? item.intent;
+  const registryUpdatedAt = item.registryUpdatedAt ?? "2026-08-01";
+
   for (const text of [
     `href: "${item.path}"`,
     `chinesePath: "${item.chinesePath}"`,
-    item.title,
-    item.intent,
+    registryTitle,
+    registryIntent,
     'publishedAt: "2026-07-26"',
-    'updatedAt: "2026-08-01"',
+    `updatedAt: "${registryUpdatedAt}"`,
     "finalScore: 98",
   ]) {
     if (!registry.includes(text)) {
