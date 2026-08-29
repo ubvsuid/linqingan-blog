@@ -230,6 +230,14 @@ const editorialMetadataOverrides: Record<string, Partial<EnglishArticleRecord>> 
   },
 };
 
+const editorialDifficultyOverrides: Partial<Record<string, EnglishDifficulty>> = {
+  "/en/blog/screeps-cpu-bucket-degradation": "Advanced",
+};
+
+const editorialContentTypeOverrides: Partial<Record<string, EnglishContentType>> = {
+  "/en/blog/screeps-spawn-exit-blocked-directions": "Debugging",
+};
+
 function articleText(article: EnglishArticleRecord): string {
   return [
     article.category,
@@ -299,8 +307,8 @@ export const englishDiscoveryArticles: EnglishDiscoveryArticle[] = publishedEngl
     moduleNumber,
     moduleTitle,
     moduleHref,
-    difficulty: getDifficulty(editorialArticle),
-    contentType: getContentType(editorialArticle),
+    difficulty: editorialDifficultyOverrides[editorialArticle.href] ?? getDifficulty(editorialArticle),
+    contentType: editorialContentTypeOverrides[editorialArticle.href] ?? getContentType(editorialArticle),
     tags: tags.map((tag) => tag.label),
     tagSlugs: tags.map((tag) => tag.slug),
     updatedAt,
