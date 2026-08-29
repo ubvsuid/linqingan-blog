@@ -140,11 +140,33 @@ const completeRegistrySource = fs.readFileSync(
   path.join(root, "src", "lib", "english-articles-complete.ts"),
   "utf8",
 );
+const bilingualRegistryPath = path.join(
+  root,
+  "src",
+  "lib",
+  "english-articles-complete-bilingual.ts",
+);
+const bilingualRegistrySource = fs.existsSync(bilingualRegistryPath)
+  ? fs.readFileSync(bilingualRegistryPath, "utf8")
+  : "";
+const standaloneRegistryFiles = new Set(
+  standaloneHrefs.map((record) => record.fileName),
+);
 
 for (const fileName of registryFiles.filter((name) => name !== "english-articles.ts")) {
   const stem = fileName.replace(/\.ts$/, "");
-  if (!completeRegistrySource.includes(`./${stem}`)) {
-    failures.push(`统一英文登记未导入 ${fileName}`);
+  const importedByComplete = completeRegistrySource.includes(`./${stem}`);
+  const importedByBilingual = bilingualRegistrySource.includes(`./${stem}`);
+
+  if (standaloneRegistryFiles.has(fileName)) {
+    if (!importedByComplete) {
+      failures.push(`统一英文登记未直接导入英文原创 ${fileName}`);
+    }
+    continue;
+  }
+
+  if (!importedByComplete && !importedByBilingual) {
+    failures.push(`统一英文登记链未导入双语登记 ${fileName}`);
   }
 }
 
