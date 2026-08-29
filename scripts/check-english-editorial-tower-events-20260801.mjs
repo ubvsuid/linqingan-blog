@@ -392,8 +392,8 @@ for (const text of [
   "Memory.towerHealing",
   "EVENT_ATTACK_TYPE_RANGED",
   "energySpent",
-  '"dateModified":"2026-08-01"',
-  '"dateModified":"2026-08-28"',
+  'modifiedAt: "2026-08-01"',
+  'modifiedAt: "2026-08-28"',
   '"@type":"BlogPosting"',
   '"@type":"FAQPage"',
 ]) {
