@@ -5,6 +5,7 @@ const articles = [
   {
     path: "/en/blog/screeps-introduction",
     chinesePath: "/blog/screeps-introduction",
+    modifiedAt: "2026-08-18",
     signals: [
       "Persistent world does not make",
       "runtime-state-boundary",
@@ -19,17 +20,19 @@ const articles = [
   {
     path: "/en/blog/screeps-first-room",
     chinesePath: "/blog/screeps-first-room",
+    modifiedAt: "2026-08-28",
     signals: [
-      "Do not confuse visibility with ownership",
+      "Find and open the three work areas",
+      "semantic arrival checks",
       "visibility-ownership-boundary",
-      "bounded-room-snapshot",
+      "Object.keys(Game.rooms)",
       "FIND_MY_SPAWNS",
       "FIND_MY_CREEPS",
-      "room.controller.my === true",
-      "no-currently-visible-room",
-      "Current official-documentation review plus Chinese-source and static editorial/code review",
+      "room.controller?.my",
+      "JavaScript syntax",
+      "Semantic navigation only",
       "Screeps Console test",
-      "Live multi-tick verification pending",
+      "Live multi-tick verification",
     ],
   },
 ];
@@ -61,7 +64,7 @@ for (const article of articles) {
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-18"`,
+    `"dateModified":"${article.modifiedAt}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: missing “${expected}”`);
@@ -84,8 +87,11 @@ const { body: roomBody } = await fetchText("/en/blog/screeps-first-room");
 if (roomBody.includes("Game.rooms is your owned rooms")) {
   failures.push("First Room still conflates Game.rooms visibility with ownership");
 }
-if (!roomBody.includes("no live <code>Room</code> object is available")) {
+if (!roomBody.includes("first confirm that a live <code>Room</code> exists before reading deeper Room state")) {
   failures.push("First Room does not preserve the current-visibility evidence boundary");
+}
+if (roomBody.includes("bounded-room-snapshot")) {
+  failures.push("First Room still exposes the superseded bounded-room-snapshot section");
 }
 
 for (const path of [
@@ -95,7 +101,7 @@ for (const path of [
   const { body } = await fetchText(path);
   if (
     body.includes("runtime-state-boundary")
-    || body.includes("bounded-room-snapshot")
+    || body.includes("visibility-ownership-boundary")
   ) {
     failures.push(`${path}: received content from the thirteenth editorial batch`);
   }
@@ -108,9 +114,9 @@ if (sitemapResponse.status !== 200) {
   failures.push(`/sitemap-en.xml: expected 200, got ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
-    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>${article.modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${article.path}: Sitemap lastmod is not aligned with the 2026-08-18 substantive revision`);
+      failures.push(`${article.path}: Sitemap lastmod is not aligned with the ${article.modifiedAt} substantive revision`);
     }
   }
 
@@ -133,5 +139,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Thirteenth English editorial smoke passed: persistent-world/runtime-state boundaries, room visibility versus ownership, read-only inventory, canonical/hreflang, structured data, freshness, and Pending live evidence.",
+  "Thirteenth English editorial smoke passed: the August 18 introduction boundaries remain intact, First Room uses its August 28 navigation/visibility supersession, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
 );
