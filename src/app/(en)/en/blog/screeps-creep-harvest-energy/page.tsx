@@ -22,6 +22,7 @@ function requireArticle(): EnglishBeginnerArticle {
 
   if (
     !record
+    || !record.chinesePath
     || !override?.title
     || !override.headline
     || !override.description

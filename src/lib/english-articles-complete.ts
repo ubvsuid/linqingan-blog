@@ -1,7 +1,7 @@
 import {
   englishArticleRoutePairs as baseEnglishArticleRoutePairs,
   publishedEnglishArticles as basePublishedEnglishArticles,
-  type EnglishArticleRecord,
+  type EnglishArticleRecord as BilingualEnglishArticleRecord,
 } from "./english-articles";
 import { englishFoundationBatchTwoRegistry } from "./english-foundation-registry-2";
 import { englishSpawnBatchThreeRegistry } from "./english-spawn-registry-3";
@@ -20,8 +20,12 @@ import { englishConstructionSafetyBatchFifteenRegistry } from "./english-constru
 import { englishConfigCodeBatchSixteenRegistry } from "./english-config-code-registry-16";
 import { englishDefenseOperationsBatchSeventeenRegistry } from "./english-defense-operations-registry-17";
 import { englishLinkSourceBatchEighteenRegistry } from "./english-link-source-registry-18";
+import { englishPathfinderBatchNineteenRegistry } from "./english-pathfinder-registry-19";
 
-export type { EnglishArticleRecord };
+export interface EnglishArticleRecord extends Omit<BilingualEnglishArticleRecord, "chinesePath"> {
+  chinesePath?: string;
+  updatedAt?: string;
+}
 
 type EnglishArticleRecordOverride = Partial<EnglishArticleRecord> & {
   updatedAt?: string;
@@ -388,6 +392,7 @@ const allPublishedEnglishArticles: EnglishArticleRecord[] = [
   ...englishConfigCodeBatchSixteenRegistry,
   ...englishDefenseOperationsBatchSeventeenRegistry,
   ...englishLinkSourceBatchEighteenRegistry,
+  ...englishPathfinderBatchNineteenRegistry,
 ];
 
 export const publishedEnglishArticles: EnglishArticleRecord[] =
