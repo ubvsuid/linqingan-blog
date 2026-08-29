@@ -386,13 +386,14 @@ for (const text of [
 
 for (const text of [
   "verified-tower-volley",
-  "verified-tower-healing",
   "verified-tower-repair",
-  "FIND_MY_POWER_CREEPS",
+  "FIND_MY_CREEPS",
+  "heal-partial",
+  "Memory.towerHealing",
   "EVENT_ATTACK_TYPE_RANGED",
-  "EVENT_HEAL_TYPE_RANGED",
   "energySpent",
   '"dateModified":"2026-08-01"',
+  '"dateModified":"2026-08-28"',
   '"@type":"BlogPosting"',
   '"@type":"FAQPage"',
 ]) {
@@ -434,5 +435,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Deep Tower event editorial gate passed: 3 existing routes, 35 TOC anchors, 18 JavaScript blocks, exact prior-tick attack/heal/repair event identity, 98-point internal thresholds, and explicit Pending live evidence.",
+  "Deep Tower event editorial gate passed: historical 2026-08-01 payloads remain intact, current registry supersession is explicit, and production smoke covers the current Tower heal workflow separately.",
 );
