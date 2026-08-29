@@ -15,6 +15,7 @@ import { englishEditorialRecoveryStorageBuildOverrides20260803 } from "./english
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
 import { englishEditorialSpawnRouteMemoryOverrides20260731 } from "./english-editorial-spawn-route-memory-overrides-20260731";
 import { englishEditorialTargetsVisualModulesOverrides20260731 } from "./english-editorial-targets-visual-modules-overrides-20260731";
+import { applyEnglishEditorialThirteenth20260818 } from "./english-editorial-thirteenth-20260818";
 import { englishEditorialTowerEventsOverrides20260801 } from "./english-editorial-tower-events-overrides-20260801";
 import { englishTowerHealArticle } from "./english-tower-heal-13";
 
@@ -150,10 +151,7 @@ const firstLoopStateNotifyEditorialArticles = Object.fromEntries(
   ]),
 ) as Record<string, EnglishBeginnerArticle>;
 
-export const englishEditorialPublished20260731: Record<
-  string,
-  EnglishBeginnerArticle
-> = {
+const publishedEditorialBase: Record<string, EnglishBeginnerArticle> = {
   ...movementEditorialArticles,
   ...englishEditorialCorePublished20260731,
   ...englishEditorialRuntimeOverrides20260731,
@@ -172,6 +170,20 @@ export const englishEditorialPublished20260731: Record<
   ...englishEditorialAccessRecycleDestroyOverrides20260804,
   ...englishEditorialObservabilityEvidenceOverrides20260805,
   [englishTowerHealArticle.slug]: englishTowerHealArticle,
+};
+
+const currentFirstRoom = applyEnglishEditorialThirteenth20260818(
+  publishedEditorialBase["screeps-first-room"],
+);
+
+export const englishEditorialPublished20260731: Record<
+  string,
+  EnglishBeginnerArticle
+> = {
+  ...publishedEditorialBase,
+  ...(currentFirstRoom
+    ? { [currentFirstRoom.slug]: currentFirstRoom }
+    : {}),
 };
 
 export function getEnglishEditorialPublished20260731(
