@@ -7,6 +7,7 @@ const revised = [
     title: "Screeps withdraw(): Take Energy from a Container Safely",
     indexTitle: "How to Make a Screeps Creep Withdraw Energy from a Container",
     headline: "How to Make a Screeps Creep Withdraw Energy from a Container",
+    modifiedAt: "2026-08-16",
     signals: [
       "Omitted, zero, and explicit withdraw amounts are different policy choices",
       "an explicit numeric <code>0</code> is also falsy",
@@ -25,6 +26,7 @@ const revised = [
     title: "Screeps pickup(): Collect Dropped Energy Safely",
     indexTitle: "How to Make a Screeps Creep Pick Up Dropped Energy",
     headline: "How to Make a Screeps Creep Pick Up Dropped Energy",
+    modifiedAt: "2026-08-16",
     signals: [
       "Store capacity is the pickup boundary; active CARRY is diagnostic context",
       "does not use <code>getActiveBodyparts(CARRY)</code> as an API preflight",
@@ -42,17 +44,23 @@ const revised = [
     chinesePath: "/blog/screeps-creep-deliver-energy",
     title: "Screeps Energy Delivery: Creep to Spawn",
     headline: "How to Make a Screeps Creep Deliver Energy to a Spawn",
+    modifiedAt: "2026-08-29",
     signals: [
-      "Omitted transfer amount is convenient, but it is still a snapshot",
-      "An explicit numeric <code>0</code> follows the same falsy/default path",
-      "actual transfer can be truncated",
-      "A full-only phase switch can waste the last Source harvest",
-      "Source <code>harvest()</code> submission path does not return <code>ERR_FULL</code>",
-      "freeEnergyCapacity &lt; harvestBatch",
-      "The early-delivery threshold is a conservative no-overflow policy",
-      "Pending — no live zero-amount transfer or near-full Source harvest trace is claimed",
+      "Keep delivery mode until the Creep is empty",
+      "empty Store → harvest",
+      "full Store → deliver",
+      "creep.memory.delivering = true",
+      "spawn.store.getFreeCapacity(RESOURCE_ENERGY)",
+      "harvest until the Energy Store is full, then deliver until it is empty",
+      "larger-body capacity guard",
+      "scheduled action rather than same-line proof of the processed amount",
+      "Pending — no live transfer transcript is claimed",
+      "Pending — no real-shard multi-tick delivery trace is claimed",
     ],
-    forbidden: [],
+    forbidden: [
+      "Omitted transfer amount is convenient, but it is still a snapshot",
+      "freeEnergyCapacity &lt; harvestBatch",
+    ],
   },
 ];
 
@@ -80,8 +88,8 @@ for (const article of revised) {
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `property="article:modified_time" content="2026-08-16"`,
-    `"dateModified":"2026-08-16"`,
+    `property="article:modified_time" content="${article.modifiedAt}"`,
+    `"dateModified":"${article.modifiedAt}"`,
     `"@type":"BlogPosting"`,
     "Screeps Console test",
     "Pending",
@@ -153,5 +161,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Sixth English editorial smoke passed: withdraw distinguishes default/zero/requested amounts from processed amounts, pickup keeps Store capacity separate from active-CARRY diagnostics, transfer separates requested delivery from processor truncation and Source overflow, freshness is scoped to three pages, and live evidence remains Pending.",
+  "Sixth English editorial smoke passed: withdraw and pickup retain their August 16 API-boundary revisions, while Transfer verifies the reviewed August 29 beginner round-trip contract, discovery freshness, and explicit Pending live evidence.",
 );
