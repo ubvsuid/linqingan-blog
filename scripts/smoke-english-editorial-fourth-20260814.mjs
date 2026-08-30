@@ -4,18 +4,18 @@ const revised = [
   {
     path: "/en/blog/screeps-creep-harvest-energy",
     chinesePath: "/blog/screeps-first-creep-harvest",
-    title: "Screeps Creep.harvest(): Full Stores, Return Codes, and Safe Energy Loops",
-    headline: "Screeps Harvest Energy Without the ERR_FULL Mistake",
-    modifiedAt: "2026-08-17",
+    title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    headline: "How to Harvest Energy With Your First Creep",
+    modifiedAt: "2026-08-29",
     signals: [
-      "harvest() does not return ERR_FULL for a Source",
+      "Source harvesting does not return <code>ERR_FULL</code>",
       "FIND_SOURCES_ACTIVE",
-      "harvestBatch = activeWork * HARVEST_POWER",
+      "const nextBatch = activeWork * HARVEST_POWER",
       "ready-for-delivery",
-      "overflow is dropped on the ground",
-      "Source-specific Creep.harvest() results",
+      "body-store-mismatch",
+      "Source-specific Creep.harvest() return codes",
       "Official engine source",
-      "Pending — no live full-Store harvest",
+      "Pending — no live near-full, full-Store, or dropped-overflow comparison is claimed",
     ],
     forbidden: [
       "worker Store full",
@@ -171,5 +171,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourth English editorial smoke passed: the original Source ERR_FULL, Extension blocker, and Builder Controller safeguards remain enforced; Build Repair keeps August 14 freshness while Harvest and First Extension carry their later August 17 verified revisions; live evidence remains Pending.",
+  "Fourth English editorial smoke passed: Harvest now validates the reviewed August 29 beginner Source loop, First Extension retains its August 17 revision, Build Repair keeps August 14 freshness, and live evidence remains Pending.",
 );
