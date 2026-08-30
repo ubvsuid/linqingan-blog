@@ -247,6 +247,9 @@ const editorialMetadataOverrides: Record<string, Partial<EnglishArticleRecord>> 
     readingTime: "9 min read",
     updatedAt: "2026-08-29",
   },
+  "/en/blog/screeps-room-energyavailable-stuck": {
+    updatedAt: "2026-08-29",
+  },
   "/en/blog/screeps-cpu-bucket-degradation": {
     description:
       "Build a four-mode Screeps CPU degradation scheduler with hysteresis, consecutive-tick confirmation, critical-first task tiers, stable staggering, CPU headroom guards, and gradual recovery.",
