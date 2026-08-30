@@ -5,7 +5,7 @@ const revised = [
     path: "/en/blog/screeps-creep-harvest-energy",
     chinesePath: "/blog/screeps-first-creep-harvest",
     title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
-    indexTitle: "Screeps Harvest Energy: Your First Creep Script",
+    indexTitle: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
     headline: "How to Harvest Energy With Your First Creep",
     modifiedAt: "2026-08-29",
     signals: [
@@ -174,5 +174,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourth English editorial smoke passed: Harvest validates the reviewed August 29 page separately from its discovery listing title, First Extension retains its August 17 revision, Build Repair keeps August 14 freshness, and live evidence remains Pending.",
+  "Fourth English editorial smoke passed: Harvest page and discovery metadata match the reviewed August 29 supersession, First Extension retains its August 17 revision, Build Repair keeps August 14 freshness, and live evidence remains Pending.",
 );
