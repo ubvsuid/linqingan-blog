@@ -60,11 +60,11 @@ function finalizeTerminalSendArticle(
     !request
     || request.enabled !== true
     || !Number.isInteger(request.revision)
-    || request.revision < 1
+    || request.revision &lt; 1
     || request.confirmation
       !== buildTerminalSendConfirmation(request)
     || !Number.isInteger(request.amount)
-    || request.amount < TERMINAL_MIN_SEND
+    || request.amount &lt; TERMINAL_MIN_SEND
   ) {`,
     String.raw`  if (
     !request
@@ -72,17 +72,17 @@ function finalizeTerminalSendArticle(
     || typeof request.requestId !== 'string'
     || request.requestId.length === 0
     || !Number.isInteger(request.revision)
-    || request.revision < 1
+    || request.revision &lt; 1
     || typeof request.terminalId !== 'string'
     || request.terminalId.length === 0
     || typeof request.resourceType !== 'string'
     || request.resourceType.length === 0
     || !Number.isInteger(request.amount)
-    || request.amount < TERMINAL_MIN_SEND
+    || request.amount &lt; TERMINAL_MIN_SEND
     || typeof request.destination !== 'string'
     || request.destination.length === 0
     || !Number.isFinite(request.energyReserve)
-    || request.energyReserve < 0
+    || request.energyReserve &lt; 0
     || request.confirmation
       !== buildTerminalSendConfirmation(request)
   ) {`,
