@@ -9,7 +9,7 @@ function applyFourthEditorialIndexMetadata() {
     const slug = article.href.split("/").pop() ?? "";
     const override = englishEditorialFourthArticleOverrides20260814[slug];
 
-    if (!override) return article;
+    if (!override || slug === "screeps-creep-harvest-energy") return article;
 
     return {
       ...article,
