@@ -40,8 +40,13 @@ for (const required of [
   "RawMemory.setActiveSegments(activeNextTick)",
   "coordinator.requested.clear()",
   "segment-unavailable",
-  "not cryptographic, collision-resistant, secret",
-  "buildNotificationPayloadDigest(request)",
+  'title: "Screeps Game.notify(): Send Rate-Limited Alerts Safely"',
+  "Game.notify(message, groupInterval)",
+  "Memory.notificationIncidents",
+  "notification-scheduled",
+  "already-reported",
+  "local-budget-exhausted",
+  "External inbox delivery observation",
   "static analysis only",
 ]) {
   if (!source.includes(required)) {
@@ -51,11 +56,12 @@ for (const required of [
 
 for (const forbidden of [
   "replace-with-current-payload-digest",
+  "buildNotificationPayloadDigest(request)",
   "Console test passed",
   "Live multi-tick verification passed",
 ]) {
   if (source.includes(forbidden)) {
-    failures.push(`Editorial override contains forbidden evidence or placeholder: ${forbidden}`);
+    failures.push(`Editorial override contains superseded or forbidden evidence: ${forbidden}`);
   }
 }
 
@@ -70,8 +76,8 @@ const blocks = [
   .replaceAll("&quot;", '"')
   .replaceAll("&#39;", "'"));
 
-if (blocks.length !== 5) {
-  failures.push(`Expected 5 revised JavaScript blocks, received ${blocks.length}`);
+if (blocks.length !== 7) {
+  failures.push(`Expected 7 current JavaScript blocks, received ${blocks.length}`);
 }
 
 for (const [index, code] of blocks.entries()) {
@@ -86,18 +92,37 @@ for (const [index, code] of blocks.entries()) {
     });
   } catch (error) {
     failures.push(
-      `Revised JavaScript block ${index + 1} failed node --check: ${error.message}`,
+      `Current JavaScript block ${index + 1} failed node --check: ${error.message}`,
     );
   } finally {
     unlinkSync(temporaryPath);
   }
 }
 
-if (blocks.length === 5) {
+const findBlock = (signal) =>
+  blocks.find((code) => code.includes(signal)) ?? null;
+
+const cpuBlock = findBlock("function measureCpu");
+const segmentBlock = findBlock("function getSegmentCoordinator");
+const sendNotificationBlock = findBlock("function sendNotification");
+const notifyIncidentBlock = findBlock("function notifyIncident");
+const notificationBudgetBlock = findBlock("function createNotificationBudget");
+
+for (const [label, block] of [
+  ["CPU probe", cpuBlock],
+  ["Segment coordinator", segmentBlock],
+  ["Notification sender", sendNotificationBlock],
+  ["Notification incident state", notifyIncidentBlock],
+  ["Notification shared budget", notificationBudgetBlock],
+]) {
+  if (!block) failures.push(`${label} executable block is missing`);
+}
+
+if (cpuBlock) {
   const cpuContext = vm.createContext({
     Game: { time: 101, cpu: { getUsed: () => 0 } },
   });
-  vm.runInContext(blocks[0], cpuContext);
+  vm.runInContext(cpuBlock, cpuContext);
 
   const invalid = vm.runInContext("measureCpu('invalid', null)", cpuContext);
   assert(invalid.status === "function-required", "CPU invalid callback state failed");
@@ -110,7 +135,9 @@ if (blocks.length === 5) {
   const measured = vm.runInContext("measureCpu('measured', () => 7)", cpuContext);
   assert(measured.status === "sample-recorded", "CPU positive sample state failed");
   assert(measured.cpu === 0.5, "CPU delta calculation failed");
+}
 
+if (segmentBlock) {
   const activeCalls = [];
   const segmentContext = vm.createContext({
     Game: { time: 200 },
@@ -123,7 +150,7 @@ if (blocks.length === 5) {
     Map,
     Number,
   });
-  vm.runInContext(blocks[1], segmentContext);
+  vm.runInContext(segmentBlock, segmentContext);
 
   const invalidSegment = vm.runInContext("requestSegment(100, 1)", segmentContext);
   assert(!invalidSegment.accepted, "Segment ID 100 was accepted");
@@ -154,40 +181,93 @@ if (blocks.length === 5) {
   segmentContext.Game.time = 201;
   const nextTickRequest = vm.runInContext("requestSegment(20, 100)", segmentContext);
   assert(nextTickRequest.accepted, "Next-tick Segment request did not recover");
+}
 
+if (sendNotificationBlock && notifyIncidentBlock && notificationBudgetBlock) {
+  const notifyResults = [];
   const notifyContext = vm.createContext({
     Memory: {},
-    Game: { time: 300 },
+    Game: {
+      time: 300,
+      notify(message, groupInterval) {
+        notifyResults.push({ message, groupInterval });
+        return 0;
+      },
+    },
+    OK: 0,
+    ERR_FULL: -8,
     Math,
+    Number,
   });
-  vm.runInContext(blocks[3], notifyContext);
-  vm.runInContext(blocks[4], notifyContext);
+  vm.runInContext(sendNotificationBlock, notifyContext);
+  vm.runInContext(notifyIncidentBlock, notifyContext);
+  vm.runInContext(notificationBudgetBlock, notifyContext);
 
-  const confirmation = vm.runInContext(
-    "Memory.notificationRequests['spawn-energy-low'].confirmation",
+  const invalidMessage = vm.runInContext(
+    "sendNotification('', 0)",
     notifyContext,
   );
-  assert(
-    confirmation.startsWith("SUBMIT_NOTIFICATION_spawn-energy-low_3_"),
-    "Notification confirmation identity was not generated",
-  );
+  assert(invalidMessage.status === "invalid-message", "Empty notification message was accepted");
 
-  const stable = vm.runInContext(
-    "buildNotificationPayloadDigest(Memory.notificationRequests['spawn-energy-low'])",
+  const scheduled = vm.runInContext(
+    "sendNotification('ready', 30)",
     notifyContext,
   );
-  const repeated = vm.runInContext(
-    "buildNotificationPayloadDigest(Memory.notificationRequests['spawn-energy-low'])",
-    notifyContext,
-  );
-  assert(stable === repeated, "Notification digest was not deterministic");
+  assert(scheduled.status === "notification-scheduled", "OK notification was not marked scheduled");
+  assert(scheduled.result === 0, "Notification sender did not preserve the raw OK result");
 
-  notifyContext.Memory.notificationRequests["spawn-energy-low"].message = "changed";
-  const changed = vm.runInContext(
-    "buildNotificationPayloadDigest(Memory.notificationRequests['spawn-energy-low'])",
+  notifyContext.Game.notify = () => -8;
+  const rejected = vm.runInContext(
+    "sendNotification('full', 0)",
     notifyContext,
   );
-  assert(stable !== changed, "Notification digest did not detect payload drift");
+  assert(rejected.status === "notification-not-scheduled", "ERR_FULL notification was marked scheduled");
+
+  notifyContext.Game.notify = (message, groupInterval) => {
+    notifyResults.push({ message, groupInterval });
+    return 0;
+  };
+  const clear = vm.runInContext(
+    "notifyIncident({ key: 'spawn-low', active: false, message: 'clear' })",
+    notifyContext,
+  );
+  assert(clear.status === "incident-clear", "Inactive incident did not clear");
+
+  const firstIncident = vm.runInContext(
+    "notifyIncident({ key: 'spawn-low', active: true, message: 'low', groupInterval: 30 })",
+    notifyContext,
+  );
+  assert(firstIncident.status === "notification-scheduled", "First active incident was not scheduled");
+  assert(notifyContext.Memory.notificationIncidents["spawn-low"].active === true, "Incident state was not activated after OK");
+  assert(notifyContext.Memory.notificationIncidents["spawn-low"].lastScheduledAt === 300, "Incident scheduled tick was not stored");
+
+  const repeatedIncident = vm.runInContext(
+    "notifyIncident({ key: 'spawn-low', active: true, message: 'low', groupInterval: 30 })",
+    notifyContext,
+  );
+  assert(repeatedIncident.status === "already-reported", "Repeated active incident was not suppressed");
+
+  notifyContext.Game.time = 305;
+  const repeatDue = vm.runInContext(
+    "notifyIncident({ key: 'spawn-low', active: true, message: 'low', groupInterval: 30, repeatAfterTicks: 5 })",
+    notifyContext,
+  );
+  assert(repeatDue.status === "notification-scheduled", "Due incident reminder did not recover");
+
+  const budgetResult = vm.runInContext(
+    `(() => {
+      const budget = createNotificationBudget(1);
+      return [
+        budget.send('first', 0).status,
+        budget.send('second', 0).status,
+        budget.getScheduledCount()
+      ];
+    })()`,
+    notifyContext,
+  );
+  assert(budgetResult[0] === "notification-scheduled", "Shared notification budget rejected the first slot");
+  assert(budgetResult[1] === "local-budget-exhausted", "Shared notification budget did not enforce its local cap");
+  assert(budgetResult[2] === 1, "Shared notification budget count was not preserved");
 }
 
 const overrideIndex = route.indexOf(
@@ -227,8 +307,8 @@ for (const signal of [
   if (!audit.includes(signal)) failures.push(`Audit record is missing: ${signal}`);
 }
 
-if (assertions !== 16) {
-  failures.push(`Expected 16 offline assertions, executed ${assertions}`);
+if (assertions !== 26) {
+  failures.push(`Expected 26 offline assertions, executed ${assertions}`);
 }
 
 if (failures.length > 0) {
@@ -238,5 +318,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `August English editorial gate passed: 3 existing URLs, 5 revised JavaScript blocks, ${assertions} offline boundary assertions, stable publication order, scoped dateModified, 98-point internal scorecards, and Pending live evidence.`,
+  `August English editorial gate passed: 3 existing URLs, 7 current JavaScript blocks, ${assertions} offline boundary assertions, stable publication order, scoped dateModified, reviewed Game.notify supersession, 98-point internal scorecards, and Pending live evidence.`,
 );
