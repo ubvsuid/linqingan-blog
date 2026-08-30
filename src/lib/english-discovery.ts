@@ -213,7 +213,7 @@ const editorialMetadataOverrides: Record<string, Partial<EnglishArticleRecord>> 
       "Open a Screeps Room, switch to the code editor and player Console, then use read-only checks to match exact Room, Spawn, Creep, Source, and Controller data.",
     readingTime: "7 min read",
     searchIntent:
-      "Beginner interface orientation that opens the Room view, code editor, and player Console before using read-only current-tick checks for real account object names and visibility",
+      "Beginner interface orientation that opens the Room view, code editor and player Console before using read-only current-tick checks for real account object names and visibility",
     updatedAt: "2026-08-28",
   },
   "/en/blog/screeps-spawn-exit-blocked-directions": {
@@ -221,6 +221,25 @@ const editorialMetadataOverrides: Record<string, Partial<EnglishArticleRecord>> 
       "Confirm a blocked Screeps Spawn exit from current spawning state and all eight adjacent tiles, then fix direction policy without confusing accepted intents with observed birth.",
     readingTime: "14 min read",
     updatedAt: "2026-08-28",
+  },
+  "/en/blog/screeps-creep-harvest-energy": {
+    category: "GETTING STARTED · HARVESTING",
+    title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    description:
+      "Use Creep.harvest() to find an active Source, move into range, keep harvesting until your Creep is ready to deliver, and read Source-specific return codes without treating ERR_FULL as a harvest result.",
+    readingTime: "10 min read",
+    primaryKeyword: "Screeps harvest energy",
+    searchIntent:
+      "Learn the simplest reliable Source-harvesting loop for a first Creep, then understand the return-code and Store-capacity boundaries needed before delivery",
+    finalScore: 98,
+    updatedAt: "2026-08-29",
+    keywords: [
+      "Screeps harvest energy",
+      "Creep.harvest",
+      "Screeps active Source",
+      "Creep.harvest return codes",
+      "Screeps ERR_NOT_IN_RANGE",
+    ],
   },
   "/en/blog/screeps-cpu-bucket-degradation": {
     description:
@@ -357,7 +376,7 @@ export function getRelatedEnglishArticles(href: string, limit = 4): EnglishDisco
       return { article, score: sharedTags * 3 + sameModule + sameDifficulty + sameType };
     })
     .filter((item) => item.score > 0)
-    .sort((left, right) => right.score - left.score || right.article.publishedAt.localeCompare(left.article.publishedAt))
+    .sort((left, right) => right.article.publishedAt.localeCompare(left.article.publishedAt))
     .slice(0, limit)
     .map((item) => item.article);
 }
