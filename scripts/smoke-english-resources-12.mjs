@@ -44,7 +44,7 @@ const articles = [
     path: "/en/blog/screeps-power-spawn-process-power",
     chinesePath: "/blog/screeps-power-spawn-process-power",
     headline: "Verify Power Processing Without Inventing an Event",
-    indexTitle: "Screeps processPower(): Single Dispatch and Local Resource Proof",
+    indexTitle: "Screeps processPower(): Energy Ratio, GPL, and Reserves",
     query: "processPower verification",
     tocId: "evidence-limit",
     tocHeading: "Start with the missing event",
