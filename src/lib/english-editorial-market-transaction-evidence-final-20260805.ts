@@ -54,6 +54,8 @@ function finalizeTerminalSendArticle(
     "optional request description guard",
   );
 
+  // articleHtml stores comparison operators as HTML entities. The decoded
+  // JavaScript guard still enforces request.energyReserve < 0 exactly.
   articleHtml = replaceRequired(
     articleHtml,
     String.raw`  if (
