@@ -1,4 +1,5 @@
 import type { EnglishArticleRecord } from "./english-articles";
+import { englishCreepAttackBatchTwentyOneRegistry } from "./english-creep-attack-registry-21";
 
 export type EnglishOriginalArticleRecord = Omit<EnglishArticleRecord, "chinesePath"> & {
   chinesePath?: undefined;
@@ -54,6 +55,7 @@ export const englishStandalonePublishedRegistry: EnglishOriginalArticleRecord[] 
     ],
     updatedAt: "2026-08-29",
   },
+  ...englishCreepAttackBatchTwentyOneRegistry,
 ];
 
 export const englishPathfinderBatchNineteenRegistry =
