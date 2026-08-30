@@ -5,6 +5,7 @@ const revised = [
     path: "/en/blog/screeps-creep-harvest-energy",
     chinesePath: "/blog/screeps-first-creep-harvest",
     title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    indexTitle: "Screeps Harvest Energy: Your First Creep Script",
     headline: "How to Harvest Energy With Your First Creep",
     modifiedAt: "2026-08-29",
     signals: [
@@ -26,6 +27,7 @@ const revised = [
     path: "/en/blog/screeps-first-extension",
     chinesePath: "/blog/screeps-first-extension",
     title: "Screeps First Extension: Build It and Diagnose ERR_INVALID_TARGET",
+    indexTitle: "Screeps First Extension: Build It and Diagnose ERR_INVALID_TARGET",
     headline: "Build Your First Screeps Extension Without Missing a Blocked Site",
     modifiedAt: "2026-08-17",
     signals: [
@@ -43,6 +45,7 @@ const revised = [
     path: "/en/blog/screeps-build-repair",
     chinesePath: "/blog/screeps-build-and-repair",
     title: "Screeps Builder Priority: Build, Repair, Then Upgrade Safely",
+    indexTitle: "Screeps Builder Priority: Build, Repair, Then Upgrade Safely",
     headline: "Run a Screeps Builder Without Hiding Build, Repair, or Controller Errors",
     modifiedAt: "2026-08-14",
     signals: [
@@ -139,8 +142,8 @@ if (indexResponse.status !== 200) {
   );
 } else {
   for (const article of revised) {
-    if (!indexBody.includes(article.title)) {
-      failures.push(`/en/blog-index.json: missing “${article.title}”`);
+    if (!indexBody.includes(article.indexTitle)) {
+      failures.push(`/en/blog-index.json: missing “${article.indexTitle}”`);
     }
   }
 }
@@ -171,5 +174,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourth English editorial smoke passed: Harvest now validates the reviewed August 29 beginner Source loop, First Extension retains its August 17 revision, Build Repair keeps August 14 freshness, and live evidence remains Pending.",
+  "Fourth English editorial smoke passed: Harvest validates the reviewed August 29 page separately from its discovery listing title, First Extension retains its August 17 revision, Build Repair keeps August 14 freshness, and live evidence remains Pending.",
 );
