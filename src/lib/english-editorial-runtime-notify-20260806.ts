@@ -4,6 +4,7 @@ import { englishEditorialNotifyEvidenceFinalArticle20260805 } from "./english-ed
 import { englishEditorialRuntimeOverrides20260731 } from "./english-editorial-runtime-overrides-20260731";
 
 const UPDATED_AT = "2026-08-06";
+const NOTIFY_UPDATED_AT = "2026-08-30";
 
 function replaceSection(
   articleHtml: string,
@@ -310,81 +311,214 @@ const segmentsArticle: EnglishBeginnerArticle = {
 
 const notifyBase = englishEditorialNotifyEvidenceFinalArticle20260805;
 
-const notifyIdentitySection = String.raw`<h2 id="revision-identity">Bind one payload revision, but do not treat its digest as authorization</h2>
-<p>The fingerprint below is useful for detecting accidental payload drift inside your own code. It is not cryptographic, collision-resistant, secret, or proof that a human approved the message. Any module that can write the request can also recompute the fingerprint. Use it as an integrity label, not a security boundary.</p>
-<pre><code class="language-javascript">function hashNotificationPayload(value) {
-  let hash = 2166136261;
+const notifyHtml = String.raw`
+<h2 id="quick-answer">Send one notification first</h2>
+<p><code>Game.notify(message, groupInterval)</code> sends a custom notification to the email channel configured for your Screeps profile. Start with one small call, then add rate limiting only when the condition can stay true across many ticks.</p>
+<pre><code class="language-javascript">const result = Game.notify(
+  'A Screeps condition needs attention.',
+  30
+);
 
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
+console.log(result);</code></pre>
+<p>The official API documents a maximum message length of 1,000 characters, up to 20 notification calls in one game tick, and no availability in the Simulation Room. A <code>groupInterval</code> of <code>0</code> schedules immediately; a positive value groups notifications using that many minutes.</p>
+<p>The public API page does not currently document a return-code table for <code>Game.notify()</code>. In the checked <code>screeps/engine</code> snapshot <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>, the method returns <code>OK</code> when the notification intent enters the per-tick queue and <code>ERR_FULL</code> when that 20-intent queue is full. Treat that return-code detail as an engine implementation boundary, not as a stronger API promise than the documentation makes.</p>
+
+<h2 id="limits">Know the two different rate controls</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Control</th><th>What it does</th><th>What it does not do</th></tr></thead>
+<tbody>
+<tr><td>20 calls per tick</td><td>Official per-tick scheduling limit.</td><td>It does not stop one persistent condition from calling again on every later tick.</td></tr>
+<tr><td><code>groupInterval</code></td><td>Groups email notifications over a number of minutes.</td><td>It is not a replacement for deciding when your script should call <code>Game.notify()</code>.</td></tr>
+<tr><td>Memory incident state</td><td>Project policy that suppresses repeated calls for the same unresolved condition.</td><td>It is not an official Screeps notification limit.</td></tr>
+</tbody></table></div>
+<p>For most alerts, the useful pattern is: call once when the condition becomes active, stay quiet while it remains active, and allow a new notification after the condition clears. Add a repeat interval only when repeated reminders are genuinely useful.</p>
+
+<h2 id="minimal-wrapper">Preserve the call result</h2>
+<pre><code class="language-javascript">function sendNotification(message, groupInterval = 0) {
+  if (
+    typeof message !== 'string'
+    || message.length === 0
+    || message.length &gt; 1000
+  ) {
+    return { status: 'invalid-message' };
+  }
+  if (!Number.isFinite(groupInterval) || groupInterval &lt; 0) {
+    return { status: 'invalid-group-interval' };
   }
 
-  return (hash >>> 0)
-    .toString(16)
-    .padStart(8, '0');
-}
-
-function buildNotificationPayloadDigest(request) {
-  return hashNotificationPayload([
-    request.requestId,
-    request.revision,
-    request.incidentKey,
-    request.message,
-    request.groupInterval
-  ].join('\u001f'));
-}
-
-function buildNotificationConfirmation(request) {
-  return [
-    'SUBMIT_NOTIFICATION',
-    request.requestId,
-    request.revision,
-    buildNotificationPayloadDigest(request)
-  ].join('_');
+  const result = Game.notify(message, groupInterval);
+  return {
+    status: result === OK
+      ? 'notification-scheduled'
+      : 'notification-not-scheduled',
+    result
+  };
 }</code></pre>
-<pre><code class="language-javascript">Memory.notificationRequests ??= {};
+<p>The length and non-negative interval checks are local guardrails around the documented parameters. The <code>result === OK</code> branch follows the checked engine behavior above. Preserve the raw result instead of turning every normal return into “delivered.”</p>
 
-const request = {
-  requestId: 'spawn-energy-low',
-  revision: 3,
-  incidentKey: 'W1N1:spawn-energy-low',
-  enabled: true,
-  priority: 80,
-  message: '[W1N1] Spawn energy remains below 200.',
-  groupInterval: 30,
-  createdAt: Game.time,
-  expiresAt: Game.time + 25
-};
+<h2 id="incident-state">Notify once per incident instead of once per tick</h2>
+<p>The helper below stores only the state needed for a recurring condition. <code>active</code> comes from your own alert rule. When the condition clears, the incident resets. A positive <code>repeatAfterTicks</code> is an optional project policy for reminders; it is measured in game ticks and is separate from the email-oriented <code>groupInterval</code> minutes.</p>
+<pre><code class="language-javascript">function notifyIncident({
+  key,
+  active,
+  message,
+  groupInterval = 0,
+  repeatAfterTicks = null
+}) {
+  if (typeof key !== 'string' || key.length === 0) {
+    return { status: 'invalid-incident-key' };
+  }
 
-request.confirmation =
-  buildNotificationConfirmation(request);
-Memory.notificationRequests[request.requestId] = request;</code></pre>
-<p>The executable example binds the stored confirmation to the exact fields used by the dispatcher. A changed message, incident, grouping interval, or revision invalidates the old fingerprint. For privileged or externally supplied alerts, add a real trust policy outside this checksum.</p>`;
+  Memory.notificationIncidents ??= {};
+  const state = Memory.notificationIncidents[key] ??= {
+    active: false,
+    lastScheduledAt: null,
+    lastResult: null
+  };
 
-const notifyHtml = replaceSection(
-  notifyBase.articleHtml,
-  "revision-identity",
-  "queue-update",
-  notifyIdentitySection,
-);
+  if (!active) {
+    state.active = false;
+    return { status: 'incident-clear' };
+  }
+
+  const repeatDue = Number.isInteger(repeatAfterTicks)
+    &amp;&amp; repeatAfterTicks &gt; 0
+    &amp;&amp; Number.isInteger(state.lastScheduledAt)
+    &amp;&amp; Game.time - state.lastScheduledAt &gt;= repeatAfterTicks;
+
+  if (state.active &amp;&amp; !repeatDue) {
+    return { status: 'already-reported' };
+  }
+
+  const submission = sendNotification(message, groupInterval);
+  state.lastResult = submission.result ?? null;
+
+  if (submission.status === 'notification-scheduled') {
+    state.active = true;
+    state.lastScheduledAt = Game.time;
+  }
+
+  return submission;
+}</code></pre>
+<p>Do not copy a made-up room name or threshold into production. Pass a stable incident key, the condition you already calculated, and a message built from the real object or room you are monitoring. If the checked engine returns <code>ERR_FULL</code>, this helper leaves the incident eligible for a later retry instead of marking it as reported.</p>
+
+<h2 id="result-boundary">Scheduled is not externally delivered</h2>
+<p>Keep the evidence levels separate:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Observation</th><th>What it supports</th><th>What it does not prove</th></tr></thead>
+<tbody>
+<tr><td>Your condition became true</td><td>The local alert rule fired.</td><td>That <code>Game.notify()</code> was called.</td></tr>
+<tr><td>Checked engine returns <code>OK</code></td><td>The notify intent entered the engine's per-tick queue.</td><td>That an external email arrived.</td></tr>
+<tr><td>Checked engine returns <code>ERR_FULL</code></td><td>The checked per-tick notify queue was full.</td><td>That the message will be retried automatically.</td></tr>
+<tr><td>Email or external inbox observation</td><td>External delivery evidence for that environment.</td><td>A general timing guarantee for every future notification.</td></tr>
+</tbody></table></div>
+<p><code>groupInterval</code> can intentionally delay grouped mail. Game code has no documented inbox receipt, so do not name a Memory state <code>delivered</code> merely because the local call was accepted.</p>
+
+<h2 id="shared-budget">Optional hardening for many notification producers</h2>
+<p>If several modules can notify in the same tick, give them one shared local budget instead of letting every module assume it owns all 20 official slots. A production bot can choose a smaller local limit to reserve headroom.</p>
+<pre><code class="language-javascript">function createNotificationBudget(maximumCalls = 20) {
+  const limit = Math.min(
+    20,
+    Math.max(0, Number.isInteger(maximumCalls)
+      ? maximumCalls
+      : 20)
+  );
+  let scheduled = 0;
+
+  return {
+    send(message, groupInterval = 0) {
+      if (scheduled &gt;= limit) {
+        return { status: 'local-budget-exhausted' };
+      }
+
+      const submission = sendNotification(message, groupInterval);
+      if (submission.status === 'notification-scheduled') {
+        scheduled += 1;
+      }
+      return submission;
+    },
+    getScheduledCount() {
+      return scheduled;
+    }
+  };
+}</code></pre>
+<p>Create one budget object for the tick and route notification-producing modules through it. This is a project coordinator, not an extra Screeps API rule. Payload signing, approval workflows, revision ledgers, and external alert-service guarantees belong in a separate operations system when your threat model actually requires them.</p>
+
+<h2 id="common-mistakes">Common mistakes</h2>
+<ul>
+<li><strong>Calling every tick while a condition stays true:</strong> use incident state so one unresolved condition does not keep scheduling calls.</li>
+<li><strong>Treating <code>groupInterval</code> as a script-side cooldown:</strong> it controls email grouping in minutes; your own Memory state controls whether you call again.</li>
+<li><strong>Claiming delivery from a local result:</strong> accepted scheduling and external email observation are different evidence levels.</li>
+<li><strong>Testing in the Simulation Room:</strong> the official API says <code>Game.notify()</code> is not available there.</li>
+<li><strong>Scattered per-module call counting:</strong> use one shared coordinator when many producers can notify in the same tick.</li>
+<li><strong>Overengineering a single alert:</strong> start with one call and one incident flag; add queues or richer identity only when the system actually needs them.</li>
+</ul>
+
+<h2 id="evidence">Evidence and production boundary</h2>
+<p>The current article was checked against the official <code>Game.notify()</code> API and the public <code>screeps/engine</code> snapshot <code>80977824199a596d174d392fd0cf8c458c21fcbd</code>. The three JavaScript examples were syntax-checked offline. No real Screeps Console notification, 20-call saturation run, grouped-email timing trace, or inbox-delivery observation is claimed.</p>
+
+<h2 id="official-docs">Official documentation</h2>
+<ul>
+<li><a href="https://docs.screeps.com/api/#Game.notify" rel="nofollow noopener noreferrer">Screeps API: Game.notify()</a></li>
+<li><a href="https://docs.screeps.com/global-objects.html" rel="nofollow noopener noreferrer">Screeps Documentation: Global Objects and Memory</a></li>
+</ul>
+`;
 
 const notifyArticle: EnglishBeginnerArticle = {
   ...notifyBase,
+  title: "Screeps Game.notify(): Send Rate-Limited Alerts Safely",
+  headline: "Send Screeps Notifications Without Spamming Every Tick",
   description:
-    "Bind each notification to one immutable request revision and integrity fingerprint, reserve shared call slots, record local submission at the Game.notify call site, and keep external delivery unverified.",
-  readingTime: "21 min read",
+    "Call Game.notify(), use groupInterval and simple Memory incident state to avoid repeated alerts, preserve the checked engine result, and keep scheduling separate from external email delivery.",
+  category: "OBSERVABILITY · RATE-LIMITED NOTIFICATIONS",
+  readingTime: "11 min read",
+  primaryKeyword: "Screeps Game.notify",
+  searchIntent:
+    "Send a Screeps notification for a recurring game condition without calling every tick or claiming that local scheduling proves external email delivery",
   finalScore: 98,
-  verification: preserveVerificationWithUpdates(notifyBase.verification, [
+  keywords: [
+    "Screeps Game.notify",
+    "Screeps email notification",
+    "Game.notify groupInterval",
+    "Screeps notification rate limit",
+    "Screeps 20 notifications per tick",
+  ],
+  toc: [
+    ["quick-answer", "Send one notification first"],
+    ["limits", "Know the two rate controls"],
+    ["minimal-wrapper", "Preserve the call result"],
+    ["incident-state", "Notify once per incident"],
+    ["result-boundary", "Scheduled is not externally delivered"],
+    ["shared-budget", "Optional shared call budget"],
+    ["common-mistakes", "Common mistakes"],
+    ["evidence", "Evidence and production boundary"],
+    ["official-docs", "Official documentation"],
+  ],
+  faq: [],
+  verification: [
+    ["Chinese source article", "Reviewed in full"],
     [
-      "Digest boundary",
-      "Checked — the payload digest is an integrity fingerprint, not cryptographic authorization or human approval",
+      "Official API",
+      "Checked August 30, 2026 — Game.notify message limit, 20 calls per tick, Simulation boundary, and groupInterval minutes",
     ],
+    [
+      "Public engine source",
+      "Checked screeps/engine 80977824199a596d174d392fd0cf8c458c21fcbd — notify intent queue cap 20 with current OK / ERR_FULL results",
+    ],
+    ["JavaScript syntax", "Passed — 3/3 article examples"],
+    [
+      "Evidence boundary",
+      "Checked — local scheduling is not described as external email delivery",
+    ],
+    ["Screeps Console test", "Pending"],
+    ["Live grouped-email and 20-call saturation test", "Pending"],
+    ["External inbox delivery observation", "Pending"],
     [
       "Evidence level",
-      "Official API review, repository review, JavaScript syntax review and static analysis only",
+      "Official documentation review, public engine-source review, repository review, and offline JavaScript syntax only",
     ],
-  ]),
+    ["Last editorial review", "August 30, 2026"],
+  ],
   articleHtml: notifyHtml,
 };
 
@@ -400,7 +534,7 @@ export const englishEditorialRuntimeNotifyOverrides20260806: Record<
 export const englishEditorialRuntimeNotifyUpdatedAt20260806: Record<string, string> = {
   [cpuArticle.slug]: UPDATED_AT,
   [segmentsArticle.slug]: UPDATED_AT,
-  [notifyArticle.slug]: UPDATED_AT,
+  [notifyArticle.slug]: NOTIFY_UPDATED_AT,
 };
 
 export function getEnglishEditorialRuntimeNotifyArticle20260806(

@@ -28,6 +28,87 @@ function markBranchValidationPending(
   };
 }
 
+function replaceRequired(
+  articleHtml: string,
+  search: string,
+  replacement: string,
+  label: string,
+): string {
+  if (!articleHtml.includes(search)) {
+    throw new Error(`Terminal send finalizer could not find ${label}`);
+  }
+  return articleHtml.replace(search, replacement);
+}
+
+function finalizeTerminalSendArticle(
+  article: EnglishBeginnerArticle,
+): EnglishBeginnerArticle {
+  let articleHtml = replaceRequired(
+    article.articleHtml,
+    String.raw`const description = normalizeSendDescription(
+    request.description
+  );`,
+    String.raw`const description = normalizeSendDescription(
+    request?.description
+  );`,
+    "optional request description guard",
+  );
+
+  articleHtml = replaceRequired(
+    articleHtml,
+    String.raw`  if (
+    !request
+    || request.enabled !== true
+    || !Number.isInteger(request.revision)
+    || request.revision < 1
+    || request.confirmation
+      !== buildTerminalSendConfirmation(request)
+    || !Number.isInteger(request.amount)
+    || request.amount < TERMINAL_MIN_SEND
+  ) {`,
+    String.raw`  if (
+    !request
+    || request.enabled !== true
+    || typeof request.requestId !== 'string'
+    || request.requestId.length === 0
+    || !Number.isInteger(request.revision)
+    || request.revision < 1
+    || typeof request.terminalId !== 'string'
+    || request.terminalId.length === 0
+    || typeof request.resourceType !== 'string'
+    || request.resourceType.length === 0
+    || !Number.isInteger(request.amount)
+    || request.amount < TERMINAL_MIN_SEND
+    || typeof request.destination !== 'string'
+    || request.destination.length === 0
+    || !Number.isFinite(request.energyReserve)
+    || request.energyReserve < 0
+    || request.confirmation
+      !== buildTerminalSendConfirmation(request)
+  ) {`,
+    "frozen request shape validation",
+  );
+
+  const verification = [
+    ...article.verification.filter(
+      ([label]) => label !== "Request shape validation"
+        && label !== "Last verified",
+    ),
+    [
+      "Request shape validation",
+      "Checked — request ID, revision, Terminal ID, resource type, amount, destination and non-negative finite Energy reserve must be valid before budget calculation or send()",
+    ] as [string, string],
+    ["Last verified", "August 30, 2026"] as [string, string],
+  ];
+
+  return markBranchValidationPending({
+    ...article,
+    updatedAt: "2026-08-30",
+    verification,
+    articleHtml,
+  });
+}
+
 export const englishEditorialMarketCreateOrderArticleFinal20260805 =
   markBranchValidationPending(
     englishEditorialMarketCreateOrderArticle20260805,
@@ -39,17 +120,9 @@ export const englishEditorialMarketDealArticleFinal20260805 =
   );
 
 export const englishEditorialTerminalSendArticleFinal20260805 =
-  markBranchValidationPending({
-    ...englishEditorialTerminalSendArticle20260805,
-    articleHtml: englishEditorialTerminalSendArticle20260805.articleHtml.replace(
-      String.raw`const description = normalizeSendDescription(
-    request.description
-  );`,
-      String.raw`const description = normalizeSendDescription(
-    request?.description
-  );`,
-    ),
-  });
+  finalizeTerminalSendArticle(
+    englishEditorialTerminalSendArticle20260805,
+  );
 
 export const englishEditorialMarketTransactionEvidenceFinalOverrides20260805: Record<
   string,

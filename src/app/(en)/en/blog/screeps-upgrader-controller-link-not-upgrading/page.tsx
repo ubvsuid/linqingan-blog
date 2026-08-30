@@ -53,10 +53,11 @@ export const metadata: Metadata = {
 
 const toc: Array<[string, string]> = [
   ["failure-chain", "Separate the Upgrader from its supply chain"],
+  ["quick-triage", "Run a 30-second read-only triage"],
   ["anchor", "Validate one exact anchor tile"],
   ["decision", "Use one diagnosable action per tick"],
-  ["complete-example", "Complete fixed-Upgrader example"],
   ["return-codes", "Return-code checklist"],
+  ["complete-example", "Complete fixed-Upgrader example"],
   ["verification", "Verify the later result"],
   ["boundaries", "Evidence boundaries"],
 ];
@@ -75,6 +76,50 @@ const articleHtml = String.raw`
     <tr><td>Evidence</td><td>Later position, Store delta, or exact event</td><td>Accepted command without observed result</td></tr>
   </tbody>
 </table>
+
+<h2 id="quick-triage">Run a 30-second read-only triage</h2>
+<p>Before changing the anchor or replacing your loop, inspect the objects that already exist. Replace the two placeholder values, then run this in the Console. It does not issue movement, withdraw, transfer, or upgrade commands.</p>
+<pre><code class="language-js">const UPGRADER_NAME = 'Upgrader1';
+const CONTROLLER_LINK_ID = 'CONTROLLER_LINK_ID';
+
+const creep = Game.creeps[UPGRADER_NAME];
+const controller = creep?.room.controller ?? null;
+const link = Game.getObjectById(CONTROLLER_LINK_ID);
+
+console.log(JSON.stringify({
+  creepFound: Boolean(creep),
+  spawning: creep?.spawning ?? null,
+  activeWork: creep?.getActiveBodyparts(WORK) ?? null,
+  energy: creep?.store.getUsedCapacity(RESOURCE_ENERGY) ?? null,
+  controllerOwned: controller?.my ?? null,
+  controllerRange: creep &amp;&amp; controller
+    ? creep.pos.getRangeTo(controller)
+    : null,
+  upgradeBlocked: controller?.upgradeBlocked ?? null,
+  linkFound: Boolean(link),
+  linkOwned: link?.my ?? null,
+  linkType: link?.structureType ?? null,
+  linkActive: typeof link?.isActive === 'function'
+    ? link.isActive()
+    : null,
+  linkEnergy: link?.store?.getUsedCapacity(RESOURCE_ENERGY) ?? null,
+  linkRange: creep &amp;&amp; link
+    ? creep.pos.getRangeTo(link)
+    : null
+}));</code></pre>
+<table>
+  <thead><tr><th>Probe result</th><th>Most likely branch</th><th>Next step</th></tr></thead>
+  <tbody>
+    <tr><td><code>creepFound: false</code> or <code>spawning: true</code></td><td>The worker is missing or not ready.</td><td>Fix the Creep name or wait for spawning to finish.</td></tr>
+    <tr><td><code>activeWork: 0</code></td><td>The Creep cannot perform Controller work.</td><td>Inspect its body and damage before changing logistics.</td></tr>
+    <tr><td><code>controllerRange &gt; 3</code></td><td>The current position cannot upgrade the Controller.</td><td>Validate the anchor geometry below.</td></tr>
+    <tr><td><code>linkRange &gt; 1</code></td><td>The current position cannot withdraw from the Controller Link.</td><td>Validate the same anchor against the Link.</td></tr>
+    <tr><td><code>energy: 0</code> and <code>linkEnergy: 0</code></td><td>The Upgrader is starved upstream.</td><td>Repair Link supply instead of changing <code>upgradeController()</code>.</td></tr>
+    <tr><td><code>upgradeBlocked &gt; 0</code></td><td>The Controller is temporarily blocked from upgrading.</td><td>Wait for the block to expire; code changes will not bypass it.</td></tr>
+    <tr><td>Ranges, body, ownership, Link Energy, and Controller state all look valid</td><td>The next useful signal is the exact action return code.</td><td>Use the checklist below before replacing the whole implementation.</td></tr>
+  </tbody>
+</table>
+<p>If the Creep is not currently on its intended fixed tile, treat the two range values as current-position diagnostics only. The next section checks the configured anchor itself.</p>
 
 <h2 id="anchor">Validate one exact anchor tile</h2>
 <p>The chosen tile must satisfy both documented action ranges:</p>
@@ -97,6 +142,17 @@ anchored and empty -&gt; withdraw only
 anchored with Energy -&gt; upgrade only</code></pre>
 <p>Screeps commands are queued against the tick's starting state and settle later. Separating the states is not the only valid architecture, but it makes return codes and next-tick observations easier to interpret.</p>
 <p>If the Controller Link is empty, keep the Upgrader fixed and repair upstream logistics. Use the <a href="/en/tools/hauling-throughput-planner">hauling throughput planner</a> and the Link guide instead of silently turning the Upgrader into a Storage hauler.</p>
+
+<h2 id="return-codes">Return-code checklist</h2>
+<table>
+  <thead><tr><th>Method</th><th>Important results</th><th>Primary diagnosis</th></tr></thead>
+  <tbody>
+    <tr><td><code>moveTo()</code></td><td><code>OK</code>, <code>ERR_TIRED</code>, <code>ERR_NO_PATH</code>, <code>ERR_NO_BODYPART</code></td><td>Traffic, fatigue, path, active MOVE</td></tr>
+    <tr><td><code>withdraw()</code></td><td><code>OK</code>, <code>ERR_NOT_ENOUGH_RESOURCES</code>, <code>ERR_FULL</code>, <code>ERR_NOT_IN_RANGE</code></td><td>Link stock, Creep capacity, range 1</td></tr>
+    <tr><td><code>upgradeController()</code></td><td><code>OK</code>, <code>ERR_NOT_ENOUGH_RESOURCES</code>, <code>ERR_INVALID_TARGET</code>, <code>ERR_NOT_IN_RANGE</code>, <code>ERR_NO_BODYPART</code>, <code>ERR_ACCESS_DENIED</code></td><td>Energy, Controller state, range 3, active WORK</td></tr>
+  </tbody>
+</table>
+<p>Preserve the actual result. <code>OK</code> means the command was accepted, not that the same code block can already read the settled state. If the short probe already isolates the problem, stop there; the complete implementation below is a hardened reference, not the first diagnostic step.</p>
 
 <h2 id="complete-example">Complete fixed-Upgrader example</h2>
 <p>The implementation below validates object identity, ownership, anchor geometry, walkability, active body parts, Link state, <code>upgradeBlocked</code>, and one later observation. History is bounded to 20 records.</p>
@@ -381,17 +437,6 @@ module.exports.loop = function () {
     }));
   }
 };</code></pre>
-
-<h2 id="return-codes">Return-code checklist</h2>
-<table>
-  <thead><tr><th>Method</th><th>Important results</th><th>Primary diagnosis</th></tr></thead>
-  <tbody>
-    <tr><td><code>moveTo()</code></td><td><code>OK</code>, <code>ERR_TIRED</code>, <code>ERR_NO_PATH</code>, <code>ERR_NO_BODYPART</code></td><td>Traffic, fatigue, path, active MOVE</td></tr>
-    <tr><td><code>withdraw()</code></td><td><code>OK</code>, <code>ERR_NOT_ENOUGH_RESOURCES</code>, <code>ERR_FULL</code>, <code>ERR_NOT_IN_RANGE</code></td><td>Link stock, Creep capacity, range 1</td></tr>
-    <tr><td><code>upgradeController()</code></td><td><code>OK</code>, <code>ERR_NOT_ENOUGH_RESOURCES</code>, <code>ERR_INVALID_TARGET</code>, <code>ERR_NOT_IN_RANGE</code>, <code>ERR_NO_BODYPART</code>, <code>ERR_ACCESS_DENIED</code></td><td>Energy, Controller state, range 3, active WORK</td></tr>
-  </tbody>
-</table>
-<p>Preserve the actual result. <code>OK</code> means the command was accepted, not that the same code block can already read the settled state.</p>
 
 <h2 id="verification">Verify the later result</h2>
 <ul>
