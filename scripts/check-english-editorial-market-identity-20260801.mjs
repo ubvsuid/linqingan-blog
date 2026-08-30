@@ -166,18 +166,21 @@ if (
   failures.push("Current market override must supersede the legacy override");
 }
 
-for (const [route, title] of [
+for (const [route, title, updatedAt] of [
   [
     "/en/blog/screeps-market-create-order",
     "Screeps createOrder(): Bind One Request to the New Order ID",
+    "2026-08-05",
   ],
   [
     "/en/blog/screeps-market-deal",
     "Screeps market.deal(): Reserve the Terminal and Verify Actual Amount",
+    "2026-08-05",
   ],
   [
     "/en/blog/screeps-terminal-send-resources",
     "Screeps Terminal.send(): Prevent Intent Overwrite and Verify Actual Amount",
+    "2026-08-30",
   ],
 ]) {
   const start = registry.indexOf(`href: "${route}"`);
@@ -185,7 +188,7 @@ for (const [route, title] of [
   const record = start < 0
     ? ""
     : registry.slice(start, next < 0 ? registry.length : next);
-  for (const text of [title, 'updatedAt: "2026-08-05"', "finalScore: 98"]) {
+  for (const text of [title, `updatedAt: "${updatedAt}"`, "finalScore: 98"]) {
     requireText(record, text, `${route} current registry`);
   }
 }
@@ -228,6 +231,6 @@ if (failures.length > 0) {
 
 console.log(
   "Market identity compatibility gate passed: legacy payload scope and "
-    + "17 code blocks remain valid, while the readable 2026-08-05 market "
-    + "transaction evidence batch supersedes current publication metadata.",
+    + "17 code blocks remain valid, while the readable market transaction "
+    + "evidence batch and reviewed Terminal supersession match current metadata.",
 );

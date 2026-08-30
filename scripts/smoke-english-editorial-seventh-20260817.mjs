@@ -3,26 +3,32 @@ const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 const revised = [
   {
     path: "/en/blog/screeps-creep-harvest-energy",
-    title: "Screeps Creep.harvest(): Full Stores, Return Codes, and Safe Energy Loops",
-    headline: "Screeps Harvest Energy Without the ERR_FULL Mistake",
+    title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    headline: "How to Harvest Energy With Your First Creep",
+    modifiedAt: "2026-08-29",
     signals: [
-      "harvestBatch = activeWork * HARVEST_POWER",
-      "freeEnergy &lt; harvestBatch",
-      "harvest-batch-exceeds-store",
+      "Source harvesting does not return <code>ERR_FULL</code>",
+      "FIND_SOURCES_ACTIVE",
+      "const nextBatch = activeWork * HARVEST_POWER",
       "ready-for-delivery",
-      "conservative <strong>project policy</strong>",
-      "Source harvesting does not have an <code>ERR_FULL</code> preflight",
-      "Pending — no live near-full Source harvest trace is claimed",
+      "body-store-mismatch",
+      "Source-specific Creep.harvest() return codes",
+      "Official engine source",
+      "Pending — no live near-full, full-Store, or dropped-overflow comparison is claimed",
     ],
+    extraRequired: [],
     forbidden: [
-      "return { status: 'store-full' };",
-      "A beginner transport loop should stop harvesting when <code>getFreeCapacity()</code> reaches zero",
+      "Screeps Creep.harvest(): Full Stores, Return Codes, and Safe Energy Loops",
+      "Screeps Harvest Energy Without the ERR_FULL Mistake",
+      "harvestBatch = activeWork * HARVEST_POWER",
+      "harvest-batch-exceeds-store",
     ],
   },
   {
     path: "/en/blog/screeps-upgrade-controller",
     title: "Screeps upgradeController(): Build Your First Upgrader Loop",
     headline: "How to Make a Screeps Creep Upgrade the Room Controller",
+    modifiedAt: "2026-08-17",
     signals: [
       "harvestBatch = activeWork * HARVEST_POWER",
       "freeEnergy &lt; harvestBatch",
@@ -30,6 +36,13 @@ const revised = [
       "<strong>Project policy, not an API contract:</strong>",
       "Source <code>harvest()</code> call has no Store-capacity <code>ERR_FULL</code> preflight",
       "Pending — no live multi-WORK near-full Upgrader overflow comparison is claimed",
+    ],
+    extraRequired: [
+      "Official engine source",
+      "80977824199a596d174d392fd0cf8c458c21fcbd",
+      "Source harvest capacity policy",
+      "Publication status",
+      "Published",
     ],
     forbidden: [
       "<strong>Empty → harvest. Full → upgrade. Partly full → continue the current trip.</strong>",
@@ -40,6 +53,7 @@ const revised = [
     path: "/en/blog/screeps-first-extension",
     title: "Screeps First Extension: Build It and Diagnose ERR_INVALID_TARGET",
     headline: "Build Your First Screeps Extension Without Missing a Blocked Site",
+    modifiedAt: "2026-08-17",
     signals: [
       "harvestBatch = activeWork * HARVEST_POWER",
       "freeEnergy &lt; harvestBatch",
@@ -47,6 +61,13 @@ const revised = [
       "conservative <strong>project policy</strong>",
       "Source <code>harvest()</code> has no Store-capacity <code>ERR_FULL</code> preflight",
       "Pending — no live near-full multi-WORK Builder overflow or occupied-site comparison is claimed",
+    ],
+    extraRequired: [
+      "Official engine source",
+      "80977824199a596d174d392fd0cf8c458c21fcbd",
+      "Source harvest capacity policy",
+      "Publication status",
+      "Published",
     ],
     forbidden: [
       "The full/empty switch is hysteresis: partial Energy keeps the previous phase.",
@@ -72,18 +93,14 @@ for (const article of revised) {
     article.title,
     article.headline,
     ...article.signals,
+    ...article.extraRequired,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
-    `property="article:modified_time" content="2026-08-17"`,
-    `"dateModified":"2026-08-17"`,
+    `property="article:modified_time" content="${article.modifiedAt}"`,
+    `"dateModified":"${article.modifiedAt}"`,
     `"@type":"BlogPosting"`,
-    "Official engine source",
-    "80977824199a596d174d392fd0cf8c458c21fcbd",
-    "Source harvest capacity policy",
-    "Publication status",
-    "Published",
   ];
 
   for (const signal of required) {
@@ -151,5 +168,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Seventh English editorial smoke passed: three existing beginner Source-acquisition guides separate harvest API return codes from Store policy, prevent intentional unboosted next-batch overflow, scope August 17 freshness to the revised pages, and keep live overflow evidence Pending.",
+  "Seventh English editorial smoke passed: Harvest follows its reviewed August 29 beginner supersession, while Upgrade Controller and First Extension retain the August 17 Source-capacity policy checks and Pending live evidence.",
 );

@@ -4,18 +4,19 @@ const revised = [
   {
     path: "/en/blog/screeps-creep-harvest-energy",
     chinesePath: "/blog/screeps-first-creep-harvest",
-    title: "Screeps Creep.harvest(): Full Stores, Return Codes, and Safe Energy Loops",
-    headline: "Screeps Harvest Energy Without the ERR_FULL Mistake",
-    modifiedAt: "2026-08-17",
+    title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    indexTitle: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    headline: "How to Harvest Energy With Your First Creep",
+    modifiedAt: "2026-08-29",
     signals: [
-      "harvest() does not return ERR_FULL for a Source",
+      "Source harvesting does not return <code>ERR_FULL</code>",
       "FIND_SOURCES_ACTIVE",
-      "harvestBatch = activeWork * HARVEST_POWER",
+      "const nextBatch = activeWork * HARVEST_POWER",
       "ready-for-delivery",
-      "overflow is dropped on the ground",
-      "Source-specific Creep.harvest() results",
+      "body-store-mismatch",
+      "Source-specific Creep.harvest() return codes",
       "Official engine source",
-      "Pending — no live full-Store harvest",
+      "Pending — no live near-full, full-Store, or dropped-overflow comparison is claimed",
     ],
     forbidden: [
       "worker Store full",
@@ -26,6 +27,7 @@ const revised = [
     path: "/en/blog/screeps-first-extension",
     chinesePath: "/blog/screeps-first-extension",
     title: "Screeps First Extension: Build It and Diagnose ERR_INVALID_TARGET",
+    indexTitle: "Screeps First Extension: Build It and Diagnose ERR_INVALID_TARGET",
     headline: "Build Your First Screeps Extension Without Missing a Blocked Site",
     modifiedAt: "2026-08-17",
     signals: [
@@ -43,6 +45,7 @@ const revised = [
     path: "/en/blog/screeps-build-repair",
     chinesePath: "/blog/screeps-build-and-repair",
     title: "Screeps Builder Priority: Build, Repair, Then Upgrade Safely",
+    indexTitle: "Screeps Builder Priority: Build, Repair, Then Upgrade Safely",
     headline: "Run a Screeps Builder Without Hiding Build, Repair, or Controller Errors",
     modifiedAt: "2026-08-14",
     signals: [
@@ -139,8 +142,8 @@ if (indexResponse.status !== 200) {
   );
 } else {
   for (const article of revised) {
-    if (!indexBody.includes(article.title)) {
-      failures.push(`/en/blog-index.json: missing “${article.title}”`);
+    if (!indexBody.includes(article.indexTitle)) {
+      failures.push(`/en/blog-index.json: missing “${article.indexTitle}”`);
     }
   }
 }
@@ -171,5 +174,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourth English editorial smoke passed: the original Source ERR_FULL, Extension blocker, and Builder Controller safeguards remain enforced; Build Repair keeps August 14 freshness while Harvest and First Extension carry their later August 17 verified revisions; live evidence remains Pending.",
+  "Fourth English editorial smoke passed: Harvest page and discovery metadata match the reviewed August 29 supersession, First Extension retains its August 17 revision, Build Repair keeps August 14 freshness, and live evidence remains Pending.",
 );

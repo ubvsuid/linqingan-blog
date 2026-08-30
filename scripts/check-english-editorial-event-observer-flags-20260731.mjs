@@ -60,8 +60,8 @@ const expected = {
     publishedAt: "2026-07-25",
     title: "Screeps Room.getEventLog(): Process Each Previous Tick Once",
     headline: "Read a Room Event Log Once Without Duplicating Incidents",
-    discoveryTitle: "Screeps Room.getEventLog(): Bind Exact Previous-Tick Windows",
-    updatedAt: "2026-08-05",
+    discoveryTitle: "Screeps Room.getEventLog(): Read Previous-Tick Events",
+    updatedAt: "2026-08-30",
     registry: observabilityRegistry,
     signals: [
       "already-processed",
@@ -299,12 +299,11 @@ for (const signal of [
 }
 for (const signal of [
   "englishEditorialEventWindowFinalArticle20260805",
-  "snapshot?.roomName === roomName",
-  "missingFrom",
-  "missingTo",
-  "missingCount",
-  "sampleTicks",
-  "sampleTruncated",
+  'title: "Screeps Room.getEventLog(): Read Previous-Tick Events"',
+  "Game.time - 1",
+  "event.data?.targetId",
+  "room.getEventLog(true)",
+  "A missed event window cannot be replayed later",
 ]) {
   if (!eventWindowFinal.includes(signal)) {
     failures.push(`Current event-window final wrapper is missing ${signal}`);

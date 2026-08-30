@@ -118,7 +118,8 @@ if (sitemapResponse.status !== 200) {
     "/en/blog/screeps-tombstone-ruin-recovery",
     "/en/blog/screeps-introduction",
   ]) {
-    const preserved = `<loc>https://www.linqingan.com${preservedPath}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+    const modifiedAt = preservedPath === "/en/blog/screeps-room-energyavailable-stuck" ? "2026-08-29" : "2026-08-18";
+    const preserved = `<loc>https://www.linqingan.com${preservedPath}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(preserved)) {
       failures.push(`${preservedPath}: prior editorial freshness regressed`);
     }
@@ -132,5 +133,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Seventeenth English editorial smoke passed: executable fatal-pulse deadline math, Container decay runway, explicit repair-submission tick, fail-closed actor/target identity, incomplete-path boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness, and Pending live evidence.",
+  "Seventeenth English editorial smoke passed: executable fatal-pulse deadline math, Container decay runway, explicit repair-submission tick, fail-closed actor/target identity, incomplete-path boundary, current-engine repair-before-decay disclosure, partial-action Energy planning, exact EVENT_REPAIR amount/energySpent evidence, event-window handling, canonical/hreflang, structured data, scoped freshness with the Room Energy August 29 supersession, and Pending live evidence.",
 );

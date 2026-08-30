@@ -26,14 +26,15 @@ export const englishPowerSpawnArticle = {
   finalScore: 98,
   verification: [
     ["Chinese source article", "Reviewed in full"],
-    ["Official docs", "Checked — processPower(), POWER_SPAWN_ENERGY_RATIO, PWR_OPERATE_POWER, POWER_INFO, Game.gpl and return codes"],
+    ["Official docs", "Checked August 30, 2026 — processPower(), POWER_SPAWN_ENERGY_RATIO, PWR_OPERATE_POWER, POWER_INFO, Game.gpl, and the current four documented processPower() return codes"],
+    ["Official engine source", "Checked screeps/engine 80977824199a596d174d392fd0cf8c458c21fcbd — call-time processing amount is base 1 plus the active PWR_OPERATE_POWER effect; resource preflight uses amount × POWER_SPAWN_ENERGY_RATIO; processPower() has no ERR_INVALID_ARGS branch"],
     ["Policy boundary", "The room Energy reserve is a configurable site strategy, not an official threshold"],
     ["Execution boundary", "OK schedules processing; GPL, Power and Energy deltas require later verification"],
     ["JavaScript syntax", "Passed"],
     ["Offline power review", "Passed — enabled state, effect amount, Power stock, local Energy, room reserve and before/after snapshot states"],
     ["Screeps Console test", "Pending"],
     ["Live GPL, Store, effect level and continuous processing test", "Pending"],
-    ["Last verified", "July 26, 2026"],
+    ["Last editorial review", "August 30, 2026"],
   ],
   toc: [
     ["quick-answer", "Quick answer"],
@@ -347,15 +348,15 @@ export const englishPowerSpawnArticle = {
   };
 }</code></pre>
 
-<h2 id="return-codes">Handle return codes</h2>
+<h2 id="return-codes">Handle the four current processPower() return codes</h2>
+<p>The current official API and checked engine snapshot expose four <code>processPower()</code> results. Do not copy <code>ERR_INVALID_ARGS</code> from other Structure methods into this table: <code>processPower()</code> takes no arguments and the checked call path has no such branch.</p>
 <div class="table-scroll"><table>
 <thead><tr><th>Code</th><th>Meaning</th><th>Review</th></tr></thead>
 <tbody>
 <tr><td><code>OK</code></td><td>Processing scheduled</td><td>GPL and Store later</td></tr>
 <tr><td><code>ERR_NOT_OWNER</code></td><td>Power Spawn not yours</td><td>ID and ownership</td></tr>
-<tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>Power or Energy missing</td><td>Planned amount and ratio</td></tr>
-<tr><td><code>ERR_INVALID_ARGS</code></td><td>Invalid processing state</td><td>Current structure and constants</td></tr>
-<tr><td><code>ERR_RCL_NOT_ENOUGH</code></td><td>Structure inactive</td><td>RCL and <code>isActive()</code></td></tr>
+<tr><td><code>ERR_NOT_ENOUGH_RESOURCES</code></td><td>Power Spawn lacks the Power or Energy required for the current processing amount</td><td>Effect-derived amount and Energy ratio</td></tr>
+<tr><td><code>ERR_RCL_NOT_ENOUGH</code></td><td>Room Controller Level is insufficient to use the Power Spawn</td><td>RCL and <code>isActive()</code></td></tr>
 </tbody></table></div>
 
 <h2 id="debugging">Debugging checklist</h2>

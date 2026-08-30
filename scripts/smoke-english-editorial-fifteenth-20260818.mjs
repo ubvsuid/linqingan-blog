@@ -21,24 +21,24 @@ if (response.status !== 200) {
   const chinese = `https://www.linqingan.com${chinesePath}`;
   const signals = [
     "Why room.energyAvailable Stays Below Capacity in Screeps",
+    "quick-diagnosis",
+    "likely-causes",
+    "minimal-diagnostic",
+    "fix-retest",
     "room-aggregate",
-    "demand-vs-delivery",
     "stable-target",
-    "exact-transfer-event-observed",
-    "energyFillTargetId",
-    "findClosestByPath",
-    "event.objectId === pending.creepId",
-    "event.data?.targetId === pending.targetId",
-    "processedAmount",
-    "room aggregate is operational context",
+    "next-tick-verification",
+    "return-codes",
+    "boundaries",
+    "diagnoseRoomEnergy",
+    "EVENT_TRANSFER",
     "ERR_NOT_OWNER",
-    "Live multi-tick verification pending",
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-18"`,
+    `"dateModified":"2026-08-29"`,
   ];
 
   for (const expected of signals) {
@@ -58,23 +58,13 @@ if (response.status !== 200) {
   }
 }
 
-for (const negativePath of [
-  "/en/blog/screeps-tombstone-ruin-recovery",
-  "/en/blog/screeps-room-event-log",
-]) {
-  const { body: negativeBody } = await fetchText(negativePath);
-  if (negativeBody.includes("energyFillTargetId")) {
-    failures.push(`${negativePath}: received fifteenth-batch filler target state`);
-  }
-}
-
 const { response: sitemapResponse, body: sitemapBody } = await fetchText("/sitemap-en.xml");
 if (sitemapResponse.status !== 200) {
   failures.push(`/sitemap-en.xml: expected 200, got ${sitemapResponse.status}`);
 } else {
-  const expected = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+  const expected = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>2026-08-29T00:00:00.000Z</lastmod>`;
   if (!sitemapBody.includes(expected)) {
-    failures.push(`${path}: Sitemap lastmod is not aligned with the 2026-08-18 substantive revision`);
+    failures.push(`${path}: Sitemap lastmod is not aligned with the 2026-08-29 substantive revision`);
   }
 
   const preservedFreshness = new Map([
@@ -99,5 +89,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fifteenth English editorial smoke passed: active Spawn/Extension reconciliation, stable reachable fill target, exact processed transfer evidence, aggregate-demand boundary, canonical/hreflang, structured data, scoped freshness with the First Room August 28 supersession, and Pending live evidence.",
+  "Fifteenth English editorial smoke passed: the August 29 room-energy debugging guide keeps its symptom-to-diagnosis-to-fix flow, stable fill-target handling, next-tick processed evidence, canonical/hreflang, structured data, and scoped discovery freshness.",
 );

@@ -65,8 +65,8 @@ const expected = {
     path: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
     title: "Screeps RoomVisual Debugging: Draw Current State Within a Budget",
-    discoveryTitle: "Screeps RoomVisual: Coordinate One Room-Bound Debug Layer",
-    updatedAt: "2026-08-05",
+    discoveryTitle: "Screeps RoomVisual: Draw Debug Labels and Paths",
+    updatedAt: "2026-08-30",
     beforeScore: 92,
     registry: observabilityRegistry,
   },
@@ -197,7 +197,9 @@ if (!packageJson.includes("englisheditorialtargetsvisualmodules20260731check")) 
 
 for (const required of [
   "englishEditorialRoomVisualEvidenceFinalArticle20260805",
-  "JSON.parse(JSON.stringify(layer))",
+  'title: "Screeps RoomVisual: Draw Debug Labels and Paths"',
+  "visual.getSize()",
+  "512000",
 ]) {
   if (!roomVisualFinal.includes(required)) {
     failures.push(`Current RoomVisual final wrapper is missing: ${required}`);

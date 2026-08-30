@@ -222,6 +222,34 @@ const editorialMetadataOverrides: Record<string, Partial<EnglishArticleRecord>> 
     readingTime: "14 min read",
     updatedAt: "2026-08-28",
   },
+  "/en/blog/screeps-creep-harvest-energy": {
+    category: "GETTING STARTED · HARVESTING",
+    title: "Screeps Harvest Energy: Build Your First Creep.harvest() Loop",
+    description:
+      "Use Creep.harvest() to find an active Source, move into range, keep harvesting until your Creep is ready to deliver, and read Source-specific return codes without treating ERR_FULL as a harvest result.",
+    readingTime: "10 min read",
+    primaryKeyword: "Screeps harvest energy",
+    searchIntent:
+      "Learn the simplest reliable Source-harvesting loop for a first Creep, then understand the return-code and Store-capacity boundaries needed before delivery",
+    finalScore: 98,
+    updatedAt: "2026-08-29",
+    keywords: [
+      "Screeps harvest energy",
+      "Creep.harvest",
+      "Screeps active Source",
+      "Creep.harvest return codes",
+      "Screeps ERR_NOT_IN_RANGE",
+    ],
+  },
+  "/en/blog/screeps-transfer-energy-to-spawn": {
+    description:
+      "Make one Creep transfer Energy to a named Spawn, keep delivery mode until it is empty, and connect harvesting and delivery into a first repeatable round trip.",
+    readingTime: "9 min read",
+    updatedAt: "2026-08-29",
+  },
+  "/en/blog/screeps-room-energyavailable-stuck": {
+    updatedAt: "2026-08-29",
+  },
   "/en/blog/screeps-cpu-bucket-degradation": {
     description:
       "Build a four-mode Screeps CPU degradation scheduler with hysteresis, consecutive-tick confirmation, critical-first task tiers, stable staggering, CPU headroom guards, and gradual recovery.",

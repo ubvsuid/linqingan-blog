@@ -25,55 +25,80 @@ const articles = [
   {
     path: "/en/blog/screeps-game-notify",
     chinesePath: "/blog/screeps-game-notify",
-    headline: "Submit One Immutable Alert Revision Without Claiming Email Delivery",
-    listingTitle: "Screeps Game.notify(): Bind Alert Payload Identity Before Submission",
-    query: "Game.notify payload identity",
-    tocId: "evidence-contract",
-    tocHeading: "Separate scheduling from delivery",
-    modifiedDate: "2026-08-06",
+    headline: "Send Screeps Notifications Without Spamming Every Tick",
+    listingTitle: "Screeps Game.notify(): Send Rate-Limited Alerts Safely",
+    query: "Game.notify",
+    tocId: "result-boundary",
+    tocHeading: "Scheduled is not externally delivered",
+    modifiedDate: "2026-08-30",
+    faqExpected: false,
+    verificationSignals: [
+      "Chinese source article",
+      "Reviewed in full",
+      "Screeps Console test",
+      "External inbox delivery observation",
+      "Pending",
+    ],
     signals: [
-      "buildNotificationPayloadDigest",
-      "result = Game.notify",
-      "if (result !== OK)",
-      "notification-rejected-review-required",
-      "local-call-site-only",
+      "function sendNotification(message, groupInterval = 0)",
+      "Notify once per incident instead of once per tick",
+      "20 calls per tick",
       "ERR_FULL",
+      "Optional shared call budget",
+      "Scheduled is not externally delivered",
     ],
   },
   {
     path: "/en/blog/screeps-room-event-log",
     chinesePath: "/blog/screeps-room-event-log",
-    headline: "Process One Event Window Without Reusing a Stale Ownership Snapshot",
-    listingTitle: "Screeps Room.getEventLog(): Bind Exact Previous-Tick Windows",
-    query: "Room.getEventLog previous tick",
-    tocId: "evidence-contract",
-    tocHeading: "Bind the previous-tick window",
-    modifiedDate: "2026-08-05",
+    headline: "How to Read Room.getEventLog() Without Mixing Up Ticks",
+    listingTitle: "Screeps Room.getEventLog(): Read Previous-Tick Events",
+    query: "Room.getEventLog",
+    tocId: "action-result",
+    tocHeading: "Keep current action results and previous-tick events separate",
+    modifiedDate: "2026-08-30",
+    faqExpected: true,
+    verificationSignals: [
+      "Official API",
+      "Timing boundary",
+      "Screeps Console test",
+      "Live multi-tick event verification",
+      "Pending",
+    ],
     signals: [
-      "non-replayable-gap-observed",
-      "snapshot.capturedAt === eventTick",
-      "snapshot?.roomName === roomName",
-      "room.getEventLog(false)",
-      "window-schema-conflict",
-      "exact-window-committed",
+      "eventTick: Game.time - 1",
+      "room.getEventLog()",
+      "EVENT_REPAIR",
+      "event.data?.targetId === targetId",
+      "room.getEventLog(true)",
+      "A missed event window cannot be replayed later",
     ],
   },
   {
     path: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
-    headline: "Draw Only Same-Room, Same-Tick Snapshots Through One Final Dispatcher",
-    listingTitle: "Screeps RoomVisual: Coordinate One Room-Bound Debug Layer",
-    query: "RoomVisual room identity",
-    tocId: "evidence-contract",
-    tocHeading: "Treat drawings as browser output",
-    modifiedDate: "2026-08-05",
+    headline: "How to Debug Creeps and Targets with RoomVisual",
+    listingTitle: "Screeps RoomVisual: Draw Debug Labels and Paths",
+    query: "RoomVisual",
+    tocId: "evidence-boundary",
+    tocHeading: "Visuals are not action evidence",
+    modifiedDate: "2026-08-30",
+    faqExpected: true,
+    verificationSignals: [
+      "Official API",
+      "Size boundary",
+      "Evidence boundary",
+      "Screeps Console test",
+      "Live browser rendering test",
+      "Pending",
+    ],
     signals: [
-      "createRoomVisualDispatcher",
-      "mark.roomName !== roomName",
-      "preexisting-visual-writer-detected",
-      "JSON.parse(JSON.stringify(layer))",
-      "soft-byte-budget-reached",
-      "room-visual-rendered-locally",
+      "target-in-another-room",
+      "visual.getSize()",
+      "512,000 bytes",
+      "soft-visual-limit-reached",
+      "currentRoom.visual.import",
+      "Visuals are not action evidence",
     ],
   },
   {
@@ -85,7 +110,13 @@ const articles = [
     tocId: "runtime-guard",
     tocHeading: "Build a reusable runtime guard",
     modifiedDate: "2026-08-06",
-    allowFaqSchema: true,
+    faqExpected: true,
+    verificationSignals: [
+      "Chinese source article",
+      "Reviewed in full",
+      "Screeps Console test",
+      "Pending",
+    ],
     signals: [
       "runGuarded",
       "runtime-guard-error",
@@ -120,10 +151,7 @@ for (const article of articles) {
     article.headline,
     article.listingTitle,
     "Verification status",
-    "Chinese source article",
-    "Reviewed in full",
-    "Screeps Console test",
-    "Pending",
+    ...article.verificationSignals,
     ...article.signals,
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
@@ -139,8 +167,9 @@ for (const article of articles) {
     }
   }
 
-  if (!article.allowFaqSchema && body.includes(`"@type":"FAQPage"`)) {
-    failures.push(`${article.path}: unexpected FAQPage schema`);
+  const hasFaqSchema = body.includes(`"@type":"FAQPage"`);
+  if (hasFaqSchema !== article.faqExpected) {
+    failures.push(`${article.path}: FAQPage expectation mismatch`);
   }
 
   const search = await fetchText(
@@ -157,67 +186,75 @@ for (const article of articles) {
 
 const notifyBody = bodies.get("/en/blog/screeps-game-notify") || "";
 for (const expected of [
-  "revision: 3",
-  "payload-confirmation-mismatch",
-  "call-limit-reached",
-  "request.lastResult = result",
-  "result !== OK",
-  "submitted-locally",
+  "result === OK",
+  "notification-scheduled",
+  "notification-not-scheduled",
+  "Memory.notificationIncidents",
+  "Scheduled is not externally delivered",
 ]) {
   if (!notifyBody.includes(expected)) {
-    failures.push(`Game.notify page missing “${expected}”`);
+    failures.push(`Game.notify page missing current boundary “${expected}”`);
   }
 }
 for (const forbidden of [
+  "buildNotificationPayloadDigest",
+  "payload-confirmation-mismatch",
+  "revision: 3",
+  "notification-rejected-review-required",
   "delivery succeeded",
   "email delivered",
 ]) {
   if (notifyBody.includes(forbidden)) {
-    failures.push(`Game.notify page contains false delivery claim “${forbidden}”`);
+    failures.push(`Game.notify page contains superseded or false boundary “${forbidden}”`);
   }
 }
 
 const eventBody = bodies.get("/en/blog/screeps-room-event-log") || "";
 for (const expected of [
-  "EVENT_WINDOW_SCHEMA = 2",
-  "snapshot?.roomName === roomName",
-  "snapshot?.capturedAt === eventTick",
-  "exact-snapshot-unavailable",
-  "unsupported-event-preserved",
-  "first-observed-window",
+  "eventTick: Game.time - 1",
+  "event.data?.targetId === targetId",
+  "room.getEventLog(true)",
+  "Memory.roomEventStats",
+  "A missed event window cannot be replayed later",
 ]) {
   if (!eventBody.includes(expected)) {
-    failures.push(`Event-log page missing “${expected}”`);
+    failures.push(`Event-log page missing current boundary “${expected}”`);
   }
 }
 for (const forbidden of [
+  "EVENT_WINDOW_SCHEMA = 2",
+  "exact-window-committed",
+  "window-schema-conflict",
+  "snapshot?.capturedAt === eventTick",
   "snapshot?.roomName === snapshot?.roomName",
-  "room.getEventLog(true)",
 ]) {
   if (eventBody.includes(forbidden)) {
-    failures.push(`Event-log page contains forbidden model “${forbidden}”`);
+    failures.push(`Event-log page contains superseded model “${forbidden}”`);
   }
 }
 
 const visualBody = bodies.get("/en/blog/screeps-roomvisual-debug") || "";
 for (const expected of [
-  "layer.roomName !== roomName",
-  "mark.roomName !== roomName",
-  "existingBytes !== 0",
-  "Math.min(480000",
-  "JSON.parse(JSON.stringify(layer))",
-  "replay-artifact-reviewed",
+  "target.pos.roomName !== creep.pos.roomName",
+  "soft-visual-limit-reached",
+  "currentRoom.visual.import",
+  "512,000 bytes",
+  "Visuals are not action evidence",
 ]) {
   if (!visualBody.includes(expected)) {
-    failures.push(`RoomVisual page missing “${expected}”`);
+    failures.push(`RoomVisual page missing current boundary “${expected}”`);
   }
 }
 for (const forbidden of [
+  "createRoomVisualDispatcher",
+  "preexisting-visual-writer-detected",
+  "JSON.parse(JSON.stringify(layer))",
+  "replay-artifact-reviewed",
   "structuredClone(layer)",
   "Memory.visualDebug[room.name].lastSummary",
 ]) {
   if (visualBody.includes(forbidden)) {
-    failures.push(`RoomVisual page contains forbidden model “${forbidden}”`);
+    failures.push(`RoomVisual page contains superseded model “${forbidden}”`);
   }
 }
 
@@ -279,5 +316,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "English observability production smoke passed: 4 articles, notification return-code identity, exact previous-tick windows, room-bound visuals, room-level exception isolation, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
+  "English observability production smoke passed: 4 articles, reviewed notification incident/rate boundaries, previous-tick event timing, focused RoomVisual debugging, room-level exception isolation, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
 );

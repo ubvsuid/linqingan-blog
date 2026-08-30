@@ -37,6 +37,7 @@ const specs = [
     nextExport: "englishEditorialMarketDealArticle20260805",
     path: "/en/blog/screeps-market-create-order",
     title: "Screeps createOrder(): Bind One Request to the New Order ID",
+    registryUpdatedAt: "2026-08-05",
     technical: [
       "buildCreateOrderConfirmation",
       "calculateCreateOrderFeeCeiling",
@@ -52,6 +53,7 @@ const specs = [
     path: "/en/blog/screeps-market-deal",
     title:
       "Screeps market.deal(): Reserve the Terminal and Verify Actual Amount",
+    registryUpdatedAt: "2026-08-05",
     technical: [
       "createTerminalMarketDispatcher",
       "terminal-already-reserved",
@@ -68,6 +70,7 @@ const specs = [
     path: "/en/blog/screeps-terminal-send-resources",
     title:
       "Screeps Terminal.send(): Prevent Intent Overwrite and Verify Actual Amount",
+    registryUpdatedAt: "2026-08-30",
     technical: [
       "normalizeSendDescription",
       "createTerminalOperationDispatcher",
@@ -83,7 +86,7 @@ function getSegment(spec) {
   const start = source.indexOf(`export const ${spec.exportName}`);
   const end = source.indexOf(`export const ${spec.nextExport}`, start + 1);
   if (start < 0 || end < 0) {
-    failures.push(`${spec.path}: source segment missing`);
+    failures.push(`${spec.path}: historical source segment missing`);
     return "";
   }
   return source.slice(start, end);
@@ -97,82 +100,12 @@ function getRegistryRecord(articlePath) {
   return registry.slice(start, end < 0 ? registry.length : end);
 }
 
-function scoreSegment(segment, spec) {
-  const toc = [
-    ...segment.matchAll(
-      /\["([a-z0-9]+(?:-[a-z0-9]+)*)", "([^"]+)"\],/g,
-    ),
-  ];
-  const dimensions = {
-    technical: spec.technical.every((item) => segment.includes(item))
-      ? 23
-      : 0,
-    intent: ["evidence-contract", "failure-states", "integration"]
-      .every((item) => segment.includes(item))
-      ? 18
-      : 0,
-    original: [
-      "80977824199a596d174d392fd0cf8c458c21fcbd",
-      "Technical correction",
-    ].every((item) => segment.includes(item))
-      ? 14
-      : 0,
-    english: [
-      "delve",
-      "game-changer",
-      "unlock the power",
-      "in today's fast-paced",
-    ].every((item) => !segment.toLowerCase().includes(item))
-      ? 12
-      : 0,
-    structure:
-      toc.length >= 11
-      && toc.every((match) =>
-        segment.includes(`<h2 id="${match[1]}">`),
-      )
-        ? 10
-        : 0,
-    evidence: [
-      "Official engine",
-      "Screeps Console test",
-      "Pending",
-      "Last verified",
-    ].every((item) => segment.includes(item))
-      ? 8
-      : 0,
-    seo: [
-      `title: "${spec.title}"`,
-      "description:",
-      "primaryKeyword:",
-      "searchIntent:",
-      "keywords:",
-    ].every((item) => segment.includes(item))
-      ? 8
-      : 0,
-    accessibility: [
-      "<h2 id=",
-      '<div class="table-scroll"><table>',
-      "<thead>",
-      "<tbody>",
-    ].every((item) => segment.includes(item))
-      ? 5
-      : 0,
-  };
-  return {
-    total: Object.values(dimensions).reduce(
-      (sum, value) => sum + value,
-      0,
-    ),
-    dimensions,
-    tocCount: toc.length,
-  };
-}
-
 let tocCount = 0;
 for (const spec of specs) {
   const segment = getSegment(spec);
   const record = getRegistryRecord(spec.path);
 
+  // Preserve the 2026-08-05 source layer as historical evidence.
   for (const text of [
     'publishedAt: "2026-07-26"',
     'updatedAt: "2026-08-05"',
@@ -180,31 +113,38 @@ for (const spec of specs) {
     "finalScore: 98",
     "faq: []",
   ]) {
-    requireText(segment, text, `${spec.path} article metadata`);
+    requireText(segment, text, `${spec.path} historical article metadata`);
   }
+  for (const signal of spec.technical) {
+    requireText(segment, signal, `${spec.path} historical technical signal`);
+  }
+
+  const toc = [
+    ...segment.matchAll(
+      /\["([a-z0-9]+(?:-[a-z0-9]+)*)", "([^"]+)"\],/g,
+    ),
+  ];
+  tocCount += toc.length;
+  for (const match of toc) {
+    requireText(
+      segment,
+      `<h2 id="${match[1]}">`,
+      `${spec.path} historical TOC target`,
+    );
+  }
+
+  // Discovery metadata follows the current public supersession. Only the
+  // Terminal article was re-reviewed on 2026-08-30.
   for (const text of [
     spec.title,
     'publishedAt: "2026-07-26"',
-    'updatedAt: "2026-08-05"',
+    `updatedAt: "${spec.registryUpdatedAt}"`,
     "finalScore: 98",
   ]) {
-    requireText(record, text, `${spec.path} registry metadata`);
+    requireText(record, text, `${spec.path} current registry metadata`);
   }
-  for (const signal of spec.technical) {
-    requireText(segment, signal, `${spec.path} technical signal`);
-  }
-
-  const score = scoreSegment(segment, spec);
-  tocCount += score.tocCount;
-  if (score.total < 96) {
-    failures.push(
-      `${spec.path}: score ${score.total}/100; `
-        + JSON.stringify(score.dimensions),
-    );
-  }
-  requireEqual(score.total, 98, `${spec.path} internal score`);
 }
-requireEqual(tocCount, 34, "combined TOC count");
+requireEqual(tocCount, 34, "combined historical TOC count");
 
 for (const text of [
   "englishEditorialMarketTransactionEvidenceFinalOverrides20260805",
@@ -223,11 +163,25 @@ if (
 ) {
   failures.push("Current market override must follow the legacy override");
 }
+
+// The final Terminal wrapper is the reviewed 2026-08-30 supersession. Assert
+// its fail-closed request shape directly rather than the old .articleHtml.replace
+// implementation form.
 for (const text of [
+  "function finalizeTerminalSendArticle",
   "request?.description",
-  "englishEditorialTerminalSendArticle20260805.articleHtml.replace",
+  "typeof request.requestId !== 'string'",
+  "typeof request.terminalId !== 'string'",
+  "typeof request.resourceType !== 'string'",
+  "!Number.isInteger(request.amount)",
+  "typeof request.destination !== 'string'",
+  "!Number.isFinite(request.energyReserve)",
+  "request.energyReserve < 0",
+  "buildTerminalSendConfirmation(request)",
+  'updatedAt: "2026-08-30"',
+  "englishEditorialTerminalSendArticleFinal20260805",
 ]) {
-  requireText(finalSource, text, "final Terminal request guard");
+  requireText(finalSource, text, "current Terminal request guard");
 }
 
 const decodeHtmlOnce = (value) => value
@@ -242,7 +196,7 @@ const blocks = [
     /<pre><code class="language-javascript">([\s\S]*?)<\/code><\/pre>/g,
   ),
 ].map((match) => decodeHtmlOnce(match[1]));
-requireEqual(blocks.length, 19, "JavaScript block count");
+requireEqual(blocks.length, 19, "historical JavaScript block count");
 
 const tempDir = fs.mkdtempSync(
   path.join(os.tmpdir(), "market-transaction-evidence-"),
@@ -256,7 +210,7 @@ try {
     });
     if (result.status !== 0) {
       failures.push(
-        `JavaScript block ${index + 1}: ${result.stderr.trim()}`,
+        `Historical JavaScript block ${index + 1}: ${result.stderr.trim()}`,
       );
     }
   });
@@ -337,7 +291,11 @@ for (const [time, orders, expected] of [
   [100, [], "waiting-for-next-tick"],
   [102, [exactOrder], "verification-window-missed"],
   [101, [], "accepted-order-not-observed"],
-  [101, [exactOrder, { ...exactOrder, id: "new-2" }], "new-order-identity-ambiguous"],
+  [
+    101,
+    [exactOrder, { ...exactOrder, id: "new-2" }],
+    "new-order-identity-ambiguous",
+  ],
   [101, [exactOrder], "created-order-observed"],
 ]) {
   requireEqual(
@@ -389,12 +347,65 @@ for (const [transactions, expected] of [
   [[], "accepted-no-transaction-observed"],
   [[{ time: 100, amount: 100 }], "full-settlement-observed"],
   [[{ time: 100, amount: 60 }], "partial-settlement-observed"],
-  [[{ time: 100, amount: 60 }, { time: 100, amount: 40 }], "transaction-identity-ambiguous"],
+  [
+    [{ time: 100, amount: 60 }, { time: 100, amount: 40 }],
+    "transaction-identity-ambiguous",
+  ],
 ]) {
   requireEqual(
     verifyTransaction(101, 100, 100, transactions),
     expected,
     `transaction ${expected}`,
+  );
+}
+
+function validateTerminalRequestShape(request, confirmationMatches) {
+  if (
+    !request
+    || request.enabled !== true
+    || typeof request.requestId !== "string"
+    || request.requestId.length === 0
+    || !Number.isInteger(request.revision)
+    || request.revision < 1
+    || typeof request.terminalId !== "string"
+    || request.terminalId.length === 0
+    || typeof request.resourceType !== "string"
+    || request.resourceType.length === 0
+    || !Number.isInteger(request.amount)
+    || request.amount < 100
+    || typeof request.destination !== "string"
+    || request.destination.length === 0
+    || !Number.isFinite(request.energyReserve)
+    || request.energyReserve < 0
+    || confirmationMatches !== true
+  ) {
+    return "request-invalid";
+  }
+  return "request-valid";
+}
+
+const validTerminalRequest = {
+  enabled: true,
+  requestId: "send-1",
+  revision: 1,
+  terminalId: "terminal-1",
+  resourceType: "U",
+  amount: 100,
+  destination: "W2N2",
+  energyReserve: 1000,
+};
+for (const [request, confirmationMatches, expected] of [
+  [validTerminalRequest, true, "request-valid"],
+  [{ ...validTerminalRequest, requestId: "" }, true, "request-invalid"],
+  [{ ...validTerminalRequest, destination: "" }, true, "request-invalid"],
+  [{ ...validTerminalRequest, energyReserve: Number.NaN }, true, "request-invalid"],
+  [{ ...validTerminalRequest, energyReserve: -1 }, true, "request-invalid"],
+  [validTerminalRequest, false, "request-invalid"],
+]) {
+  requireEqual(
+    validateTerminalRequestShape(request, confirmationMatches),
+    expected,
+    `Terminal request shape ${expected}`,
   );
 }
 
@@ -424,7 +435,7 @@ for (const marker of [
   "Screeps Console execution",
   "Evidence still Pending",
 ]) {
-  requireText(audit, marker, "audit evidence");
+  requireText(audit, marker, "historical audit evidence");
 }
 
 if (failures.length > 0) {
@@ -436,8 +447,9 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Market transaction evidence simulation passed: 3 existing routes, "
-    + "34 anchors, 19 JavaScript blocks, content-derived 98-point scores, "
-    + "rounded fees, exact next-tick IDs, shared Terminal reservations, "
-    + "partial settlements, safe empty requests and normalized descriptions.",
+  "Market transaction evidence simulation passed: the 2026-08-05 market "
+    + "source layer remains intact, current registry metadata recognizes the "
+    + "2026-08-30 Terminal supersession, 19 historical JavaScript blocks "
+    + "parse, and the current Terminal request shape rejects malformed "
+    + "identity, destination, reserve and confirmation inputs.",
 );

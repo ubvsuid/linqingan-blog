@@ -65,7 +65,7 @@ export const englishMarketBatchTenRegistry: DatedEnglishArticleRecord[] = [
       "Freeze one transfer revision, reserve the exact Terminal against send and market-deal conflicts, submit once, normalize ledger descriptions, and verify the actual full or partial outgoing transaction next tick.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    updatedAt: "2026-08-05",
+    updatedAt: "2026-08-30",
     readingTime: "21 min read",
     primaryKeyword: "Screeps Terminal send verification",
     searchIntent:

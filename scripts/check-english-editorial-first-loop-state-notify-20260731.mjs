@@ -89,8 +89,8 @@ const expected = {
     publishedAt: "2026-07-25",
     title: "Screeps Game.notify(): Queue Alerts and Mark Them Submitted",
     headline: "Do Not Mark an Alert Sent Until Game.notify() Is Called",
-    discoveryTitle: "Screeps Game.notify(): Bind Alert Payload Identity Before Submission",
-    updatedAt: "2026-08-05",
+    discoveryTitle: "Screeps Game.notify(): Send Rate-Limited Alerts Safely",
+    updatedAt: "2026-08-30",
     registry: observabilityRegistry,
     signals: [
       "awaiting-first-submission",
