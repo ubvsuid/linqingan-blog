@@ -89,8 +89,8 @@ for (const signal of [
   'title: "Screeps Game.notify(): Send Rate-Limited Alerts Safely"',
   "Game.notify",
   "groupInterval",
-  "valid.slice(0, 20)",
-  "lastSubmittedTick",
+  "Memory.notificationIncidents ??= {}",
+  "state.lastScheduledAt = Game.time",
   "External delivery",
 ]) {
   requireText(currentNotify, signal, "current notification supersession");
