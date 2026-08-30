@@ -17,6 +17,7 @@ const articles = [
     title:
       "Screeps createOrder(): Bind One Request to the New Order ID",
     query: "createOrder",
+    modifiedDate: "2026-08-05",
     signals: [
       "buildCreateOrderConfirmation",
       "calculateCreateOrderFeeCeiling",
@@ -33,6 +34,7 @@ const articles = [
     title:
       "Screeps market.deal(): Reserve the Terminal and Verify Actual Amount",
     query: "market.deal",
+    modifiedDate: "2026-08-05",
     signals: [
       "createTerminalMarketDispatcher",
       "terminal-already-reserved",
@@ -49,6 +51,7 @@ const articles = [
     title:
       "Screeps Terminal.send(): Prevent Intent Overwrite and Verify Actual Amount",
     query: "Terminal.send",
+    modifiedDate: "2026-08-30",
     signals: [
       "normalizeSendDescription",
       "createTerminalOperationDispatcher",
@@ -98,7 +101,7 @@ for (const article of articles) {
     `<h2 id="evidence-contract">`,
     `"@type":"BlogPosting"`,
     `"datePublished":"2026-07-26"`,
-    `"dateModified":"2026-08-05"`,
+    `"dateModified":"${article.modifiedDate}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少 “${expected}”`);
