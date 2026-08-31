@@ -12,12 +12,16 @@ import {
 import { getLocalizedScreepsApiReference } from "@/lib/screeps-api-reference-localized";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
+import { getEvidenceApiReferenceId } from "@/lib/verification-evidence-relations";
 import {
   localizeVerificationCoveragePlan,
   verificationCoveragePlans,
   type VerificationCoveragePlan,
 } from "@/lib/verification-coverage";
-import { getVerifiedContentWithEvidence } from "@/lib/verified-content";
+import {
+  getVerifiedContentWithEvidence,
+  type VerifiedEvidencePreview,
+} from "@/lib/verified-content";
 
 import styles from "./verification-coverage.module.css";
 
@@ -30,21 +34,48 @@ function uniqueByHref<T extends { href: string }>(items: T[]): T[] {
   });
 }
 
+function evidenceCoversError(evidence: VerifiedEvidencePreview, errorName: string) {
+  const raw = evidence.returnCode?.trim();
+  if (!raw) return false;
+  if (raw.toUpperCase() === errorName.toUpperCase()) return true;
+
+  const error = screepsErrorCodes.find((candidate) => candidate.name === errorName);
+  const numeric = Number(raw);
+  return Boolean(error && Number.isInteger(numeric) && numeric === error.value);
+}
+
 function coverageStatus(
   plan: VerificationCoveragePlan,
-  records: Awaited<ReturnType<typeof getVerifiedContentWithEvidence>>,
+  evidence: readonly VerifiedEvidencePreview[],
 ) {
-  const hasLive = records.some((record) => record.liveTested);
-  const hasConsole = records.some((record) => record.consoleTested);
-  const targetMet = plan.targetLevel === "console" ? hasConsole || hasLive : hasLive;
+  const hasLive = evidence.some((record) => record.type === "live");
+  const hasConsole = evidence.some((record) => record.type === "console");
+  const targetLevelMet = plan.targetLevel === "console" ? hasConsole || hasLive : hasLive;
+  const coveredErrorNames = plan.primaryErrorNames.filter((name) =>
+    evidence.some((record) => evidenceCoversError(record, name)),
+  );
+  const errorBranchesMet = plan.primaryErrorNames.length === 0 || coveredErrorNames.length === plan.primaryErrorNames.length;
+  const targetMet = targetLevelMet && errorBranchesMet;
 
   return {
     hasLive,
     hasConsole,
     targetMet,
-    completeness: records.length === 0 ? "unverified" as const : targetMet ? "covered" as const : "partial" as const,
+    targetLevelMet,
+    coveredErrorNames,
+    completeness: evidence.length === 0 ? "unverified" as const : targetMet ? "covered" as const : "partial" as const,
     evidenceLevel: hasLive ? "live-multitick" as const : hasConsole ? "console" as const : "none" as const,
   };
+}
+
+function formatEvidence(evidence: VerifiedEvidencePreview, isEnglish: boolean) {
+  const parts = [
+    evidence.type === "live" ? "LIVE" : "CONSOLE",
+    evidence.apiName,
+  ];
+  if (evidence.returnCode) parts.push(isEnglish ? `return ${evidence.returnCode}` : `返回 ${evidence.returnCode}`);
+  parts.push(evidence.verifiedAt.slice(0, 10));
+  return parts.join(" · ");
 }
 
 export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnosticLocale }) {
@@ -61,12 +92,12 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
     ? {
         eyebrow: "VERIFICATION COVERAGE",
         title: "Coverage is measured against accepted runtime evidence",
-        body: "The registry prioritizes what should be proved next. Coverage status is calculated from the same accepted public verification layer used by Diagnostic Center; database records cannot promote an unaccepted guide on their own.",
+        body: "The registry prioritizes what should be proved next. Current coverage is calculated from structured Runtime Evidence that survives the same accepted + Markdown-accepted public boundary as Diagnostic Center, then matched to each path by canonical API identity.",
         total: "planned diagnostic paths",
-        p0: "P0 evidence priorities",
-        accepted: "accepted related runtime guides",
+        evidenced: "paths with accepted evidence",
+        evidenceRecords: "structured accepted evidence records",
         legendTitle: "How to read the status",
-        legendBody: "Evidence strength and coverage completeness are separate. Console and live multi-tick are evidence levels; partial means some accepted evidence exists but the planned target is not met yet.",
+        legendBody: "Evidence strength and coverage completeness are separate. A path is only target-covered when the planned evidence level is present and all planned primary return-code branches are represented; otherwise accepted evidence remains Partial.",
         unverified: "Unverified",
         partial: "Partial",
         covered: "Target covered",
@@ -75,29 +106,30 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
         live: "Live multi-tick",
         target: "Target evidence",
         current: "Current accepted evidence",
+        returnBranches: "return-code branches",
         goal: "Coverage goal",
         next: "Next evidence to capture",
         errors: "Primary error branches",
         apis: "Primary API surfaces",
         hubs: "Related object hubs",
         tools: "Useful tools",
-        guides: "Related guide surfaces",
         noErrors: "No single return-code branch defines this path.",
-        noAccepted: "No related accepted Console/live guide is public yet.",
+        noAccepted: "No matching structured accepted Runtime Evidence is public for the primary APIs yet.",
+        acceptedGuideCount: "accepted guide(s)",
+        acceptedEvidenceCount: "evidence record(s)",
         openDiagnostic: "Open diagnostic path",
         method: "Verification method",
-        archive: "Recently verified",
-        acceptedCount: "accepted guide(s)",
+        archive: "Runtime Evidence Hub",
       }
     : {
         eyebrow: "VERIFICATION COVERAGE",
         title: "用已接受的运行时证据衡量验证覆盖",
-        body: "这份 Registry 只决定“下一步最值得验证什么”。当前覆盖状态仍由 Diagnostic Center 同一套公开 accepted Verification 层计算；数据库记录不能单独把未接受文章提升为已验证。",
+        body: "这份 Registry 只决定“下一步最值得验证什么”。当前覆盖由与 Diagnostic Center 相同的 accepted + Markdown accepted 公共边界筛出的结构化 Runtime Evidence 计算，再按 canonical API identity 关联到每条症状路径。",
         total: "条计划诊断路径",
-        p0: "个 P0 证据优先项",
-        accepted: "篇相关已接受运行时文章",
+        evidenced: "条已有 accepted Evidence 路径",
+        evidenceRecords: "条结构化 accepted Evidence",
         legendTitle: "如何理解状态",
-        legendBody: "证据强度与覆盖完整度分开记录。Console / Live multi-tick 是证据等级；Partial 表示已经有部分 accepted 证据，但还没有达到这条路径计划的目标。",
+        legendBody: "证据强度与覆盖完整度分开记录。只有达到计划证据等级，并覆盖计划中的主要返回码分支，才标记为“目标已覆盖”；已有 accepted Evidence 但仍有缺口时保持“部分覆盖”。",
         unverified: "未验证",
         partial: "部分覆盖",
         covered: "目标已覆盖",
@@ -106,19 +138,20 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
         live: "Live multi-tick",
         target: "目标证据",
         current: "当前 accepted 证据",
+        returnBranches: "个返回码分支",
         goal: "覆盖目标",
         next: "下一步应采集的证据",
         errors: "主要错误码分支",
         apis: "主要 API",
         hubs: "相关对象 Hub",
         tools: "可用工具",
-        guides: "相关教程入口",
         noErrors: "这条路径没有单一错误码可以定义。",
-        noAccepted: "当前还没有相关的公开 accepted Console / Live 验证文章。",
+        noAccepted: "当前主要 API 还没有可匹配的公开结构化 accepted Runtime Evidence。",
+        acceptedGuideCount: "篇已接受文章",
+        acceptedEvidenceCount: "条 Evidence",
         openDiagnostic: "打开诊断路径",
         method: "验证方法",
-        archive: "最近验证",
-        acceptedCount: "篇已接受文章",
+        archive: "Runtime Evidence Hub",
       };
 
   const rows = verificationCoveragePlans.flatMap((plan) => {
@@ -140,8 +173,23 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
       }),
     ]);
     const guideHrefSet = new Set(guideLinks.map((link) => link.href));
-    const relatedVerified = verified.filter((record) => guideHrefSet.has(record.href));
-    const status = coverageStatus(plan, relatedVerified);
+    const primaryApiIdSet = new Set(plan.primaryApiEntryIds);
+    const relatedVerified = verified.filter((record) =>
+      guideHrefSet.has(record.href) ||
+      record.evidence.some((evidence) => {
+        const apiId = getEvidenceApiReferenceId(evidence.apiName);
+        return apiId ? primaryApiIdSet.has(apiId) : false;
+      }),
+    );
+    const relatedEvidence = relatedVerified.flatMap((record) =>
+      record.evidence.flatMap((evidence) => {
+        const apiId = getEvidenceApiReferenceId(evidence.apiName);
+        return apiId && primaryApiIdSet.has(apiId)
+          ? [{ recordHref: record.href, recordTitle: record.title, evidence }]
+          : [];
+      }),
+    );
+    const status = coverageStatus(plan, relatedEvidence.map((item) => item.evidence));
     const localized = localizeVerificationCoveragePlan(plan, locale);
     const apiRelations = plan.primaryApiEntryIds
       .map((id) => apiEntries.find((entry) => entry.id === id))
@@ -160,11 +208,13 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
       ),
     ]);
 
-    return [{ plan, symptom, localized, guideLinks, relatedVerified, status, apiRelations, hubs, tools }];
+    return [{ plan, symptom, localized, relatedVerified, relatedEvidence, status, apiRelations, hubs, tools }];
   });
 
-  const p0Count = rows.filter((row) => row.plan.priority === "P0").length;
-  const acceptedCount = new Set(rows.flatMap((row) => row.relatedVerified.map((record) => record.href))).size;
+  const evidencedPathCount = rows.filter((row) => row.relatedEvidence.length > 0).length;
+  const acceptedEvidenceCount = new Set(
+    rows.flatMap((row) => row.relatedEvidence.map((item) => item.evidence.evidenceKey)),
+  ).size;
 
   return (
     <section className={styles.coverage} aria-labelledby={`verification-coverage-${locale}`}>
@@ -176,8 +226,8 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
         </div>
         <div className={styles.summary} aria-label={isEnglish ? "Coverage summary" : "覆盖摘要"}>
           <strong>{rows.length}<span>{copy.total}</span></strong>
-          <strong>{p0Count}<span>{copy.p0}</span></strong>
-          <strong>{acceptedCount}<span>{copy.accepted}</span></strong>
+          <strong>{evidencedPathCount}<span>{copy.evidenced}</span></strong>
+          <strong>{acceptedEvidenceCount}<span>{copy.evidenceRecords}</span></strong>
         </div>
       </header>
 
@@ -191,7 +241,7 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
       </aside>
 
       <div className={styles.grid}>
-        {rows.map(({ plan, symptom, localized, guideLinks, relatedVerified, status, apiRelations, hubs, tools }) => {
+        {rows.map(({ plan, symptom, localized, relatedVerified, relatedEvidence, status, apiRelations, hubs, tools }) => {
           const title = isEnglish ? symptom.enTitle : symptom.zhTitle;
           const completenessLabel = status.completeness === "covered"
             ? copy.covered
@@ -204,6 +254,9 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
               ? copy.console
               : copy.none;
           const targetLevel = plan.targetLevel === "live-multitick" ? copy.live : copy.console;
+          const branchCoverage = plan.primaryErrorNames.length > 0
+            ? `${status.coveredErrorNames.length}/${plan.primaryErrorNames.length} ${copy.returnBranches}`
+            : null;
 
           return (
             <article className={styles.card} id={`coverage-${plan.symptomId}`} key={plan.symptomId}>
@@ -217,7 +270,7 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
 
               <div className={styles.levels}>
                 <div><span>{copy.target}</span><strong>{targetLevel}</strong></div>
-                <div><span>{copy.current}</span><strong>{currentLevel}</strong></div>
+                <div><span>{copy.current}</span><strong>{currentLevel}{branchCoverage ? ` · ${branchCoverage}` : ""}</strong></div>
               </div>
 
               <section className={styles.plan}>
@@ -274,13 +327,15 @@ export async function VerificationCoverage({ locale }: { locale: ScreepsDiagnost
 
               <footer className={styles.evidence}>
                 <div>
-                  <strong>{copy.guides}</strong>
-                  <span>{guideLinks.length} · {relatedVerified.length} {copy.acceptedCount}</span>
+                  <strong>{copy.current}</strong>
+                  <span>{relatedVerified.length} {copy.acceptedGuideCount} · {relatedEvidence.length} {copy.acceptedEvidenceCount}</span>
                 </div>
-                {relatedVerified.length > 0 ? (
+                {relatedEvidence.length > 0 ? (
                   <div className={styles.linkStack}>
-                    {relatedVerified.slice(0, 3).map((record) => (
-                      <Link href={record.href} key={record.href}>{record.liveTested ? copy.live : copy.console} · {record.title}</Link>
+                    {relatedEvidence.slice(0, 6).map(({ recordHref, recordTitle, evidence }) => (
+                      <Link href={recordHref} key={evidence.evidenceKey} title={recordTitle}>
+                        {formatEvidence(evidence, isEnglish)}
+                      </Link>
                     ))}
                   </div>
                 ) : <p className={styles.muted}>{copy.noAccepted}</p>}

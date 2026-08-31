@@ -12,6 +12,7 @@ import {
 import { getLocalizedScreepsApiReference } from "@/lib/screeps-api-reference-localized";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
+import { getEvidenceApiReferenceId } from "@/lib/verification-evidence-relations";
 import {
   getVerifiedContentWithEvidence,
   type VerifiedEvidencePreview,
@@ -139,6 +140,7 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
             .filter((diagnostic): diagnostic is NonNullable<typeof diagnostic> => Boolean(diagnostic));
 
           const directApiIds = uniqueStrings(symptom.directApiEntryIds ?? []);
+          const directApiIdSet = new Set(directApiIds);
           const diagnosticApiIds = uniqueStrings(diagnostics.flatMap((diagnostic) => diagnostic.apiEntryIds));
           const primaryApiIds = directApiIds.length > 0 ? directApiIds.slice(0, 4) : diagnosticApiIds.slice(0, 3);
           const primaryApiIdSet = new Set(primaryApiIds);
@@ -201,7 +203,13 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
           const primaryErrorNames = symptom.errorNames.slice(0, 3);
           const secondaryErrorNames = symptom.errorNames.slice(3, 5);
           const verificationHrefSet = new Set(guides.map((guide) => guide.href));
-          const relatedVerified = verified.filter((record) => verificationHrefSet.has(record.href));
+          const relatedVerified = verified.filter((record) =>
+            verificationHrefSet.has(record.href) ||
+            record.evidence.some((evidence) => {
+              const evidenceApiId = getEvidenceApiReferenceId(evidence.apiName);
+              return evidenceApiId ? directApiIdSet.has(evidenceApiId) : false;
+            }),
+          );
           const triage = isEnglish ? symptom.enTriage : symptom.zhTriage;
           const symptomTitle = isEnglish ? symptom.enTitle : symptom.zhTitle;
           const symptomSearchHref = `${searchRootHref}?q=${encodeURIComponent(symptomTitle)}`;

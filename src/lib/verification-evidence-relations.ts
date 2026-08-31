@@ -31,7 +31,7 @@ const apiReferenceAliases: Record<string, string> = {
   "structuretower.repair": "tower-attack-heal-repair",
 };
 
-function findApiReferenceId(apiName: string) {
+export function getEvidenceApiReferenceId(apiName: string) {
   const normalized = apiName.trim().toLowerCase();
   const aliased = apiReferenceAliases[normalized];
   if (aliased) return aliased;
@@ -73,7 +73,7 @@ export function getEvidenceRelations(
 ): EvidenceRelations {
   const prefix = locale === "en" ? "/en" : "";
   const tool = toolByApi.find(([pattern]) => pattern.test(record.apiName))?.[1];
-  const apiReferenceId = findApiReferenceId(record.apiName);
+  const apiReferenceId = getEvidenceApiReferenceId(record.apiName);
   const errorCode = findErrorCode(record);
 
   return {

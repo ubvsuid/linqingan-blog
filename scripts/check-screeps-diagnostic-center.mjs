@@ -33,6 +33,7 @@ const englishRoute = read("src/app/(en)/en/diagnostics/page.tsx");
 const diagnostics = read("src/lib/screeps-error-diagnostics.ts");
 const errors = read("src/lib/screeps-errors.ts");
 const apiReference = read("src/lib/screeps-api-reference.ts");
+const evidenceRelations = read("src/lib/verification-evidence-relations.ts");
 const hubs = read("src/lib/screeps-api-hubs.ts");
 const chineseSearch = read("src/lib/search.ts");
 const englishSearch = read("src/lib/english-search.ts");
@@ -91,6 +92,12 @@ if (!component.includes("getVerifiedContentWithEvidence(locale)")) {
 }
 if (component.includes("getPublicVerificationEvidence(")) {
   failures.push("Diagnostic Center must not bypass the Markdown acceptance boundary with direct public evidence reads.");
+}
+if (!component.includes("getEvidenceApiReferenceId") || !component.includes("record.evidence.some")) {
+  failures.push("Diagnostic Center must bridge accepted structured Runtime Evidence to symptoms through direct API identity, not guide href alone.");
+}
+if (!evidenceRelations.includes('"structurespawn.spawncreep": "spawn-spawn-creep"')) {
+  failures.push("Runtime Evidence API identity must preserve the StructureSpawn.spawnCreep alias used by Diagnostics coverage.");
 }
 if (!component.includes("getScreepsErrorDiagnostic")) {
   failures.push("Diagnostic Center must reuse the Phase 4A-2 error diagnostic network.");

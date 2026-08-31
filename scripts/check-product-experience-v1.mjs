@@ -13,6 +13,11 @@ const checks = [
   ["src/app/(en)/en/search/page.tsx", "Problem-solving path", "English problem-solving path"],
   ["src/components/screeps-diagnostic-center.tsx", "Accepted Runtime Evidence", "diagnostics evidence bridge"],
   ["src/components/screeps-diagnostic-center.tsx", "symptomSearchHref", "diagnostics-to-search bridge"],
+  ["src/components/screeps-diagnostic-center.tsx", "getEvidenceApiReferenceId", "diagnostics API-identity evidence bridge"],
+  ["src/components/verification-coverage.tsx", "getEvidenceApiReferenceId", "coverage API-identity evidence bridge"],
+  ["src/components/verification-coverage.tsx", "relatedEvidence", "structured Runtime Evidence coverage matrix"],
+  ["src/components/verification-coverage.tsx", "coveredErrorNames", "return-code branch coverage"],
+  ["src/components/verification-coverage.tsx", "acceptedEvidenceCount", "structured Evidence summary"],
 ];
 
 const failures = [];

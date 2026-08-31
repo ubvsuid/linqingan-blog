@@ -31,6 +31,7 @@ const symptoms = read("src/lib/screeps-diagnostic-symptoms.ts");
 const diagnostics = read("src/lib/screeps-error-diagnostics.ts");
 const errors = read("src/lib/screeps-errors.ts");
 const apiReference = read("src/lib/screeps-api-reference.ts");
+const evidenceRelations = read("src/lib/verification-evidence-relations.ts");
 const component = read("src/components/verification-coverage.tsx");
 const diagnosticCenter = read("src/components/screeps-diagnostic-center.tsx");
 const chineseRoute = read("src/app/(zh)/verification/coverage/page.tsx");
@@ -101,14 +102,30 @@ for (const [label, source, locale] of [
 if (!component.includes("getVerifiedContentWithEvidence(locale)")) {
   failures.push("Verification Coverage must reuse the accepted localized verification content layer.");
 }
-if (component.includes("getPublicVerificationEvidence(") || component.includes("verification-evidence")) {
+if (
+  component.includes("getPublicVerificationEvidence(") ||
+  component.includes('@/lib/verification-evidence"') ||
+  component.includes("@/lib/verification-evidence'")
+) {
   failures.push("Verification Coverage must not bypass the Markdown + accepted Evidence boundary with direct evidence reads.");
 }
-if (!component.includes("records.length === 0") || !component.includes('"partial" as const') || !component.includes('"covered" as const')) {
-  failures.push("Verification Coverage must distinguish unverified, partial, and target-covered completeness from evidence strength.");
+if (!component.includes("getEvidenceApiReferenceId") || !component.includes("relatedEvidence")) {
+  failures.push("Verification Coverage must derive structured Runtime Evidence by canonical API identity instead of guide href alone.");
+}
+if (!evidenceRelations.includes('"structurespawn.spawncreep": "spawn-spawn-creep"')) {
+  failures.push("Verification Coverage API identity must preserve the StructureSpawn.spawnCreep alias.");
+}
+if (!component.includes("evidence.length === 0") || !component.includes('"partial" as const') || !component.includes('"covered" as const')) {
+  failures.push("Verification Coverage must distinguish unverified, partial, and target-covered completeness from structured Evidence strength.");
 }
 if (!component.includes('hasLive ? "live-multitick"') || !component.includes('hasConsole ? "console"')) {
-  failures.push("Verification Coverage must derive Console/live-multitick evidence strength from accepted records.");
+  failures.push("Verification Coverage must derive Console/live-multitick strength from structured accepted Evidence records.");
+}
+if (!component.includes("coveredErrorNames") || !component.includes("primaryErrorNames")) {
+  failures.push("Verification Coverage must measure planned return-code branch coverage from structured Evidence.");
+}
+if (!component.includes("acceptedEvidenceCount") || !component.includes("evidence.evidenceKey")) {
+  failures.push("Verification Coverage summary must count unique structured accepted Evidence records.");
 }
 
 if (!i18n.includes('"/verification/coverage": "/en/verification/coverage"')) {
@@ -155,4 +172,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verification Coverage check passed: ${expectedSymptoms.length} symptom paths have bilingual priorities, evidence targets, Search/Sitemap discovery, Diagnostic links, and accepted Verification boundaries.`);
+console.log(`Verification Coverage check passed: ${expectedSymptoms.length} symptom paths use structured accepted Evidence, canonical API identity, planned return-code branch coverage, bilingual discovery, and the existing public acceptance boundary.`);
