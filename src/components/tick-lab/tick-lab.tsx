@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   evaluateTransfer,
   type TransferEvaluation,
+  type TransferScenario,
   type TransferStepKey,
 } from "@/lib/tick-lab";
 
@@ -19,22 +20,22 @@ interface TickLabProps {
 
 const stepLabels: Record<TickLabLanguage, Record<TransferStepKey, string>> = {
   zh: {
-    "resolve-creep": "解析 Creep1",
-    "resolve-target": "解析 Spawn1",
+    "resolve-creep": "读取受控 Creep1 状态",
+    "resolve-target": "读取受控 Spawn1 状态",
     "check-range": "检查距离",
     "check-resource": "检查 Creep 能量",
     "check-capacity": "检查目标剩余容量",
     "submit-intent": "提交 transfer intent",
-    "resolve-tick": "结算本 Tick 的模型状态",
+    "resolve-tick": "应用受控 intent，计算模型化下一状态",
   },
   en: {
-    "resolve-creep": "Resolve Creep1",
-    "resolve-target": "Resolve Spawn1",
+    "resolve-creep": "Read the constrained Creep1 state",
+    "resolve-target": "Read the constrained Spawn1 state",
     "check-range": "Check range",
     "check-resource": "Check Creep energy",
     "check-capacity": "Check target free capacity",
     "submit-intent": "Submit transfer intent",
-    "resolve-tick": "Resolve the modeled Tick state",
+    "resolve-tick": "Apply the constrained intent and model the next state",
   },
 };
 
@@ -52,14 +53,27 @@ const copy = {
     experimentLead: "把 Creep1 携带的 ENERGY 转移给相邻 Spawn1。",
     worldState: "Tick 100 · World State",
     code: "Code",
-    nextState: "Tick 101 · Modeled State",
+    nextState: "Tick 101 · 模型化下一状态",
     creep: "Creep1",
     spawn: "Spawn1",
     energy: "Energy",
     position: "Position",
     freeCapacity: "Free capacity",
     pending: "运行 Tick 后显示状态变化",
-    controls: "实验参数",
+    presets: "直接试一个分支",
+    presetsLead: "不用猜参数。选择典型场景后会立即运行，并把返回码、Intent 与下一状态一起展示。",
+    presetSuccess: "成功",
+    presetSuccessDetail: "50 → 50",
+    presetPartial: "部分填充",
+    presetPartialDetail: "只剩 25 容量",
+    presetRange: "距离过远",
+    presetRangeDetail: "Range 2",
+    presetEmpty: "Creep 空了",
+    presetEmptyDetail: "0 ENERGY",
+    presetFull: "Spawn 已满",
+    presetFullDetail: "0 free",
+    controls: "自定义参数",
+    controlsLead: "也可以自己改变世界状态，再运行一次。",
     range: "Range",
     rangeHelp: "transfer() 的目标必须位于相邻格。",
     creepEnergy: "Creep Energy",
@@ -68,6 +82,9 @@ const copy = {
     run: "Run Tick ▶",
     timeline: "Tick Timeline",
     result: "Return Code",
+    intent: "Intent",
+    intentSubmitted: "已提交",
+    intentNotSubmitted: "未提交",
     transferred: "本实验转移量",
     explanation: "发生了什么",
     related: "继续查询",
@@ -99,14 +116,27 @@ const copy = {
     experimentLead: "Transfer ENERGY carried by Creep1 into adjacent Spawn1.",
     worldState: "Tick 100 · World State",
     code: "Code",
-    nextState: "Tick 101 · Modeled State",
+    nextState: "Tick 101 · Modeled next state",
     creep: "Creep1",
     spawn: "Spawn1",
     energy: "Energy",
     position: "Position",
     freeCapacity: "Free capacity",
     pending: "Run the Tick to reveal the state transition",
-    controls: "Experiment controls",
+    presets: "Try a branch directly",
+    presetsLead: "No parameter guessing required. Pick a typical scenario to run it immediately and inspect the return code, intent, and next state together.",
+    presetSuccess: "Success",
+    presetSuccessDetail: "50 → 50",
+    presetPartial: "Partial fill",
+    presetPartialDetail: "25 free",
+    presetRange: "Too far",
+    presetRangeDetail: "Range 2",
+    presetEmpty: "Empty Creep",
+    presetEmptyDetail: "0 ENERGY",
+    presetFull: "Full Spawn",
+    presetFullDetail: "0 free",
+    controls: "Custom controls",
+    controlsLead: "Or change the world state yourself, then run another Tick.",
     range: "Range",
     rangeHelp: "transfer() requires the target to be adjacent.",
     creepEnergy: "Creep Energy",
@@ -115,6 +145,9 @@ const copy = {
     run: "Run Tick ▶",
     timeline: "Tick Timeline",
     result: "Return Code",
+    intent: "Intent",
+    intentSubmitted: "Submitted",
+    intentNotSubmitted: "Not submitted",
     transferred: "Modeled transfer amount",
     explanation: "What happened",
     related: "Continue exploring",
@@ -134,6 +167,13 @@ const copy = {
     skipped: "Skipped",
   },
 } as const;
+
+interface ScenarioPreset {
+  key: string;
+  scenario: TransferScenario;
+  label: string;
+  detail: string;
+}
 
 function explanationFor(language: TickLabLanguage, result: TransferEvaluation) {
   const text = copy[language];
@@ -172,6 +212,39 @@ export function TickLab({ language }: TickLabProps) {
         evidence: "/verified",
       };
 
+  const presets: ScenarioPreset[] = [
+    {
+      key: "success",
+      scenario: { range: 1, creepEnergy: 50, targetFreeCapacity: 50 },
+      label: text.presetSuccess,
+      detail: text.presetSuccessDetail,
+    },
+    {
+      key: "partial",
+      scenario: { range: 1, creepEnergy: 50, targetFreeCapacity: 25 },
+      label: text.presetPartial,
+      detail: text.presetPartialDetail,
+    },
+    {
+      key: "range",
+      scenario: { range: 2, creepEnergy: 50, targetFreeCapacity: 50 },
+      label: text.presetRange,
+      detail: text.presetRangeDetail,
+    },
+    {
+      key: "empty",
+      scenario: { range: 1, creepEnergy: 0, targetFreeCapacity: 50 },
+      label: text.presetEmpty,
+      detail: text.presetEmptyDetail,
+    },
+    {
+      key: "full",
+      scenario: { range: 1, creepEnergy: 50, targetFreeCapacity: 0 },
+      label: text.presetFull,
+      detail: text.presetFullDetail,
+    },
+  ];
+
   function invalidateResult() {
     setResult(null);
   }
@@ -181,6 +254,13 @@ export function TickLab({ language }: TickLabProps) {
     setCreepEnergy(50);
     setTargetFreeCapacity(50);
     setResult(null);
+  }
+
+  function runScenario(scenario: TransferScenario) {
+    setRange(scenario.range);
+    setCreepEnergy(scenario.creepEnergy);
+    setTargetFreeCapacity(scenario.targetFreeCapacity);
+    setResult(evaluateTransfer(scenario));
   }
 
   function runTick() {
@@ -288,6 +368,33 @@ export function TickLab({ language }: TickLabProps) {
           </article>
         </div>
 
+        <section className={styles.presetPanel} aria-labelledby="tick-lab-presets-title">
+          <div className={styles.presetHeader}>
+            <div>
+              <strong id="tick-lab-presets-title">{text.presets}</strong>
+              <p>{text.presetsLead}</p>
+            </div>
+          </div>
+          <div className={styles.presetGrid}>
+            {presets.map((preset) => (
+              <button
+                key={preset.key}
+                type="button"
+                className={styles.presetButton}
+                onClick={() => runScenario(preset.scenario)}
+              >
+                <strong>{preset.label}</strong>
+                <span>{preset.detail}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <div className={styles.controlsHeader}>
+          <strong>{text.controls}</strong>
+          <span>{text.controlsLead}</span>
+        </div>
+
         <div className={styles.controlGrid}>
           <fieldset className={styles.controlCard}>
             <legend>{text.range}</legend>
@@ -382,6 +489,10 @@ export function TickLab({ language }: TickLabProps) {
                   <span>{result.returnCode}</span>
                 </div>
                 <dl className={styles.resultStats}>
+                  <div>
+                    <dt>{text.intent}</dt>
+                    <dd>{result.intentSubmitted ? text.intentSubmitted : text.intentNotSubmitted}</dd>
+                  </div>
                   <div>
                     <dt>{text.transferred}</dt>
                     <dd>{result.transferred} ENERGY</dd>

@@ -32,6 +32,7 @@ export interface TransferEvaluation {
   returnCode: number;
   returnName: TransferReturnName;
   failure: TransferFailureKey;
+  intentSubmitted: boolean;
   transferred: number;
   nextCreepEnergy: number;
   nextTargetFreeCapacity: number;
@@ -76,6 +77,7 @@ function failedEvaluation(
     returnCode: transferReturnCodes[returnName],
     returnName,
     failure,
+    intentSubmitted: false,
     transferred: 0,
     nextCreepEnergy: scenario.creepEnergy,
     nextTargetFreeCapacity: scenario.targetFreeCapacity,
@@ -128,6 +130,7 @@ export function evaluateTransfer(scenario: TransferScenario): TransferEvaluation
     returnCode: transferReturnCodes.OK,
     returnName: "OK",
     failure: null,
+    intentSubmitted: true,
     transferred,
     nextCreepEnergy: scenario.creepEnergy - transferred,
     nextTargetFreeCapacity: scenario.targetFreeCapacity - transferred,
