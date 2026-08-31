@@ -21,6 +21,7 @@ import { englishConfigCodeBatchSixteenRegistry } from "./english-config-code-reg
 import { englishDefenseOperationsBatchSeventeenRegistry } from "./english-defense-operations-registry-17";
 import { englishLinkSourceBatchEighteenRegistry } from "./english-link-source-registry-18";
 import { englishPathfinderBatchNineteenRegistry } from "./english-pathfinder-registry-19";
+import { englishCreepAttackBatchTwentyOneRegistry } from "./english-creep-attack-registry-21";
 
 export interface EnglishArticleRecord extends Omit<BilingualEnglishArticleRecord, "chinesePath"> {
   chinesePath?: string;
@@ -393,6 +394,7 @@ const allPublishedEnglishArticles: EnglishArticleRecord[] = [
   ...englishDefenseOperationsBatchSeventeenRegistry,
   ...englishLinkSourceBatchEighteenRegistry,
   ...englishPathfinderBatchNineteenRegistry,
+  ...englishCreepAttackBatchTwentyOneRegistry,
 ];
 
 export const publishedEnglishArticles: EnglishArticleRecord[] =

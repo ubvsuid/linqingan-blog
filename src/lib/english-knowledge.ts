@@ -65,6 +65,7 @@ const articleModuleOverrides: Record<string, number> = {
   "/en/blog/screeps-build-repair": 6,
   "/en/blog/screeps-remove-construction-site": 6,
   "/en/blog/screeps-tower-auto-attack-hostiles": 6,
+  "/en/blog/screeps-creep-attack": 6,
   "/en/blog/screeps-tower-heal-creeps": 6,
   "/en/blog/screeps-tower-repair-threshold": 6,
   "/en/blog/screeps-room-create-construction-site": 6,
