@@ -36,6 +36,7 @@ export const siteConfig = {
     { label: "学习", href: "/beginner" },
     { label: "解决问题", href: "/diagnostics" },
     { label: "工具", href: "/tools" },
+    { label: "Tick Lab", href: "/tick-lab" },
     { label: "验证", href: "/verification" },
     { label: "关于", href: "/about" },
   ],
