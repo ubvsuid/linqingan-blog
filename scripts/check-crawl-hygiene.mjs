@@ -38,6 +38,9 @@ const englishBrowser = "src/components/english-article-browser.tsx";
 const siteSearch = "src/components/site-search-v2.tsx";
 const englishSiteSearch = "src/components/english-site-search.tsx";
 const englishBlog = "src/app/(en)/en/blog/page.tsx";
+const englishTagIndex = "src/app/(en)/en/tags/page.tsx";
+const englishTag = "src/app/(en)/en/tags/[tag]/page.tsx";
+const chineseTagIndex = "src/app/(zh)/tags/page.tsx";
 const chineseTag = "src/app/(zh)/tags/[tag]/page.tsx";
 const sitemap = "src/lib/sitemaps.ts";
 
@@ -48,12 +51,17 @@ requireOccurrences(pagination, "prefetch={false}", 2, "pagination prefetch suppr
 requireOccurrences(englishBrowser, "prefetch={false}", 5, "English result-list prefetch suppression");
 requireOccurrences(siteSearch, "prefetch={false}", 3, "Chinese site-search result prefetch suppression");
 requireOccurrences(englishSiteSearch, "prefetch={false}", 5, "English site-search result prefetch suppression");
+requireOccurrences(englishTagIndex, "prefetch={false}", 1, "English Tag-index prefetch suppression");
+requireOccurrences(chineseTagIndex, "prefetch={false}", 1, "Chinese Tag-index prefetch suppression");
 requireOccurrences(chineseTag, "prefetch={false}", 2, "Chinese tag-archive prefetch suppression");
 
 requireText(postCard, "getTagArchiveHref(tag, publicTags)", "Tag archive threshold routing");
 requireText(englishBlog, "isCleanPagination", "clean pagination boundary");
 requireText(englishBlog, '`/en/blog?page=${parsed.page}`', "self-canonical clean pagination");
 requireText(englishBlog, "noindex: !isCleanPagination", "filtered-state noindex boundary");
+requireText(englishTag, "isCleanPagination", "English Tag clean-pagination boundary");
+requireText(englishTag, '`/en/tags/${tag.slug}?page=${parsed.page}`', "English Tag self-canonical pagination");
+requireText(englishTag, "index: tag.count >= 3 && isCleanPagination", "English Tag filtered-state noindex boundary");
 
 const sitemapSource = read(sitemap);
 for (const forbidden of ["_rsc=", "?difficulty=", "?type=", "?sort=", "?module=", "?q="]) {
@@ -95,5 +103,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Crawl hygiene check passed: dense link clusters and bilingual search results suppress automatic prefetch, clean English pagination is self-canonical, filter states stay non-indexable, Tag thresholds are respected, Sitemap URLs remain clean, and application code does not manually interfere with _rsc.",
+  "Crawl hygiene check passed: dense link clusters, bilingual search results, and Tag indexes suppress automatic prefetch; clean English article and Tag pagination are self-canonical; filter states stay non-indexable; Tag thresholds are respected; Sitemap URLs remain clean; and application code does not manually interfere with _rsc.",
 );
