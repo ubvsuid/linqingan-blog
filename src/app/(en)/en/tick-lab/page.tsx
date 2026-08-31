@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 export const metadata = createEnglishPageMetadata({
   title: "Screeps Tick Lab: See What One Tick Does",
   description:
-    "Use a deterministic interactive Creep.transfer() experiment to inspect return codes, intents, and modeled pre/post-Tick state while keeping the boundary from real Runtime Evidence explicit.",
+    "Use deterministic Creep.transfer() and StructureSpawn.spawnCreep() experiments to inspect return codes, intents, check order, and modeled Tick state while keeping the boundary from real Runtime Evidence explicit.",
   path: "/en/tick-lab",
   chinesePath: "/tick-lab",
 });
@@ -21,7 +21,7 @@ export default function EnglishTickLabPage() {
     operatingSystem: "Web",
     inLanguage: "en",
     isAccessibleForFree: true,
-    description: "A constrained deterministic lab for understanding Screeps return values, intents, and Tick state transitions.",
+    description: "A constrained deterministic lab for understanding Screeps transfer and spawnCreep return values, intents, check order, and Tick state transitions.",
   };
 
   return (

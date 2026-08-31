@@ -1,0 +1,121 @@
+.spawnSection {
+  margin-top: 56px;
+  padding-top: 56px;
+  border-top: 1px solid var(--border);
+}
+
+.boundaryNote {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.boundaryNote strong {
+  font-size: 13px;
+}
+
+.boundaryNote p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.bodyCode {
+  display: block;
+  overflow-x: auto;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.spawnControlGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.controlSelect {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+}
+
+.toggleButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.toggleButtons button {
+  min-height: 44px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.toggleButtons .toggleActive {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.controlSelect:focus-visible,
+.toggleButtons button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--foreground) 30%, transparent);
+  outline-offset: 3px;
+}
+
+.unchangedState {
+  margin-top: 14px;
+  padding: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--background);
+}
+
+.unchangedState > strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+@media (max-width: 1100px) {
+  .spawnControlGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .spawnControlGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .spawnSection {
+    margin-top: 40px;
+    padding-top: 40px;
+  }
+
+  .boundaryNote {
+    display: block;
+  }
+
+  .boundaryNote p {
+    margin-top: 6px;
+  }
+}
