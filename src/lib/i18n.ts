@@ -6,6 +6,7 @@ export const englishNavigation = [
   { label: "Knowledge", href: "/en/knowledge" },
   { label: "Diagnostics", href: "/en/diagnostics" },
   { label: "Tools", href: "/en/tools" },
+  { label: "Tick Lab", href: "/en/tick-lab" },
   { label: "About", href: "/en/about" },
 ] as const;
 
@@ -37,6 +38,7 @@ export const languageRoutePairs = {
   "/tools/spawn-queue-replacement-planner": "/en/tools/spawn-queue-replacement-planner",
   "/tools/hauling-throughput-planner": "/en/tools/hauling-throughput-planner",
   "/tools/tower-damage-heal-repair-calculator": "/en/tools/tower-damage-heal-repair-calculator",
+  "/tick-lab": "/en/tick-lab",
   "/screeps-errors": "/en/screeps-errors",
   "/glossary": "/en/glossary",
   "/verification": "/en/verification",
