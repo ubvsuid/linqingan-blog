@@ -1,5 +1,7 @@
 import fs from "node:fs";
 
+import "./check-crawl-hygiene.mjs";
+
 const checks = [
   ["package.json", '"nanoid": "3.3.18"', "nanoid security override"],
   ["package-lock.json", '"version": "3.3.18"', "nanoid 3.3.18 lock"],

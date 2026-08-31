@@ -67,16 +67,16 @@ export function SiteFooter() {
         <nav className="footer-column" aria-label={english ? "Learning links" : "页脚学习导航"}>
           <strong>{english ? "Learn" : "学习"}</strong>
           {learningLinks.map((item) => (
-            <Link href={item.href} key={item.href}>{item.label}</Link>
+            <Link href={item.href} key={item.href} prefetch={false}>{item.label}</Link>
           ))}
         </nav>
 
         <nav className="footer-column" aria-label={english ? "Site links" : "页脚网站导航"}>
           <strong>{english ? "Site" : "网站"}</strong>
           {siteLinks.map((item) => (
-            <Link href={item.href} key={item.href}>{item.label}</Link>
+            <Link href={item.href} key={item.href} prefetch={false}>{item.label}</Link>
           ))}
-          <Link href={languageTarget} hrefLang={english ? "zh-CN" : "en"}>
+          <Link href={languageTarget} hrefLang={english ? "zh-CN" : "en"} prefetch={false}>
             {english ? "中文版" : "English version"}
           </Link>
         </nav>
@@ -88,8 +88,8 @@ export function SiteFooter() {
           </a>
           <a href={siteConfig.links.facebook} rel="noreferrer" target="_blank">Facebook ↗</a>
           <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub ↗</a>
-          <Link href={english ? "/en/feed.xml" : "/feed.xml"}>{english ? "English RSS" : "RSS"}</Link>
-          {english ? <Link href="/feed.xml">Chinese RSS</Link> : null}
+          <Link href={english ? "/en/feed.xml" : "/feed.xml"} prefetch={false}>{english ? "English RSS" : "RSS"}</Link>
+          {english ? <Link href="/feed.xml" prefetch={false}>Chinese RSS</Link> : null}
           {english ? <a href={siteConfig.links.issues} rel="noreferrer" target="_blank">Report an issue ↗</a> : null}
           <a href={`mailto:${siteConfig.author.email}`}>Email</a>
         </div>
