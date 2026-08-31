@@ -100,7 +100,7 @@ export function EnglishArticleBrowser({
           <div className={styles.actions}>
             <button type="submit">Apply filters</button>
             {hasFilters || normalizedParams.sort !== "newest" || normalizedParams.page > 1
-              ? <Link href={pathname}>Clear filters</Link>
+              ? <Link href={pathname} prefetch={false}>Clear filters</Link>
               : null}
           </div>
         </div>
@@ -115,13 +115,13 @@ export function EnglishArticleBrowser({
                 <span>{article.difficulty}</span>
                 <span>{article.contentType}</span>
               </div>
-              <h2><Link href={article.href}>{article.title}</Link></h2>
+              <h2><Link href={article.href} prefetch={false}>{article.title}</Link></h2>
               <p>{article.description}</p>
               <div className={styles.footer}>
                 <small>{article.readingTime}</small>
                 <div>
                   {article.topics.slice(0, 3).map((topic) => (
-                    <Link href={`/en/tags/${topic.slug}`} key={topic.slug}>{topic.label}</Link>
+                    <Link href={`/en/tags/${topic.slug}`} key={topic.slug} prefetch={false}>{topic.label}</Link>
                   ))}
                 </div>
               </div>
@@ -132,18 +132,18 @@ export function EnglishArticleBrowser({
         <div className={styles.empty}>
           <strong>No published guide matches these filters.</strong>
           <p>Try a broader module, remove a difficulty filter, or search by an API method, object, return code, or symptom.</p>
-          <Link href={pathname}>Show all articles</Link>
+          <Link href={pathname} prefetch={false}>Show all articles</Link>
         </div>
       )}
 
       {result.totalPages > 1 ? (
         <nav className={styles.pagination} aria-label="Article pages">
           {result.page > 1
-            ? <Link rel="prev" href={buildEnglishBrowseHref(pathname, normalizedParams, { page: result.page - 1 })}>Previous</Link>
+            ? <Link rel="prev" href={buildEnglishBrowseHref(pathname, normalizedParams, { page: result.page - 1 })} prefetch={false}>Previous</Link>
             : <span aria-disabled="true">Previous</span>}
           <span>Page {result.page} of {result.totalPages}</span>
           {result.page < result.totalPages
-            ? <Link rel="next" href={buildEnglishBrowseHref(pathname, normalizedParams, { page: result.page + 1 })}>Next</Link>
+            ? <Link rel="next" href={buildEnglishBrowseHref(pathname, normalizedParams, { page: result.page + 1 })} prefetch={false}>Next</Link>
             : <span aria-disabled="true">Next</span>}
         </nav>
       ) : null}

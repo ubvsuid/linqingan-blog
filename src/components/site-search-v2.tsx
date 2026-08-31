@@ -477,6 +477,7 @@ export function SiteSearchV2({
               <h2>
                 <Link
                   href={result.href}
+                  prefetch={false}
                   onClick={() => handleResultClick(result, index + 1)}
                 >
                   <HighlightedText text={result.title} query={query} />
@@ -501,7 +502,7 @@ export function SiteSearchV2({
           <p>可以换一个 API 名称、错误码、中文说法，或者从下面的入口继续排查。</p>
           <div>
             {emptyRecommendations.map((item) => (
-              <Link href={item.href} key={item.href}>
+              <Link href={item.href} key={item.href} prefetch={false}>
                 <strong>{item.title}</strong>
                 <span>{item.description}</span>
               </Link>
@@ -514,7 +515,7 @@ export function SiteSearchV2({
           <p>Search V2 只返回最相关的一小批结果，不再把整份全文索引下载到浏览器。</p>
           <div>
             {emptyRecommendations.map((item) => (
-              <Link href={item.href} key={item.href}>
+              <Link href={item.href} key={item.href} prefetch={false}>
                 <strong>{item.title}</strong>
                 <span>{item.description}</span>
               </Link>

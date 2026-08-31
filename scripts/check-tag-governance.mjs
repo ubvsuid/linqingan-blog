@@ -109,6 +109,23 @@ for (const marker of [
   }
 }
 
+const postCardSource = fs.readFileSync(
+  path.join(root, "src", "components", "post-card.tsx"),
+  "utf8",
+);
+for (const marker of [
+  "getPublicTagRecords",
+  "getTagArchiveHref(tag, publicTags)",
+  "prefetch={false}",
+]) {
+  if (!postCardSource.includes(marker)) {
+    failures.push(`文章卡片缺少抓取治理边界：${marker}`);
+  }
+}
+if (postCardSource.includes('href={`/tags/${tagToSlug(tag)}`}')) {
+  failures.push("文章卡片不得绕过标签归档阈值直接暴露所有 Tag URL");
+}
+
 const retiredTagSource = fs.readFileSync(
   path.join(root, "src", "app", "(zh)", "tags", "retired", "page.tsx"),
   "utf8",
@@ -126,5 +143,5 @@ if (failures.length > 0) {
 
 console.log(
   `标签治理检查通过：${coreTagSlugs.length} 个核心标签，${publicTagCount} 个可浏览归档，` +
-    `${indexableTagCount} 个可索引归档，${singletonCount} 个单篇描述标签，canonical 标签共 ${uniqueTagCount} 个。`,
+    `${indexableTagCount} 个可索引归档，${singletonCount} 个单篇描述标签，canonical 标签共 ${uniqueTagCount} 个；文章卡片不再暴露 singleton Tag URL。`,
 );

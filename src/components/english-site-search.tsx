@@ -306,7 +306,7 @@ export function EnglishSiteSearch({
         <div className="english-search-empty">
           <strong>The search index could not load.</strong>
           <p>Retry the index request, or continue with the roadmap, knowledge modules, references, and tools below.</p>
-          <div><button type="button" onClick={() => { setLoadState("idle"); void loadSearchIndex(); }}>Retry search</button><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link></div>
+          <div><button type="button" onClick={() => { setLoadState("idle"); void loadSearchIndex(); }}>Retry search</button><Link href="/en/beginner" prefetch={false}>Beginner roadmap</Link><Link href="/en/knowledge" prefetch={false}>Knowledge modules</Link></div>
         </div>
       ) : waitingForIndex ? (
         <div className="english-search-loading" role="status">Preparing searchable guides, tools, references, and topic pages…</div>
@@ -315,7 +315,7 @@ export function EnglishSiteSearch({
           {results.map((result) => (
             <article key={result.id}>
               <span>{result.type}</span>
-              <h2><Link href={result.href}><Highlight text={result.title} query={query} /></Link></h2>
+              <h2><Link href={result.href} prefetch={false}><Highlight text={result.title} query={query} /></Link></h2>
               <p>{result.description}</p>
               <div>{result.keywords.slice(0, 5).map((keyword) => <small key={keyword}>{keyword}</small>)}</div>
             </article>
@@ -325,7 +325,7 @@ export function EnglishSiteSearch({
         <div className="english-search-empty">
           <strong>No resource matches “{query.trim()}”.</strong>
           <p>This zero-result query has been anonymously recorded. Try an API method, return code, object name, symptom, or broader knowledge topic.</p>
-          <div><a href={missingResourceHref} target="_blank" rel="noreferrer">Request this guide ↗</a><Link href="/en/beginner">Beginner roadmap</Link><Link href="/en/knowledge">Knowledge modules</Link><Link href="/en/screeps-errors">Error codes</Link><Link href="/en/blog">All guides</Link></div>
+          <div><a href={missingResourceHref} target="_blank" rel="noreferrer">Request this guide ↗</a><Link href="/en/beginner" prefetch={false}>Beginner roadmap</Link><Link href="/en/knowledge" prefetch={false}>Knowledge modules</Link><Link href="/en/screeps-errors" prefetch={false}>Error codes</Link><Link href="/en/blog" prefetch={false}>All guides</Link></div>
         </div>
       )}
     </div>

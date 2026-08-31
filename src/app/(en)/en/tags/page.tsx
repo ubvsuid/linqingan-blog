@@ -32,7 +32,7 @@ export default function EnglishTagsPage() {
               <p className="eyebrow">{tag.count} {tag.count === 1 ? "GUIDE" : "GUIDES"}</p>
               <h2>{tag.label}</h2>
               <p>Articles that match the {tag.label.toLowerCase()} topic across the verified English library.</p>
-              <Link href={`/en/tags/${tag.slug}`}>Browse {tag.label} →</Link>
+              <Link href={`/en/tags/${tag.slug}`} prefetch={false}>Browse {tag.label} →</Link>
             </article>
           ))}
         </section>

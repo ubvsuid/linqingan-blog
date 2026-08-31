@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import "./check-crawl-hygiene.mjs";
+
 const root = process.cwd();
 const failures = [];
 
@@ -50,10 +52,15 @@ requireText(browserLibrary, "normalizeEnglishArticleBrowseParams", "invalid filt
 requireText(serverBrowser, "browseEnglishArticles(articles, effectiveParams)", "server-rendered result selection");
 requireText(serverBrowser, 'method="get"', "URL-backed article filters");
 requireText(serverBrowser, 'rel="next"', "crawlable article pagination");
+requireText(serverBrowser, "prefetch={false}", "crawl-efficient dense result links");
 requireText(queryInput, 'fetch("/en/blog-index.json")', "lazy article-index request");
 requireText(indexRoute, 'dynamic = "force-static"', "static lightweight article index");
 requireText(indexRoute, '"X-Robots-Tag": "noindex, nofollow"', "article-index noindex header");
 requireText(blogPage, "Publication standard", "plain-language publication policy");
+requireText(blogPage, "export async function generateMetadata", "dynamic pagination metadata");
+requireText(blogPage, "isCleanPagination", "clean pagination canonical boundary");
+requireText(blogPage, '`/en/blog?page=${parsed.page}`', "self-canonical English pagination path");
+requireText(blogPage, "noindex: !isCleanPagination", "filtered-state noindex boundary");
 
 forbidText(serverBrowser, '"use client"', "client rendering on the full article browser");
 forbidText(serverBrowser, "<style", "component-local article-browser styles");
@@ -86,5 +93,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "English article-library check passed: server-rendered 12-item pages, URL filters, crawlable pagination, lazy lightweight suggestions, external styles, and a plain-language publication policy are present.",
+  "English article-library check passed: server-rendered 12-item pages, crawl-efficient result links, self-canonical clean pagination, noindex filter states, lazy lightweight suggestions, external styles, and a plain-language publication policy are present.",
 );

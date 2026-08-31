@@ -20,7 +20,7 @@ function TagLinks({ tags }: { tags: ReturnType<typeof getPublicTagRecords> }) {
   return (
     <div className={styles.tagCloud}>
       {tags.map((tag) => (
-        <Link key={tag.slug} href={`/tags/${tag.slug}`}>
+        <Link key={tag.slug} href={`/tags/${tag.slug}`} prefetch={false}>
           <strong>{tag.name}</strong>
           <span>{tag.count}</span>
         </Link>

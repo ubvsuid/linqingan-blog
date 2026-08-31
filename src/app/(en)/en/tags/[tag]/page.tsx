@@ -4,7 +4,11 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticleBrowser } from "@/components/english-article-browser";
 import { Container } from "@/components/container";
-import { parseEnglishArticleBrowseParams } from "@/lib/english-article-browser";
+import {
+  browseEnglishArticles,
+  normalizeEnglishArticleBrowseParams,
+  parseEnglishArticleBrowseParams,
+} from "@/lib/english-article-browser";
 import {
   englishTags,
   getEnglishArticlesByTag,
@@ -32,27 +36,58 @@ export function generateStaticParams() {
   return englishTags.map((tag) => ({ tag: tag.slug }));
 }
 
-export async function generateMetadata({ params }: EnglishTagPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: EnglishTagPageProps): Promise<Metadata> {
   const { tag: slug } = await params;
   const tag = getEnglishTag(slug);
   if (!tag) return { title: "Topic not found", robots: { index: false, follow: false } };
 
-  const path = `/en/tags/${tag.slug}`;
-  const title = `${tag.label} Screeps Guides | Linqingan`;
+  const basePath = `/en/tags/${tag.slug}`;
+  const baseTitle = `${tag.label} Screeps Guides`;
   const description = `Browse focused English Screeps guides related to ${tag.label}, with checked APIs, debugging steps, and transparent verification status.`;
+  const articles = getEnglishArticlesByTag(slug);
+  const parsed = parseEnglishArticleBrowseParams(await searchParams);
+  const normalized = normalizeEnglishArticleBrowseParams(
+    articles,
+    parsed,
+    { allowTag: false },
+  );
+  const result = browseEnglishArticles(articles, {
+    ...normalized,
+    tag: tag.label,
+  });
+  const hasBrowseFilters = Boolean(
+    parsed.q
+      || parsed.module
+      || parsed.difficulty
+      || parsed.type
+      || parsed.sort !== "newest",
+  );
+  const hasValidPage = parsed.page === result.page;
+  const isCleanPagination = !hasBrowseFilters && hasValidPage;
+  const canonicalPath =
+    isCleanPagination && parsed.page > 1
+      ? `/en/tags/${tag.slug}?page=${parsed.page}`
+      : basePath;
+  const title =
+    isCleanPagination && parsed.page > 1
+      ? `${baseTitle} — Page ${parsed.page} | Linqingan`
+      : `${baseTitle} | Linqingan`;
 
   return {
     title: { absolute: title },
     description,
     robots: {
-      index: tag.count >= 3,
+      index: tag.count >= 3 && isCleanPagination,
       follow: true,
     },
-    alternates: { canonical: path },
+    alternates: { canonical: canonicalPath },
     openGraph: {
       type: "website",
       locale: "en_US",
-      url: `${siteConfig.url}${path}`,
+      url: `${siteConfig.url}${canonicalPath}`,
       siteName: "Linqingan",
       title,
       description,

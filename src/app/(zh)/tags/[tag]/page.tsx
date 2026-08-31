@@ -99,7 +99,7 @@ export default async function TagPage({ params }: TagPageProps) {
                 </div>
 
                 <h2>
-                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  <Link href={`/blog/${post.slug}`} prefetch={false}>{post.title}</Link>
                 </h2>
                 <p>{post.description}</p>
 
@@ -107,7 +107,7 @@ export default async function TagPage({ params }: TagPageProps) {
                   {post.tags.map((item) => {
                     const href = getTagArchiveHref(item, publicTags);
                     return href ? (
-                      <Link key={item} href={href}>
+                      <Link key={item} href={href} prefetch={false}>
                         {item}
                       </Link>
                     ) : (
