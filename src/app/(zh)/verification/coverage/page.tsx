@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { VerificationCaptureQueue } from "@/components/verification-capture-queue";
 import { VerificationCoverage } from "@/components/verification-coverage";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { createPageMetadata } from "@/lib/metadata";
@@ -69,6 +70,7 @@ export default function VerificationCoveragePage() {
           <strong>当前原则</strong>
           <p>Evidence 强度与覆盖完整度分开记录；没有 accepted Console / Live multi-tick 证据时就保持未验证，不从数据库、文档核对或离线模拟自动推断成已验证。</p>
         </aside>
+        <VerificationCaptureQueue locale="zh" />
         <VerificationCoverage locale="zh" />
       </Container>
     </main>

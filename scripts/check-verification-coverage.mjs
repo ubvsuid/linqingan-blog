@@ -33,6 +33,8 @@ const errors = read("src/lib/screeps-errors.ts");
 const apiReference = read("src/lib/screeps-api-reference.ts");
 const evidenceRelations = read("src/lib/verification-evidence-relations.ts");
 const component = read("src/components/verification-coverage.tsx");
+const captureQueue = read("src/components/verification-capture-queue.tsx");
+const captureQueueStyles = read("src/components/verification-capture-queue.module.css");
 const diagnosticCenter = read("src/components/screeps-diagnostic-center.tsx");
 const chineseRoute = read("src/app/(zh)/verification/coverage/page.tsx");
 const englishRoute = read("src/app/(en)/en/verification/coverage/page.tsx");
@@ -128,11 +130,53 @@ if (!component.includes("acceptedEvidenceCount") || !component.includes("evidenc
   failures.push("Verification Coverage summary must count unique structured accepted Evidence records.");
 }
 
+// Capture Queue V1 must reuse the same public acceptance boundary and derive work from live coverage state.
+if (!captureQueue.includes("getVerifiedContentWithEvidence(locale)")) {
+  failures.push("Capture Queue must reuse the accepted localized verification content layer.");
+}
+if (
+  captureQueue.includes("getPublicVerificationEvidence(") ||
+  captureQueue.includes('@/lib/verification-evidence"') ||
+  captureQueue.includes("@/lib/verification-evidence'")
+) {
+  failures.push("Capture Queue must not bypass the Markdown + accepted Evidence boundary with direct evidence reads.");
+}
+if (!captureQueue.includes("getEvidenceApiReferenceId") || !captureQueue.includes("primaryApiIds.has(apiId)")) {
+  failures.push("Capture Queue must match accepted Evidence through canonical API identity.");
+}
+if (!captureQueue.includes(".filter((row) => !row.status.targetMet)") || !captureQueue.includes("openRows.slice(0, 5)")) {
+  failures.push("Capture Queue must exclude target-covered paths and stay bounded to the next five jobs.");
+}
+if (!captureQueue.includes('left.plan.priority === "P0" ? 0 : 1') || !captureQueue.includes("completenessRank")) {
+  failures.push("Capture Queue must sort deterministically by priority and completeness.");
+}
+if (!captureQueue.includes('if (value === "partial") return 0') || !captureQueue.includes('if (value === "unverified") return 1')) {
+  failures.push("Capture Queue must finish Partial paths before Unverified paths within the same priority.");
+}
+if (!captureQueue.includes("left.registryIndex - right.registryIndex")) {
+  failures.push("Capture Queue must use registry order as its deterministic tie-breaker.");
+}
+if (!captureQueue.includes("missingErrorNames") || !captureQueue.includes("!status.targetLevelMet")) {
+  failures.push("Capture Queue must expose both missing return-code branches and target-evidence-level gaps.");
+}
+if (!captureQueue.includes("never creates or accepts Evidence") || !captureQueue.includes("不会自行创建或接受 Evidence")) {
+  failures.push("Capture Queue copy must state that prioritization does not create or accept Evidence.");
+}
+if (!chineseRoute.includes('VerificationCaptureQueue locale="zh"') || !englishRoute.includes('VerificationCaptureQueue locale="en"')) {
+  failures.push("Both Verification Coverage routes must render the shared Capture Queue before the full Coverage matrix.");
+}
+for (const className of ["queue", "header", "count", "list", "item", "meta", "links"]) {
+  if (!captureQueueStyles.includes(`.${className}`)) failures.push(`Missing Capture Queue style contract: .${className}`);
+}
+
 if (!i18n.includes('"/verification/coverage": "/en/verification/coverage"')) {
   failures.push("Missing bilingual route pair for Verification Coverage.");
 }
 if (!revisions["/verification/coverage"] || !revisions["/en/verification/coverage"]) {
   failures.push("Verification Coverage routes must be registered in static page revisions.");
+}
+if (revisions["/verification/coverage"] !== "2026-09-01" || revisions["/en/verification/coverage"] !== "2026-09-01") {
+  failures.push("Capture Queue release must update both Verification Coverage static revisions to 2026-09-01.");
 }
 if (!sitemap.includes('staticPageEntry("/verification/coverage")') || !sitemap.includes('staticPageEntry("/en/verification/coverage")')) {
   failures.push("Both Verification Coverage routes must be present in sitemaps.");
@@ -172,4 +216,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verification Coverage check passed: ${expectedSymptoms.length} symptom paths use structured accepted Evidence, canonical API identity, planned return-code branch coverage, bilingual discovery, and the existing public acceptance boundary.`);
+console.log(`Verification Coverage check passed: ${expectedSymptoms.length} symptom paths use structured accepted Evidence, canonical API identity, planned return-code branch coverage, a deterministic next-five Capture Queue, bilingual discovery, and the existing public acceptance boundary.`);

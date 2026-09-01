@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { VerificationCaptureQueue } from "@/components/verification-capture-queue";
 import { VerificationCoverage } from "@/components/verification-coverage";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
@@ -72,6 +73,7 @@ export default function EnglishVerificationCoveragePage() {
           <strong>Current rule</strong>
           <p>Evidence strength and coverage completeness stay separate. Without accepted Console or live multi-tick evidence, a path remains unverified; documentation review, offline simulation, or a database row cannot promote it on their own.</p>
         </div>
+        <VerificationCaptureQueue locale="en" />
         <VerificationCoverage locale="en" />
       </Container>
     </main>
