@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 const root = process.cwd();
 const checks = [
   ["Environment isolation", "scripts/check-environment-isolation.mjs"],
+  ["Vercel deployment safety", "scripts/check-vercel-deployment-safety.mjs"],
   ["Backup / Recovery", "scripts/check-backup-recovery.mjs"],
   ["Evidence Model", "scripts/check-evidence-model.mjs"],
   ["Knowledge generated registry freshness", "scripts/generate-knowledge-article-registry.mjs", "--check"],

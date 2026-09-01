@@ -8,5 +8,6 @@
       "*": false,
       "clean-blog-v1": true
     }
-  }
+  },
+  "ignoreCommand": "node scripts/vercel-ignore-build.mjs"
 }
