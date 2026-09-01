@@ -18,6 +18,140 @@ import {
 
 import styles from "./verification-capture-queue.module.css";
 
+const spawnCaptureRecipes = [
+  {
+    errorName: "ERR_INVALID_ARGS",
+    enTitle: "Invalid body · dryRun only",
+    zhTitle: "非法 body · 仅 dryRun",
+    enGuard: "Use an idle, active owned Spawn. The empty body is intentionally invalid. The snippet keeps nothing unless the observed code is exactly ERR_INVALID_ARGS (-10).",
+    zhGuard: "使用空闲、active 且属于自己的 Spawn。空 body 是刻意制造的无效参数；只有真实返回值严格等于 ERR_INVALID_ARGS (-10) 时才保留采集结果。",
+    code: `var spawn = Object.values(Game.spawns).find(function (item) {
+  return item.my && item.isActive() && !item.spawning;
+});
+if (!spawn) throw new Error("Need an idle active owned Spawn; skip this branch for now.");
+
+var name = "LQInvalid_" + Game.time;
+var before = EvidenceCapture.snapshot({ spawn: spawn, room: spawn.room });
+before.probe = {
+  branch: "ERR_INVALID_ARGS",
+  name: name,
+  body: [],
+  dryRun: true,
+  spawnActive: spawn.isActive(),
+  spawnBusy: Boolean(spawn.spawning)
+};
+
+var rc = spawn.spawnCreep([], name, { dryRun: true });
+if (rc !== ERR_INVALID_ARGS) {
+  throw new Error("Unexpected return code " + rc + "; discard this capture.");
+}
+
+var after = EvidenceCapture.snapshot({ spawn: spawn, room: spawn.room });
+EvidenceCapture.captureConsole({
+  articleSlug: "screeps-spawn-create-creep",
+  language: "zh-CN",
+  roomName: spawn.room.name,
+  apiName: "StructureSpawn.spawnCreep",
+  returnCode: rc,
+  beforeState: before,
+  afterState: after,
+  evidenceNote: "Explicit dryRun with an empty body returned ERR_INVALID_ARGS (-10); no spawn intent was submitted.",
+  label: "SPAWN-INVALID-ARGS"
+});`,
+  },
+  {
+    errorName: "ERR_BUSY",
+    enTitle: "Naturally busy Spawn · dryRun only",
+    zhTitle: "自然忙碌 Spawn · 仅 dryRun",
+    enGuard: "Wait for a Spawn that is already spawning through normal colony activity. Do not start or cancel a Creep just to manufacture this branch. The snippet is dryRun-only and fails closed unless it observes ERR_BUSY (-4).",
+    zhGuard: "只等待正常房间运行中已经处于 spawning 的 Spawn；不要为了制造该分支额外开始或取消 Creep。代码只执行 dryRun，并在不是 ERR_BUSY (-4) 时直接失败丢弃。",
+    code: `var spawn = Object.values(Game.spawns).find(function (item) {
+  return item.my && item.isActive() && Boolean(item.spawning);
+});
+if (!spawn) throw new Error("No naturally busy owned Spawn; skip this branch for now.");
+
+var name = "LQBusy_" + Game.time;
+var body = [MOVE];
+var before = EvidenceCapture.snapshot({ spawn: spawn, room: spawn.room });
+before.probe = {
+  branch: "ERR_BUSY",
+  name: name,
+  body: body,
+  dryRun: true,
+  spawnActive: spawn.isActive(),
+  spawnBusy: Boolean(spawn.spawning),
+  spawningName: spawn.spawning && spawn.spawning.name
+};
+
+var rc = spawn.spawnCreep(body, name, { dryRun: true });
+if (rc !== ERR_BUSY) {
+  throw new Error("Unexpected return code " + rc + "; discard this capture.");
+}
+
+var after = EvidenceCapture.snapshot({ spawn: spawn, room: spawn.room });
+EvidenceCapture.captureConsole({
+  articleSlug: "screeps-spawn-create-creep",
+  language: "zh-CN",
+  roomName: spawn.room.name,
+  apiName: "StructureSpawn.spawnCreep",
+  returnCode: rc,
+  beforeState: before,
+  afterState: after,
+  evidenceNote: "A naturally busy owned Spawn returned ERR_BUSY (-4) to an explicit dryRun probe; no additional spawn intent was submitted.",
+  label: "SPAWN-BUSY"
+});`,
+  },
+  {
+    errorName: "ERR_RCL_NOT_ENOUGH",
+    enTitle: "Naturally inactive Spawn · never downgrade for evidence",
+    zhTitle: "自然 inactive Spawn · 不为采证降级",
+    enGuard: "Only use an owned Spawn that is already inactive because of the current room state. Never downgrade, unclaim, destroy, or otherwise damage a room to obtain this Evidence. If no such Spawn exists, leave this branch pending.",
+    zhGuard: "仅在当前房间状态本来就存在 owned 且 inactive 的 Spawn 时采集。不要为了采证主动降级 Controller、unclaim、destroy 或破坏房间；没有自然条件就继续保持 Pending。",
+    code: `var spawn = Object.values(Game.spawns).find(function (item) {
+  return item.my && item.isActive() === false;
+});
+if (!spawn) throw new Error("No naturally inactive owned Spawn; leave ERR_RCL_NOT_ENOUGH pending.");
+
+var name = "LQRcl_" + Game.time;
+var body = [MOVE];
+var before = EvidenceCapture.snapshot({
+  spawn: spawn,
+  room: spawn.room,
+  controller: spawn.room.controller
+});
+before.probe = {
+  branch: "ERR_RCL_NOT_ENOUGH",
+  name: name,
+  body: body,
+  dryRun: true,
+  spawnActive: spawn.isActive(),
+  controllerLevel: spawn.room.controller && spawn.room.controller.level
+};
+
+var rc = spawn.spawnCreep(body, name, { dryRun: true });
+if (rc !== ERR_RCL_NOT_ENOUGH) {
+  throw new Error("Unexpected return code " + rc + "; discard this capture.");
+}
+
+var after = EvidenceCapture.snapshot({
+  spawn: spawn,
+  room: spawn.room,
+  controller: spawn.room.controller
+});
+EvidenceCapture.captureConsole({
+  articleSlug: "screeps-spawn-create-creep",
+  language: "zh-CN",
+  roomName: spawn.room.name,
+  apiName: "StructureSpawn.spawnCreep",
+  returnCode: rc,
+  beforeState: before,
+  afterState: after,
+  evidenceNote: "A naturally inactive owned Spawn returned ERR_RCL_NOT_ENOUGH (-14) to a dryRun probe; no room downgrade or spawn intent was performed for evidence collection.",
+  label: "SPAWN-RCL-NOT-ENOUGH"
+});`,
+  },
+] as const;
+
 function evidenceCoversError(evidence: VerifiedEvidencePreview, errorName: string) {
   const raw = evidence.returnCode?.trim();
   if (!raw) return false;
@@ -55,6 +189,69 @@ function completenessRank(value: "unverified" | "partial" | "covered") {
   if (value === "partial") return 0;
   if (value === "unverified") return 1;
   return 2;
+}
+
+function SpawnCaptureRecipe({
+  locale,
+  missingErrorNames,
+}: {
+  locale: ScreepsDiagnosticLocale;
+  missingErrorNames: readonly string[];
+}) {
+  const isEnglish = locale === "en";
+  const recipes = spawnCaptureRecipes.filter((recipe) => missingErrorNames.includes(recipe.errorName));
+  if (recipes.length === 0) return null;
+
+  const copy = isEnglish
+    ? {
+        eyebrow: "SAFE CAPTURE RECIPE",
+        title: "Finish the remaining spawnCreep() branches without changing colony policy",
+        body: "The current public Evidence already covers the Energy-shortage and duplicate-name branches. These recipes target only still-missing branches. Every probe uses dryRun, records scoped before/after state, and fails closed if the observed return code is not the intended branch.",
+        install: "Open the read-only Evidence Capture Kit",
+        method: "Review the Evidence workflow",
+        guard: "Safety guard",
+        lifecycle: "A printed bundle is still only captured material. Validate it, review it, then accept it separately; this recipe never changes Evidence status.",
+      }
+    : {
+        eyebrow: "SAFE CAPTURE RECIPE",
+        title: "不改变房间策略，补完剩余 spawnCreep() 返回码分支",
+        body: "当前公开 Evidence 已覆盖 Energy 不足与重名分支；这里仅针对仍缺的分支。每个探针都只使用 dryRun，记录限定范围的前后状态，并在真实返回值不是目标分支时 fail-closed 丢弃。",
+        install: "打开只读 Evidence Capture Kit",
+        method: "查看 Evidence 采集流程",
+        guard: "安全条件",
+        lifecycle: "Console 打印出的 bundle 仍然只是 captured material；必须先校验、review，再单独 accept。本 recipe 不会改变任何 Evidence 状态。",
+      };
+
+  return (
+    <aside className={styles.recipe} aria-label={isEnglish ? "Safe Spawn Runtime Evidence capture recipe" : "安全 Spawn Runtime Evidence 采集 recipe"}>
+      <header className={styles.recipeHeader}>
+        <div>
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h4>{copy.title}</h4>
+          <p>{copy.body}</p>
+        </div>
+        <nav className={styles.recipeLinks}>
+          <Link href="/screeps-evidence-capture-kit.js">{copy.install}</Link>
+          <Link href={isEnglish ? "/en/verification" : "/verification"}>{copy.method}</Link>
+        </nav>
+      </header>
+
+      <div className={styles.recipeGrid}>
+        {recipes.map((recipe) => (
+          <section className={styles.recipeCard} key={recipe.errorName}>
+            <div className={styles.recipeCardHeader}>
+              <code>{recipe.errorName}</code>
+              <strong>{isEnglish ? recipe.enTitle : recipe.zhTitle}</strong>
+            </div>
+            <p><strong>{copy.guard}</strong>{isEnglish ? recipe.enGuard : recipe.zhGuard}</p>
+            <pre className={styles.recipeCode}><code>{recipe.code}</code></pre>
+          </section>
+        ))}
+      </div>
+
+      <p className={styles.recipeLifecycle}>{copy.lifecycle}</p>
+    </aside>
+  );
 }
 
 export async function VerificationCaptureQueue({ locale }: { locale: ScreepsDiagnosticLocale }) {
@@ -175,6 +372,9 @@ export async function VerificationCaptureQueue({ locale }: { locale: ScreepsDiag
                     <Link href={`#coverage-${plan.symptomId}`}>{copy.view}</Link>
                     <Link href={`${diagnosticsRoot}#${plan.symptomId}`}>{copy.diagnostic}</Link>
                   </nav>
+                  {index === 0 && plan.symptomId === "spawn-not-spawning" ? (
+                    <SpawnCaptureRecipe locale={locale} missingErrorNames={missingErrorNames} />
+                  ) : null}
                 </div>
               </article>
             );

@@ -162,10 +162,42 @@ if (!captureQueue.includes("missingErrorNames") || !captureQueue.includes("!stat
 if (!captureQueue.includes("never creates or accepts Evidence") || !captureQueue.includes("不会自行创建或接受 Evidence")) {
   failures.push("Capture Queue copy must state that prioritization does not create or accept Evidence.");
 }
+
+// Spawn Capture Recipe V1 must bridge the top queue item to safe, fail-closed Console collection.
+for (const errorName of ["ERR_BUSY", "ERR_INVALID_ARGS", "ERR_RCL_NOT_ENOUGH"]) {
+  if (!captureQueue.includes(`errorName: "${errorName}"`)) {
+    failures.push(`Spawn Capture Recipe must include the still-missing ${errorName} branch.`);
+  }
+}
+if (!captureQueue.includes('articleSlug: "screeps-spawn-create-creep"')) {
+  failures.push("Spawn Capture Recipe must keep the existing accepted Markdown owner instead of inventing a new Evidence owner.");
+}
+if (!captureQueue.includes('apiName: "StructureSpawn.spawnCreep"')) {
+  failures.push("Spawn Capture Recipe must record the canonical StructureSpawn.spawnCreep API name.");
+}
+if ((captureQueue.match(/dryRun: true/g) ?? []).length < 6) {
+  failures.push("Spawn Capture Recipe must keep every branch dryRun-only in both probe metadata and the explicit action call.");
+}
+if (!captureQueue.includes("rc !== ERR_INVALID_ARGS") || !captureQueue.includes("rc !== ERR_BUSY") || !captureQueue.includes("rc !== ERR_RCL_NOT_ENOUGH")) {
+  failures.push("Spawn Capture Recipe must fail closed when the observed return code does not match the intended branch.");
+}
+if (!captureQueue.includes("No naturally busy owned Spawn") || !captureQueue.includes("No naturally inactive owned Spawn")) {
+  failures.push("Spawn Capture Recipe must skip unavailable natural preconditions instead of manufacturing busy/RCL states.");
+}
+if (!captureQueue.includes("Never downgrade, unclaim, destroy") || !captureQueue.includes("不要为了采证主动降级 Controller")) {
+  failures.push("Spawn Capture Recipe must explicitly forbid damaging a room to manufacture ERR_RCL_NOT_ENOUGH evidence.");
+}
+if (!captureQueue.includes("A printed bundle is still only captured material") || !captureQueue.includes("bundle 仍然只是 captured material")) {
+  failures.push("Spawn Capture Recipe must preserve the captured → review → accept lifecycle boundary.");
+}
+if (!captureQueue.includes('index === 0 && plan.symptomId === "spawn-not-spawning"')) {
+  failures.push("Spawn Capture Recipe must only expand when Spawn is the current top queue target.");
+}
+
 if (!chineseRoute.includes('VerificationCaptureQueue locale="zh"') || !englishRoute.includes('VerificationCaptureQueue locale="en"')) {
   failures.push("Both Verification Coverage routes must render the shared Capture Queue before the full Coverage matrix.");
 }
-for (const className of ["queue", "header", "count", "list", "item", "meta", "links"]) {
+for (const className of ["queue", "header", "count", "list", "item", "meta", "links", "recipe", "recipeGrid", "recipeCard", "recipeCode"]) {
   if (!captureQueueStyles.includes(`.${className}`)) failures.push(`Missing Capture Queue style contract: .${className}`);
 }
 
@@ -216,4 +248,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verification Coverage check passed: ${expectedSymptoms.length} symptom paths use structured accepted Evidence, canonical API identity, planned return-code branch coverage, a deterministic next-five Capture Queue, bilingual discovery, and the existing public acceptance boundary.`);
+console.log(`Verification Coverage check passed: ${expectedSymptoms.length} symptom paths use structured accepted Evidence, canonical API identity, planned return-code branch coverage, a deterministic next-five Capture Queue with a safe Spawn recipe, bilingual discovery, and the existing public acceptance boundary.`);
