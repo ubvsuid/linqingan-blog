@@ -3,6 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 import {
+  evaluateCpuBudget,
+  getModeledCpuTickLimit,
+} from "../src/lib/tick-lab-cpu.ts";
+import {
   evaluateSpawnCreep,
   evaluateTransfer,
 } from "../src/lib/tick-lab.ts";
@@ -94,6 +98,60 @@ for (const testCase of spawnCases) {
   }
 }
 
+const cpuCases = [
+  {
+    name: "unused baseline CPU replenishes bucket",
+    input: { bucket: 4000, used: 40, plannedTaskCost: 20 },
+    expected: { limit: 100, tickLimit: 500, decision: "RUN", taskRuns: true, modeledTotalUsed: 60, bucketDelta: 40, nextBucket: 4040, bucketDirection: "replenish", wouldExceedTickLimitIfForced: false },
+  },
+  {
+    name: "exact baseline keeps bucket steady",
+    input: { bucket: 4000, used: 60, plannedTaskCost: 40 },
+    expected: { tickLimit: 500, decision: "RUN", modeledTotalUsed: 100, bucketDelta: 0, nextBucket: 4000, bucketDirection: "steady" },
+  },
+  {
+    name: "CPU above baseline spends bucket reserve",
+    input: { bucket: 4000, used: 80, plannedTaskCost: 120 },
+    expected: { tickLimit: 500, decision: "RUN", modeledTotalUsed: 200, bucketDelta: -100, nextBucket: 3900, bucketDirection: "spend" },
+  },
+  {
+    name: "exact tickLimit can consume the available reserve",
+    input: { bucket: 400, used: 350, plannedTaskCost: 150 },
+    expected: { tickLimit: 500, headroomBeforeTask: 150, decision: "RUN", modeledTotalUsed: 500, bucketDelta: -400, nextBucket: 0, bucketDirection: "spend" },
+  },
+  {
+    name: "local guard skips an optional task that would exceed tickLimit",
+    input: { bucket: 50, used: 100, plannedTaskCost: 80 },
+    expected: { tickLimit: 150, headroomBeforeTask: 50, decision: "SKIP", taskRuns: false, modeledTotalUsed: 100, bucketDelta: 0, nextBucket: 50, wouldExceedTickLimitIfForced: true },
+  },
+  {
+    name: "empty bucket collapses tickLimit to baseline limit",
+    input: { bucket: 0, used: 70, plannedTaskCost: 30 },
+    expected: { tickLimit: 100, decision: "RUN", modeledTotalUsed: 100, bucketDelta: 0, nextBucket: 0 },
+  },
+  {
+    name: "full bucket caps tickLimit and cannot replenish beyond 10000",
+    input: { bucket: 10000, used: 20, plannedTaskCost: 20 },
+    expected: { tickLimit: 500, decision: "RUN", modeledTotalUsed: 40, bucketDelta: 0, nextBucket: 10000, bucketDirection: "steady" },
+  },
+];
+
+for (const testCase of cpuCases) {
+  const result = evaluateCpuBudget(testCase.input);
+  for (const [key, value] of Object.entries(testCase.expected)) {
+    assert.equal(result[key], value, `${testCase.name}: ${key}`);
+  }
+}
+
+assert.equal(getModeledCpuTickLimit(0), 100, "empty bucket tickLimit");
+assert.equal(getModeledCpuTickLimit(50), 150, "partial reserve tickLimit");
+assert.equal(getModeledCpuTickLimit(400), 500, "500 CPU tickLimit cap");
+assert.throws(
+  () => evaluateCpuBudget({ bucket: 0, used: 110, plannedTaskCost: 0 }),
+  /used cannot exceed/,
+  "inconsistent CPU snapshots fail closed",
+);
+
 const requiredFiles = [
   "src/app/(zh)/tick-lab/page.tsx",
   "src/app/(en)/en/tick-lab/page.tsx",
@@ -101,7 +159,9 @@ const requiredFiles = [
   "src/components/tick-lab/transfer-experiment.tsx",
   "src/components/tick-lab/spawn-creep-experiment.tsx",
   "src/components/tick-lab/spawn-creep-experiment.module.css",
+  "src/components/tick-lab/cpu-bucket-experiment.tsx",
   "src/components/tick-lab/tick-lab.module.css",
+  "src/lib/tick-lab-cpu.ts",
 ];
 for (const relativePath of requiredFiles) {
   assert.equal(fs.existsSync(path.join(root, relativePath)), true, `missing ${relativePath}`);
@@ -111,6 +171,7 @@ const componentSources = [
   "src/components/tick-lab/tick-lab.tsx",
   "src/components/tick-lab/transfer-experiment.tsx",
   "src/components/tick-lab/spawn-creep-experiment.tsx",
+  "src/components/tick-lab/cpu-bucket-experiment.tsx",
 ].map((relativePath) => fs.readFileSync(path.join(root, relativePath), "utf8")).join("\n");
 
 assert.match(componentSources, /Deterministic educational model/);
@@ -119,6 +180,10 @@ assert.match(componentSources, /presetGrid/);
 assert.match(componentSources, /StructureSpawn\.spawnCreep\(\)/);
 assert.match(componentSources, /nameExists/);
 assert.match(componentSources, /spawnBusy/);
+assert.match(componentSources, /Game\.cpu/);
+assert.match(componentSources, /plannedTaskCost/);
+assert.match(componentSources, /Budget Decision/);
+assert.match(componentSources, /not a Screeps API return code or intent/);
 assert.match(componentSources, /\/verified/);
 assert.match(componentSources, /\/en\/verified/);
 assert.doesNotMatch(componentSources, /eval\s*\(/);
@@ -131,4 +196,8 @@ const sitemapSource = fs.readFileSync(path.join(root, "src/lib/sitemaps.ts"), "u
 assert.match(sitemapSource, /staticPageEntry\("\/tick-lab"\)/);
 assert.match(sitemapSource, /staticPageEntry\("\/en\/tick-lab"\)/);
 
-console.log(`Tick Lab check passed: ${transferCases.length} transfer + ${spawnCases.length} spawnCreep deterministic cases, plus route/discovery/interaction contracts.`);
+const staticRevisions = JSON.parse(fs.readFileSync(path.join(root, "src/data/static-page-revisions.json"), "utf8"));
+assert.equal(staticRevisions["/tick-lab"], "2026-09-01");
+assert.equal(staticRevisions["/en/tick-lab"], "2026-09-01");
+
+console.log(`Tick Lab check passed: ${transferCases.length} transfer + ${spawnCases.length} spawnCreep + ${cpuCases.length} CPU/Bucket deterministic cases, plus route/discovery/interaction contracts.`);
