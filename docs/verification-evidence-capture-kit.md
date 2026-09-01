@@ -126,17 +126,50 @@ EvidenceCapture.clearLive(session);
 
 The kit limits one live session to 30 samples to keep evidence state within the repository budget.
 
+## Phase 1 Spawn operator path
+
+The first Runtime Evidence expansion target is `StructureSpawn.spawnCreep()` for the still-missing Console branches `ERR_INVALID_ARGS (-10)`, naturally occurring `ERR_BUSY (-4)`, and naturally inactive `ERR_RCL_NOT_ENOUGH (-14)`.
+
+Use the Safe Capture Recipe shown on `/verification/coverage`. Run **one branch at a time** and save each printed bundle as its own JSON file. The recipe is deliberately `dryRun: true` and fail-closed. Do not create, cancel, downgrade, unclaim, destroy, or otherwise damage colony state to manufacture Evidence.
+
+Before any database import, run the Spawn-specific guard:
+
+```bash
+node scripts/verification-evidence-spawn-check.mjs evidence.json
+```
+
+This guard adds branch-specific checks on top of the generic Evidence schema validation. It requires:
+
+- exactly one record per operator file;
+- current owner `screeps-spawn-create-creep`;
+- `verificationType=console` and `apiName=StructureSpawn.spawnCreep`;
+- `beforeState.probe.dryRun === true`;
+- target branch and return code agreement;
+- the expected active/busy/body state for the selected recipe;
+- no observed Spawn spawning-identity change across the dryRun probe;
+- the explicit non-destructive room-safety note for `ERR_RCL_NOT_ENOUGH`.
+
+A passing guard still does **not** prove that an inactive Spawn occurred naturally. The operator/reviewer must confirm that no downgrade, unclaim, destruction, or other room manipulation was performed to create that condition. If the environment does not naturally provide `ERR_BUSY` or `ERR_RCL_NOT_ENOUGH`, leave that branch Pending.
+
+The guard never writes to Neon and never changes Evidence lifecycle status.
+
 ## Validate and import
 
 Save the printed JSON as a local file, for example `evidence.json`.
 
-Dry-run validation:
+For a Spawn Phase 1 bundle, run the Spawn-specific guard first:
+
+```bash
+node scripts/verification-evidence-spawn-check.mjs evidence.json
+```
+
+Then run the repository-wide dry-run validation:
 
 ```bash
 npm run verification:evidence-validate -- evidence.json
 ```
 
-Import as internal `captured` evidence only after the dry run is clean:
+Import as internal `captured` evidence only after both checks are clean and the operator has reviewed the real Console context:
 
 ```bash
 npm run verification:evidence-write -- evidence.json --commit
@@ -149,7 +182,7 @@ npm run verification:evidence-review -- EV-... --note="what was checked" --commi
 npm run verification:evidence-accept -- EV-... --note="why this evidence is sufficient" --commit
 ```
 
-Acceptance never bypasses the Markdown/public verification boundary.
+Acceptance never bypasses the Markdown/public verification boundary. After database acceptance, the owning article's Markdown verification state must be reviewed and updated separately before the new record can become public accepted Evidence.
 
 ## First P0 targets
 
