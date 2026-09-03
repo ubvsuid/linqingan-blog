@@ -1,0 +1,66 @@
+name: Internal Link Release Readiness
+
+on:
+  push:
+    branches:
+      - gpt-work
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout gpt-work
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build isolated Production plus Internal Link candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_root="$GITHUB_WORKSPACE"
+          git fetch --depth=1 origin clean-blog-v1
+          candidate="$(mktemp -d)"
+          git worktree add --detach "$candidate" FETCH_HEAD
+
+          files=(
+            package-lock.json
+            scripts/report-internal-link-graph.mjs
+            src/components/article-curated-links.tsx
+            src/components/article-learning-context.tsx
+            src/components/english-learning-progress.tsx
+            src/lib/internal-link-clusters.ts
+            src/lib/internal-link-clusters-movement.ts
+            src/lib/internal-link-clusters-debugging.ts
+            src/lib/internal-link-clusters-controller.ts
+            src/lib/internal-link-clusters-construction.ts
+            src/lib/internal-link-clusters-defense.ts
+            src/lib/internal-link-clusters-industry.ts
+          )
+
+          for file in "${files[@]}"; do
+            install -D "$source_root/$file" "$candidate/$file"
+          done
+
+          test ! -e "$candidate/scripts/lib/verification-spawn-evidence-guard.mjs"
+          test ! -e "$candidate/scripts/verification-evidence-spawn-check.mjs"
+
+          echo "Isolated candidate changes:"
+          git -C "$candidate" status --short
+
+          cd "$candidate"
+          npm ci
+          node scripts/report-internal-link-graph.mjs
+          npm run linkcheck
+          npm run integritycheck
+          npm run typecheck
+          npm audit --audit-level=high
+          npm run build
