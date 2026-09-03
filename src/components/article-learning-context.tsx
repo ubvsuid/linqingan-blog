@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import Link from "next/link";
 
+import { ArticleCuratedLinks } from "@/components/article-curated-links";
 import { ArticleKnowledgeRelations } from "@/components/article-knowledge-relations";
 import { ArticleRuntimeEvidenceCard } from "@/components/article-runtime-evidence-card";
 import {
@@ -87,6 +88,7 @@ export async function ArticleLearningContext({ slug }: ArticleLearningContextPro
     <>
       {learningContext}
       <ArticleRuntimeEvidenceCard evidence={runtimeEvidence} locale="zh" />
+      <ArticleCuratedLinks href={`/blog/${slug}`} locale="zh" />
       {!beginnerStage ? <ArticleKnowledgeRelations slug={slug} /> : null}
     </>
   );
