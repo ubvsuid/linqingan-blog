@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import Link from "next/link";
 
+import { ArticleCuratedLinks } from "@/components/article-curated-links";
 import { useEnglishLearning } from "@/hooks/use-english-learning";
 import {
   clearEnglishLearningState,
@@ -104,28 +105,33 @@ export function EnglishArticleLearningTracker({
     recordEnglishArticleVisit(href, title);
   }, [href, title]);
 
-  if (!isBeginnerLesson) return null;
+  if (!isBeginnerLesson) {
+    return <ArticleCuratedLinks href={href} locale="en" />;
+  }
 
   return (
-    <aside
-      className="english-lesson-progress"
-      aria-label="Beginner lesson progress"
-    >
-      <div>
-        <span>Saved only in this browser</span>
-        <strong>
-          {learning.completedPaths.length} of {ENGLISH_BEGINNER_PATHS.length}{" "}
-          beginner lessons complete
-        </strong>
-      </div>
-      <button
-        type="button"
-        className={isCompleted ? "is-complete" : undefined}
-        aria-pressed={isCompleted}
-        onClick={() => toggleEnglishLessonCompleted(href)}
+    <>
+      <aside
+        className="english-lesson-progress"
+        aria-label="Beginner lesson progress"
       >
-        {isCompleted ? "Completed — mark incomplete" : "Mark lesson complete"}
-      </button>
-    </aside>
+        <div>
+          <span>Saved only in this browser</span>
+          <strong>
+            {learning.completedPaths.length} of {ENGLISH_BEGINNER_PATHS.length}{" "}
+            beginner lessons complete
+          </strong>
+        </div>
+        <button
+          type="button"
+          className={isCompleted ? "is-complete" : undefined}
+          aria-pressed={isCompleted}
+          onClick={() => toggleEnglishLessonCompleted(href)}
+        >
+          {isCompleted ? "Completed — mark incomplete" : "Mark lesson complete"}
+        </button>
+      </aside>
+      <ArticleCuratedLinks href={href} locale="en" />
+    </>
   );
 }
