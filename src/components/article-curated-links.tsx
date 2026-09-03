@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { curatedInternalLinkClusters } from "@/lib/internal-link-clusters";
+import { debuggingInternalLinkClusters } from "@/lib/internal-link-clusters-debugging";
+import { movementInternalLinkClusters } from "@/lib/internal-link-clusters-movement";
 
 import styles from "./article-knowledge-relations.module.css";
 
@@ -14,7 +16,10 @@ function titleIdForHref(href: string): string {
 }
 
 export function ArticleCuratedLinks({ href, locale }: ArticleCuratedLinksProps) {
-  const relation = curatedInternalLinkClusters[href];
+  const relation =
+    curatedInternalLinkClusters[href]
+    ?? movementInternalLinkClusters[href]
+    ?? debuggingInternalLinkClusters[href];
   if (!relation || relation.links.length === 0) return null;
 
   const titleId = titleIdForHref(href);

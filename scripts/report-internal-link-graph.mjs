@@ -59,18 +59,37 @@ function extractLiteralInternalLinks(source) {
   return routes;
 }
 
-function loadCuratedClusters() {
-  const filePath = path.join(root, "src", "lib", "internal-link-clusters.ts");
+function loadClusterMap(fileName, marker) {
+  const filePath = path.join(root, "src", "lib", fileName);
   if (!fs.existsSync(filePath)) return {};
   const source = fs.readFileSync(filePath, "utf8");
-  const marker = "export const curatedInternalLinkClusters";
   const markerIndex = source.indexOf(marker);
   if (markerIndex < 0) return {};
   const equalsIndex = source.indexOf("=", markerIndex);
   const start = source.indexOf("{", equalsIndex);
   const end = source.lastIndexOf("};");
-  if (start < 0 || end < start) throw new Error("Could not parse curatedInternalLinkClusters");
+  if (start < 0 || end < start) throw new Error(`Could not parse ${marker}`);
   return JSON.parse(source.slice(start, end + 1));
+}
+
+function loadCuratedClusters() {
+  const maps = [
+    loadClusterMap("internal-link-clusters.ts", "export const curatedInternalLinkClusters"),
+    loadClusterMap("internal-link-clusters-movement.ts", "export const movementInternalLinkClusters"),
+    loadClusterMap("internal-link-clusters-debugging.ts", "export const debuggingInternalLinkClusters"),
+  ];
+  const merged = {};
+
+  for (const map of maps) {
+    for (const [source, relation] of Object.entries(map)) {
+      if (merged[source]) {
+        throw new Error(`Duplicate curated source route: ${source}`);
+      }
+      merged[source] = relation;
+    }
+  }
+
+  return merged;
 }
 
 const files = scanRoots.flatMap(walk);
