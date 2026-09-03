@@ -49,7 +49,7 @@ function extractEnglishRegistryArticleRoutes(source, filePath) {
   if (!isEnglishArticleRegistry) return [];
 
   const routes = [];
-  const pattern = /\bhref\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;
+  const pattern = /(?:["']href["']|\bhref)\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;
   for (const match of source.matchAll(pattern)) {
     const route = normalizeRoute(match[1]);
     if (route) routes.push(route);
