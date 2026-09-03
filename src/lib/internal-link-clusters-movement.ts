@@ -83,11 +83,6 @@ export const movementInternalLinkClusters: Record<string, CuratedInternalLinkClu
         "href": "/blog/screeps-moveto-not-moving",
         "label": "Creep 不移动的完整排查路径",
         "role": "症状排错"
-      },
-      {
-        "href": "/blog/screeps-creep-pull",
-        "label": "需要双 Creep 协同移动时",
-        "role": "进阶移动"
       }
     ]
   },
@@ -173,26 +168,6 @@ export const movementInternalLinkClusters: Record<string, CuratedInternalLinkClu
         "href": "/blog/screeps-first-creep-harvest",
         "label": "回到采集 Energy 的主流程",
         "role": "业务上下文"
-      }
-    ]
-  },
-  "/blog/screeps-creep-pull": {
-    "cluster": "Movement",
-    "links": [
-      {
-        "href": "/blog/screeps-move-fatigue-body-ratio",
-        "label": "先理解 fatigue 与 MOVE 负担",
-        "role": "前置概念"
-      },
-      {
-        "href": "/blog/screeps-moveto-not-moving",
-        "label": "拉动组合没有前进时怎么查",
-        "role": "故障排查"
-      },
-      {
-        "href": "/blog/screeps-roomposition-distance",
-        "label": "确认相邻与距离条件",
-        "role": "距离判断"
       }
     ]
   },
