@@ -9,7 +9,7 @@ on:
       - clean-blog-v1
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   product-experience:
@@ -22,6 +22,23 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci --ignore-scripts
+      - name: Refresh vulnerable transitive lock
+        run: |
+          npm audit fix --package-lock-only --ignore-scripts
+          git diff -- package-lock.json
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "linqingan-security-bot"
+            git config user.email "linqingan501@gmail.com"
+            git add package-lock.json
+            git commit -m "fix: refresh vulnerable browserslist lock"
+            git push origin HEAD:gpt-work
+          fi
+      - name: Reinstall refreshed locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Internal link graph gate
+        run: node scripts/report-internal-link-graph.mjs
+      - name: Internal link existence gate
+        run: npm run linkcheck
       - name: Product experience gate
         run: node scripts/check-product-experience-v1.mjs
       - name: Tick Lab deterministic gate
@@ -30,3 +47,5 @@ jobs:
         run: npm audit --audit-level=high
       - name: Type check
         run: npm run typecheck
+      - name: Release-readiness build and smoke
+        run: npm run build
