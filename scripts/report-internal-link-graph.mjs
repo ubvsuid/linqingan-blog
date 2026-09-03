@@ -92,6 +92,8 @@ function loadCuratedClusters() {
     loadClusterMap("internal-link-clusters.ts", "export const curatedInternalLinkClusters"),
     loadClusterMap("internal-link-clusters-movement.ts", "export const movementInternalLinkClusters"),
     loadClusterMap("internal-link-clusters-debugging.ts", "export const debuggingInternalLinkClusters"),
+    loadClusterMap("internal-link-clusters-controller.ts", "export const controllerInternalLinkClusters"),
+    loadClusterMap("internal-link-clusters-construction.ts", "export const constructionInternalLinkClusters"),
   ];
   const merged = {};
 
