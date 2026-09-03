@@ -42,6 +42,21 @@ function inferRouteFromFile(filePath) {
   return normalizeRoute(`/${routeParts.join("/")}`);
 }
 
+function extractEnglishRegistryArticleRoutes(source, filePath) {
+  const relative = path.relative(root, filePath).split(path.sep).join("/");
+  const isEnglishArticleRegistry =
+    /^src\/lib\/english-.*(?:registry|articles).*\.ts$/.test(relative);
+  if (!isEnglishArticleRegistry) return [];
+
+  const routes = [];
+  const pattern = /\bhref\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;
+  for (const match of source.matchAll(pattern)) {
+    const route = normalizeRoute(match[1]);
+    if (route) routes.push(route);
+  }
+  return routes;
+}
+
 function extractLiteralInternalLinks(source) {
   const patterns = [
     /\]\((\/[a-zA-Z0-9_./?#=-]+)(?:\s+["'][^"']*["'])?\)/g,
@@ -93,6 +108,7 @@ function loadCuratedClusters() {
 }
 
 const files = scanRoots.flatMap(walk);
+const routeInventory = new Set(["/", "/en"]);
 const knownRoutes = new Set(["/", "/en"]);
 const knownArticleRoutes = new Set();
 const edges = [];
@@ -100,8 +116,17 @@ const edges = [];
 for (const filePath of files) {
   const source = fs.readFileSync(filePath, "utf8");
   const sourceRoute = inferRouteFromFile(filePath);
-  if (sourceRoute) knownRoutes.add(sourceRoute);
+  if (sourceRoute) {
+    routeInventory.add(sourceRoute);
+    knownRoutes.add(sourceRoute);
+  }
   if (sourceRoute && articleRoutePattern.test(sourceRoute)) knownArticleRoutes.add(sourceRoute);
+
+  for (const route of extractEnglishRegistryArticleRoutes(source, filePath)) {
+    routeInventory.add(route);
+    knownRoutes.add(route);
+    knownArticleRoutes.add(route);
+  }
 
   for (const route of extractLiteralInternalLinks(source)) {
     knownRoutes.add(route);
@@ -112,7 +137,6 @@ for (const filePath of files) {
   }
 }
 
-const discoveredRoutes = new Set(knownRoutes);
 const curatedClusters = loadCuratedClusters();
 let curatedEdgeCount = 0;
 for (const [source, relation] of Object.entries(curatedClusters)) {
@@ -136,11 +160,13 @@ for (const edge of dedupedEdges) {
   outbound.set(edge.source, (outbound.get(edge.source) ?? 0) + 1);
 }
 
+const missingCuratedSources = [];
 const missingCuratedTargets = [];
 for (const [source, relation] of Object.entries(curatedClusters)) {
+  if (!routeInventory.has(source)) missingCuratedSources.push(source);
   for (const link of relation.links ?? []) {
     const target = normalizeRoute(link.href);
-    if (target && !discoveredRoutes.has(target)) missingCuratedTargets.push({ source, target });
+    if (target && !routeInventory.has(target)) missingCuratedTargets.push({ source, target });
   }
 }
 
@@ -163,6 +189,7 @@ const weakInboundArticles = [...knownArticleRoutes]
 console.log("Internal Link Graph Report");
 console.log("==========================");
 console.log(`Files scanned: ${files.length}`);
+console.log(`Route inventory: ${routeInventory.size}`);
 console.log(`Known routes: ${knownRoutes.size}`);
 console.log(`Known article routes: ${knownArticleRoutes.size}`);
 console.log(`Edges: ${dedupedEdges.length} (${curatedEdgeCount} curated declarations)`);
@@ -186,13 +213,19 @@ for (const route of weakInboundArticles.slice(0, 40)) console.log(`  ${route}`);
 if (weakInboundArticles.length > 40) console.log(`  ... ${weakInboundArticles.length - 40} more`);
 console.log("");
 
-if (missingCuratedTargets.length > 0) {
-  console.log("Curated targets not found in the statically discovered route set:");
-  for (const item of missingCuratedTargets) console.log(`  ${item.source} -> ${item.target}`);
+if (missingCuratedSources.length > 0 || missingCuratedTargets.length > 0) {
+  if (missingCuratedSources.length > 0) {
+    console.log("Curated source routes missing from the page/registry inventory:");
+    for (const source of missingCuratedSources) console.log(`  ${source}`);
+  }
+  if (missingCuratedTargets.length > 0) {
+    console.log("Curated targets missing from the page/registry inventory:");
+    for (const item of missingCuratedTargets) console.log(`  ${item.source} -> ${item.target}`);
+  }
   process.exitCode = 1;
 } else {
-  console.log("Curated target check: OK");
+  console.log("Curated source/target inventory check: OK");
 }
 
 console.log("");
-console.log("Note: zero/weak inbound counts cover statically discoverable literal links. Dynamic recommendations and runtime-generated links can add additional inbound paths.");
+console.log("Note: route existence uses page files plus published English registry declarations. Zero/weak inbound counts still cover statically discoverable literal links; dynamic recommendations can add additional inbound paths.");
