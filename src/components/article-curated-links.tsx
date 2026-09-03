@@ -4,6 +4,8 @@ import { curatedInternalLinkClusters } from "@/lib/internal-link-clusters";
 import { constructionInternalLinkClusters } from "@/lib/internal-link-clusters-construction";
 import { controllerInternalLinkClusters } from "@/lib/internal-link-clusters-controller";
 import { debuggingInternalLinkClusters } from "@/lib/internal-link-clusters-debugging";
+import { defenseInternalLinkClusters } from "@/lib/internal-link-clusters-defense";
+import { industryInternalLinkClusters } from "@/lib/internal-link-clusters-industry";
 import { movementInternalLinkClusters } from "@/lib/internal-link-clusters-movement";
 
 import styles from "./article-knowledge-relations.module.css";
@@ -23,7 +25,9 @@ export function ArticleCuratedLinks({ href, locale }: ArticleCuratedLinksProps) 
     ?? movementInternalLinkClusters[href]
     ?? debuggingInternalLinkClusters[href]
     ?? controllerInternalLinkClusters[href]
-    ?? constructionInternalLinkClusters[href];
+    ?? constructionInternalLinkClusters[href]
+    ?? defenseInternalLinkClusters[href]
+    ?? industryInternalLinkClusters[href];
   if (!relation || relation.links.length === 0) return null;
 
   const titleId = titleIdForHref(href);
