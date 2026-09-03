@@ -40,12 +40,15 @@ jobs:
           from pathlib import Path
 
           report_path = Path("scripts/report-internal-link-graph.mjs")
-          report = report_path.read_text()
-          old = r'''const pattern = /\bhref\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;'''
-          new = r'''const pattern = /["']?href["']?\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;'''
-          if old not in report:
-              raise SystemExit("expected English registry href extractor not found")
-          report_path.write_text(report.replace(old, new, 1))
+          report_lines = report_path.read_text().splitlines()
+          matched = [
+              index for index, line in enumerate(report_lines)
+              if "const pattern =" in line and "href" in line and "en\\/blog" in line
+          ]
+          if len(matched) != 1:
+              raise SystemExit(f"expected one English registry href extractor, found {len(matched)}")
+          report_lines[matched[0]] = r'''  const pattern = /["']?href["']?\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;'''
+          report_path.write_text("\n".join(report_lines) + "\n")
 
           movement_path = Path("src/lib/internal-link-clusters-movement.ts")
           movement = movement_path.read_text()
@@ -74,7 +77,7 @@ jobs:
               + movement[end + 1:]
           )
 
-          print("Removed Chinese Creep.pull curated source and target")
+          print("Adjusted English route inventory extractor and removed invalid Chinese Creep.pull paths")
           PY
           git diff -- scripts/report-internal-link-graph.mjs src/lib/internal-link-clusters-movement.ts
           git config user.name "linqingan-link-audit-bot"
