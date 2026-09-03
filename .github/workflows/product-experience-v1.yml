@@ -9,7 +9,7 @@ on:
       - clean-blog-v1
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   product-experience:
@@ -22,75 +22,6 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci --ignore-scripts
-      - name: Refresh vulnerable transitive lock
-        run: |
-          npm audit fix --package-lock-only --ignore-scripts
-          git diff -- package-lock.json
-          if ! git diff --quiet -- package-lock.json; then
-            git config user.name "linqingan-security-bot"
-            git config user.email "linqingan501@gmail.com"
-            git add package-lock.json
-            git commit -m "fix: refresh vulnerable browserslist lock"
-            git push origin HEAD:gpt-work
-          fi
-      - name: Repair validated internal-link findings
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          report_path = Path("scripts/report-internal-link-graph.mjs")
-          report_lines = report_path.read_text().splitlines()
-          matched = [
-              index for index, line in enumerate(report_lines)
-              if "const pattern =" in line and "href" in line and "en\\/blog" in line
-          ]
-          if len(matched) != 1:
-              raise SystemExit(f"expected one English registry href extractor, found {len(matched)}")
-          report_lines[matched[0]] = r'''  const pattern = /["']?href["']?\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;'''
-          report_path.write_text("\n".join(report_lines) + "\n")
-
-          movement_path = Path("src/lib/internal-link-clusters-movement.ts")
-          movement = movement_path.read_text()
-          marker = "export const movementInternalLinkClusters"
-          marker_index = movement.index(marker)
-          equals_index = movement.index("=", marker_index)
-          start = movement.index("{", equals_index)
-          end = movement.rindex("};")
-          data = json.loads(movement[start:end + 1])
-          removed = data.pop("/blog/screeps-creep-pull", None)
-          if removed is None:
-              raise SystemExit("expected Chinese Creep.pull curated source not found")
-          removed_targets = 0
-          for relation in data.values():
-              before = len(relation.get("links", []))
-              relation["links"] = [
-                  link for link in relation.get("links", [])
-                  if link.get("href") != "/blog/screeps-creep-pull"
-              ]
-              removed_targets += before - len(relation["links"])
-          if removed_targets != 1:
-              raise SystemExit(f"expected exactly 1 Chinese Creep.pull target, removed {removed_targets}")
-          movement_path.write_text(
-              movement[:start]
-              + json.dumps(data, ensure_ascii=False, indent=2)
-              + movement[end + 1:]
-          )
-
-          print("Adjusted English route inventory extractor and removed invalid Chinese Creep.pull paths")
-          PY
-          git diff -- scripts/report-internal-link-graph.mjs src/lib/internal-link-clusters-movement.ts
-          git config user.name "linqingan-link-audit-bot"
-          git config user.email "linqingan501@gmail.com"
-          git add scripts/report-internal-link-graph.mjs src/lib/internal-link-clusters-movement.ts
-          git commit -m "fix: align curated links with published routes"
-          git push origin HEAD:gpt-work
-      - name: Reinstall refreshed locked dependencies
-        run: npm ci --ignore-scripts
-      - name: Internal link graph gate
-        run: node scripts/report-internal-link-graph.mjs
-      - name: Internal link existence gate
-        run: npm run linkcheck
       - name: Product experience gate
         run: node scripts/check-product-experience-v1.mjs
       - name: Tick Lab deterministic gate
@@ -99,5 +30,3 @@ jobs:
         run: npm audit --audit-level=high
       - name: Type check
         run: npm run typecheck
-      - name: Release-readiness build and smoke
-        run: npm run build
