@@ -33,6 +33,55 @@ jobs:
             git commit -m "fix: refresh vulnerable browserslist lock"
             git push origin HEAD:gpt-work
           fi
+      - name: Repair validated internal-link findings
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report_path = Path("scripts/report-internal-link-graph.mjs")
+          report = report_path.read_text()
+          old = r'''const pattern = /\bhref\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;'''
+          new = r'''const pattern = /["']?href["']?\s*:\s*["'`](\/en\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*)["'`]/g;'''
+          if old not in report:
+              raise SystemExit("expected English registry href extractor not found")
+          report_path.write_text(report.replace(old, new, 1))
+
+          movement_path = Path("src/lib/internal-link-clusters-movement.ts")
+          movement = movement_path.read_text()
+          marker = "export const movementInternalLinkClusters"
+          marker_index = movement.index(marker)
+          equals_index = movement.index("=", marker_index)
+          start = movement.index("{", equals_index)
+          end = movement.rindex("};")
+          data = json.loads(movement[start:end + 1])
+          removed = data.pop("/blog/screeps-creep-pull", None)
+          if removed is None:
+              raise SystemExit("expected Chinese Creep.pull curated source not found")
+          removed_targets = 0
+          for relation in data.values():
+              before = len(relation.get("links", []))
+              relation["links"] = [
+                  link for link in relation.get("links", [])
+                  if link.get("href") != "/blog/screeps-creep-pull"
+              ]
+              removed_targets += before - len(relation["links"])
+          if removed_targets != 1:
+              raise SystemExit(f"expected exactly 1 Chinese Creep.pull target, removed {removed_targets}")
+          movement_path.write_text(
+              movement[:start]
+              + json.dumps(data, ensure_ascii=False, indent=2)
+              + movement[end + 1:]
+          )
+
+          print("Removed Chinese Creep.pull curated source and target")
+          PY
+          git diff -- scripts/report-internal-link-graph.mjs src/lib/internal-link-clusters-movement.ts
+          git config user.name "linqingan-link-audit-bot"
+          git config user.email "linqingan501@gmail.com"
+          git add scripts/report-internal-link-graph.mjs src/lib/internal-link-clusters-movement.ts
+          git commit -m "fix: align curated links with published routes"
+          git push origin HEAD:gpt-work
       - name: Reinstall refreshed locked dependencies
         run: npm ci --ignore-scripts
       - name: Internal link graph gate
