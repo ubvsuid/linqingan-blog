@@ -46,6 +46,23 @@ function optionalString(value, field, maxLength) {
   return normalized;
 }
 
+function optionalReturnCode(value) {
+  if (value === undefined || value === null || value === "") return null;
+  if (typeof value === "number") {
+    if (!Number.isSafeInteger(value)) {
+      throw new Error("returnCode must be a safe integer or string when provided");
+    }
+    return String(value);
+  }
+  if (typeof value !== "string") {
+    throw new Error("returnCode must be a safe integer or string when provided");
+  }
+  const normalized = value.trim();
+  if (!normalized) return null;
+  if (normalized.length > 80) throw new Error("returnCode exceeds 80 characters");
+  return normalized;
+}
+
 function requiredString(value, field, maxLength) {
   const normalized = optionalString(value, field, maxLength);
   if (!normalized) throw new Error(`${field} is required`);
@@ -205,7 +222,7 @@ export function validateVerificationEvidenceRecord(input) {
     shard: optionalString(input.shard, "shard", 80),
     roomName: optionalString(input.roomName, "roomName", 80),
     apiName: requiredString(input.apiName, "apiName", 120),
-    returnCode: optionalString(input.returnCode, "returnCode", 80),
+    returnCode: optionalReturnCode(input.returnCode),
     beforeState,
     afterState,
     tickStart,
