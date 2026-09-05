@@ -18,6 +18,7 @@ export const languageRoutePairs = {
   ...englishArticleRoutePairs,
   ...articleLanguageRoutePairs,
   "/knowledge": "/en/knowledge",
+  "/knowledge/coverage": "/en/knowledge/coverage",
   "/diagnostics": "/en/diagnostics",
   "/resolver": "/en/resolver",
   "/screeps-api": "/en/screeps-api",

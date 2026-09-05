@@ -3,6 +3,10 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { ProblemResolver } from "@/components/problem-resolver";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import {
+  buildKnowledgeGraphV1,
+  getKnowledgeGraphCoverage,
+} from "@/lib/knowledge-graph-v1";
 
 import styles from "../english.module.css";
 
@@ -14,6 +18,8 @@ export const metadata = createEnglishPageMetadata({
 });
 
 export default function EnglishProblemResolverPage() {
+  const graphCoverage = getKnowledgeGraphCoverage(buildKnowledgeGraphV1());
+
   return (
     <main className={styles.page} lang="en">
       <Container>
@@ -28,6 +34,13 @@ export default function EnglishProblemResolverPage() {
         <div className={styles.notice}>
           <strong>Boundary</strong>
           <p>This is a read-only deterministic V1: no AI inference, arbitrary JavaScript execution, or database writes. When state is unknown, the flow asks you to capture the real return value first.</p>
+        </div>
+        <div className={styles.notice}>
+          <strong>Knowledge Graph V1 is connected</strong>
+          <p>
+            The resolver now consumes the same read-only graph semantics: {graphCoverage.nodes} nodes, {graphCoverage.edges} relations, and {graphCoverage.unmapped} unmapped items.
+            {" "}<Link href="/en/knowledge/coverage">Open Knowledge Coverage →</Link>
+          </p>
         </div>
         <ProblemResolver locale="en" />
       </Container>

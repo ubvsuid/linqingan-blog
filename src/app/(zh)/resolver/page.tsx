@@ -2,6 +2,10 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { ProblemResolver } from "@/components/problem-resolver";
+import {
+  buildKnowledgeGraphV1,
+  getKnowledgeGraphCoverage,
+} from "@/lib/knowledge-graph-v1";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
@@ -11,6 +15,8 @@ export const metadata = createPageMetadata({
 });
 
 export default function ProblemResolverPage() {
+  const graphCoverage = getKnowledgeGraphCoverage(buildKnowledgeGraphV1());
+
   return (
     <main className="page-shell">
       <Container>
@@ -25,6 +31,13 @@ export default function ProblemResolverPage() {
         <aside className="error-tip">
           <strong>边界</strong>
           <p>这是只读、确定性的 V1。没有 AI 推断、没有任意 JavaScript 执行、没有数据库写入。遇到不确定状态时，流程会要求你先保存真实返回值。</p>
+        </aside>
+        <aside className="error-tip">
+          <strong>Knowledge Graph V1 已接入</strong>
+          <p>
+            Resolver 现在消费同一套只读 Graph 语义层：{graphCoverage.nodes} 个节点、{graphCoverage.edges} 条关系、{graphCoverage.unmapped} 个未映射项。
+            {" "}<Link href="/knowledge/coverage">查看 Knowledge Coverage →</Link>
+          </p>
         </aside>
         <ProblemResolver locale="zh" />
       </Container>
