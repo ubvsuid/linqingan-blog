@@ -16,6 +16,8 @@ const root = process.cwd();
 const UUID_SUFFIX = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 const TOOL_ID_PATTERN = new RegExp(`^tool_${UUID_SUFFIX}$`);
 const EXPERIMENT_ID_PATTERN = new RegExp(`^experiment_${UUID_SUFFIX}$`);
+const CHINESE_ARTICLE_PATH_PATTERN = /^\/blog\/[a-z0-9-]+$/;
+const ENGLISH_ARTICLE_PATH_PATTERN = /^\/en\/blog\/[a-z0-9-]+$/;
 
 function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -62,11 +64,11 @@ const knowledgeIdentityPayload = parseJson("content/knowledge-identities.json");
 const roadmapIdentityPayload = parseJson("content/roadmap-identities.json");
 assert.equal(knowledgeIdentityPayload.schemaVersion, 1, "knowledge identities schemaVersion");
 assert.equal(roadmapIdentityPayload.schemaVersion, 1, "roadmap identities schemaVersion");
-assert.equal(knowledgeIdentityPayload.records.length, 65, "knowledge durable identity coverage");
+assert.equal(knowledgeIdentityPayload.records.length, 66, "knowledge durable identity coverage");
 assert.equal(roadmapIdentityPayload.records.length, 12, "Beginner roadmap durable identity coverage");
 
 const contentIdentities = loadContentIdentityRegistry(root);
-assert.equal(contentIdentities.records.length, 77, "Chinese Article/Beginner durable identity coverage");
+assert.equal(contentIdentities.records.length, 78, "Chinese Article/Beginner durable identity coverage");
 const chineseIds = new Set();
 for (const record of contentIdentities.records) {
   assert.match(record.contentId, CONTENT_ID_PATTERN, `${record.slug} durable contentId`);
@@ -76,8 +78,8 @@ for (const record of contentIdentities.records) {
 
 const englishIdentities = loadEnglishContentIdentityReadiness(root);
 assert.equal(englishIdentities.records.length, 80, "English article durable identity coverage");
-assert.equal(englishIdentities.bilingualRecords.length, 77, "bilingual English durable identity coverage");
-assert.equal(englishIdentities.standaloneRecords.length, 3, "English-original durable identity coverage");
+assert.equal(englishIdentities.bilingualRecords.length, 77, "derived bilingual English durable identity coverage");
+assert.equal(englishIdentities.standaloneRecords.length, 3, "English-original durable identity provenance coverage");
 const expectedStandaloneHrefs = new Set([
   "/en/blog/screeps-pathfinder-search",
   "/en/blog/screeps-creep-pull",
@@ -102,6 +104,46 @@ for (const record of englishIdentities.records) {
   }
   englishIds.add(record.contentId);
 }
+
+const associationPayload = parseJson("content/article-language-associations.json");
+assert.equal(associationPayload.schemaVersion, 1, "explicit article language associations schemaVersion");
+assert.ok(Array.isArray(associationPayload.records), "explicit article language associations records[]");
+const associationChinesePaths = new Set();
+const associationEnglishPaths = new Set();
+const standaloneHrefs = new Set(englishIdentities.standaloneRecords.map((record) => record.href));
+for (const record of associationPayload.records) {
+  const chinesePath = String(record?.chinesePath ?? "").trim();
+  const englishPath = String(record?.englishPath ?? "").trim();
+  assert.match(chinesePath, CHINESE_ARTICLE_PATH_PATTERN, `valid explicit Chinese path ${chinesePath}`);
+  assert.match(englishPath, ENGLISH_ARTICLE_PATH_PATTERN, `valid explicit English path ${englishPath}`);
+  assert.equal(associationChinesePaths.has(chinesePath), false, `duplicate explicit Chinese path ${chinesePath}`);
+  assert.equal(associationEnglishPaths.has(englishPath), false, `duplicate explicit English path ${englishPath}`);
+  associationChinesePaths.add(chinesePath);
+  associationEnglishPaths.add(englishPath);
+
+  const chineseSlug = chinesePath.slice("/blog/".length);
+  assert.ok(contentIdentities.bySlug.get(chineseSlug), `${chinesePath} has permanent Chinese Content Identity`);
+  assert.ok(englishIdentities.byHref.get(englishPath), `${englishPath} has permanent English identity`);
+  assert.equal(
+    standaloneHrefs.has(englishPath),
+    true,
+    `${englishPath} explicit counterpart association must preserve standalone identity provenance`,
+  );
+}
+assert.equal(associationPayload.records.length, 1, "current explicit standalone-counterpart association coverage");
+assert.deepEqual(
+  associationPayload.records[0],
+  {
+    chinesePath: "/blog/screeps-creep-attack",
+    englishPath: "/en/blog/screeps-creep-attack",
+  },
+  "Creep.attack explicit language association",
+);
+assert.equal(
+  englishIdentities.byHref.get("/en/blog/screeps-creep-attack")?.contentId,
+  "en_article_c784e904-4517-4476-ada6-53adbfd7966d",
+  "published English Creep.attack durable identity must never change when a Chinese counterpart is added",
+);
 
 const toolSource = read("src/lib/tool-catalog.ts");
 const toolRecords = [...toolSource.matchAll(
@@ -214,5 +256,5 @@ assert.equal(
 );
 
 console.log(
-  `[knowledge-graph-readiness] PASS: 77 Chinese content identities + 80 English identities (77 bilingual, 3 standalone) + 8 Tool IDs + 3 Tick Lab experiment IDs; Runtime Evidence stable/accepted-only identity contract and 4 verified API ReturnCode ownership maps are green.`,
+  `[knowledge-graph-readiness] PASS: 78 Chinese content identities + 80 English identities (77 derived bilingual, 3 standalone-provenance) + 1 explicit standalone-counterpart language association + 8 Tool IDs + 3 Tick Lab experiment IDs; Runtime Evidence stable/accepted-only identity contract and 4 verified API ReturnCode ownership maps are green.`,
 );
