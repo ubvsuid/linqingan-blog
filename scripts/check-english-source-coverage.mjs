@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const postsDirectory = path.join(root, "content", "posts");
 const libDirectory = path.join(root, "src", "lib");
+const associationPath = path.join(root, "content", "article-language-associations.json");
 const registryFiles = fs.readdirSync(libDirectory)
   .filter((name) =>
     name === "english-articles.ts"
@@ -23,6 +24,14 @@ for (const fileName of registryFiles) {
     /["']?chinesePath["']?\s*:\s*["']\/blog\/([a-z0-9-]+)["']/g,
   )) {
     mappedSlugs.add(match[1]);
+  }
+}
+
+if (fs.existsSync(associationPath)) {
+  const associationPayload = JSON.parse(fs.readFileSync(associationPath, "utf8"));
+  for (const record of associationPayload.records ?? []) {
+    const match = String(record?.chinesePath ?? "").match(/^\/blog\/([a-z0-9-]+)$/);
+    if (match) mappedSlugs.add(match[1]);
   }
 }
 
