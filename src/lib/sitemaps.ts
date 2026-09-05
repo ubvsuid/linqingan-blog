@@ -120,6 +120,7 @@ export function getChineseSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/blog", allPostDates),
     staticPageEntry("/knowledge", allPostDates),
     staticPageEntry("/diagnostics"),
+    staticPageEntry("/resolver"),
     staticPageEntry("/screeps-api"),
     ...chineseApiHubPaths.map((path) => staticPageEntry(path)),
     staticPageEntry(
@@ -217,6 +218,7 @@ export function getEnglishSitemapEntries(): SitemapEntry[] {
     staticPageEntry("/en/blog", englishArticleDates),
     staticPageEntry("/en/knowledge", englishArticleDates),
     staticPageEntry("/en/diagnostics"),
+    staticPageEntry("/en/resolver"),
     staticPageEntry("/en/screeps-api"),
     ...englishApiHubPaths.map((path) => staticPageEntry(path)),
     staticPageEntry("/en/tags", englishArticleDates),

@@ -19,6 +19,7 @@ export const languageRoutePairs = {
   ...articleLanguageRoutePairs,
   "/knowledge": "/en/knowledge",
   "/diagnostics": "/en/diagnostics",
+  "/resolver": "/en/resolver",
   "/screeps-api": "/en/screeps-api",
   "/screeps-api/creep": "/en/screeps-api/creep",
   "/screeps-api/room": "/en/screeps-api/room",
