@@ -578,6 +578,23 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+    "contentGroupId": "group_1825e2cc-8a6e-46e7-9fc5-b5692e006677",
+    "slug": "screeps-pathfinder-search",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 35,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps PathFinder.search",
+      "searchIntent": "正确调用 PathFinder.search()，理解 goal range、path、cost、ops、incomplete，并判断搜索是否真正到达目标",
+      "keywordRole": "owner"
+    },
+    "source": "frontmatter"
+  },
+  {
     "contentId": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
     "contentGroupId": "group_44f2d1d6-250b-4b3d-8e93-3fccb70fb509",
     "slug": "screeps-pathfinder-costmatrix",
