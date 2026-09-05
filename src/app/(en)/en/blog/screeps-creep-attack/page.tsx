@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { EnglishOriginalArticlePage } from "@/components/english-original-article-page";
-import { getChineseArticlePathForEnglish } from "@/lib/article-language-associations";
 import { englishCreepAttackArticle as article } from "@/lib/english-creep-attack-original-21";
 import { getEnglishDiscoveryArticle } from "@/lib/english-discovery";
 import { siteConfig } from "@/lib/site";
@@ -9,7 +8,6 @@ import { siteConfig } from "@/lib/site";
 const articleUrl = `${siteConfig.url}${article.path}`;
 const discovery = getEnglishDiscoveryArticle(article.path);
 const modifiedTime = discovery?.updatedAt ?? article.publishedAt;
-const chinesePath = getChineseArticlePathForEnglish(article.path);
 
 export const metadata: Metadata = {
   title: { absolute: `${article.title} | Linqingan` },
@@ -18,15 +16,12 @@ export const metadata: Metadata = {
   authors: [{ name: "Linqingan", url: `${siteConfig.url}/en/about` }],
   alternates: {
     canonical: article.path,
-    languages: chinesePath
-      ? { en: article.path, "zh-CN": chinesePath, "x-default": article.path }
-      : { en: article.path, "x-default": article.path },
+    languages: { en: article.path, "x-default": article.path },
     types: { "application/rss+xml": "/en/feed.xml" },
   },
   openGraph: {
     type: "article",
     locale: "en_US",
-    alternateLocale: chinesePath ? ["zh_CN"] : undefined,
     url: articleUrl,
     siteName: "Linqingan",
     title: `${article.title} | Linqingan`,

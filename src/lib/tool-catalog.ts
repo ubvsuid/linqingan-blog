@@ -1,5 +1,4 @@
 export interface ToolCatalogEntry {
-  toolId: `tool_${string}`;
   slug: string;
   eyebrow: string;
   zhTitle: string;
@@ -14,7 +13,6 @@ export interface ToolCatalogEntry {
 
 export const toolCatalog = [
   {
-    toolId: "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
     slug: "creep-body-calculator",
     eyebrow: "BODY CALCULATOR",
     zhTitle: "Creep 身体计算器",
@@ -27,7 +25,6 @@ export const toolCatalog = [
     enKeywords: ["body calculator", "creep cost", "move ratio", "spawn time", "carry capacity"],
   },
   {
-    toolId: "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
     slug: "room-diagnostics",
     eyebrow: "ROOM DIAGNOSTICS",
     zhTitle: "房间运行诊断",
@@ -40,7 +37,6 @@ export const toolCatalog = [
     enKeywords: ["room diagnostics", "spawn count", "harvester", "controller downgrade", "cpu bucket"],
   },
   {
-    toolId: "tool_b034997f-9ba2-404b-9698-66b9bb3bfe4c",
     slug: "market-terminal-cost-calculator",
     eyebrow: "MARKET & TERMINAL",
     zhTitle: "Market 与 Terminal 成本计算器",
@@ -53,7 +49,6 @@ export const toolCatalog = [
     enKeywords: ["market calculator", "terminal cost", "calcTransactionCost", "deal price", "order fee", "credits"],
   },
   {
-    toolId: "tool_7e7f160d-65df-475c-934c-f3a96539dfbc",
     slug: "controller-downgrade-planner",
     eyebrow: "CONTROLLER",
     zhTitle: "Controller 降级与 Upgrader 规划器",
@@ -66,7 +61,6 @@ export const toolCatalog = [
     enKeywords: ["controller downgrade", "ticksToDowngrade", "upgrader", "work parts", "xgh2o", "operate controller"],
   },
   {
-    toolId: "tool_292ae9b9-2135-4a1d-bb86-0fab1bb50fd4",
     slug: "lab-reaction-boost-planner",
     eyebrow: "LAB & BOOST",
     zhTitle: "Lab 反应与 Boost 规划器",
@@ -79,7 +73,6 @@ export const toolCatalog = [
     enKeywords: ["lab planner", "reaction chain", "boost calculator", "xgh2o", "operate lab", "mineral"],
   },
   {
-    toolId: "tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f",
     slug: "spawn-queue-replacement-planner",
     eyebrow: "SPAWN CAPACITY",
     zhTitle: "Spawn 队列与替换规划器",
@@ -92,7 +85,6 @@ export const toolCatalog = [
     enKeywords: ["spawn queue", "replacement", "prespawn", "ticksToLive", "operate spawn", "spawn utilization"],
   },
   {
-    toolId: "tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057",
     slug: "hauling-throughput-planner",
     eyebrow: "LOGISTICS",
     zhTitle: "运输吞吐量规划器",
@@ -105,7 +97,6 @@ export const toolCatalog = [
     enKeywords: ["hauling", "throughput", "carry", "move", "fatigue", "logistics", "remote mining"],
   },
   {
-    toolId: "tool_1ae7f59e-5815-498b-a205-d1b717894779",
     slug: "tower-damage-heal-repair-calculator",
     eyebrow: "TOWER POWER",
     zhTitle: "Tower 伤害、治疗与维修计算器",
