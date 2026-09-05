@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "href": "/en/blog/screeps-pathfinder-search",
+      "contentId": "en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102"
+    },
+    {
+      "href": "/en/blog/screeps-creep-pull",
+      "contentId": "en_article_04018d73-542b-4f45-8e36-d24597aeb6c0"
+    },
+    {
+      "href": "/en/blog/screeps-creep-attack",
+      "contentId": "en_article_c784e904-4517-4476-ada6-53adbfd7966d"
+    }
+  ]
+}

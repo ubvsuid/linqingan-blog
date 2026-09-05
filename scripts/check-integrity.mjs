@@ -11,6 +11,7 @@ const checks = [
   ["Beginner generated registry freshness", "scripts/generate-beginner-roadmap-registry.mjs", "--check"],
   ["Content Metadata Schema V1 contract", "scripts/check-content-metadata-schema-contract.mjs"],
   ["Content Metadata Schema V1", "scripts/check-content-metadata-schema.mjs"],
+  ["Knowledge Graph V1 durable identity readiness", "scripts/check-knowledge-graph-readiness.mjs"],
   ["Knowledge registry", "scripts/check-knowledge-registry.mjs"],
   ["Beginner roadmap", "scripts/check-beginner-roadmap.mjs"],
   ["Internal links", "scripts/check-internal-links.mjs"],

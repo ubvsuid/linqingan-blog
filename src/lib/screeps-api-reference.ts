@@ -5,6 +5,7 @@ export interface ScreepsApiReferenceEntry {
   summary: string;
   keywords: string[];
   guideHref?: string;
+  returnCodeNames?: readonly string[];
 }
 
 export const screepsApiReference: ScreepsApiReferenceEntry[] = [
@@ -79,6 +80,16 @@ export const screepsApiReference: ScreepsApiReferenceEntry[] = [
     summary: "把 Creep Store 中的资源转移给可接收目标。",
     keywords: ["运输", "Energy", "Store", "Spawn"],
     guideHref: "/blog/screeps-creep-deliver-energy",
+    returnCodeNames: [
+      "OK",
+      "ERR_NOT_OWNER",
+      "ERR_BUSY",
+      "ERR_NOT_ENOUGH_RESOURCES",
+      "ERR_INVALID_TARGET",
+      "ERR_FULL",
+      "ERR_NOT_IN_RANGE",
+      "ERR_INVALID_ARGS",
+    ],
   },
   {
     id: "creep-withdraw",
@@ -143,6 +154,15 @@ export const screepsApiReference: ScreepsApiReferenceEntry[] = [
     summary: "提交 Creep 生成请求；建议保存 dryRun 和正式返回值并检查名称、身体与 Energy。",
     keywords: ["Spawn", "Creep", "body", "dryRun"],
     guideHref: "/blog/screeps-spawncreep-return-codes",
+    returnCodeNames: [
+      "OK",
+      "ERR_NOT_OWNER",
+      "ERR_NAME_EXISTS",
+      "ERR_BUSY",
+      "ERR_NOT_ENOUGH_ENERGY",
+      "ERR_INVALID_ARGS",
+      "ERR_RCL_NOT_ENOUGH",
+    ],
   },
   {
     id: "spawn-renew-creep",
@@ -151,6 +171,16 @@ export const screepsApiReference: ScreepsApiReferenceEntry[] = [
     summary: "使用 Spawn 为符合条件的普通 Creep 增加寿命，同时需要评估 Spawn 占用和 Boost 边界。",
     keywords: ["Spawn", "TTL", "ticksToLive", "续命"],
     guideHref: "/blog/screeps-spawn-renew-creep",
+    returnCodeNames: [
+      "OK",
+      "ERR_NOT_OWNER",
+      "ERR_BUSY",
+      "ERR_NOT_ENOUGH_ENERGY",
+      "ERR_INVALID_TARGET",
+      "ERR_FULL",
+      "ERR_NOT_IN_RANGE",
+      "ERR_RCL_NOT_ENOUGH",
+    ],
   },
   {
     id: "spawn-recycle-creep",
@@ -159,6 +189,13 @@ export const screepsApiReference: ScreepsApiReferenceEntry[] = [
     summary: "回收不再需要的 Creep；目标需要靠近己方 Spawn，并应作为明确的一次性任务执行。",
     keywords: ["Spawn", "Creep", "回收"],
     guideHref: "/blog/screeps-spawn-recycle-creep",
+    returnCodeNames: [
+      "OK",
+      "ERR_NOT_OWNER",
+      "ERR_INVALID_TARGET",
+      "ERR_NOT_IN_RANGE",
+      "ERR_RCL_NOT_ENOUGH",
+    ],
   },
   {
     id: "link-transfer-energy",
