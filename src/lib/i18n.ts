@@ -19,6 +19,7 @@ export const languageRoutePairs = {
   ...articleLanguageRoutePairs,
   "/knowledge": "/en/knowledge",
   "/diagnostics": "/en/diagnostics",
+  "/resolver": "/en/resolver",
   "/screeps-api": "/en/screeps-api",
   "/screeps-api/creep": "/en/screeps-api/creep",
   "/screeps-api/room": "/en/screeps-api/room",
@@ -54,68 +55,24 @@ export const languageRoutePairs = {
 } as const;
 
 export const englishKnowledgeModules = [
-  {
-    number: 1,
-    slug: "memory-code-structure",
-    title: "Memory and Code Structure",
-    description: "State, modules, global cache, RawMemory, flags, and maintainable game-loop structure.",
-  },
-  {
-    number: 2,
-    slug: "spawn-creep-lifecycle",
-    title: "Spawn and Creep Lifecycle",
-    description: "Body design, spawn return codes, role memory, renewal, recycling, and emergency recovery.",
-  },
-  {
-    number: 3,
-    slug: "room-economy",
-    title: "Room Economy",
-    description: "Harvesting, hauling, storage, links, terminals, minerals, and stable energy flow.",
-  },
-  {
-    number: 4,
-    slug: "movement-vision",
-    title: "Movement and Vision",
-    description: "moveTo(), fatigue, RoomPosition, PathFinder, routes, observers, and room visibility.",
-  },
-  {
-    number: 5,
-    slug: "controllers-expansion",
-    title: "Controllers and Expansion",
-    description: "Upgrading, downgrade recovery, reserving, claiming, safe mode, and remote control.",
-  },
-  {
-    number: 6,
-    slug: "construction-defense",
-    title: "Construction and Defense",
-    description: "Construction sites, Creep combat, towers, walls, ramparts, repairs, and defensive priorities.",
-  },
-  {
-    number: 7,
-    slug: "market-advanced-resources",
-    title: "Market and Advanced Resources",
-    description: "Orders, deals, terminals, labs, boosts, factories, power, and late-game resources.",
-  },
-  {
-    number: 8,
-    slug: "operations-debugging",
-    title: "Operations and Debugging",
-    description: "Return codes, CPU, bucket, event logs, notifications, diagnostics, and safe operations.",
-  },
+  { number: 1, slug: "memory-code-structure", title: "Memory and Code Structure", description: "State, modules, global cache, RawMemory, flags, and maintainable game-loop structure." },
+  { number: 2, slug: "spawn-creep-lifecycle", title: "Spawn and Creep Lifecycle", description: "Body design, spawn return codes, role memory, renewal, recycling, and emergency recovery." },
+  { number: 3, slug: "room-economy", title: "Room Economy", description: "Harvesting, hauling, storage, links, terminals, minerals, and stable energy flow." },
+  { number: 4, slug: "movement-vision", title: "Movement and Vision", description: "moveTo(), fatigue, RoomPosition, PathFinder, routes, observers, and room visibility." },
+  { number: 5, slug: "controllers-expansion", title: "Controllers and Expansion", description: "Upgrading, downgrade recovery, reserving, claiming, safe mode, and remote control." },
+  { number: 6, slug: "construction-defense", title: "Construction and Defense", description: "Construction sites, Creep combat, towers, walls, ramparts, repairs, and defensive priorities." },
+  { number: 7, slug: "market-advanced-resources", title: "Market and Advanced Resources", description: "Orders, deals, terminals, labs, boosts, factories, power, and late-game resources." },
+  { number: 8, slug: "operations-debugging", title: "Operations and Debugging", description: "Return codes, CPU, bucket, event logs, notifications, diagnostics, and safe operations." },
 ] as const;
 
-export function isEnglishPath(pathname: string): boolean {
-  return pathname === "/en" || pathname.startsWith("/en/");
-}
+export function isEnglishPath(pathname: string): boolean { return pathname === "/en" || pathname.startsWith("/en/"); }
 
 export function getLanguageSwitchTarget(pathname: string): string {
   const pairs = Object.entries(languageRoutePairs) as Array<[string, string]>;
-
   if (isEnglishPath(pathname)) {
     const match = pairs.find(([, englishPath]) => pathname === englishPath);
     return match?.[0] ?? "/";
   }
-
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
   const match = pairs.find(([chinesePath]) => normalized === chinesePath.split("#")[0]);
   return match?.[1] ?? "/en";

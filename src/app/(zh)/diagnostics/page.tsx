@@ -19,32 +19,9 @@ export default function DiagnosticsPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "CollectionPage",
-        name: "Screeps 故障诊断中心",
-        url: pageUrl,
-        inLanguage: "zh-CN",
-        description: "从可见游戏症状进入结构化 Screeps 故障诊断路径。",
-        mainEntity: { "@id": `${pageUrl}#symptoms` },
-      },
-      {
-        "@type": "ItemList",
-        "@id": `${pageUrl}#symptoms`,
-        numberOfItems: screepsDiagnosticSymptoms.length,
-        itemListElement: screepsDiagnosticSymptoms.map((symptom, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          name: symptom.zhTitle,
-          url: `${pageUrl}#${symptom.id}`,
-        })),
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "首页", item: siteConfig.url },
-          { "@type": "ListItem", position: 2, name: "故障诊断中心", item: pageUrl },
-        ],
-      },
+      { "@type": "CollectionPage", name: "Screeps 故障诊断中心", url: pageUrl, inLanguage: "zh-CN", description: "从可见游戏症状进入结构化 Screeps 故障诊断路径。", mainEntity: { "@id": `${pageUrl}#symptoms` } },
+      { "@type": "ItemList", "@id": `${pageUrl}#symptoms`, numberOfItems: screepsDiagnosticSymptoms.length, itemListElement: screepsDiagnosticSymptoms.map((symptom, index) => ({ "@type": "ListItem", position: index + 1, name: symptom.zhTitle, url: `${pageUrl}#${symptom.id}` })) },
+      { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "首页", item: siteConfig.url }, { "@type": "ListItem", position: 2, name: "故障诊断中心", item: pageUrl }] },
     ],
   };
 
@@ -52,18 +29,9 @@ export default function DiagnosticsPage() {
     <main className="page-shell">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
-        <nav className="resource-breadcrumb" aria-label="面包屑">
-          <Link href="/knowledge">知识库</Link><span aria-hidden="true">/</span><span>故障诊断中心</span>
-        </nav>
-        <header className="page-header">
-          <p className="eyebrow">SCREEPS DIAGNOSTIC CENTER</p>
-          <h1>先说“哪里不对”，再定位错误码</h1>
-          <p>这里不是另一份错误码字典。它从你能直接观察到的症状开始，把排查过程连接到真实返回值、API、对象 Hub、专题教程、浏览器本地工具与已接受的 Runtime Verification。</p>
-        </header>
-        <aside className="error-tip">
-          <strong>推荐使用方式</strong>
-          <p>先选最接近的症状，按“快速排查”保存真实返回值和运行状态；只有拿到证据后，再进入对应错误码与 API 分支。</p>
-        </aside>
+        <nav className="resource-breadcrumb" aria-label="面包屑"><Link href="/knowledge">知识库</Link><span aria-hidden="true">/</span><span>故障诊断中心</span></nav>
+        <header className="page-header"><p className="eyebrow">SCREEPS DIAGNOSTIC CENTER</p><h1>先说“哪里不对”，再定位错误码</h1><p>这里不是另一份错误码字典。它从你能直接观察到的症状开始，把排查过程连接到真实返回值、API、对象 Hub、专题教程、浏览器本地工具与已接受的 Runtime Verification。</p></header>
+        <aside className="error-tip"><strong>推荐使用方式</strong><p>如果你希望被一步步引导，先进入 <Link href="/resolver">Problem Resolver V1</Link>；如果已经拿到真实返回值，可以直接使用下面的症状关系图。</p></aside>
         <ScreepsDiagnosticCenter locale="zh" />
       </Container>
     </main>
