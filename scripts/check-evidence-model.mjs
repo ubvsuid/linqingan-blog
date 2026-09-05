@@ -61,7 +61,7 @@ expect(policy.runtimeEvidence?.publicWriteApiAllowed === false, "public Evidence
 let registry = { records: [] };
 try {
   registry = loadContentIdentityRegistry(root);
-  expect(registry.records.length === 77, `Content Identity registry must own 77 published Chinese articles, found ${registry.records.length}`);
+  expect(registry.records.length === 78, `Content Identity registry must own 78 current Chinese articles, found ${registry.records.length}`);
 } catch (error) {
   failures.push(`Content Identity registry validation failed: ${error instanceof Error ? error.message : String(error)}`);
 }
@@ -168,7 +168,7 @@ if (failures.length > 0) {
 }
 
 console.log("Evidence Model V1 check passed.");
-console.log("- 77 published Chinese articles resolve to permanent Content Identity ownership.");
+console.log("- 78 current Chinese articles resolve to permanent Content Identity ownership.");
 console.log("- New structured runtime Evidence keys are slug-independent identity v2.");
 console.log("- Runtime lifecycle and public Markdown acceptance remain separate boundaries.");
 console.log("- Migration is fail-closed for unmapped legacy Evidence rows.");

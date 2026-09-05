@@ -1,3 +1,4 @@
+import { articleLanguageRoutePairs } from "@/lib/article-language-associations";
 import { englishArticleRoutePairs } from "@/lib/english-articles-complete";
 
 export const englishNavigation = [
@@ -15,6 +16,7 @@ export const languageRoutePairs = {
   "/beginner": "/en/beginner",
   "/blog": "/en/blog",
   ...englishArticleRoutePairs,
+  ...articleLanguageRoutePairs,
   "/knowledge": "/en/knowledge",
   "/diagnostics": "/en/diagnostics",
   "/screeps-api": "/en/screeps-api",
@@ -86,7 +88,7 @@ export const englishKnowledgeModules = [
     number: 6,
     slug: "construction-defense",
     title: "Construction and Defense",
-    description: "Construction sites, towers, walls, ramparts, repairs, and defensive priorities.",
+    description: "Construction sites, Creep combat, towers, walls, ramparts, repairs, and defensive priorities.",
   },
   {
     number: 7,

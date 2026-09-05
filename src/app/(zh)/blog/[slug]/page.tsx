@@ -10,6 +10,7 @@ import { ArticleToc } from "@/components/article-toc";
 import { ArticleVerificationSummary } from "@/components/article-verification-summary";
 import { ArticleLearningContext } from "@/components/article-learning-context";
 import { Container } from "@/components/container";
+import { getEnglishArticlePathForChinese } from "@/lib/article-language-associations";
 import {
   beginnerSeriesSlugs,
   getBeginnerSeriesIndex,
@@ -55,17 +56,29 @@ export async function generateMetadata({
   }
 
   const path = `/blog/${post.slug}`;
+  const englishPath = getEnglishArticlePathForChinese(path);
   const socialImage = post.cover ?? `${siteConfig.url}/blog/${post.slug}/opengraph-image`;
 
   return {
     title: post.title,
     description: post.description,
     keywords: post.tags,
-    alternates: {
-      canonical: path,
-    },
+    alternates: englishPath
+      ? {
+          canonical: path,
+          languages: {
+            "zh-CN": path,
+            en: englishPath,
+            "x-default": englishPath,
+          },
+        }
+      : {
+          canonical: path,
+        },
     openGraph: {
       type: "article",
+      locale: "zh_CN",
+      alternateLocale: englishPath ? ["en_US"] : undefined,
       url: path,
       title: post.title,
       description: post.description,
