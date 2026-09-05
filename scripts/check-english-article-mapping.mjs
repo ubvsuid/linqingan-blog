@@ -3,6 +3,13 @@ import path from "node:path";
 
 const root = process.cwd();
 const libDirectory = path.join(root, "src", "lib");
+const associationPath = path.join(root, "content", "article-language-associations.json");
+const associationPayload = fs.existsSync(associationPath)
+  ? JSON.parse(fs.readFileSync(associationPath, "utf8"))
+  : { records: [] };
+const explicitAssociationByEnglish = new Map(
+  (associationPayload.records ?? []).map((record) => [record.englishPath, record.chinesePath]),
+);
 const registryFiles = fs.readdirSync(libDirectory)
   .filter((name) =>
     name === "english-articles.ts"
@@ -100,8 +107,24 @@ for (const record of standaloneHrefs) {
   }
 
   const staticPageSource = fs.readFileSync(staticPagePath, "utf8");
-  if (staticPageSource.includes('"zh-CN"') || staticPageSource.includes("isBasedOn")) {
-    failures.push(`${record.fileName}: 英文原创页面不应声明不存在的中文 alternate 或 isBasedOn ${record.href}`);
+  const associatedChinesePath = explicitAssociationByEnglish.get(record.href);
+
+  if (staticPageSource.includes("isBasedOn")) {
+    failures.push(`${record.fileName}: 英文原创页面不应声明 isBasedOn ${record.href}`);
+  }
+  if (staticPageSource.includes('"zh-CN"') && !associatedChinesePath) {
+    failures.push(`${record.fileName}: 英文原创页面声明了不存在的中文 alternate ${record.href}`);
+  }
+  if (associatedChinesePath && !staticPageSource.includes('"zh-CN"')) {
+    failures.push(`${record.fileName}: 已存在显式中文 counterpart，但页面缺少 zh-CN alternate ${record.href}`);
+  }
+  if (associatedChinesePath) {
+    const associatedSlug = associatedChinesePath.slice("/blog/".length);
+    const markdownPath = path.join(root, "content", "posts", `${associatedSlug}.md`);
+    const legacyStaticPagePath = path.join(root, "src", "app", "blog", associatedSlug, "page.tsx");
+    if (!fs.existsSync(markdownPath) && !fs.existsSync(legacyStaticPagePath)) {
+      failures.push(`${record.fileName}: 显式中文 counterpart 不存在 ${associatedChinesePath}`);
+    }
   }
 }
 
