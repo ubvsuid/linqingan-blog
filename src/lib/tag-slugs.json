@@ -38,6 +38,7 @@
   "移动": "movement",
   "疲劳": "fatigue",
   "防御": "defense",
+  "战斗": "combat",
   "视野": "vision",
   "通行": "access-control",
   "远程房间": "remote-rooms",

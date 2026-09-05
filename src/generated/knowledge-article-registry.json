@@ -119,6 +119,23 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_1cc772a0-f18a-44b4-bbef-462c32257324",
+    "contentGroupId": "group_d129d88c-34d7-4e81-b0af-005e4bd56447",
+    "slug": "screeps-creep-attack",
+    "knowledge": {
+      "module": "construction-defense",
+      "stage": "creep-combat",
+      "order": 75,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep.attack",
+      "searchIntent": "正确使用 Creep.attack() 发起近战攻击，理解 Range 1、ATTACK 部件、返回码、Rampart 与 tick 结算边界",
+      "keywordRole": "owner"
+    },
+    "source": "frontmatter"
+  },
+  {
     "contentId": "article_00651b28-9573-49a1-ab03-d77c76cf4220",
     "contentGroupId": "group_518122d9-a4d1-40bf-9334-aa160f8e08af",
     "slug": "screeps-rampart-set-public",
