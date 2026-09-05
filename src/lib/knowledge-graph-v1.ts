@@ -99,7 +99,7 @@ const standaloneEnglishIds = new Map<string, string>(
     (record) => [String(record.href), String(record.contentId)] as const,
   ),
 );
-const chineseIdentityByPath = new Map(
+const chineseIdentityByPath = new Map<string, IdentityRecord>(
   chineseIdentityRecords.map(
     (record) => [`/blog/${record.slug}`, record] as const,
   ),
@@ -329,12 +329,12 @@ export function buildKnowledgeGraphV1(): KnowledgeGraphV1 {
     }
   }
 
-  const chineseArticleByHref = new Map(
+  const chineseArticleByHref = new Map<string, string>(
     [...knowledgeRegistry, ...beginnerRegistry].map(
       (record) => [`/blog/${record.slug}`, record.contentId] as const,
     ),
   );
-  const englishByChinesePath = new Map(
+  const englishByChinesePath = new Map<string, string>(
     articleLanguageAssociations.map(
       (record) => [record.chinesePath, record.englishPath] as const,
     ),
@@ -462,7 +462,8 @@ export function buildKnowledgeGraphV1(): KnowledgeGraphV1 {
       }
     }
 
-    for (const guide of symptom.guides ?? []) {
+    const symptomGuides = "guides" in symptom ? symptom.guides : [];
+    for (const guide of symptomGuides) {
       const zhArticle = chineseArticleByHref.get(guide.zhHref);
       const enArticle = englishIdByHref.get(guide.enHref);
       if (zhArticle) {
