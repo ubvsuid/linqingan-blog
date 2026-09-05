@@ -578,6 +578,23 @@
     "source": "migration-sidecar"
   },
   {
+    "contentId": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+    "contentGroupId": "group_1825e2cc-8a6e-46e7-9fc5-b5692e006677",
+    "slug": "screeps-pathfinder-search",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 35,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps PathFinder.search",
+      "searchIntent": "正确调用 PathFinder.search()，理解 goal range、path、cost、ops、incomplete，并判断搜索是否真正到达目标",
+      "keywordRole": "owner"
+    },
+    "source": "frontmatter"
+  },
+  {
     "contentId": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
     "contentGroupId": "group_44f2d1d6-250b-4b3d-8e93-3fccb70fb509",
     "slug": "screeps-pathfinder-costmatrix",
@@ -644,6 +661,23 @@
       "keywordRole": "owner"
     },
     "source": "migration-sidecar"
+  },
+  {
+    "contentId": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+    "contentGroupId": "group_6c88f3f4-23ed-431c-835e-c8ba31e8a0f7",
+    "slug": "screeps-creep-pull",
+    "knowledge": {
+      "module": "movement-vision",
+      "stage": "path-costs",
+      "order": 75,
+      "difficulty": "intermediate"
+    },
+    "seo": {
+      "primaryKeyword": "Screeps Creep.pull",
+      "searchIntent": "正确使用 Creep.pull() 协调两只相邻 Creep 的同 tick 移动，理解 pull、双方 move、fatigue 与失败边界",
+      "keywordRole": "owner"
+    },
+    "source": "frontmatter"
   },
   {
     "contentId": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62",

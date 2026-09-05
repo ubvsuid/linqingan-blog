@@ -4,6 +4,14 @@
     {
       "chinesePath": "/blog/screeps-creep-attack",
       "englishPath": "/en/blog/screeps-creep-attack"
+    },
+    {
+      "chinesePath": "/blog/screeps-creep-pull",
+      "englishPath": "/en/blog/screeps-creep-pull"
+    },
+    {
+      "chinesePath": "/blog/screeps-pathfinder-search",
+      "englishPath": "/en/blog/screeps-pathfinder-search"
     }
   ]
 }
