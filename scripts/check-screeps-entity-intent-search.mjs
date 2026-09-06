@@ -14,10 +14,12 @@ function read(relativePath) {
 }
 
 const entityIntent = read("src/lib/screeps-entity-intent.ts");
+const knowledgeGraphSearchPolicy = read("src/lib/knowledge-graph-search-policy.ts");
 const knowledgeGraphSearch = read("src/lib/knowledge-graph-search.ts");
 const chineseSearch = read("src/lib/search-v2.ts");
 const englishClientSearch = read("src/components/english-site-search.tsx");
 const englishServerSearch = read("src/lib/english-search.ts");
+const englishSearchIndexRoute = read("src/app/(en)/en/search-index.json/route.ts");
 const packageJson = read("package.json");
 
 for (const registry of [
@@ -81,27 +83,36 @@ if (!entityIntent.includes("/verification/coverage#coverage-${symptom.id}")) {
 if (!knowledgeGraphSearch.includes('import knowledgeGraphPayload from "@/generated/knowledge-graph-v1.json"')) {
   failures.push("Search Graph enrichment must consume the canonical generated Knowledge Graph artifact.");
 }
-if (!knowledgeGraphSearch.includes("GRAPH_SEARCH_ANCHOR_MIN_SCORE = 120")) {
+if (!knowledgeGraphSearchPolicy.includes("GRAPH_SEARCH_ANCHOR_MIN_SCORE = 120")) {
   failures.push("Search Graph enrichment must require the frozen high-confidence anchor threshold.");
 }
-if (!knowledgeGraphSearch.includes('return `return-code:${entityId.slice("error:".length)}`')) {
-  failures.push("Search Graph enrichment must map intent error identities to durable ReturnCode graph identities.");
+if (!knowledgeGraphSearchPolicy.includes('kind === "symptom" || kind === "api" || kind === "error"')) {
+  failures.push("Search Graph enrichment anchors must remain limited to Symptom/API/ReturnCode intent kinds.");
+}
+if (!knowledgeGraphSearch.includes('return `error:${node.id.slice("return-code:".length)}`')) {
+  failures.push("Search Graph enrichment must map durable ReturnCode graph identities back to intent error identities.");
 }
 for (const relation of ["solvedBy", "involvesApi", "relatedTo", "returns", "testedBy", "explains", "usesApi"]) {
   if (!knowledgeGraphSearch.includes(`"${relation}"`)) {
     failures.push(`Search Graph enrichment is missing allowed relation: ${relation}`);
   }
 }
-if (knowledgeGraphSearch.includes("prerequisiteOf")) {
-  failures.push("Search Graph V1A must not use registry-order prerequisiteOf as a search-intent signal.");
+if (knowledgeGraphSearch.includes("prerequisiteOf") || knowledgeGraphSearchPolicy.includes("prerequisiteOf")) {
+  failures.push("Search Graph enrichment must not use registry-order prerequisiteOf as a search-intent signal.");
 }
 for (const forbidden of ["drizzle-orm", "getPlatformDatabase", "pgvector", "neo4j", "OpenAI", "verificationEvidence"]) {
-  if (knowledgeGraphSearch.includes(forbidden)) {
+  if (knowledgeGraphSearch.includes(forbidden) || knowledgeGraphSearchPolicy.includes(forbidden)) {
     failures.push(`Search Graph enrichment must remain read-only and deterministic; forbidden dependency: ${forbidden}.`);
   }
 }
 if (!knowledgeGraphSearch.includes("if (!graphIsUsable) return null")) {
   failures.push("Search Graph enrichment must fail open to unchanged Search behavior when the static Graph is unusable.");
+}
+if (!knowledgeGraphSearch.includes("getKnowledgeGraphSearchRouteSignals")) {
+  failures.push("Search Graph enrichment must expose a compact route-signal projection for corpus-bounded consumers.");
+}
+if (!knowledgeGraphSearch.includes("routeSignalCache")) {
+  failures.push("Search Graph route signals must be derived once per locale rather than recomputing the full graph in client-facing search loops.");
 }
 
 if (!chineseSearch.includes('getScreepsIntentPromotions(query, "zh", 8)')) {
@@ -116,7 +127,7 @@ if (!chineseSearch.includes("SEARCH_V2_MAX_LIMIT,")) {
 if (!chineseSearch.includes("applyKnowledgeGraphRanking(normalizedQuery, results, type, limit)")) {
   failures.push("Chinese Search V2 must apply the Knowledge Graph enrichment layer after entity intent ranking.");
 }
-if (!chineseSearch.includes("getKnowledgeGraphSearchContext(query, \"zh\", 8)")) {
+if (!chineseSearch.includes('getKnowledgeGraphSearchContext(query, "zh", 8)')) {
   failures.push("Chinese Search V2 must request deterministic Chinese Graph search context.");
 }
 if (!chineseSearch.includes("getSearchDocuments({ includeArticleText: false })")) {
@@ -133,13 +144,25 @@ if (!englishClientSearch.includes('getScreepsIntentPromotions(query, "en", 8)'))
   failures.push("English client search must use the shared English intent resolver.");
 }
 if (!englishClientSearch.includes('fetch("/en/search-index.json"')) {
-  failures.push("English search must preserve lazy full-index loading after Phase 5.");
+  failures.push("English search must preserve lazy full-index loading.");
+}
+if (!englishClientSearch.includes("Array.isArray(payload)")) {
+  failures.push("English lazy search must preserve the existing array search-index protocol.");
 }
 if (!englishClientSearch.includes("promotionScoreByHref")) {
   failures.push("English client search must combine lexical score with entity-intent promotion score.");
 }
 if (!englishClientSearch.includes("intent:${promotion.entityId}")) {
   failures.push("English client search must inject intent results without expanding the persisted index.");
+}
+if (!englishClientSearch.includes("getKnowledgeGraphSearchAnchorEntityId(")) {
+  failures.push("English client search must resolve the same high-confidence Graph anchor from compact document signals.");
+}
+if (!englishClientSearch.includes("getKnowledgeGraphSearchSignalScore(")) {
+  failures.push("English client search must use compact corpus-bounded Graph signals after entity-intent ranking.");
+}
+if (englishClientSearch.includes("knowledge-graph-v1.json") || englishClientSearch.includes("getKnowledgeGraphSearchRouteSignals")) {
+  failures.push("English client search must not bundle or directly traverse the canonical Knowledge Graph artifact.");
 }
 
 if (!englishServerSearch.includes('getScreepsIntentPromotions(query, "en", 8)')) {
@@ -150,6 +173,19 @@ if (!englishServerSearch.includes("promotionScoreByHref")) {
 }
 if (!englishServerSearch.includes("intent:${promotion.entityId}")) {
   failures.push("English SSR search must support the same virtual intent results without changing the persisted index.");
+}
+if (!englishServerSearch.includes('getKnowledgeGraphSearchRouteSignals("en")')) {
+  failures.push("English SSR/search-index construction must derive compact signals server-side from the canonical Graph.");
+}
+if (!englishServerSearch.includes("graphSearch?: KnowledgeGraphSearchSignal[]")) {
+  failures.push("English Search documents must carry only compact Graph route signals, not the full Graph artifact.");
+}
+if (!englishServerSearch.includes("getKnowledgeGraphSearchAnchorEntityId(") ||
+    !englishServerSearch.includes("getKnowledgeGraphSearchSignalScore(")) {
+  failures.push("English SSR ranking must use the same compact Graph anchor/signal policy as the lazy client.");
+}
+if (!englishSearchIndexRoute.includes("Response.json(englishSearchDocuments")) {
+  failures.push("English search-index must keep returning the existing document array; compact Graph signals ride inside corpus documents.");
 }
 
 for (const forbidden of ["drizzle-orm", "getPlatformDatabase", "pgvector", "neo4j", "OpenAI", "verificationEvidence"]) {
@@ -168,4 +204,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Screeps entity intent search check passed: bilingual entity-intent ranking remains intact, while Chinese Search V2 adds high-confidence, one-hop, corpus-bounded Knowledge Graph enrichment without persistence, prerequisite-order promotion, or AI dependencies.");
+console.log("Screeps entity intent search check passed: bilingual entity-intent ranking remains intact; Chinese Search V2 and English SSR/lazy Search use high-confidence, one-hop, corpus-bounded Knowledge Graph enrichment without persistence, prerequisite-order promotion, full-Graph client bundling, or AI dependencies.");

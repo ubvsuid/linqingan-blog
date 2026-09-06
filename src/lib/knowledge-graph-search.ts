@@ -1,11 +1,14 @@
 import knowledgeGraphPayload from "@/generated/knowledge-graph-v1.json";
 import {
   getScreepsIntentPromotions,
-  type ScreepsEntityKind,
   type ScreepsEntityLocale,
 } from "@/lib/screeps-entity-intent";
+import {
+  getKnowledgeGraphSearchAnchorEntityId,
+  type KnowledgeGraphSearchSignal,
+} from "@/lib/knowledge-graph-search-policy";
 
-export const GRAPH_SEARCH_ANCHOR_MIN_SCORE = 120;
+export { GRAPH_SEARCH_ANCHOR_MIN_SCORE } from "@/lib/knowledge-graph-search-policy";
 
 interface GraphNode {
   id: string;
@@ -59,14 +62,6 @@ const graphNodes = graphIsUsable ? graph.nodes : [];
 const graphEdges = graphIsUsable ? graph.edges : [];
 const nodeById = new Map(graphNodes.map((node) => [node.id, node] as const));
 
-function graphNodeIdForIntent(entityId: string, kind: ScreepsEntityKind): string | null {
-  if (kind === "symptom" || kind === "api") return entityId;
-  if (kind === "error" && entityId.startsWith("error:")) {
-    return `return-code:${entityId.slice("error:".length)}`;
-  }
-  return null;
-}
-
 function graphAnchorEntityId(node: GraphNode): string | null {
   if (node.type === "Symptom" || node.type === "API") return node.id;
   if (node.type === "ReturnCode" && node.id.startsWith("return-code:")) {
@@ -74,6 +69,15 @@ function graphAnchorEntityId(node: GraphNode): string | null {
   }
   return null;
 }
+
+const graphNodeIdByAnchorEntityId = new Map<string, string>();
+for (const node of graphNodes) {
+  const entityId = graphAnchorEntityId(node);
+  if (entityId && !graphNodeIdByAnchorEntityId.has(entityId)) {
+    graphNodeIdByAnchorEntityId.set(entityId, node.id);
+  }
+}
+const graphAnchorEntityIds = new Set(graphNodeIdByAnchorEntityId.keys());
 
 function localizedBaseHref(href: string, locale: ScreepsEntityLocale): string {
   if (locale === "zh") return href;
@@ -229,6 +233,57 @@ function collectGraphPromotions(
   );
 }
 
+const routeSignalCache = new Map<
+  ScreepsEntityLocale,
+  ReadonlyMap<string, KnowledgeGraphSearchSignal[]>
+>();
+
+export function getKnowledgeGraphSearchRouteSignals(
+  locale: ScreepsEntityLocale,
+): ReadonlyMap<string, KnowledgeGraphSearchSignal[]> {
+  const cached = routeSignalCache.get(locale);
+  if (cached) return cached;
+
+  if (!graphIsUsable) {
+    const empty = new Map<string, KnowledgeGraphSearchSignal[]>();
+    routeSignalCache.set(locale, empty);
+    return empty;
+  }
+
+  const scoresByHref = new Map<string, Map<string, number>>();
+
+  for (const anchor of graphNodes) {
+    const anchorEntityId = graphAnchorEntityId(anchor);
+    if (!anchorEntityId) continue;
+
+    for (const promotion of collectGraphPromotions(anchor, locale)) {
+      const scoresByAnchor = scoresByHref.get(promotion.href) ?? new Map<string, number>();
+      const current = scoresByAnchor.get(anchorEntityId) ?? 0;
+      if (promotion.score > current) scoresByAnchor.set(anchorEntityId, promotion.score);
+      scoresByHref.set(promotion.href, scoresByAnchor);
+    }
+  }
+
+  const routeSignals = new Map<string, KnowledgeGraphSearchSignal[]>();
+  for (const [href, scoresByAnchor] of [...scoresByHref.entries()].sort(([left], [right]) =>
+    left.localeCompare(right),
+  )) {
+    routeSignals.set(
+      href,
+      [...scoresByAnchor.entries()]
+        .map(([anchorEntityId, score]) => ({ anchorEntityId, score }))
+        .sort(
+          (left, right) =>
+            right.score - left.score ||
+            left.anchorEntityId.localeCompare(right.anchorEntityId),
+        ),
+    );
+  }
+
+  routeSignalCache.set(locale, routeSignals);
+  return routeSignals;
+}
+
 export function getKnowledgeGraphSearchContext(
   query: string,
   locale: ScreepsEntityLocale,
@@ -237,22 +292,21 @@ export function getKnowledgeGraphSearchContext(
   if (!graphIsUsable) return null;
 
   const intentPromotions = getScreepsIntentPromotions(query, locale, 8);
-  const anchorPromotion = intentPromotions.find((promotion) => {
-    if (promotion.score < GRAPH_SEARCH_ANCHOR_MIN_SCORE) return false;
-    const graphNodeId = graphNodeIdForIntent(promotion.entityId, promotion.kind);
-    if (!graphNodeId) return false;
-    const graphNode = nodeById.get(graphNodeId);
-    return Boolean(graphNode && graphAnchorEntityId(graphNode) === promotion.entityId);
-  });
-
-  if (!anchorPromotion) return null;
-  const anchorGraphNodeId = graphNodeIdForIntent(
-    anchorPromotion.entityId,
-    anchorPromotion.kind,
+  const anchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+    intentPromotions,
+    graphAnchorEntityIds,
   );
+  if (!anchorEntityId) return null;
+
+  const anchorGraphNodeId = graphNodeIdByAnchorEntityId.get(anchorEntityId);
   if (!anchorGraphNodeId) return null;
   const anchor = nodeById.get(anchorGraphNodeId);
   if (!anchor) return null;
+
+  const anchorPromotion = intentPromotions.find(
+    (promotion) => promotion.entityId === anchorEntityId,
+  );
+  if (!anchorPromotion) return null;
 
   const promotions = collectGraphPromotions(anchor, locale).slice(
     0,
@@ -261,7 +315,7 @@ export function getKnowledgeGraphSearchContext(
   if (promotions.length === 0) return null;
 
   return {
-    anchorEntityId: anchorPromotion.entityId,
+    anchorEntityId,
     anchorGraphNodeId,
     anchorScore: anchorPromotion.score,
     promotions,

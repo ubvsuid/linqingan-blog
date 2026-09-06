@@ -5,6 +5,10 @@ import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EnglishSearchDocument } from "@/lib/english-search";
+import {
+  getKnowledgeGraphSearchAnchorEntityId,
+  getKnowledgeGraphSearchSignalScore,
+} from "@/lib/knowledge-graph-search-policy";
 import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 
 const popularQueries = ["ERR_NOT_IN_RANGE", "creep not moving", "CPU bucket", "body calculator", "Memory cleanup"];
@@ -179,7 +183,21 @@ export function EnglishSiteSearch({
     }
 
     const promotions = getScreepsIntentPromotions(query, "en", 8);
+    const availableGraphAnchorEntityIds = new Set(
+      sourceDocuments.flatMap((document) =>
+        document.graphSearch?.map((signal) => signal.anchorEntityId) ?? [],
+      ),
+    );
+    const graphAnchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+      promotions,
+      availableGraphAnchorEntityIds,
+    );
     const promotionScoreByHref = new Map(promotions.map((promotion) => [promotion.href, promotion.score]));
+    const intentOrderByHref = new Map(
+      promotions
+        .filter((promotion) => !type || intentDocumentType(promotion.kind) === type)
+        .map((promotion, index) => [promotion.href, index] as const),
+    );
     const mergedByHref = new Map(sourceDocuments.map((document) => [document.href, document]));
 
     for (const promotion of promotions) {
@@ -214,10 +232,29 @@ export function EnglishSiteSearch({
           if (!`${title} ${description} ${keywords}`.includes(token) && fuzzyTokenMatch(token, words)) score += 2;
         }
 
-        return { document, score };
+        const graphScore = getKnowledgeGraphSearchSignalScore(
+          document.graphSearch,
+          graphAnchorEntityId,
+        );
+
+        return { document, score, graphScore };
       })
-      .filter((item) => item.score > 0)
-      .sort((left, right) => right.score - left.score)
+      .filter((item) => item.score > 0 || item.graphScore > 0)
+      .sort((left, right) => {
+        if (graphAnchorEntityId) {
+          const leftIntentOrder = intentOrderByHref.get(left.document.href);
+          const rightIntentOrder = intentOrderByHref.get(right.document.href);
+          if (leftIntentOrder !== undefined || rightIntentOrder !== undefined) {
+            if (leftIntentOrder === undefined) return 1;
+            if (rightIntentOrder === undefined) return -1;
+            if (leftIntentOrder !== rightIntentOrder) return leftIntentOrder - rightIntentOrder;
+          }
+
+          if (left.graphScore !== right.graphScore) return right.graphScore - left.graphScore;
+        }
+
+        return right.score - left.score;
+      })
       .map((item) => item.document);
   }, [documents, normalizedQuery, query, type]);
 

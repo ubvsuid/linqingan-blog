@@ -1,4 +1,10 @@
 import { englishDiscoveryArticles, englishTags } from "@/lib/english-discovery";
+import { getKnowledgeGraphSearchRouteSignals } from "@/lib/knowledge-graph-search";
+import {
+  getKnowledgeGraphSearchAnchorEntityId,
+  getKnowledgeGraphSearchSignalScore,
+  type KnowledgeGraphSearchSignal,
+} from "@/lib/knowledge-graph-search-policy";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { screepsErrorDiagnostics } from "@/lib/screeps-error-diagnostics";
@@ -13,6 +19,7 @@ export interface EnglishSearchDocument {
   href: string;
   type: "Page" | "Reference" | "Tool" | "Article";
   keywords: string[];
+  graphSearch?: KnowledgeGraphSearchSignal[];
 }
 
 const knowledgeModuleSearchTerms: Record<number, string[]> = {
@@ -144,13 +151,24 @@ const articleDocuments: EnglishSearchDocument[] = englishDiscoveryArticles.map((
   ]),
 }));
 
+const englishGraphSearchSignals = getKnowledgeGraphSearchRouteSignals("en");
+
 export const englishSearchDocuments: EnglishSearchDocument[] = [
   ...articleDocuments,
   ...topicDocuments,
   ...toolDocuments,
   ...apiHubDocuments,
   ...foundationDocuments,
-];
+].map((document) => {
+  const graphSearch = englishGraphSearchSignals.get(document.href);
+  return graphSearch?.length ? { ...document, graphSearch: [...graphSearch] } : document;
+});
+
+const availableEnglishGraphSearchAnchorIds = new Set(
+  englishSearchDocuments.flatMap((document) =>
+    document.graphSearch?.map((signal) => signal.anchorEntityId) ?? [],
+  ),
+);
 
 function normalizeSearchValue(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase("en");
@@ -171,7 +189,14 @@ export function getEnglishInitialSearchDocuments(query: string, limit = 80): Eng
   if (tokens.length === 0) return [];
 
   const promotions = getScreepsIntentPromotions(query, "en", 8);
+  const graphAnchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+    promotions,
+    availableEnglishGraphSearchAnchorIds,
+  );
   const promotionScoreByHref = new Map(promotions.map((promotion) => [promotion.href, promotion.score]));
+  const intentOrderByHref = new Map(
+    promotions.map((promotion, index) => [promotion.href, index] as const),
+  );
   const mergedByHref = new Map(englishSearchDocuments.map((document) => [document.href, document]));
 
   for (const promotion of promotions) {
@@ -200,10 +225,29 @@ export function getEnglishInitialSearchDocuments(query: string, limit = 80): Eng
         if (description.includes(token)) score += 3;
       }
 
-      return { document, score };
+      const graphScore = getKnowledgeGraphSearchSignalScore(
+        document.graphSearch,
+        graphAnchorEntityId,
+      );
+
+      return { document, score, graphScore };
     })
-    .filter((item) => item.score > 0)
-    .sort((left, right) => right.score - left.score)
+    .filter((item) => item.score > 0 || item.graphScore > 0)
+    .sort((left, right) => {
+      if (graphAnchorEntityId) {
+        const leftIntentOrder = intentOrderByHref.get(left.document.href);
+        const rightIntentOrder = intentOrderByHref.get(right.document.href);
+        if (leftIntentOrder !== undefined || rightIntentOrder !== undefined) {
+          if (leftIntentOrder === undefined) return 1;
+          if (rightIntentOrder === undefined) return -1;
+          if (leftIntentOrder !== rightIntentOrder) return leftIntentOrder - rightIntentOrder;
+        }
+
+        if (left.graphScore !== right.graphScore) return right.graphScore - left.graphScore;
+      }
+
+      return right.score - left.score;
+    })
     .slice(0, limit)
     .map((item) => item.document);
 }
