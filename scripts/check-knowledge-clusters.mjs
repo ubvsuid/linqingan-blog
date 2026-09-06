@@ -5,6 +5,10 @@ const root = process.cwd();
 const clusterPath = path.join(root, "content", "knowledge-clusters-v1.json");
 const modulePath = path.join(root, "src", "lib", "knowledge-module-registry.ts");
 const articlePath = path.join(root, "src", "generated", "knowledge-article-registry.json");
+const coveragePath = path.join(root, "reports", "knowledge-cluster-coverage-v1.json");
+const surfacePath = path.join(root, "src", "lib", "knowledge-cluster-experience.ts");
+const experiencePath = path.join(root, "src", "components", "knowledge-cluster-experience.tsx");
+const systemMapPath = path.join(root, "src", "components", "knowledge-system-map.tsx");
 const expectedFacets = ["learn", "build", "solve", "verify", "explore"];
 const errors = [];
 
@@ -51,9 +55,49 @@ for (const record of articles) {
   else articleIds.add(record.contentId);
 }
 
+for (const requiredPath of [coveragePath, surfacePath, experiencePath, systemMapPath]) {
+  if (!fs.existsSync(requiredPath)) fail(`Knowledge Cluster demonstrator file missing: ${path.relative(root, requiredPath)}`);
+}
+
+if (fs.existsSync(coveragePath)) {
+  const coverage = readJson(coveragePath);
+  if (coverage.schemaVersion !== 1) fail("Knowledge Cluster coverage schemaVersion must be 1");
+  if (coverage.graphUnmappedCount !== 0) fail("Knowledge Cluster user-facing demonstrator requires graphUnmappedCount=0");
+  if (coverage.demonstrator?.clusterId !== "spawn-lifecycle") fail("Knowledge Cluster coverage demonstrator must stay spawn-lifecycle");
+  const surface = coverage.demonstrator?.graphSurface;
+  if (!surface?.apiIds?.length) fail("Spawn demonstrator requires Graph-derived API surface");
+  if (!surface?.symptomIds?.length) fail("Spawn demonstrator requires Graph-derived Symptom surface");
+  if (!surface?.toolIds?.length) fail("Spawn demonstrator requires Graph-derived Tool surface");
+  if (!surface?.tickLabExperimentIds?.length) fail("Spawn demonstrator requires Graph-derived Tick Lab surface");
+  if (!surface?.returnCodeIds?.length) fail("Spawn demonstrator requires Graph-derived ReturnCode surface");
+}
+
+if (fs.existsSync(surfacePath)) {
+  const source = fs.readFileSync(surfacePath, "utf8");
+  if (!source.includes("knowledge-cluster-coverage-v1.json")) fail("Cluster experience must consume deterministic coverage artifact");
+  if (!source.includes("knowledge-graph-v1.json")) fail("Cluster experience must consume canonical Knowledge Graph artifact");
+  if (!source.includes("knowledge-article-registry.json")) fail("Cluster Learn facet must preserve Knowledge article ownership");
+  if (/tool_[0-9a-f]{8}-[0-9a-f-]{27,}/i.test(source)) fail("Cluster experience must not hard-code Tool durable IDs");
+  if (/symptom:[a-z0-9-]+/.test(source)) fail("Cluster experience must not hard-code Symptom durable IDs");
+}
+
+if (fs.existsSync(experiencePath)) {
+  const source = fs.readFileSync(experiencePath, "utf8");
+  for (const facet of ["LEARN", "BUILD", "SOLVE", "VERIFY", "EXPLORE"]) {
+    if (!source.includes(`label: "${facet}"`)) fail(`Cluster experience missing ${facet} facet`);
+  }
+  if (!source.includes("getKnowledgeClusterExperienceByModuleNumber")) fail("Cluster experience UI must use the shared demonstrator surface helper");
+}
+
+if (fs.existsSync(systemMapPath)) {
+  const source = fs.readFileSync(systemMapPath, "utf8");
+  if (!source.includes("KnowledgeClusterExperience")) fail("Knowledge module system map must mount the Cluster demonstrator enhancement");
+  if (!source.includes("moduleNumber={moduleNumber} locale={locale}")) fail("Cluster demonstrator integration must preserve shared bilingual module context");
+}
+
 if (errors.length) {
   for (const error of errors) console.error(`ERROR: ${error}`);
   console.error(`\nKnowledge Cluster V1 check failed: ${errors.length} issue(s).`);
   process.exit(1);
 }
-console.log(`Knowledge Cluster V1 check passed: 8 clusters, ${articles.length} primary Knowledge articles, 1 Spawn demonstrator, 0 unmapped article modules.`);
+console.log(`Knowledge Cluster V1 check passed: 8 clusters, ${articles.length} primary Knowledge articles, 1 Spawn demonstrator, bilingual Learn/Build/Solve/Verify/Explore experience, 0 unmapped article modules.`);
