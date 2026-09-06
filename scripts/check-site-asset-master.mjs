@@ -108,6 +108,40 @@ const knowledgeModuleCount = assets.filter((asset) => asset.assetType === "knowl
 const sourceKnowledgeModuleCount = new Set(zhArticles.filter((asset) => asset.contentSystem === "knowledge").map((asset) => asset.module)).size;
 if (knowledgeModuleCount !== sourceKnowledgeModuleCount) addError(`Knowledge Module 资产数量不一致：Asset Master=${knowledgeModuleCount}，中文文章引用=${sourceKnowledgeModuleCount}`);
 
+const requiredPageAssets = [
+  ["/", "zh-CN", "site-home"],
+  ["/blog", "zh-CN", "article-library-hub"],
+  ["/en", "en", "site-home"],
+  ["/en/blog", "en", "article-library-hub"],
+  ["/en/beginner", "en", "roadmap-hub"],
+  ["/en/knowledge", "en", "knowledge-hub"],
+  ["/en/tools", "en", "tools-hub"],
+  ["/en/diagnostics", "en", "diagnostics-hub"],
+  ["/en/screeps-api", "en", "api-hub-index"],
+  ["/en/screeps-errors", "en", "errors-hub"],
+  ["/en/glossary", "en", "glossary-hub"],
+  ["/en/verification", "en", "verification-hub"],
+];
+for (const [href, language, assetType] of requiredPageAssets) {
+  const matches = master.resolvePath(href);
+  if (matches.length !== 1) addError(`${href}: expected exactly one Site Asset Master page, got ${matches.length}`);
+  else if (matches[0].language !== language || matches[0].assetType !== assetType) {
+    addError(`${href}: expected ${language}/${assetType}, got ${matches[0].language}/${matches[0].assetType}`);
+  }
+}
+
+const zhTools = assets.filter((asset) => asset.assetType === "tool" && asset.language === "zh-CN");
+const enTools = assets.filter((asset) => asset.assetType === "tool" && asset.language === "en");
+if (zhTools.length === 0) addError("未读取到中文 tool 资产");
+if (enTools.length !== zhTools.length) addError(`英文 Tool 资产数量不一致：English=${enTools.length}，Chinese=${zhTools.length}`);
+for (const zhTool of zhTools) {
+  const englishPath = `/en/tools/${zhTool.slug}`;
+  const matches = master.resolvePath(englishPath);
+  if (matches.length !== 1 || matches[0].language !== "en" || matches[0].assetType !== "tool") {
+    addError(`${englishPath}: 缺少对应英文 Tool asset`);
+  }
+}
+
 for (const type of ["tool", "diagnostic", "api-hub"]) {
   if (!assets.some((asset) => asset.assetType === type)) addError(`未读取到 ${type} 资产`);
 }
@@ -118,11 +152,17 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-const typeCounts = Object.fromEntries([...new Set(assets.map((asset) => asset.assetType))].sort().map((type) => [type, assets.filter((asset) => asset.assetType === type).length]));
+const typeCounts = Object.fromEntries(
+  [...new Set(assets.map((asset) => asset.assetType))]
+    .sort()
+    .map((type) => [type, assets.filter((asset) => asset.assetType === type).length]),
+);
 console.log("Site Asset Master V2 validation passed.");
 console.log(`Assets: ${assets.length}`);
 console.log(`Chinese articles: ${zhArticles.length}/${sourceArticleCount}`);
 console.log(`English articles: ${enArticles.length}`);
+console.log(`Chinese tools: ${zhTools.length}`);
+console.log(`English tools: ${enTools.length}`);
 console.log(`Error fragments: ${errorAssetCount}`);
 console.log(`Glossary fragments: ${glossaryAssetCount}`);
 console.log(`Knowledge modules: ${knowledgeModuleCount}`);
