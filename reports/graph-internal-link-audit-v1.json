@@ -9,10 +9,10 @@
     "graphUnmapped": 0,
     "pageNodes": 160,
     "curatedSources": 107,
-    "curatedEdges": 361,
-    "zeroCuratedInbound": 46,
-    "weakCuratedInbound": 30,
-    "directPrerequisiteGaps": 32,
+    "curatedEdges": 364,
+    "zeroCuratedInbound": 44,
+    "weakCuratedInbound": 31,
+    "directPrerequisiteGaps": 31,
     "semanticPageGaps": 2,
     "articleToolGaps": 8,
     "bilingualPairs": 80,
@@ -51,14 +51,6 @@
           "locale": "zh",
           "type": "Article",
           "title": "Screeps Creep prespawn replacement",
-          "curatedInbound": 0
-        },
-        {
-          "id": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
-          "href": "/blog/screeps-creep-pull",
-          "locale": "zh",
-          "type": "Article",
-          "title": "Screeps Creep.pull",
           "curatedInbound": 0
         },
         {
@@ -139,14 +131,6 @@
           "locale": "zh",
           "type": "Article",
           "title": "Screeps Nuker launchNuke",
-          "curatedInbound": 0
-        },
-        {
-          "id": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
-          "href": "/blog/screeps-pathfinder-search",
-          "locale": "zh",
-          "type": "Article",
-          "title": "Screeps PathFinder.search",
           "curatedInbound": 0
         },
         {
@@ -579,29 +563,6 @@
           "priority": "P0",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_7e90fe24-44b7-4239-8258-a02e29a99f84",
-            "href": "/blog/screeps-move-fatigue-body-ratio",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps MOVE fatigue body ratio",
-            "curatedInbound": 1
-          },
-          "target": {
-            "id": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
-            "href": "/blog/screeps-creep-pull",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Creep.pull",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:movement-vision:path-costs"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_958be26d-2666-4b94-8d23-5cb625074032",
             "href": "/blog/screeps-room-energyavailable-stuck",
             "locale": "zh",
@@ -762,6 +723,14 @@
           "locale": "zh",
           "type": "BeginnerLesson",
           "title": "Screeps Creep transfer Energy to Spawn",
+          "curatedInbound": 1
+        },
+        {
+          "id": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+          "href": "/blog/screeps-creep-pull",
+          "locale": "zh",
+          "type": "Article",
+          "title": "Screeps Creep.pull",
           "curatedInbound": 1
         },
         {
@@ -1313,7 +1282,7 @@
             "locale": "zh",
             "type": "Article",
             "title": "Screeps PathFinder.search",
-            "curatedInbound": 0
+            "curatedInbound": 2
           },
           "target": {
             "id": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
@@ -1653,7 +1622,7 @@
             "locale": "zh",
             "type": "Article",
             "title": "Screeps PathFinder.search",
-            "curatedInbound": 0
+            "curatedInbound": 2
           },
           "en": {
             "id": "en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102",
@@ -1697,7 +1666,7 @@
             "locale": "zh",
             "type": "Article",
             "title": "Screeps Creep.pull",
-            "curatedInbound": 0
+            "curatedInbound": 1
           },
           "en": {
             "id": "en_article_04018d73-542b-4f45-8e36-d24597aeb6c0",
