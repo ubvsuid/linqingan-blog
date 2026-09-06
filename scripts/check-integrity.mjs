@@ -16,6 +16,7 @@ const checks = [
   ["Knowledge Graph V1 contract and coverage", "scripts/check-knowledge-graph-v1.mjs"],
   ["Knowledge registry", "scripts/check-knowledge-registry.mjs"],
   ["Beginner roadmap", "scripts/check-beginner-roadmap.mjs"],
+  ["Site Asset Master V2", "scripts/check-site-asset-master.mjs"],
   ["Internal links", "scripts/check-internal-links.mjs"],
   ["Verification coverage", "scripts/check-verification-coverage.mjs"],
   ["Evidence Capture Kit", "scripts/check-evidence-capture-kit.mjs"],
