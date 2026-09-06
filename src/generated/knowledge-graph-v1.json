@@ -1,0 +1,3149 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "authoritative-source-adapters",
+  "runtimeEvidenceMode": "accepted-only-runtime-adapter",
+  "nodes": [
+    {
+      "id": "api:creep-build",
+      "type": "API",
+      "title": "creep.build(target)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-harvest",
+      "type": "API",
+      "title": "creep.harvest(target)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-move-to",
+      "type": "API",
+      "title": "creep.moveTo(target, opts)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-pickup",
+      "type": "API",
+      "title": "creep.pickup(resource)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-repair",
+      "type": "API",
+      "title": "creep.repair(target)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-transfer",
+      "type": "API",
+      "title": "creep.transfer(target, resourceType, amount?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-upgrade-controller",
+      "type": "API",
+      "title": "creep.upgradeController(controller)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:creep-withdraw",
+      "type": "API",
+      "title": "creep.withdraw(target, resourceType, amount?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:factory-produce",
+      "type": "API",
+      "title": "factory.produce(resourceType)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:game-cpu-get-used",
+      "type": "API",
+      "title": "Game.cpu.getUsed()",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:game-get-object-by-id",
+      "type": "API",
+      "title": "Game.getObjectById(id)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:game-map-find-route",
+      "type": "API",
+      "title": "Game.map.findRoute(from, to, opts)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:game-notify",
+      "type": "API",
+      "title": "Game.notify(message, groupInterval)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:game-rooms",
+      "type": "API",
+      "title": "Game.rooms[roomName]",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:game-time",
+      "type": "API",
+      "title": "Game.time",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:lab-boost-creep",
+      "type": "API",
+      "title": "lab.boostCreep(creep, bodyPartsCount?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:lab-run-reaction",
+      "type": "API",
+      "title": "lab.runReaction(inputLab1, inputLab2)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:link-transfer-energy",
+      "type": "API",
+      "title": "link.transferEnergy(target, amount?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:market-create-order",
+      "type": "API",
+      "title": "Game.market.createOrder(params)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:market-deal",
+      "type": "API",
+      "title": "Game.market.deal(orderId, amount, roomName?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:observer-observe-room",
+      "type": "API",
+      "title": "observer.observeRoom(roomName)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:pathfinder-search",
+      "type": "API",
+      "title": "PathFinder.search(origin, goal, opts?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:room-create-construction-site",
+      "type": "API",
+      "title": "room.createConstructionSite(x, y, structureType)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:room-get-event-log",
+      "type": "API",
+      "title": "room.getEventLog(raw?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:spawn-recycle-creep",
+      "type": "API",
+      "title": "spawn.recycleCreep(creep)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:spawn-renew-creep",
+      "type": "API",
+      "title": "spawn.renewCreep(creep)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:spawn-spawn-creep",
+      "type": "API",
+      "title": "spawn.spawnCreep(body, name, opts?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:terminal-send",
+      "type": "API",
+      "title": "terminal.send(resourceType, amount, destination, description?)",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "api:tower-attack-heal-repair",
+      "type": "API",
+      "title": "tower.attack() / heal() / repair()",
+      "locale": "neutral",
+      "source": "src/lib/screeps-api-reference.ts"
+    },
+    {
+      "id": "article_00651b28-9573-49a1-ab03-d77c76cf4220",
+      "type": "Article",
+      "title": "Screeps Rampart setPublic",
+      "href": "/blog/screeps-rampart-set-public",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+      "type": "Article",
+      "title": "Screeps Creep pickup dropped Energy",
+      "href": "/blog/screeps-creep-pickup-dropped-energy",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_1089aaf2-bb8f-47c6-b9a6-032391c22bdb",
+      "type": "Article",
+      "title": "Screeps ERR_NOT_IN_RANGE",
+      "href": "/blog/screeps-err-not-in-range",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+      "type": "Article",
+      "title": "Screeps Creep withdraw Container Energy",
+      "href": "/blog/screeps-creep-withdraw-container-energy",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+      "type": "Article",
+      "title": "Screeps multi Spawn queue",
+      "href": "/blog/screeps-multi-spawn-queue",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+      "type": "Article",
+      "title": "Screeps StructureTerminal send",
+      "href": "/blog/screeps-terminal-send-resources",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_1cc772a0-f18a-44b4-bbef-462c32257324",
+      "type": "Article",
+      "title": "Screeps Creep.attack",
+      "href": "/blog/screeps-creep-attack",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "type": "Article",
+      "title": "Screeps Tower attack hostiles",
+      "href": "/blog/screeps-tower-auto-attack-hostiles",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+      "type": "Article",
+      "title": "Screeps Spawn exit blocked directions",
+      "href": "/blog/screeps-spawn-exit-blocked-directions",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+      "type": "Article",
+      "title": "Screeps Game.map.findRoute",
+      "href": "/blog/screeps-map-find-route",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+      "type": "Article",
+      "title": "Screeps Creep prespawn replacement",
+      "href": "/blog/screeps-creep-prespawn-replacement",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_2c43c180-8c10-424e-bc7e-a47b08a3c5aa",
+      "type": "Article",
+      "title": "Screeps require module.exports",
+      "href": "/blog/screeps-modules-require",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_32219971-b044-4240-8f28-25ccc9920ca3",
+      "type": "Article",
+      "title": "Screeps dynamic Creep body Energy",
+      "href": "/blog/screeps-dynamic-creep-body-energy",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
+      "type": "Article",
+      "title": "Screeps Store capacity API",
+      "href": "/blog/screeps-store-capacity-api",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+      "type": "Article",
+      "title": "Screeps Room.getEventLog",
+      "href": "/blog/screeps-room-event-log",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+      "type": "Article",
+      "title": "Screeps InterShardMemory",
+      "href": "/blog/screeps-intershardmemory-sync",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
+      "type": "Article",
+      "title": "Screeps RoomVisual debug",
+      "href": "/blog/screeps-roomvisual-debug",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_5cf8ef1f-9881-4483-9bad-922ccca36c95",
+      "type": "Article",
+      "title": "Screeps Flag configuration",
+      "href": "/blog/screeps-flags-config",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
+      "type": "Article",
+      "title": "Screeps Creep working state",
+      "href": "/blog/screeps-creep-working-state",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_6625380b-414a-402b-9807-1705554155ee",
+      "type": "Article",
+      "title": "Screeps global cache",
+      "href": "/blog/screeps-global-cache",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_663184a4-c0a3-4bf5-b166-ff0a1bb205ba",
+      "type": "Article",
+      "title": "Screeps Upgrader not upgrading",
+      "href": "/blog/screeps-upgrader-controller-link-not-upgrading",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_6846ad93-d52a-4b03-8c6d-2d6cc6ad90e9",
+      "type": "Article",
+      "title": "Screeps Controller downgrade",
+      "href": "/blog/screeps-controller-downgrade",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+      "type": "Article",
+      "title": "Screeps ConstructionSite remove",
+      "href": "/blog/screeps-construction-site-remove",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+      "type": "Article",
+      "title": "Screeps ConstructionSite progress",
+      "href": "/blog/screeps-construction-site-progress",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
+      "type": "Article",
+      "title": "Screeps RawMemory segments",
+      "href": "/blog/screeps-rawmemory-segments",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_764e6035-6293-4af0-871b-965eb2e8cb53",
+      "type": "Article",
+      "title": "Screeps Spawn emergency recovery",
+      "href": "/blog/screeps-spawn-emergency-recovery",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+      "type": "Article",
+      "title": "Screeps MOVE fatigue body ratio",
+      "href": "/blog/screeps-move-fatigue-body-ratio",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+      "type": "Article",
+      "title": "Screeps Mineral harvesting",
+      "href": "/blog/screeps-mineral-extractor-harvest",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_82cce7d7-5166-4f51-b44d-539ea1343282",
+      "type": "Article",
+      "title": "Screeps clean dead Creep Memory",
+      "href": "/blog/screeps-clean-dead-creep-memory",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
+      "type": "Article",
+      "title": "Screeps Structure destroy",
+      "href": "/blog/screeps-structure-destroy",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+      "type": "Article",
+      "title": "Screeps RoomPosition distance",
+      "href": "/blog/screeps-roomposition-distance",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_950688b6-2702-4b3e-b1f1-850cf583ab94",
+      "type": "Article",
+      "title": "Screeps Game.market.deal",
+      "href": "/blog/screeps-market-deal",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_958be26d-2666-4b94-8d23-5cb625074032",
+      "type": "Article",
+      "title": "Screeps room energyAvailable stuck",
+      "href": "/blog/screeps-room-energyavailable-stuck",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_a15ce91c-30a0-4eb3-b89e-5d333095a80f",
+      "type": "Article",
+      "title": "Screeps room error isolation",
+      "href": "/blog/screeps-room-error-isolation",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+      "type": "Article",
+      "title": "Screeps Game.cpu.getUsed bucket",
+      "href": "/blog/screeps-cpu-getused-bucket",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+      "type": "Article",
+      "title": "Screeps Container ticksToDecay",
+      "href": "/blog/screeps-container-decay-repair-deadline",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d",
+      "type": "Article",
+      "title": "Screeps Memory",
+      "href": "/blog/screeps-memory-basics",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+      "type": "Article",
+      "title": "Screeps Tombstone Ruin recovery",
+      "href": "/blog/screeps-tombstone-ruin-recovery",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_ad28a5da-d98b-4935-a70b-c8e89d68f326",
+      "type": "Article",
+      "title": "Screeps reserveController vs claimController",
+      "href": "/blog/screeps-reserve-vs-claim-controller",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
+      "type": "Article",
+      "title": "Screeps CPU Bucket degradation",
+      "href": "/blog/screeps-cpu-bucket-degradation",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
+      "type": "Article",
+      "title": "Screeps market order maintenance",
+      "href": "/blog/screeps-market-order-maintenance",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_b332171b-7207-44fd-964b-46ca864c7aa2",
+      "type": "Article",
+      "title": "Screeps Game.market.createOrder",
+      "href": "/blog/screeps-market-create-order",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+      "type": "Article",
+      "title": "Screeps Wall Rampart repair limit",
+      "href": "/blog/screeps-wall-rampart-repair-limit",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+      "type": "Article",
+      "title": "Screeps PathFinder.search",
+      "href": "/blog/screeps-pathfinder-search",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3",
+      "type": "Article",
+      "title": "Screeps Game.notify",
+      "href": "/blog/screeps-game-notify",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
+      "type": "Article",
+      "title": "Screeps StructureFactory.produce",
+      "href": "/blog/screeps-factory-produce",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_c1fe2f0b-4b28-44d2-9295-a47863be9ad1",
+      "type": "Article",
+      "title": "Screeps Nuker launchNuke",
+      "href": "/blog/screeps-nuker-launch-checklist",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_c3e8034a-03fc-431c-9c49-43b129e4a9cb",
+      "type": "Article",
+      "title": "Screeps StructureController activateSafeMode",
+      "href": "/blog/screeps-controller-activate-safe-mode",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+      "type": "Article",
+      "title": "Screeps StructureObserver.observeRoom",
+      "href": "/blog/screeps-observer-observe-room",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_c5110a68-fbba-4709-805c-70709e0eb420",
+      "type": "Article",
+      "title": "Screeps Game.getObjectById",
+      "href": "/blog/screeps-game-get-object-by-id",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_cb41c144-290c-4258-817b-91763313600f",
+      "type": "Article",
+      "title": "Screeps spawnCreep return codes",
+      "href": "/blog/screeps-spawncreep-return-codes",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+      "type": "Article",
+      "title": "Screeps moveTo not moving",
+      "href": "/blog/screeps-moveto-not-moving",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+      "type": "Article",
+      "title": "Screeps Creep.pull",
+      "href": "/blog/screeps-creep-pull",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
+      "type": "Article",
+      "title": "Screeps Room.storage Energy",
+      "href": "/blog/screeps-storage-energy-usage",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+      "type": "Article",
+      "title": "Screeps renewCreep",
+      "href": "/blog/screeps-spawn-renew-creep",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "type": "Article",
+      "title": "Screeps Tower repair threshold",
+      "href": "/blog/screeps-tower-repair-threshold",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_e07e2933-5b54-43e7-a940-6ac2619e76b0",
+      "type": "Article",
+      "title": "Screeps Room.createConstructionSite",
+      "href": "/blog/screeps-room-create-construction-site",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
+      "type": "Article",
+      "title": "Screeps PathFinder CostMatrix",
+      "href": "/blog/screeps-pathfinder-costmatrix",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "type": "Article",
+      "title": "Screeps Tower heal Creeps",
+      "href": "/blog/screeps-tower-heal-creeps",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+      "type": "Article",
+      "title": "Screeps StructureLink transferEnergy",
+      "href": "/blog/screeps-link-transfer-energy",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f131df21-2d5a-4357-86f0-51812915f662",
+      "type": "Article",
+      "title": "Screeps recycleCreep",
+      "href": "/blog/screeps-spawn-recycle-creep",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f2aa1354-170d-4244-8abd-55bb7309cc95",
+      "type": "Article",
+      "title": "Screeps ERR_NO_PATH",
+      "href": "/blog/screeps-err-no-path",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62",
+      "type": "Article",
+      "title": "Screeps Game.rooms undefined",
+      "href": "/blog/screeps-room-visibility",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f4f272e7-80a8-491c-99e0-35db11d49d65",
+      "type": "Article",
+      "title": "Screeps StructureLab.runReaction",
+      "href": "/blog/screeps-lab-run-reaction",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "type": "Article",
+      "title": "Screeps StructureLab.boostCreep",
+      "href": "/blog/screeps-lab-boost-creep",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc",
+      "type": "Article",
+      "title": "Screeps Source selection by path",
+      "href": "/blog/screeps-select-source-by-path",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_f98e73c3-aa63-480e-a0a7-5f042af8a55e",
+      "type": "Article",
+      "title": "Screeps StructurePowerSpawn.processPower",
+      "href": "/blog/screeps-power-spawn-process-power",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+      "type": "Article",
+      "title": "Screeps RawMemory Foreign Segment",
+      "href": "/blog/screeps-rawmemory-foreign-segment",
+      "locale": "zh",
+      "source": "src/generated/knowledge-article-registry.json"
+    },
+    {
+      "id": "en_article_00651b28-9573-49a1-ab03-d77c76cf4220",
+      "type": "Article",
+      "title": "screeps-rampart-set-public",
+      "href": "/en/blog/screeps-rampart-set-public",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_04018d73-542b-4f45-8e36-d24597aeb6c0",
+      "type": "Article",
+      "title": "screeps-creep-pull",
+      "href": "/en/blog/screeps-creep-pull",
+      "locale": "en",
+      "source": "content/english-standalone-identities.json"
+    },
+    {
+      "id": "en_article_05115243-96ad-452e-b184-dd17cf8b09a7",
+      "type": "Article",
+      "title": "screeps-spawn-creep",
+      "href": "/en/blog/screeps-spawn-creep",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+      "type": "Article",
+      "title": "screeps-pickup-dropped-energy",
+      "href": "/en/blog/screeps-pickup-dropped-energy",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_1089aaf2-bb8f-47c6-b9a6-032391c22bdb",
+      "type": "Article",
+      "title": "screeps-err-not-in-range",
+      "href": "/en/blog/screeps-err-not-in-range",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_1648e4f3-b6e3-4a91-af85-fe2f9016128b",
+      "type": "Article",
+      "title": "screeps-first-extension",
+      "href": "/en/blog/screeps-first-extension",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+      "type": "Article",
+      "title": "screeps-withdraw-container-energy",
+      "href": "/en/blog/screeps-withdraw-container-energy",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+      "type": "Article",
+      "title": "screeps-multi-spawn-queue",
+      "href": "/en/blog/screeps-multi-spawn-queue",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+      "type": "Article",
+      "title": "screeps-terminal-send-resources",
+      "href": "/en/blog/screeps-terminal-send-resources",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "type": "Article",
+      "title": "screeps-tower-auto-attack-hostiles",
+      "href": "/en/blog/screeps-tower-auto-attack-hostiles",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+      "type": "Article",
+      "title": "screeps-spawn-exit-blocked-directions",
+      "href": "/en/blog/screeps-spawn-exit-blocked-directions",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+      "type": "Article",
+      "title": "screeps-map-find-route",
+      "href": "/en/blog/screeps-map-find-route",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+      "type": "Article",
+      "title": "screeps-creep-prespawn-replacement",
+      "href": "/en/blog/screeps-creep-prespawn-replacement",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_2c43c180-8c10-424e-bc7e-a47b08a3c5aa",
+      "type": "Article",
+      "title": "screeps-require-modules",
+      "href": "/en/blog/screeps-require-modules",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_32219971-b044-4240-8f28-25ccc9920ca3",
+      "type": "Article",
+      "title": "screeps-dynamic-creep-body",
+      "href": "/en/blog/screeps-dynamic-creep-body",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
+      "type": "Article",
+      "title": "screeps-store-capacity-api",
+      "href": "/en/blog/screeps-store-capacity-api",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+      "type": "Article",
+      "title": "screeps-room-event-log",
+      "href": "/en/blog/screeps-room-event-log",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02",
+      "type": "Article",
+      "title": "screeps-creep-harvest-energy",
+      "href": "/en/blog/screeps-creep-harvest-energy",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102",
+      "type": "Article",
+      "title": "screeps-pathfinder-search",
+      "href": "/en/blog/screeps-pathfinder-search",
+      "locale": "en",
+      "source": "content/english-standalone-identities.json"
+    },
+    {
+      "id": "en_article_58082347-eca6-468d-9386-0f91c5474c2f",
+      "type": "Article",
+      "title": "screeps-creep-roles",
+      "href": "/en/blog/screeps-creep-roles",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+      "type": "Article",
+      "title": "screeps-intershardmemory-sync",
+      "href": "/en/blog/screeps-intershardmemory-sync",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+      "type": "Article",
+      "title": "screeps-first-room",
+      "href": "/en/blog/screeps-first-room",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
+      "type": "Article",
+      "title": "screeps-roomvisual-debug",
+      "href": "/en/blog/screeps-roomvisual-debug",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_5cf8ef1f-9881-4483-9bad-922ccca36c95",
+      "type": "Article",
+      "title": "screeps-flags-configuration",
+      "href": "/en/blog/screeps-flags-configuration",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
+      "type": "Article",
+      "title": "screeps-working-state",
+      "href": "/en/blog/screeps-working-state",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_6625380b-414a-402b-9807-1705554155ee",
+      "type": "Article",
+      "title": "screeps-global-cache",
+      "href": "/en/blog/screeps-global-cache",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_663184a4-c0a3-4bf5-b166-ff0a1bb205ba",
+      "type": "Article",
+      "title": "screeps-upgrader-controller-link-not-upgrading",
+      "href": "/en/blog/screeps-upgrader-controller-link-not-upgrading",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_6846ad93-d52a-4b03-8c6d-2d6cc6ad90e9",
+      "type": "Article",
+      "title": "screeps-controller-downgrade",
+      "href": "/en/blog/screeps-controller-downgrade",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+      "type": "Article",
+      "title": "screeps-remove-construction-site",
+      "href": "/en/blog/screeps-remove-construction-site",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+      "type": "Article",
+      "title": "screeps-construction-site-progress",
+      "href": "/en/blog/screeps-construction-site-progress",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
+      "type": "Article",
+      "title": "screeps-rawmemory-segments",
+      "href": "/en/blog/screeps-rawmemory-segments",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_764e6035-6293-4af0-871b-965eb2e8cb53",
+      "type": "Article",
+      "title": "screeps-emergency-harvester-recovery",
+      "href": "/en/blog/screeps-emergency-harvester-recovery",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+      "type": "Article",
+      "title": "screeps-move-fatigue-body-ratio",
+      "href": "/en/blog/screeps-move-fatigue-body-ratio",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+      "type": "Article",
+      "title": "screeps-mineral-extractor-harvest",
+      "href": "/en/blog/screeps-mineral-extractor-harvest",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_82cce7d7-5166-4f51-b44d-539ea1343282",
+      "type": "Article",
+      "title": "screeps-clean-dead-creep-memory",
+      "href": "/en/blog/screeps-clean-dead-creep-memory",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
+      "type": "Article",
+      "title": "screeps-structure-destroy",
+      "href": "/en/blog/screeps-structure-destroy",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+      "type": "Article",
+      "title": "screeps-roomposition-distance",
+      "href": "/en/blog/screeps-roomposition-distance",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "type": "Article",
+      "title": "screeps-transfer-energy-to-spawn",
+      "href": "/en/blog/screeps-transfer-energy-to-spawn",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_950688b6-2702-4b3e-b1f1-850cf583ab94",
+      "type": "Article",
+      "title": "screeps-market-deal",
+      "href": "/en/blog/screeps-market-deal",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_958be26d-2666-4b94-8d23-5cb625074032",
+      "type": "Article",
+      "title": "screeps-room-energyavailable-stuck",
+      "href": "/en/blog/screeps-room-energyavailable-stuck",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_a15ce91c-30a0-4eb3-b89e-5d333095a80f",
+      "type": "Article",
+      "title": "screeps-room-error-isolation",
+      "href": "/en/blog/screeps-room-error-isolation",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+      "type": "Article",
+      "title": "screeps-cpu-getused-bucket",
+      "href": "/en/blog/screeps-cpu-getused-bucket",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+      "type": "Article",
+      "title": "screeps-container-decay-repair-deadline",
+      "href": "/en/blog/screeps-container-decay-repair-deadline",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d",
+      "type": "Article",
+      "title": "screeps-memory-basics",
+      "href": "/en/blog/screeps-memory-basics",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+      "type": "Article",
+      "title": "screeps-tombstone-ruin-recovery",
+      "href": "/en/blog/screeps-tombstone-ruin-recovery",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_ad28a5da-d98b-4935-a70b-c8e89d68f326",
+      "type": "Article",
+      "title": "screeps-reserve-vs-claim-controller",
+      "href": "/en/blog/screeps-reserve-vs-claim-controller",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
+      "type": "Article",
+      "title": "screeps-cpu-bucket-degradation",
+      "href": "/en/blog/screeps-cpu-bucket-degradation",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
+      "type": "Article",
+      "title": "screeps-market-order-maintenance",
+      "href": "/en/blog/screeps-market-order-maintenance",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "type": "Article",
+      "title": "screeps-build-repair",
+      "href": "/en/blog/screeps-build-repair",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_b332171b-7207-44fd-964b-46ca864c7aa2",
+      "type": "Article",
+      "title": "screeps-market-create-order",
+      "href": "/en/blog/screeps-market-create-order",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+      "type": "Article",
+      "title": "screeps-wall-rampart-repair-limit",
+      "href": "/en/blog/screeps-wall-rampart-repair-limit",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3",
+      "type": "Article",
+      "title": "screeps-game-notify",
+      "href": "/en/blog/screeps-game-notify",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
+      "type": "Article",
+      "title": "screeps-factory-produce",
+      "href": "/en/blog/screeps-factory-produce",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c1fe2f0b-4b28-44d2-9295-a47863be9ad1",
+      "type": "Article",
+      "title": "screeps-nuker-launch",
+      "href": "/en/blog/screeps-nuker-launch",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c3e8034a-03fc-431c-9c49-43b129e4a9cb",
+      "type": "Article",
+      "title": "screeps-controller-activate-safe-mode",
+      "href": "/en/blog/screeps-controller-activate-safe-mode",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+      "type": "Article",
+      "title": "screeps-observer-observe-room",
+      "href": "/en/blog/screeps-observer-observe-room",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c5110a68-fbba-4709-805c-70709e0eb420",
+      "type": "Article",
+      "title": "screeps-get-object-by-id",
+      "href": "/en/blog/screeps-get-object-by-id",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9",
+      "type": "Article",
+      "title": "screeps-introduction",
+      "href": "/en/blog/screeps-introduction",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_c784e904-4517-4476-ada6-53adbfd7966d",
+      "type": "Article",
+      "title": "screeps-creep-attack",
+      "href": "/en/blog/screeps-creep-attack",
+      "locale": "en",
+      "source": "content/english-standalone-identities.json"
+    },
+    {
+      "id": "en_article_cb41c144-290c-4258-817b-91763313600f",
+      "type": "Article",
+      "title": "screeps-spawncreep-return-codes",
+      "href": "/en/blog/screeps-spawncreep-return-codes",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+      "type": "Article",
+      "title": "screeps-moveto-not-moving",
+      "href": "/en/blog/screeps-moveto-not-moving",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
+      "type": "Article",
+      "title": "screeps-creep-body-parts",
+      "href": "/en/blog/screeps-creep-body-parts",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+      "type": "Article",
+      "title": "screeps-upgrade-controller",
+      "href": "/en/blog/screeps-upgrade-controller",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
+      "type": "Article",
+      "title": "screeps-storage-energy-usage",
+      "href": "/en/blog/screeps-storage-energy-usage",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+      "type": "Article",
+      "title": "screeps-renew-creep",
+      "href": "/en/blog/screeps-renew-creep",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "type": "Article",
+      "title": "screeps-tower-repair-threshold",
+      "href": "/en/blog/screeps-tower-repair-threshold",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_e07e2933-5b54-43e7-a940-6ac2619e76b0",
+      "type": "Article",
+      "title": "screeps-room-create-construction-site",
+      "href": "/en/blog/screeps-room-create-construction-site",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+      "type": "Article",
+      "title": "screeps-tick-game-loop",
+      "href": "/en/blog/screeps-tick-game-loop",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_e14fa86b-99ab-4178-8708-71a931344bf8",
+      "type": "Article",
+      "title": "screeps-pathfinder-costmatrix",
+      "href": "/en/blog/screeps-pathfinder-costmatrix",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "type": "Article",
+      "title": "screeps-tower-heal-creeps",
+      "href": "/en/blog/screeps-tower-heal-creeps",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_e3b60f0f-e950-41fb-b469-7e802b589e38",
+      "type": "Article",
+      "title": "screeps-first-room-code",
+      "href": "/en/blog/screeps-first-room-code",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+      "type": "Article",
+      "title": "screeps-link-transfer-energy",
+      "href": "/en/blog/screeps-link-transfer-energy",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f131df21-2d5a-4357-86f0-51812915f662",
+      "type": "Article",
+      "title": "screeps-recycle-creep",
+      "href": "/en/blog/screeps-recycle-creep",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f2aa1354-170d-4244-8abd-55bb7309cc95",
+      "type": "Article",
+      "title": "screeps-err-no-path",
+      "href": "/en/blog/screeps-err-no-path",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f3eeaf97-967d-466d-8720-ddd87f01cf62",
+      "type": "Article",
+      "title": "screeps-room-visibility",
+      "href": "/en/blog/screeps-room-visibility",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f4f272e7-80a8-491c-99e0-35db11d49d65",
+      "type": "Article",
+      "title": "screeps-lab-run-reaction",
+      "href": "/en/blog/screeps-lab-run-reaction",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "type": "Article",
+      "title": "screeps-lab-boost-creep",
+      "href": "/en/blog/screeps-lab-boost-creep",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f62daaf9-e951-48e4-862c-6bfae7fef3fc",
+      "type": "Article",
+      "title": "screeps-select-source-by-path",
+      "href": "/en/blog/screeps-select-source-by-path",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_f98e73c3-aa63-480e-a0a7-5f042af8a55e",
+      "type": "Article",
+      "title": "screeps-power-spawn-process-power",
+      "href": "/en/blog/screeps-power-spawn-process-power",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "en_article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+      "type": "Article",
+      "title": "screeps-rawmemory-foreign-segment",
+      "href": "/en/blog/screeps-rawmemory-foreign-segment",
+      "locale": "en",
+      "source": "src/lib/english-articles-complete.ts#source-derived"
+    },
+    {
+      "id": "article_05115243-96ad-452e-b184-dd17cf8b09a7",
+      "type": "BeginnerLesson",
+      "title": "Screeps spawnCreep()",
+      "href": "/blog/screeps-spawn-create-creep",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_1648e4f3-b6e3-4a91-af85-fe2f9016128b",
+      "type": "BeginnerLesson",
+      "title": "Screeps first Extension",
+      "href": "/blog/screeps-first-extension",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02",
+      "type": "BeginnerLesson",
+      "title": "Screeps first Creep harvest",
+      "href": "/blog/screeps-first-creep-harvest",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_58082347-eca6-468d-9386-0f91c5474c2f",
+      "type": "BeginnerLesson",
+      "title": "Screeps Creep roles",
+      "href": "/blog/screeps-creep-roles",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+      "type": "BeginnerLesson",
+      "title": "Screeps first room",
+      "href": "/blog/screeps-first-room",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "type": "BeginnerLesson",
+      "title": "Screeps Creep transfer Energy to Spawn",
+      "href": "/blog/screeps-creep-deliver-energy",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "type": "BeginnerLesson",
+      "title": "Screeps Creep build repair",
+      "href": "/blog/screeps-build-and-repair",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9",
+      "type": "BeginnerLesson",
+      "title": "Screeps programming game",
+      "href": "/blog/screeps-introduction",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
+      "type": "BeginnerLesson",
+      "title": "Screeps Creep body parts",
+      "href": "/blog/screeps-creep-body-parts",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+      "type": "BeginnerLesson",
+      "title": "Screeps upgrade Controller",
+      "href": "/blog/screeps-upgrade-controller",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+      "type": "BeginnerLesson",
+      "title": "Screeps tick game loop",
+      "href": "/blog/screeps-tick-and-game-loop",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "article_e3b60f0f-e950-41fb-b469-7e802b589e38",
+      "type": "BeginnerLesson",
+      "title": "Screeps first room code",
+      "href": "/blog/screeps-first-room-code",
+      "locale": "zh",
+      "source": "src/generated/beginner-roadmap-registry.json"
+    },
+    {
+      "id": "return-code:ERR_BUSY",
+      "type": "ReturnCode",
+      "title": "ERR_BUSY",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_FULL",
+      "type": "ReturnCode",
+      "title": "ERR_FULL",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_GCL_NOT_ENOUGH",
+      "type": "ReturnCode",
+      "title": "ERR_GCL_NOT_ENOUGH",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_INVALID_ARGS",
+      "type": "ReturnCode",
+      "title": "ERR_INVALID_ARGS",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_INVALID_TARGET",
+      "type": "ReturnCode",
+      "title": "ERR_INVALID_TARGET",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NAME_EXISTS",
+      "type": "ReturnCode",
+      "title": "ERR_NAME_EXISTS",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NO_BODYPART",
+      "type": "ReturnCode",
+      "title": "ERR_NO_BODYPART",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NO_PATH",
+      "type": "ReturnCode",
+      "title": "ERR_NO_PATH",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NOT_ENOUGH_ENERGY",
+      "type": "ReturnCode",
+      "title": "ERR_NOT_ENOUGH_ENERGY",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "type": "ReturnCode",
+      "title": "ERR_NOT_ENOUGH_RESOURCES",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NOT_FOUND",
+      "type": "ReturnCode",
+      "title": "ERR_NOT_FOUND",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NOT_IN_RANGE",
+      "type": "ReturnCode",
+      "title": "ERR_NOT_IN_RANGE",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_NOT_OWNER",
+      "type": "ReturnCode",
+      "title": "ERR_NOT_OWNER",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_RCL_NOT_ENOUGH",
+      "type": "ReturnCode",
+      "title": "ERR_RCL_NOT_ENOUGH",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:ERR_TIRED",
+      "type": "ReturnCode",
+      "title": "ERR_TIRED",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "return-code:OK",
+      "type": "ReturnCode",
+      "title": "OK",
+      "locale": "neutral",
+      "source": "src/lib/screeps-errors.ts"
+    },
+    {
+      "id": "symptom:builder-not-building",
+      "type": "Symptom",
+      "title": "Builder 不建造或不维修",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:controller-downgrade",
+      "type": "Symptom",
+      "title": "Controller 快降级或升级异常",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:cpu-too-high",
+      "type": "Symptom",
+      "title": "CPU 使用过高",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:creep-not-harvesting",
+      "type": "Symptom",
+      "title": "Creep 不采集资源",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:creep-not-moving",
+      "type": "Symptom",
+      "title": "Creep 不移动",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:link-not-transferring",
+      "type": "Symptom",
+      "title": "Link 不传能量",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:market-action-failed",
+      "type": "Symptom",
+      "title": "Market 交易失败",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:resources-not-moving",
+      "type": "Symptom",
+      "title": "资源运不过去",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:spawn-not-spawning",
+      "type": "Symptom",
+      "title": "Spawn 不生产 Creep",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "symptom:tower-not-acting",
+      "type": "Symptom",
+      "title": "Tower 不攻击、治疗或维修",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
+      "id": "experiment_07cfce9c-29f9-4466-bc54-bd33f67b889b",
+      "type": "TickLabExperiment",
+      "title": "cpu-bucket",
+      "href": "/tick-lab",
+      "locale": "neutral",
+      "source": "src/lib/tick-lab-experiments.ts"
+    },
+    {
+      "id": "experiment_1d0e6ab9-bbd8-41c8-8b99-38ffb2dca0cb",
+      "type": "TickLabExperiment",
+      "title": "creep-transfer",
+      "href": "/tick-lab",
+      "locale": "neutral",
+      "source": "src/lib/tick-lab-experiments.ts"
+    },
+    {
+      "id": "experiment_fc3dc347-d2cf-40cc-86c5-334ba4ab9a6a",
+      "type": "TickLabExperiment",
+      "title": "spawn-creep",
+      "href": "/tick-lab",
+      "locale": "neutral",
+      "source": "src/lib/tick-lab-experiments.ts"
+    },
+    {
+      "id": "tool_1ae7f59e-5815-498b-a205-d1b717894779",
+      "type": "Tool",
+      "title": "Tower 伤害、治疗与维修计算器",
+      "href": "/tools/tower-damage-heal-repair-calculator",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_292ae9b9-2135-4a1d-bb86-0fab1bb50fd4",
+      "type": "Tool",
+      "title": "Lab 反应与 Boost 规划器",
+      "href": "/tools/lab-reaction-boost-planner",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "type": "Tool",
+      "title": "Creep 身体计算器",
+      "href": "/tools/creep-body-calculator",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f",
+      "type": "Tool",
+      "title": "Spawn 队列与替换规划器",
+      "href": "/tools/spawn-queue-replacement-planner",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "type": "Tool",
+      "title": "房间运行诊断",
+      "href": "/tools/room-diagnostics",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_7e7f160d-65df-475c-934c-f3a96539dfbc",
+      "type": "Tool",
+      "title": "Controller 降级与 Upgrader 规划器",
+      "href": "/tools/controller-downgrade-planner",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_b034997f-9ba2-404b-9698-66b9bb3bfe4c",
+      "type": "Tool",
+      "title": "Market 与 Terminal 成本计算器",
+      "href": "/tools/market-terminal-cost-calculator",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    },
+    {
+      "id": "tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057",
+      "type": "Tool",
+      "title": "运输吞吐量规划器",
+      "href": "/tools/hauling-throughput-planner",
+      "locale": "zh",
+      "source": "src/lib/tool-catalog.ts"
+    }
+  ],
+  "edges": [
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_BUSY",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_BUSY",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_FULL",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_FULL",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_INVALID_ARGS",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_INVALID_ARGS",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_INVALID_TARGET",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_NOT_IN_RANGE",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:ERR_NOT_OWNER",
+      "from": "api:creep-transfer",
+      "to": "return-code:ERR_NOT_OWNER",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|returns|return-code:OK",
+      "from": "api:creep-transfer",
+      "to": "return-code:OK",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:creep-transfer|testedBy|experiment_1d0e6ab9-bbd8-41c8-8b99-38ffb2dca0cb",
+      "from": "api:creep-transfer",
+      "to": "experiment_1d0e6ab9-bbd8-41c8-8b99-38ffb2dca0cb",
+      "relation": "testedBy",
+      "provenance": "src/lib/tick-lab-experiments.ts#experiment-key-contract"
+    },
+    {
+      "id": "api:game-cpu-get-used|testedBy|experiment_07cfce9c-29f9-4466-bc54-bd33f67b889b",
+      "from": "api:game-cpu-get-used",
+      "to": "experiment_07cfce9c-29f9-4466-bc54-bd33f67b889b",
+      "relation": "testedBy",
+      "provenance": "src/lib/tick-lab-experiments.ts#experiment-key-contract"
+    },
+    {
+      "id": "api:spawn-recycle-creep|returns|return-code:ERR_INVALID_TARGET",
+      "from": "api:spawn-recycle-creep",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-recycle-creep|returns|return-code:ERR_NOT_IN_RANGE",
+      "from": "api:spawn-recycle-creep",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-recycle-creep|returns|return-code:ERR_NOT_OWNER",
+      "from": "api:spawn-recycle-creep",
+      "to": "return-code:ERR_NOT_OWNER",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-recycle-creep|returns|return-code:ERR_RCL_NOT_ENOUGH",
+      "from": "api:spawn-recycle-creep",
+      "to": "return-code:ERR_RCL_NOT_ENOUGH",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-recycle-creep|returns|return-code:OK",
+      "from": "api:spawn-recycle-creep",
+      "to": "return-code:OK",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_BUSY",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_BUSY",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_FULL",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_FULL",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_INVALID_TARGET",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_NOT_ENOUGH_ENERGY",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_NOT_ENOUGH_ENERGY",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_NOT_IN_RANGE",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_NOT_OWNER",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_NOT_OWNER",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:ERR_RCL_NOT_ENOUGH",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:ERR_RCL_NOT_ENOUGH",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-renew-creep|returns|return-code:OK",
+      "from": "api:spawn-renew-creep",
+      "to": "return-code:OK",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:ERR_BUSY",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:ERR_BUSY",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:ERR_INVALID_ARGS",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:ERR_INVALID_ARGS",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:ERR_NAME_EXISTS",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:ERR_NAME_EXISTS",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:ERR_NOT_ENOUGH_ENERGY",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:ERR_NOT_ENOUGH_ENERGY",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:ERR_NOT_OWNER",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:ERR_NOT_OWNER",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:ERR_RCL_NOT_ENOUGH",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:ERR_RCL_NOT_ENOUGH",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|returns|return-code:OK",
+      "from": "api:spawn-spawn-creep",
+      "to": "return-code:OK",
+      "relation": "returns",
+      "provenance": "src/lib/screeps-api-reference.ts#returnCodeNames"
+    },
+    {
+      "id": "api:spawn-spawn-creep|testedBy|experiment_fc3dc347-d2cf-40cc-86c5-334ba4ab9a6a",
+      "from": "api:spawn-spawn-creep",
+      "to": "experiment_fc3dc347-d2cf-40cc-86c5-334ba4ab9a6a",
+      "relation": "testedBy",
+      "provenance": "src/lib/tick-lab-experiments.ts#experiment-key-contract"
+    },
+    {
+      "id": "article_00651b28-9573-49a1-ab03-d77c76cf4220|prerequisiteOf|article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+      "from": "article_00651b28-9573-49a1-ab03-d77c76cf4220",
+      "to": "article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:defense-structures"
+    },
+    {
+      "id": "article_05115243-96ad-452e-b184-dd17cf8b09a7|prerequisiteOf|article_58082347-eca6-468d-9386-0f91c5474c2f",
+      "from": "article_05115243-96ad-452e-b184-dd17cf8b09a7",
+      "to": "article_58082347-eca6-468d-9386-0f91c5474c2f",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:build-room-team"
+    },
+    {
+      "id": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015|explains|api:creep-pickup",
+      "from": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+      "to": "api:creep-pickup",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015|prerequisiteOf|article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+      "from": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+      "to": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:room-economy:resource-recovery"
+    },
+    {
+      "id": "article_1089aaf2-bb8f-47c6-b9a6-032391c22bdb|prerequisiteOf|article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+      "from": "article_1089aaf2-bb8f-47c6-b9a6-032391c22bdb",
+      "to": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:common-errors"
+    },
+    {
+      "id": "article_1648e4f3-b6e3-4a91-af85-fe2f9016128b|prerequisiteOf|article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "from": "article_1648e4f3-b6e3-4a91-af85-fe2f9016128b",
+      "to": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:complete-room-loop"
+    },
+    {
+      "id": "article_195be63d-b2ae-486e-b157-356eea4ae9c1|explains|api:creep-withdraw",
+      "from": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+      "to": "api:creep-withdraw",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_195be63d-b2ae-486e-b157-356eea4ae9c1|prerequisiteOf|article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+      "from": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+      "to": "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:room-economy:store-container"
+    },
+    {
+      "id": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c|explains|api:terminal-send",
+      "from": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+      "to": "api:terminal-send",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c|prerequisiteOf|article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+      "from": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+      "to": "article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:room-economy:interroom-minerals"
+    },
+    {
+      "id": "article_1cc772a0-f18a-44b4-bbef-462c32257324|relatedTo|en_article_c784e904-4517-4476-ada6-53adbfd7966d",
+      "from": "article_1cc772a0-f18a-44b4-bbef-462c32257324",
+      "to": "en_article_c784e904-4517-4476-ada6-53adbfd7966d",
+      "relation": "relatedTo",
+      "provenance": "content/article-language-associations.json"
+    },
+    {
+      "id": "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21|prerequisiteOf|article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "from": "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "to": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:tower-actions"
+    },
+    {
+      "id": "article_1e3cf799-2023-4ae9-a402-dd7693c317b1|prerequisiteOf|article_32219971-b044-4240-8f28-25ccc9920ca3",
+      "from": "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+      "to": "article_32219971-b044-4240-8f28-25ccc9920ca3",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:spawn-lifecycle:create-queue"
+    },
+    {
+      "id": "article_20821e31-d92d-462a-8fe2-d4d519e0c157|explains|api:game-map-find-route",
+      "from": "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+      "to": "api:game-map-find-route",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_20821e31-d92d-462a-8fe2-d4d519e0c157|prerequisiteOf|article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+      "from": "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+      "to": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:path-costs"
+    },
+    {
+      "id": "article_25651256-9f5c-44fb-8f2f-50da0e627bfc|prerequisiteOf|article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+      "from": "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+      "to": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:spawn-lifecycle:replacement-retirement"
+    },
+    {
+      "id": "article_32219971-b044-4240-8f28-25ccc9920ca3|prerequisiteOf|article_958be26d-2666-4b94-8d23-5cb625074032",
+      "from": "article_32219971-b044-4240-8f28-25ccc9920ca3",
+      "to": "article_958be26d-2666-4b94-8d23-5cb625074032",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:spawn-lifecycle:create-queue"
+    },
+    {
+      "id": "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3|prerequisiteOf|article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+      "from": "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
+      "to": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:room-economy:store-container"
+    },
+    {
+      "id": "article_3a86a086-338c-4f67-a0d6-c3883c36bc04|explains|api:room-get-event-log",
+      "from": "article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+      "to": "api:room-get-event-log",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02|explains|api:creep-harvest",
+      "from": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02",
+      "to": "api:creep-harvest",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02|prerequisiteOf|article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "from": "article_45d8cab8-dfb9-404a-98d5-d6aef7edaf02",
+      "to": "article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:control-first-creep"
+    },
+    {
+      "id": "article_58082347-eca6-468d-9386-0f91c5474c2f|prerequisiteOf|article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+      "from": "article_58082347-eca6-468d-9386-0f91c5474c2f",
+      "to": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:build-room-team"
+    },
+    {
+      "id": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa|prerequisiteOf|article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+      "from": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+      "to": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:memory-engineering:advanced-storage-cache"
+    },
+    {
+      "id": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89|prerequisiteOf|article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+      "from": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+      "to": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:understand-screeps"
+    },
+    {
+      "id": "article_5cf8ef1f-9881-4483-9bad-922ccca36c95|prerequisiteOf|article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+      "from": "article_5cf8ef1f-9881-4483-9bad-922ccca36c95",
+      "to": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:operations-debugging:config-performance"
+    },
+    {
+      "id": "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb|prerequisiteOf|article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
+      "from": "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+      "to": "article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:construction-management"
+    },
+    {
+      "id": "article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60|prerequisiteOf|article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+      "from": "article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+      "to": "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:construction-management"
+    },
+    {
+      "id": "article_75aeff40-68cc-48e9-9cde-fc1399b05f33|prerequisiteOf|article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+      "from": "article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
+      "to": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:memory-engineering:advanced-storage-cache"
+    },
+    {
+      "id": "article_7e90fe24-44b7-4239-8258-a02e29a99f84|prerequisiteOf|article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+      "from": "article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+      "to": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:path-costs"
+    },
+    {
+      "id": "article_82cce7d7-5166-4f51-b44d-539ea1343282|prerequisiteOf|article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
+      "from": "article_82cce7d7-5166-4f51-b44d-539ea1343282",
+      "to": "article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:memory-engineering:state-basics"
+    },
+    {
+      "id": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0|prerequisiteOf|article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+      "from": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+      "to": "article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:path-costs"
+    },
+    {
+      "id": "article_90c42c4f-238e-4009-80e6-378621655ebf|explains|api:creep-transfer",
+      "from": "article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "to": "api:creep-transfer",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_90c42c4f-238e-4009-80e6-378621655ebf|prerequisiteOf|article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
+      "from": "article_90c42c4f-238e-4009-80e6-378621655ebf",
+      "to": "article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:control-first-creep"
+    },
+    {
+      "id": "article_950688b6-2702-4b3e-b1f1-850cf583ab94|explains|api:market-deal",
+      "from": "article_950688b6-2702-4b3e-b1f1-850cf583ab94",
+      "to": "api:market-deal",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_950688b6-2702-4b3e-b1f1-850cf583ab94|prerequisiteOf|article_b332171b-7207-44fd-964b-46ca864c7aa2",
+      "from": "article_950688b6-2702-4b3e-b1f1-850cf583ab94",
+      "to": "article_b332171b-7207-44fd-964b-46ca864c7aa2",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:market-advanced-resources:market-operations"
+    },
+    {
+      "id": "article_958be26d-2666-4b94-8d23-5cb625074032|prerequisiteOf|article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+      "from": "article_958be26d-2666-4b94-8d23-5cb625074032",
+      "to": "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:spawn-lifecycle:create-queue"
+    },
+    {
+      "id": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071|explains|api:game-cpu-get-used",
+      "from": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+      "to": "api:game-cpu-get-used",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071|prerequisiteOf|article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
+      "from": "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+      "to": "article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:operations-debugging:config-performance"
+    },
+    {
+      "id": "article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d|prerequisiteOf|article_82cce7d7-5166-4f51-b44d-539ea1343282",
+      "from": "article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d",
+      "to": "article_82cce7d7-5166-4f51-b44d-539ea1343282",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:memory-engineering:state-basics"
+    },
+    {
+      "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e|prerequisiteOf|article_f62daaf9-e951-48e4-862c-6bfae7fef3fc",
+      "from": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+      "to": "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:room-economy:resource-recovery"
+    },
+    {
+      "id": "article_b315e239-9ba7-453c-8743-e98b9c394adb|explains|api:creep-build",
+      "from": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "to": "api:creep-build",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_b315e239-9ba7-453c-8743-e98b9c394adb|explains|api:creep-repair",
+      "from": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "to": "api:creep-repair",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_b315e239-9ba7-453c-8743-e98b9c394adb|prerequisiteOf|article_e3b60f0f-e950-41fb-b469-7e802b589e38",
+      "from": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "to": "article_e3b60f0f-e950-41fb-b469-7e802b589e38",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:complete-room-loop"
+    },
+    {
+      "id": "article_b332171b-7207-44fd-964b-46ca864c7aa2|explains|api:market-create-order",
+      "from": "article_b332171b-7207-44fd-964b-46ca864c7aa2",
+      "to": "api:market-create-order",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_b332171b-7207-44fd-964b-46ca864c7aa2|prerequisiteOf|article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
+      "from": "article_b332171b-7207-44fd-964b-46ca864c7aa2",
+      "to": "article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:market-advanced-resources:market-operations"
+    },
+    {
+      "id": "article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6|prerequisiteOf|article_c1fe2f0b-4b28-44d2-9295-a47863be9ad1",
+      "from": "article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+      "to": "article_c1fe2f0b-4b28-44d2-9295-a47863be9ad1",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:defense-structures"
+    },
+    {
+      "id": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318|prerequisiteOf|article_e14fa86b-99ab-4178-8708-71a931344bf8",
+      "from": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+      "to": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:path-costs"
+    },
+    {
+      "id": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318|relatedTo|en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102",
+      "from": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+      "to": "en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102",
+      "relation": "relatedTo",
+      "provenance": "content/article-language-associations.json"
+    },
+    {
+      "id": "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3|explains|api:game-notify",
+      "from": "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3",
+      "to": "api:game-notify",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3|prerequisiteOf|article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+      "from": "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3",
+      "to": "article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:operations-debugging:notifications-events"
+    },
+    {
+      "id": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32|explains|api:factory-produce",
+      "from": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
+      "to": "api:factory-produce",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32|prerequisiteOf|article_f98e73c3-aa63-480e-a0a7-5f042af8a55e",
+      "from": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
+      "to": "article_f98e73c3-aa63-480e-a0a7-5f042af8a55e",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:market-advanced-resources:production-power"
+    },
+    {
+      "id": "article_c3e8034a-03fc-431c-9c49-43b129e4a9cb|prerequisiteOf|article_6846ad93-d52a-4b03-8c6d-2d6cc6ad90e9",
+      "from": "article_c3e8034a-03fc-431c-9c49-43b129e4a9cb",
+      "to": "article_6846ad93-d52a-4b03-8c6d-2d6cc6ad90e9",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:controller-control:safety-lifecycle"
+    },
+    {
+      "id": "article_c4680480-813f-4674-a2c2-9f0673ae9c22|explains|api:observer-observe-room",
+      "from": "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+      "to": "api:observer-observe-room",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_c4680480-813f-4674-a2c2-9f0673ae9c22|prerequisiteOf|article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
+      "from": "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+      "to": "article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:vision-visualization"
+    },
+    {
+      "id": "article_c5110a68-fbba-4709-805c-70709e0eb420|explains|api:game-get-object-by-id",
+      "from": "article_c5110a68-fbba-4709-805c-70709e0eb420",
+      "to": "api:game-get-object-by-id",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_c5110a68-fbba-4709-805c-70709e0eb420|prerequisiteOf|article_2c43c180-8c10-424e-bc7e-a47b08a3c5aa",
+      "from": "article_c5110a68-fbba-4709-805c-70709e0eb420",
+      "to": "article_2c43c180-8c10-424e-bc7e-a47b08a3c5aa",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:memory-engineering:objects-modules"
+    },
+    {
+      "id": "article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9|prerequisiteOf|article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+      "from": "article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9",
+      "to": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:roadmap:beginner:understand-screeps"
+    },
+    {
+      "id": "article_cb41c144-290c-4258-817b-91763313600f|explains|api:spawn-spawn-creep",
+      "from": "article_cb41c144-290c-4258-817b-91763313600f",
+      "to": "api:spawn-spawn-creep",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_cb41c144-290c-4258-817b-91763313600f|prerequisiteOf|article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+      "from": "article_cb41c144-290c-4258-817b-91763313600f",
+      "to": "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:spawn-lifecycle:create-queue"
+    },
+    {
+      "id": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4|explains|api:creep-move-to",
+      "from": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+      "to": "api:creep-move-to",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4|prerequisiteOf|article_f2aa1354-170d-4244-8abd-55bb7309cc95",
+      "from": "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+      "to": "article_f2aa1354-170d-4244-8abd-55bb7309cc95",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:common-errors"
+    },
+    {
+      "id": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4|relatedTo|en_article_04018d73-542b-4f45-8e36-d24597aeb6c0",
+      "from": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+      "to": "en_article_04018d73-542b-4f45-8e36-d24597aeb6c0",
+      "relation": "relatedTo",
+      "provenance": "content/article-language-associations.json"
+    },
+    {
+      "id": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7|explains|api:creep-upgrade-controller",
+      "from": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
+      "to": "api:creep-upgrade-controller",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064|prerequisiteOf|article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+      "from": "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
+      "to": "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:room-economy:room-storage-transfer"
+    },
+    {
+      "id": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c|explains|api:spawn-renew-creep",
+      "from": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+      "to": "api:spawn-renew-creep",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c|prerequisiteOf|article_f131df21-2d5a-4357-86f0-51812915f662",
+      "from": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+      "to": "article_f131df21-2d5a-4357-86f0-51812915f662",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:spawn-lifecycle:replacement-retirement"
+    },
+    {
+      "id": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad|prerequisiteOf|article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "from": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "to": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:tower-actions"
+    },
+    {
+      "id": "article_e07e2933-5b54-43e7-a940-6ac2619e76b0|explains|api:room-create-construction-site",
+      "from": "article_e07e2933-5b54-43e7-a940-6ac2619e76b0",
+      "to": "api:room-create-construction-site",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_e07e2933-5b54-43e7-a940-6ac2619e76b0|prerequisiteOf|article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+      "from": "article_e07e2933-5b54-43e7-a940-6ac2619e76b0",
+      "to": "article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:construction-defense:construction-management"
+    },
+    {
+      "id": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d|explains|api:game-time",
+      "from": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
+      "to": "api:game-time",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_e14fa86b-99ab-4178-8708-71a931344bf8|explains|api:pathfinder-search",
+      "from": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
+      "to": "api:pathfinder-search",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_e14fa86b-99ab-4178-8708-71a931344bf8|prerequisiteOf|article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+      "from": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
+      "to": "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:path-costs"
+    },
+    {
+      "id": "article_eb047b24-028c-45cf-b37b-3ed8074414ee|explains|api:link-transfer-energy",
+      "from": "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+      "to": "api:link-transfer-energy",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_f131df21-2d5a-4357-86f0-51812915f662|explains|api:spawn-recycle-creep",
+      "from": "article_f131df21-2d5a-4357-86f0-51812915f662",
+      "to": "api:spawn-recycle-creep",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62|explains|api:game-rooms",
+      "from": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62",
+      "to": "api:game-rooms",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62|prerequisiteOf|article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+      "from": "article_f3eeaf97-967d-466d-8720-ddd87f01cf62",
+      "to": "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:movement-vision:vision-visualization"
+    },
+    {
+      "id": "article_f4f272e7-80a8-491c-99e0-35db11d49d65|explains|api:lab-run-reaction",
+      "from": "article_f4f272e7-80a8-491c-99e0-35db11d49d65",
+      "to": "api:lab-run-reaction",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_f4f272e7-80a8-491c-99e0-35db11d49d65|prerequisiteOf|article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "from": "article_f4f272e7-80a8-491c-99e0-35db11d49d65",
+      "to": "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:market-advanced-resources:lab-boost"
+    },
+    {
+      "id": "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c|explains|api:lab-boost-creep",
+      "from": "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "to": "api:lab-boost-creep",
+      "relation": "explains",
+      "provenance": "src/lib/screeps-api-reference.ts#guideHref"
+    },
+    {
+      "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4|prerequisiteOf|article_6625380b-414a-402b-9807-1705554155ee",
+      "from": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+      "to": "article_6625380b-414a-402b-9807-1705554155ee",
+      "relation": "prerequisiteOf",
+      "provenance": "registry-order:knowledge:memory-engineering:advanced-storage-cache"
+    },
+    {
+      "id": "en_article_04018d73-542b-4f45-8e36-d24597aeb6c0|relatedTo|article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+      "from": "en_article_04018d73-542b-4f45-8e36-d24597aeb6c0",
+      "to": "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+      "relation": "relatedTo",
+      "provenance": "content/article-language-associations.json"
+    },
+    {
+      "id": "en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102|relatedTo|article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+      "from": "en_article_4eaf75ae-b28e-4108-a092-d7dcf0af1102",
+      "to": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+      "relation": "relatedTo",
+      "provenance": "content/article-language-associations.json"
+    },
+    {
+      "id": "en_article_c784e904-4517-4476-ada6-53adbfd7966d|relatedTo|article_1cc772a0-f18a-44b4-bbef-462c32257324",
+      "from": "en_article_c784e904-4517-4476-ada6-53adbfd7966d",
+      "to": "article_1cc772a0-f18a-44b4-bbef-462c32257324",
+      "relation": "relatedTo",
+      "provenance": "content/article-language-associations.json"
+    },
+    {
+      "id": "symptom:builder-not-building|involvesApi|api:creep-build",
+      "from": "symptom:builder-not-building",
+      "to": "api:creep-build",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:builder-not-building|involvesApi|api:creep-repair",
+      "from": "symptom:builder-not-building",
+      "to": "api:creep-repair",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:builder-not-building|involvesApi|api:room-create-construction-site",
+      "from": "symptom:builder-not-building",
+      "to": "api:room-create-construction-site",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:builder-not-building|involvesApi|api:room-get-event-log",
+      "from": "symptom:builder-not-building",
+      "to": "api:room-get-event-log",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:builder-not-building|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:builder-not-building",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:builder-not-building|relatedTo|return-code:ERR_NO_BODYPART",
+      "from": "symptom:builder-not-building",
+      "to": "return-code:ERR_NO_BODYPART",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:builder-not-building|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:builder-not-building",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:builder-not-building|relatedTo|return-code:ERR_NOT_IN_RANGE",
+      "from": "symptom:builder-not-building",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:builder-not-building|solvedBy|article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "from": "symptom:builder-not-building",
+      "to": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:builder-not-building|solvedBy|tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "from": "symptom:builder-not-building",
+      "to": "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:builder-not-building|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:builder-not-building",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:controller-downgrade|involvesApi|api:creep-upgrade-controller",
+      "from": "symptom:controller-downgrade",
+      "to": "api:creep-upgrade-controller",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:controller-downgrade|involvesApi|api:game-notify",
+      "from": "symptom:controller-downgrade",
+      "to": "api:game-notify",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:controller-downgrade|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:controller-downgrade",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:controller-downgrade|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:controller-downgrade",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:controller-downgrade|relatedTo|return-code:ERR_NOT_IN_RANGE",
+      "from": "symptom:controller-downgrade",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:controller-downgrade|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:controller-downgrade",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:controller-downgrade|solvedBy|tool_7e7f160d-65df-475c-934c-f3a96539dfbc",
+      "from": "symptom:controller-downgrade",
+      "to": "tool_7e7f160d-65df-475c-934c-f3a96539dfbc",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:cpu-too-high|involvesApi|api:game-cpu-get-used",
+      "from": "symptom:cpu-too-high",
+      "to": "api:game-cpu-get-used",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:cpu-too-high|involvesApi|api:pathfinder-search",
+      "from": "symptom:cpu-too-high",
+      "to": "api:pathfinder-search",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:cpu-too-high|involvesApi|api:room-get-event-log",
+      "from": "symptom:cpu-too-high",
+      "to": "api:room-get-event-log",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:cpu-too-high|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:cpu-too-high",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:creep-not-harvesting|involvesApi|api:creep-harvest",
+      "from": "symptom:creep-not-harvesting",
+      "to": "api:creep-harvest",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:creep-not-harvesting|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:creep-not-harvesting",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-harvesting|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:creep-not-harvesting",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-harvesting|relatedTo|return-code:ERR_NOT_IN_RANGE",
+      "from": "symptom:creep-not-harvesting",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-harvesting|solvedBy|tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "from": "symptom:creep-not-harvesting",
+      "to": "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:creep-not-harvesting|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:creep-not-harvesting",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:creep-not-moving|involvesApi|api:creep-move-to",
+      "from": "symptom:creep-not-moving",
+      "to": "api:creep-move-to",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:creep-not-moving|involvesApi|api:game-map-find-route",
+      "from": "symptom:creep-not-moving",
+      "to": "api:game-map-find-route",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:creep-not-moving|involvesApi|api:pathfinder-search",
+      "from": "symptom:creep-not-moving",
+      "to": "api:pathfinder-search",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:creep-not-moving|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:creep-not-moving",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-moving|relatedTo|return-code:ERR_NO_PATH",
+      "from": "symptom:creep-not-moving",
+      "to": "return-code:ERR_NO_PATH",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-moving|relatedTo|return-code:ERR_NOT_IN_RANGE",
+      "from": "symptom:creep-not-moving",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-moving|relatedTo|return-code:ERR_TIRED",
+      "from": "symptom:creep-not-moving",
+      "to": "return-code:ERR_TIRED",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:creep-not-moving|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:creep-not-moving",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:link-not-transferring|involvesApi|api:link-transfer-energy",
+      "from": "symptom:link-not-transferring",
+      "to": "api:link-transfer-energy",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:link-not-transferring|relatedTo|return-code:ERR_FULL",
+      "from": "symptom:link-not-transferring",
+      "to": "return-code:ERR_FULL",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:link-not-transferring|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:link-not-transferring",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:link-not-transferring|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:link-not-transferring",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:link-not-transferring|relatedTo|return-code:ERR_TIRED",
+      "from": "symptom:link-not-transferring",
+      "to": "return-code:ERR_TIRED",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:link-not-transferring|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:link-not-transferring",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:link-not-transferring|solvedBy|tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057",
+      "from": "symptom:link-not-transferring",
+      "to": "tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:market-action-failed|involvesApi|api:market-create-order",
+      "from": "symptom:market-action-failed",
+      "to": "api:market-create-order",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:market-action-failed|involvesApi|api:market-deal",
+      "from": "symptom:market-action-failed",
+      "to": "api:market-deal",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:market-action-failed|involvesApi|api:terminal-send",
+      "from": "symptom:market-action-failed",
+      "to": "api:terminal-send",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:market-action-failed|relatedTo|return-code:ERR_INVALID_ARGS",
+      "from": "symptom:market-action-failed",
+      "to": "return-code:ERR_INVALID_ARGS",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:market-action-failed|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:market-action-failed",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:market-action-failed|solvedBy|tool_b034997f-9ba2-404b-9698-66b9bb3bfe4c",
+      "from": "symptom:market-action-failed",
+      "to": "tool_b034997f-9ba2-404b-9698-66b9bb3bfe4c",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:resources-not-moving|involvesApi|api:creep-move-to",
+      "from": "symptom:resources-not-moving",
+      "to": "api:creep-move-to",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:resources-not-moving|involvesApi|api:creep-pickup",
+      "from": "symptom:resources-not-moving",
+      "to": "api:creep-pickup",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:resources-not-moving|involvesApi|api:creep-transfer",
+      "from": "symptom:resources-not-moving",
+      "to": "api:creep-transfer",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:resources-not-moving|involvesApi|api:creep-withdraw",
+      "from": "symptom:resources-not-moving",
+      "to": "api:creep-withdraw",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:resources-not-moving|relatedTo|return-code:ERR_FULL",
+      "from": "symptom:resources-not-moving",
+      "to": "return-code:ERR_FULL",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:resources-not-moving|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:resources-not-moving",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:resources-not-moving|relatedTo|return-code:ERR_NO_PATH",
+      "from": "symptom:resources-not-moving",
+      "to": "return-code:ERR_NO_PATH",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:resources-not-moving|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:resources-not-moving",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:resources-not-moving|relatedTo|return-code:ERR_NOT_IN_RANGE",
+      "from": "symptom:resources-not-moving",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:resources-not-moving|relatedTo|return-code:ERR_TIRED",
+      "from": "symptom:resources-not-moving",
+      "to": "return-code:ERR_TIRED",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:resources-not-moving|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:resources-not-moving",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:resources-not-moving|solvedBy|tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057",
+      "from": "symptom:resources-not-moving",
+      "to": "tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|involvesApi|api:spawn-spawn-creep",
+      "from": "symptom:spawn-not-spawning",
+      "to": "api:spawn-spawn-creep",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|relatedTo|return-code:ERR_BUSY",
+      "from": "symptom:spawn-not-spawning",
+      "to": "return-code:ERR_BUSY",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|relatedTo|return-code:ERR_INVALID_ARGS",
+      "from": "symptom:spawn-not-spawning",
+      "to": "return-code:ERR_INVALID_ARGS",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|relatedTo|return-code:ERR_NAME_EXISTS",
+      "from": "symptom:spawn-not-spawning",
+      "to": "return-code:ERR_NAME_EXISTS",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:spawn-not-spawning",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|relatedTo|return-code:ERR_RCL_NOT_ENOUGH",
+      "from": "symptom:spawn-not-spawning",
+      "to": "return-code:ERR_RCL_NOT_ENOUGH",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|solvedBy|tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "from": "symptom:spawn-not-spawning",
+      "to": "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:spawn-not-spawning|solvedBy|tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f",
+      "from": "symptom:spawn-not-spawning",
+      "to": "tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:tower-not-acting|involvesApi|api:room-get-event-log",
+      "from": "symptom:tower-not-acting",
+      "to": "api:room-get-event-log",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:tower-not-acting|involvesApi|api:tower-attack-heal-repair",
+      "from": "symptom:tower-not-acting",
+      "to": "api:tower-attack-heal-repair",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:tower-not-acting|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:tower-not-acting",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:tower-not-acting|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:tower-not-acting",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:tower-not-acting|relatedTo|return-code:ERR_NOT_OWNER",
+      "from": "symptom:tower-not-acting",
+      "to": "return-code:ERR_NOT_OWNER",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:tower-not-acting|relatedTo|return-code:ERR_RCL_NOT_ENOUGH",
+      "from": "symptom:tower-not-acting",
+      "to": "return-code:ERR_RCL_NOT_ENOUGH",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "from": "symptom:tower-not-acting",
+      "to": "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "from": "symptom:tower-not-acting",
+      "to": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "from": "symptom:tower-not-acting",
+      "to": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|en_article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "from": "symptom:tower-not-acting",
+      "to": "en_article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|en_article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "from": "symptom:tower-not-acting",
+      "to": "en_article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|en_article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "from": "symptom:tower-not-acting",
+      "to": "en_article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|tool_1ae7f59e-5815-498b-a205-d1b717894779",
+      "from": "symptom:tower-not-acting",
+      "to": "tool_1ae7f59e-5815-498b-a205-d1b717894779",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:tower-not-acting|solvedBy|tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "from": "symptom:tower-not-acting",
+      "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    }
+  ],
+  "unmapped": []
+}
