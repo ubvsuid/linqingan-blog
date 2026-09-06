@@ -84,6 +84,18 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
       { "href": "/blog/screeps-global-cache", "label": "global cache", "role": "运行时缓存" }
     ]
   },
+  "/blog/screeps-creep-pickup-dropped-energy": {
+    "cluster": "Room Economy / Recovery",
+    "links": [
+      { "href": "/blog/screeps-tombstone-ruin-recovery", "label": "资源不在地面时，继续回收 Tombstone 与 Ruin", "role": "资源恢复分支" }
+    ]
+  },
+  "/blog/screeps-intershardmemory-sync": {
+    "cluster": "Memory / Cross-boundary",
+    "links": [
+      { "href": "/blog/screeps-rawmemory-foreign-segment", "label": "如果要读取其他玩家公开数据，改用 Foreign Segment", "role": "跨玩家数据分支" }
+    ]
+  },
   "/en/blog/screeps-creep-harvest-energy": {
     "cluster": "Beginner / Energy",
     "links": [
