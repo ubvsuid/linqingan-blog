@@ -8,17 +8,17 @@
     "graphEdges": 198,
     "graphUnmapped": 0,
     "pageNodes": 160,
-    "curatedSources": 107,
-    "curatedEdges": 364,
+    "curatedSources": 109,
+    "curatedEdges": 366,
     "chineseMarkdownEditorialEdges": 447,
     "markdownCoveredPrerequisitePaths": 19,
-    "zeroCuratedInbound": 44,
-    "weakCuratedInbound": 31,
-    "directPrerequisiteGaps": 12,
+    "zeroCuratedInbound": 42,
+    "weakCuratedInbound": 33,
+    "directPrerequisiteGaps": 10,
     "semanticPageGaps": 1,
     "articleToolGaps": 8,
     "bilingualPairs": 80,
-    "bilingualAsymmetry": 7
+    "bilingualAsymmetry": 11
   },
   "priorities": {
     "P0": {
@@ -136,14 +136,6 @@
           "curatedInbound": 0
         },
         {
-          "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
-          "href": "/blog/screeps-rawmemory-foreign-segment",
-          "locale": "zh",
-          "type": "Article",
-          "title": "Screeps RawMemory Foreign Segment",
-          "curatedInbound": 0
-        },
-        {
           "id": "article_ad28a5da-d98b-4935-a70b-c8e89d68f326",
           "href": "/blog/screeps-reserve-vs-claim-controller",
           "locale": "zh",
@@ -181,14 +173,6 @@
           "locale": "zh",
           "type": "BeginnerLesson",
           "title": "Screeps tick game loop",
-          "curatedInbound": 0
-        },
-        {
-          "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
-          "href": "/blog/screeps-tombstone-ruin-recovery",
-          "locale": "zh",
-          "type": "Article",
-          "title": "Screeps Tombstone Ruin recovery",
           "curatedInbound": 0
         },
         {
@@ -381,29 +365,6 @@
           "priority": "P0",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
-            "href": "/blog/screeps-creep-pickup-dropped-energy",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Creep pickup dropped Energy",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
-            "href": "/blog/screeps-tombstone-ruin-recovery",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tombstone Ruin recovery",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:room-economy:resource-recovery"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_c5110a68-fbba-4709-805c-70709e0eb420",
             "href": "/blog/screeps-game-get-object-by-id",
             "locale": "zh",
@@ -421,29 +382,6 @@
           },
           "evidence": [
             "prerequisiteOf:registry-order:knowledge:memory-engineering:objects-modules"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
-            "href": "/blog/screeps-intershardmemory-sync",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps InterShardMemory",
-            "curatedInbound": 1
-          },
-          "target": {
-            "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
-            "href": "/blog/screeps-rawmemory-foreign-segment",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps RawMemory Foreign Segment",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:memory-engineering:advanced-storage-cache"
           ]
         },
         {
@@ -608,6 +546,14 @@
           "curatedInbound": 1
         },
         {
+          "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+          "href": "/blog/screeps-rawmemory-foreign-segment",
+          "locale": "zh",
+          "type": "Article",
+          "title": "Screeps RawMemory Foreign Segment",
+          "curatedInbound": 1
+        },
+        {
           "id": "article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
           "href": "/blog/screeps-rawmemory-segments",
           "locale": "zh",
@@ -637,6 +583,14 @@
           "locale": "zh",
           "type": "Article",
           "title": "Screeps Structure destroy",
+          "curatedInbound": 1
+        },
+        {
+          "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+          "href": "/blog/screeps-tombstone-ruin-recovery",
+          "locale": "zh",
+          "type": "Article",
+          "title": "Screeps Tombstone Ruin recovery",
           "curatedInbound": 1
         },
         {
@@ -1225,6 +1179,28 @@
         {
           "priority": "P1",
           "zh": {
+            "id": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+            "href": "/blog/screeps-intershardmemory-sync",
+            "locale": "zh",
+            "type": "Article",
+            "title": "Screeps InterShardMemory",
+            "curatedInbound": 1
+          },
+          "en": {
+            "id": "en_article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+            "href": "/en/blog/screeps-intershardmemory-sync",
+            "locale": "en",
+            "type": "Article",
+            "title": "screeps-intershardmemory-sync",
+            "curatedInbound": 1
+          },
+          "zhCuratedSource": true,
+          "enCuratedSource": false,
+          "evidence": "derived-bilingual-id"
+        },
+        {
+          "priority": "P1",
+          "zh": {
             "id": "article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
             "href": "/blog/screeps-market-order-maintenance",
             "locale": "zh",
@@ -1241,6 +1217,50 @@
             "curatedInbound": 0
           },
           "zhCuratedSource": true,
+          "enCuratedSource": false,
+          "evidence": "derived-bilingual-id"
+        },
+        {
+          "priority": "P1",
+          "zh": {
+            "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+            "href": "/blog/screeps-rawmemory-foreign-segment",
+            "locale": "zh",
+            "type": "Article",
+            "title": "Screeps RawMemory Foreign Segment",
+            "curatedInbound": 1
+          },
+          "en": {
+            "id": "en_article_fdc54cb6-3887-429b-947d-56d07bc171b4",
+            "href": "/en/blog/screeps-rawmemory-foreign-segment",
+            "locale": "en",
+            "type": "Article",
+            "title": "screeps-rawmemory-foreign-segment",
+            "curatedInbound": 0
+          },
+          "zhCuratedSource": false,
+          "enCuratedSource": false,
+          "evidence": "derived-bilingual-id"
+        },
+        {
+          "priority": "P1",
+          "zh": {
+            "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+            "href": "/blog/screeps-tombstone-ruin-recovery",
+            "locale": "zh",
+            "type": "Article",
+            "title": "Screeps Tombstone Ruin recovery",
+            "curatedInbound": 1
+          },
+          "en": {
+            "id": "en_article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+            "href": "/en/blog/screeps-tombstone-ruin-recovery",
+            "locale": "en",
+            "type": "Article",
+            "title": "screeps-tombstone-ruin-recovery",
+            "curatedInbound": 0
+          },
+          "zhCuratedSource": false,
           "enCuratedSource": false,
           "evidence": "derived-bilingual-id"
         },
@@ -1265,6 +1285,28 @@
           "zhCuratedSource": false,
           "enCuratedSource": true,
           "evidence": "explicit-relatedTo:content/article-language-associations.json"
+        },
+        {
+          "priority": "P1",
+          "zh": {
+            "id": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+            "href": "/blog/screeps-creep-pickup-dropped-energy",
+            "locale": "zh",
+            "type": "Article",
+            "title": "Screeps Creep pickup dropped Energy",
+            "curatedInbound": 0
+          },
+          "en": {
+            "id": "en_article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+            "href": "/en/blog/screeps-pickup-dropped-energy",
+            "locale": "en",
+            "type": "Article",
+            "title": "screeps-pickup-dropped-energy",
+            "curatedInbound": 0
+          },
+          "zhCuratedSource": true,
+          "enCuratedSource": false,
+          "evidence": "derived-bilingual-id"
         }
       ]
     }
