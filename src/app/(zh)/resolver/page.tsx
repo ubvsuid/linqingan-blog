@@ -6,6 +6,7 @@ import {
   buildKnowledgeGraphV1,
   getKnowledgeGraphCoverage,
 } from "@/lib/knowledge-graph-v1";
+import { buildProblemResolverGraphPaths } from "@/lib/problem-resolver-graph";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
@@ -15,7 +16,9 @@ export const metadata = createPageMetadata({
 });
 
 export default function ProblemResolverPage() {
-  const graphCoverage = getKnowledgeGraphCoverage(buildKnowledgeGraphV1());
+  const graph = buildKnowledgeGraphV1();
+  const graphCoverage = getKnowledgeGraphCoverage(graph);
+  const relatedPathsByStep = buildProblemResolverGraphPaths("zh", graph);
 
   return (
     <main className="page-shell">
@@ -39,7 +42,7 @@ export default function ProblemResolverPage() {
             {" "}<Link href="/knowledge/coverage">查看 Knowledge Coverage →</Link>
           </p>
         </aside>
-        <ProblemResolver locale="zh" />
+        <ProblemResolver locale="zh" relatedPathsByStep={relatedPathsByStep} />
       </Container>
     </main>
   );

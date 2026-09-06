@@ -14,6 +14,7 @@ const checks = [
   ["Knowledge Graph V1 durable identity readiness", "scripts/check-knowledge-graph-readiness.mjs"],
   ["Knowledge Graph V1 generated freshness", "scripts/generate-knowledge-graph-v1.mjs", "--check"],
   ["Knowledge Graph V1 contract and coverage", "scripts/check-knowledge-graph-v1.mjs"],
+  ["Problem Resolver Graph reuse", "scripts/check-problem-resolver-graph.mjs"],
   ["Knowledge registry", "scripts/check-knowledge-registry.mjs"],
   ["Beginner roadmap", "scripts/check-beginner-roadmap.mjs"],
   ["Site Asset Master V2", "scripts/check-site-asset-master.mjs"],

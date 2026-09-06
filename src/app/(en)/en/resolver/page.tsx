@@ -7,6 +7,7 @@ import {
   buildKnowledgeGraphV1,
   getKnowledgeGraphCoverage,
 } from "@/lib/knowledge-graph-v1";
+import { buildProblemResolverGraphPaths } from "@/lib/problem-resolver-graph";
 
 import styles from "../english.module.css";
 
@@ -18,7 +19,9 @@ export const metadata = createEnglishPageMetadata({
 });
 
 export default function EnglishProblemResolverPage() {
-  const graphCoverage = getKnowledgeGraphCoverage(buildKnowledgeGraphV1());
+  const graph = buildKnowledgeGraphV1();
+  const graphCoverage = getKnowledgeGraphCoverage(graph);
+  const relatedPathsByStep = buildProblemResolverGraphPaths("en", graph);
 
   return (
     <main className={styles.page} lang="en">
@@ -42,7 +45,7 @@ export default function EnglishProblemResolverPage() {
             {" "}<Link href="/en/knowledge/coverage">Open Knowledge Coverage →</Link>
           </p>
         </div>
-        <ProblemResolver locale="en" />
+        <ProblemResolver locale="en" relatedPathsByStep={relatedPathsByStep} />
       </Container>
     </main>
   );

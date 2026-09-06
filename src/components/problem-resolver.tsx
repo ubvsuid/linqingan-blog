@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import type { ProblemResolverGraphPathsByStep } from "@/lib/problem-resolver-graph";
 import {
   getProblemResolverStep,
   problemResolverFlows,
@@ -11,7 +12,13 @@ import {
 
 import styles from "./problem-resolver.module.css";
 
-export function ProblemResolver({ locale }: { locale: ProblemResolverLocale }) {
+export function ProblemResolver({
+  locale,
+  relatedPathsByStep = {},
+}: {
+  locale: ProblemResolverLocale;
+  relatedPathsByStep?: ProblemResolverGraphPathsByStep;
+}) {
   const isEnglish = locale === "en";
   const [flowId, setFlowId] = useState(problemResolverFlows[0].flowId);
   const flow = useMemo(() => problemResolverFlows.find((item) => item.flowId === flowId) ?? problemResolverFlows[0], [flowId]);
@@ -48,6 +55,7 @@ export function ProblemResolver({ locale }: { locale: ProblemResolverLocale }) {
   const diagnosticHref = `${isEnglish ? "/en/diagnostics" : "/diagnostics"}#${flow.symptomId}`;
   const searchHref = `${isEnglish ? "/en/search" : "/search"}?q=${encodeURIComponent(isEnglish ? flow.enTitle : flow.zhTitle)}`;
   const tickLabHref = isEnglish ? "/en/tick-lab" : "/tick-lab";
+  const graphRelatedPaths = step.kind === "outcome" ? relatedPathsByStep[step.stepId] ?? [] : [];
 
   return (
     <section className={styles.shell} aria-labelledby={`problem-resolver-${locale}`}>
@@ -55,7 +63,7 @@ export function ProblemResolver({ locale }: { locale: ProblemResolverLocale }) {
         <div>
           <p className="eyebrow">PROBLEM RESOLVER V1</p>
           <h2 id={`problem-resolver-${locale}`}>{isEnglish ? "Turn symptoms into the next concrete check" : "把现象变成下一步具体检查"}</h2>
-          <p>{isEnglish ? "The resolver owns only deterministic questions and branch logic. API, guide, tool, and accepted Runtime Evidence relationships remain owned by the existing Diagnostic Center." : "Resolver 只负责确定性问题与分支逻辑。API、教程、工具与 accepted Runtime Evidence 的关系仍由现有故障诊断中心负责。"}</p>
+          <p>{isEnglish ? "The resolver owns only deterministic questions and branch logic. After an outcome is fixed, read-only Knowledge Graph relations can project related API, guide, and tool paths while their canonical ownership stays with the existing registries." : "Resolver 只负责确定性问题与分支逻辑。结果确定后，只读 Knowledge Graph 可以投影相关 API、教程与工具路径，但关系真值仍由现有 authoritative registries 持有。"}</p>
         </div>
         <span>{problemResolverFlows.length} {isEnglish ? "guided flows" : "条引导流程"}</span>
       </header>
@@ -101,6 +109,17 @@ export function ProblemResolver({ locale }: { locale: ProblemResolverLocale }) {
               <Link href={searchHref}>{isEnglish ? "Search related site knowledge" : "搜索相关站内知识"} →</Link>
               {step.tickLab ? <Link href={tickLabHref}>{isEnglish ? "Try the modeled case in Tick Lab" : "在 Tick Lab 尝试模型场景"} →</Link> : null}
             </div>
+            {graphRelatedPaths.length > 0 ? (
+              <>
+                <h5>{isEnglish ? "Related paths from the Knowledge Graph" : "Knowledge Graph 关联路径"}</h5>
+                <p>{isEnglish ? "These links are derived only after this deterministic outcome is known. They do not participate in choosing the diagnosis." : "这些链接只在确定性结果已经成立后生成，不参与诊断分支判断。"}</p>
+                <div className={styles.actions}>
+                  {graphRelatedPaths.map((path) => (
+                    <Link key={`${path.targetNodeId}:${path.href}`} href={path.href}>{path.label} →</Link>
+                  ))}
+                </div>
+              </>
+            ) : null}
           </div>
         )}
 
