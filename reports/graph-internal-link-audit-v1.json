@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "audit": "graph-powered-internal-link-audit/v1",
-  "scope": "read-only-curated-link-gap-audit",
+  "scope": "read-only-curated-plus-chinese-markdown-gap-audit",
   "graphFingerprint": null,
   "counts": {
     "graphNodes": 226,
@@ -10,10 +10,12 @@
     "pageNodes": 160,
     "curatedSources": 107,
     "curatedEdges": 364,
+    "chineseMarkdownEditorialEdges": 447,
+    "markdownCoveredPrerequisitePaths": 19,
     "zeroCuratedInbound": 44,
     "weakCuratedInbound": 31,
-    "directPrerequisiteGaps": 31,
-    "semanticPageGaps": 2,
+    "directPrerequisiteGaps": 12,
+    "semanticPageGaps": 1,
     "articleToolGaps": 8,
     "bilingualPairs": 80,
     "bilingualAsymmetry": 7
@@ -379,29 +381,6 @@
           "priority": "P0",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
-            "href": "/blog/screeps-build-and-repair",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps Creep build repair",
-            "curatedInbound": 2
-          },
-          "target": {
-            "id": "article_e3b60f0f-e950-41fb-b469-7e802b589e38",
-            "href": "/blog/screeps-first-room-code",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps first room code",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:roadmap:beginner:complete-room-loop"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
             "href": "/blog/screeps-creep-pickup-dropped-energy",
             "locale": "zh",
@@ -419,52 +398,6 @@
           },
           "evidence": [
             "prerequisiteOf:registry-order:knowledge:room-economy:resource-recovery"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
-            "href": "/blog/screeps-creep-prespawn-replacement",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Creep prespawn replacement",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
-            "href": "/blog/screeps-spawn-renew-creep",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps renewCreep",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:spawn-lifecycle:replacement-retirement"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
-            "href": "/blog/screeps-first-room",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps first room",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_e0f6fcca-ead1-4499-ae85-f57f1959c30d",
-            "href": "/blog/screeps-tick-and-game-loop",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps tick game loop",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:roadmap:beginner:understand-screeps"
           ]
         },
         {
@@ -517,52 +450,6 @@
           "priority": "P0",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_c73d8305-015c-4dd4-9bb6-2e3b74d3a3e9",
-            "href": "/blog/screeps-introduction",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps programming game",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_5bf29a98-a84e-4a0e-b4aa-96121e86be89",
-            "href": "/blog/screeps-first-room",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps first room",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:roadmap:beginner:understand-screeps"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d",
-            "href": "/blog/screeps-memory-basics",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Memory",
-            "curatedInbound": 4
-          },
-          "target": {
-            "id": "article_82cce7d7-5166-4f51-b44d-539ea1343282",
-            "href": "/blog/screeps-clean-dead-creep-memory",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps clean dead Creep Memory",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:memory-engineering:state-basics"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_958be26d-2666-4b94-8d23-5cb625074032",
             "href": "/blog/screeps-room-energyavailable-stuck",
             "locale": "zh",
@@ -586,29 +473,6 @@
           "priority": "P0",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_05115243-96ad-452e-b184-dd17cf8b09a7",
-            "href": "/blog/screeps-spawn-create-creep",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps spawnCreep()",
-            "curatedInbound": 3
-          },
-          "target": {
-            "id": "article_58082347-eca6-468d-9386-0f91c5474c2f",
-            "href": "/blog/screeps-creep-roles",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps Creep roles",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:roadmap:beginner:build-room-team"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
             "href": "/blog/screeps-spawn-exit-blocked-directions",
             "locale": "zh",
@@ -626,52 +490,6 @@
           },
           "evidence": [
             "prerequisiteOf:registry-order:knowledge:spawn-lifecycle:create-queue"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
-            "href": "/blog/screeps-spawn-renew-creep",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps renewCreep",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_f131df21-2d5a-4357-86f0-51812915f662",
-            "href": "/blog/screeps-spawn-recycle-creep",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps recycleCreep",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:spawn-lifecycle:replacement-retirement"
-          ]
-        },
-        {
-          "priority": "P0",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
-            "href": "/blog/screeps-store-capacity-api",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Store capacity API",
-            "curatedInbound": 2
-          },
-          "target": {
-            "id": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
-            "href": "/blog/screeps-creep-withdraw-container-energy",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Creep withdraw Container Energy",
-            "curatedInbound": 0
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:room-economy:store-container"
           ]
         },
         {
@@ -955,29 +773,6 @@
           "priority": "P1",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
-            "href": "/blog/screeps-construction-site-remove",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps ConstructionSite remove",
-            "curatedInbound": 3
-          },
-          "target": {
-            "id": "article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
-            "href": "/blog/screeps-structure-destroy",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Structure destroy",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:construction-defense:construction-management"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
             "href": "/blog/screeps-creep-withdraw-container-energy",
             "locale": "zh",
@@ -995,29 +790,6 @@
           },
           "evidence": [
             "prerequisiteOf:registry-order:knowledge:room-economy:store-container"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
-            "href": "/blog/screeps-factory-produce",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps StructureFactory.produce",
-            "curatedInbound": 4
-          },
-          "target": {
-            "id": "article_f98e73c3-aa63-480e-a0a7-5f042af8a55e",
-            "href": "/blog/screeps-power-spawn-process-power",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps StructurePowerSpawn.processPower",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:market-advanced-resources:production-power"
           ]
         },
         {
@@ -1070,121 +842,6 @@
           "priority": "P1",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
-            "href": "/blog/screeps-storage-energy-usage",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Room.storage Energy",
-            "curatedInbound": 6
-          },
-          "target": {
-            "id": "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
-            "href": "/blog/screeps-link-transfer-energy",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps StructureLink transferEnergy",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:room-economy:room-storage-transfer"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
-            "href": "/blog/screeps-tower-repair-threshold",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower repair threshold",
-            "curatedInbound": 3
-          },
-          "target": {
-            "id": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
-            "href": "/blog/screeps-tower-heal-creeps",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower heal Creeps",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:construction-defense:tower-actions"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_82cce7d7-5166-4f51-b44d-539ea1343282",
-            "href": "/blog/screeps-clean-dead-creep-memory",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps clean dead Creep Memory",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
-            "href": "/blog/screeps-creep-working-state",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Creep working state",
-            "curatedInbound": 2
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:memory-engineering:state-basics"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_58082347-eca6-468d-9386-0f91c5474c2f",
-            "href": "/blog/screeps-creep-roles",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps Creep roles",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_d5c705cf-f064-4e8d-82b5-7d5ee61faef7",
-            "href": "/blog/screeps-upgrade-controller",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps upgrade Controller",
-            "curatedInbound": 2
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:roadmap:beginner:build-room-team"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_fdc54cb6-3887-429b-947d-56d07bc171b4",
-            "href": "/blog/screeps-rawmemory-foreign-segment",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps RawMemory Foreign Segment",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_6625380b-414a-402b-9807-1705554155ee",
-            "href": "/blog/screeps-global-cache",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps global cache",
-            "curatedInbound": 2
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:memory-engineering:advanced-storage-cache"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
             "href": "/blog/screeps-terminal-send-resources",
             "locale": "zh",
@@ -1202,29 +859,6 @@
           },
           "evidence": [
             "prerequisiteOf:registry-order:knowledge:room-economy:interroom-minerals"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
-            "href": "/blog/screeps-tombstone-ruin-recovery",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tombstone Ruin recovery",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc",
-            "href": "/blog/screeps-select-source-by-path",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Source selection by path",
-            "curatedInbound": 2
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:room-economy:resource-recovery"
           ]
         },
         {
@@ -1254,52 +888,6 @@
           "priority": "P1",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
-            "href": "/blog/screeps-map-find-route",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Game.map.findRoute",
-            "curatedInbound": 5
-          },
-          "target": {
-            "id": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
-            "href": "/blog/screeps-roomposition-distance",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps RoomPosition distance",
-            "curatedInbound": 3
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:movement-vision:path-costs"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
-            "href": "/blog/screeps-pathfinder-search",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps PathFinder.search",
-            "curatedInbound": 2
-          },
-          "target": {
-            "id": "article_e14fa86b-99ab-4178-8708-71a931344bf8",
-            "href": "/blog/screeps-pathfinder-costmatrix",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps PathFinder CostMatrix",
-            "curatedInbound": 4
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:movement-vision:path-costs"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_90c42c4f-238e-4009-80e6-378621655ebf",
             "href": "/blog/screeps-creep-deliver-energy",
             "locale": "zh",
@@ -1318,55 +906,9 @@
           "evidence": [
             "prerequisiteOf:registry-order:roadmap:beginner:control-first-creep"
           ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
-            "href": "/blog/screeps-observer-observe-room",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps StructureObserver.observeRoom",
-            "curatedInbound": 2
-          },
-          "target": {
-            "id": "article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
-            "href": "/blog/screeps-roomvisual-debug",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps RoomVisual debug",
-            "curatedInbound": 6
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:movement-vision:vision-visualization"
-          ]
         }
       ],
       "semanticPageGaps": [
-        {
-          "priority": "P1",
-          "kind": "semantic-page-gap",
-          "source": {
-            "id": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
-            "href": "/blog/screeps-tower-repair-threshold",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower repair threshold",
-            "curatedInbound": 3
-          },
-          "target": {
-            "id": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
-            "href": "/blog/screeps-tower-heal-creeps",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower heal Creeps",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "shared-symptom:symptom:tower-not-acting"
-          ]
-        },
         {
           "priority": "P1",
           "kind": "semantic-page-gap",
@@ -1728,10 +1270,11 @@
     }
   },
   "notes": [
-    "Zero/weak inbound means zero/one curated editorial inbound edge, not that the page is unreachable from listings, navigation, search, tags, or dynamic UI.",
+    "Zero/weak inbound still means zero/one curated editorial inbound edge; it does not mean the page is unreachable or lacks Markdown body links.",
+    "Actionable prerequisite, semantic-page, and Chinese article-to-tool candidates are suppressed when the exact Chinese Markdown source→target path already exists.",
+    "English article-body links are not parsed in V1.1; English candidate lists remain curated-map signals and still require manual editorial review.",
     "Candidates are deterministic audit suggestions only. They do not mutate articles and must still pass the article-link usefulness rule before any editorial change.",
-    "Semantic page candidates are emitted only when the target has at most one curated inbound edge and the same-locale pages share an authoritative Graph API or Symptom relation.",
-    "Bilingual asymmetry is a coverage signal, not a recommendation to add cross-language body links."
+    "Bilingual asymmetry remains a curated-map coverage signal, not a recommendation to add cross-language body links."
   ],
   "errors": []
 }
