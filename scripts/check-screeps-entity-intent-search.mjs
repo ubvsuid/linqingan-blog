@@ -14,6 +14,7 @@ function read(relativePath) {
 }
 
 const entityIntent = read("src/lib/screeps-entity-intent.ts");
+const knowledgeGraphSearch = read("src/lib/knowledge-graph-search.ts");
 const chineseSearch = read("src/lib/search-v2.ts");
 const englishClientSearch = read("src/components/english-site-search.tsx");
 const englishServerSearch = read("src/lib/english-search.ts");
@@ -77,14 +78,52 @@ if (!entityIntent.includes("/verification/coverage#coverage-${symptom.id}")) {
   failures.push("Verification Coverage must remain connected as an entity relation.");
 }
 
+if (!knowledgeGraphSearch.includes('import knowledgeGraphPayload from "@/generated/knowledge-graph-v1.json"')) {
+  failures.push("Search Graph enrichment must consume the canonical generated Knowledge Graph artifact.");
+}
+if (!knowledgeGraphSearch.includes("GRAPH_SEARCH_ANCHOR_MIN_SCORE = 120")) {
+  failures.push("Search Graph enrichment must require the frozen high-confidence anchor threshold.");
+}
+if (!knowledgeGraphSearch.includes('return `return-code:${entityId.slice("error:".length)}`')) {
+  failures.push("Search Graph enrichment must map intent error identities to durable ReturnCode graph identities.");
+}
+for (const relation of ["solvedBy", "involvesApi", "relatedTo", "returns", "testedBy", "explains", "usesApi"]) {
+  if (!knowledgeGraphSearch.includes(`"${relation}"`)) {
+    failures.push(`Search Graph enrichment is missing allowed relation: ${relation}`);
+  }
+}
+if (knowledgeGraphSearch.includes("prerequisiteOf")) {
+  failures.push("Search Graph V1A must not use registry-order prerequisiteOf as a search-intent signal.");
+}
+for (const forbidden of ["drizzle-orm", "getPlatformDatabase", "pgvector", "neo4j", "OpenAI", "verificationEvidence"]) {
+  if (knowledgeGraphSearch.includes(forbidden)) {
+    failures.push(`Search Graph enrichment must remain read-only and deterministic; forbidden dependency: ${forbidden}.`);
+  }
+}
+if (!knowledgeGraphSearch.includes("if (!graphIsUsable) return null")) {
+  failures.push("Search Graph enrichment must fail open to unchanged Search behavior when the static Graph is unusable.");
+}
+
 if (!chineseSearch.includes('getScreepsIntentPromotions(query, "zh", 8)')) {
   failures.push("Chinese Search V2 must use the shared Chinese intent resolver.");
 }
-if (!chineseSearch.includes("applyScreepsIntentRanking(normalizedQuery, results, type, limit)")) {
-  failures.push("Chinese Search V2 must rerank both database and static results through the intent layer.");
+if (!chineseSearch.includes("applyScreepsIntentRanking(")) {
+  failures.push("Chinese Search V2 must preserve the existing entity-intent ranking layer.");
+}
+if (!chineseSearch.includes("SEARCH_V2_MAX_LIMIT,")) {
+  failures.push("Chinese Search V2 must preserve a broad candidate pool before Graph reranking.");
+}
+if (!chineseSearch.includes("applyKnowledgeGraphRanking(normalizedQuery, results, type, limit)")) {
+  failures.push("Chinese Search V2 must apply the Knowledge Graph enrichment layer after entity intent ranking.");
+}
+if (!chineseSearch.includes("getKnowledgeGraphSearchContext(query, \"zh\", 8)")) {
+  failures.push("Chinese Search V2 must request deterministic Chinese Graph search context.");
+}
+if (!chineseSearch.includes("getSearchDocuments({ includeArticleText: false })")) {
+  failures.push("Graph enrichment must only promote documents that already exist in the Search corpus.");
 }
 if (!chineseSearch.includes("searchDatabase(normalizedQuery, type, SEARCH_V2_MAX_LIMIT)")) {
-  failures.push("Chinese database search must preserve a broad candidate pool before intent reranking.");
+  failures.push("Chinese database search must preserve a broad candidate pool before intent and Graph reranking.");
 }
 if (!chineseSearch.includes("intent:${promotion.entityId}")) {
   failures.push("Chinese search must be able to inject non-persisted intent results without adding search_documents rows.");
@@ -129,4 +168,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Screeps entity intent search check passed: shared bilingual entity relations and symptom-first intent ranking are wired across Chinese database/static search plus English SSR/client search without new persistence or AI dependencies.");
+console.log("Screeps entity intent search check passed: bilingual entity-intent ranking remains intact, while Chinese Search V2 adds high-confidence, one-hop, corpus-bounded Knowledge Graph enrichment without persistence, prerequisite-order promotion, or AI dependencies.");

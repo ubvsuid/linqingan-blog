@@ -2,6 +2,7 @@ import { and, desc, eq, or, sql } from "drizzle-orm";
 
 import { getPlatformDatabase } from "@/db/client";
 import { searchClicks, searchDocuments, searchQueries } from "@/db/schema";
+import { getKnowledgeGraphSearchContext } from "@/lib/knowledge-graph-search";
 import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 import {
   getSearchDocuments,
@@ -174,6 +175,67 @@ function applyScreepsIntentRanking(
     .slice(0, limit);
 }
 
+function applyKnowledgeGraphRanking(
+  query: string,
+  documents: SearchDocument[],
+  type: SearchDocumentType | null,
+  limit: number,
+): SearchDocument[] {
+  const graphContext = getKnowledgeGraphSearchContext(query, "zh", 8);
+  if (!graphContext) return documents.slice(0, limit);
+
+  const graphScoreByHref = new Map(
+    graphContext.promotions.map((promotion) => [promotion.href, promotion.score] as const),
+  );
+  const intentPromotions = getScreepsIntentPromotions(query, "zh", 8)
+    .map((promotion) => ({ ...promotion, documentType: intentDocumentType(promotion.kind) }))
+    .filter((promotion) => !type || promotion.documentType === type);
+  const intentOrderByHref = new Map(
+    intentPromotions.map((promotion, index) => [promotion.href, index] as const),
+  );
+  const mergedByHref = new Map(documents.map((document) => [document.href, document] as const));
+  const originalOrder = new Map(
+    documents.map((document, index) => [document.href, documents.length - index] as const),
+  );
+  const staticCandidates = new Map(
+    getSearchDocuments({ includeArticleText: false })
+      .filter((document) => !type || document.type === type)
+      .map((document) => [document.href, document] as const),
+  );
+
+  let hasGraphCandidate = false;
+  for (const promotion of graphContext.promotions) {
+    if (mergedByHref.has(promotion.href)) {
+      hasGraphCandidate = true;
+      continue;
+    }
+    const candidate = staticCandidates.get(promotion.href);
+    if (!candidate) continue;
+    mergedByHref.set(candidate.href, candidate);
+    hasGraphCandidate = true;
+  }
+
+  if (!hasGraphCandidate) return documents.slice(0, limit);
+
+  return [...mergedByHref.values()]
+    .sort((left, right) => {
+      const leftIntentOrder = intentOrderByHref.get(left.href);
+      const rightIntentOrder = intentOrderByHref.get(right.href);
+      if (leftIntentOrder !== undefined || rightIntentOrder !== undefined) {
+        if (leftIntentOrder === undefined) return 1;
+        if (rightIntentOrder === undefined) return -1;
+        if (leftIntentOrder !== rightIntentOrder) return leftIntentOrder - rightIntentOrder;
+      }
+
+      const leftGraph = graphScoreByHref.get(left.href) ?? 0;
+      const rightGraph = graphScoreByHref.get(right.href) ?? 0;
+      if (leftGraph !== rightGraph) return rightGraph - leftGraph;
+
+      return (originalOrder.get(right.href) ?? 0) - (originalOrder.get(left.href) ?? 0);
+    })
+    .slice(0, limit);
+}
+
 async function searchDatabase(
   query: string,
   type: SearchDocumentType | null,
@@ -297,7 +359,13 @@ export async function searchV2(
     results = rankStaticDocuments(normalizedQuery, type, SEARCH_V2_MAX_LIMIT);
   }
 
-  results = applyScreepsIntentRanking(normalizedQuery, results, type, limit);
+  results = applyScreepsIntentRanking(
+    normalizedQuery,
+    results,
+    type,
+    SEARCH_V2_MAX_LIMIT,
+  );
+  results = applyKnowledgeGraphRanking(normalizedQuery, results, type, limit);
 
   return {
     query: query.trim(),
