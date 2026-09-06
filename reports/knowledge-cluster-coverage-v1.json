@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "source": "knowledge-module + explicit Knowledge Graph relations",
+  "clusterCount": 8,
+  "primaryKnowledgeArticleCount": 68,
+  "unmappedPrimaryKnowledgeArticles": [],
+  "graphUnmappedCount": 0,
+  "clusters": [
+    {
+      "clusterId": "memory-engineering",
+      "number": 1,
+      "primaryKnowledgeArticleCount": 9,
+      "primaryKnowledgeArticleIds": [
+        "article_2c43c180-8c10-424e-bc7e-a47b08a3c5aa",
+        "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
+        "article_644fb8cf-9c7a-4833-b178-9db8a8a08260",
+        "article_6625380b-414a-402b-9807-1705554155ee",
+        "article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
+        "article_82cce7d7-5166-4f51-b44d-539ea1343282",
+        "article_a5dc9b40-803b-43d4-88fe-0a75d9445e6d",
+        "article_c5110a68-fbba-4709-805c-70709e0eb420",
+        "article_fdc54cb6-3887-429b-947d-56d07bc171b4"
+      ],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "spawn-lifecycle",
+      "number": 2,
+      "primaryKnowledgeArticleCount": 9,
+      "primaryKnowledgeArticleIds": [
+        "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+        "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+        "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+        "article_32219971-b044-4240-8f28-25ccc9920ca3",
+        "article_764e6035-6293-4af0-871b-965eb2e8cb53",
+        "article_958be26d-2666-4b94-8d23-5cb625074032",
+        "article_cb41c144-290c-4258-817b-91763313600f",
+        "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+        "article_f131df21-2d5a-4357-86f0-51812915f662"
+      ],
+      "demonstrator": true
+    },
+    {
+      "clusterId": "room-economy",
+      "number": 3,
+      "primaryKnowledgeArticleCount": 10,
+      "primaryKnowledgeArticleIds": [
+        "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+        "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+        "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+        "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
+        "article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+        "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+        "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+        "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
+        "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+        "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc"
+      ],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "movement-vision",
+      "number": 4,
+      "primaryKnowledgeArticleCount": 12,
+      "primaryKnowledgeArticleIds": [
+        "article_1089aaf2-bb8f-47c6-b9a6-032391c22bdb",
+        "article_20821e31-d92d-462a-8fe2-d4d519e0c157",
+        "article_5c691868-f5f2-4dbc-aa18-62579778dcd9",
+        "article_7e90fe24-44b7-4239-8258-a02e29a99f84",
+        "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
+        "article_bb0f6b47-c8b5-4b48-bf08-89610a2c1318",
+        "article_c4680480-813f-4674-a2c2-9f0673ae9c22",
+        "article_cdfd68ca-c3f5-4ded-942d-85ad0f328ac4",
+        "article_d4c49dc5-9302-44e0-b781-6c4a897223a4",
+        "article_e14fa86b-99ab-4178-8708-71a931344bf8",
+        "article_f2aa1354-170d-4244-8abd-55bb7309cc95",
+        "article_f3eeaf97-967d-466d-8720-ddd87f01cf62"
+      ],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "controller-control",
+      "number": 5,
+      "primaryKnowledgeArticleCount": 4,
+      "primaryKnowledgeArticleIds": [
+        "article_663184a4-c0a3-4bf5-b166-ff0a1bb205ba",
+        "article_6846ad93-d52a-4b03-8c6d-2d6cc6ad90e9",
+        "article_ad28a5da-d98b-4935-a70b-c8e89d68f326",
+        "article_c3e8034a-03fc-431c-9c49-43b129e4a9cb"
+      ],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "construction-defense",
+      "number": 6,
+      "primaryKnowledgeArticleCount": 11,
+      "primaryKnowledgeArticleIds": [
+        "article_00651b28-9573-49a1-ab03-d77c76cf4220",
+        "article_1cc772a0-f18a-44b4-bbef-462c32257324",
+        "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
+        "article_68c277c6-c55f-4272-a2d8-1c863a95bdbb",
+        "article_703d3efb-fcbb-4019-80b9-d5d1f0a82c60",
+        "article_849b8ed1-d4c1-4be6-9708-63c36b153cdb",
+        "article_b8cceaca-ed76-4a0a-a3d9-65084c7a59a6",
+        "article_c1fe2f0b-4b28-44d2-9295-a47863be9ad1",
+        "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
+        "article_e07e2933-5b54-43e7-a940-6ac2619e76b0",
+        "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a"
+      ],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "market-advanced-resources",
+      "number": 7,
+      "primaryKnowledgeArticleCount": 7,
+      "primaryKnowledgeArticleIds": [
+        "article_950688b6-2702-4b3e-b1f1-850cf583ab94",
+        "article_b292247d-a9cc-4b64-a198-69bd2a3f145c",
+        "article_b332171b-7207-44fd-964b-46ca864c7aa2",
+        "article_c1dc1545-afce-4c4e-80a3-339e62d87c32",
+        "article_f4f272e7-80a8-491c-99e0-35db11d49d65",
+        "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+        "article_f98e73c3-aa63-480e-a0a7-5f042af8a55e"
+      ],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "operations-debugging",
+      "number": 8,
+      "primaryKnowledgeArticleCount": 6,
+      "primaryKnowledgeArticleIds": [
+        "article_3a86a086-338c-4f67-a0d6-c3883c36bc04",
+        "article_5cf8ef1f-9881-4483-9bad-922ccca36c95",
+        "article_a15ce91c-30a0-4eb3-b89e-5d333095a80f",
+        "article_a32a0ff5-fc54-4776-8a7a-8c0f76260071",
+        "article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
+        "article_bc1cdf06-9705-4273-9b47-3d88d7f54ee3"
+      ],
+      "demonstrator": false
+    }
+  ],
+  "demonstrator": {
+    "clusterId": "spawn-lifecycle",
+    "expansionPolicy": "explicit-relations-only; non-article entities are related surface, not primary membership",
+    "graphSurface": {
+      "articleIds": [
+        "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+        "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+        "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+        "article_32219971-b044-4240-8f28-25ccc9920ca3",
+        "article_764e6035-6293-4af0-871b-965eb2e8cb53",
+        "article_958be26d-2666-4b94-8d23-5cb625074032",
+        "article_cb41c144-290c-4258-817b-91763313600f",
+        "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+        "article_f131df21-2d5a-4357-86f0-51812915f662"
+      ],
+      "apiIds": [
+        "api:spawn-recycle-creep",
+        "api:spawn-renew-creep",
+        "api:spawn-spawn-creep"
+      ],
+      "returnCodeIds": [
+        "return-code:ERR_BUSY",
+        "return-code:ERR_FULL",
+        "return-code:ERR_INVALID_ARGS",
+        "return-code:ERR_INVALID_TARGET",
+        "return-code:ERR_NAME_EXISTS",
+        "return-code:ERR_NOT_ENOUGH_ENERGY",
+        "return-code:ERR_NOT_ENOUGH_RESOURCES",
+        "return-code:ERR_NOT_IN_RANGE",
+        "return-code:ERR_NOT_OWNER",
+        "return-code:ERR_RCL_NOT_ENOUGH",
+        "return-code:OK"
+      ],
+      "symptomIds": [
+        "symptom:spawn-not-spawning"
+      ],
+      "toolIds": [
+        "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+        "tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f"
+      ],
+      "tickLabExperimentIds": [
+        "experiment_fc3dc347-d2cf-40cc-86c5-334ba4ab9a6a"
+      ]
+    },
+    "runtimeEvidenceMode": "accepted-only-runtime-adapter"
+  }
+}
