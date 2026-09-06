@@ -80,8 +80,8 @@ const graphNodeByHref = new Map(
     .map((node) => [node.href as string, node] as const),
 );
 const toolById = new Map(toolCatalog.map((tool) => [tool.toolId, tool] as const));
-const symptomById = new Map(
-  screepsDiagnosticSymptoms.map((symptom) => [symptom.id, symptom] as const),
+const symptomById = new Map<string, (typeof screepsDiagnosticSymptoms)[number]>(
+  screepsDiagnosticSymptoms.map((symptom) => [symptom.id, symptom]),
 );
 
 function localizedNodeLink(
