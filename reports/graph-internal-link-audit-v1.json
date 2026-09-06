@@ -8,13 +8,13 @@
     "graphEdges": 198,
     "graphUnmapped": 0,
     "pageNodes": 160,
-    "curatedSources": 111,
-    "curatedEdges": 368,
+    "curatedSources": 115,
+    "curatedEdges": 374,
     "chineseMarkdownEditorialEdges": 447,
     "markdownCoveredPrerequisitePaths": 19,
     "zeroCuratedInbound": 40,
-    "weakCuratedInbound": 35,
-    "directPrerequisiteGaps": 10,
+    "weakCuratedInbound": 31,
+    "directPrerequisiteGaps": 7,
     "semanticPageGaps": 1,
     "articleToolGaps": 8,
     "bilingualPairs": 80,
@@ -442,14 +442,6 @@
     "P1": {
       "weakCuratedInbound": [
         {
-          "id": "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
-          "href": "/blog/screeps-container-decay-repair-deadline",
-          "locale": "zh",
-          "type": "Article",
-          "title": "Screeps Container ticksToDecay",
-          "curatedInbound": 1
-        },
-        {
           "id": "article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
           "href": "/blog/screeps-cpu-bucket-degradation",
           "locale": "zh",
@@ -471,14 +463,6 @@
           "locale": "zh",
           "type": "Article",
           "title": "Screeps Creep.pull",
-          "curatedInbound": 1
-        },
-        {
-          "id": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
-          "href": "/blog/screeps-intershardmemory-sync",
-          "locale": "zh",
-          "type": "Article",
-          "title": "Screeps InterShardMemory",
           "curatedInbound": 1
         },
         {
@@ -586,14 +570,6 @@
           "curatedInbound": 1
         },
         {
-          "id": "en_article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
-          "href": "/en/blog/screeps-container-decay-repair-deadline",
-          "locale": "en",
-          "type": "Article",
-          "title": "screeps-container-decay-repair-deadline",
-          "curatedInbound": 1
-        },
-        {
           "id": "en_article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
           "href": "/en/blog/screeps-cpu-bucket-degradation",
           "locale": "en",
@@ -607,14 +583,6 @@
           "locale": "en",
           "type": "Article",
           "title": "screeps-creep-pull",
-          "curatedInbound": 1
-        },
-        {
-          "id": "en_article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
-          "href": "/en/blog/screeps-intershardmemory-sync",
-          "locale": "en",
-          "type": "Article",
-          "title": "screeps-intershardmemory-sync",
           "curatedInbound": 1
         },
         {
@@ -727,52 +695,6 @@
           "priority": "P1",
           "kind": "direct-prerequisite",
           "source": {
-            "id": "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
-            "href": "/blog/screeps-creep-withdraw-container-energy",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Creep withdraw Container Energy",
-            "curatedInbound": 0
-          },
-          "target": {
-            "id": "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
-            "href": "/blog/screeps-container-decay-repair-deadline",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Container ticksToDecay",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:room-economy:store-container"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_75aeff40-68cc-48e9-9cde-fc1399b05f33",
-            "href": "/blog/screeps-rawmemory-segments",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps RawMemory segments",
-            "curatedInbound": 1
-          },
-          "target": {
-            "id": "article_5b9bfaa5-4d58-459b-8772-98a976f5cefa",
-            "href": "/blog/screeps-intershardmemory-sync",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps InterShardMemory",
-            "curatedInbound": 1
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:knowledge:memory-engineering:advanced-storage-cache"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
             "id": "article_8f2b5c84-5d26-49f5-94e0-eb292587c5b0",
             "href": "/blog/screeps-roomposition-distance",
             "locale": "zh",
@@ -836,29 +758,6 @@
           },
           "evidence": [
             "prerequisiteOf:registry-order:knowledge:operations-debugging:config-performance"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "direct-prerequisite",
-          "source": {
-            "id": "article_90c42c4f-238e-4009-80e6-378621655ebf",
-            "href": "/blog/screeps-creep-deliver-energy",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps Creep transfer Energy to Spawn",
-            "curatedInbound": 1
-          },
-          "target": {
-            "id": "article_cff20bce-c005-4a01-b1c5-b7459160a7f9",
-            "href": "/blog/screeps-creep-body-parts",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps Creep body parts",
-            "curatedInbound": 5
-          },
-          "evidence": [
-            "prerequisiteOf:registry-order:roadmap:beginner:control-first-creep"
           ]
         }
       ],
