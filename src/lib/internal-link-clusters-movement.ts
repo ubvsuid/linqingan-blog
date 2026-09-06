@@ -50,6 +50,11 @@ export const movementInternalLinkClusters: Record<string, CuratedInternalLinkClu
     "cluster": "Movement",
     "links": [
       {
+        "href": "/blog/screeps-pathfinder-search",
+        "label": "理解 PathFinder.search() 与 incomplete",
+        "role": "搜索语义"
+      },
+      {
         "href": "/blog/screeps-pathfinder-costmatrix",
         "label": "检查 CostMatrix 与不可走格",
         "role": "核心排错"
@@ -83,6 +88,11 @@ export const movementInternalLinkClusters: Record<string, CuratedInternalLinkClu
         "href": "/blog/screeps-moveto-not-moving",
         "label": "Creep 不移动的完整排查路径",
         "role": "症状排错"
+      },
+      {
+        "href": "/blog/screeps-creep-pull",
+        "label": "理解 pull() 如何改变两只 Creep 的移动负载",
+        "role": "进阶移动"
       }
     ]
   },
@@ -98,6 +108,11 @@ export const movementInternalLinkClusters: Record<string, CuratedInternalLinkClu
         "href": "/blog/screeps-select-source-by-path",
         "label": "按可达路径选择 Source",
         "role": "目标选择"
+      },
+      {
+        "href": "/blog/screeps-pathfinder-search",
+        "label": "从 range 判断进入 PathFinder.search()",
+        "role": "进阶寻路"
       },
       {
         "href": "/blog/screeps-pathfinder-costmatrix",
