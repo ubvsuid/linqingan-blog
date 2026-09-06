@@ -169,5 +169,17 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
       { "href": "/en/blog/screeps-intershardmemory-sync", "label": "InterShardMemory sync", "role": "Cross-shard state" },
       { "href": "/en/blog/screeps-global-cache", "label": "Global cache", "role": "Runtime cache" }
     ]
+  },
+  "/en/blog/screeps-pickup-dropped-energy": {
+    "cluster": "Room Economy / Recovery",
+    "links": [
+      { "href": "/en/blog/screeps-tombstone-ruin-recovery", "label": "Recover resources from Tombstones and Ruins", "role": "Recovery branch" }
+    ]
+  },
+  "/en/blog/screeps-intershardmemory-sync": {
+    "cluster": "Memory / Cross-boundary",
+    "links": [
+      { "href": "/en/blog/screeps-rawmemory-foreign-segment", "label": "Use Foreign Segment for another player's public data", "role": "Cross-player data branch" }
+    ]
   }
 };
