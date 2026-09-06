@@ -13,7 +13,7 @@ const args = new Set(process.argv.slice(2));
 function normalizeRoute(value) {
   if (typeof value !== "string" || !value.startsWith("/")) return null;
   const clean = value.split(/[?#]/, 1)[0];
-  if (!clean || clean.startsWith("/_next")) return null;
+  if (!clean || clean.startsWith("/_next") || /\.[a-z0-9]{2,5}$/i.test(clean)) return null;
   return clean.length > 1 ? clean.replace(/\/$/, "") : clean;
 }
 
@@ -49,7 +49,6 @@ function loadCuratedLinks() {
       if (!source) throw new Error(`Invalid curated source route: ${sourceValue}`);
       if (sourceOwners.has(source)) throw new Error(`Duplicate curated source route: ${source}`);
       sourceOwners.add(source);
-
       for (const item of relation.links ?? []) {
         const target = normalizeRoute(item.href);
         if (!target || source === target) continue;
@@ -61,6 +60,30 @@ function loadCuratedLinks() {
   const deduped = [...new Map(links.map((link) => [`${link.source}\u0000${link.target}`, link])).values()]
     .sort((a, b) => a.source.localeCompare(b.source) || a.target.localeCompare(b.target));
   return { sourceOwners, links: deduped };
+}
+
+function loadChineseMarkdownEditorialLinks() {
+  const postsDir = path.join(root, "content", "posts");
+  if (!fs.existsSync(postsDir)) return { links: [] };
+  const links = [];
+  const pattern = /\]\((\/[a-zA-Z0-9_./?#=-]+)(?:\s+["'][^"']*["'])?\)/g;
+
+  for (const fileName of fs.readdirSync(postsDir).sort()) {
+    const match = fileName.match(/^([a-z0-9]+(?:-[a-z0-9]+)*)\.mdx?$/);
+    if (!match) continue;
+    const source = `/blog/${match[1]}`;
+    const text = fs.readFileSync(path.join(postsDir, fileName), "utf8");
+    for (const linkMatch of text.matchAll(pattern)) {
+      const target = normalizeRoute(linkMatch[1]);
+      if (!target || source === target) continue;
+      links.push({ source, target });
+    }
+  }
+
+  return {
+    links: [...new Map(links.map((link) => [`${link.source}\u0000${link.target}`, link])).values()]
+      .sort((a, b) => a.source.localeCompare(b.source) || a.target.localeCompare(b.target)),
+  };
 }
 
 function pageDescriptor(node, inbound) {
@@ -84,7 +107,7 @@ function candidateSort(a, b) {
   );
 }
 
-export function buildGraphInternalLinkAudit(graph, curated) {
+export function buildGraphInternalLinkAudit(graph, curated, markdownEditorial = { links: [] }) {
   const errors = [];
   if (graph?.schemaVersion !== 1) errors.push(`Unsupported Knowledge Graph schemaVersion: ${graph?.schemaVersion}`);
   if (!Array.isArray(graph?.nodes) || !Array.isArray(graph?.edges) || !Array.isArray(graph?.unmapped)) {
@@ -112,8 +135,13 @@ export function buildGraphInternalLinkAudit(graph, curated) {
     ? curated.sourceOwners
     : new Set(curated?.sourceOwners ?? []);
   const curatedLinkSet = new Set(curatedLinks.map((link) => `${link.source}\u0000${link.target}`));
+  const markdownLinks = Array.isArray(markdownEditorial?.links) ? markdownEditorial.links : [];
+  const markdownLinkSet = new Set(markdownLinks.map((link) => `${link.source}\u0000${link.target}`));
   const inbound = new Map();
   for (const link of curatedLinks) inbound.set(link.target, (inbound.get(link.target) ?? 0) + 1);
+
+  const hasEditorialPath = (source, target) =>
+    curatedLinkSet.has(`${source}\u0000${target}`) || markdownLinkSet.has(`${source}\u0000${target}`);
 
   const zeroCuratedInbound = pageNodes
     .filter((node) => (inbound.get(node.href) ?? 0) === 0)
@@ -122,12 +150,18 @@ export function buildGraphInternalLinkAudit(graph, curated) {
     .filter((node) => (inbound.get(node.href) ?? 0) === 1)
     .map((node) => pageDescriptor(node, inbound));
 
+  let markdownCoveredPrerequisitePaths = 0;
   const directPrerequisiteGaps = [];
   for (const edge of edges.filter((item) => item.relation === "prerequisiteOf")) {
     const source = pageById.get(edge.from);
     const target = pageById.get(edge.to);
     if (!source || !target || source.locale !== target.locale) continue;
-    if (curatedLinkSet.has(`${source.href}\u0000${target.href}`)) continue;
+    const key = `${source.href}\u0000${target.href}`;
+    if (curatedLinkSet.has(key)) continue;
+    if (markdownLinkSet.has(key)) {
+      markdownCoveredPrerequisitePaths += 1;
+      continue;
+    }
     directPrerequisiteGaps.push({
       priority: (inbound.get(target.href) ?? 0) === 0 ? "P0" : "P1",
       kind: "direct-prerequisite",
@@ -142,7 +176,7 @@ export function buildGraphInternalLinkAudit(graph, curated) {
   function addSemanticCandidate(source, target, evidence) {
     if (!source || !target || source.id === target.id || source.locale !== target.locale) return;
     if ((inbound.get(target.href) ?? 0) > 1) return;
-    if (curatedLinkSet.has(`${source.href}\u0000${target.href}`)) return;
+    if (hasEditorialPath(source.href, target.href)) return;
     const key = `${source.id}\u0000${target.id}`;
     const existing = semanticCandidates.get(key);
     if (existing) {
@@ -172,9 +206,7 @@ export function buildGraphInternalLinkAudit(graph, curated) {
   for (const [apiId, pages] of apiPages) {
     const uniquePages = [...new Map(pages.map((page) => [page.id, page])).values()];
     for (const source of uniquePages) {
-      for (const target of uniquePages) {
-        addSemanticCandidate(source, target, `shared-api:${apiId}`);
-      }
+      for (const target of uniquePages) addSemanticCandidate(source, target, `shared-api:${apiId}`);
     }
   }
 
@@ -197,12 +229,9 @@ export function buildGraphInternalLinkAudit(graph, curated) {
   for (const [symptomId, pages] of symptomPages) {
     const uniquePages = [...new Map(pages.map((page) => [page.id, page])).values()];
     for (const source of uniquePages) {
-      for (const target of uniquePages) {
-        addSemanticCandidate(source, target, `shared-symptom:${symptomId}`);
-      }
+      for (const target of uniquePages) addSemanticCandidate(source, target, `shared-symptom:${symptomId}`);
     }
   }
-
   const semanticPageGaps = [...semanticCandidates.values()].sort(candidateSort);
 
   const utilityCandidates = new Map();
@@ -210,7 +239,7 @@ export function buildGraphInternalLinkAudit(graph, curated) {
     for (const page of pages) {
       if (page.locale !== "zh") continue;
       for (const tool of symptomTools.get(symptomId) ?? []) {
-        if (!tool.href || curatedLinkSet.has(`${page.href}\u0000${tool.href}`)) continue;
+        if (!tool.href || hasEditorialPath(page.href, tool.href)) continue;
         const key = `${page.id}\u0000${tool.id}`;
         const existing = utilityCandidates.get(key);
         if (existing) {
@@ -242,11 +271,7 @@ export function buildGraphInternalLinkAudit(graph, curated) {
   for (const zh of pageNodes.filter((node) => node.locale === "zh")) {
     const english = pageById.get(`en_${zh.id}`);
     if (english?.locale === "en") {
-      bilingualPairs.set(`${zh.id}\u0000${english.id}`, {
-        zh,
-        en: english,
-        evidence: "derived-bilingual-id",
-      });
+      bilingualPairs.set(`${zh.id}\u0000${english.id}`, { zh, en: english, evidence: "derived-bilingual-id" });
     }
   }
   for (const edge of edges.filter((item) => item.relation === "relatedTo")) {
@@ -255,7 +280,6 @@ export function buildGraphInternalLinkAudit(graph, curated) {
     if (!left || !right || left.locale === right.locale) continue;
     const zh = left.locale === "zh" ? left : right;
     const en = left.locale === "en" ? left : right;
-    if (!zh || !en) continue;
     bilingualPairs.set(`${zh.id}\u0000${en.id}`, {
       zh,
       en,
@@ -292,7 +316,7 @@ export function buildGraphInternalLinkAudit(graph, curated) {
   return {
     schemaVersion: 1,
     audit: "graph-powered-internal-link-audit/v1",
-    scope: "read-only-curated-link-gap-audit",
+    scope: "read-only-curated-plus-chinese-markdown-gap-audit",
     graphFingerprint: graph?.sourceFingerprint ?? null,
     counts: {
       graphNodes: nodes.length,
@@ -301,6 +325,8 @@ export function buildGraphInternalLinkAudit(graph, curated) {
       pageNodes: pageNodes.length,
       curatedSources: curatedSourceOwners.size,
       curatedEdges: curatedLinks.length,
+      chineseMarkdownEditorialEdges: markdownLinks.length,
+      markdownCoveredPrerequisitePaths,
       zeroCuratedInbound: zeroCuratedInbound.length,
       weakCuratedInbound: weakCuratedInbound.length,
       directPrerequisiteGaps: directPrerequisiteGaps.length,
@@ -323,10 +349,11 @@ export function buildGraphInternalLinkAudit(graph, curated) {
       },
     },
     notes: [
-      "Zero/weak inbound means zero/one curated editorial inbound edge, not that the page is unreachable from listings, navigation, search, tags, or dynamic UI.",
+      "Zero/weak inbound still means zero/one curated editorial inbound edge; it does not mean the page is unreachable or lacks Markdown body links.",
+      "Actionable prerequisite, semantic-page, and Chinese article-to-tool candidates are suppressed when the exact Chinese Markdown source→target path already exists.",
+      "English article-body links are not parsed in V1.1; English candidate lists remain curated-map signals and still require manual editorial review.",
       "Candidates are deterministic audit suggestions only. They do not mutate articles and must still pass the article-link usefulness rule before any editorial change.",
-      "Semantic page candidates are emitted only when the target has at most one curated inbound edge and the same-locale pages share an authoritative Graph API or Symptom relation.",
-      "Bilingual asymmetry is a coverage signal, not a recommendation to add cross-language body links.",
+      "Bilingual asymmetry remains a curated-map coverage signal, not a recommendation to add cross-language body links.",
     ],
     errors: errors.sort(),
   };
@@ -371,6 +398,22 @@ function runSyntheticSelfTest() {
   if (!report.priorities.P1.bilingualAsymmetry.some((item) => item.zh.href === "/blog/b")) {
     throw new Error("Self-test bilingual asymmetry missing");
   }
+
+  const markdownAware = buildGraphInternalLinkAudit(graph, curated, {
+    links: [
+      { source: "/blog/a", target: "/blog/b" },
+      { source: "/blog/a", target: "/tools/test" },
+    ],
+  });
+  if (markdownAware.counts.directPrerequisiteGaps !== 0) {
+    throw new Error("Self-test Markdown prerequisite suppression failed");
+  }
+  if (markdownAware.counts.markdownCoveredPrerequisitePaths !== 1) {
+    throw new Error("Self-test Markdown prerequisite coverage mismatch");
+  }
+  if (markdownAware.priorities.P1.articleToolGaps.some((item) => item.source.href === "/blog/a" && item.target.href === "/tools/test")) {
+    throw new Error("Self-test Markdown tool suppression failed");
+  }
 }
 
 function buildCurrentReport() {
@@ -385,7 +428,7 @@ function buildCurrentReport() {
   }
   if (!fs.existsSync(graphPath)) throw new Error(`Missing Knowledge Graph artifact: ${path.relative(root, graphPath)}`);
   const graph = JSON.parse(fs.readFileSync(graphPath, "utf8"));
-  return buildGraphInternalLinkAudit(graph, loadCuratedLinks());
+  return buildGraphInternalLinkAudit(graph, loadCuratedLinks(), loadChineseMarkdownEditorialLinks());
 }
 
 function stableJson(value) {
@@ -398,8 +441,10 @@ function printSummary(report) {
   console.log(`Graph: ${report.counts.graphNodes} nodes / ${report.counts.graphEdges} edges / ${report.counts.graphUnmapped} unmapped`);
   console.log(`Graph page nodes: ${report.counts.pageNodes}`);
   console.log(`Curated links: ${report.counts.curatedSources} sources / ${report.counts.curatedEdges} edges`);
+  console.log(`Chinese Markdown editorial links: ${report.counts.chineseMarkdownEditorialEdges}`);
+  console.log(`Prerequisite paths already covered by Chinese Markdown: ${report.counts.markdownCoveredPrerequisitePaths}`);
   console.log(`P0 zero curated inbound: ${report.counts.zeroCuratedInbound}`);
-  console.log(`P0/P1 direct prerequisite gaps: ${report.counts.directPrerequisiteGaps}`);
+  console.log(`P0/P1 actionable direct prerequisite gaps: ${report.counts.directPrerequisiteGaps}`);
   console.log(`P1 weak curated inbound: ${report.counts.weakCuratedInbound}`);
   console.log(`P1 semantic page gaps: ${report.counts.semanticPageGaps}`);
   console.log(`P1 article -> tool gaps: ${report.counts.articleToolGaps}`);
@@ -407,7 +452,7 @@ function printSummary(report) {
   console.log("");
 
   const p0Targets = report.priorities.P0.zeroCuratedInbound.slice(0, 20);
-  console.log("P0: zero curated inbound page nodes (first 20)");
+  console.log("P0 diagnostic: zero curated inbound page nodes (first 20)");
   for (const item of p0Targets) console.log(`  ${item.locale} ${item.href} — ${item.title}`);
   if (report.priorities.P0.zeroCuratedInbound.length > 20) {
     console.log(`  ... ${report.priorities.P0.zeroCuratedInbound.length - 20} more in the JSON report`);
@@ -420,7 +465,7 @@ function printSummary(report) {
     ...report.priorities.P1.semanticPageGaps,
     ...report.priorities.P1.articleToolGaps,
   ].sort(candidateSort).slice(0, 20);
-  console.log("Top semantic gap candidates (first 20)");
+  console.log("Top actionable semantic gap candidates (first 20)");
   for (const item of topCandidates) {
     console.log(`  ${item.priority} ${item.source.href} -> ${item.target.href} [${item.evidence.join(", ")}]`);
   }
