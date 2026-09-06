@@ -9,14 +9,14 @@
     "graphUnmapped": 0,
     "pageNodes": 160,
     "curatedSources": 115,
-    "curatedEdges": 374,
+    "curatedEdges": 380,
     "chineseMarkdownEditorialEdges": 447,
     "markdownCoveredPrerequisitePaths": 19,
     "zeroCuratedInbound": 40,
     "weakCuratedInbound": 31,
     "directPrerequisiteGaps": 7,
     "semanticPageGaps": 1,
-    "articleToolGaps": 8,
+    "articleToolGaps": 5,
     "bilingualPairs": 80,
     "bilingualAsymmetry": 7
   },
@@ -857,78 +857,12 @@
           "priority": "P1",
           "kind": "article-tool-bridge",
           "source": {
-            "id": "article_1e18e39c-e2c2-458d-b2b2-2e2112e46e21",
-            "href": "/blog/screeps-tower-auto-attack-hostiles",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower attack hostiles",
-            "curatedInbound": 3
-          },
-          "target": {
-            "id": "tool_1ae7f59e-5815-498b-a205-d1b717894779",
-            "href": "/tools/tower-damage-heal-repair-calculator",
-            "locale": "zh",
-            "type": "Tool",
-            "title": "Tower 伤害、治疗与维修计算器"
-          },
-          "evidence": [
-            "shared-symptom:symptom:tower-not-acting"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "article-tool-bridge",
-          "source": {
             "id": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
             "href": "/blog/screeps-tower-heal-creeps",
             "locale": "zh",
             "type": "Article",
             "title": "Screeps Tower heal Creeps",
             "curatedInbound": 1
-          },
-          "target": {
-            "id": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
-            "href": "/tools/room-diagnostics",
-            "locale": "zh",
-            "type": "Tool",
-            "title": "房间运行诊断"
-          },
-          "evidence": [
-            "shared-symptom:symptom:tower-not-acting"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "article-tool-bridge",
-          "source": {
-            "id": "article_e36ef0e1-d790-4d38-a5fe-fc9014ad4d2a",
-            "href": "/blog/screeps-tower-heal-creeps",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower heal Creeps",
-            "curatedInbound": 1
-          },
-          "target": {
-            "id": "tool_1ae7f59e-5815-498b-a205-d1b717894779",
-            "href": "/tools/tower-damage-heal-repair-calculator",
-            "locale": "zh",
-            "type": "Tool",
-            "title": "Tower 伤害、治疗与维修计算器"
-          },
-          "evidence": [
-            "shared-symptom:symptom:tower-not-acting"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "article-tool-bridge",
-          "source": {
-            "id": "article_dfa067a1-24be-4bfd-b6ab-45752038f0ad",
-            "href": "/blog/screeps-tower-repair-threshold",
-            "locale": "zh",
-            "type": "Article",
-            "title": "Screeps Tower repair threshold",
-            "curatedInbound": 3
           },
           "target": {
             "id": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
@@ -953,11 +887,11 @@
             "curatedInbound": 3
           },
           "target": {
-            "id": "tool_1ae7f59e-5815-498b-a205-d1b717894779",
-            "href": "/tools/tower-damage-heal-repair-calculator",
+            "id": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+            "href": "/tools/room-diagnostics",
             "locale": "zh",
             "type": "Tool",
-            "title": "Tower 伤害、治疗与维修计算器"
+            "title": "房间运行诊断"
           },
           "evidence": [
             "shared-symptom:symptom:tower-not-acting"
