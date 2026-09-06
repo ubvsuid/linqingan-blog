@@ -22,6 +22,7 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
     "cluster": "Beginner / Energy",
     "links": [
       { "href": "/blog/screeps-first-creep-harvest", "label": "让第一只 Creep 采集 Energy", "role": "前置步骤" },
+      { "href": "/blog/screeps-creep-body-parts", "label": "下一篇：认识 WORK、CARRY 和 MOVE", "role": "下一课" },
       { "href": "/blog/screeps-spawn-create-creep", "label": "用 Spawn 创建 Creep", "role": "进入 Spawn 系统" },
       { "href": "/blog/screeps-creep-working-state", "label": "用 working 状态稳定往返逻辑", "role": "下一步" }
     ]
@@ -90,6 +91,18 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
       { "href": "/blog/screeps-tombstone-ruin-recovery", "label": "资源不在地面时，继续回收 Tombstone 与 Ruin", "role": "资源恢复分支" }
     ]
   },
+  "/blog/screeps-creep-withdraw-container-energy": {
+    "cluster": "Room Economy / Container",
+    "links": [
+      { "href": "/blog/screeps-container-decay-repair-deadline", "label": "Container 长期使用时继续检查腐化与维修截止时间", "role": "维护下一步" }
+    ]
+  },
+  "/blog/screeps-rawmemory-segments": {
+    "cluster": "Memory / Cross-boundary",
+    "links": [
+      { "href": "/blog/screeps-intershardmemory-sync", "label": "需要跨 shard 同步自己的状态时改用 InterShardMemory", "role": "跨 shard 分支" }
+    ]
+  },
   "/blog/screeps-intershardmemory-sync": {
     "cluster": "Memory / Cross-boundary",
     "links": [
@@ -108,6 +121,7 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
     "cluster": "Beginner / Energy",
     "links": [
       { "href": "/en/blog/screeps-creep-harvest-energy", "label": "Harvest Energy", "role": "Prerequisite step" },
+      { "href": "/en/blog/screeps-creep-body-parts", "label": "Next lesson: understand WORK, CARRY, and MOVE", "role": "Next lesson" },
       { "href": "/en/blog/screeps-spawn-creep", "label": "Spawn a Creep", "role": "Enter the Spawn system" },
       { "href": "/en/blog/screeps-working-state", "label": "Working-state switching", "role": "Next step" }
     ]
@@ -174,6 +188,18 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
     "cluster": "Room Economy / Recovery",
     "links": [
       { "href": "/en/blog/screeps-tombstone-ruin-recovery", "label": "Recover resources from Tombstones and Ruins", "role": "Recovery branch" }
+    ]
+  },
+  "/en/blog/screeps-withdraw-container-energy": {
+    "cluster": "Room Economy / Container",
+    "links": [
+      { "href": "/en/blog/screeps-container-decay-repair-deadline", "label": "Keep long-lived Containers healthy before decay becomes urgent", "role": "Maintenance next step" }
+    ]
+  },
+  "/en/blog/screeps-rawmemory-segments": {
+    "cluster": "Memory / Cross-boundary",
+    "links": [
+      { "href": "/en/blog/screeps-intershardmemory-sync", "label": "Use InterShardMemory when your own state must cross shards", "role": "Cross-shard branch" }
     ]
   },
   "/en/blog/screeps-intershardmemory-sync": {
