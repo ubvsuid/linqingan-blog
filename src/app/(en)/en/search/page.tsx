@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { EnglishSiteSearch } from "@/components/english-site-search";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { getKnowledgeClusterHandoffSignals } from "@/lib/knowledge-cluster-handoff";
 import { getEnglishInitialSearchDocuments } from "@/lib/english-search";
 
 import styles from "../english.module.css";
@@ -23,6 +24,7 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
   const params = await searchParams;
   const initialQuery = Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "";
   const initialDocuments = getEnglishInitialSearchDocuments(initialQuery);
+  const clusterHandoffs = getKnowledgeClusterHandoffSignals("en");
 
   return (
     <main className={styles.page} lang="en">
@@ -47,7 +49,11 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
           </p>
         </div>
 
-        <EnglishSiteSearch initialQuery={initialQuery} initialDocuments={initialDocuments} />
+        <EnglishSiteSearch
+          initialQuery={initialQuery}
+          initialDocuments={initialDocuments}
+          clusterHandoffs={clusterHandoffs}
+        />
       </Container>
     </main>
   );

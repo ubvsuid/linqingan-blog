@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { ProblemResolver } from "@/components/problem-resolver";
+import { getKnowledgeClusterHandoffSignals } from "@/lib/knowledge-cluster-handoff";
 import {
   buildKnowledgeGraphV1,
   getKnowledgeGraphCoverage,
@@ -19,6 +20,7 @@ export default function ProblemResolverPage() {
   const graph = buildKnowledgeGraphV1();
   const graphCoverage = getKnowledgeGraphCoverage(graph);
   const relatedPathsByStep = buildProblemResolverGraphPaths("zh", graph);
+  const clusterHandoffs = getKnowledgeClusterHandoffSignals("zh");
 
   return (
     <main className="page-shell">
@@ -42,7 +44,11 @@ export default function ProblemResolverPage() {
             {" "}<Link href="/knowledge/coverage">查看 Knowledge Coverage →</Link>
           </p>
         </aside>
-        <ProblemResolver locale="zh" relatedPathsByStep={relatedPathsByStep} />
+        <ProblemResolver
+          locale="zh"
+          relatedPathsByStep={relatedPathsByStep}
+          clusterHandoffs={clusterHandoffs}
+        />
       </Container>
     </main>
   );

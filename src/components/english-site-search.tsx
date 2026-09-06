@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EnglishSearchDocument } from "@/lib/english-search";
+import type { KnowledgeClusterHandoffSignal } from "@/lib/knowledge-cluster-handoff";
 import {
   getKnowledgeGraphSearchAnchorEntityId,
   getKnowledgeGraphSearchSignalScore,
@@ -113,9 +114,11 @@ function Highlight({ text, query }: { text: string; query: string }) {
 export function EnglishSiteSearch({
   initialQuery = "",
   initialDocuments = [],
+  clusterHandoffs = [],
 }: {
   initialQuery?: string;
   initialDocuments?: EnglishSearchDocument[];
+  clusterHandoffs?: readonly KnowledgeClusterHandoffSignal[];
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [type, setType] = useState("");
@@ -258,6 +261,24 @@ export function EnglishSiteSearch({
       .map((item) => item.document);
   }, [documents, normalizedQuery, query, type]);
 
+  const activeClusterHandoff = useMemo(() => {
+    if (!normalizedQuery || documents.length === 0) return null;
+    const promotions = getScreepsIntentPromotions(query, "en", 8);
+    const availableGraphAnchorEntityIds = new Set(
+      documents.flatMap((document) =>
+        document.graphSearch?.map((signal) => signal.anchorEntityId) ?? [],
+      ),
+    );
+    const graphAnchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+      promotions,
+      availableGraphAnchorEntityIds,
+    );
+    if (!graphAnchorEntityId) return null;
+    return clusterHandoffs.find((handoff) =>
+      handoff.anchorEntityIds.includes(graphAnchorEntityId),
+    ) ?? null;
+  }, [clusterHandoffs, documents, normalizedQuery, query]);
+
   function updateQuery(value: string) {
     setQuery(value);
     const url = new URL(window.location.href);
@@ -338,6 +359,14 @@ export function EnglishSiteSearch({
             ? `${results.length} matching result${results.length === 1 ? "" : "s"}`
             : "Recommended English resources"}
       </p>
+
+      {normalizedQuery && activeClusterHandoff ? (
+        <aside className="english-search-empty" aria-label="Knowledge Cluster handoff">
+          <strong>Continue in the complete problem space: {activeClusterHandoff.title}</strong>
+          <p>{activeClusterHandoff.description} This handoff is derived from the same high-confidence canonical entity anchor; it does not change search ranking.</p>
+          <div><Link href={activeClusterHandoff.href} prefetch={false}>Open the Knowledge Cluster →</Link></div>
+        </aside>
+      ) : null}
 
       {loadState === "error" && (normalizedQuery || type) && documents.length === 0 ? (
         <div className="english-search-empty">

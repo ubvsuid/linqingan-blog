@@ -107,6 +107,9 @@ export function SiteSearchV2({
   const [source, setSource] = useState<SearchV2Source | null>(
     initialResponse?.source ?? null,
   );
+  const [clusterHandoff, setClusterHandoff] = useState(
+    initialResponse?.clusterHandoff ?? null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -165,9 +168,11 @@ export function SiteSearchV2({
         const payload = (await response.json()) as SearchV2Response;
         setResults(Array.isArray(payload.results) ? payload.results : []);
         setSource(payload.source === "database" ? "database" : "static");
+        setClusterHandoff(payload.clusterHandoff ?? null);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setRequestError(true);
+        setClusterHandoff(null);
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }
@@ -293,6 +298,7 @@ export function SiteSearchV2({
     setActiveSuggestionIndex(-1);
     setQueryId(null);
     setRequestError(false);
+    setClusterHandoff(null);
     setQuery(value);
 
     if (!nextQuery) {
@@ -438,6 +444,19 @@ export function SiteSearchV2({
           })}
         </div>
       </div>
+
+      {normalizedQuery && clusterHandoff ? (
+        <aside className="site-search-empty" aria-label="Knowledge Cluster 回流入口">
+          <strong>进入完整问题空间：{clusterHandoff.title}</strong>
+          <p>{clusterHandoff.description} 这个入口由同一条高置信 canonical entity anchor 派生，不参与 Search 排名。</p>
+          <div>
+            <Link href={clusterHandoff.href} prefetch={false}>
+              <strong>打开 Knowledge Cluster</strong>
+              <span>从 Learn / Build / Solve / Verify / Explore 继续处理这个系统。</span>
+            </Link>
+          </div>
+        </aside>
+      ) : null}
 
       {normalizedQuery ? (
         <>

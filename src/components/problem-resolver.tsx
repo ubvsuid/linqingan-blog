@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import type { KnowledgeClusterHandoffSignal } from "@/lib/knowledge-cluster-handoff";
 import type { ProblemResolverGraphPathsByStep } from "@/lib/problem-resolver-graph";
 import {
   getProblemResolverStep,
@@ -15,9 +16,11 @@ import styles from "./problem-resolver.module.css";
 export function ProblemResolver({
   locale,
   relatedPathsByStep = {},
+  clusterHandoffs = [],
 }: {
   locale: ProblemResolverLocale;
   relatedPathsByStep?: ProblemResolverGraphPathsByStep;
+  clusterHandoffs?: readonly KnowledgeClusterHandoffSignal[];
 }) {
   const isEnglish = locale === "en";
   const [flowId, setFlowId] = useState(problemResolverFlows[0].flowId);
@@ -56,6 +59,9 @@ export function ProblemResolver({
   const searchHref = `${isEnglish ? "/en/search" : "/search"}?q=${encodeURIComponent(isEnglish ? flow.enTitle : flow.zhTitle)}`;
   const tickLabHref = isEnglish ? "/en/tick-lab" : "/tick-lab";
   const graphRelatedPaths = step.kind === "outcome" ? relatedPathsByStep[step.stepId] ?? [] : [];
+  const clusterHandoff = clusterHandoffs.find((handoff) =>
+    handoff.anchorGraphNodeIds.includes(`symptom:${flow.symptomId}`),
+  ) ?? null;
 
   return (
     <section className={styles.shell} aria-labelledby={`problem-resolver-${locale}`}>
@@ -107,6 +113,11 @@ export function ProblemResolver({
             <div className={styles.actions}>
               <Link href={diagnosticHref}>{isEnglish ? "Open the full diagnostic path" : "打开完整诊断路径"} →</Link>
               <Link href={searchHref}>{isEnglish ? "Search related site knowledge" : "搜索相关站内知识"} →</Link>
+              {clusterHandoff ? (
+                <Link href={clusterHandoff.href}>
+                  {isEnglish ? `Open the ${clusterHandoff.title} Cluster` : `进入 ${clusterHandoff.title} Cluster`} →
+                </Link>
+              ) : null}
               {step.tickLab ? <Link href={tickLabHref}>{isEnglish ? "Try the modeled case in Tick Lab" : "在 Tick Lab 尝试模型场景"} →</Link> : null}
             </div>
             {graphRelatedPaths.length > 0 ? (

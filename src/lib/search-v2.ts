@@ -2,6 +2,7 @@ import { and, desc, eq, or, sql } from "drizzle-orm";
 
 import { getPlatformDatabase } from "@/db/client";
 import { searchClicks, searchDocuments, searchQueries } from "@/db/schema";
+import { getKnowledgeClusterHandoffForGraphNodeId } from "@/lib/knowledge-cluster-handoff";
 import { getKnowledgeGraphSearchContext } from "@/lib/knowledge-graph-search";
 import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 import {
@@ -367,12 +368,18 @@ export async function searchV2(
   );
   results = applyKnowledgeGraphRanking(normalizedQuery, results, type, limit);
 
+  const graphContext = getKnowledgeGraphSearchContext(normalizedQuery, "zh", 8);
+  const clusterHandoff = graphContext
+    ? getKnowledgeClusterHandoffForGraphNodeId(graphContext.anchorGraphNodeId, "zh")
+    : null;
+
   return {
     query: query.trim(),
     normalizedQuery,
     results,
     total: results.length,
     source,
+    clusterHandoff,
   };
 }
 
