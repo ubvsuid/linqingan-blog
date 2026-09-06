@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "primaryMembership": "knowledge-module",
+  "graphExpansion": "explicit-relations-only",
+  "clusters": [
+    {
+      "clusterId": "memory-engineering",
+      "sourceModuleId": "memory-engineering",
+      "number": 1,
+      "enTitle": "Memory Engineering",
+      "enDescription": "Persistent state, object recovery, modules, segments, cross-shard state, and runtime caching.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "spawn-lifecycle",
+      "sourceModuleId": "spawn-lifecycle",
+      "number": 2,
+      "enTitle": "Spawn & Creep Lifecycle",
+      "enDescription": "Body design, spawning, Energy constraints, queues, replacement, renewal, recycling, and recovery.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": true
+    },
+    {
+      "clusterId": "room-economy",
+      "sourceModuleId": "room-economy",
+      "number": 3,
+      "enTitle": "Room Economy",
+      "enDescription": "Store semantics, harvesting, resource recovery, storage, transport, links, terminals, and minerals.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "movement-vision",
+      "sourceModuleId": "movement-vision",
+      "number": 4,
+      "enTitle": "Movement & Vision",
+      "enDescription": "Movement failures, fatigue, routing, PathFinder, CostMatrix, room visibility, observers, and visualization.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "controller-control",
+      "sourceModuleId": "controller-control",
+      "number": 5,
+      "enTitle": "Controller & Expansion",
+      "enDescription": "Controller upgrading, safety, downgrade pressure, reservation, claiming, and expansion boundaries.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "construction-defense",
+      "sourceModuleId": "construction-defense",
+      "number": 6,
+      "enTitle": "Construction & Defense",
+      "enDescription": "Construction lifecycle, Tower actions, combat, Ramparts, Walls, repairs, and higher-level defense systems.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "market-advanced-resources",
+      "sourceModuleId": "market-advanced-resources",
+      "number": 7,
+      "enTitle": "Market & Advanced Resources",
+      "enDescription": "Market operations, Labs, boosts, Factory production, commodities, Power, and advanced resource workflows.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    },
+    {
+      "clusterId": "operations-debugging",
+      "sourceModuleId": "operations-debugging",
+      "number": 8,
+      "enTitle": "Operations & Debugging",
+      "enDescription": "Configuration, CPU and Bucket health, load shedding, notifications, event logs, isolation, and recovery.",
+      "facets": ["learn", "build", "solve", "verify", "explore"],
+      "demonstrator": false
+    }
+  ]
+}

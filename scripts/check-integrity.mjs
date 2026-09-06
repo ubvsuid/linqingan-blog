@@ -15,6 +15,7 @@ const checks = [
   ["Knowledge Graph V1 generated freshness", "scripts/generate-knowledge-graph-v1.mjs", "--check"],
   ["Knowledge Graph V1 contract and coverage", "scripts/check-knowledge-graph-v1.mjs"],
   ["Problem Resolver Graph reuse", "scripts/check-problem-resolver-graph.mjs"],
+  ["Knowledge Clusters V1", "scripts/check-knowledge-clusters.mjs"],
   ["Knowledge registry", "scripts/check-knowledge-registry.mjs"],
   ["Beginner roadmap", "scripts/check-beginner-roadmap.mjs"],
   ["Site Asset Master V2", "scripts/check-site-asset-master.mjs"],
@@ -30,14 +31,10 @@ for (const [label, script, ...args] of checks) {
     env: process.env,
     stdio: "inherit",
   });
-
   if (result.error) throw result.error;
   if (result.status !== 0) {
     console.error(`\n[integrity] FAILED: ${label}`);
     process.exit(result.status ?? 1);
   }
 }
-
-console.log(
-  `\n[integrity] PASS: ${checks.length} deterministic repository checks passed.`,
-);
+console.log(`\n[integrity] PASS: ${checks.length} deterministic repository checks passed.`);
