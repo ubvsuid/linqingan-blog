@@ -5,6 +5,11 @@ import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { EnglishSearchDocument } from "@/lib/english-search";
+import type { KnowledgeClusterHandoffSignal } from "@/lib/knowledge-cluster-handoff";
+import {
+  getKnowledgeGraphSearchAnchorEntityId,
+  getKnowledgeGraphSearchSignalScore,
+} from "@/lib/knowledge-graph-search-policy";
 import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 
 const popularQueries = ["ERR_NOT_IN_RANGE", "creep not moving", "CPU bucket", "body calculator", "Memory cleanup"];
@@ -109,9 +114,11 @@ function Highlight({ text, query }: { text: string; query: string }) {
 export function EnglishSiteSearch({
   initialQuery = "",
   initialDocuments = [],
+  clusterHandoffs = [],
 }: {
   initialQuery?: string;
   initialDocuments?: EnglishSearchDocument[];
+  clusterHandoffs?: readonly KnowledgeClusterHandoffSignal[];
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [type, setType] = useState("");
@@ -179,7 +186,21 @@ export function EnglishSiteSearch({
     }
 
     const promotions = getScreepsIntentPromotions(query, "en", 8);
+    const availableGraphAnchorEntityIds = new Set(
+      sourceDocuments.flatMap((document) =>
+        document.graphSearch?.map((signal) => signal.anchorEntityId) ?? [],
+      ),
+    );
+    const graphAnchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+      promotions,
+      availableGraphAnchorEntityIds,
+    );
     const promotionScoreByHref = new Map(promotions.map((promotion) => [promotion.href, promotion.score]));
+    const intentOrderByHref = new Map(
+      promotions
+        .filter((promotion) => !type || intentDocumentType(promotion.kind) === type)
+        .map((promotion, index) => [promotion.href, index] as const),
+    );
     const mergedByHref = new Map(sourceDocuments.map((document) => [document.href, document]));
 
     for (const promotion of promotions) {
@@ -214,12 +235,49 @@ export function EnglishSiteSearch({
           if (!`${title} ${description} ${keywords}`.includes(token) && fuzzyTokenMatch(token, words)) score += 2;
         }
 
-        return { document, score };
+        const graphScore = getKnowledgeGraphSearchSignalScore(
+          document.graphSearch,
+          graphAnchorEntityId,
+        );
+
+        return { document, score, graphScore };
       })
-      .filter((item) => item.score > 0)
-      .sort((left, right) => right.score - left.score)
+      .filter((item) => item.score > 0 || item.graphScore > 0)
+      .sort((left, right) => {
+        if (graphAnchorEntityId) {
+          const leftIntentOrder = intentOrderByHref.get(left.document.href);
+          const rightIntentOrder = intentOrderByHref.get(right.document.href);
+          if (leftIntentOrder !== undefined || rightIntentOrder !== undefined) {
+            if (leftIntentOrder === undefined) return 1;
+            if (rightIntentOrder === undefined) return -1;
+            if (leftIntentOrder !== rightIntentOrder) return leftIntentOrder - rightIntentOrder;
+          }
+
+          if (left.graphScore !== right.graphScore) return right.graphScore - left.graphScore;
+        }
+
+        return right.score - left.score;
+      })
       .map((item) => item.document);
   }, [documents, normalizedQuery, query, type]);
+
+  const activeClusterHandoff = useMemo(() => {
+    if (!normalizedQuery || documents.length === 0) return null;
+    const promotions = getScreepsIntentPromotions(query, "en", 8);
+    const availableGraphAnchorEntityIds = new Set(
+      documents.flatMap((document) =>
+        document.graphSearch?.map((signal) => signal.anchorEntityId) ?? [],
+      ),
+    );
+    const graphAnchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+      promotions,
+      availableGraphAnchorEntityIds,
+    );
+    if (!graphAnchorEntityId) return null;
+    return clusterHandoffs.find((handoff) =>
+      handoff.anchorEntityIds.includes(graphAnchorEntityId),
+    ) ?? null;
+  }, [clusterHandoffs, documents, normalizedQuery, query]);
 
   function updateQuery(value: string) {
     setQuery(value);
@@ -301,6 +359,14 @@ export function EnglishSiteSearch({
             ? `${results.length} matching result${results.length === 1 ? "" : "s"}`
             : "Recommended English resources"}
       </p>
+
+      {normalizedQuery && activeClusterHandoff ? (
+        <aside className="english-search-empty" aria-label="Knowledge Cluster handoff">
+          <strong>Continue in the complete problem space: {activeClusterHandoff.title}</strong>
+          <p>{activeClusterHandoff.description} This handoff is derived from the same high-confidence canonical entity anchor; it does not change search ranking.</p>
+          <div><Link href={activeClusterHandoff.href} prefetch={false}>Open the Knowledge Cluster →</Link></div>
+        </aside>
+      ) : null}
 
       {loadState === "error" && (normalizedQuery || type) && documents.length === 0 ? (
         <div className="english-search-empty">

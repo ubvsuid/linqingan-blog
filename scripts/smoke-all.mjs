@@ -5,6 +5,7 @@ await import("./smoke-search-v2.mjs");
 await import("./smoke-platform-data-phase2.mjs");
 await import("./check-verification-evidence-pipeline.mjs");
 await import("./smoke-planning-tools.mjs");
+await import("./smoke-knowledge-clusters.mjs");
 
 const originalFetch = globalThis.fetch;
 

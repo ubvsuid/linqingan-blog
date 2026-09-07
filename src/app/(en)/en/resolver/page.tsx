@@ -3,10 +3,12 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { ProblemResolver } from "@/components/problem-resolver";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
+import { getKnowledgeClusterHandoffSignals } from "@/lib/knowledge-cluster-handoff";
 import {
   buildKnowledgeGraphV1,
   getKnowledgeGraphCoverage,
 } from "@/lib/knowledge-graph-v1";
+import { buildProblemResolverGraphPaths } from "@/lib/problem-resolver-graph";
 
 import styles from "../english.module.css";
 
@@ -18,7 +20,10 @@ export const metadata = createEnglishPageMetadata({
 });
 
 export default function EnglishProblemResolverPage() {
-  const graphCoverage = getKnowledgeGraphCoverage(buildKnowledgeGraphV1());
+  const graph = buildKnowledgeGraphV1();
+  const graphCoverage = getKnowledgeGraphCoverage(graph);
+  const relatedPathsByStep = buildProblemResolverGraphPaths("en", graph);
+  const clusterHandoffs = getKnowledgeClusterHandoffSignals("en");
 
   return (
     <main className={styles.page} lang="en">
@@ -42,7 +47,11 @@ export default function EnglishProblemResolverPage() {
             {" "}<Link href="/en/knowledge/coverage">Open Knowledge Coverage →</Link>
           </p>
         </div>
-        <ProblemResolver locale="en" />
+        <ProblemResolver
+          locale="en"
+          relatedPathsByStep={relatedPathsByStep}
+          clusterHandoffs={clusterHandoffs}
+        />
       </Container>
     </main>
   );

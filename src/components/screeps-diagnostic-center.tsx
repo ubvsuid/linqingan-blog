@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { getKnowledgeClusterHandoffForGraphNodeId } from "@/lib/knowledge-cluster-handoff";
 import {
   localizeDiagnosticLink,
   screepsDiagnosticSymptoms,
@@ -213,6 +214,10 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
           const triage = isEnglish ? symptom.enTriage : symptom.zhTriage;
           const symptomTitle = isEnglish ? symptom.enTitle : symptom.zhTitle;
           const symptomSearchHref = `${searchRootHref}?q=${encodeURIComponent(symptomTitle)}`;
+          const clusterHandoff = getKnowledgeClusterHandoffForGraphNodeId(
+            `symptom:${symptom.id}`,
+            locale,
+          );
 
           const renderErrorLink = (name: string) => {
             const error = errorMap.get(name);
@@ -326,6 +331,11 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
                 ) : null}
                 <nav aria-label={copy.verification}>
                   <Link href={symptomSearchHref}>{copy.searchProblem}</Link>
+                  {clusterHandoff ? (
+                    <Link href={clusterHandoff.href}>
+                      {isEnglish ? `Open ${clusterHandoff.title} Cluster` : `进入 ${clusterHandoff.title} Cluster`}
+                    </Link>
+                  ) : null}
                   <Link href={verificationHref}>{copy.verificationMethod}</Link>
                   <Link href={`${coverageHref}#coverage-${symptom.id}`}>{copy.coverage}</Link>
                   <Link href={verifiedHref}>{copy.recentlyVerified}</Link>
