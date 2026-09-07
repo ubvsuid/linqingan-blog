@@ -25,6 +25,8 @@ export interface KnowledgeClusterExperienceLink {
 
 export interface KnowledgeClusterExperience {
   clusterId: KnowledgeClusterId;
+  title: string;
+  description: string;
   articleCount: number;
   stageCount: number;
   firstGuide: KnowledgeClusterExperienceLink;
@@ -241,6 +243,9 @@ export function getKnowledgeClusterExperienceByModuleNumber(
 
   return {
     clusterId: cluster.clusterId,
+    title: locale === "en" ? clusterRecord.enTitle : clusterRecord.zhTitle,
+    description:
+      locale === "en" ? clusterRecord.enDescription : clusterRecord.zhDescription,
     articleCount,
     stageCount: clusterRecord.sourceModule.stages.length,
     firstGuide,
