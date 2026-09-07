@@ -17,8 +17,10 @@ function titleFromSlug(value) { return String(value).split("-").filter(Boolean).
 function extractToolCatalog(root) {
   const source = readText(path.join(root, "src", "lib", "tool-catalog.ts"));
   const records = [];
-  const pattern = /\n\s*slug:\s*"([^"]+)"[\s\S]*?\n\s*zhTitle:\s*"([^"]+)"[\s\S]*?\n\s*zhDescription:\s*"([^"]+)"/g;
-  for (const match of source.matchAll(pattern)) records.push({ slug: match[1], title: match[2], description: match[3] });
+  const pattern = /\n\s*slug:\s*"([^"]+)"[\s\S]*?\n\s*zhTitle:\s*"([^"]+)"[\s\S]*?\n\s*zhDescription:\s*"([^"]+)"[\s\S]*?\n\s*enTitle:\s*"([^"]+)"[\s\S]*?\n\s*enDescription:\s*"([^"]+)"/g;
+  for (const match of source.matchAll(pattern)) {
+    records.push({ slug: match[1], zhTitle: match[2], zhDescription: match[3], enTitle: match[4], enDescription: match[5] });
+  }
   return records;
 }
 function extractDiagnosticSymptoms(root) {
@@ -37,8 +39,35 @@ function extractApiHubs(root) {
 }
 function emptyDecisionState() { return { health: { content: "not-scored", evidence: "not-scored", indexation: "not-scored" }, opportunity: { priority: null, reasons: [] } }; }
 function withDecisionHooks(asset) { return { ...asset, joinKeys: { path: asset.path, ownerKeyword: asset.primaryKeyword ?? null }, decision: emptyDecisionState() }; }
-function pageAsset({ id, type, path: href, title, system, parentPath = "/", sourceOfTruth, module = null, order = null }) {
-  return withDecisionHooks({ assetId: `zh-CN:${type}:${id}`, assetType: type, language: "zh-CN", path: href, canonicalPath: href, routeKind: "page", title, contentSystem: system, module, roadmap: null, stage: null, order, difficulty: null, primaryKeyword: null, keywordRole: null, searchIntent: null, metadataSource: sourceOfTruth, sourceOfTruth, parentPath });
+function pageAsset({ id, type, path: href, title, system, language = "zh-CN", parentPath = "/", sourceOfTruth, module = null, order = null }) {
+  return withDecisionHooks({ assetId: `${language}:${type}:${id}`, assetType: type, language, path: href, canonicalPath: href, routeKind: "page", title, contentSystem: system, module, roadmap: null, stage: null, order, difficulty: null, primaryKeyword: null, keywordRole: null, searchIntent: null, metadataSource: sourceOfTruth, sourceOfTruth, parentPath });
+}
+function toolAsset(tool, index, language = "zh-CN") {
+  const english = language === "en";
+  const href = english ? `/en/tools/${tool.slug}` : `/tools/${tool.slug}`;
+  return withDecisionHooks({
+    assetId: `${language}:tool:${tool.slug}`,
+    assetType: "tool",
+    language,
+    path: href,
+    canonicalPath: href,
+    routeKind: "page",
+    slug: tool.slug,
+    title: english ? tool.enTitle : tool.zhTitle,
+    description: english ? tool.enDescription : tool.zhDescription,
+    contentSystem: "utility",
+    module: null,
+    roadmap: null,
+    stage: null,
+    order: (index + 1) * 10,
+    difficulty: null,
+    primaryKeyword: null,
+    keywordRole: null,
+    searchIntent: null,
+    metadataSource: "tool-catalog",
+    sourceOfTruth: "src/lib/tool-catalog.ts",
+    parentPath: english ? "/en/tools" : "/tools",
+  });
 }
 
 export function buildSiteAssetMaster(root = process.cwd()) {
@@ -64,6 +93,8 @@ export function buildSiteAssetMaster(root = process.cwd()) {
   const knowledgeModules = [...new Set(articleAssets.filter((asset) => asset.contentSystem === "knowledge" && asset.module).map((asset) => asset.module))];
   const knowledgeModuleAssets = knowledgeModules.map((module, index) => pageAsset({ id: module, type: "knowledge-module", path: `/knowledge/${module}`, title: titleFromSlug(module), system: "knowledge", parentPath: "/knowledge", sourceOfTruth: "generated-knowledge-registry", module, order: (index + 1) * 10 }));
   const hubAssets = [
+    pageAsset({ id: "home", type: "site-home", path: "/", title: "Linqingan Screeps", system: "site", parentPath: null, sourceOfTruth: "route" }),
+    pageAsset({ id: "blog", type: "article-library-hub", path: "/blog", title: "Screeps Articles", system: "content", sourceOfTruth: "route" }),
     pageAsset({ id: "beginner", type: "roadmap-hub", path: "/beginner", title: "Screeps Beginner Roadmap", system: "roadmap", sourceOfTruth: "route" }),
     pageAsset({ id: "knowledge", type: "knowledge-hub", path: "/knowledge", title: "Screeps Knowledge", system: "knowledge", sourceOfTruth: "route" }),
     pageAsset({ id: "tools", type: "tools-hub", path: "/tools", title: "Screeps Tools", system: "utility", sourceOfTruth: "route" }),
@@ -72,13 +103,25 @@ export function buildSiteAssetMaster(root = process.cwd()) {
     pageAsset({ id: "screeps-errors", type: "errors-hub", path: "/screeps-errors", title: "Screeps Errors", system: "reference", sourceOfTruth: "route" }),
     pageAsset({ id: "glossary", type: "glossary-hub", path: "/glossary", title: "Screeps Glossary", system: "reference", sourceOfTruth: "route" }),
     pageAsset({ id: "verification", type: "verification-hub", path: "/verification", title: "Runtime Verification", system: "evidence", sourceOfTruth: "route" }),
+    pageAsset({ id: "home", type: "site-home", path: "/en", title: "Verified Screeps Guides", system: "site", language: "en", parentPath: null, sourceOfTruth: "route" }),
+    pageAsset({ id: "blog", type: "article-library-hub", path: "/en/blog", title: "Screeps Articles and Debugging Guides", system: "content", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "beginner", type: "roadmap-hub", path: "/en/beginner", title: "Screeps Beginner Roadmap", system: "roadmap", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "knowledge", type: "knowledge-hub", path: "/en/knowledge", title: "Screeps Knowledge", system: "knowledge", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "tools", type: "tools-hub", path: "/en/tools", title: "Screeps Tools", system: "utility", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "diagnostics", type: "diagnostics-hub", path: "/en/diagnostics", title: "Screeps Diagnostics", system: "diagnostics", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "screeps-api", type: "api-hub-index", path: "/en/screeps-api", title: "Screeps API Quick Reference", system: "reference", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "screeps-errors", type: "errors-hub", path: "/en/screeps-errors", title: "Screeps Error Codes", system: "reference", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "glossary", type: "glossary-hub", path: "/en/glossary", title: "Screeps Glossary", system: "reference", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
+    pageAsset({ id: "verification", type: "verification-hub", path: "/en/verification", title: "Runtime Verification", system: "evidence", language: "en", parentPath: "/en", sourceOfTruth: "route" }),
   ];
-  const toolAssets = extractToolCatalog(root).map((tool, index) => withDecisionHooks({ assetId: `zh-CN:tool:${tool.slug}`, assetType: "tool", language: "zh-CN", path: `/tools/${tool.slug}`, canonicalPath: `/tools/${tool.slug}`, routeKind: "page", slug: tool.slug, title: tool.title, description: tool.description, contentSystem: "utility", module: null, roadmap: null, stage: null, order: (index + 1) * 10, difficulty: null, primaryKeyword: null, keywordRole: null, searchIntent: null, metadataSource: "tool-catalog", sourceOfTruth: "src/lib/tool-catalog.ts", parentPath: "/tools" }));
+  const tools = extractToolCatalog(root);
+  const toolAssets = tools.map((tool, index) => toolAsset(tool, index, "zh-CN"));
+  const englishToolAssets = tools.map((tool, index) => toolAsset(tool, index, "en"));
   const diagnosticAssets = extractDiagnosticSymptoms(root).map((symptom, index) => withDecisionHooks({ assetId: `zh-CN:diagnostic:${symptom.id}`, assetType: "diagnostic", language: "zh-CN", path: `/diagnostics#${symptom.id}`, canonicalPath: "/diagnostics", routeKind: "fragment", slug: symptom.id, title: symptom.title, contentSystem: "diagnostics", module: null, roadmap: null, stage: null, order: (index + 1) * 10, difficulty: null, primaryKeyword: null, keywordRole: null, searchIntent: null, metadataSource: "diagnostic-registry", sourceOfTruth: "src/lib/screeps-diagnostic-symptoms.ts", parentPath: "/diagnostics" }));
   const apiHubAssets = extractApiHubs(root).map((hub, index) => withDecisionHooks({ assetId: `zh-CN:api-hub:${hub.slug}`, assetType: "api-hub", language: "zh-CN", path: `/screeps-api/${hub.slug}`, canonicalPath: `/screeps-api/${hub.slug}`, routeKind: "page", slug: hub.slug, title: hub.title, contentSystem: "reference", module: hub.objectName, roadmap: null, stage: null, order: (index + 1) * 10, difficulty: null, primaryKeyword: null, keywordRole: null, searchIntent: null, metadataSource: "api-hub-registry", sourceOfTruth: "src/lib/screeps-api-hubs.ts", parentPath: "/screeps-api" }));
 
   const extensions = loadSiteAssetExtensions(root, articleAssets);
-  const assets = [...articleAssets, ...extensions.englishArticles.map(withDecisionHooks), ...knowledgeModuleAssets, ...hubAssets, ...toolAssets, ...diagnosticAssets, ...apiHubAssets, ...extensions.errorCodes.map(withDecisionHooks), ...extensions.glossary.map(withDecisionHooks)];
+  const assets = [...articleAssets, ...extensions.englishArticles.map(withDecisionHooks), ...knowledgeModuleAssets, ...hubAssets, ...toolAssets, ...englishToolAssets, ...diagnosticAssets, ...apiHubAssets, ...extensions.errorCodes.map(withDecisionHooks), ...extensions.glossary.map(withDecisionHooks)];
   const byId = new Map(assets.map((asset) => [asset.assetId, asset]));
   const byPath = new Map();
   for (const asset of assets) { const records = byPath.get(asset.path) ?? []; records.push(asset); byPath.set(asset.path, records); }
@@ -86,7 +129,7 @@ export function buildSiteAssetMaster(root = process.cwd()) {
   return {
     schemaVersion: 2,
     generatedFrom: ["src/generated/knowledge-article-registry.json", "src/generated/beginner-roadmap-registry.json", "content/posts/*.md", "src/lib/english-articles-complete.ts", "src/lib/english-*-registry-*.ts", "src/lib/screeps-errors.ts", "src/lib/screeps-glossary.ts", "src/lib/tool-catalog.ts", "src/lib/screeps-diagnostic-symptoms.ts", "src/lib/screeps-api-hubs.ts", "canonical application routes"],
-    coverage: { englishArticles: extensions.englishArticles.length, errorCodes: extensions.errorCodes.length, glossaryTerms: extensions.glossary.length },
+    coverage: { englishArticles: extensions.englishArticles.length, englishTools: englishToolAssets.length, errorCodes: extensions.errorCodes.length, glossaryTerms: extensions.glossary.length },
     assets,
     resolveId(assetId) { return byId.get(assetId) ?? null; },
     resolvePath(value) { return byPath.get(value) ?? []; },
