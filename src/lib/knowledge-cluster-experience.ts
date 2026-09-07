@@ -1,6 +1,7 @@
 import knowledgeArticleRegistryPayload from "@/generated/knowledge-article-registry.json";
 import graphPayload from "@/generated/knowledge-graph-v1.json";
 import { getEnglishArticlePathForChinese } from "@/lib/article-language-associations";
+import { englishArticleRoutePairs } from "@/lib/english-articles-complete";
 import {
   getKnowledgeCluster,
   knowledgeClusterRegistry,
@@ -162,7 +163,8 @@ function firstGuideLink(
   const chineseHref = `/blog/${first.slug}`;
   const href =
     locale === "en"
-      ? getEnglishArticlePathForChinese(chineseHref)
+      ? englishArticleRoutePairs[chineseHref] ??
+        getEnglishArticlePathForChinese(chineseHref)
       : chineseHref;
   if (!href) return null;
 
