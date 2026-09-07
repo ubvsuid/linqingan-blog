@@ -21,6 +21,15 @@ export interface KnowledgeClusterHandoffSignal extends KnowledgeClusterHandoff {
   anchorGraphNodeIds: readonly string[];
 }
 
+interface ClusterCoverageSurface {
+  articleIds: string[];
+  apiIds: string[];
+  returnCodeIds: string[];
+  symptomIds: string[];
+  toolIds: string[];
+  tickLabExperimentIds: string[];
+}
+
 interface ClusterCoverageDocument {
   schemaVersion: 1;
   clusterCount: number;
@@ -33,17 +42,10 @@ interface ClusterCoverageDocument {
     primaryKnowledgeArticleCount: number;
     demonstrator: boolean;
   }>;
-  demonstrator: {
+  demonstrators: Array<{
     clusterId: string;
-    graphSurface: {
-      articleIds: string[];
-      apiIds: string[];
-      returnCodeIds: string[];
-      symptomIds: string[];
-      toolIds: string[];
-      tickLabExperimentIds: string[];
-    };
-  };
+    graphSurface: ClusterCoverageSurface;
+  }>;
 }
 
 interface GraphDocument {
@@ -56,29 +58,26 @@ const coverage = clusterCoveragePayload as unknown as ClusterCoverageDocument;
 const graph = graphPayload as unknown as GraphDocument;
 const graphNodeIds = new Set(graph.nodes.map((node) => node.id));
 
-function getHealthyDemonstratorSignal(
+function stripSignal(signal: KnowledgeClusterHandoffSignal): KnowledgeClusterHandoff {
+  return {
+    clusterId: signal.clusterId,
+    href: signal.href,
+    title: signal.title,
+    description: signal.description,
+  };
+}
+
+function buildSignal(
+  clusterId: string,
+  surface: ClusterCoverageSurface,
   locale: KnowledgeClusterHandoffLocale,
 ): KnowledgeClusterHandoffSignal | null {
-  if (
-    graph.schemaVersion !== 1 ||
-    graph.unmapped.length > 0 ||
-    coverage.schemaVersion !== 1 ||
-    coverage.graphUnmappedCount > 0 ||
-    coverage.unmappedPrimaryKnowledgeArticles.length > 0 ||
-    coverage.clusterCount !== knowledgeClusterRegistry.length
-  ) {
-    return null;
-  }
-
-  const cluster = getKnowledgeCluster(coverage.demonstrator.clusterId);
-  const coverageRow = coverage.clusters.find(
-    (row) => row.clusterId === coverage.demonstrator.clusterId,
-  );
+  const cluster = getKnowledgeCluster(clusterId);
+  const coverageRow = coverage.clusters.find((row) => row.clusterId === clusterId);
   if (!cluster?.demonstrator || !coverageRow?.demonstrator) return null;
   if (cluster.number !== coverageRow.number) return null;
 
-  const surface = coverage.demonstrator.graphSurface;
-  // Handoff V1 intentionally uses only high-specificity canonical anchors.
+  // Handoff intentionally uses only high-specificity canonical anchors.
   // Return codes remain useful inside Search/Diagnostics, but generic codes can
   // span several problem spaces and therefore must not choose a Cluster.
   const anchorGraphNodeIds = [
@@ -115,36 +114,89 @@ function getHealthyDemonstratorSignal(
   };
 }
 
-function stripSignal(signal: KnowledgeClusterHandoffSignal): KnowledgeClusterHandoff {
-  return {
-    clusterId: signal.clusterId,
-    href: signal.href,
-    title: signal.title,
-    description: signal.description,
-  };
+function getHealthyDemonstratorSignals(
+  locale: KnowledgeClusterHandoffLocale,
+): readonly KnowledgeClusterHandoffSignal[] {
+  if (
+    graph.schemaVersion !== 1 ||
+    graph.unmapped.length > 0 ||
+    coverage.schemaVersion !== 1 ||
+    coverage.graphUnmappedCount > 0 ||
+    coverage.unmappedPrimaryKnowledgeArticles.length > 0 ||
+    coverage.clusterCount !== knowledgeClusterRegistry.length ||
+    !Array.isArray(coverage.demonstrators)
+  ) {
+    return [];
+  }
+
+  const configuredDemonstrators = knowledgeClusterRegistry.filter(
+    (cluster) => cluster.demonstrator,
+  );
+  if (
+    coverage.demonstrators.length !== configuredDemonstrators.length ||
+    new Set(coverage.demonstrators.map((item) => item.clusterId)).size !==
+      coverage.demonstrators.length
+  ) {
+    return [];
+  }
+
+  const rawSignals = coverage.demonstrators.map((item) =>
+    buildSignal(item.clusterId, item.graphSurface, locale),
+  );
+  if (rawSignals.some((signal) => !signal)) return [];
+
+  const signals = rawSignals.filter(
+    (signal): signal is KnowledgeClusterHandoffSignal => Boolean(signal),
+  );
+  const entityAnchorCounts = new Map<string, number>();
+  const graphAnchorCounts = new Map<string, number>();
+  for (const signal of signals) {
+    for (const anchor of signal.anchorEntityIds) {
+      entityAnchorCounts.set(anchor, (entityAnchorCounts.get(anchor) ?? 0) + 1);
+    }
+    for (const anchor of signal.anchorGraphNodeIds) {
+      graphAnchorCounts.set(anchor, (graphAnchorCounts.get(anchor) ?? 0) + 1);
+    }
+  }
+
+  return signals
+    .map((signal) => ({
+      ...signal,
+      anchorEntityIds: signal.anchorEntityIds.filter(
+        (anchor) => entityAnchorCounts.get(anchor) === 1,
+      ),
+      anchorGraphNodeIds: signal.anchorGraphNodeIds.filter(
+        (anchor) => graphAnchorCounts.get(anchor) === 1,
+      ),
+    }))
+    .filter(
+      (signal) =>
+        signal.anchorEntityIds.length > 0 && signal.anchorGraphNodeIds.length > 0,
+    );
 }
 
 export function getKnowledgeClusterHandoffSignals(
   locale: KnowledgeClusterHandoffLocale,
 ): readonly KnowledgeClusterHandoffSignal[] {
-  const signal = getHealthyDemonstratorSignal(locale);
-  return signal ? [signal] : [];
+  return getHealthyDemonstratorSignals(locale);
 }
 
 export function getKnowledgeClusterHandoffForGraphNodeId(
   graphNodeId: string,
   locale: KnowledgeClusterHandoffLocale,
 ): KnowledgeClusterHandoff | null {
-  const signal = getHealthyDemonstratorSignal(locale);
-  if (!signal?.anchorGraphNodeIds.includes(graphNodeId)) return null;
-  return stripSignal(signal);
+  const matches = getHealthyDemonstratorSignals(locale).filter((signal) =>
+    signal.anchorGraphNodeIds.includes(graphNodeId),
+  );
+  return matches.length === 1 ? stripSignal(matches[0]) : null;
 }
 
 export function getKnowledgeClusterHandoffForEntityId(
   entityId: string,
   locale: KnowledgeClusterHandoffLocale,
 ): KnowledgeClusterHandoff | null {
-  const signal = getHealthyDemonstratorSignal(locale);
-  if (!signal?.anchorEntityIds.includes(entityId)) return null;
-  return stripSignal(signal);
+  const matches = getHealthyDemonstratorSignals(locale).filter((signal) =>
+    signal.anchorEntityIds.includes(entityId),
+  );
+  return matches.length === 1 ? stripSignal(matches[0]) : null;
 }

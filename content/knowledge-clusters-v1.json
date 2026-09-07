@@ -28,7 +28,7 @@
       "enTitle": "Room Economy",
       "enDescription": "Store semantics, harvesting, resource recovery, storage, transport, links, terminals, and minerals.",
       "facets": ["learn", "build", "solve", "verify", "explore"],
-      "demonstrator": false
+      "demonstrator": true
     },
     {
       "clusterId": "movement-vision",

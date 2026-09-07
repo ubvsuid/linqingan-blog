@@ -48,6 +48,15 @@ interface RegistryRecord {
   };
 }
 
+interface ClusterCoverageSurface {
+  articleIds: string[];
+  apiIds: string[];
+  returnCodeIds: string[];
+  symptomIds: string[];
+  toolIds: string[];
+  tickLabExperimentIds: string[];
+}
+
 interface ClusterCoverageDocument {
   schemaVersion: 1;
   graphUnmappedCount: number;
@@ -56,17 +65,10 @@ interface ClusterCoverageDocument {
     primaryKnowledgeArticleCount: number;
     demonstrator: boolean;
   }>;
-  demonstrator: {
+  demonstrators: Array<{
     clusterId: string;
-    graphSurface: {
-      articleIds: string[];
-      apiIds: string[];
-      returnCodeIds: string[];
-      symptomIds: string[];
-      toolIds: string[];
-      tickLabExperimentIds: string[];
-    };
-  };
+    graphSurface: ClusterCoverageSurface;
+  }>;
 }
 
 const graph = graphPayload as unknown as KnowledgeGraphV1;
@@ -185,7 +187,7 @@ export function getKnowledgeClusterExperienceByModuleNumber(
     graph.unmapped.length > 0 ||
     coverage.schemaVersion !== 1 ||
     coverage.graphUnmappedCount > 0 ||
-    coverage.demonstrator.clusterId !== cluster.clusterId
+    !Array.isArray(coverage.demonstrators)
   ) {
     return null;
   }
@@ -194,6 +196,11 @@ export function getKnowledgeClusterExperienceByModuleNumber(
     (row) => row.clusterId === cluster.clusterId,
   );
   if (!coverageRow?.demonstrator) return null;
+
+  const demonstratorCoverage = coverage.demonstrators.find(
+    (item) => item.clusterId === cluster.clusterId,
+  );
+  if (!demonstratorCoverage) return null;
 
   const clusterRecord = getKnowledgeCluster(cluster.clusterId);
   if (!clusterRecord) return null;
@@ -206,7 +213,7 @@ export function getKnowledgeClusterExperienceByModuleNumber(
   const firstGuide = firstGuideLink(cluster.clusterId, locale);
   if (!firstGuide) return null;
 
-  const surface = coverage.demonstrator.graphSurface;
+  const surface = demonstratorCoverage.graphSurface;
   const tools = surface.toolIds
     .map((id) => localizedToolLink(id, locale))
     .filter((item): item is KnowledgeClusterExperienceLink => Boolean(item));
@@ -222,7 +229,13 @@ export function getKnowledgeClusterExperienceByModuleNumber(
     .map((node) => (node ? localizedNodeLink(node, locale) : null))
     .filter((item): item is KnowledgeClusterExperienceLink => Boolean(item));
 
-  if (tools.length === 0 || symptoms.length === 0 || experiments.length === 0 || apis.length === 0) {
+  if (
+    tools.length === 0 ||
+    symptoms.length === 0 ||
+    experiments.length === 0 ||
+    apis.length === 0 ||
+    surface.returnCodeIds.length === 0
+  ) {
     return null;
   }
 
