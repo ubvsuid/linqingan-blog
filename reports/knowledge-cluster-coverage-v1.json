@@ -56,7 +56,7 @@
         "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
         "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc"
       ],
-      "demonstrator": false
+      "demonstrator": true
     },
     {
       "clusterId": "movement-vision",
@@ -139,50 +139,96 @@
       "demonstrator": false
     }
   ],
-  "demonstrator": {
-    "clusterId": "spawn-lifecycle",
-    "expansionPolicy": "explicit-relations-only; non-article entities are related surface, not primary membership",
-    "graphSurface": {
-      "articleIds": [
-        "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
-        "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
-        "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
-        "article_32219971-b044-4240-8f28-25ccc9920ca3",
-        "article_764e6035-6293-4af0-871b-965eb2e8cb53",
-        "article_958be26d-2666-4b94-8d23-5cb625074032",
-        "article_cb41c144-290c-4258-817b-91763313600f",
-        "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
-        "article_f131df21-2d5a-4357-86f0-51812915f662"
-      ],
-      "apiIds": [
-        "api:spawn-recycle-creep",
-        "api:spawn-renew-creep",
-        "api:spawn-spawn-creep"
-      ],
-      "returnCodeIds": [
-        "return-code:ERR_BUSY",
-        "return-code:ERR_FULL",
-        "return-code:ERR_INVALID_ARGS",
-        "return-code:ERR_INVALID_TARGET",
-        "return-code:ERR_NAME_EXISTS",
-        "return-code:ERR_NOT_ENOUGH_ENERGY",
-        "return-code:ERR_NOT_ENOUGH_RESOURCES",
-        "return-code:ERR_NOT_IN_RANGE",
-        "return-code:ERR_NOT_OWNER",
-        "return-code:ERR_RCL_NOT_ENOUGH",
-        "return-code:OK"
-      ],
-      "symptomIds": [
-        "symptom:spawn-not-spawning"
-      ],
-      "toolIds": [
-        "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
-        "tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f"
-      ],
-      "tickLabExperimentIds": [
-        "experiment_fc3dc347-d2cf-40cc-86c5-334ba4ab9a6a"
-      ]
+  "demonstrators": [
+    {
+      "clusterId": "spawn-lifecycle",
+      "expansionPolicy": "explicit-relations-only; non-article entities are related surface, not primary membership; Verify may bridge selected Symptom involvesApi relations to testedBy experiments",
+      "graphSurface": {
+        "articleIds": [
+          "article_1c27ecb9-d19b-415e-b877-df6c758a17fb",
+          "article_1e3cf799-2023-4ae9-a402-dd7693c317b1",
+          "article_25651256-9f5c-44fb-8f2f-50da0e627bfc",
+          "article_32219971-b044-4240-8f28-25ccc9920ca3",
+          "article_764e6035-6293-4af0-871b-965eb2e8cb53",
+          "article_958be26d-2666-4b94-8d23-5cb625074032",
+          "article_cb41c144-290c-4258-817b-91763313600f",
+          "article_d9540eb5-5644-4ba1-80ff-23ec60a09d2c",
+          "article_f131df21-2d5a-4357-86f0-51812915f662"
+        ],
+        "apiIds": [
+          "api:spawn-recycle-creep",
+          "api:spawn-renew-creep",
+          "api:spawn-spawn-creep"
+        ],
+        "returnCodeIds": [
+          "return-code:ERR_BUSY",
+          "return-code:ERR_FULL",
+          "return-code:ERR_INVALID_ARGS",
+          "return-code:ERR_INVALID_TARGET",
+          "return-code:ERR_NAME_EXISTS",
+          "return-code:ERR_NOT_ENOUGH_ENERGY",
+          "return-code:ERR_NOT_ENOUGH_RESOURCES",
+          "return-code:ERR_NOT_IN_RANGE",
+          "return-code:ERR_NOT_OWNER",
+          "return-code:ERR_RCL_NOT_ENOUGH",
+          "return-code:OK"
+        ],
+        "symptomIds": [
+          "symptom:spawn-not-spawning"
+        ],
+        "toolIds": [
+          "tool_567c4dfb-2235-4597-a29d-3881cae606fc",
+          "tool_5aac41a4-d77a-4dd2-99f5-fca2c4e3a23f"
+        ],
+        "tickLabExperimentIds": [
+          "experiment_fc3dc347-d2cf-40cc-86c5-334ba4ab9a6a"
+        ]
+      },
+      "runtimeEvidenceMode": "accepted-only-runtime-adapter"
     },
-    "runtimeEvidenceMode": "accepted-only-runtime-adapter"
-  }
+    {
+      "clusterId": "room-economy",
+      "expansionPolicy": "explicit-relations-only; non-article entities are related surface, not primary membership; Verify may bridge selected Symptom involvesApi relations to testedBy experiments",
+      "graphSurface": {
+        "articleIds": [
+          "article_099c1a1d-25d6-462f-ad13-ff41f4db3015",
+          "article_195be63d-b2ae-486e-b157-356eea4ae9c1",
+          "article_1c46d5fe-c0dd-49ba-bee2-10925dd9ed0c",
+          "article_38a18ea7-d3a0-44ee-b348-a9c3d9e960b3",
+          "article_811f344b-2ab5-4ca6-9921-1f5c9188570b",
+          "article_a3f5cf12-3dd0-47b6-b1ce-0039fb7261ce",
+          "article_a6e4b993-e3c0-4cac-afd9-5d00550de13e",
+          "article_d80a3d78-5c41-48c6-8c4c-2cfb9de73064",
+          "article_eb047b24-028c-45cf-b37b-3ed8074414ee",
+          "article_f62daaf9-e951-48e4-862c-6bfae7fef3fc"
+        ],
+        "apiIds": [
+          "api:creep-pickup",
+          "api:creep-withdraw",
+          "api:link-transfer-energy",
+          "api:terminal-send"
+        ],
+        "returnCodeIds": [
+          "return-code:ERR_FULL",
+          "return-code:ERR_INVALID_TARGET",
+          "return-code:ERR_NOT_ENOUGH_RESOURCES",
+          "return-code:ERR_NOT_IN_RANGE",
+          "return-code:ERR_NO_PATH",
+          "return-code:ERR_TIRED"
+        ],
+        "symptomIds": [
+          "symptom:link-not-transferring",
+          "symptom:resources-not-moving"
+        ],
+        "toolIds": [
+          "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
+          "tool_e57e380f-dfd9-45b7-a5a8-07090a7a9057"
+        ],
+        "tickLabExperimentIds": [
+          "experiment_1d0e6ab9-bbd8-41c8-8b99-38ffb2dca0cb"
+        ]
+      },
+      "runtimeEvidenceMode": "accepted-only-runtime-adapter"
+    }
+  ]
 }
