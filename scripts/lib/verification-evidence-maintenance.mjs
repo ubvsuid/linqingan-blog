@@ -87,7 +87,7 @@ function getVerificationContext(source) {
 
   const frontmatter = frontmatterMatch[1];
   const verificationMatch = frontmatter.match(
-    /(^verification:\n[\s\S]*?)(?=^[A-Za-z][A-Za-z0-9_-]*:|\s*$)/m,
+    /(^verification:\n(?:^[ \t]+[^\n]*(?:\n|$))*)/m,
   );
   if (!verificationMatch) throw new Error("Article verification frontmatter block is missing.");
 
