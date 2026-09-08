@@ -1,5 +1,6 @@
 import { normalizeKeyword, normalizeKeywordLoose, normalizePagePath } from "./content-asset-index.mjs";
 import { inferPathLanguage } from "./site-intelligence-identity.mjs";
+import { compileSiteIntelligenceKeywordOwnership, siteIntelligenceOwnershipKey } from "./site-intelligence-keyword-ownership.mjs";
 
 function text(value) { return String(value ?? "").trim(); }
 function languageKey(language, value) { return `${text(language) || "zh-CN"}\u0000${value}`; }
@@ -15,7 +16,7 @@ function unique(map, key) {
   return value && !Array.isArray(value) ? value : null;
 }
 
-export function buildSiteAssetLookup(assetMaster) {
+export function buildSiteAssetLookup(assetMaster, { keywordOwnership = null } = {}) {
   if (!assetMaster?.assets) throw new Error("assetMaster.assets is required");
   const byPath = new Map();
   const byArticleSlug = new Map();
@@ -36,13 +37,25 @@ export function buildSiteAssetLookup(assetMaster) {
     }
   }
 
+  const curated = keywordOwnership
+    ? compileSiteIntelligenceKeywordOwnership(keywordOwnership, assetMaster)
+    : { ownerByKey: new Map(), exclusionByKey: new Map() };
+
   return {
     resolvePath(value) { return unique(byPath, normalizePagePath(value)); },
     resolveArticleSlug(slug, language = "zh-CN") { return unique(byArticleSlug, languageKey(language, text(slug))); },
     resolveToolSlug(slug, language = "zh-CN") { return unique(byToolSlug, languageKey(language, text(slug))); },
     resolveOwnerKeyword(value, language = "zh-CN") {
+      const curatedKey = siteIntelligenceOwnershipKey(language, value);
+      const exclusion = curated.exclusionByKey.get(curatedKey);
+      if (exclusion) return { asset: null, source: "owner-query-excluded", exclusion };
+
       const strict = unique(byOwnerStrict, languageKey(language, normalizeKeyword(value)));
       if (strict) return { asset: strict, source: "owner-keyword-exact" };
+
+      const approved = curated.ownerByKey.get(curatedKey);
+      if (approved) return { asset: approved.asset, source: "owner-query-curated", ownershipRecord: approved };
+
       const loose = unique(byOwnerLoose, languageKey(language, normalizeKeywordLoose(value)));
       if (loose) return { asset: loose, source: "owner-keyword-normalized" };
       return { asset: null, source: null };
@@ -60,7 +73,6 @@ export function resolveGscOwnership(record, lookup) {
 
   let ownerStatus = text(record.ownerStatus) || null;
   if (actualAsset && expectedAsset) ownerStatus = actualAsset.assetId === expectedAsset.assetId ? "owner-match" : "owner-mismatch";
-  else if (pagePath && pageLanguage === "en" && !expectedAsset) ownerStatus = "owner-language-unmapped";
   else if (actualAsset && !expectedAsset && ownerStatus === "owner-mismatch") ownerStatus = "owner-unmapped";
 
   return { pagePath, actualAsset, expectedAsset, pageLanguage, ownerStatus, ownerResolution };
@@ -70,7 +82,6 @@ export function databaseOwnerStatus(ownership) {
   if (!ownership.actualAsset) return { status: "unmapped", reason: ownership.pageLanguage === "en" ? "page-language-unmapped" : "page-unmapped" };
   if (ownership.ownerStatus === "owner-match") return { status: "matched", reason: null };
   if (ownership.ownerStatus === "owner-mismatch") return { status: "mismatch", reason: null };
-  if (ownership.ownerStatus === "owner-language-unmapped") return { status: "unmapped", reason: "owner-language-unmapped" };
   if (!ownership.expectedAsset) return { status: "unowned", reason: null };
   return { status: "not_evaluated", reason: null };
 }
