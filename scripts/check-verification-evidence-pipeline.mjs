@@ -3,6 +3,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+import {
+  buildAcceptanceChanges,
+  patchArticleVerification,
+  readArticleVerificationField,
+} from "./lib/verification-evidence-maintenance.mjs";
 import { validateVerificationEvidenceRecord } from "./lib/verification-evidence-validation.mjs";
 
 const validConsole = {
@@ -66,6 +71,52 @@ for (const fixture of invalidFixtures) {
   if (!failed) {
     throw new Error("Verification evidence validator accepted an invalid fixture.");
   }
+}
+
+const existingEvidenceKey = "EV-BBBBBBBBBBBBBBBBBBBB";
+const nextEvidenceKey = "EV-AAAAAAAAAAAAAAAAAAAA";
+const acceptanceFixture = {
+  evidence_key: nextEvidenceKey,
+  evidence_note: "Synthetic accepted evidence summary for preservation testing.",
+  verified_at: "2026-09-08T00:00:00.000Z",
+  shard: "shard3",
+  room_name: "W39N53",
+  verification_type: "console",
+};
+const articleFixture = `---
+title: "Synthetic evidence article"
+verification:
+  docsChecked: true
+  syntaxChecked: true
+  consoleTested: true
+  liveTested: false
+  testedAt: "2026-08-11"
+  testEnvironment: "shard3 / W39N53"
+  testResult: "Accepted Console evidence: ${existingEvidenceKey} verified an earlier pathway."
+featured: false
+---
+
+Synthetic fixture only.
+`;
+
+const existingTestResult = readArticleVerificationField(articleFixture, "testResult");
+const firstAcceptanceChanges = buildAcceptanceChanges(acceptanceFixture, existingTestResult);
+const firstAcceptedSource = patchArticleVerification(articleFixture, firstAcceptanceChanges);
+const firstAcceptedTestResult = readArticleVerificationField(firstAcceptedSource, "testResult");
+if (
+  !firstAcceptedTestResult.includes(existingEvidenceKey) ||
+  !firstAcceptedTestResult.includes(nextEvidenceKey)
+) {
+  throw new Error("Accepting new evidence must preserve earlier accepted evidence summaries.");
+}
+if ((firstAcceptedTestResult.match(new RegExp(nextEvidenceKey, "g")) ?? []).length !== 1) {
+  throw new Error("A newly accepted evidence key must appear exactly once in the Markdown testResult.");
+}
+
+const repeatedAcceptanceChanges = buildAcceptanceChanges(acceptanceFixture, firstAcceptedTestResult);
+const repeatedAcceptedSource = patchArticleVerification(firstAcceptedSource, repeatedAcceptanceChanges);
+if (repeatedAcceptedSource !== firstAcceptedSource) {
+  throw new Error("Repeating acceptance for the same evidence must be idempotent in Markdown.");
 }
 
 const publicWriteRoute = path.join(
@@ -197,5 +248,5 @@ try {
 }
 
 console.log(
-  "Verification evidence pipeline check passed: stable evidence identity, controlled capture references, lifecycle schema, accepted-only public reads, Markdown acceptance gating, bilingual verified-page integration, maintenance CLI syntax, no public write route, and writer dry-run behavior are verified.",
+  "Verification evidence pipeline check passed: stable evidence identity, controlled capture references, lifecycle schema, accepted-only public reads, Markdown acceptance gating, accepted-summary preservation and idempotency, bilingual verified-page integration, maintenance CLI syntax, no public write route, and writer dry-run behavior are verified.",
 );
