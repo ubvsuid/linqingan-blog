@@ -81,15 +81,7 @@ function yamlString(value) {
   return JSON.stringify(String(value));
 }
 
-function replaceVerificationField(block, field, serializedValue) {
-  const fieldPattern = new RegExp(`^  ${field}:.*$`, "m");
-  if (fieldPattern.test(block)) {
-    return block.replace(fieldPattern, `  ${field}: ${serializedValue}`);
-  }
-  return `${block.trimEnd()}\n  ${field}: ${serializedValue}\n`;
-}
-
-export function patchArticleVerification(source, changes) {
+function getVerificationContext(source) {
   const frontmatterMatch = source.match(/^---\n([\s\S]*?)\n---\n/);
   if (!frontmatterMatch) throw new Error("Article frontmatter block is missing.");
 
@@ -98,6 +90,36 @@ export function patchArticleVerification(source, changes) {
     /(^verification:\n[\s\S]*?)(?=^[A-Za-z][A-Za-z0-9_-]*:|\s*$)/m,
   );
   if (!verificationMatch) throw new Error("Article verification frontmatter block is missing.");
+
+  return { frontmatterMatch, frontmatter, verificationMatch };
+}
+
+function replaceVerificationField(block, field, serializedValue) {
+  const fieldPattern = new RegExp(`^  ${field}:.*$`, "m");
+  if (fieldPattern.test(block)) {
+    return block.replace(fieldPattern, `  ${field}: ${serializedValue}`);
+  }
+  return `${block.trimEnd()}\n  ${field}: ${serializedValue}\n`;
+}
+
+export function readArticleVerificationField(source, field) {
+  const { verificationMatch } = getVerificationContext(source);
+  const fieldPattern = new RegExp(`^  ${field}:\\s*(.*)$`, "m");
+  const fieldMatch = verificationMatch[1].match(fieldPattern);
+  if (!fieldMatch) return null;
+
+  const serializedValue = fieldMatch[1].trim();
+  if (!serializedValue) return "";
+
+  try {
+    return JSON.parse(serializedValue);
+  } catch {
+    return serializedValue.replace(/^['"]|['"]$/g, "");
+  }
+}
+
+export function patchArticleVerification(source, changes) {
+  const { frontmatterMatch, frontmatter, verificationMatch } = getVerificationContext(source);
 
   let verificationBlock = verificationMatch[1];
   for (const [field, value] of Object.entries(changes)) {
@@ -116,12 +138,22 @@ export function buildEvidenceEnvironment(evidence) {
   return [evidence.shard, evidence.room_name].filter(Boolean).join(" / ") || "Screeps runtime evidence";
 }
 
-export function buildAcceptanceChanges(evidence) {
+export function buildAcceptanceTestResult(evidence, currentTestResult = "") {
+  const acceptedSummary = `Accepted runtime evidence ${evidence.evidence_key}: ${evidence.evidence_note}`;
+  const current = String(currentTestResult ?? "").trim();
+  if (!current) return acceptedSummary;
+  if (current.includes(evidence.evidence_key)) return current;
+
+  const separator = /[.!?]$/.test(current) ? " " : "; ";
+  return `${current}${separator}${acceptedSummary}`;
+}
+
+export function buildAcceptanceChanges(evidence, currentTestResult = "") {
   const testedAt = new Date(evidence.verified_at).toISOString().slice(0, 10);
   const changes = {
     testedAt,
     testEnvironment: buildEvidenceEnvironment(evidence),
-    testResult: `Accepted runtime evidence ${evidence.evidence_key}: ${evidence.evidence_note}`,
+    testResult: buildAcceptanceTestResult(evidence, currentTestResult),
   };
 
   if (evidence.verification_type === "live") {
