@@ -1,4 +1,8 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { desc, eq } from "drizzle-orm";
+import matter from "gray-matter";
 
 import { getPlatformDatabase, getPlatformSql } from "@/db/client";
 import { publicVerificationEvidence } from "@/db/schema";
@@ -30,6 +34,16 @@ export interface ArticleEvidenceSummary {
   latest: PublicVerificationEvidenceRecord;
   environment?: string;
 }
+
+interface MarkdownEvidenceGate {
+  acceptedEvidenceKeys: ReadonlySet<string>;
+  consoleTested: boolean;
+  liveTested: boolean;
+}
+
+const postsDirectory = path.join(process.cwd(), "content", "posts");
+const articleSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const evidenceKeyPattern = /\bEV-[A-F0-9]{20}\b/g;
 
 let governanceReadiness = {
   checkedAt: 0,
@@ -78,6 +92,68 @@ function isRuntimeVerificationType(value: string): value is RuntimeVerificationT
 
 function buildEnvironment(record: PublicVerificationEvidenceRecord): string | undefined {
   return [record.shard, record.roomName].filter(Boolean).join(" · ") || undefined;
+}
+
+function emptyMarkdownEvidenceGate(): MarkdownEvidenceGate {
+  return {
+    acceptedEvidenceKeys: new Set<string>(),
+    consoleTested: false,
+    liveTested: false,
+  };
+}
+
+function readMarkdownEvidenceGate(articleSlug: string): MarkdownEvidenceGate {
+  if (!articleSlugPattern.test(articleSlug)) return emptyMarkdownEvidenceGate();
+
+  try {
+    const articlePath = path.join(postsDirectory, `${articleSlug}.md`);
+    const source = fs.readFileSync(articlePath, "utf8");
+    const { data } = matter(source);
+    const verification = data.verification;
+    if (!verification || typeof verification !== "object" || Array.isArray(verification)) {
+      return emptyMarkdownEvidenceGate();
+    }
+
+    const verificationRecord = verification as Record<string, unknown>;
+    const testResult =
+      typeof verificationRecord.testResult === "string"
+        ? verificationRecord.testResult
+        : "";
+    const acceptedEvidenceKeys = new Set(testResult.match(evidenceKeyPattern) ?? []);
+
+    return {
+      acceptedEvidenceKeys,
+      consoleTested: verificationRecord.consoleTested === true,
+      liveTested: verificationRecord.liveTested === true,
+    };
+  } catch {
+    return emptyMarkdownEvidenceGate();
+  }
+}
+
+function passesMarkdownEvidenceGate(
+  record: PublicVerificationEvidenceRecord,
+  gate: MarkdownEvidenceGate,
+): boolean {
+  if (!gate.acceptedEvidenceKeys.has(record.evidenceKey)) return false;
+  return record.verificationType === "live"
+    ? gate.liveTested
+    : gate.consoleTested;
+}
+
+function filterMarkdownAcceptedEvidence(
+  records: PublicVerificationEvidenceRecord[],
+): PublicVerificationEvidenceRecord[] {
+  const gatesByArticle = new Map<string, MarkdownEvidenceGate>();
+
+  return records.filter((record) => {
+    let gate = gatesByArticle.get(record.articleSlug);
+    if (!gate) {
+      gate = readMarkdownEvidenceGate(record.articleSlug);
+      gatesByArticle.set(record.articleSlug, gate);
+    }
+    return passesMarkdownEvidenceGate(record, gate);
+  });
 }
 
 function mapPublicRows(rows: Array<{
@@ -138,7 +214,7 @@ export async function getPublicVerificationEvidence(
       .orderBy(desc(publicVerificationEvidence.verifiedAt))
       .limit(Math.max(1, Math.min(limit, 1000)));
 
-    return mapPublicRows(rows);
+    return filterMarkdownAcceptedEvidence(mapPublicRows(rows));
   } catch {
     console.warn("Verification evidence database read failed; using Markdown fallback.");
     return [];
@@ -160,7 +236,7 @@ export async function getPublicVerificationEvidenceForArticle(
       .orderBy(desc(publicVerificationEvidence.verifiedAt))
       .limit(Math.max(1, Math.min(limit, 100)));
 
-    return mapPublicRows(rows);
+    return filterMarkdownAcceptedEvidence(mapPublicRows(rows));
   } catch {
     console.warn(`Verification evidence read failed for ${articleSlug}; using Markdown-only article state.`);
     return [];

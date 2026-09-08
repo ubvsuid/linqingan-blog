@@ -154,6 +154,25 @@ if (
 ) {
   throw new Error("Public evidence reads must use the public view, not the base table.");
 }
+for (const requiredExactKeyGateToken of [
+  "readMarkdownEvidenceGate",
+  "verificationRecord.testResult",
+  "acceptedEvidenceKeys.has(record.evidenceKey)",
+  'record.verificationType === "live"',
+  "gate.liveTested",
+  "gate.consoleTested",
+]) {
+  if (!evidenceReaderSource.includes(requiredExactKeyGateToken)) {
+    throw new Error(`Public Evidence exact-key Markdown gate is missing token: ${requiredExactKeyGateToken}`);
+  }
+}
+const exactKeyGateApplications =
+  evidenceReaderSource.match(/filterMarkdownAcceptedEvidence\(mapPublicRows\(rows\)\)/g) ?? [];
+if (exactKeyGateApplications.length < 2) {
+  throw new Error(
+    "Both global and article-scoped public Evidence reads must pass the exact-key Markdown gate.",
+  );
+}
 
 const evidenceViewMigration = fs.readFileSync(
   path.join(process.cwd(), "drizzle/0003_public_verification_evidence_view.sql"),
@@ -248,5 +267,5 @@ try {
 }
 
 console.log(
-  "Verification evidence pipeline check passed: stable evidence identity, controlled capture references, lifecycle schema, accepted-only public reads, Markdown acceptance gating, accepted-summary preservation and idempotency, bilingual verified-page integration, maintenance CLI syntax, no public write route, and writer dry-run behavior are verified.",
+  "Verification evidence pipeline check passed: stable evidence identity, controlled capture references, lifecycle schema, accepted-only DB reads, exact-key Markdown acceptance gating, accepted-summary preservation and idempotency, bilingual verified-page integration, maintenance CLI syntax, no public write route, and writer dry-run behavior are verified.",
 );
