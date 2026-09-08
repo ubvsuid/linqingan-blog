@@ -2,6 +2,7 @@ import { normalizePagePath } from "./content-asset-index.mjs";
 import { GSC_GRAIN_CONTRACT, makeDataQualityFingerprint, makeGscRowFingerprint, makeRelationshipId, validateGscGrain } from "./site-intelligence-foundation.mjs";
 import { classifyGscMetrics } from "./site-intelligence-gsc.mjs";
 import { buildSiteAssetLookup, databaseOwnerStatus, resolveGscOwnership } from "./site-intelligence-mapping.mjs";
+import { loadSiteIntelligenceKeywordOwnership } from "./site-intelligence-keyword-ownership.mjs";
 
 function text(value) { return String(value ?? "").trim(); }
 function issueId(fingerprint) { return `dq:${fingerprint.slice(0, 24)}`; }
@@ -14,7 +15,6 @@ function missingAssetIssue(pagePath, row, source, pageLanguage) {
   const fingerprint = makeDataQualityFingerprint({ source, issueType: "missing_asset", entityKind: "path", entityKey: pagePath });
   return { issueId: issueId(fingerprint), issueType: "missing_asset", severity: "warning", source, entityKind: "path", entityKey: pagePath, issueFingerprint: fingerprint, rawPayload: row, metadata: { pageLanguage } };
 }
-
 function unknownOwnerIssue(query, row, source, pageLanguage) {
   const normalizedQuery = text(query).normalize("NFKC").toLowerCase().replace(/\s+/g, " ");
   const entityKey = `${pageLanguage || "unknown"}|${normalizedQuery}`;
@@ -25,6 +25,7 @@ function unknownOwnerIssue(query, row, source, pageLanguage) {
 export function planGscHistoricalImport({
   rows,
   assetMaster,
+  keywordOwnership = undefined,
   periodStart,
   periodEnd,
   source = "gsc",
@@ -37,7 +38,10 @@ export function planGscHistoricalImport({
   if (!text(periodStart) || !text(periodEnd)) throw new Error("periodStart and periodEnd are required");
   if (new Date(`${periodEnd}T00:00:00Z`) < new Date(`${periodStart}T00:00:00Z`)) throw new Error("periodEnd cannot be before periodStart");
   const grain = validateGscGrain({ searchType, country, device, dimensions });
-  const lookup = buildSiteAssetLookup(assetMaster);
+  const effectiveKeywordOwnership = keywordOwnership === undefined && Number(assetMaster?.schemaVersion) >= 2
+    ? loadSiteIntelligenceKeywordOwnership(process.cwd())
+    : keywordOwnership;
+  const lookup = buildSiteAssetLookup(assetMaster, { keywordOwnership: effectiveKeywordOwnership });
   const accepted = [], rejected = [], issueMap = new Map(), relationshipMap = new Map(), resolvedIssueFingerprints = new Set();
 
   for (const row of rows) {
@@ -63,7 +67,17 @@ export function planGscHistoricalImport({
         ownerStatus: dbOwner.status,
         clicks: row.clicks, impressions: row.impressions, ctr: row.ctr, position: row.position,
         rowFingerprint,
-        metadata: { grainVersion: grain.version, pageLanguage: ownership.pageLanguage, ownerMappingReason: dbOwner.reason, mappingSource: ownership.actualAsset ? "asset-path" : ownership.ownerResolution.source, classifierAction: action, sourceRow: row.rowNumber ?? null },
+        metadata: {
+          grainVersion: grain.version,
+          pageLanguage: ownership.pageLanguage,
+          ownerMappingReason: dbOwner.reason,
+          mappingSource: ownership.actualAsset ? "asset-path" : ownership.ownerResolution.source,
+          ownerResolutionSource: ownership.ownerResolution.source,
+          ownerDecisionBatch: ownership.ownerResolution.ownershipRecord?.batchId ?? null,
+          ownerExclusionBatch: ownership.ownerResolution.exclusion?.batchId ?? null,
+          classifierAction: action,
+          sourceRow: row.rowNumber ?? null,
+        },
       };
       accepted.push(observation);
 
@@ -86,7 +100,12 @@ export function planGscHistoricalImport({
           relationshipId,
           fromKind: "keyword", fromKey: ownership.expectedAsset.primaryKeyword,
           relationshipType: "owned_by", toKind: "asset", toKey: ownership.expectedAsset.assetId,
-          basis: "keyword_owner", metadata: { language: ownership.expectedAsset.language },
+          basis: "keyword_owner",
+          metadata: {
+            language: ownership.expectedAsset.language,
+            ownerResolutionSource: ownership.ownerResolution.source,
+            decisionBatch: ownership.ownerResolution.ownershipRecord?.batchId ?? null,
+          },
         });
       }
     } catch (error) {

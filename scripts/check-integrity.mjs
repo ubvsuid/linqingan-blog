@@ -19,6 +19,7 @@ const checks = [
   ["Knowledge registry", "scripts/check-knowledge-registry.mjs"],
   ["Beginner roadmap", "scripts/check-beginner-roadmap.mjs"],
   ["Site Asset Master V2", "scripts/check-site-asset-master.mjs"],
+  ["Site Intelligence GSC ownership", "scripts/check-site-intelligence-gsc-import.mjs"],
   ["Internal links", "scripts/check-internal-links.mjs"],
   ["Verification coverage", "scripts/check-verification-coverage.mjs"],
   ["Evidence Capture Kit", "scripts/check-evidence-capture-kit.mjs"],
@@ -26,11 +27,7 @@ const checks = [
 
 for (const [label, script, ...args] of checks) {
   console.log(`\n[integrity] ${label}`);
-  const result = spawnSync(process.execPath, [path.join(root, script), ...args], {
-    cwd: root,
-    env: process.env,
-    stdio: "inherit",
-  });
+  const result = spawnSync(process.execPath, [path.join(root, script), ...args], { cwd: root, env: process.env, stdio: "inherit" });
   if (result.error) throw result.error;
   if (result.status !== 0) {
     console.error(`\n[integrity] FAILED: ${label}`);
