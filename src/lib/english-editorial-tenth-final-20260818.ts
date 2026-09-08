@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { applyEnglishPathfinderCtrBatch01A20260908 } from "@/lib/english-ctr-pathfinder-20260908";
 import { applyEnglishEditorialEleventhCleanup20260818 } from "@/lib/english-editorial-eleventh-cleanup-20260818";
 import { applyEnglishEditorialEleventh20260818 } from "@/lib/english-editorial-eleventh-20260818";
 import { applyEnglishEditorialThirteenth20260818 } from "@/lib/english-editorial-thirteenth-20260818";
@@ -59,5 +60,6 @@ export function applyEnglishEditorialTenthFinal20260818(
   const eleventhArticle = applyEnglishEditorialEleventh20260818(finalizedArticle);
   const cleanedEleventhArticle = applyEnglishEditorialEleventhCleanup20260818(eleventhArticle);
   const twelfthArticle = applyEnglishEditorialTwelfth20260818(cleanedEleventhArticle);
-  return applyEnglishEditorialThirteenth20260818(twelfthArticle);
+  const thirteenthArticle = applyEnglishEditorialThirteenth20260818(twelfthArticle);
+  return applyEnglishPathfinderCtrBatch01A20260908(thirteenthArticle);
 }

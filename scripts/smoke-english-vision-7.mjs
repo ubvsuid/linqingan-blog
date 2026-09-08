@@ -43,15 +43,16 @@ const articles = [
     path: "/en/blog/screeps-pathfinder-costmatrix",
     chinesePath: "/blog/screeps-pathfinder-costmatrix",
     headline:
-      "Build a CostMatrix Without Hiding the Real Path Failure",
+      "What CostMatrix 255 Means in Screeps PathFinder",
     listingTitle:
-      "Screeps CostMatrix: Static Costs, Traffic, and Incomplete Paths",
+      "Screeps CostMatrix 255: Why It Means Unwalkable",
     query: "CostMatrix",
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     faqExpected: false,
     modifiedExpected: true,
     signals: [
+      "a CostMatrix cost of 255 is unwalkable",
       "STRUCTURE_PORTAL",
       "staticCosts.clone()",
       "Math.max(current, 10)",

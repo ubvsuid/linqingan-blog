@@ -30,19 +30,22 @@ const expected = {
   "screeps-pathfinder-costmatrix": {
     path: "/en/blog/screeps-pathfinder-costmatrix",
     chinesePath: "/blog/screeps-pathfinder-costmatrix",
-    title: "Screeps CostMatrix: Static Costs, Traffic, and Incomplete Paths",
+    runtimeTitle: "Screeps CostMatrix: Static Costs, Traffic, and Incomplete Paths",
+    discoveryTitle: "Screeps CostMatrix 255: Why It Means Unwalkable",
     beforeScore: 93,
   },
   "screeps-global-cache": {
     path: "/en/blog/screeps-global-cache",
     chinesePath: "/blog/screeps-global-cache",
-    title: "Screeps Global Cache: Rebuildable Data Across Runtime Ticks",
+    runtimeTitle: "Screeps Global Cache: Rebuildable Data Across Runtime Ticks",
+    discoveryTitle: "Screeps Global Cache: Rebuildable Data Across Runtime Ticks",
     beforeScore: 92,
   },
   "screeps-rawmemory-segments": {
     path: "/en/blog/screeps-rawmemory-segments",
     chinesePath: "/blog/screeps-rawmemory-segments",
-    title: "Screeps RawMemory Segments: Request, Read, and Write Across Ticks",
+    runtimeTitle: "Screeps RawMemory Segments: Request, Read, and Write Across Ticks",
+    discoveryTitle: "Screeps RawMemory Segments: Request, Read, and Write Across Ticks",
     beforeScore: 93,
   },
 };
@@ -92,14 +95,14 @@ function getRegistryRecord(registry, path) {
 const selectedSlugs = Object.keys(expected);
 for (const [slug, identity] of Object.entries(expected)) {
   if (!override.includes(`"${slug}": {`)) failures.push(`${slug}: override missing`);
-  if (!override.includes(`title: "${identity.title}"`)) failures.push(`${slug}: title missing`);
+  if (!override.includes(`title: "${identity.runtimeTitle}"`)) failures.push(`${slug}: historical runtime title missing`);
   const registry = slug === "screeps-pathfinder-costmatrix"
     ? visionRegistry
     : runtimeRegistry;
   const record = getRegistryRecord(registry, identity.path);
   if (!record.includes(`href: "${identity.path}"`)) failures.push(`${slug}: existing URL missing`);
   if (!record.includes(`chinesePath: "${identity.chinesePath}"`)) failures.push(`${slug}: Chinese mapping changed or missing`);
-  if (!record.includes(identity.title)) failures.push(`${slug}: discovery title is not synchronized`);
+  if (!record.includes(identity.discoveryTitle)) failures.push(`${slug}: discovery title is not synchronized`);
   if (!record.includes('updatedAt: "2026-07-31"')) failures.push(`${slug}: scoped updatedAt is missing`);
   if (!record.includes('publishedAt: "2026-07-25"')) failures.push(`${slug}: publication date changed or is missing`);
   if (!auditDoc.includes(`| ${identity.path} | ${identity.beforeScore} |`)) {
