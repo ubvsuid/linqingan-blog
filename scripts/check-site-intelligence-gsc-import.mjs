@@ -30,45 +30,58 @@ assert.notEqual(plan.accepted[0].rowFingerprint,plan.accepted[1].rowFingerprint)
 const root = process.cwd();
 const currentAssetMaster = buildSiteAssetMaster(root);
 const registry = loadSiteIntelligenceKeywordOwnership(root);
-const batchId = "gsc-owner-batch-01-20260908";
-const batchOwners = registry.owners.filter((record) => record.batchId === batchId);
-const batchExclusions = registry.exclusions.filter((record) => record.batchId === batchId);
-assert.equal(batchOwners.length, 26);
-assert.equal(batchExclusions.length, 11);
+const batchExpectations = [
+  { batchId: "gsc-owner-batch-01-20260908", owners: 26, exclusions: 11 },
+  { batchId: "gsc-owner-batch-02-20260908", owners: 2, exclusions: 4 },
+];
+assert.equal(registry.owners.length, 28);
+assert.equal(registry.exclusions.length, 15);
 
 const byId = new Map(currentAssetMaster.assets.map((asset) => [asset.assetId, asset]));
-const ownerRows = batchOwners.map((record, index) => {
-  const asset = byId.get(record.ownerAssetId);
-  assert.ok(asset, `Missing owner asset ${record.ownerAssetId}`);
-  return { rowNumber:index+2,page:`https://www.linqingan.com${asset.path}`,query:record.query,clicks:0,impressions:1,ctr:0,position:10 };
-});
-const ownerPlan = planGscHistoricalImport({ rows:ownerRows,assetMaster:currentAssetMaster,keywordOwnership:registry,periodStart:"2026-07-10",periodEnd:"2026-09-03" });
-assert.equal(ownerPlan.counts.rowsAccepted,26);
-assert.equal(ownerPlan.counts.rowsRejected,0);
-assert.equal(ownerPlan.counts.rowsUnmapped,0);
-assert.equal(ownerPlan.accepted.filter((row)=>row.ownerStatus==="matched").length,26);
-assert.equal(ownerPlan.accepted.filter((row)=>row.metadata.ownerResolutionSource==="owner-query-curated").length,26);
-assert.equal(ownerPlan.accepted.filter((row)=>row.metadata.ownerDecisionBatch===batchId).length,26);
-assert.equal(ownerPlan.issues.filter((issue)=>issue.issueType==="unknown_keyword_owner").length,0);
 
-const exclusionRows = batchExclusions.map((record,index) => {
-  const asset = byId.get(record.candidateOwnerAssetId);
-  assert.ok(asset, `Missing excluded candidate asset ${record.candidateOwnerAssetId}`);
-  return { rowNumber:index+2,page:`https://www.linqingan.com${asset.path}`,query:record.query,clicks:0,impressions:1,ctr:0,position:10 };
-});
-const exclusionPlan = planGscHistoricalImport({ rows:exclusionRows,assetMaster:currentAssetMaster,keywordOwnership:registry,periodStart:"2026-07-10",periodEnd:"2026-09-03" });
-assert.equal(exclusionPlan.counts.rowsAccepted,11);
-assert.equal(exclusionPlan.accepted.filter((row)=>row.ownerStatus==="unowned").length,11);
-assert.equal(exclusionPlan.accepted.filter((row)=>row.metadata.ownerResolutionSource==="owner-query-excluded").length,11);
-assert.equal(exclusionPlan.accepted.filter((row)=>row.metadata.ownerExclusionBatch===batchId).length,11);
-assert.equal(exclusionPlan.issues.filter((issue)=>issue.issueType==="unknown_keyword_owner").length,11);
+function verifyBatch({ batchId, owners: expectedOwners, exclusions: expectedExclusions }) {
+  const batchOwners = registry.owners.filter((record) => record.batchId === batchId);
+  const batchExclusions = registry.exclusions.filter((record) => record.batchId === batchId);
+  assert.equal(batchOwners.length, expectedOwners, `${batchId} owner count drift`);
+  assert.equal(batchExclusions.length, expectedExclusions, `${batchId} exclusion count drift`);
 
-const mismatchOwner = batchOwners[0];
-const mismatchTarget = batchOwners.find((record)=>record.ownerAssetId!==mismatchOwner.ownerAssetId && record.language===mismatchOwner.language);
+  const ownerRows = batchOwners.map((record, index) => {
+    const asset = byId.get(record.ownerAssetId);
+    assert.ok(asset, `Missing owner asset ${record.ownerAssetId}`);
+    return { rowNumber:index+2,page:`https://www.linqingan.com${asset.path}`,query:record.query,clicks:0,impressions:1,ctr:0,position:10 };
+  });
+  const ownerPlan = planGscHistoricalImport({ rows:ownerRows,assetMaster:currentAssetMaster,keywordOwnership:registry,periodStart:"2026-07-10",periodEnd:"2026-09-03" });
+  assert.equal(ownerPlan.counts.rowsAccepted,expectedOwners);
+  assert.equal(ownerPlan.counts.rowsRejected,0);
+  assert.equal(ownerPlan.counts.rowsUnmapped,0);
+  assert.equal(ownerPlan.accepted.filter((row)=>row.ownerStatus==="matched").length,expectedOwners);
+  assert.equal(ownerPlan.accepted.filter((row)=>row.metadata.ownerResolutionSource==="owner-query-curated").length,expectedOwners);
+  assert.equal(ownerPlan.accepted.filter((row)=>row.metadata.ownerDecisionBatch===batchId).length,expectedOwners);
+  assert.equal(ownerPlan.issues.filter((issue)=>issue.issueType==="unknown_keyword_owner").length,0);
+
+  const exclusionRows = batchExclusions.map((record,index) => {
+    const asset = byId.get(record.candidateOwnerAssetId);
+    assert.ok(asset, `Missing excluded candidate asset ${record.candidateOwnerAssetId}`);
+    return { rowNumber:index+2,page:`https://www.linqingan.com${asset.path}`,query:record.query,clicks:0,impressions:1,ctr:0,position:10 };
+  });
+  const exclusionPlan = planGscHistoricalImport({ rows:exclusionRows,assetMaster:currentAssetMaster,keywordOwnership:registry,periodStart:"2026-07-10",periodEnd:"2026-09-03" });
+  assert.equal(exclusionPlan.counts.rowsAccepted,expectedExclusions);
+  assert.equal(exclusionPlan.accepted.filter((row)=>row.ownerStatus==="unowned").length,expectedExclusions);
+  assert.equal(exclusionPlan.accepted.filter((row)=>row.metadata.ownerResolutionSource==="owner-query-excluded").length,expectedExclusions);
+  assert.equal(exclusionPlan.accepted.filter((row)=>row.metadata.ownerExclusionBatch===batchId).length,expectedExclusions);
+  assert.equal(exclusionPlan.issues.filter((issue)=>issue.issueType==="unknown_keyword_owner").length,expectedExclusions);
+
+  return { batchOwners, batchExclusions };
+}
+
+const verifiedBatches = batchExpectations.map(verifyBatch);
+const allOwners = verifiedBatches.flatMap((batch) => batch.batchOwners);
+const mismatchOwner = allOwners[0];
+const mismatchTarget = allOwners.find((record)=>record.ownerAssetId!==mismatchOwner.ownerAssetId && record.language===mismatchOwner.language);
 assert.ok(mismatchTarget);
 const mismatchAsset = byId.get(mismatchTarget.ownerAssetId);
 const mismatchPlan = planGscHistoricalImport({ rows:[{rowNumber:2,page:`https://www.linqingan.com${mismatchAsset.path}`,query:mismatchOwner.query,clicks:0,impressions:1,ctr:0,position:10}],assetMaster:currentAssetMaster,keywordOwnership:registry,periodStart:"2026-07-10",periodEnd:"2026-09-03" });
 assert.equal(mismatchPlan.accepted[0].ownerStatus,"mismatch");
 assert.equal(mismatchPlan.accepted[0].ownerAssetId,mismatchOwner.ownerAssetId);
 
-console.log("Historical GSC import planner and curated keyword ownership registry passed.");
+console.log("Historical GSC import planner and curated keyword ownership registry passed for Batch 01 + Batch 02.");
