@@ -8,6 +8,7 @@ import {
   patchArticleVerification,
   printEvidenceSummary,
   readArticleSource,
+  readArticleVerificationField,
 } from "./lib/verification-evidence-maintenance.mjs";
 
 const args = process.argv.slice(2);
@@ -28,7 +29,8 @@ if (["rejected", "revoked"].includes(evidence.status)) {
 }
 
 const { articlePath, source } = readArticleSource(evidence.article_slug);
-const changes = buildAcceptanceChanges(evidence);
+const currentTestResult = readArticleVerificationField(source, "testResult");
+const changes = buildAcceptanceChanges(evidence, currentTestResult);
 const nextSource = patchArticleVerification(source, changes);
 
 printEvidenceSummary(evidence);
