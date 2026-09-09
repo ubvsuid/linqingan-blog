@@ -77,12 +77,12 @@ const articles = [
   {
     path: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
-    headline: "How to Debug Creeps and Targets with RoomVisual",
-    listingTitle: "Screeps RoomVisual: Draw Debug Labels and Paths",
+    headline: "How to Draw RoomVisual Debug Shapes Without a Fill",
+    listingTitle: "Screeps RoomVisual: Transparent Fills, Labels, and Paths",
     query: "RoomVisual",
     tocId: "evidence-boundary",
     tocHeading: "Visuals are not action evidence",
-    modifiedDate: "2026-08-30",
+    modifiedDate: "2026-09-09",
     faqExpected: true,
     verificationSignals: [
       "Official API",
@@ -93,6 +93,8 @@ const articles = [
       "Pending",
     ],
     signals: [
+      "fill: 'transparent'",
+      "null</code> is not the documented no-fill value",
       "target-in-another-room",
       "visual.getSize()",
       "512,000 bytes",
@@ -316,5 +318,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "English observability production smoke passed: 4 articles, reviewed notification incident/rate boundaries, previous-tick event timing, focused RoomVisual debugging, room-level exception isolation, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
+  "English observability production smoke passed: 4 articles, reviewed notification incident/rate boundaries, previous-tick event timing, scoped RoomVisual transparent-fill debugging, room-level exception isolation, Canonical, hreflang, JSON-LD, search, index, and sitemap.",
 );
