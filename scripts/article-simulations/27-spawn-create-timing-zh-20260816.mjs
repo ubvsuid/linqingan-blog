@@ -51,6 +51,20 @@ assert.equal(dryRun.result, "OK");
 assert.equal(dryRunGameCreeps.Worker1, undefined);
 assert.equal(readSpawnLifecycle(dryRunGameCreeps.Worker1), "not-created");
 
+const invalidDryRunGameCreeps = {};
+const invalidDryRun = simulateSpawnCreepCall({
+  dryRun: true,
+  requestValid: false,
+  gameCreeps: invalidDryRunGameCreeps,
+  name: "ev_invalid_args_82745772",
+});
+assert.equal(invalidDryRun.result, "ERR_INVALID_ARGS");
+assert.equal(invalidDryRunGameCreeps.ev_invalid_args_82745772, undefined);
+assert.equal(
+  readSpawnLifecycle(invalidDryRunGameCreeps.ev_invalid_args_82745772),
+  "not-created",
+);
+
 const formalGameCreeps = {};
 const formal = simulateSpawnCreepCall({
   dryRun: false,
@@ -84,9 +98,13 @@ for (const requiredText of [
   "EV-1132EEA6DB475F4BDE4C",
   "EV-5F64D77F6CEDD1637FA3",
   "EV-1EB26EDDC7D65006ADB2",
+  "EV-BD1A9FFBDE1E56470CCE",
+  "ERR_INVALID_ARGS (-10)",
+  "空 body `[]`",
   "consoleTested: true",
   "liveTested: false",
-  'testedAt: "2026-08-11"',
+  'testedAt: "2026-09-04"',
+  'testEnvironment: "shard3 / W39N53 + W39N52"',
   'checkedAt: "2026-08-16"',
   "来自当前官方 engine 源码核对，不冒充新的 Console 实测",
 ]) {
@@ -122,5 +140,5 @@ assert.ok(
 );
 
 console.log(
-  "中文 spawnCreep 创建时序模拟通过：dryRun 不创建对象、正式 OK 后同执行上下文对象进入 Game.creeps 且 spawning=true、完成后 spawning=false，并保留原有 Console 证据边界。",
+  "中文 spawnCreep 创建时序模拟通过：dryRun 不创建对象、empty-body invalid dryRun 返回 ERR_INVALID_ARGS 且不创建对象、正式 OK 后同执行上下文对象进入 Game.creeps 且 spawning=true、完成后 spawning=false，并保留 4 条 accepted Console Evidence 边界。",
 );

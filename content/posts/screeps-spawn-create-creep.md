@@ -2,7 +2,7 @@
 title: "怎样让 Spawn 创建新的 Creep？认识 spawnCreep()"
 description: "写给 Screeps 新手的第一只 Creep 创建教程：找到 Spawn，准备 WORK、CARRY、MOVE，检查 spawnCreep() 返回值，并正确理解 Game.creeps 与 spawning 状态。"
 publishedAt: "2026-07-16"
-updatedAt: "2026-08-16"
+updatedAt: "2026-09-08"
 category: "Screeps 入门"
 tags:
   - "Screeps"
@@ -17,9 +17,9 @@ verification:
   consoleTested: true
   liveTested: false
   checkedAt: "2026-08-16"
-  testedAt: "2026-08-11"
-  testEnvironment: "shard3 / W39N53"
-  testResult: "Accepted Console evidence: EV-1132EEA6DB475F4BDE4C verified a unique [WORK,CARRY,MOVE] StructureSpawn.spawnCreep() request returned OK (0) and the exact Creep later existed with the expected body; EV-5F64D77F6CEDD1637FA3 verified dryRun duplicate-name ERR_NAME_EXISTS (-3); EV-1EB26EDDC7D65006ADB2 verified dryRun ERR_NOT_ENOUGH_ENERGY (-6) when a 2400-Energy body exceeded the room's 2300 available Energy. The intermediate spawning window was not directly observed in that Console evidence; the same-tick Game.creeps[name].spawning boundary described in this revision is source-derived from the current official engine."
+  testedAt: "2026-09-04"
+  testEnvironment: "shard3 / W39N53 + W39N52"
+  testResult: "Accepted Console evidence: EV-1132EEA6DB475F4BDE4C verified a unique [WORK,CARRY,MOVE] StructureSpawn.spawnCreep() request returned OK (0) and the exact Creep later existed with the expected body; EV-5F64D77F6CEDD1637FA3 verified dryRun duplicate-name ERR_NAME_EXISTS (-3); EV-1EB26EDDC7D65006ADB2 verified dryRun ERR_NOT_ENOUGH_ENERGY (-6) when a 2400-Energy body exceeded the room's 2300 available Energy; EV-BD1A9FFBDE1E56470CCE verified a controlled dryRun with an empty body [] returned ERR_INVALID_ARGS (-10), while the Spawn remained idle and no Creep with the probe name was created. The -10 evidence proves this empty-body argument boundary only. The intermediate spawning window was not directly observed in the successful Console evidence; the same-tick Game.creeps[name].spawning boundary described in this revision is source-derived from the current official engine."
 featured: false
 ---
 
@@ -303,6 +303,9 @@ Game.creeps.Worker1?.spawning === false
 
 更完整的返回码可以看：[spawnCreep() 失败怎么查](/blog/screeps-spawncreep-return-codes)。
 
+> **补充证据：empty body 参数边界**
+> 2026-09-04 的一条真实 Screeps Console `dryRun` 记录中，`StructureSpawn.spawnCreep([], name, { dryRun: true })` 返回 `ERR_INVALID_ARGS (-10)`，Spawn 保持 idle，且没有创建对应名称的 Creep。这条证据只证明 **空 body `[]`** 这一种参数错误路径；本文不扩展完整 `ERR_INVALID_ARGS` 成因，其他参数错误继续由上面的返回码专题负责。
+
 ## 八、保存代码后应该观察什么
 
 按顺序观察：
@@ -370,12 +373,38 @@ ERR_NAME_EXISTS (-3)
 ERR_NOT_ENOUGH_ENERGY (-6)
 ```
 
+### EV-BD1A9FFBDE1E56470CCE
+
+2026-09-04，真实 Screeps Console 在 `shard3 / W39N52` 对一个属于自己的 idle `Spawn3` 执行了受控 `dryRun`：
+
+```javascript
+Game.spawns.Spawn3.spawnCreep(
+  [],
+  'ev_invalid_args_82745772',
+  { dryRun: true }
+)
+```
+
+返回：
+
+```text
+ERR_INVALID_ARGS (-10)
+```
+
+随后确认：
+
+- `Spawn3` 仍然 idle；
+- 没有创建名为 `ev_invalid_args_82745772` 的 Creep。
+
+这条证据**只证明空 body `[]` 会在这个已观察路径上被拒绝为 `ERR_INVALID_ARGS (-10)`**；它不证明其他所有 `ERR_INVALID_ARGS` 成因，也不把 `dryRun` 结果当成正式生成行为。
+
 因此本文目前的证据层级是：
 
 ```text
 正式 OK + 后续 Creep/body：Console 已验证
 dryRun 名称重复：Console 已验证
 dryRun Energy 不足：Console 已验证
+dryRun 空 body：Console 已验证 ERR_INVALID_ARGS (-10)
 同 tick Game.creeps[name].spawning：官方 engine 源码确认，未新增 Console 证据
 ```
 
