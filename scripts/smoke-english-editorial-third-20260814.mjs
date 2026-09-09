@@ -41,7 +41,7 @@ const checks = [
       "partial-or-ambiguous-boost",
       "verified-exact-boost",
       "target ownership is not an API precondition",
-      `"dateModified":"2026-08-14"`,
+      `"dateModified":"2026-09-09"`,
     ],
     prohibited: [
       "&& part.hits > 0",

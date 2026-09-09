@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 
 import { EnglishArticlePage } from "@/components/english-article-page";
 import { englishBeginnerArticles, getEnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import {
+  applyEnglishLabBoostCtrBatch03A20260909,
+  getEnglishLabBoostCtrUpdatedAt20260909,
+} from "@/lib/english-ctr-lab-boost-20260909";
 import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
 import {
   applyEnglishEditorialEighth20260817,
@@ -154,12 +158,14 @@ function getDynamicEnglishArticle(slug: string) {
   const ninthArticle = applyEnglishEditorialNinth20260817(normalizedArticle);
   const ninthFinalArticle = applyEnglishEditorialNinthFinal20260817(ninthArticle);
   const tenthArticle = applyEnglishEditorialTenth20260818(ninthFinalArticle);
+  const tenthFinalArticle = applyEnglishEditorialTenthFinal20260818(tenthArticle);
 
-  return applyEnglishEditorialTenthFinal20260818(tenthArticle);
+  return applyEnglishLabBoostCtrBatch03A20260909(tenthFinalArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishEditorialThirteenthUpdatedAt20260818(slug)
+  return getEnglishLabBoostCtrUpdatedAt20260909(slug)
+    ?? getEnglishEditorialThirteenthUpdatedAt20260818(slug)
     ?? getEnglishEditorialTwelfthUpdatedAt20260818(slug)
     ?? getEnglishEditorialEleventhUpdatedAt20260818(slug)
     ?? getEnglishEditorialTenthUpdatedAt20260818(slug)
