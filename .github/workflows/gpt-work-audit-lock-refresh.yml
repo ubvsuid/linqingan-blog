@@ -1,0 +1,55 @@
+name: GPT Work audited dependency lock refresh
+
+on:
+  push:
+    branches:
+      - gpt-work
+    paths:
+      - .github/workflows/gpt-work-audit-lock-refresh.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Refresh vulnerable lock entries
+        run: npm audit fix --package-lock-only
+
+      - name: Verify production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Verify full dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Commit lock refresh and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain -- package.json)" ]]; then
+            echo "package.json changed unexpectedly; refusing automatic commit"
+            git diff -- package.json
+            exit 1
+          fi
+          if [[ -z "$(git status --porcelain -- package-lock.json)" ]]; then
+            echo "package-lock.json did not change; refusing no-op refresh"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git rm .github/workflows/gpt-work-audit-lock-refresh.yml
+          git commit -m "fix: refresh audited dependency lock"
+          git push origin HEAD:gpt-work
