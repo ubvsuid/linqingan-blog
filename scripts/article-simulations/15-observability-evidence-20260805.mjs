@@ -25,6 +25,9 @@ const currentEvent = read(
 const currentVisual = read(
   "src/lib/english-editorial-roomvisual-evidence-final-20260805.ts",
 );
+const currentVisualCtr = read(
+  "src/lib/english-ctr-roomvisual-20260909.ts",
+);
 const index = read(
   "src/lib/english-editorial-observability-evidence-20260805.ts",
 );
@@ -83,8 +86,8 @@ for (const [source, label, signals] of [
   for (const signal of signals) requireText(source, signal, label);
 }
 
-// The public current state is the reviewed 2026-08-30 supersession. Assert its
-// task-focused contract instead of requiring the older implementation shape.
+// The public current source layer keeps the reviewed 2026-08-30 observability
+// contracts. RoomVisual then receives a scoped 2026-09-09 CTR enhancement.
 for (const signal of [
   'title: "Screeps Game.notify(): Send Rate-Limited Alerts Safely"',
   "Game.notify",
@@ -115,13 +118,26 @@ for (const signal of [
   "480000",
   "512000",
 ]) {
-  requireText(currentVisual, signal, "current RoomVisual supersession");
+  requireText(currentVisual, signal, "current RoomVisual base supersession");
+}
+
+for (const signal of [
+  "applyEnglishRoomVisualCtrBatch02A20260909",
+  'title: "Screeps RoomVisual: Transparent Fills, Labels, and Paths"',
+  'headline: "How to Draw RoomVisual Debug Shapes Without a Fill"',
+  "fill: 'transparent'",
+  "null</code> is not the documented no-fill value",
+  "Screeps RoomVisual transparent fill",
+  "Screeps RoomVisual no fill",
+]) {
+  requireText(currentVisualCtr, signal, "current RoomVisual CTR enhancement");
 }
 
 for (const signal of [
   "englishEditorialNotifyEvidenceFinalArticle20260805",
   "englishEditorialEventWindowFinalArticle20260805",
   "englishEditorialRoomVisualEvidenceFinalArticle20260805",
+  "applyEnglishRoomVisualCtrBatch02A20260909",
   "englishEditorialObservabilityEvidenceOverrides20260805",
 ]) {
   requireText(index, signal, "observability override mapping");
@@ -134,20 +150,23 @@ for (const signal of [
 }
 
 const currentRegistryExpectations = [
-  [
-    "/en/blog/screeps-game-notify",
-    "Screeps Game.notify(): Send Rate-Limited Alerts Safely",
-  ],
-  [
-    "/en/blog/screeps-room-event-log",
-    "Screeps Room.getEventLog(): Read Previous-Tick Events",
-  ],
-  [
-    "/en/blog/screeps-roomvisual-debug",
-    "Screeps RoomVisual: Draw Debug Labels and Paths",
-  ],
+  {
+    href: "/en/blog/screeps-game-notify",
+    title: "Screeps Game.notify(): Send Rate-Limited Alerts Safely",
+    updatedAt: "2026-08-30",
+  },
+  {
+    href: "/en/blog/screeps-room-event-log",
+    title: "Screeps Room.getEventLog(): Read Previous-Tick Events",
+    updatedAt: "2026-08-30",
+  },
+  {
+    href: "/en/blog/screeps-roomvisual-debug",
+    title: "Screeps RoomVisual: Transparent Fills, Labels, and Paths",
+    updatedAt: "2026-09-09",
+  },
 ];
-for (const [href, title] of currentRegistryExpectations) {
+for (const { href, title, updatedAt } of currentRegistryExpectations) {
   const start = registry.indexOf(`href: "${href}"`);
   const next = registry.indexOf("\n  {", start + href.length);
   const record = start < 0
@@ -155,7 +174,7 @@ for (const [href, title] of currentRegistryExpectations) {
     : registry.slice(start, next < 0 ? registry.length : next);
   for (const signal of [
     title,
-    'updatedAt: "2026-08-30"',
+    `updatedAt: "${updatedAt}"`,
     "finalScore: 98",
   ]) {
     requireText(record, signal, `${href} current registry`);
@@ -263,7 +282,8 @@ if (failures.length > 0) {
 
 console.log(
   "Observability supersession simulation passed: the 2026-08-05 historical "
-    + "sources remain intact, the reviewed 2026-08-30 notify/event/RoomVisual "
-    + "current contracts match discovery metadata, current JavaScript blocks "
-    + "parse, and focused notification/event/visual boundaries pass.",
+    + "sources remain intact, the reviewed 2026-08-30 notify/event/current "
+    + "RoomVisual base plus the scoped 2026-09-09 RoomVisual CTR enhancement "
+    + "match discovery metadata, current JavaScript blocks parse, and focused "
+    + "notification/event/visual boundaries pass.",
 );
