@@ -57,12 +57,12 @@ export const englishObservabilityBatchNineRegistry: DatedEnglishArticleRecord[] 
     href: "/en/blog/screeps-roomvisual-debug",
     chinesePath: "/blog/screeps-roomvisual-debug",
     category: "OBSERVABILITY · ROOM VISUAL DEBUGGING",
-    title: "Screeps RoomVisual: Draw Debug Labels and Paths",
+    title: "Screeps RoomVisual: Transparent Fills, Labels, and Paths",
     description:
-      "Draw current-tick circles, labels, and lines with RoomVisual, keep coordinates in the correct Room, understand one-tick lifetime and the 512,000-byte limit, and avoid treating visuals as action evidence.",
+      "Use fill: 'transparent' for unfilled RoomVisual circles and rectangles, then add debug labels and target paths without confusing visuals with game results.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    updatedAt: "2026-08-30",
+    updatedAt: "2026-09-09",
     readingTime: "10 min read",
     primaryKeyword: "Screeps RoomVisual",
     searchIntent:
@@ -75,6 +75,8 @@ export const englishObservabilityBatchNineRegistry: DatedEnglishArticleRecord[] 
       "RoomVisual text circle line",
       "RoomVisual getSize",
       "Screeps debug Creep target",
+      "Screeps RoomVisual transparent fill",
+      "Screeps RoomVisual no fill",
     ],
   },
   {
