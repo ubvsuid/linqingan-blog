@@ -56,12 +56,12 @@ const invalidDryRun = simulateSpawnCreepCall({
   dryRun: true,
   requestValid: false,
   gameCreeps: invalidDryRunGameCreeps,
-  name: "ev_invalid_args_82745772",
+  name: "L82745772",
 });
 assert.equal(invalidDryRun.result, "ERR_INVALID_ARGS");
-assert.equal(invalidDryRunGameCreeps.ev_invalid_args_82745772, undefined);
+assert.equal(invalidDryRunGameCreeps.L82745772, undefined);
 assert.equal(
-  readSpawnLifecycle(invalidDryRunGameCreeps.ev_invalid_args_82745772),
+  readSpawnLifecycle(invalidDryRunGameCreeps.L82745772),
   "not-created",
 );
 
@@ -98,9 +98,12 @@ for (const requiredText of [
   "EV-1132EEA6DB475F4BDE4C",
   "EV-5F64D77F6CEDD1637FA3",
   "EV-1EB26EDDC7D65006ADB2",
-  "EV-BD1A9FFBDE1E56470CCE",
+  "EV-BD81087C010F40D037B1",
   "ERR_INVALID_ARGS (-10)",
   "空 body `[]`",
+  "L82745772",
+  "busy flag",
+  "没有提交 spawn intent",
   "consoleTested: true",
   "liveTested: false",
   'testedAt: "2026-09-04"',
@@ -117,10 +120,12 @@ for (const requiredText of [
 for (const staleText of [
   "创建完成后，可以通过 `Game.creeps['Worker1']` 找到它",
   "真正完成以后，再在后续 tick 重新读取 `Game.creeps[name]`",
+  "EV-BD1A9FFBDE1E56470CCE",
+  "ev_invalid_args_82745772",
 ]) {
   assert.ok(
     !article.includes(staleText),
-    `spawn-create timing article reintroduced stale completion timing: ${staleText}`,
+    `spawn-create timing article reintroduced stale completion/evidence identity: ${staleText}`,
   );
 }
 
@@ -140,5 +145,5 @@ assert.ok(
 );
 
 console.log(
-  "中文 spawnCreep 创建时序模拟通过：dryRun 不创建对象、empty-body invalid dryRun 返回 ERR_INVALID_ARGS 且不创建对象、正式 OK 后同执行上下文对象进入 Game.creeps 且 spawning=true、完成后 spawning=false，并保留 4 条 accepted Console Evidence 边界。",
+  "中文 spawnCreep 创建时序模拟通过：dryRun 不创建对象、empty-body invalid dryRun 返回 ERR_INVALID_ARGS 且不创建对象、正式 OK 后同执行上下文对象进入 Game.creeps 且 spawning=true、完成后 spawning=false，并锁定 Production DB accepted 的 4 条 Console Evidence identity/boundary。",
 );
