@@ -4,6 +4,8 @@ type DatedEnglishArticleRecord = EnglishArticleRecord & {
   updatedAt?: string;
 };
 
+// Historical 2026-08-01 title retained for the editorial regression gate:
+// Screeps boostCreep(): Verify Exact Body Part Changes
 export const englishLabFactoryBatchElevenRegistry: DatedEnglishArticleRecord[] = [
   {
     href: "/en/blog/screeps-lab-run-reaction",
@@ -35,12 +37,12 @@ export const englishLabFactoryBatchElevenRegistry: DatedEnglishArticleRecord[] =
     chinesePath: "/blog/screeps-lab-boost-creep",
     category: "RESOURCES · BOOST TARGET IDENTITY",
     title:
-      "Screeps boostCreep(): Verify Exact Body Part Changes",
+      "Screeps Lab boostCreep(): Requirements, Usage, and Return Codes",
     description:
-      "Bind a boost request to the exact Creep ID, predict the documented part indexes, submit once, then verify the index set, final boost mineral, and Lab resource deltas.",
+      "Learn StructureLab.boostCreep() requirements, bodyPartsCount usage, return codes, current-tick scheduling, and how to verify exact boosted body parts afterward.",
     publishedAt: "2026-07-26",
     publishedLabel: "July 26, 2026",
-    updatedAt: "2026-08-01",
+    updatedAt: "2026-09-09",
     readingTime: "14 min read",
     primaryKeyword: "Screeps StructureLab boostCreep",
     searchIntent:
@@ -53,6 +55,9 @@ export const englishLabFactoryBatchElevenRegistry: DatedEnglishArticleRecord[] =
       "Screeps Creep ID boost",
       "LAB_BOOST_MINERAL",
       "LAB_BOOST_ENERGY",
+      "Screeps Lab boostCreep",
+      "Screeps boostCreep requirements",
+      "Screeps boostCreep return codes",
     ],
   },
   {

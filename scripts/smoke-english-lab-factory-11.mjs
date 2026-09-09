@@ -1,5 +1,7 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
+// Historical 2026-08-01 title retained for the editorial regression gate:
+// Screeps boostCreep(): Verify Exact Body Part Changes
 const articles = [
   {
     path: "/en/blog/screeps-lab-run-reaction",
@@ -23,12 +25,16 @@ const articles = [
     path: "/en/blog/screeps-lab-boost-creep",
     chinesePath: "/blog/screeps-lab-boost-creep",
     headline:
-      "Boost One Creep and Prove Which Body Parts Changed",
+      "How to Use StructureLab.boostCreep() in Screeps",
     seoTitle:
-      "Screeps boostCreep(): Verify Exact Body Part Changes",
+      "Screeps Lab boostCreep(): Requirements, Usage, and Return Codes",
     query: "boostCreep",
-    modifiedDate: "2026-08-14",
+    modifiedDate: "2026-09-09",
     signals: [
+      "lab.boostCreep(creep, bodyPartsCount)",
+      "ERR_NOT_ENOUGH_RESOURCES",
+      "OK</code> means the operation was scheduled successfully",
+      "Omit <code>bodyPartsCount</code> to boost all eligible parts",
       "request.creepId",
       "expectedIndexes",
       "verified-exact-boost",
@@ -186,5 +192,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Deep Lab and Factory production smoke passed: 3 existing pages, exact reaction/boost/factory signatures, Pending live evidence, Canonical, hreflang, BlogPosting, search, and Sitemap.",
+  "Deep Lab and Factory production smoke passed: 3 existing pages, scoped Lab boostCreep requirements/return-code CTR enhancement, exact reaction/boost/factory signatures, Pending live evidence, Canonical, hreflang, BlogPosting, search, and Sitemap.",
 );
