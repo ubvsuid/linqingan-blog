@@ -6,12 +6,12 @@ import { siteConfig } from "@/lib/site";
 
 const path = "/en/blog/screeps-remove-construction-site";
 const chinesePath = "/blog/screeps-construction-site-remove";
-const title = "Screeps ConstructionSite.remove(): Safe Removal Guide";
+const title = "Screeps ConstructionSite.remove() API Guide";
 const headline = "How to Remove a Construction Site Safely in Screeps";
 const description =
-  "Remove one Screeps ConstructionSite by exact ID, preserve OK or ERR_NOT_OWNER, distinguish it from a completed Structure, and verify the original site on a later visible tick.";
+  "Use ConstructionSite.remove() in Screeps: resolve the site by ID, handle OK or ERR_NOT_OWNER, and verify the original site is gone on a later visible tick.";
 const publishedAt = "2026-07-24";
-const modifiedTime = "2026-08-29";
+const modifiedTime = "2026-09-10";
 const articleUrl = `${siteConfig.url}${path}`;
 
 export const metadata: Metadata = {
@@ -55,10 +55,11 @@ export const metadata: Metadata = {
 };
 
 const quickAnswerHtml = String.raw`
-<h2 id="quick-answer">Quick answer</h2>
-<p>Use <code>ConstructionSite.remove()</code> on the exact unfinished site you intend to remove. Do not use <code>Structure.destroy()</code> unless construction has already completed.</p>
+<h2 id="quick-answer">Quick answer: ConstructionSite.remove()</h2>
+<p><strong>API docs answer:</strong> call <code>site.remove()</code> on the exact visible <code>ConstructionSite</code>. The method documents two return values: <code>OK</code> when removal is scheduled and <code>ERR_NOT_OWNER</code> when the site is neither yours nor in your room.</p>
+<p>If you only have the site ID, resolve it with <code>Game.getObjectById(id)</code> first. If construction has already completed, the target is a <code>Structure</code> and uses <code>Structure.destroy()</code> instead.</p>
 <pre><code class="language-javascript">const result = site.remove();</code></pre>
-<p><code>OK</code> means the removal was scheduled successfully. Keep the original site ID and position, then verify the result on a later tick when the room is visible. <code>ERR_NOT_OWNER</code> means the site is neither yours nor in your room.</p>
+<p>After <code>OK</code>, keep the original site ID and position, then verify the original site is absent on a later tick when the room is visible.</p>
 `;
 
 const articleHtml = String.raw`
@@ -273,6 +274,12 @@ if (!(site instanceof ConstructionSite)) {
 </ul>
 <p>No live Console or official-shard removal trace is claimed here. The API behavior, visibility rule, current engine ownership boundary, and code paths were checked against current official sources and offline logic; live multi-tick verification remains pending.</p>
 
+<h2 id="faq">ConstructionSite.remove() FAQ</h2>
+<h3>What does ConstructionSite.remove() return in Screeps?</h3>
+<p>The documented return values are <code>OK</code> when removal is scheduled and <code>ERR_NOT_OWNER</code> when the site is neither yours nor in your room. A missing object from <code>Game.getObjectById()</code> is a lookup state to handle before calling <code>remove()</code>, not another documented return value from the method.</p>
+<h3>Can I remove a construction site when I only know its ID?</h3>
+<p>Yes. Resolve the ID with <code>Game.getObjectById(id)</code>, confirm that the current object is the intended <code>ConstructionSite</code>, then call <code>remove()</code>. If the room is not visible, do not treat a missing lookup as proof that removal succeeded.</p>
+
 <h2 id="official-docs">Official documentation</h2>
 <ul>
 <li><a href="https://docs.screeps.com/api/#ConstructionSite.remove" rel="nofollow">ConstructionSite.remove()</a></li>
@@ -344,6 +351,7 @@ const toc = [
   ["Verify on a later tick", "verify-later"],
   ["Optional automation guard", "automation-guard"],
   ["Failure and evidence boundaries", "boundaries"],
+  ["FAQ", "faq"],
 ] as const;
 
 export default function RemoveConstructionSitePage() {
@@ -372,7 +380,7 @@ export default function RemoveConstructionSitePage() {
             <div className="post-meta">
               <time dateTime={publishedAt}>Published July 24, 2026</time>
               <span aria-hidden="true">/</span>
-              <time dateTime={modifiedTime}>Updated August 29, 2026</time>
+              <time dateTime={modifiedTime}>Updated September 10, 2026</time>
               <span aria-hidden="true">/</span>
               <span>9 min read</span>
             </div>
@@ -413,7 +421,7 @@ export default function RemoveConstructionSitePage() {
               <div><dt>Offline logic review</dt><dd>Passed — one-shot request consumption, target mismatch, room-vision, original-ID, and replacement-site branches</dd></div>
               <div><dt>Screeps Console</dt><dd>Pending</dd></div>
               <div><dt>Live multi-tick test</dt><dd>Pending</dd></div>
-              <div><dt>Last verified</dt><dd>August 29, 2026</dd></div>
+              <div><dt>Last verified</dt><dd>September 10, 2026</dd></div>
             </dl>
           </section>
 

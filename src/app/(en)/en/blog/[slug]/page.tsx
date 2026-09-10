@@ -7,6 +7,10 @@ import {
   applyEnglishLabBoostCtrBatch03A20260909,
   getEnglishLabBoostCtrUpdatedAt20260909,
 } from "@/lib/english-ctr-lab-boost-20260909";
+import {
+  applyEnglishRenewCreepCtr20260910,
+  getEnglishRenewCreepCtrUpdatedAt20260910,
+} from "@/lib/english-ctr-renew-creep-20260910";
 import { getEnglishEditorialCoreUpdatedAt20260812 } from "@/lib/english-editorial-core-20260812";
 import {
   applyEnglishEditorialEighth20260817,
@@ -159,12 +163,14 @@ function getDynamicEnglishArticle(slug: string) {
   const ninthFinalArticle = applyEnglishEditorialNinthFinal20260817(ninthArticle);
   const tenthArticle = applyEnglishEditorialTenth20260818(ninthFinalArticle);
   const tenthFinalArticle = applyEnglishEditorialTenthFinal20260818(tenthArticle);
+  const labBoostArticle = applyEnglishLabBoostCtrBatch03A20260909(tenthFinalArticle);
 
-  return applyEnglishLabBoostCtrBatch03A20260909(tenthFinalArticle);
+  return applyEnglishRenewCreepCtr20260910(labBoostArticle);
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishLabBoostCtrUpdatedAt20260909(slug)
+  return getEnglishRenewCreepCtrUpdatedAt20260910(slug)
+    ?? getEnglishLabBoostCtrUpdatedAt20260909(slug)
     ?? getEnglishEditorialThirteenthUpdatedAt20260818(slug)
     ?? getEnglishEditorialTwelfthUpdatedAt20260818(slug)
     ?? getEnglishEditorialEleventhUpdatedAt20260818(slug)

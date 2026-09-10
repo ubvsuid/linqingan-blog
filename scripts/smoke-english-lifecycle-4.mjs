@@ -5,12 +5,19 @@ const articles = [
   {
     path: "/en/blog/screeps-renew-creep",
     chinesePath: "/blog/screeps-spawn-renew-creep",
-    headline: "Renew a Creep Without Hiding Spawn Contention or Boost Loss",
-    indexTitle: "Screeps renewCreep(): Coordinate Spawn Time and Verify TTL Gain",
+    headline: "How to Use StructureSpawn.renewCreep() in Screeps",
+    indexTitle: "Screeps renewCreep(): Requirements, Cost, and Return Codes",
     query: "renewCreep verification",
     tocId: "evidence-contract",
     tocHeading: "Start with the missing event",
     signals: [
+      "Quick answer:",
+      "spawn.renewCreep(creep)",
+      "floor(600 / bodySize)",
+      "ceil(creepCost / 2.5 / bodySize)",
+      "ERR_INVALID_TARGET",
+      "ERR_FULL",
+      "ERR_RCL_NOT_ENOUGH",
       "createRenewalDispatcher",
       "Memory.pendingRenewals",
       "renewal-ttl-signature-mismatch",
@@ -149,5 +156,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Lifecycle production smoke passed: ${articles.length} articles, exact renewal and recycling identity, previous-tick destruction event, Creep-tile Tombstone and Container evidence, Canonical, hreflang, JSON-LD, search and Sitemap.`,
+  `Lifecycle production smoke passed: ${articles.length} articles, current renewCreep API supersession, preserved deep renewal/recycling identity evidence, previous-tick destruction event, Creep-tile Tombstone and Container evidence, Canonical, hreflang, JSON-LD, search and Sitemap.`,
 );

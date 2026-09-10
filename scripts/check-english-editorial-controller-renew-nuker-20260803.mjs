@@ -17,6 +17,8 @@ const registries = [
   "src/lib/english-lifecycle-registry-4.ts",
   "src/lib/english-defense-operations-registry-17.ts",
 ].map(read).join("\n");
+const renewCtr = read("src/lib/english-ctr-renew-creep-20260910.ts");
+const dynamicRoute = read("src/app/(en)/en/blog/[slug]/page.tsx");
 const packageJson = read("package.json");
 const failures = [];
 
@@ -27,6 +29,8 @@ const articles = [
     chinesePath: "/blog/screeps-reserve-vs-claim-controller",
     title: "Screeps reserveController() vs claimController(): Verify the Exact Mission",
     headline: "Reserve or Claim a Controller Without Losing Mission Identity",
+    registryTitle: "Screeps reserveController() vs claimController(): Verify the Exact Mission",
+    registryUpdatedAt: "2026-08-03",
     signals: [
       "Memory.pendingControllerOperations",
       "EVENT_RESERVE_CONTROLLER",
@@ -44,6 +48,8 @@ const articles = [
     chinesePath: "/blog/screeps-spawn-renew-creep",
     title: "Screeps renewCreep(): Coordinate Spawn Time and Verify TTL Gain",
     headline: "Renew a Creep Without Hiding Spawn Contention or Boost Loss",
+    registryTitle: "Screeps renewCreep(): Requirements, Cost, and Return Codes",
+    registryUpdatedAt: "2026-09-10",
     signals: [
       "createRenewalDispatcher",
       "usedSpawnIds",
@@ -62,6 +68,8 @@ const articles = [
     chinesePath: "/blog/screeps-nuker-launch-checklist",
     title: "Screeps launchNuke(): Exact Target Records and Post-Launch Proof",
     headline: "Launch a Nuke Once and Preserve the Exact Operation Record",
+    registryTitle: "Screeps launchNuke(): Exact Target Records and Post-Launch Proof",
+    registryUpdatedAt: "2026-08-03",
     signals: [
       "Memory.pendingNukeLaunches",
       "accepted-awaiting-verification",
@@ -98,12 +106,39 @@ for (const article of articles) {
   for (const expected of [
     `href: \"${article.path}\"`,
     `chinesePath: \"${article.chinesePath}\"`,
-    `title: \"${article.title}\"`,
-    `updatedAt: \"2026-08-03\"`,
+    `title: \"${article.registryTitle}\"`,
+    `updatedAt: \"${article.registryUpdatedAt}\"`,
   ]) {
     if (!registries.includes(expected)) {
-      failures.push(`${article.slug}: 登记元数据缺少 ${expected}`);
+      failures.push(`${article.slug}: 当前登记元数据缺少 ${expected}`);
     }
+  }
+}
+
+for (const expected of [
+  'const TARGET_SLUG = "screeps-renew-creep"',
+  'const UPDATED_AT = "2026-09-10"',
+  'title: "Screeps renewCreep(): Requirements, Cost, and Return Codes"',
+  'headline: "How to Use StructureSpawn.renewCreep() in Screeps"',
+  "floor(600 / bodySize)",
+  "ceil(creepCost / 2.5 / bodySize)",
+  "ERR_INVALID_TARGET",
+  "ERR_FULL",
+  "ERR_RCL_NOT_ENOUGH",
+  "September 10, 2026",
+]) {
+  if (!renewCtr.includes(expected)) {
+    failures.push(`renewCreep 当前 CTR supersession 缺少 ${expected}`);
+  }
+}
+
+for (const expected of [
+  'from "@/lib/english-ctr-renew-creep-20260910"',
+  "applyEnglishRenewCreepCtr20260910(labBoostArticle)",
+  "getEnglishRenewCreepCtrUpdatedAt20260910(slug)",
+]) {
+  if (!dynamicRoute.includes(expected)) {
+    failures.push(`renewCreep 当前层未正确接入动态路由：${expected}`);
   }
 }
 
@@ -298,5 +333,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Controller、续命与 Nuker 深度编辑门禁通过：3 个现有路由、${blocks.length} 个 JavaScript 代码块、${offlineCases} 个离线用例、精确 Reserve/Claim/Renew/Nuker 证据边界、Pending 真实环境证据与 98 分内部门槛均有效。`,
+  `Controller、续命与 Nuker 深度编辑门禁通过：3 个历史路由、${blocks.length} 个 JavaScript 代码块、${offlineCases} 个离线用例、历史 Reserve/Claim/Renew/Nuker 证据边界与当前 renewCreep CTR supersession 均有效。`,
 );
