@@ -190,6 +190,7 @@ export const screepsDiagnosticSymptoms = [
     guides: [
       { zhLabel: "Lab 强化 Creep", enLabel: "StructureLab.boostCreep() guide", zhHref: "/blog/screeps-lab-boost-creep", enHref: "/en/blog/screeps-lab-boost-creep" },
     ],
+    tools: [],
     zhSearchTerms: ["boostCreep失败", "lab强化失败", "creep boost没反应", "ERR_NOT_FOUND boostCreep", "lab boost资源不足"],
     enSearchTerms: ["boostCreep failed", "lab boost not working", "creep boost not applied", "boostCreep ERR_NOT_FOUND", "lab boost resources"],
   },
