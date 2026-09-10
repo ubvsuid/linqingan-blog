@@ -1634,6 +1634,13 @@
       "source": "src/lib/screeps-diagnostic-symptoms.ts"
     },
     {
+      "id": "symptom:lab-boost-failed",
+      "type": "Symptom",
+      "title": "Lab boostCreep() 失败",
+      "locale": "zh",
+      "source": "src/lib/screeps-diagnostic-symptoms.ts"
+    },
+    {
       "id": "symptom:link-not-transferring",
       "type": "Symptom",
       "title": "Link 不传能量",
@@ -2814,6 +2821,69 @@
       "to": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
       "relation": "solvedBy",
       "provenance": "src/lib/screeps-diagnostic-symptoms.ts#tools"
+    },
+    {
+      "id": "symptom:lab-boost-failed|involvesApi|api:lab-boost-creep",
+      "from": "symptom:lab-boost-failed",
+      "to": "api:lab-boost-creep",
+      "relation": "involvesApi",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#directApiEntryIds"
+    },
+    {
+      "id": "symptom:lab-boost-failed|relatedTo|return-code:ERR_INVALID_TARGET",
+      "from": "symptom:lab-boost-failed",
+      "to": "return-code:ERR_INVALID_TARGET",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:lab-boost-failed|relatedTo|return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "from": "symptom:lab-boost-failed",
+      "to": "return-code:ERR_NOT_ENOUGH_RESOURCES",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:lab-boost-failed|relatedTo|return-code:ERR_NOT_FOUND",
+      "from": "symptom:lab-boost-failed",
+      "to": "return-code:ERR_NOT_FOUND",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:lab-boost-failed|relatedTo|return-code:ERR_NOT_IN_RANGE",
+      "from": "symptom:lab-boost-failed",
+      "to": "return-code:ERR_NOT_IN_RANGE",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:lab-boost-failed|relatedTo|return-code:ERR_NOT_OWNER",
+      "from": "symptom:lab-boost-failed",
+      "to": "return-code:ERR_NOT_OWNER",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:lab-boost-failed|relatedTo|return-code:ERR_RCL_NOT_ENOUGH",
+      "from": "symptom:lab-boost-failed",
+      "to": "return-code:ERR_RCL_NOT_ENOUGH",
+      "relation": "relatedTo",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#errorNames"
+    },
+    {
+      "id": "symptom:lab-boost-failed|solvedBy|article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "from": "symptom:lab-boost-failed",
+      "to": "article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
+    },
+    {
+      "id": "symptom:lab-boost-failed|solvedBy|en_article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "from": "symptom:lab-boost-failed",
+      "to": "en_article_f4fe86ff-6ea8-432b-bc89-89a43a942e2c",
+      "relation": "solvedBy",
+      "provenance": "src/lib/screeps-diagnostic-symptoms.ts#guides"
     },
     {
       "id": "symptom:link-not-transferring|involvesApi|api:link-transfer-energy",
