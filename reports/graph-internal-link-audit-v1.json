@@ -4,8 +4,8 @@
   "scope": "read-only-curated-plus-chinese-markdown-gap-audit",
   "graphFingerprint": null,
   "counts": {
-    "graphNodes": 226,
-    "graphEdges": 198,
+    "graphNodes": 227,
+    "graphEdges": 207,
     "graphUnmapped": 0,
     "pageNodes": 160,
     "curatedSources": 115,
