@@ -32,6 +32,7 @@ const component = read("src/components/problem-resolver.tsx");
 const resolverRegistry = read("src/lib/problem-resolver.ts");
 const rankingCli = read("scripts/resolver-demand-ranking.mjs");
 const rankingLib = read("scripts/lib/resolver-demand-ranking.mjs");
+const gscSource = read("scripts/lib/resolver-demand-gsc-source.mjs");
 const integrity = read("scripts/check-integrity.mjs");
 
 const eventNames = [
@@ -270,6 +271,39 @@ for (const broadPattern of ['"source"', '"controller"']) {
 }
 requireSignal(
   rankingCli,
+  "readResolverDemandGscRows",
+  "Demand ranking CLI must use the shared settled GSC source adapter.",
+);
+requireSignal(
+  gscSource,
+  "site_intelligence_gsc_observations",
+  "Demand ranking must reuse the existing Site Intelligence GSC serving layer by default.",
+);
+requireSignal(
+  gscSource,
+  "ORDER BY max(period_end) DESC, max(captured_at) DESC, source_import_id DESC",
+  "Demand ranking must deterministically select the latest settled Site Intelligence import.",
+);
+requireSignal(
+  gscSource,
+  "WHERE source_import_id = ${latest.source_import_id}",
+  "Demand ranking must aggregate only one selected GSC import and never sum multiple replay imports together.",
+);
+requireSignal(
+  gscSource,
+  "payload.records.map",
+  "Demand ranking must retain a reproducible settled-file override path.",
+);
+requireSignal(
+  gscSource,
+  "path.basename(filePath)",
+  "GSC file provenance must expose only the basename, not an operator filesystem path.",
+);
+if (rankingCli.includes("No settled GSC report supplied")) {
+  failures.push("Demand ranking must not require a manual GSC file when Site Intelligence serving data is available.");
+}
+requireSignal(
+  rankingCli,
   "raw Search/GSC query text is not emitted",
   "Demand ranking report must state its aggregate-only privacy boundary.",
 );
@@ -285,5 +319,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Resolver observability check passed: ${eventNames.length} structured events, ${expectedFlowIds.length} unchanged deterministic flows, ${resolverDemandCandidates.length} demand candidates, aggregate-only ranking, and fail-closed insufficient-data behavior.`,
+  `Resolver observability check passed: ${eventNames.length} structured events, ${expectedFlowIds.length} unchanged deterministic flows, ${resolverDemandCandidates.length} demand candidates, canonical Site Intelligence GSC source with settled-file override, aggregate-only ranking, and fail-closed insufficient-data behavior.`,
 );

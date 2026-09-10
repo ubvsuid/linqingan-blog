@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
+import { readResolverDemandGscRows } from "./lib/resolver-demand-gsc-source.mjs";
 import { buildResolverDemandRanking } from "./lib/resolver-demand-ranking.mjs";
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
@@ -55,36 +56,11 @@ async function readSearchRows() {
   }
 }
 
-function readGscRows() {
-  if (!gscInputPath) {
-    console.warn("No settled GSC report supplied; ranking will fail closed as INSUFFICIENT_DATA.");
-    return { rows: null, source: null };
-  }
-
-  const absolute = path.resolve(gscInputPath);
-  if (!fs.existsSync(absolute)) {
-    console.warn("Configured GSC report does not exist; ranking will fail closed as INSUFFICIENT_DATA.");
-    return { rows: null, source: path.basename(absolute) };
-  }
-
-  try {
-    const payload = JSON.parse(fs.readFileSync(absolute, "utf8"));
-    if (!Array.isArray(payload.records)) {
-      console.warn("GSC report has no records array; ranking will fail closed as INSUFFICIENT_DATA.");
-      return { rows: null, source: path.basename(absolute) };
-    }
-    return { rows: payload.records, source: path.basename(absolute) };
-  } catch {
-    console.warn("GSC report could not be parsed; ranking will fail closed as INSUFFICIENT_DATA.");
-    return { rows: null, source: path.basename(absolute) };
-  }
-}
-
-const [resolverRows, searchRows] = await Promise.all([
+const [resolverRows, searchRows, gsc] = await Promise.all([
   readResolverRows(),
   readSearchRows(),
+  readResolverDemandGscRows({ sql, inputPath: gscInputPath }),
 ]);
-const gsc = readGscRows();
 const ranking = buildResolverDemandRanking({
   resolverRows,
   searchRows,
@@ -107,5 +83,6 @@ fs.writeFileSync(absoluteOutput, `${JSON.stringify(report, null, 2)}\n`, "utf8")
 console.log(`Resolver Demand Ranking — last ${days} day(s)`);
 console.log(`Status: ${report.status}`);
 console.log(`Recommendation: ${report.recommendation.candidateId ?? "none"}`);
+console.log(`GSC source: ${report.gscSource.kind}/${report.gscSource.status}`);
 if (report.reasons.length > 0) console.log(`Reasons: ${report.reasons.join(", ")}`);
 console.log(`Report written to ${absoluteOutput}`);
