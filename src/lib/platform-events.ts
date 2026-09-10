@@ -1,7 +1,8 @@
 import { and, eq } from "drizzle-orm";
 
 import { getPlatformDatabase } from "@/db/client";
-import { articleFeedback, toolEvents } from "@/db/schema";
+import { articleFeedback, resolverEvents, toolEvents } from "@/db/schema";
+import type { ResolverTelemetryEvent } from "@/lib/problem-resolver-telemetry-contract";
 
 export const articleFeedbackValues = [
   "helpful",
@@ -115,6 +116,32 @@ export async function persistToolEvent(input: {
     return true;
   } catch (error) {
     console.warn("Tool event database write failed", error);
+    return false;
+  }
+}
+
+export async function persistResolverEvent(
+  input: ResolverTelemetryEvent & { identity?: AnonymousIdentity },
+): Promise<boolean> {
+  const db = getPlatformDatabase();
+  if (!db) return false;
+
+  try {
+    await db.insert(resolverEvents).values({
+      eventName: input.eventName,
+      flowId: input.flowId,
+      language: input.language,
+      stepId: input.stepId ?? null,
+      optionId: input.optionId ?? null,
+      outcomeId: input.outcomeId ?? null,
+      targetId: input.targetId ?? null,
+      targetKind: input.targetKind ?? null,
+      anonymousId: cleanIdentity(input.identity?.anonymousId),
+      sessionId: cleanIdentity(input.identity?.sessionId),
+    });
+    return true;
+  } catch (error) {
+    console.warn("Resolver telemetry database write failed", error);
     return false;
   }
 }

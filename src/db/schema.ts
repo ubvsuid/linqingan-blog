@@ -109,6 +109,41 @@ export const toolEvents = pgTable(
   (table) => [index("tool_events_tool_created_idx").on(table.toolId, table.createdAt)],
 );
 
+export const resolverEvents = pgTable(
+  "resolver_events",
+  {
+    id: bigint("id", { mode: "number" }).primaryKey().generatedByDefaultAsIdentity(),
+    anonymousId: text("anonymous_id"),
+    sessionId: text("session_id"),
+    language: text("language").notNull(),
+    eventName: text("event_name").notNull(),
+    flowId: text("flow_id").notNull(),
+    stepId: text("step_id"),
+    optionId: text("option_id"),
+    outcomeId: text("outcome_id"),
+    targetId: text("target_id"),
+    targetKind: text("target_kind"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("resolver_events_created_at_idx").on(table.createdAt.desc()),
+    index("resolver_events_event_created_idx").on(table.eventName, table.createdAt.desc()),
+    index("resolver_events_flow_created_idx").on(table.flowId, table.createdAt.desc()),
+    index("resolver_events_outcome_created_idx")
+      .on(table.outcomeId, table.createdAt.desc())
+      .where(sql`${table.outcomeId} is not null`),
+    check("resolver_events_language_check", sql`${table.language} in ('zh', 'en')`),
+    check(
+      "resolver_events_event_name_check",
+      sql`${table.eventName} in ('flow_started', 'step_answered', 'outcome_reached', 'diagnostics_clicked', 'guide_clicked', 'tool_clicked', 'ticklab_clicked')`,
+    ),
+    check(
+      "resolver_events_target_kind_check",
+      sql`${table.targetKind} is null or ${table.targetKind} in ('diagnostics', 'guide', 'api', 'tool', 'ticklab')`,
+    ),
+  ],
+);
+
 export const verificationEvidence = pgTable(
   "verification_evidence",
   {
