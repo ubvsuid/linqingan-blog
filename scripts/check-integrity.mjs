@@ -16,6 +16,7 @@ const checks = [
   ["Knowledge Graph V1 generated freshness", "scripts/generate-knowledge-graph-v1.mjs", "--check"],
   ["Knowledge Graph V1 contract and coverage", "scripts/check-knowledge-graph-v1.mjs"],
   ["Problem Resolver Graph reuse", "scripts/check-problem-resolver-graph.mjs"],
+  ["Resolver observability and demand ranking", "scripts/check-resolver-observability.mjs"],
   ["Knowledge Clusters V1", "scripts/check-knowledge-clusters.mjs"],
   ["Knowledge registry", "scripts/check-knowledge-registry.mjs"],
   ["Beginner roadmap", "scripts/check-beginner-roadmap.mjs"],

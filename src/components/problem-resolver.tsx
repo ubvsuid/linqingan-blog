@@ -1,17 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
+import { buildIdentityHeaders } from "@/lib/browser-identity";
 import type { KnowledgeClusterHandoffSignal } from "@/lib/knowledge-cluster-handoff";
-import type { ProblemResolverGraphPathsByStep } from "@/lib/problem-resolver-graph";
+import type {
+  ProblemResolverGraphPath,
+  ProblemResolverGraphPathsByStep,
+} from "@/lib/problem-resolver-graph";
 import {
   getProblemResolverStep,
   problemResolverFlows,
   type ProblemResolverLocale,
+  type ProblemResolverOption,
 } from "@/lib/problem-resolver";
+import type {
+  ResolverTelemetryEvent,
+  ResolverTelemetryTargetKind,
+} from "@/lib/problem-resolver-telemetry-contract";
 
 import styles from "./problem-resolver.module.css";
+
+type ResolverClickEventName =
+  | "diagnostics_clicked"
+  | "guide_clicked"
+  | "tool_clicked"
+  | "ticklab_clicked";
+
+function recordResolverTelemetry(event: ResolverTelemetryEvent) {
+  try {
+    void fetch("/api/resolver/event", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...buildIdentityHeaders(),
+      },
+      body: JSON.stringify(event),
+      keepalive: true,
+      referrerPolicy: "no-referrer",
+    }).catch(() => undefined);
+  } catch {
+    // Telemetry is best-effort and must never block Resolver use.
+  }
+}
 
 export function ProblemResolver({
   locale,
@@ -27,18 +59,51 @@ export function ProblemResolver({
   const flow = useMemo(() => problemResolverFlows.find((item) => item.flowId === flowId) ?? problemResolverFlows[0], [flowId]);
   const [stepId, setStepId] = useState(flow.startStepId);
   const [history, setHistory] = useState<string[]>([]);
+  const activeRunRef = useRef<string | null>(null);
   const step = getProblemResolverStep(flow, stepId) ?? getProblemResolverStep(flow, flow.startStepId);
+
+  function startFlowIfNeeded(nextFlowId: string) {
+    const runKey = `${locale}:${nextFlowId}`;
+    if (activeRunRef.current === runKey) return;
+    activeRunRef.current = runKey;
+    recordResolverTelemetry({
+      eventName: "flow_started",
+      flowId: nextFlowId,
+      language: locale,
+    });
+  }
 
   function chooseFlow(nextFlowId: string) {
     const nextFlow = problemResolverFlows.find((item) => item.flowId === nextFlowId) ?? problemResolverFlows[0];
+    activeRunRef.current = null;
+    startFlowIfNeeded(nextFlow.flowId);
     setFlowId(nextFlow.flowId);
     setStepId(nextFlow.startStepId);
     setHistory([]);
   }
 
-  function chooseNext(nextStepId: string) {
+  function chooseNext(option: ProblemResolverOption) {
+    startFlowIfNeeded(flow.flowId);
+    recordResolverTelemetry({
+      eventName: "step_answered",
+      flowId: flow.flowId,
+      stepId,
+      optionId: option.id,
+      language: locale,
+    });
+
+    const nextStep = getProblemResolverStep(flow, option.nextStepId);
+    if (nextStep?.kind === "outcome") {
+      recordResolverTelemetry({
+        eventName: "outcome_reached",
+        flowId: flow.flowId,
+        outcomeId: nextStep.stepId,
+        language: locale,
+      });
+    }
+
     setHistory((items) => [...items, stepId]);
-    setStepId(nextStepId);
+    setStepId(option.nextStepId);
   }
 
   function goBack() {
@@ -49,8 +114,40 @@ export function ProblemResolver({
   }
 
   function reset() {
+    activeRunRef.current = null;
+    startFlowIfNeeded(flow.flowId);
     setStepId(flow.startStepId);
     setHistory([]);
+  }
+
+  function trackOutcomeClick(
+    eventName: ResolverClickEventName,
+    targetId: string,
+    targetKind: ResolverTelemetryTargetKind,
+  ) {
+    if (!step || step.kind !== "outcome") return;
+    recordResolverTelemetry({
+      eventName,
+      flowId: flow.flowId,
+      outcomeId: step.stepId,
+      targetId,
+      targetKind,
+      language: locale,
+    });
+  }
+
+  function trackGraphPath(path: ProblemResolverGraphPath) {
+    if (path.targetType === "Tool") {
+      trackOutcomeClick("tool_clicked", path.targetNodeId, "tool");
+      return;
+    }
+    if (path.targetType === "API") {
+      trackOutcomeClick("guide_clicked", path.targetNodeId, "api");
+      return;
+    }
+    if (path.targetType === "Article" || path.targetType === "BeginnerLesson") {
+      trackOutcomeClick("guide_clicked", path.targetNodeId, "guide");
+    }
   }
 
   if (!step) return null;
@@ -96,7 +193,7 @@ export function ProblemResolver({
             {(isEnglish ? step.enHelp : step.zhHelp) ? <p className={styles.help}>{isEnglish ? step.enHelp : step.zhHelp}</p> : null}
             <div className={styles.options}>
               {step.options.map((option) => (
-                <button key={option.id} type="button" onClick={() => chooseNext(option.nextStepId)}>
+                <button key={option.id} type="button" onClick={() => chooseNext(option)}>
                   {isEnglish ? option.enLabel : option.zhLabel}
                 </button>
               ))}
@@ -111,14 +208,26 @@ export function ProblemResolver({
             <h5>{isEnglish ? "What to do next" : "下一步怎么做"}</h5>
             <ol>{(isEnglish ? step.enFixes : step.zhFixes).map((fix) => <li key={fix}>{fix}</li>)}</ol>
             <div className={styles.actions}>
-              <Link href={diagnosticHref}>{isEnglish ? "Open the full diagnostic path" : "打开完整诊断路径"} →</Link>
+              <Link
+                href={diagnosticHref}
+                onClick={() => trackOutcomeClick("diagnostics_clicked", flow.symptomId, "diagnostics")}
+              >
+                {isEnglish ? "Open the full diagnostic path" : "打开完整诊断路径"} →
+              </Link>
               <Link href={searchHref}>{isEnglish ? "Search related site knowledge" : "搜索相关站内知识"} →</Link>
               {clusterHandoff ? (
                 <Link href={clusterHandoff.href}>
                   {isEnglish ? `Open the ${clusterHandoff.title} Cluster` : `进入 ${clusterHandoff.title} Cluster`} →
                 </Link>
               ) : null}
-              {step.tickLab ? <Link href={tickLabHref}>{isEnglish ? "Try the modeled case in Tick Lab" : "在 Tick Lab 尝试模型场景"} →</Link> : null}
+              {step.tickLab ? (
+                <Link
+                  href={tickLabHref}
+                  onClick={() => trackOutcomeClick("ticklab_clicked", "tick-lab", "ticklab")}
+                >
+                  {isEnglish ? "Try the modeled case in Tick Lab" : "在 Tick Lab 尝试模型场景"} →
+                </Link>
+              ) : null}
             </div>
             {graphRelatedPaths.length > 0 ? (
               <>
@@ -126,7 +235,13 @@ export function ProblemResolver({
                 <p>{isEnglish ? "These links are derived only after this deterministic outcome is known. They do not participate in choosing the diagnosis." : "这些链接只在确定性结果已经成立后生成，不参与诊断分支判断。"}</p>
                 <div className={styles.actions}>
                   {graphRelatedPaths.map((path) => (
-                    <Link key={`${path.targetNodeId}:${path.href}`} href={path.href}>{path.label} →</Link>
+                    <Link
+                      key={`${path.targetNodeId}:${path.href}`}
+                      href={path.href}
+                      onClick={() => trackGraphPath(path)}
+                    >
+                      {path.label} →
+                    </Link>
                   ))}
                 </div>
               </>
