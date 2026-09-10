@@ -12,6 +12,10 @@ import { persistResolverEvent } from "@/lib/platform-events";
 
 export const dynamic = "force-dynamic";
 
+function isSmokeRequest(request: NextRequest): boolean {
+  return request.headers.get("x-platform-smoke-test") === "1";
+}
+
 function matchesResolverRegistry(event: ResolverTelemetryEvent): boolean {
   const flow = problemResolverFlows.find((item) => item.flowId === event.flowId);
   if (!flow) return false;
@@ -70,6 +74,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (isSmokeRequest(request)) {
+    return NextResponse.json(
+      { stored: false, smoke: true },
+      {
+        status: 202,
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
+  }
+
   const stored = await persistResolverEvent({
     ...event,
     identity: {
@@ -80,6 +94,9 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(
     { stored },
-    { headers: { "Cache-Control": "no-store" } },
+    {
+      status: stored ? 200 : 202,
+      headers: { "Cache-Control": "no-store" },
+    },
   );
 }
