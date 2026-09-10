@@ -126,10 +126,12 @@ export const resolverEvents = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    index("resolver_events_created_at_idx").on(table.createdAt),
-    index("resolver_events_event_created_idx").on(table.eventName, table.createdAt),
-    index("resolver_events_flow_created_idx").on(table.flowId, table.createdAt),
-    index("resolver_events_outcome_created_idx").on(table.outcomeId, table.createdAt),
+    index("resolver_events_created_at_idx").on(table.createdAt.desc()),
+    index("resolver_events_event_created_idx").on(table.eventName, table.createdAt.desc()),
+    index("resolver_events_flow_created_idx").on(table.flowId, table.createdAt.desc()),
+    index("resolver_events_outcome_created_idx")
+      .on(table.outcomeId, table.createdAt.desc())
+      .where(sql`${table.outcomeId} is not null`),
     check("resolver_events_language_check", sql`${table.language} in ('zh', 'en')`),
     check(
       "resolver_events_event_name_check",
