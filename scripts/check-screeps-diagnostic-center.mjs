@@ -19,6 +19,7 @@ const expectedSymptoms = [
   "spawn-not-spawning",
   "controller-downgrade",
   "link-not-transferring",
+  "lab-boost-failed",
   "market-action-failed",
   "cpu-too-high",
   "resources-not-moving",
@@ -120,6 +121,7 @@ const expectedResolverFlows = [
   ["creep-not-moving", "creep-not-moving"],
   ["creep-not-harvesting", "creep-not-harvesting"],
   ["creep-not-upgrading", "controller-downgrade"],
+  ["lab-boost-failed", "lab-boost-failed"],
   ["cpu-bucket-abnormal", "cpu-too-high"],
 ];
 for (const [flowId, symptomId] of expectedResolverFlows) {
@@ -138,6 +140,34 @@ const resolverReturnCodes = new Set([...resolverRegistry.matchAll(/returnCodeNam
 for (const name of resolverReturnCodes) {
   if (!referenceErrorNames.has(name)) failures.push(`Problem Resolver references unknown return code: ${name}`);
 }
+
+for (const signal of [
+  'id: "lab-boost-failed"',
+  'directApiEntryIds: ["lab-boost-creep"]',
+  'directHubSlugs: ["structure-lab", "creep", "store"]',
+  'enHref: "/en/blog/screeps-lab-boost-creep"',
+]) {
+  if (!registry.includes(signal)) failures.push(`Resolver Batch 02 Diagnostic symptom missing contract signal: ${signal}`);
+}
+for (const signal of [
+  'flowId: "lab-boost-failed"',
+  'startStepId: "lab-boost-result"',
+  'returnCodeName: "ERR_NOT_OWNER"',
+  'returnCodeName: "ERR_NOT_FOUND"',
+  'returnCodeName: "ERR_NOT_ENOUGH_RESOURCES"',
+  'returnCodeName: "ERR_INVALID_TARGET"',
+  'returnCodeName: "ERR_NOT_IN_RANGE"',
+  'returnCodeName: "ERR_RCL_NOT_ENOUGH"',
+  'stepId: "lab-boost-out-ok"',
+  'part.boost',
+  'Lab Mineral/Energy Store deltas',
+]) {
+  if (!resolverRegistry.includes(signal)) failures.push(`Resolver Batch 02 flow missing deterministic contract signal: ${signal}`);
+}
+if (resolverRegistry.includes('stepId: "lab-boost-out-ok"') && resolverRegistry.match(/stepId: "lab-boost-out-ok"[^\n]*tickLab: true/)) {
+  failures.push("Resolver Batch 02 must not claim a Lab Tick Lab experiment that does not exist.");
+}
+
 if (resolverRegistry.includes("getVerifiedContentWithEvidence") || resolverRegistry.includes("getPublicVerificationEvidence")) failures.push("Problem Resolver registry must not own Runtime Evidence relations.");
 if (resolverComponent.includes("getVerifiedContentWithEvidence") || resolverComponent.includes("getPublicVerificationEvidence")) failures.push("Problem Resolver component must hand off Evidence relations to Diagnostics instead of reading Evidence stores.");
 if (!resolverComponent.includes('"/en/diagnostics" : "/diagnostics"')) failures.push("Problem Resolver outcomes must hand off to the existing Diagnostic Center.");
