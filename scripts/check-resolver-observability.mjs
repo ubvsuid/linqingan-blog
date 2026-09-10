@@ -6,6 +6,10 @@ import {
   mapResolverDemandText,
   resolverDemandCandidates,
 } from "./lib/resolver-demand-ranking.mjs";
+import {
+  buildResolverExpansionRanking,
+  resolverExpansionSelectionWeights,
+} from "./lib/resolver-demand-expansion-ranking.mjs";
 
 const root = process.cwd();
 const failures = [];
@@ -32,6 +36,7 @@ const component = read("src/components/problem-resolver.tsx");
 const resolverRegistry = read("src/lib/problem-resolver.ts");
 const rankingCli = read("scripts/resolver-demand-ranking.mjs");
 const rankingLib = read("scripts/lib/resolver-demand-ranking.mjs");
+const expansionLib = read("scripts/lib/resolver-demand-expansion-ranking.mjs");
 const gscSource = read("scripts/lib/resolver-demand-gsc-source.mjs");
 const integrity = read("scripts/check-integrity.mjs");
 
@@ -233,13 +238,32 @@ if (mapResolverDemandText("link transferEnergy failed")?.candidateId !== "link-n
   failures.push("High-specificity Link query must map to link-not-transferring.");
 }
 
-const insufficient = buildResolverDemandRanking();
-if (insufficient.status !== "INSUFFICIENT_DATA" || insufficient.recommendation.candidateId !== null) {
-  failures.push("Demand ranking must fail closed when Resolver/Search/GSC sources are unavailable.");
+const baseReady = buildResolverDemandRanking({
+  resolverRows: [{ flowId: "spawn-not-working", starts: 25 }],
+  searchRows: [{ query: "tower not repairing", searches: 20 }],
+  gscRows: [{ query: "tower not attacking", impressions: 100, clicks: 3 }],
+});
+if (
+  baseReady.weights.resolver !== 0.45 ||
+  baseReady.weights.search !== 0.30 ||
+  baseReady.weights.gsc !== 0.25
+) {
+  failures.push("Covered-flow benchmark weights must remain Resolver 45% / Search 30% / GSC 25%.");
 }
 
-const ready = buildResolverDemandRanking({
-  resolverRows: [{ flowId: "spawn-not-working", starts: 25 }],
+const insufficient = buildResolverExpansionRanking();
+if (insufficient.status !== "INSUFFICIENT_DATA" || insufficient.recommendation.candidateId !== null) {
+  failures.push("Expansion ranking must fail closed when Resolver/Search/GSC sources are unavailable.");
+}
+if (insufficient.schemaVersion !== 2 || insufficient.selectionMode !== "uncovered-expansion-v2") {
+  failures.push("Expansion ranking must publish schemaVersion 2 and uncovered-expansion-v2 semantics.");
+}
+if (insufficient.sourceRoles.resolver !== "readiness_gate_and_covered_flow_benchmark") {
+  failures.push("Resolver telemetry must be explicitly modeled as readiness gate / covered-flow benchmark, not direct uncovered-candidate score.");
+}
+
+const ready = buildResolverExpansionRanking({
+  resolverRows: [{ flowId: "spawn-not-working", starts: 25, outcomes: 20, downstreamClicks: 10 }],
   searchRows: [
     { query: "tower not repairing", searches: 20 },
     { query: "builder not building", searches: 5 },
@@ -250,18 +274,68 @@ const ready = buildResolverDemandRanking({
   ],
 });
 if (ready.status !== "READY" || ready.recommendation.candidateId !== "tower-not-acting") {
-  failures.push("Demand ranking synthetic fixture must select the clear uncovered Tower winner.");
+  failures.push("Expansion ranking synthetic fixture must select the clear uncovered Tower winner.");
+}
+if (ready.resolverContext.outcomeRate !== 80 || ready.resolverContext.downstreamClickRate !== 50) {
+  failures.push("Resolver outcomes/downstream clicks must remain visible as adoption context without becoming fake uncovered-candidate demand.");
 }
 const readyJson = JSON.stringify(ready);
 if (readyJson.includes("tower not repairing") || readyJson.includes("tower not attacking")) {
   failures.push("Demand ranking output must not emit raw Search/GSC query text.");
 }
 if (
-  ready.weights.resolver !== 0.45 ||
-  ready.weights.search !== 0.30 ||
-  ready.weights.gsc !== 0.25
+  ready.benchmarkWeights.resolver !== 0.45 ||
+  ready.benchmarkWeights.search !== 0.30 ||
+  ready.benchmarkWeights.gsc !== 0.25
 ) {
-  failures.push("Demand ranking weights must remain explicit at Resolver 45% / Search 30% / GSC 25%.");
+  failures.push("Expansion report must preserve the explicit 45/30/25 benchmark weights for covered flows.");
+}
+const selectionWeightSum = resolverExpansionSelectionWeights.search + resolverExpansionSelectionWeights.gsc;
+if (Math.abs(selectionWeightSum - 1) > 0.00001) {
+  failures.push("Uncovered expansion Search/GSC selection weights must normalize to 1.");
+}
+if (resolverExpansionSelectionWeights.search <= resolverExpansionSelectionWeights.gsc) {
+  failures.push("Uncovered expansion must preserve Search's 30:25 relative weight over GSC.");
+}
+
+const coveredDominance = buildResolverExpansionRanking({
+  resolverRows: [{ flowId: "spawn-not-working", starts: 25 }],
+  searchRows: [
+    { query: "spawn not working", searches: 1000 },
+    { query: "tower not repairing", searches: 10 },
+  ],
+  gscRows: [
+    { query: "spawn not spawning", impressions: 10000, clicks: 100 },
+    { query: "tower not attacking", impressions: 50, clicks: 1 },
+  ],
+});
+if (
+  coveredDominance.status !== "READY" ||
+  coveredDominance.recommendation.candidateId !== "tower-not-acting" ||
+  coveredDominance.recommendation.score !== 100
+) {
+  failures.push("Covered-topic dominance must not compress or distort normalization among uncovered expansion candidates.");
+}
+
+const coveredOnlySignal = buildResolverExpansionRanking({
+  resolverRows: [{ flowId: "spawn-not-working", starts: 25 }],
+  searchRows: [
+    { query: "spawn not working", searches: 100 },
+    { query: "tower not repairing", searches: 1 },
+  ],
+  gscRows: [
+    { query: "spawn not spawning", impressions: 1000, clicks: 10 },
+    { query: "tower not attacking", impressions: 1, clicks: 0 },
+  ],
+});
+if (coveredOnlySignal.status !== "INSUFFICIENT_DATA") {
+  failures.push("Covered-flow demand must not satisfy the minimum sample requirement for an uncovered expansion recommendation.");
+}
+if (!coveredOnlySignal.reasons.includes("uncovered_matched_searches_below_10")) {
+  failures.push("Expansion ranking must require enough Search demand specifically among uncovered candidates.");
+}
+if (!coveredOnlySignal.reasons.includes("uncovered_matched_gsc_impressions_below_50")) {
+  failures.push("Expansion ranking must require enough GSC demand specifically among uncovered candidates.");
 }
 
 for (const broadPattern of ['"source"', '"controller"']) {
@@ -269,6 +343,31 @@ for (const broadPattern of ['"source"', '"controller"']) {
     failures.push(`Demand ranking registry must not use broad standalone pattern ${broadPattern}.`);
   }
 }
+requireSignal(
+  expansionLib,
+  'selectionMode: "uncovered-expansion-v2"',
+  "Expansion ranking must encode its selection semantics in the report.",
+);
+requireSignal(
+  expansionLib,
+  "uncoveredMatchedSearches",
+  "Expansion ranking must compute Search sufficiency only from uncovered candidate demand.",
+);
+requireSignal(
+  expansionLib,
+  "uncoveredMatchedGscImpressions",
+  "Expansion ranking must compute GSC sufficiency only from uncovered candidate demand.",
+);
+requireSignal(
+  rankingCli,
+  "buildResolverExpansionRanking",
+  "Demand ranking CLI must use the uncovered expansion semantics, not the legacy mixed score directly.",
+);
+requireSignal(
+  rankingCli,
+  "resolver-demand-ranking-v2.json",
+  "Demand ranking CLI must default to a V2 report name after the semantic contract change.",
+);
 requireSignal(
   rankingCli,
   "readResolverDemandGscRows",
@@ -319,5 +418,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Resolver observability check passed: ${eventNames.length} structured events, ${expectedFlowIds.length} unchanged deterministic flows, ${resolverDemandCandidates.length} demand candidates, canonical Site Intelligence GSC source with settled-file override, aggregate-only ranking, and fail-closed insufficient-data behavior.`,
+  `Resolver observability check passed: ${eventNames.length} structured events, ${expectedFlowIds.length} unchanged deterministic flows, ${resolverDemandCandidates.length} demand candidates, canonical Site Intelligence GSC source with settled-file override, explicit Resolver readiness semantics, uncovered-only Search/GSC expansion ranking, aggregate-only reporting, and fail-closed insufficient-data behavior.`,
 );

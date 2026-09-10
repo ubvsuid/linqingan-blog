@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { createIsolatedNeon } from "./lib/database-environment-isolation.mjs";
+import { buildResolverExpansionRanking } from "./lib/resolver-demand-expansion-ranking.mjs";
 import { readResolverDemandGscRows } from "./lib/resolver-demand-gsc-source.mjs";
-import { buildResolverDemandRanking } from "./lib/resolver-demand-ranking.mjs";
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) {
@@ -12,7 +12,7 @@ if (!databaseUrl) {
 }
 
 const gscInputPath = process.argv[2] ?? process.env.RESOLVER_GSC_REPORT ?? null;
-const outputPath = process.argv[3] ?? "reports/resolver-demand-ranking-v1.json";
+const outputPath = process.argv[3] ?? "reports/resolver-demand-ranking-v2.json";
 const daysArg = Number.parseInt(process.argv[4] ?? process.env.RESOLVER_DEMAND_DAYS ?? "30", 10);
 const days = Number.isFinite(daysArg) ? Math.max(1, Math.min(daysArg, 365)) : 30;
 const sql = createIsolatedNeon(databaseUrl);
@@ -61,7 +61,7 @@ const [resolverRows, searchRows, gsc] = await Promise.all([
   readSearchRows(),
   readResolverDemandGscRows({ sql, inputPath: gscInputPath }),
 ]);
-const ranking = buildResolverDemandRanking({
+const ranking = buildResolverExpansionRanking({
   resolverRows,
   searchRows,
   gscRows: gsc.rows,
@@ -83,6 +83,7 @@ fs.writeFileSync(absoluteOutput, `${JSON.stringify(report, null, 2)}\n`, "utf8")
 console.log(`Resolver Demand Ranking — last ${days} day(s)`);
 console.log(`Status: ${report.status}`);
 console.log(`Recommendation: ${report.recommendation.candidateId ?? "none"}`);
+console.log(`Selection mode: ${report.selectionMode}`);
 console.log(`GSC source: ${report.gscSource.kind}/${report.gscSource.status}`);
 if (report.reasons.length > 0) console.log(`Reasons: ${report.reasons.join(", ")}`);
 console.log(`Report written to ${absoluteOutput}`);
