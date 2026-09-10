@@ -35,7 +35,7 @@ export default function ProblemResolverPage() {
         </header>
         <aside className="error-tip">
           <strong>边界</strong>
-          <p>这是只读、确定性的 V1。没有 AI 推断、没有任意 JavaScript 执行、没有数据库写入。遇到不确定状态时，流程会要求你先保存真实返回值。</p>
+          <p>这是确定性的 V1：没有 AI 推断，也不执行任意 JavaScript；它不会写入 Runtime Evidence 或你的 Screeps 业务状态。为改进流程，站点会尽力记录一组受限、匿名的结构化 Resolver 事件；这些记录不接收自由文本、IP、Referer、User-Agent 或地理位置。遇到不确定状态时，流程会要求你先保存真实返回值。</p>
         </aside>
         <aside className="error-tip">
           <strong>Knowledge Graph V1 已接入</strong>

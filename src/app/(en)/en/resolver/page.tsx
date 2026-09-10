@@ -38,7 +38,7 @@ export default function EnglishProblemResolverPage() {
         </header>
         <div className={styles.notice}>
           <strong>Boundary</strong>
-          <p>This is a read-only deterministic V1: no AI inference, arbitrary JavaScript execution, or database writes. When state is unknown, the flow asks you to capture the real return value first.</p>
+          <p>This deterministic V1 does not use AI inference or execute arbitrary JavaScript, and it does not write to Runtime Evidence or your Screeps game state. To improve the flow, the site records a limited set of anonymous structured Resolver events on a best-effort basis; these records do not accept free text, IP addresses, Referer, User-Agent, or geolocation. When state is unknown, the flow asks you to capture the real return value first.</p>
         </div>
         <div className={styles.notice}>
           <strong>Knowledge Graph V1 is connected</strong>
