@@ -120,14 +120,15 @@ if (sitemapResponse.status !== 200) {
     }
   }
 
-  for (const path of [
-    "/en/blog/screeps-tick-game-loop",
-    "/en/blog/screeps-creep-roles",
-    "/en/blog/screeps-clean-dead-creep-memory",
-  ]) {
-    const expectedEntry = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+  const twelfthPassFreshness = new Map([
+    ["/en/blog/screeps-tick-game-loop", "2026-09-11"],
+    ["/en/blog/screeps-creep-roles", "2026-08-18"],
+    ["/en/blog/screeps-clean-dead-creep-memory", "2026-08-18"],
+  ]);
+  for (const [path, modifiedAt] of twelfthPassFreshness) {
+    const expectedEntry = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${path}: twelfth-pass Sitemap freshness regressed`);
+      failures.push(`${path}: twelfth-pass current Sitemap freshness regressed`);
     }
   }
 }
@@ -139,5 +140,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Thirteenth English editorial smoke passed: the August 18 introduction boundaries remain intact, First Room uses its August 28 navigation/visibility supersession, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
+  "Thirteenth English editorial smoke passed: the August 18 introduction boundaries remain intact, First Room uses its August 28 navigation/visibility supersession, Tick carries its September 11 current freshness, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
 );

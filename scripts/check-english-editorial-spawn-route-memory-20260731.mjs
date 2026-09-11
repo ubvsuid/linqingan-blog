@@ -49,6 +49,8 @@ const expected = {
     path: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
     title: "Screeps Dead Creep Memory: Clean Names and Owned Indexes",
+    currentTitle: "Screeps: Clean Dead Creep Memory Safely",
+    currentUpdatedAt: "2026-09-11",
     beforeScore: 93,
     registry: foundationRegistry,
   },
@@ -96,7 +98,7 @@ for (const [slug, identity] of Object.entries(expected)) {
     failures.push(`${slug}: override missing`);
   }
   if (!override.includes(`title: "${identity.title}"`)) {
-    failures.push(`${slug}: title missing`);
+    failures.push(`${slug}: historical title missing`);
   }
   if (!identity.registry.includes(`href: "${identity.path}"`)) {
     failures.push(`${slug}: existing URL missing`);
@@ -104,8 +106,9 @@ for (const [slug, identity] of Object.entries(expected)) {
   if (!identity.registry.includes(`chinesePath: "${identity.chinesePath}"`)) {
     failures.push(`${slug}: Chinese mapping changed or missing`);
   }
-  if (!identity.registry.includes(identity.title)) {
-    failures.push(`${slug}: discovery title is not synchronized`);
+  const expectedDiscoveryTitle = identity.currentTitle ?? identity.title;
+  if (!identity.registry.includes(expectedDiscoveryTitle)) {
+    failures.push(`${slug}: current discovery title is not synchronized`);
   }
   if (!auditDoc.includes(`| ${identity.path} | ${identity.beforeScore} |`)) {
     failures.push(`${slug}: before score evidence is missing`);
@@ -117,8 +120,9 @@ for (const [slug, identity] of Object.entries(expected)) {
     recordStart,
     nextRecord < 0 ? identity.registry.length : nextRecord,
   );
-  if (!record.includes('updatedAt: "2026-07-31"')) {
-    failures.push(`${slug}: scoped updatedAt is missing`);
+  const expectedUpdatedAt = identity.currentUpdatedAt ?? "2026-07-31";
+  if (!record.includes(`updatedAt: "${expectedUpdatedAt}"`)) {
+    failures.push(`${slug}: current scoped updatedAt is missing`);
   }
   if (!record.includes('publishedAt: "2026-07-25"')) {
     failures.push(`${slug}: publication date changed or missing`);
@@ -242,5 +246,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Spawn, route, and Memory editorial gate passed: 3 existing pages, ${blocks.length} JavaScript blocks, stable URLs, scoped dates, distinct intent, Pending live evidence, and 98-point internal scores.`,
+  `Spawn, route, and Memory editorial gate passed: 3 existing pages, ${blocks.length} JavaScript blocks, stable URLs, historical payloads plus current discovery supersession, distinct intent, Pending live evidence, and 98-point internal scores.`,
 );

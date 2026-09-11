@@ -5,6 +5,7 @@ const articles = [
   {
     path: "/en/blog/screeps-tick-game-loop",
     chinesePath: "/blog/screeps-tick-and-game-loop",
+    currentModifiedAt: "2026-09-11",
     signals: [
       "One tick has one starting snapshot, but not one universal action slot",
       "firstMove",
@@ -20,6 +21,7 @@ const articles = [
   {
     path: "/en/blog/screeps-creep-roles",
     chinesePath: "/blog/screeps-creep-roles",
+    currentModifiedAt: "2026-08-18",
     signals: [
       "Make role dispatch fail closed",
       "ROLE_HANDLERS",
@@ -35,6 +37,7 @@ const articles = [
   {
     path: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
+    currentModifiedAt: "2026-08-18",
     signals: [
       "Do not delete Memory for a Creep that is still spawning",
       "getSpawningCreepNames",
@@ -76,7 +79,7 @@ for (const article of articles) {
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-18"`,
+    `"dateModified":"${article.currentModifiedAt}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: missing “${expected}”`);
@@ -132,20 +135,21 @@ if (sitemapResponse.status !== 200) {
   failures.push(`/sitemap-en.xml: expected 200, got ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
-    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>${article.currentModifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${article.path}: Sitemap lastmod is not aligned with the 2026-08-18 substantive revision`);
+      failures.push(`${article.path}: Sitemap lastmod is not aligned with its current substantive revision`);
     }
   }
 
-  for (const path of [
-    "/en/blog/screeps-first-room-code",
-    "/en/blog/screeps-room-visibility",
-    "/en/blog/screeps-global-cache",
-  ]) {
-    const expectedEntry = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+  const previousPassFreshness = new Map([
+    ["/en/blog/screeps-first-room-code", "2026-08-18"],
+    ["/en/blog/screeps-room-visibility", "2026-09-11"],
+    ["/en/blog/screeps-global-cache", "2026-08-18"],
+  ]);
+  for (const [path, modifiedAt] of previousPassFreshness) {
+    const expectedEntry = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${path}: eleventh-pass Sitemap freshness regressed`);
+      failures.push(`${path}: previous-pass current Sitemap freshness regressed`);
     }
   }
 }
@@ -157,5 +161,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Twelfth English editorial smoke passed: tick snapshot/intent priority, strict role dispatch, spawning-safe dead-memory cleanup, scoped freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Twelfth English editorial smoke passed: tick snapshot/intent priority, strict role dispatch, spawning-safe dead-memory cleanup, historical payloads plus scoped current freshness supersession, canonical/hreflang, structured data, and Pending live evidence.",
 );

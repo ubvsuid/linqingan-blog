@@ -1,0 +1,29 @@
+import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishPickupDroppedEnergyCtrUpdatedAt20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
+import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
+import { getEnglishTickGameLoopCtrUpdatedAt20260911 } from "@/lib/english-ctr-tick-game-loop-20260911";
+
+const TARGET_SLUG = "screeps-memory-basics";
+const UPDATED_AT = "2026-09-11";
+
+export function applyEnglishMemoryBasicsCtr20260911(
+  article: EnglishBeginnerArticle | undefined,
+): EnglishBeginnerArticle | undefined {
+  if (!article || article.slug !== TARGET_SLUG) return article;
+
+  return {
+    ...article,
+    title: "Screeps Memory: Persistent State vs Heap Cache",
+    description:
+      "Learn how Screeps Memory persists state across ticks, when to use heap cache, how creep.memory maps to Memory.creeps, and how to recover saved object IDs.",
+  };
+}
+
+export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
+  slug: string,
+): string | undefined {
+  return getEnglishTickGameLoopCtrUpdatedAt20260911(slug)
+    ?? getEnglishPickupDroppedEnergyCtrUpdatedAt20260911(slug)
+    ?? getEnglishRoomVisibilityCtrUpdatedAt20260911(slug)
+    ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);
+}
