@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
 
 const TARGET_SLUG = "screeps-memory-basics";
 const UPDATED_AT = "2026-09-11";
@@ -19,5 +20,6 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return slug === TARGET_SLUG ? UPDATED_AT : undefined;
+  return getEnglishRoomVisibilityCtrUpdatedAt20260911(slug)
+    ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);
 }
