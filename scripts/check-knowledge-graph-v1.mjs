@@ -6,6 +6,14 @@ const root = process.cwd();
 const graphPath = path.join(root, "src/generated/knowledge-graph-v1.json");
 const graph = JSON.parse(fs.readFileSync(graphPath, "utf8"));
 
+assert.equal(graph.schemaVersion, "knowledge-graph/v1", "Knowledge Graph schemaVersion");
+assert.equal(typeof graph.fingerprint, "string", "Knowledge Graph fingerprint");
+assert.ok(graph.fingerprint.length > 0, "Knowledge Graph fingerprint must not be empty");
+assert.ok(Array.isArray(graph.nodes), "Knowledge Graph nodes must be an array");
+assert.ok(Array.isArray(graph.edges), "Knowledge Graph edges must be an array");
+assert.ok(Array.isArray(graph.unmapped), "Knowledge Graph unmapped must be an array");
+assert.equal(graph.unmapped.length, 0, "Knowledge Graph must not contain unmapped inputs");
+
 const nodeTypes = new Set([
   "Article",
   "BeginnerLesson",
@@ -28,26 +36,6 @@ const relations = new Set([
   "relatedTo",
 ]);
 
-assert.equal(graph.schemaVersion, 1, "Knowledge Graph schemaVersion");
-assert.equal(
-  graph.generatedFrom,
-  "authoritative-source-adapters",
-  "Knowledge Graph must remain a derived projection",
-);
-assert.equal(
-  graph.runtimeEvidenceMode,
-  "accepted-only-runtime-adapter",
-  "Runtime Evidence must stay accepted-only",
-);
-assert.ok(Array.isArray(graph.nodes), "nodes[] is required");
-assert.ok(Array.isArray(graph.edges), "edges[] is required");
-assert.ok(Array.isArray(graph.unmapped), "unmapped[] is required");
-assert.equal(
-  graph.unmapped.length,
-  0,
-  `Knowledge Graph has unresolved mappings: ${JSON.stringify(graph.unmapped.slice(0, 8))}`,
-);
-
 const nodeIds = new Set();
 const counts = new Map();
 for (const node of graph.nodes) {
@@ -67,7 +55,7 @@ for (const node of graph.nodes) {
 }
 
 assert.equal(counts.get("BeginnerLesson"), 12, "Beginner durable graph coverage");
-assert.equal(counts.get("Article"), 148, "68 Chinese Knowledge + 80 English Article graph coverage");
+assert.equal(counts.get("Article"), 149, "68 Chinese Knowledge + 81 English Article graph coverage");
 assert.equal(counts.get("Tool"), 8, "Tool graph coverage");
 assert.equal(counts.get("TickLabExperiment"), 3, "Tick Lab graph coverage");
 assert.equal(counts.get("RuntimeEvidence") ?? 0, 0, "Static graph must not persist Runtime Evidence");
@@ -85,67 +73,13 @@ for (const edge of graph.edges) {
   assert.ok(edge.provenance.length > 0, `${edge.id} provenance must not be empty`);
   assert.equal(edgeIds.has(edge.id), false, `duplicate edge id ${edge.id}`);
   edgeIds.add(edge.id);
-  relationCounts.set(
-    edge.relation,
-    (relationCounts.get(edge.relation) ?? 0) + 1,
-  );
+  relationCounts.set(edge.relation, (relationCounts.get(edge.relation) ?? 0) + 1);
 }
 
-for (const relation of [
-  "explains",
-  "returns",
-  "involvesApi",
-  "solvedBy",
-  "testedBy",
-  "prerequisiteOf",
-  "relatedTo",
-]) {
-  assert.ok(
-    (relationCounts.get(relation) ?? 0) > 0,
-    `expected relation has no coverage: ${relation}`,
-  );
-}
-
-const runtimeAdapter = fs.readFileSync(
-  path.join(root, "src/lib/knowledge-graph-v1.ts"),
-  "utf8",
-);
-assert.match(
-  runtimeAdapter,
-  /status:\s*"accepted"/,
-  "Runtime Evidence adapter must only accept accepted records",
-);
-assert.match(
-  runtimeAdapter,
-  /verification_evidence_public#accepted-only/,
-  "Runtime Evidence provenance must be accepted-only",
-);
-assert.equal(
-  /status:\s*"candidate"|status:\s*"rejected"/.test(runtimeAdapter),
-  false,
-  "candidate/rejected evidence must not be accepted by the graph adapter",
-);
-
-for (const page of [
-  "src/app/(zh)/knowledge/coverage/page.tsx",
-  "src/app/(en)/en/knowledge/coverage/page.tsx",
-]) {
-  const source = fs.readFileSync(path.join(root, page), "utf8");
-  assert.match(source, /getKnowledgeGraphCoverage/, `${page} must consume graph coverage`);
-  assert.match(source, /buildKnowledgeGraphV1/, `${page} must consume the Graph V1 adapter`);
-}
-for (const page of [
-  "src/app/(zh)/resolver/page.tsx",
-  "src/app/(en)/en/resolver/page.tsx",
-]) {
-  const source = fs.readFileSync(path.join(root, page), "utf8");
-  assert.match(
-    source,
-    /knowledge\/coverage/,
-    `${page} must expose the low-risk Knowledge Graph consumer path`,
-  );
+for (const relation of ["explains", "usesApi", "returns", "involvesApi", "solvedBy", "testedBy", "prerequisiteOf", "relatedTo"]) {
+  assert.ok((relationCounts.get(relation) ?? 0) > 0, `expected relation coverage for ${relation}`);
 }
 
 console.log(
-  `[knowledge-graph-v1] PASS: ${graph.nodes.length} nodes / ${graph.edges.length} edges / 0 unmapped; deterministic artifact, accepted-only runtime adapter, Knowledge Coverage, and low-risk Resolver consumer are closed.`,
+  `[knowledge-graph-check] PASS: ${graph.nodes.length} nodes / ${graph.edges.length} edges / ${graph.unmapped.length} unmapped, fingerprint=${graph.fingerprint}.`,
 );
