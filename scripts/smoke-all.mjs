@@ -29,6 +29,7 @@ globalThis.fetch = function sitemapAwareFetch(input, init) {
 };
 
 try {
+  await import("./smoke-english-tick-game-loop-ctr-20260911.mjs");
   await import("./smoke-english-foundation.mjs");
   await import("./smoke-english-foundation-2.mjs");
   await import("./smoke-english-spawn-3.mjs");
