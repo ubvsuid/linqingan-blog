@@ -67,7 +67,7 @@ for (const node of graph.nodes) {
 }
 
 assert.equal(counts.get("BeginnerLesson"), 12, "Beginner durable graph coverage");
-assert.equal(counts.get("Article"), 148, "68 Chinese Knowledge + 80 English Article graph coverage");
+assert.equal(counts.get("Article"), 149, "68 Chinese Knowledge + 81 English Article graph coverage");
 assert.equal(counts.get("Tool"), 8, "Tool graph coverage");
 assert.equal(counts.get("TickLabExperiment"), 3, "Tick Lab graph coverage");
 assert.equal(counts.get("RuntimeEvidence") ?? 0, 0, "Static graph must not persist Runtime Evidence");

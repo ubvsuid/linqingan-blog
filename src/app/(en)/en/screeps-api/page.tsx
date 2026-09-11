@@ -11,9 +11,9 @@ import { siteConfig } from "@/lib/site";
 import styles from "../english.module.css";
 
 export const metadata = createEnglishPageMetadata({
-  title: "Screeps API Quick Reference",
+  title: "Screeps API Reference: Objects, Methods & Return Codes",
   description:
-    "Search common Screeps Game, Creep, Room, Structure, Market, and PathFinder APIs, or start from Creep, Room, Spawn, Controller, Market, Link, Tower, Terminal, Lab, PathFinder, and Store hubs that connect guides, return codes, tools, and verification.",
+    "Search the Screeps API by object, method, or keyword. Find Creep, Room, Spawn, Controller, Market, PathFinder, Store, return codes, guides, and tools.",
   path: "/en/screeps-api",
   chinesePath: "/screeps-api",
 });
@@ -24,9 +24,9 @@ export default function EnglishScreepsApiPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Screeps API Quick Reference",
+    name: "Screeps API Reference",
     description:
-      "A searchable quick reference for common Screeps APIs with object and practice hubs that connect guides, errors, tools, and verification.",
+      "A searchable Screeps API reference for common objects, methods, and return-code context, with hubs connecting guides, errors, tools, and verification.",
     url: pageUrl,
     inLanguage: "en",
     mainEntity: {
@@ -53,14 +53,14 @@ export default function EnglishScreepsApiPage() {
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/en/knowledge">Knowledge Base</Link>
           <span aria-hidden="true">/</span>
-          <span>API Quick Reference</span>
+          <span>Screeps API Reference</span>
         </nav>
 
         <header className={styles.header}>
-          <p className="eyebrow">API QUICK REFERENCE</p>
-          <h1>Search common Screeps APIs</h1>
+          <p className="eyebrow">SCREEPS API REFERENCE</p>
+          <h1>Screeps API Reference</h1>
           <p>
-            Find common APIs by object, method, or keyword, or start from Creep, Room, Spawn, Controller, Market, Link, Tower, Terminal, Lab, PathFinder, and Store hubs. This page remains a practical navigation and recall layer rather than a replacement for the official API Reference. For state-changing actions, record return codes and verify later-tick state.
+            Use this Screeps API reference to find common objects, methods, and return-code context quickly. Search by object, method, or keyword, or start from Creep, Room, Spawn, Controller, Market, Link, Tower, Terminal, Lab, PathFinder, and Store hubs. It is a practical navigation and recall layer, not a replacement for the official API Reference. For state-changing actions, record return codes and verify later-tick state.
           </p>
           <div className="button-row">
             <a

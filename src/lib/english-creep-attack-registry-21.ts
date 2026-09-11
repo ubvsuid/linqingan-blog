@@ -29,4 +29,26 @@ export const englishCreepAttackBatchTwentyOneRegistry: EnglishCreepAttackArticle
     ],
     updatedAt: "2026-08-30",
   },
+  {
+    href: "/en/blog/screeps-arena-spawn-creep",
+    category: "ARENA · SPAWNING API",
+    title: "Screeps Arena spawnCreep(): Find Your Spawn",
+    description:
+      "Find your Screeps Arena Spawn with getObjectsByPrototype(), call spawnCreep(body), read object or error results, and avoid mixing Arena with MMO syntax.",
+    publishedAt: "2026-09-11",
+    publishedLabel: "September 11, 2026",
+    readingTime: "8 min read",
+    primaryKeyword: "Screeps Arena spawnCreep",
+    searchIntent:
+      "Find the player's owned StructureSpawn in Screeps Arena with getObjectsByPrototype(), call spawnCreep(body), and interpret the Arena-specific object-or-error result without applying Screeps MMO syntax",
+    status: "published",
+    finalScore: 98,
+    keywords: [
+      "Screeps Arena spawnCreep",
+      "Screeps Arena getObjectsByPrototype StructureSpawn",
+      "Screeps Arena StructureSpawn",
+      "Screeps Arena spawnCreep docs",
+    ],
+    updatedAt: "2026-09-11",
+  },
 ];
