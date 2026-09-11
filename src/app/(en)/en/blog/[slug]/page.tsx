@@ -8,6 +8,10 @@ import {
   getEnglishLabBoostCtrUpdatedAt20260909,
 } from "@/lib/english-ctr-lab-boost-20260909";
 import {
+  applyEnglishMemoryBasicsCtr20260911,
+  getEnglishMemoryBasicsCtrUpdatedAt20260911,
+} from "@/lib/english-ctr-memory-basics-20260911";
+import {
   applyEnglishRenewCreepCtr20260910,
   getEnglishRenewCreepCtrUpdatedAt20260910,
 } from "@/lib/english-ctr-renew-creep-20260910";
@@ -135,7 +139,7 @@ function getDynamicEnglishArticle(slug: string) {
   const article = getBaseDynamicEnglishArticle(slug);
 
   if (slug === "screeps-memory-basics") {
-    return applyEnglishEditorialNinth20260817(
+    const memoryArticle = applyEnglishEditorialNinth20260817(
       applyEnglishEditorialSixth20260816(
         applyEnglishEditorialFifth20260816(
           applyEnglishEditorialFourth20260814(
@@ -146,6 +150,8 @@ function getDynamicEnglishArticle(slug: string) {
         ),
       ),
     );
+
+    return applyEnglishMemoryBasicsCtr20260911(memoryArticle);
   }
 
   const editorialArticle = applyEnglishEditorialFinal20260812(article);
@@ -169,7 +175,8 @@ function getDynamicEnglishArticle(slug: string) {
 }
 
 function getModifiedTime(slug: string, fallback: string): string {
-  return getEnglishRenewCreepCtrUpdatedAt20260910(slug)
+  return getEnglishMemoryBasicsCtrUpdatedAt20260911(slug)
+    ?? getEnglishRenewCreepCtrUpdatedAt20260910(slug)
     ?? getEnglishLabBoostCtrUpdatedAt20260909(slug)
     ?? getEnglishEditorialThirteenthUpdatedAt20260818(slug)
     ?? getEnglishEditorialTwelfthUpdatedAt20260818(slug)
