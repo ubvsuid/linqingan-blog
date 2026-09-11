@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { applyEnglishDeadCreepMemoryCtr20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 
 const TARGET_SLUG = "screeps-renew-creep";
 const UPDATED_AT = "2026-09-10";
@@ -17,7 +18,7 @@ function refreshLastVerified(
   ) as EnglishBeginnerArticle["verification"];
 }
 
-export function applyEnglishRenewCreepCtr20260910(
+function applyRenewCreepCtr20260910(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
   if (!article || article.slug !== TARGET_SLUG) return article;
@@ -49,6 +50,14 @@ export function applyEnglishRenewCreepCtr20260910(
     verification: refreshLastVerified(article.verification),
     articleHtml,
   };
+}
+
+export function applyEnglishRenewCreepCtr20260910(
+  article: EnglishBeginnerArticle | undefined,
+): EnglishBeginnerArticle | undefined {
+  return applyEnglishDeadCreepMemoryCtr20260911(
+    applyRenewCreepCtr20260910(article),
+  );
 }
 
 export function getEnglishRenewCreepCtrUpdatedAt20260910(

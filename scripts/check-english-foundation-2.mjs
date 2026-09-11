@@ -8,11 +8,17 @@ const contentPath = path.join(root, "src", "lib", "english-foundation-content-2.
 const registryPath = path.join(root, "src", "lib", "english-foundation-registry-2.ts");
 const routePath = path.join(root, "src", "app", "(en)", "en", "blog", "[slug]", "page.tsx");
 const componentPath = path.join(root, "src", "components", "english-article-page.tsx");
+const deadCreepCtrPath = path.join(root, "src", "lib", "english-ctr-dead-creep-memory-20260911.ts");
+const renewCtrPath = path.join(root, "src", "lib", "english-ctr-renew-creep-20260910.ts");
+const sitemapPath = path.join(root, "src", "lib", "sitemaps.ts");
 
 const source = fs.readFileSync(contentPath, "utf8");
 const registry = fs.readFileSync(registryPath, "utf8");
 const routeSource = fs.readFileSync(routePath, "utf8");
 const componentSource = fs.readFileSync(componentPath, "utf8");
+const deadCreepCtrSource = fs.readFileSync(deadCreepCtrPath, "utf8");
+const renewCtrSource = fs.readFileSync(renewCtrPath, "utf8");
+const sitemapSource = fs.readFileSync(sitemapPath, "utf8");
 
 const articles = [
   {
@@ -114,6 +120,65 @@ if (!routeSource.includes("getEnglishFoundationBatchTwoArticle")) {
 }
 if (!componentSource.includes("normalizeTocItem")) {
   failures.push("英文文章组件缺少目录元组规范化逻辑");
+}
+
+const deadCreepRegistryStart = registry.indexOf(
+  'href: "/en/blog/screeps-clean-dead-creep-memory"',
+);
+const deadCreepRegistryEnd = registry.indexOf("\n  },", deadCreepRegistryStart);
+const deadCreepRegistry = deadCreepRegistryStart >= 0 && deadCreepRegistryEnd >= 0
+  ? registry.slice(deadCreepRegistryStart, deadCreepRegistryEnd)
+  : "";
+
+for (const requiredText of [
+  'const TARGET_SLUG = "screeps-clean-dead-creep-memory";',
+  'title: "Screeps: Clean Dead Creep Memory Safely"',
+  '"Clean stale Memory.creeps entries by comparing them with Game.creeps. Delete only confirmed dead names and keep custom task indexes in sync."',
+]) {
+  if (!deadCreepCtrSource.includes(requiredText)) {
+    failures.push(`Dead Creep current CTR overlay 缺少：${requiredText}`);
+  }
+}
+
+for (const forbiddenField of ["headline:", "articleHtml:", "verification:"]) {
+  if (deadCreepCtrSource.includes(forbiddenField)) {
+    failures.push(`Dead Creep current CTR overlay 不应修改 ${forbiddenField}`);
+  }
+}
+
+for (const requiredText of [
+  'title: "Screeps Memory Cleanup: Remove Dead Creep Entries Safely"',
+  'headline: "How to Clean Dead Creep Memory Safely in Screeps"',
+]) {
+  if (!source.includes(requiredText)) {
+    failures.push(`Dead Creep historical source contract 漂移：${requiredText}`);
+  }
+}
+
+for (const requiredText of [
+  'title: "Screeps: Clean Dead Creep Memory Safely"',
+  '"Clean stale Memory.creeps entries by comparing them with Game.creeps. Delete only confirmed dead names and keep custom task indexes in sync."',
+  'updatedAt: "2026-09-11"',
+]) {
+  if (!deadCreepRegistry.includes(requiredText)) {
+    failures.push(`Dead Creep current discovery contract 缺少：${requiredText}`);
+  }
+}
+
+if (!renewCtrSource.includes("applyEnglishDeadCreepMemoryCtr20260911")) {
+  failures.push("共享 current CTR tail 未串联 Dead Creep overlay");
+}
+if (!renewCtrSource.includes("applyRenewCreepCtr20260910(article)")) {
+  failures.push("renewCreep current overlay 的既有执行顺序被破坏");
+}
+if (!routeSource.includes("return applyEnglishRenewCreepCtr20260910(labBoostArticle);")) {
+  failures.push("动态英文文章路由不再经过 current CTR tail");
+}
+if (!routeSource.includes("discovery?.updatedAt ?? article.publishedAt")) {
+  failures.push("动态英文文章 route 的 current discovery freshness fallback 缺失");
+}
+if (!sitemapSource.includes("?? article.updatedAt;")) {
+  failures.push("英文 Sitemap 不再使用 current discovery updatedAt fallback");
 }
 
 const chineseCharacters = source.match(/[\u3400-\u9fff]/g) ?? [];
