@@ -65,6 +65,7 @@ export const englishArenaSpawnCreepArticle = {
     label: "Using Screeps MMO instead?",
     title: "Create Your First MMO Creep",
   },
+  next: null,
   articleHtml: String.raw`
 <h2 id="quick-answer">Quick answer</h2>
 <p>In Screeps Arena, first find your owned <code>StructureSpawn</code> with <code>getObjectsByPrototype(StructureSpawn)</code>. Then call <code>spawn.spawnCreep(body)</code>. Arena documents a result object with either an <code>object</code> field for the newly spawning Creep or an <code>error</code> field for a numeric error code.</p>
