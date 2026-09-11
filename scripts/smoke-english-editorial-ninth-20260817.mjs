@@ -1,4 +1,5 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
+const HISTORICAL_UPDATED_AT = "2026-08-17";
 
 const articles = [
   {
@@ -18,6 +19,11 @@ const articles = [
   {
     path: "/en/blog/screeps-memory-basics",
     chinesePath: "/blog/screeps-memory-basics",
+    currentUpdatedAt: "2026-09-11",
+    currentSignals: [
+      "Screeps Memory: Persistent State vs Heap Cache",
+      "Learn how Screeps Memory persists state across ticks, when to use heap cache, how creep.memory maps to Memory.creeps, and how to recover saved object IDs.",
+    ],
     signals: [
       "source-room-not-visible",
       "source-missing-in-visible-room",
@@ -79,15 +85,19 @@ for (const article of articles) {
 
   const canonical = `https://www.linqingan.com${article.path}`;
   const chinese = `https://www.linqingan.com${article.chinesePath}`;
+  const currentUpdatedAt = article.currentUpdatedAt ?? HISTORICAL_UPDATED_AT;
 
+  // Keep the 2026-08-17 editorial body/evidence signals locked while allowing
+  // later current-layer metadata supersessions to own their own freshness date.
   for (const expected of [
     ...article.signals,
+    ...(article.currentSignals ?? []),
     `rel="canonical" href="${canonical}"`,
     `rel="alternate" hrefLang="en" href="${canonical}"`,
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-17"`,
+    `"dateModified":"${currentUpdatedAt}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: missing “${expected}”`);
@@ -134,9 +144,10 @@ if (sitemapResponse.status !== 200) {
   failures.push(`/sitemap-en.xml: expected 200, got ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
-    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>2026-08-17T00:00:00.000Z</lastmod>`;
+    const currentUpdatedAt = article.currentUpdatedAt ?? HISTORICAL_UPDATED_AT;
+    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>${currentUpdatedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${article.path}: Sitemap lastmod is not aligned with the 2026-08-17 substantive revision`);
+      failures.push(`${article.path}: Sitemap lastmod is not aligned with the current substantive revision`);
     }
   }
 }
@@ -148,5 +159,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Ninth English editorial smoke passed: CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, live-RoomPosition-aware consecutive accepted-movement evidence, scoped page/Sitemap freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Ninth English editorial smoke passed: historical 2026-08-17 body/evidence contracts remain locked; Memory current-layer metadata and 2026-09-11 freshness supersession are verified separately; CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, live-RoomPosition-aware consecutive accepted-movement evidence, canonical/hreflang, structured data, and Pending live evidence remain valid.",
 );

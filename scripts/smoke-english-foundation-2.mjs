@@ -40,7 +40,7 @@ const articles = [
     path: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
     headline: "Clean Dead Creep Memory Without Deleting Unrelated State",
-    listingTitle: "Screeps Dead Creep Memory: Clean Names and Owned Indexes",
+    listingTitle: "Screeps: Clean Dead Creep Memory Safely",
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     faqExpected: false,

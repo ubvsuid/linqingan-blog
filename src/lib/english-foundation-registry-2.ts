@@ -57,12 +57,12 @@ export const englishFoundationBatchTwoRegistry: DatedEnglishArticleRecord[] = [
     href: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
     category: "MEMORY · DEAD-CREEP CLEANUP",
-    title: "Screeps Dead Creep Memory: Clean Names and Owned Indexes",
+    title: "Screeps: Clean Dead Creep Memory Safely",
     description:
-      "Collect names absent from Game.creeps, remove their Creep-owned Memory, clean only documented name indexes, bound logs, and keep death cause and shared queues separate.",
+      "Clean stale Memory.creeps entries by comparing them with Game.creeps. Delete only confirmed dead names and keep custom task indexes in sync.",
     publishedAt: "2026-07-25",
     publishedLabel: "July 25, 2026",
-    updatedAt: "2026-07-31",
+    updatedAt: "2026-09-11",
     readingTime: "11 min read",
     primaryKeyword: "Screeps clean dead Creep Memory",
     searchIntent:

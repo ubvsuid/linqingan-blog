@@ -5,16 +5,19 @@ const pages = [
     path: "/en/blog/screeps-first-room-code",
     sectionId: "orchestration-contract",
     staleLiveLabel: "Live Spawn, harvest, transfer, build, repair, upgrade, and recovery test",
+    expectedModifiedAt: "2026-08-18",
   },
   {
     path: "/en/blog/screeps-room-visibility",
     sectionId: "name-position-map-live-room",
     staleLiveLabel: "Live multi-tick visibility test",
+    expectedModifiedAt: "2026-09-11",
   },
   {
     path: "/en/blog/screeps-global-cache",
     sectionId: "cache-key-contract",
     staleLiveLabel: "Live global-reset and cache-invalidation test",
+    expectedModifiedAt: "2026-08-18",
   },
 ];
 
@@ -45,7 +48,7 @@ for (const page of pages) {
 
   for (const expected of [
     `id="${page.sectionId}"`,
-    `"dateModified":"2026-08-18"`,
+    `"dateModified":"${page.expectedModifiedAt}"`,
     "Pending — no real-shard Console transcript was collected for this revision",
   ]) {
     if (!body.includes(expected)) {
@@ -59,4 +62,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Eleventh editorial verification smoke passed: ${pages.length} pages have one Chinese-source row, one consolidated live Pending row, current sections, and 2026-08-18 dateModified.`);
+console.log(`Eleventh editorial verification smoke passed: ${pages.length} pages have one Chinese-source row, one consolidated live Pending row, current sections, and scoped current dateModified values including the Room Visibility CTR supersession.`);
