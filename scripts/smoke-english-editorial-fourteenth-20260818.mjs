@@ -78,7 +78,7 @@ if (sitemapResponse.status !== 200) {
   const preservedFreshness = new Map([
     ["/en/blog/screeps-introduction", "2026-08-18"],
     ["/en/blog/screeps-first-room", "2026-08-28"],
-    ["/en/blog/screeps-tick-game-loop", "2026-08-18"],
+    ["/en/blog/screeps-tick-game-loop", "2026-09-11"],
     ["/en/blog/screeps-creep-roles", "2026-08-18"],
     ["/en/blog/screeps-clean-dead-creep-memory", "2026-08-18"],
   ]);
@@ -98,5 +98,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fourteenth English editorial smoke passed: hostile-Rampart reachability, complete-path decay lower bound, processed withdraw event evidence, canonical/hreflang, structured data, scoped freshness with the First Room August 28 supersession, and Pending live evidence.",
+  "Fourteenth English editorial smoke passed: hostile-Rampart reachability, complete-path decay lower bound, processed withdraw event evidence, canonical/hreflang, structured data, scoped freshness with the First Room August 28 and Tick September 11 supersessions, and Pending live evidence.",
 );
