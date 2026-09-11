@@ -1007,6 +1007,14 @@
       "source": "src/lib/english-articles-complete.ts#source-derived"
     },
     {
+      "id": "en_article_7b437bc8-aeb9-4d7a-a565-86ef6dc54b21",
+      "type": "Article",
+      "title": "screeps-arena-spawn-creep",
+      "href": "/en/blog/screeps-arena-spawn-creep",
+      "locale": "en",
+      "source": "content/english-standalone-identities.json"
+    },
+    {
       "id": "en_article_7e90fe24-44b7-4239-8258-a02e29a99f84",
       "type": "Article",
       "title": "screeps-move-fatigue-body-ratio",
