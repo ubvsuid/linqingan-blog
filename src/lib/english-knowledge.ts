@@ -20,6 +20,7 @@ const articleModuleOverrides: Record<string, number> = {
 
   "/en/blog/screeps-creep-body-parts": 2,
   "/en/blog/screeps-spawn-creep": 2,
+  "/en/blog/screeps-arena-spawn-creep": 2,
   "/en/blog/screeps-creep-roles": 2,
   "/en/blog/screeps-spawncreep-return-codes": 2,
   "/en/blog/screeps-spawn-exit-blocked-directions": 2,
