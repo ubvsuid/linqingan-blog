@@ -4,15 +4,15 @@
   "scope": "read-only-curated-plus-chinese-markdown-gap-audit",
   "graphFingerprint": null,
   "counts": {
-    "graphNodes": 227,
+    "graphNodes": 228,
     "graphEdges": 207,
     "graphUnmapped": 0,
-    "pageNodes": 160,
+    "pageNodes": 161,
     "curatedSources": 115,
     "curatedEdges": 380,
     "chineseMarkdownEditorialEdges": 447,
     "markdownCoveredPrerequisitePaths": 19,
-    "zeroCuratedInbound": 40,
+    "zeroCuratedInbound": 41,
     "weakCuratedInbound": 31,
     "directPrerequisiteGaps": 7,
     "semanticPageGaps": 1,
@@ -173,6 +173,14 @@
           "locale": "zh",
           "type": "BeginnerLesson",
           "title": "Screeps tick game loop",
+          "curatedInbound": 0
+        },
+        {
+          "id": "en_article_7b437bc8-aeb9-4d7a-a565-86ef6dc54b21",
+          "href": "/en/blog/screeps-arena-spawn-creep",
+          "locale": "en",
+          "type": "Article",
+          "title": "screeps-arena-spawn-creep",
           "curatedInbound": 0
         },
         {
