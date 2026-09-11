@@ -41,9 +41,9 @@ for (const record of chinese.records) {
 }
 
 const english = loadEnglishContentIdentityReadiness(root);
-assert.equal(english.records.length, 80, "English durable identity coverage");
+assert.equal(english.records.length, 81, "English durable identity coverage");
 assert.equal(english.bilingualRecords.length, 77, "English source-derived identity coverage");
-assert.equal(english.standaloneRecords.length, 3, "English-original durable identity coverage");
+assert.equal(english.standaloneRecords.length, 4, "English-original durable identity coverage");
 for (const record of english.records) {
   assert.match(record.contentId, ENGLISH_CONTENT_ID_PATTERN, `${record.href} English durable contentId`);
   assert.equal(chineseIds.has(record.contentId), false, `${record.href} must not reuse a Chinese contentId`);
@@ -95,5 +95,5 @@ const evidenceReadSource = evidenceReadPaths.map(read).join("\n");
 assert.match(evidenceReadSource, /accepted|verification_evidence_public/, "public Runtime Evidence boundary must remain accepted-only");
 
 console.log(
-  "[knowledge-graph-readiness] PASS: 80 Chinese + 80 English durable article identities, 3 explicit language associations, 8 Tool IDs, 3 Tick Lab experiment IDs, API ReturnCode ownership, and Runtime Evidence identity boundaries are ready.",
+  "[knowledge-graph-readiness] PASS: 80 Chinese + 81 English durable article identities, 3 explicit language associations, 8 Tool IDs, 3 Tick Lab experiment IDs, API ReturnCode ownership, and Runtime Evidence identity boundaries are ready.",
 );
