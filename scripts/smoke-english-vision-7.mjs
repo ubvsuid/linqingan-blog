@@ -5,12 +5,14 @@ const articles = [
     path: "/en/blog/screeps-room-visibility",
     chinesePath: "/blog/screeps-room-visibility",
     headline: "Why Is Game.rooms[roomName] Undefined in Screeps?",
-    listingTitle: "Why Is Game.rooms[roomName] Undefined in Screeps?",
+    listingTitle: "Screeps: Why Game.rooms[roomName] Is Undefined",
+    metaDescription:
+      "Learn why Game.rooms[roomName] is undefined without current room vision, how to guard live Room reads, and why Memory.rooms does not prove visibility.",
     query: "Game.rooms",
     tocId: "quick-answer",
     tocHeading: "Quick answer",
     faqExpected: true,
-    modifiedExpected: false,
+    modifiedAt: "2026-09-11",
     signals: [
       "Memory.rooms is not a live Room object",
       "status: 'room-not-visible'",
@@ -29,7 +31,7 @@ const articles = [
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     faqExpected: false,
-    modifiedExpected: true,
+    modifiedAt: "2026-07-31",
     signals: [
       "createObservationPlan",
       "selectObservationRequest",
@@ -50,7 +52,7 @@ const articles = [
     tocId: "use-this-guide",
     tocHeading: "Use this guide when",
     faqExpected: false,
-    modifiedExpected: true,
+    modifiedAt: "2026-07-31",
     signals: [
       "a CostMatrix cost of 255 is unwalkable",
       "STRUCTURE_PORTAL",
@@ -82,6 +84,8 @@ for (const article of articles) {
 
   for (const expected of [
     article.headline,
+    article.listingTitle,
+    ...(article.metaDescription ? [article.metaDescription] : []),
     "Verification status",
     "Chinese source article",
     "Reviewed in full",
@@ -94,6 +98,7 @@ for (const article of articles) {
     `href="#${article.tocId}"`,
     `<h2 id="${article.tocId}">${article.tocHeading}</h2>`,
     `"@type":"BlogPosting"`,
+    `"dateModified":"${article.modifiedAt}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少 “${expected}”`);
@@ -105,13 +110,6 @@ for (const article of articles) {
     !== article.faqExpected
   ) {
     failures.push(`${article.path}: FAQPage expectation mismatch`);
-  }
-
-  if (
-    article.modifiedExpected
-    && !body.includes(`"dateModified":"2026-07-31"`)
-  ) {
-    failures.push(`${article.path}: 缺少 2026-07-31 dateModified`);
   }
 
   const searchResponse = await fetch(
@@ -216,8 +214,16 @@ if (sitemapResponse.status !== 200) {
   for (const article of articles) {
     const expected =
       `https://www.linqingan.com${article.path}`;
-    if (!sitemapBody.includes(expected)) {
+    const index = sitemapBody.indexOf(expected);
+    if (index === -1) {
       failures.push(`/sitemap.xml: 缺少 ${expected}`);
+      continue;
+    }
+    const entryWindow = sitemapBody.slice(index, index + 260);
+    if (!entryWindow.includes(article.modifiedAt)) {
+      failures.push(
+        `/sitemap.xml: ${article.path} 缺少 ${article.modifiedAt} lastmod`,
+      );
     }
   }
 }
@@ -237,5 +243,5 @@ console.log(
   "第七批英文视野与寻路生产冒烟测试通过："
     + "3 篇文章、Observer 单次最终提交、CostMatrix 工作流、"
     + "Verification、Canonical、hreflang、JSON-LD、"
-    + "目录、搜索与 Sitemap。",
+    + "current metadata、目录、搜索与 Sitemap。",
 );
