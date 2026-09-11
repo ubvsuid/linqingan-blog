@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishPickupDroppedEnergyCtrUpdatedAt20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
 
 const TARGET_SLUG = "screeps-memory-basics";
@@ -20,6 +21,7 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return getEnglishRoomVisibilityCtrUpdatedAt20260911(slug)
+  return getEnglishPickupDroppedEnergyCtrUpdatedAt20260911(slug)
+    ?? getEnglishRoomVisibilityCtrUpdatedAt20260911(slug)
     ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);
 }

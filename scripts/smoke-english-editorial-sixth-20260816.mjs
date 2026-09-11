@@ -23,10 +23,10 @@ const revised = [
   {
     path: "/en/blog/screeps-pickup-dropped-energy",
     chinesePath: "/blog/screeps-creep-pickup-dropped-energy",
-    title: "Screeps pickup(): Collect Dropped Energy Safely",
+    title: "Screeps Creep.pickup(): Pick Up Dropped Energy",
     indexTitle: "How to Make a Screeps Creep Pick Up Dropped Energy",
     headline: "How to Make a Screeps Creep Pick Up Dropped Energy",
-    modifiedAt: "2026-08-16",
+    modifiedAt: "2026-09-11",
     signals: [
       "Store capacity is the pickup boundary; active CARRY is diagnostic context",
       "does not use <code>getActiveBodyparts(CARRY)</code> as an API preflight",
@@ -154,6 +154,20 @@ if (sitemapResponse.status !== 200) {
   }
 }
 
+const englishSitemapResponse = await fetch(`${baseUrl}/sitemap-en.xml`, {
+  redirect: "manual",
+});
+const englishSitemapBody = await englishSitemapResponse.text();
+
+if (englishSitemapResponse.status !== 200) {
+  failures.push(`/sitemap-en.xml: expected 200, received ${englishSitemapResponse.status}`);
+} else {
+  const pickupEntry = `<loc>https://www.linqingan.com/en/blog/screeps-pickup-dropped-energy</loc>\n    <lastmod>2026-09-11T00:00:00.000Z</lastmod>`;
+  if (!englishSitemapBody.includes(pickupEntry)) {
+    failures.push(`/en/blog/screeps-pickup-dropped-energy: current Sitemap freshness regressed`);
+  }
+}
+
 if (failures.length > 0) {
   failures.forEach((failure) => console.error(`ERROR: ${failure}`));
   console.error(`\nSixth English editorial production smoke failed: ${failures.length} item(s).`);
@@ -161,5 +175,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Sixth English editorial smoke passed: withdraw and pickup retain their August 16 API-boundary revisions, while Transfer verifies the reviewed August 29 beginner round-trip contract, discovery freshness, and explicit Pending live evidence.",
+  "Sixth English editorial smoke passed: August API-boundary revisions stay locked, Pickup applies its September 11 current metadata/freshness supersession, Transfer keeps the reviewed August 29 round-trip contract, and Pending live evidence remains explicit.",
 );
