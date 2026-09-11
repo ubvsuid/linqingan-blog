@@ -138,14 +138,15 @@ if (sitemapResponse.status !== 200) {
     }
   }
 
-  for (const path of [
-    "/en/blog/screeps-first-room-code",
-    "/en/blog/screeps-room-visibility",
-    "/en/blog/screeps-global-cache",
-  ]) {
-    const expectedEntry = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+  const previousPassFreshness = new Map([
+    ["/en/blog/screeps-first-room-code", "2026-08-18"],
+    ["/en/blog/screeps-room-visibility", "2026-09-11"],
+    ["/en/blog/screeps-global-cache", "2026-08-18"],
+  ]);
+  for (const [path, modifiedAt] of previousPassFreshness) {
+    const expectedEntry = `<loc>https://www.linqingan.com${path}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${path}: eleventh-pass Sitemap freshness regressed`);
+      failures.push(`${path}: previous-pass current Sitemap freshness regressed`);
     }
   }
 }
@@ -157,5 +158,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Twelfth English editorial smoke passed: tick snapshot/intent priority, strict role dispatch, spawning-safe dead-memory cleanup, scoped freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Twelfth English editorial smoke passed: tick snapshot/intent priority, strict role dispatch, spawning-safe dead-memory cleanup, scoped historical freshness plus current Room Visibility supersession, canonical/hreflang, structured data, and Pending live evidence.",
 );
