@@ -68,6 +68,12 @@ const articles = [
 
 const failures = [];
 
+function expectedModifiedAt(path) {
+  return path === "/en/blog/screeps-room-create-construction-site"
+    ? "2026-09-12"
+    : "2026-08-18";
+}
+
 async function fetchText(path) {
   const response = await fetch(`${baseUrl}${path}`, {
     redirect: "manual",
@@ -93,7 +99,7 @@ for (const article of articles) {
     `rel="alternate" hrefLang="zh-CN" href="${chinese}"`,
     `rel="alternate" hrefLang="x-default" href="${canonical}"`,
     `"@type":"BlogPosting"`,
-    `"dateModified":"2026-08-18"`,
+    `"dateModified":"${expectedModifiedAt(article.path)}"`,
   ]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: missing “${expected}”`);
@@ -170,9 +176,10 @@ if (sitemapResponse.status !== 200) {
   failures.push(`/sitemap-en.xml: expected 200, got ${sitemapResponse.status}`);
 } else {
   for (const article of articles) {
-    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>2026-08-18T00:00:00.000Z</lastmod>`;
+    const modifiedAt = expectedModifiedAt(article.path);
+    const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>${modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${article.path}: Sitemap lastmod is not aligned with the 2026-08-18 substantive revision`);
+      failures.push(`${article.path}: Sitemap lastmod is not aligned with the current ${modifiedAt} revision`);
     }
   }
 }
@@ -184,5 +191,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Tenth English editorial smoke passed: Controller runway and restricted-shard return-code boundary, module result-contract isolation, immutable Flag identity with vision-aware saved targets, exact next-tick Construction Site evidence, scoped freshness, canonical/hreflang, structured data, and Pending live evidence.",
+  "Tenth English editorial smoke passed: Controller runway and restricted-shard return-code boundary, module result-contract isolation, immutable Flag identity with vision-aware saved targets, exact next-tick Construction Site evidence with current CTR freshness supersession, canonical/hreflang, structured data, and Pending live evidence.",
 );
