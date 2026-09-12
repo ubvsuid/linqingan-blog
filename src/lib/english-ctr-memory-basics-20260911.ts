@@ -3,6 +3,7 @@ import { getEnglishCreateConstructionSiteCtrUpdatedAt20260912 } from "@/lib/engl
 import { getEnglishDeadCreepMemoryCtrUpdatedAt20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 import { getEnglishPickupDroppedEnergyCtrUpdatedAt20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
+import { getEnglishSpawnCreepReturnCodesCtrUpdatedAt20260913 } from "@/lib/english-ctr-spawncreep-return-codes-20260913";
 import { getEnglishTickGameLoopCtrUpdatedAt20260911 } from "@/lib/english-ctr-tick-game-loop-20260911";
 
 const TARGET_SLUG = "screeps-memory-basics";
@@ -24,7 +25,8 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return getEnglishCreateConstructionSiteCtrUpdatedAt20260912(slug)
+  return getEnglishSpawnCreepReturnCodesCtrUpdatedAt20260913(slug)
+    ?? getEnglishCreateConstructionSiteCtrUpdatedAt20260912(slug)
     ?? getEnglishDeadCreepMemoryCtrUpdatedAt20260911(slug)
     ?? getEnglishTickGameLoopCtrUpdatedAt20260911(slug)
     ?? getEnglishPickupDroppedEnergyCtrUpdatedAt20260911(slug)

@@ -3,6 +3,7 @@ import { applyEnglishCreateConstructionSiteCtr20260912 } from "@/lib/english-ctr
 import { applyEnglishDeadCreepMemoryCtr20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 import { applyEnglishPickupDroppedEnergyCtr20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { applyEnglishRoomVisibilityCtr20260911 } from "@/lib/english-ctr-room-visibility-20260911";
+import { applyEnglishSpawnCreepReturnCodesCtr20260913 } from "@/lib/english-ctr-spawncreep-return-codes-20260913";
 import { applyEnglishTickGameLoopCtr20260911 } from "@/lib/english-ctr-tick-game-loop-20260911";
 
 const TARGET_SLUG = "screeps-renew-creep";
@@ -59,12 +60,14 @@ function applyRenewCreepCtr20260910(
 export function applyEnglishRenewCreepCtr20260910(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
-  return applyEnglishCreateConstructionSiteCtr20260912(
-    applyEnglishTickGameLoopCtr20260911(
-      applyEnglishPickupDroppedEnergyCtr20260911(
-        applyEnglishRoomVisibilityCtr20260911(
-          applyEnglishDeadCreepMemoryCtr20260911(
-            applyRenewCreepCtr20260910(article),
+  return applyEnglishSpawnCreepReturnCodesCtr20260913(
+    applyEnglishCreateConstructionSiteCtr20260912(
+      applyEnglishTickGameLoopCtr20260911(
+        applyEnglishPickupDroppedEnergyCtr20260911(
+          applyEnglishRoomVisibilityCtr20260911(
+            applyEnglishDeadCreepMemoryCtr20260911(
+              applyRenewCreepCtr20260910(article),
+            ),
           ),
         ),
       ),
