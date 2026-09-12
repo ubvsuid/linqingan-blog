@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishDeadCreepMemoryCtrUpdatedAt20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 import { getEnglishPickupDroppedEnergyCtrUpdatedAt20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
 import { getEnglishTickGameLoopCtrUpdatedAt20260911 } from "@/lib/english-ctr-tick-game-loop-20260911";
@@ -22,7 +23,8 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return getEnglishTickGameLoopCtrUpdatedAt20260911(slug)
+  return getEnglishDeadCreepMemoryCtrUpdatedAt20260911(slug)
+    ?? getEnglishTickGameLoopCtrUpdatedAt20260911(slug)
     ?? getEnglishPickupDroppedEnergyCtrUpdatedAt20260911(slug)
     ?? getEnglishRoomVisibilityCtrUpdatedAt20260911(slug)
     ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);

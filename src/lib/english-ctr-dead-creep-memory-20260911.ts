@@ -1,6 +1,7 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
 
 const TARGET_SLUG = "screeps-clean-dead-creep-memory";
+const UPDATED_AT = "2026-09-11";
 
 export function applyEnglishDeadCreepMemoryCtr20260911(
   article: EnglishBeginnerArticle | undefined,
@@ -13,4 +14,10 @@ export function applyEnglishDeadCreepMemoryCtr20260911(
     description:
       "Clean stale Memory.creeps entries by comparing them with Game.creeps. Delete only confirmed dead names and keep custom task indexes in sync.",
   };
+}
+
+export function getEnglishDeadCreepMemoryCtrUpdatedAt20260911(
+  slug: string,
+): string | undefined {
+  return slug === TARGET_SLUG ? UPDATED_AT : undefined;
 }
