@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishCreateConstructionSiteCtrUpdatedAt20260912 } from "@/lib/english-ctr-create-construction-site-20260912";
 import { getEnglishDeadCreepMemoryCtrUpdatedAt20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 import { getEnglishPickupDroppedEnergyCtrUpdatedAt20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
@@ -23,7 +24,8 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return getEnglishDeadCreepMemoryCtrUpdatedAt20260911(slug)
+  return getEnglishCreateConstructionSiteCtrUpdatedAt20260912(slug)
+    ?? getEnglishDeadCreepMemoryCtrUpdatedAt20260911(slug)
     ?? getEnglishTickGameLoopCtrUpdatedAt20260911(slug)
     ?? getEnglishPickupDroppedEnergyCtrUpdatedAt20260911(slug)
     ?? getEnglishRoomVisibilityCtrUpdatedAt20260911(slug)
