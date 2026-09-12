@@ -5,8 +5,9 @@ const articles = [
     path: "/en/blog/screeps-err-not-in-range",
     chinesePath: "/blog/screeps-err-not-in-range",
     title: "Screeps ERR_NOT_IN_RANGE: Use the Correct Action Range",
+    currentTitle: "Screeps ERR_NOT_IN_RANGE (-9): Action Range Fix",
     searchQuery: "ERR_NOT_IN_RANGE",
-    modifiedAt: "2026-08-12",
+    modifiedAt: "2026-09-13",
     requiredBody: [
       "Use this guide when",
       "Choose another guide when",
@@ -75,7 +76,7 @@ for (const article of articles) {
     continue;
   }
 
-  for (const expected of [article.title, ...article.requiredBody]) {
+  for (const expected of [article.currentTitle ?? article.title, ...article.requiredBody]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
     }
