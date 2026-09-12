@@ -37,7 +37,7 @@ const articles = [
   {
     path: "/en/blog/screeps-clean-dead-creep-memory",
     chinesePath: "/blog/screeps-clean-dead-creep-memory",
-    currentModifiedAt: "2026-08-18",
+    currentModifiedAt: "2026-09-11",
     signals: [
       "Do not delete Memory for a Creep that is still spawning",
       "getSpawningCreepNames",
