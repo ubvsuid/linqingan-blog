@@ -20,7 +20,7 @@ if (response.status !== 200) {
     "What Is Screeps? How the Programming Strategy Game Works",
     "Screeps: World is a persistent multiplayer real-time strategy game controlled primarily through JavaScript.",
     "Persistent world does not make",
-    "Current `Game` snapshot",
+    "Current <code>Game</code> snapshot",
     "Persistent JSON state",
     "Rebuildable runtime cache",
     "Live multi-tick verification pending",
