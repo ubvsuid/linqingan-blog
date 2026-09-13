@@ -29,6 +29,9 @@ globalThis.fetch = function sitemapAwareFetch(input, init) {
 };
 
 try {
+  await import("./smoke-english-err-not-in-range-ctr-20260913.mjs");
+  await import("./smoke-english-spawncreep-return-codes-ctr-20260913.mjs");
+  await import("./smoke-english-create-construction-site-ctr-20260912.mjs");
   await import("./smoke-english-dead-creep-memory-ctr-20260912.mjs");
   await import("./smoke-english-tick-game-loop-ctr-20260911.mjs");
   await import("./smoke-english-foundation.mjs");

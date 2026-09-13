@@ -38,6 +38,11 @@ const articles = [
   {
     path: "/en/blog/screeps-spawncreep-return-codes",
     chinesePath: "/blog/screeps-spawncreep-return-codes",
+    currentUpdatedAt: "2026-09-13",
+    currentSignals: [
+      "Screeps spawnCreep() Return Codes &amp; Error Fixes",
+      "Debug Screeps spawnCreep() failures with the documented return codes, dryRun boundaries, Energy checks, name conflicts, invalid arguments, and RCL limits.",
+    ],
     signals: [
       "describeSpawnEnergy",
       "selectedEnergyAvailable",
@@ -159,5 +164,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Ninth English editorial smoke passed: historical 2026-08-17 body/evidence contracts remain locked; Memory current-layer metadata and 2026-09-11 freshness supersession are verified separately; CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, live-RoomPosition-aware consecutive accepted-movement evidence, canonical/hreflang, structured data, and Pending live evidence remain valid.",
+  "Ninth English editorial smoke passed: historical 2026-08-17 body/evidence contracts remain locked; Memory 2026-09-11 and spawnCreep return-code 2026-09-13 current-layer metadata/freshness supersessions are verified separately; CPU comparison boundaries, visibility-aware Memory ID recovery, request-specific spawn Energy diagnostics, live-RoomPosition-aware consecutive accepted-movement evidence, canonical/hreflang, structured data, and Pending live evidence remain valid.",
 );

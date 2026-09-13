@@ -4,7 +4,7 @@ const articles = [
     path: "/en/blog/screeps-spawncreep-return-codes", chinesePath: "/blog/screeps-spawncreep-return-codes",
     headline: "How to Diagnose spawnCreep() Return Codes", listingTitle: "Screeps spawnCreep() Errors: Diagnose Every Return Code",
     tocId: "use-this-guide", tocHeading: "Use this guide when", faqExpected: false,
-    reviewedInFullExpected: false, modifiedAt: "2026-08-17",
+    reviewedInFullExpected: false, modifiedAt: "2026-09-13",
     verification: ["Chinese source article", "Screeps Console test", "Pending", "Live multi-tick verification pending"],
     signals: [
       "dryRunResult",
