@@ -13,6 +13,7 @@ const articles = [
     tocHeading: "Use this guide when",
     faqExpected: false,
     modifiedExpected: true,
+    modifiedAt: "2026-08-18",
     signals: [
       "target-room-mismatch",
       "fallback-forbidden",
@@ -35,6 +36,7 @@ const articles = [
     tocHeading: "Use this guide when",
     faqExpected: false,
     modifiedExpected: true,
+    modifiedAt: "2026-09-13",
     signals: [
       "module.exports.loop",
       "module.exports = { run }",
@@ -92,9 +94,9 @@ for (const article of articles) {
 
   if (
     article.modifiedExpected
-    && !body.includes(`"dateModified":"2026-08-18"`)
+    && !body.includes(`"dateModified":"${article.modifiedAt}"`)
   ) {
-    failures.push(`${article.path}: 缺少 2026-08-18 dateModified`);
+    failures.push(`${article.path}: 缺少 ${article.modifiedAt} dateModified`);
   }
 
   const searchResponse = await fetch(
