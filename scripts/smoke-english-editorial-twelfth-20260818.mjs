@@ -142,7 +142,7 @@ if (sitemapResponse.status !== 200) {
   }
 
   const previousPassFreshness = new Map([
-    ["/en/blog/screeps-first-room-code", "2026-08-18"],
+    ["/en/blog/screeps-first-room-code", "2026-09-13"],
     ["/en/blog/screeps-room-visibility", "2026-09-11"],
     ["/en/blog/screeps-global-cache", "2026-08-18"],
   ]);
