@@ -5,7 +5,7 @@ const pages = [
     path: "/en/blog/screeps-first-room-code",
     sectionId: "orchestration-contract",
     staleLiveLabel: "Live Spawn, harvest, transfer, build, repair, upgrade, and recovery test",
-    expectedModifiedAt: "2026-08-18",
+    expectedModifiedAt: "2026-09-13",
   },
   {
     path: "/en/blog/screeps-room-visibility",
@@ -62,4 +62,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Eleventh editorial verification smoke passed: ${pages.length} pages have one Chinese-source row, one consolidated live Pending row, current sections, and scoped current dateModified values including the Room Visibility CTR supersession.`);
+console.log(`Eleventh editorial verification smoke passed: ${pages.length} pages have one Chinese-source row, one consolidated live Pending row, current sections, and scoped current dateModified values including the First Room Code and Room Visibility CTR supersessions.`);
