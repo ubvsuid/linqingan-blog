@@ -42,8 +42,9 @@ const articles = [
     path: "/en/blog/screeps-err-no-path",
     chinesePath: "/blog/screeps-err-no-path",
     title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
+    currentTitle: "Screeps ERR_NO_PATH (-2): Causes, Checks & Fixes",
     searchQuery: "ERR_NO_PATH",
-    modifiedAt: "2026-08-12",
+    modifiedAt: "2026-09-13",
     requiredBody: [
       "Use this guide when",
       "Screeps Console test",
