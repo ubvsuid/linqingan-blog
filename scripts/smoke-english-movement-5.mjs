@@ -42,8 +42,10 @@ const articles = [
     path: "/en/blog/screeps-err-no-path",
     chinesePath: "/blog/screeps-err-no-path",
     title: "Screeps ERR_NO_PATH: Diagnose Range, Matrices, and Routes",
+    currentTitle: "Screeps ERR_NO_PATH (-2): Causes, Checks & Fixes",
+    currentTitleHtml: "Screeps ERR_NO_PATH (-2): Causes, Checks &amp; Fixes",
     searchQuery: "ERR_NO_PATH",
-    modifiedAt: "2026-08-12",
+    modifiedAt: "2026-09-13",
     requiredBody: [
       "Use this guide when",
       "Screeps Console test",
@@ -76,7 +78,7 @@ for (const article of articles) {
     continue;
   }
 
-  for (const expected of [article.currentTitle ?? article.title, ...article.requiredBody]) {
+  for (const expected of [article.currentTitleHtml ?? article.currentTitle ?? article.title, ...article.requiredBody]) {
     if (!body.includes(expected)) {
       failures.push(`${article.path}: 缺少预期内容 “${expected}”`);
     }

@@ -1,7 +1,9 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
 import { applyEnglishCreateConstructionSiteCtr20260912 } from "@/lib/english-ctr-create-construction-site-20260912";
 import { applyEnglishDeadCreepMemoryCtr20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
+import { applyEnglishErrNoPathCtr20260913 } from "@/lib/english-ctr-err-no-path-20260913";
 import { applyEnglishErrNotInRangeCtr20260913 } from "@/lib/english-ctr-err-not-in-range-20260913";
+import { applyEnglishFirstRoomCodeCtr20260913 } from "@/lib/english-ctr-first-room-code-20260913";
 import { applyEnglishPickupDroppedEnergyCtr20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { applyEnglishRoomVisibilityCtr20260911 } from "@/lib/english-ctr-room-visibility-20260911";
 import { applyEnglishSpawnCreepReturnCodesCtr20260913 } from "@/lib/english-ctr-spawncreep-return-codes-20260913";
@@ -61,14 +63,18 @@ function applyRenewCreepCtr20260910(
 export function applyEnglishRenewCreepCtr20260910(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
-  return applyEnglishErrNotInRangeCtr20260913(
-    applyEnglishSpawnCreepReturnCodesCtr20260913(
-      applyEnglishCreateConstructionSiteCtr20260912(
-        applyEnglishTickGameLoopCtr20260911(
-          applyEnglishPickupDroppedEnergyCtr20260911(
-            applyEnglishRoomVisibilityCtr20260911(
-              applyEnglishDeadCreepMemoryCtr20260911(
-                applyRenewCreepCtr20260910(article),
+  return applyEnglishErrNoPathCtr20260913(
+    applyEnglishFirstRoomCodeCtr20260913(
+      applyEnglishErrNotInRangeCtr20260913(
+        applyEnglishSpawnCreepReturnCodesCtr20260913(
+          applyEnglishCreateConstructionSiteCtr20260912(
+            applyEnglishTickGameLoopCtr20260911(
+              applyEnglishPickupDroppedEnergyCtr20260911(
+                applyEnglishRoomVisibilityCtr20260911(
+                  applyEnglishDeadCreepMemoryCtr20260911(
+                    applyRenewCreepCtr20260910(article),
+                  ),
+                ),
               ),
             ),
           ),

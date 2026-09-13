@@ -29,6 +29,8 @@ globalThis.fetch = function sitemapAwareFetch(input, init) {
 };
 
 try {
+  await import("./smoke-english-err-no-path-ctr-20260913.mjs");
+  await import("./smoke-english-first-room-code-ctr-20260913.mjs");
   await import("./smoke-english-err-not-in-range-ctr-20260913.mjs");
   await import("./smoke-english-spawncreep-return-codes-ctr-20260913.mjs");
   await import("./smoke-english-create-construction-site-ctr-20260912.mjs");
