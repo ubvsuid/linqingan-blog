@@ -69,7 +69,7 @@ if (sitemapResponse.status !== 200) {
 
   const preservedFreshness = new Map([
     ["/en/blog/screeps-tombstone-ruin-recovery", "2026-08-18"],
-    ["/en/blog/screeps-introduction", "2026-08-18"],
+    ["/en/blog/screeps-introduction", "2026-09-13"],
     ["/en/blog/screeps-first-room", "2026-08-28"],
     ["/en/blog/screeps-tick-game-loop", "2026-09-11"],
   ]);
@@ -89,5 +89,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Fifteenth English editorial smoke passed: the August 29 room-energy debugging guide keeps its symptom-to-diagnosis-to-fix flow, stable fill-target handling, next-tick processed evidence, canonical/hreflang, structured data, scoped discovery freshness, and the Tick September 11 supersession.",
+  "Fifteenth English editorial smoke passed: the August 29 room-energy debugging guide keeps its symptom-to-diagnosis-to-fix flow, stable fill-target handling, next-tick processed evidence, canonical/hreflang, structured data, scoped discovery freshness, the Introduction September 13 CTR supersession, and the Tick September 11 supersession.",
 );
