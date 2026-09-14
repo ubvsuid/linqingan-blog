@@ -18,6 +18,10 @@ import {
   getEnglishRequireModulesCtrUpdatedAt20260913,
 } from "@/lib/english-ctr-require-modules-20260913";
 import { applyEnglishRoomVisibilityCtr20260911 } from "@/lib/english-ctr-room-visibility-20260911";
+import {
+  applyEnglishSpawnCreepCtr20260914,
+  getEnglishSpawnCreepCtrUpdatedAt20260914,
+} from "@/lib/english-ctr-spawn-creep-20260914";
 import { applyEnglishSpawnCreepReturnCodesCtr20260913 } from "@/lib/english-ctr-spawncreep-return-codes-20260913";
 import { applyEnglishTickGameLoopCtr20260911 } from "@/lib/english-ctr-tick-game-loop-20260911";
 
@@ -75,19 +79,21 @@ function applyRenewCreepCtr20260910(
 export function applyEnglishRenewCreepCtr20260910(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
-  return applyEnglishRecycleCreepCtr20260914(
-    applyEnglishRequireModulesCtr20260913(
-      applyEnglishIntroductionCtr20260913(
-        applyEnglishErrNoPathCtr20260913(
-          applyEnglishFirstRoomCodeCtr20260913(
-            applyEnglishErrNotInRangeCtr20260913(
-              applyEnglishSpawnCreepReturnCodesCtr20260913(
-                applyEnglishCreateConstructionSiteCtr20260912(
-                  applyEnglishTickGameLoopCtr20260911(
-                    applyEnglishPickupDroppedEnergyCtr20260911(
-                      applyEnglishRoomVisibilityCtr20260911(
-                        applyEnglishDeadCreepMemoryCtr20260911(
-                          applyRenewCreepCtr20260910(article),
+  return applyEnglishSpawnCreepCtr20260914(
+    applyEnglishRecycleCreepCtr20260914(
+      applyEnglishRequireModulesCtr20260913(
+        applyEnglishIntroductionCtr20260913(
+          applyEnglishErrNoPathCtr20260913(
+            applyEnglishFirstRoomCodeCtr20260913(
+              applyEnglishErrNotInRangeCtr20260913(
+                applyEnglishSpawnCreepReturnCodesCtr20260913(
+                  applyEnglishCreateConstructionSiteCtr20260912(
+                    applyEnglishTickGameLoopCtr20260911(
+                      applyEnglishPickupDroppedEnergyCtr20260911(
+                        applyEnglishRoomVisibilityCtr20260911(
+                          applyEnglishDeadCreepMemoryCtr20260911(
+                            applyRenewCreepCtr20260910(article),
+                          ),
                         ),
                       ),
                     ),
@@ -105,7 +111,8 @@ export function applyEnglishRenewCreepCtr20260910(
 export function getEnglishRenewCreepCtrUpdatedAt20260910(
   slug: string,
 ): string | undefined {
-  return getEnglishRecycleCreepCtrUpdatedAt20260914(slug)
+  return getEnglishSpawnCreepCtrUpdatedAt20260914(slug)
+    ?? getEnglishRecycleCreepCtrUpdatedAt20260914(slug)
     ?? getEnglishRequireModulesCtrUpdatedAt20260913(slug)
     ?? getEnglishIntroductionCtrUpdatedAt20260913(slug)
     ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);
