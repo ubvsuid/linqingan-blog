@@ -4,6 +4,7 @@ import { getEnglishDeadCreepMemoryCtrUpdatedAt20260911 } from "@/lib/english-ctr
 import { getEnglishErrNoPathCtrUpdatedAt20260913 } from "@/lib/english-ctr-err-no-path-20260913";
 import { getEnglishErrNotInRangeCtrUpdatedAt20260913 } from "@/lib/english-ctr-err-not-in-range-20260913";
 import { getEnglishFirstRoomCodeCtrUpdatedAt20260913 } from "@/lib/english-ctr-first-room-code-20260913";
+import { getEnglishIntroductionCtrUpdatedAt20260913 } from "@/lib/english-ctr-introduction-20260913";
 import { getEnglishPickupDroppedEnergyCtrUpdatedAt20260911 } from "@/lib/english-ctr-pickup-dropped-energy-20260911";
 import { getEnglishRoomVisibilityCtrUpdatedAt20260911 } from "@/lib/english-ctr-room-visibility-20260911";
 import { getEnglishSpawnCreepReturnCodesCtrUpdatedAt20260913 } from "@/lib/english-ctr-spawncreep-return-codes-20260913";
@@ -28,7 +29,8 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return getEnglishErrNoPathCtrUpdatedAt20260913(slug)
+  return getEnglishIntroductionCtrUpdatedAt20260913(slug)
+    ?? getEnglishErrNoPathCtrUpdatedAt20260913(slug)
     ?? getEnglishFirstRoomCodeCtrUpdatedAt20260913(slug)
     ?? getEnglishErrNotInRangeCtrUpdatedAt20260913(slug)
     ?? getEnglishSpawnCreepReturnCodesCtrUpdatedAt20260913(slug)

@@ -69,6 +69,7 @@ const articles = [
 const failures = [];
 
 function expectedModifiedAt(path) {
+  if (path === "/en/blog/screeps-require-modules") return "2026-09-13";
   return path === "/en/blog/screeps-room-create-construction-site"
     ? "2026-09-12"
     : "2026-08-18";

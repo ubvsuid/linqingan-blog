@@ -5,7 +5,7 @@ const articles = [
   {
     path: "/en/blog/screeps-introduction",
     chinesePath: "/blog/screeps-introduction",
-    modifiedAt: "2026-08-18",
+    modifiedAt: "2026-09-13",
     signals: [
       "Persistent world does not make",
       "runtime-state-boundary",
@@ -20,7 +20,7 @@ const articles = [
   {
     path: "/en/blog/screeps-first-room",
     chinesePath: "/blog/screeps-first-room",
-    modifiedAt: "2026-08-28",
+    modifiedAt: "2026-09-14",
     signals: [
       "Find and open the three work areas",
       "semantic arrival checks",
@@ -116,7 +116,7 @@ if (sitemapResponse.status !== 200) {
   for (const article of articles) {
     const expectedEntry = `<loc>https://www.linqingan.com${article.path}</loc>\n    <lastmod>${article.modifiedAt}T00:00:00.000Z</lastmod>`;
     if (!sitemapBody.includes(expectedEntry)) {
-      failures.push(`${article.path}: Sitemap lastmod is not aligned with the ${article.modifiedAt} substantive revision`);
+      failures.push(`${article.path}: current Sitemap freshness regressed`);
     }
   }
 
@@ -140,5 +140,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Thirteenth English editorial smoke passed: the August 18 introduction boundaries remain intact, First Room uses its August 28 navigation/visibility supersession, Tick and Dead Creep carry their September 11 current freshness, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
+  "Thirteenth English editorial smoke passed: the August 18 introduction and First Room body boundaries remain intact under their current CTR/freshness supersessions (Introduction September 13; First Room September 14), Tick and Dead Creep carry their September 11 current freshness, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
 );
