@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishRecycleCreepCtrUpdatedAt20260914 } from "@/lib/english-ctr-recycle-creep-20260914";
 
 const TARGET_SLUG = "screeps-require-modules";
 const UPDATED_AT = "2026-09-13";
@@ -19,5 +20,6 @@ export function applyEnglishRequireModulesCtr20260913(
 export function getEnglishRequireModulesCtrUpdatedAt20260913(
   slug: string,
 ): string | undefined {
-  return slug === TARGET_SLUG ? UPDATED_AT : undefined;
+  return getEnglishRecycleCreepCtrUpdatedAt20260914(slug)
+    ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);
 }

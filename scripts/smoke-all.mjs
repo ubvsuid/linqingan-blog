@@ -29,6 +29,7 @@ globalThis.fetch = function sitemapAwareFetch(input, init) {
 };
 
 try {
+  await import("./smoke-english-recycle-creep-ctr-20260914.mjs");
   await import("./smoke-english-require-modules-ctr-20260913.mjs");
   await import("./smoke-english-introduction-ctr-20260913.mjs");
   await import("./smoke-english-err-no-path-ctr-20260913.mjs");
