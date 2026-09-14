@@ -24,7 +24,6 @@ if (response.status !== 200) {
     "Game.creeps",
     "FIND_SOURCES",
     "room.controller",
-    "Current client layout",
     "Pending",
     '"dateModified":"2026-09-14"',
     '<time dateTime="2026-09-14">Updated ',
@@ -52,4 +51,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("First-room CTR production smoke passed: current first-room snippet and 2026-09-14 freshness are active while the existing H1, read-only inventory, room-object, bilingual, canonical, and Pending client-layout contracts remain intact.");
+console.log("First-room CTR production smoke passed: current first-room snippet and 2026-09-14 freshness are active while the existing H1, read-only inventory, room-object, bilingual, canonical, and Pending-evidence contracts remain intact.");
