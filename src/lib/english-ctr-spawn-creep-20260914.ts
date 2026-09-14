@@ -2,7 +2,7 @@ import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
 
 const TARGET_SLUG = "screeps-spawn-creep";
 const UPDATED_AT = "2026-09-14";
-const LESSON_BOUNDARY = '<p><strong>Lesson boundary:</strong> this lesson creates one fixed-name Creep. Dynamic names, population targets, role Memory, replacement timing, and spawn queues belong in later guides.</p>';
+const BEFORE_YOU_START_HEADING = /<h2 id="[^"]+">Before you start<\/h2>/;
 const GAME_MODE_SECTION = String.raw`<h2 id="game-mode-boundary">Game mode boundary</h2>
 <p>This guide covers Screeps World/MMO, where <code>StructureSpawn.spawnCreep(body, name, opts)</code> is the relevant contract. Screeps Arena uses a different <code>spawnCreep(body)</code> contract. If you are playing Arena, use the dedicated <a href="/en/blog/screeps-arena-spawn-creep">Screeps Arena spawnCreep guide</a>.</p>`;
 
@@ -11,12 +11,24 @@ function insertGameModeToc(
 ): EnglishBeginnerArticle["toc"] {
   if (toc.some(([id]) => id === "game-mode-boundary")) return toc;
 
-  const index = toc.findIndex(([id]) => id === "lesson-goal");
+  const afterGoalIndex = toc.findIndex(
+    ([, label]) => label === "What you will build",
+  );
+  const beforeStartIndex = toc.findIndex(
+    ([id, label]) => id === "before-you-start" || label === "Before you start",
+  );
+  const insertionIndex = afterGoalIndex >= 0
+    ? afterGoalIndex + 1
+    : beforeStartIndex >= 0
+      ? beforeStartIndex
+      : toc.length;
   const entry: [string, string] = ["game-mode-boundary", "Game mode boundary"];
 
-  return index < 0
-    ? [...toc, entry]
-    : [...toc.slice(0, index + 1), entry, ...toc.slice(index + 1)];
+  return [
+    ...toc.slice(0, insertionIndex),
+    entry,
+    ...toc.slice(insertionIndex),
+  ];
 }
 
 export function applyEnglishSpawnCreepCtr20260914(
@@ -29,14 +41,16 @@ export function applyEnglishSpawnCreepCtr20260914(
       toc: insertGameModeToc(article.toc),
     };
   }
-  if (!article.articleHtml.includes(LESSON_BOUNDARY)) return article;
+
+  const headingMatch = article.articleHtml.match(BEFORE_YOU_START_HEADING);
+  if (!headingMatch) return article;
 
   return {
     ...article,
     toc: insertGameModeToc(article.toc),
     articleHtml: article.articleHtml.replace(
-      LESSON_BOUNDARY,
-      `${LESSON_BOUNDARY}\n\n${GAME_MODE_SECTION}`,
+      headingMatch[0],
+      `${GAME_MODE_SECTION}\n\n${headingMatch[0]}`,
     ),
   };
 }

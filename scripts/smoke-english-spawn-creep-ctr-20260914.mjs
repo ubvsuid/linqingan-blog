@@ -1,6 +1,6 @@
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 const path = "/en/blog/screeps-spawn-creep";
-const title = "Screeps spawnCreep(): Create Your First Creep";
+const title = "Screeps spawnCreep(): Spawn Your First Creep Safely";
 const failures = [];
 
 const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
@@ -19,7 +19,8 @@ if (response.status !== 200) {
 
   for (const expected of [
     "How to Make a Screeps Spawn Create a New Creep",
-    "Lesson boundary:",
+    "What you will build",
+    "Before you start",
     "Game mode boundary",
     "This guide covers Screeps World/MMO",
     "StructureSpawn.spawnCreep(body, name, opts)",
