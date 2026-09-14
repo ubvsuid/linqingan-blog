@@ -2,6 +2,7 @@ import { beginnerSeriesSlugs } from "@/lib/beginner-series";
 import { changelogEntries } from "@/lib/changelog";
 import { getEnglishMemoryBasicsCtrUpdatedAt20260911 } from "@/lib/english-ctr-memory-basics-20260911";
 import { getEnglishRequireModulesCtrUpdatedAt20260913 } from "@/lib/english-ctr-require-modules-20260913";
+import { getEnglishSpawnCreepCtrUpdatedAt20260914 } from "@/lib/english-ctr-spawn-creep-20260914";
 import {
   englishDiscoveryArticles,
   englishTags,
@@ -67,7 +68,8 @@ function staticPageEntry(
 
 function getEnglishArticleUpdatedAt(article: { href: string; updatedAt: string }): string {
   const slug = article.href.split("/").filter(Boolean).at(-1) ?? "";
-  return getEnglishRequireModulesCtrUpdatedAt20260913(slug)
+  return getEnglishSpawnCreepCtrUpdatedAt20260914(slug)
+    ?? getEnglishRequireModulesCtrUpdatedAt20260913(slug)
     ?? getEnglishMemoryBasicsCtrUpdatedAt20260911(slug)
     ?? getEnglishEditorialThirteenthUpdatedAt20260818(slug)
     ?? getEnglishEditorialTwelfthUpdatedAt20260818(slug)
