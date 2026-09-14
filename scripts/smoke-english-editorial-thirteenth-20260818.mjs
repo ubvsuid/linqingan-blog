@@ -20,7 +20,7 @@ const articles = [
   {
     path: "/en/blog/screeps-first-room",
     chinesePath: "/blog/screeps-first-room",
-    modifiedAt: "2026-08-28",
+    modifiedAt: "2026-09-14",
     signals: [
       "Find and open the three work areas",
       "semantic arrival checks",
@@ -140,5 +140,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Thirteenth English editorial smoke passed: the August 18 introduction body boundaries remain intact under the September 13 CTR/freshness supersession, First Room uses its August 28 navigation/visibility supersession, Tick and Dead Creep carry their September 11 current freshness, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
+  "Thirteenth English editorial smoke passed: the August 18 introduction and First Room body boundaries remain intact under their current CTR/freshness supersessions (Introduction September 13; First Room September 14), Tick and Dead Creep carry their September 11 current freshness, and canonical/hreflang/structured-data/Sitemap freshness stay aligned.",
 );
