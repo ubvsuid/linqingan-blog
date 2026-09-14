@@ -1,9 +1,13 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import {
+  applyEnglishFirstRoomCtr20260914,
+  getEnglishFirstRoomCtrUpdatedAt20260914,
+} from "@/lib/english-ctr-first-room-20260914";
 
 const TARGET_SLUG = "screeps-recycle-creep";
 const UPDATED_AT = "2026-09-14";
 
-export function applyEnglishRecycleCreepCtr20260914(
+function applyRecycleCreepCtr20260914(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
   if (!article || article.slug !== TARGET_SLUG) return article;
@@ -16,8 +20,17 @@ export function applyEnglishRecycleCreepCtr20260914(
   };
 }
 
+export function applyEnglishRecycleCreepCtr20260914(
+  article: EnglishBeginnerArticle | undefined,
+): EnglishBeginnerArticle | undefined {
+  return applyEnglishFirstRoomCtr20260914(
+    applyRecycleCreepCtr20260914(article),
+  );
+}
+
 export function getEnglishRecycleCreepCtrUpdatedAt20260914(
   slug: string,
 ): string | undefined {
-  return slug === TARGET_SLUG ? UPDATED_AT : undefined;
+  return getEnglishFirstRoomCtrUpdatedAt20260914(slug)
+    ?? (slug === TARGET_SLUG ? UPDATED_AT : undefined);
 }
