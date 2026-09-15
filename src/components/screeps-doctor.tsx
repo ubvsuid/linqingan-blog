@@ -97,10 +97,15 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
   useEffect(() => {
     const requestedSymptom = parseScreepsDoctorLaunchSymptom(new URLSearchParams(window.location.search).get("doctor"));
     if (!requestedSymptom) return;
-    setSymptom(requestedSymptom);
-    setSnapshot("");
-    setDiagnosis(null);
-    setError(null);
+
+    const frameId = window.requestAnimationFrame(() => {
+      setSymptom(requestedSymptom);
+      setSnapshot("");
+      setDiagnosis(null);
+      setError(null);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   function selectSymptom(nextSymptom: DoctorSymptom) {
