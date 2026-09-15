@@ -1,25 +1,26 @@
 import Link from "next/link";
 
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
+import { getScreepsDoctorLaunchByDiagnosticSymptom } from "@/lib/screeps-doctor-launcher";
 
 import styles from "./home-problem-hub.module.css";
 
 const featuredSymptomOrder = new Map<string, number>([
   "spawn-not-spawning",
   "creep-not-moving",
+  "creep-not-harvesting",
   "resources-not-moving",
-  "cpu-too-high",
   "controller-downgrade",
-  "market-action-failed",
+  "cpu-too-high",
 ].map((id, index) => [id, index]));
 
 const diagnosticCheckLabels: Record<string, readonly string[]> = {
-  "creep-not-moving": ["返回值", "fatigue", "路径", "目标"],
   "spawn-not-spawning": ["Energy", "body", "name", "Spawn 状态"],
-  "cpu-too-high": ["getUsed()", "bucket", "PathFinder", "全量扫描"],
-  "controller-downgrade": ["ticksToDowngrade", "Upgrader", "Link", "Energy"],
+  "creep-not-moving": ["返回值", "fatigue", "路径", "目标"],
+  "creep-not-harvesting": ["WORK", "目标", "距离", "返回值"],
   "resources-not-moving": ["withdraw", "moveTo", "transfer", "Store"],
-  "market-action-failed": ["Credits", "Terminal", "Energy", "Order"],
+  "controller-downgrade": ["ticksToDowngrade", "Upgrader", "Link", "Energy"],
+  "cpu-too-high": ["getUsed()", "bucket", "PathFinder", "全量扫描"],
 };
 
 const featuredSymptoms = screepsDiagnosticSymptoms
@@ -35,35 +36,42 @@ export function HomeProblemHub() {
     <section className={styles.section} aria-labelledby="home-problem-title">
       <header className={styles.heading}>
         <div>
-          <p className="eyebrow">SOLVE BY SYMPTOM · DOCTOR</p>
-          <h2 id="home-problem-title">我遇到了问题，直接开始诊断</h2>
+          <p className="eyebrow">SOLVE BY SYMPTOM</p>
+          <h2 id="home-problem-title">你现在遇到了什么问题？</h2>
         </div>
         <p>
-          不需要先知道错误码。选择可见症状，Doctor 会引导你查看证据、Resolver、API、返回码和对应修复路径。
+          不需要先知道错误码。Spawn、移动和采集问题可直接进入 Doctor；其他症状继续进入 Diagnostics，再连接 Resolver、API、返回码和对应修复路径。
         </p>
       </header>
 
       <div className={styles.grid}>
-        {featuredSymptoms.map((symptom) => (
-          <Link className={styles.card} href={`/diagnostics#${symptom.id}`} key={symptom.id}>
-            <span className={styles.kind}>Doctor Flow</span>
-            <strong>{symptom.zhTitle}</strong>
-            <p className={styles.checks}>
-              <span>诊断证据</span>
-              {diagnosticCheckLabels[symptom.id]?.join(" · ")}
-            </p>
-            <div className={styles.meta}>
-              {symptom.errorNames.slice(0, 2).map((errorName) => (
-                <code key={errorName}>{errorName}</code>
-              ))}
-              <span>启动 Doctor →</span>
-            </div>
-          </Link>
-        ))}
+        {featuredSymptoms.map((symptom) => {
+          const doctorLaunch = getScreepsDoctorLaunchByDiagnosticSymptom(symptom.id);
+          const href = doctorLaunch
+            ? `/resolver?doctor=${doctorLaunch.doctorSymptom}#screeps-doctor`
+            : `/diagnostics#${symptom.id}`;
+
+          return (
+            <Link className={styles.card} href={href} key={symptom.id}>
+              <span className={styles.kind}>{doctorLaunch ? "Doctor Quick Start" : "Diagnostics"}</span>
+              <strong>{symptom.zhTitle}</strong>
+              <p className={styles.checks}>
+                <span>诊断证据</span>
+                {diagnosticCheckLabels[symptom.id]?.join(" · ")}
+              </p>
+              <div className={styles.meta}>
+                {symptom.errorNames.slice(0, 2).map((errorName) => (
+                  <code key={errorName}>{errorName}</code>
+                ))}
+                <span>{doctorLaunch ? "启动 Doctor →" : "开始排查 →"}</span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       <footer className={styles.footer}>
-        <Link href="/diagnostics">查看全部 Doctor 问题 →</Link>
+        <Link href="/diagnostics">查看全部诊断问题 →</Link>
         <Link href="/screeps-errors">按错误码查询 →</Link>
         <Link href="/screeps-api">按 API 查询 →</Link>
       </footer>
