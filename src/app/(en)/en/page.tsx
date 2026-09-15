@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { HomeKnowledgeOs } from "@/components/home-knowledge-os";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 import { englishKnowledgeModules } from "@/lib/i18n";
@@ -44,16 +45,9 @@ export default function EnglishHomePage() {
         </Container>
       </section>
 
-      <section className="english-home-workflow" aria-label="English Screeps learning and debugging paths">
+      <section className="english-home-workflow" aria-label="English Screeps product and debugging paths">
         <Container>
-          <section className="english-task-hub" aria-labelledby="english-task-title">
-            <div className="english-task-heading"><p className="eyebrow">CHOOSE YOUR NEXT STEP</p><h2 id="english-task-title">What do you want to do?</h2></div>
-            <div className="english-task-grid">
-              <article><span>01</span><p className="eyebrow">START LEARNING</p><h3>Control your first Creep</h3><p>Harvest Energy, deliver it to a Spawn, and understand the body parts that make the loop possible.</p><Link href="/en/beginner">Open the beginner roadmap →</Link></article>
-              <article><span>02</span><p className="eyebrow">FIX A PROBLEM</p><h3>Search an API, error code, or symptom</h3><p>Search published guides, terms, return codes, tools, and common debugging questions.</p><form role="search" action="/en/search"><label htmlFor="english-home-search">Describe the problem</label><div><input id="english-home-search" type="search" name="q" placeholder="Example: creep not moving" /><button type="submit">Search</button></div></form></article>
-              <article><span>03</span><p className="eyebrow">USE A TOOL</p><h3>Calculate or diagnose before changing code</h3><p>Use local body, room, Market, Controller, Lab, Spawn, logistics, and Tower tools without connecting a Screeps account.</p><Link href="/en/tools">Browse English tools →</Link></article>
-            </div>
-          </section>
+          <HomeKnowledgeOs locale="en" />
 
           <div className="english-system-visual" role="img" aria-label="Screeps Energy loop and debugging workflow diagram">
             <div className="system-loop">
