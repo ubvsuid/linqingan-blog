@@ -108,6 +108,23 @@ forbidText(
   "ambiguous verified-article wording",
 );
 requireText(
+  "src/components/home-knowledge-os.tsx",
+  "SCREEPS KNOWLEDGE OS",
+  "Knowledge OS product label",
+);
+for (const productPath of ["LEARN", "BUILD", "SOLVE", "VERIFY"]) {
+  requireText(
+    "src/components/home-knowledge-os.tsx",
+    `eyebrow: "${productPath}"`,
+    `${productPath} Knowledge OS path`,
+  );
+}
+requireText(
+  "src/components/home-knowledge-os.tsx",
+  'primaryHref: `${prefix}/resolver#screeps-doctor`',
+  "Knowledge OS Doctor handoff",
+);
+requireText(
   "src/app/(en)/en/tools/page.tsx",
   "SAMPLE OUTPUT",
   "tool sample-output label",
@@ -289,10 +306,10 @@ if (navigation.includes('{ label: "Topics", href: "/en/tags" }')) {
 }
 
 const home = read("src/app/(en)/en/page.tsx");
-const taskIndex = home.indexOf('className="english-task-hub"');
+const taskIndex = home.indexOf('<HomeKnowledgeOs locale="en" />');
 const diagramIndex = home.indexOf('className="english-system-visual"');
 if (taskIndex < 0 || diagramIndex < 0 || taskIndex > diagramIndex) {
-  failures.push("English task navigation must appear before the system diagram.");
+  failures.push("English Knowledge OS task navigation must appear before the system diagram.");
 }
 
 const libraryDirectory = path.join(root, "src/lib");
@@ -354,5 +371,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, lazy search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and bilingual Sitemap entries are present.",
+  "English interface check passed: language fallbacks, metadata, error states, hierarchy, navigation, Knowledge OS task paths, lazy search, tool previews, curated knowledge mapping, trust pages, permanent redirects, and bilingual Sitemap entries are present.",
 );
