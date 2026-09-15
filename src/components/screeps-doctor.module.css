@@ -21,6 +21,41 @@
   color: var(--muted, #5f6b7a);
 }
 
+.symptoms {
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 0;
+}
+
+.symptoms legend {
+  margin-bottom: 0.55rem;
+  font-weight: 700;
+}
+
+.symptoms > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.symptomButton,
+.activeSymptom {
+  appearance: none;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.6rem 0.9rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.activeSymptom {
+  background: #111827;
+  color: #fff;
+}
+
 .label {
   display: block;
   margin-bottom: 0.5rem;
@@ -41,6 +76,8 @@
 
 .textarea:focus-visible,
 .actions button:focus-visible,
+.symptomButton:focus-visible,
+.activeSymptom:focus-visible,
 .handoffs a:focus-visible {
   outline: 3px solid currentColor;
   outline-offset: 2px;

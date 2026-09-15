@@ -6,6 +6,10 @@ import "./check-knowledge-clusters.mjs";
 const checks = [
   ["package.json", '"nanoid": "3.3.18"', "nanoid security override"],
   ["package-lock.json", '"version": "3.3.18"', "nanoid 3.3.18 lock"],
+  ["src/app/(zh)/page.tsx", "Screeps Knowledge OS：从问题到可验证的解决方案", "Chinese Knowledge OS hero"],
+  ["src/app/(zh)/page.tsx", 'href="/resolver#screeps-doctor"', "Chinese Hero Doctor CTA"],
+  ["src/app/(en)/en/page.tsx", "Screeps Knowledge OS: from problem to verified fix", "English Knowledge OS hero"],
+  ["src/app/(en)/en/page.tsx", 'href="/en/resolver#screeps-doctor"', "English Hero Doctor CTA"],
   ["src/app/(zh)/verified/page.tsx", "RUNTIME EVIDENCE HUB", "Chinese Runtime Evidence Hub"],
   ["src/app/(en)/en/verified/page.tsx", "RUNTIME EVIDENCE HUB", "English Runtime Evidence Hub"],
   ["src/components/verified-content-explorer.tsx", "accepted Evidence", "accepted Evidence public boundary"],

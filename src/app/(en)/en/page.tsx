@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { HomeKnowledgeOs } from "@/components/home-knowledge-os";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { publishedEnglishArticles } from "@/lib/english-articles-complete";
 import { englishKnowledgeModules } from "@/lib/i18n";
@@ -30,30 +31,23 @@ export default function EnglishHomePage() {
     <main className={styles.home} lang="en">
       <section className={`${styles.hero} screeps-room-grid`}>
         <Container className={styles.heroInner}>
-          <p className="eyebrow">SCREEPS · JAVASCRIPT · VERIFIED BOUNDARIES</p>
-          <h1>Verified Screeps guides for safer automation and debugging</h1>
+          <p className="eyebrow">SCREEPS KNOWLEDGE OS · LEARN · BUILD · SOLVE · VERIFY</p>
+          <h1>Screeps Knowledge OS: from problem to verified fix</h1>
           <p className={styles.heroDescription}>
-            Learn with observable examples, return-code diagnostics, practical tools, and a clear record of what has been checked in documentation, offline tests, the Console, or a live room.
+            Linqingan connects tutorials, API references, tools, Resolver, Doctor, and Runtime Evidence into one path: learn the system, build code, diagnose failures, and verify the result. If you do not know where to start, start with Doctor.
           </p>
           <div className="english-hero-actions" aria-label="Primary English actions">
-            <Link className="english-primary-action" href="/en/beginner">Start the beginner roadmap</Link>
-            <Link href="/en/search">Search a problem</Link>
+            <Link className="english-primary-action" href="/en/resolver#screeps-doctor">Diagnose with Screeps Doctor</Link>
+            <Link href="/en/beginner">Start learning Screeps</Link>
           </div>
           <p className={styles.heroStats}>{publishedEnglishArticles.length} published English guides · 8 knowledge modules · 8 working tools</p>
-          <p className="english-verification-note">Every guide states its own verification level. Publication does not imply hidden live-room testing.</p>
+          <p className="english-verification-note">Doctor uses bounded read-only Snapshots locally in the browser. Every guide keeps its own verification level.</p>
         </Container>
       </section>
 
-      <section className="english-home-workflow" aria-label="English Screeps learning and debugging paths">
+      <section className="english-home-workflow" aria-label="English Screeps product and debugging paths">
         <Container>
-          <section className="english-task-hub" aria-labelledby="english-task-title">
-            <div className="english-task-heading"><p className="eyebrow">CHOOSE YOUR NEXT STEP</p><h2 id="english-task-title">What do you want to do?</h2></div>
-            <div className="english-task-grid">
-              <article><span>01</span><p className="eyebrow">START LEARNING</p><h3>Control your first Creep</h3><p>Harvest Energy, deliver it to a Spawn, and understand the body parts that make the loop possible.</p><Link href="/en/beginner">Open the beginner roadmap →</Link></article>
-              <article><span>02</span><p className="eyebrow">FIX A PROBLEM</p><h3>Search an API, error code, or symptom</h3><p>Search published guides, terms, return codes, tools, and common debugging questions.</p><form role="search" action="/en/search"><label htmlFor="english-home-search">Describe the problem</label><div><input id="english-home-search" type="search" name="q" placeholder="Example: creep not moving" /><button type="submit">Search</button></div></form></article>
-              <article><span>03</span><p className="eyebrow">USE A TOOL</p><h3>Calculate or diagnose before changing code</h3><p>Use local body, room, Market, Controller, Lab, Spawn, logistics, and Tower tools without connecting a Screeps account.</p><Link href="/en/tools">Browse English tools →</Link></article>
-            </div>
-          </section>
+          <HomeKnowledgeOs locale="en" />
 
           <div className="english-system-visual" role="img" aria-label="Screeps Energy loop and debugging workflow diagram">
             <div className="system-loop">

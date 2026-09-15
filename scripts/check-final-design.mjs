@@ -3,7 +3,7 @@ import fs from "node:fs";
 const checks = [
   {
     path: "src/app/(zh)/page.tsx",
-    required: ["HomeTaskHub", "HomeProblemHub", "slice(0, 3)", "screeps-room-grid", "构建，运行，迭代", "开始新手路线", "解决当前问题"],
+    required: ["HomeTaskHub", "HomeProblemHub", "slice(0, 3)", "screeps-room-grid", "Screeps Knowledge OS：从问题到可验证的解决方案", "用 Doctor 解决问题", "开始学习 Screeps", "/resolver#screeps-doctor"],
     forbidden: ["<HomeLearningActions />"],
   },
   {
