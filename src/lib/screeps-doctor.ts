@@ -13,6 +13,12 @@ export const MOVEMENT_DOCTOR_CANONICAL_REFERENCES = {
   apiEntryId: "creep-move-to",
 } as const;
 
+export const HARVEST_DOCTOR_CANONICAL_REFERENCES = {
+  resolverFlowId: "creep-not-harvesting",
+  diagnosticSymptomId: "creep-not-harvesting",
+  apiEntryId: "creep-harvest",
+} as const;
+
 export const SPAWN_DOCTOR_READ_ONLY_PROBE_CONTRACT = {
   reads: [
     "Game.rooms[roomName]",
@@ -34,6 +40,18 @@ export const MOVEMENT_DOCTOR_READ_ONLY_PROBE_CONTRACT = {
   ],
   writes: [],
   forbidden: ["move/moveTo call", "Memory write", "Screeps token", "arbitrary JavaScript evaluation"],
+} as const;
+
+export const HARVEST_DOCTOR_READ_ONLY_PROBE_CONTRACT = {
+  reads: [
+    "creep visibility",
+    "creep.my",
+    "creep.body active WORK part count",
+    "harvest target visibility",
+    "creep-to-target range",
+  ],
+  writes: [],
+  forbidden: ["harvest call", "Memory write", "Screeps token", "arbitrary JavaScript evaluation"],
 } as const;
 
 export interface SpawnDoctorSnapshotV1 {
@@ -65,6 +83,20 @@ export interface CreepMovementDoctorSnapshotV1 {
   };
 }
 
+export interface CreepHarvestDoctorSnapshotV1 {
+  version: typeof SCREEPS_DOCTOR_SNAPSHOT_VERSION;
+  symptom: "creep-not-harvesting";
+  creep: {
+    visible: boolean;
+    owned: boolean | null;
+    activeWorkParts: number | null;
+  };
+  target: {
+    visible: boolean;
+    inRange: boolean | null;
+  };
+}
+
 export type SpawnDoctorClassification =
   | "room-not-visible"
   | "spawn-not-visible"
@@ -78,6 +110,14 @@ export type CreepMovementDoctorClassification =
   | "creep-not-owned"
   | "no-active-move-parts"
   | "fatigue-blocked"
+  | "return-code-required";
+
+export type CreepHarvestDoctorClassification =
+  | "creep-not-visible"
+  | "creep-not-owned"
+  | "no-active-work-parts"
+  | "target-not-visible"
+  | "target-out-of-range"
   | "return-code-required";
 
 type DoctorConfidence = "direct" | "bounded";
@@ -152,7 +192,46 @@ export interface CreepMovementDoctorDiagnosis {
   };
 }
 
-export type ScreepsDoctorDiagnosis = SpawnDoctorDiagnosis | CreepMovementDoctorDiagnosis;
+export interface CreepHarvestDoctorDiagnosis {
+  snapshotVersion: typeof SCREEPS_DOCTOR_SNAPSHOT_VERSION;
+  symptom: "creep-not-harvesting";
+  classification: CreepHarvestDoctorClassification;
+  confidence: DoctorConfidence;
+  observations: readonly string[];
+  canonical: {
+    resolverFlowId: typeof HARVEST_DOCTOR_CANONICAL_REFERENCES.resolverFlowId;
+    resolverStepId: "harvest-result" | null;
+    resolverOutcomeId: null;
+    diagnosticSymptomId: typeof HARVEST_DOCTOR_CANONICAL_REFERENCES.diagnosticSymptomId;
+    apiEntryId: typeof HARVEST_DOCTOR_CANONICAL_REFERENCES.apiEntryId;
+  };
+  fix: {
+    recommendationId:
+      | "select-visible-harvest-creep"
+      | "select-owned-harvest-creep"
+      | "restore-active-work-parts-or-replace-creep"
+      | "select-visible-harvest-target"
+      | "move-into-harvest-range"
+      | "capture-harvest-return-code-in-canonical-resolver";
+    doctorExecutesAction: false;
+  };
+  verification: {
+    mode: "session-only";
+    nextCheckId:
+      | "resnapshot-visible-harvest-creep"
+      | "resnapshot-owned-harvest-creep"
+      | "resnapshot-active-work-parts"
+      | "resnapshot-visible-harvest-target"
+      | "resnapshot-harvest-range"
+      | "continue-harvest-resolver";
+    publishableRuntimeEvidence: false;
+  };
+}
+
+export type ScreepsDoctorDiagnosis =
+  | SpawnDoctorDiagnosis
+  | CreepMovementDoctorDiagnosis
+  | CreepHarvestDoctorDiagnosis;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -339,6 +418,57 @@ export function parseCreepMovementDoctorSnapshot(input: unknown): CreepMovementD
   };
 }
 
+export function parseCreepHarvestDoctorSnapshot(input: unknown): CreepHarvestDoctorSnapshotV1 {
+  const value = readSnapshotValue(input);
+  assertExactKeys(value, ["version", "symptom", "creep", "target"], "snapshot");
+
+  if (value.version !== SCREEPS_DOCTOR_SNAPSHOT_VERSION) {
+    throw new Error(`snapshot.version must be ${SCREEPS_DOCTOR_SNAPSHOT_VERSION}.`);
+  }
+  if (value.symptom !== "creep-not-harvesting") {
+    throw new Error("snapshot.symptom must be creep-not-harvesting.");
+  }
+
+  assertExactKeys(value.creep, ["visible", "owned", "activeWorkParts"], "snapshot.creep");
+  assertExactKeys(value.target, ["visible", "inRange"], "snapshot.target");
+
+  const creepVisible = readBoolean(value.creep, "visible", "snapshot.creep");
+  const creepOwned = readNullableBoolean(value.creep, "owned", "snapshot.creep");
+  const activeWorkParts = readNullableInteger(value.creep, "activeWorkParts", "snapshot.creep", 0);
+  const targetVisible = readBoolean(value.target, "visible", "snapshot.target");
+  const targetInRange = readNullableBoolean(value.target, "inRange", "snapshot.target");
+
+  if (!creepVisible) {
+    if (creepOwned !== null || activeWorkParts !== null) {
+      throw new Error("Non-visible Creeps must use null owned and activeWorkParts values.");
+    }
+  } else if (creepOwned === null || activeWorkParts === null) {
+    throw new Error("Visible Creeps must include owned and activeWorkParts values.");
+  }
+
+  if (!creepVisible || !targetVisible) {
+    if (targetInRange !== null) {
+      throw new Error("inRange must be null unless both the Creep and harvest target are visible.");
+    }
+  } else if (targetInRange === null) {
+    throw new Error("Visible Creep and target snapshots must include inRange.");
+  }
+
+  return {
+    version: SCREEPS_DOCTOR_SNAPSHOT_VERSION,
+    symptom: "creep-not-harvesting",
+    creep: {
+      visible: creepVisible,
+      owned: creepOwned,
+      activeWorkParts,
+    },
+    target: {
+      visible: targetVisible,
+      inRange: targetInRange,
+    },
+  };
+}
+
 function spawnResult(
   classification: SpawnDoctorClassification,
   confidence: SpawnDoctorDiagnosis["confidence"],
@@ -390,6 +520,37 @@ function movementResult(
       ...MOVEMENT_DOCTOR_CANONICAL_REFERENCES,
       resolverStepId,
       resolverOutcomeId,
+    },
+    fix: {
+      recommendationId,
+      doctorExecutesAction: false,
+    },
+    verification: {
+      mode: "session-only",
+      nextCheckId,
+      publishableRuntimeEvidence: false,
+    },
+  };
+}
+
+function harvestResult(
+  classification: CreepHarvestDoctorClassification,
+  confidence: CreepHarvestDoctorDiagnosis["confidence"],
+  observations: readonly string[],
+  resolverStepId: CreepHarvestDoctorDiagnosis["canonical"]["resolverStepId"],
+  recommendationId: CreepHarvestDoctorDiagnosis["fix"]["recommendationId"],
+  nextCheckId: CreepHarvestDoctorDiagnosis["verification"]["nextCheckId"],
+): CreepHarvestDoctorDiagnosis {
+  return {
+    snapshotVersion: SCREEPS_DOCTOR_SNAPSHOT_VERSION,
+    symptom: "creep-not-harvesting",
+    classification,
+    confidence,
+    observations,
+    canonical: {
+      ...HARVEST_DOCTOR_CANONICAL_REFERENCES,
+      resolverStepId,
+      resolverOutcomeId: null,
     },
     fix: {
       recommendationId,
@@ -556,5 +717,79 @@ export function diagnoseCreepMovementDoctor(input: unknown): CreepMovementDoctor
     null,
     "capture-movement-return-code-in-canonical-resolver",
     "continue-movement-resolver",
+  );
+}
+
+export function diagnoseCreepHarvestDoctor(input: unknown): CreepHarvestDoctorDiagnosis {
+  const snapshot = parseCreepHarvestDoctorSnapshot(input);
+  const observations: string[] = [];
+
+  observations.push(snapshot.creep.visible ? "creep-visible" : "creep-not-visible");
+  if (!snapshot.creep.visible) {
+    return harvestResult(
+      "creep-not-visible",
+      "direct",
+      observations,
+      null,
+      "select-visible-harvest-creep",
+      "resnapshot-visible-harvest-creep",
+    );
+  }
+
+  observations.push(snapshot.creep.owned ? "creep-owned" : "creep-not-owned");
+  if (!snapshot.creep.owned) {
+    return harvestResult(
+      "creep-not-owned",
+      "direct",
+      observations,
+      null,
+      "select-owned-harvest-creep",
+      "resnapshot-owned-harvest-creep",
+    );
+  }
+
+  observations.push(`creep-active-work-parts:${snapshot.creep.activeWorkParts}`);
+  if (snapshot.creep.activeWorkParts === 0) {
+    return harvestResult(
+      "no-active-work-parts",
+      "direct",
+      observations,
+      null,
+      "restore-active-work-parts-or-replace-creep",
+      "resnapshot-active-work-parts",
+    );
+  }
+
+  observations.push(snapshot.target.visible ? "harvest-target-visible" : "harvest-target-not-visible");
+  if (!snapshot.target.visible) {
+    return harvestResult(
+      "target-not-visible",
+      "direct",
+      observations,
+      null,
+      "select-visible-harvest-target",
+      "resnapshot-visible-harvest-target",
+    );
+  }
+
+  observations.push(snapshot.target.inRange ? "harvest-target-in-range" : "harvest-target-out-of-range");
+  if (!snapshot.target.inRange) {
+    return harvestResult(
+      "target-out-of-range",
+      "direct",
+      observations,
+      null,
+      "move-into-harvest-range",
+      "resnapshot-harvest-range",
+    );
+  }
+
+  return harvestResult(
+    "return-code-required",
+    "bounded",
+    observations,
+    "harvest-result",
+    "capture-harvest-return-code-in-canonical-resolver",
+    "continue-harvest-resolver",
   );
 }
