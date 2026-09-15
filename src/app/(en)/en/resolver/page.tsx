@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { ProblemResolver } from "@/components/problem-resolver";
+import { ScreepsDoctor } from "@/components/screeps-doctor";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { getKnowledgeClusterHandoffSignals } from "@/lib/knowledge-cluster-handoff";
 import {
@@ -47,6 +48,7 @@ export default function EnglishProblemResolverPage() {
             {" "}<Link href="/en/knowledge/coverage">Open Knowledge Coverage →</Link>
           </p>
         </div>
+        <ScreepsDoctor locale="en" />
         <ProblemResolver
           locale="en"
           relatedPathsByStep={relatedPathsByStep}

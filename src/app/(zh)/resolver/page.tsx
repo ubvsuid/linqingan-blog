@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { ProblemResolver } from "@/components/problem-resolver";
+import { ScreepsDoctor } from "@/components/screeps-doctor";
 import { getKnowledgeClusterHandoffSignals } from "@/lib/knowledge-cluster-handoff";
 import {
   buildKnowledgeGraphV1,
@@ -44,6 +45,7 @@ export default function ProblemResolverPage() {
             {" "}<Link href="/knowledge/coverage">查看 Knowledge Coverage →</Link>
           </p>
         </aside>
+        <ScreepsDoctor locale="zh" />
         <ProblemResolver
           locale="zh"
           relatedPathsByStep={relatedPathsByStep}

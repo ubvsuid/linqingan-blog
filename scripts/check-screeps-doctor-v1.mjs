@@ -7,10 +7,14 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(`[Screeps Doctor V1] ${message}`);
 };
 
-const [doctor, resolver, diagnostics, smokeAll] = await Promise.all([
+const [doctor, doctorUi, doctorStyles, resolver, diagnostics, zhResolverPage, enResolverPage, smokeAll] = await Promise.all([
   read("src/lib/screeps-doctor.ts"),
+  read("src/components/screeps-doctor.tsx"),
+  read("src/components/screeps-doctor.module.css"),
   read("src/lib/problem-resolver.ts"),
   read("src/lib/screeps-diagnostic-symptoms.ts"),
+  read("src/app/(zh)/resolver/page.tsx"),
+  read("src/app/(en)/en/resolver/page.tsx"),
   read("scripts/smoke-all.mjs"),
 ]);
 
@@ -37,7 +41,21 @@ const forbiddenDoctorPatterns = [
 
 for (const [pattern, label] of forbiddenDoctorPatterns) {
   assert(!pattern.test(doctor), `Doctor core must not contain ${label}`);
+  assert(!pattern.test(doctorUi), `Doctor UI must not contain ${label}`);
 }
+
+assert(!/\bfetch\s*\(/.test(doctorUi), "Doctor UI must remain local-only and must not upload Snapshot data");
+assert(!/XMLHttpRequest|sendBeacon|WebSocket/.test(doctorUi), "Doctor UI must not add a network or telemetry transport");
+assert(doctorUi.includes('diagnoseSpawnDoctor(snapshot)'), "Doctor UI must consume the canonical strict parser/diagnosis core");
+assert(doctorUi.includes('maxLength={SCREEPS_DOCTOR_MAX_SNAPSHOT_CHARS}'), "Doctor UI must enforce the core Snapshot size boundary");
+assert(doctorUi.includes('Session Verification') && doctorUi.includes('public Runtime Evidence'), "Doctor UI must visibly separate session verification from public Runtime Evidence");
+assert(doctorUi.includes('href={`${prefix}/resolver`}') && doctorUi.includes('href={`${prefix}/diagnostics`}'), "Doctor UI must hand off to existing Resolver and Diagnostics surfaces");
+assert(doctorUi.includes('href={`${prefix}/screeps-api`}') && doctorUi.includes('href={`${prefix}/tick-lab`}'), "Doctor UI must preserve API and Tick Lab handoffs");
+assert(doctorStyles.includes(".doctor") && doctorStyles.includes(".result"), "Doctor UI styles are missing");
+assert(zhResolverPage.includes('import { ScreepsDoctor } from "@/components/screeps-doctor";'), "Chinese Resolver must expose the Doctor entry");
+assert(zhResolverPage.includes('<ScreepsDoctor locale="zh" />'), "Chinese Resolver must render the Doctor entry");
+assert(enResolverPage.includes('import { ScreepsDoctor } from "@/components/screeps-doctor";'), "English Resolver must expose the Doctor entry");
+assert(enResolverPage.includes('<ScreepsDoctor locale="en" />'), "English Resolver must render the Doctor entry");
 
 assert(resolver.includes('flowId: "spawn-not-working"'), "canonical Spawn resolver flow is missing");
 assert(resolver.includes('symptomId: "spawn-not-spawning"'), "canonical Spawn resolver symptom binding changed");
@@ -49,4 +67,4 @@ assert(diagnostics.includes('id: "spawn-not-spawning"'), "canonical Spawn diagno
 assert(diagnostics.includes('directApiEntryIds: ["spawn-spawn-creep"]'), "Spawn diagnostic must keep its canonical API entry");
 assert(smokeAll.includes('await import("./check-screeps-doctor-v1.mjs");'), "Doctor V1 regression gate must remain in the production smoke chain");
 
-console.log("[Screeps Doctor V1] contract and canonical-link checks passed.");
+console.log("[Screeps Doctor V1] core, UI, and canonical-link checks passed.");

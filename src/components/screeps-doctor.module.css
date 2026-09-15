@@ -1,0 +1,167 @@
+.doctor {
+  margin: 2rem 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border, #d8dee8);
+  border-radius: 18px;
+  background: var(--surface, #fff);
+}
+
+.header {
+  max-width: 760px;
+  margin-bottom: 1.25rem;
+}
+
+.header h2 {
+  margin: 0.35rem 0 0.75rem;
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+}
+
+.header p:last-child,
+.hint {
+  color: var(--muted, #5f6b7a);
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 17rem;
+  padding: 1rem;
+  border: 1px solid var(--border, #cdd5df);
+  border-radius: 12px;
+  background: var(--background, #fff);
+  color: inherit;
+  font: 0.9rem/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.textarea:focus-visible,
+.actions button:focus-visible,
+.handoffs a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+.hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.86rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.actions button {
+  appearance: none;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: #111827;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.actions .secondary {
+  background: transparent;
+  color: inherit;
+}
+
+.error {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #b42318;
+  border-radius: 12px;
+}
+
+.error code,
+.card code {
+  overflow-wrap: anywhere;
+}
+
+.result {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.card,
+.handoffs {
+  padding: 1rem;
+  border: 1px solid var(--border, #d8dee8);
+  border-radius: 14px;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.card ul {
+  margin-bottom: 0;
+  padding-left: 1.2rem;
+}
+
+.card dl,
+.card dl div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.card dl {
+  margin-bottom: 0;
+}
+
+.card dl div + div {
+  margin-top: 0.75rem;
+}
+
+.card dt {
+  color: var(--muted, #5f6b7a);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.card dd {
+  margin: 0;
+}
+
+.boundary {
+  margin-bottom: 0;
+}
+
+.handoffs {
+  grid-column: 1 / -1;
+}
+
+.handoffs div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1rem;
+  margin-top: 0.65rem;
+}
+
+@media (max-width: 720px) {
+  .result {
+    grid-template-columns: 1fr;
+  }
+
+  .handoffs {
+    grid-column: auto;
+  }
+}
