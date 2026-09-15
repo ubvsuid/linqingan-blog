@@ -4,34 +4,53 @@ import Link from "next/link";
 import { useState } from "react";
 
 import {
+  diagnoseCreepMovementDoctor,
   diagnoseSpawnDoctor,
   SCREEPS_DOCTOR_MAX_SNAPSHOT_CHARS,
-  type SpawnDoctorDiagnosis,
+  type ScreepsDoctorDiagnosis,
 } from "@/lib/screeps-doctor";
 
 import styles from "./screeps-doctor.module.css";
 
 type Locale = "zh" | "en";
+type DoctorSymptom = ScreepsDoctorDiagnosis["symptom"];
 
-const SAMPLE_SNAPSHOT = JSON.stringify(
-  {
-    version: 1,
-    symptom: "spawn-not-working",
-    room: { visible: true, energyAvailable: 300 },
-    spawn: { visible: true, owned: true, spawning: false, remainingTime: null },
-    request: { bodyCost: 350 },
-  },
-  null,
-  2,
-);
+const SAMPLE_SNAPSHOTS: Record<DoctorSymptom, string> = {
+  "spawn-not-working": JSON.stringify(
+    {
+      version: 1,
+      symptom: "spawn-not-working",
+      room: { visible: true, energyAvailable: 300 },
+      spawn: { visible: true, owned: true, spawning: false, remainingTime: null },
+      request: { bodyCost: 350 },
+    },
+    null,
+    2,
+  ),
+  "creep-not-moving": JSON.stringify(
+    {
+      version: 1,
+      symptom: "creep-not-moving",
+      creep: { visible: true, owned: true, fatigue: 6, activeMoveParts: 2 },
+    },
+    null,
+    2,
+  ),
+};
+
+const SYMPTOM_LABELS: Record<DoctorSymptom, { zh: string; en: string }> = {
+  "spawn-not-working": { zh: "Spawn 不工作", en: "Spawn not working" },
+  "creep-not-moving": { zh: "Creep 不移动", en: "Creep not moving" },
+};
 
 const COPY = {
   zh: {
     eyebrow: "READ-ONLY SNAPSHOT",
-    title: "Screeps Doctor V1 · Spawn 不工作",
-    intro: "粘贴一份严格的 V1 Snapshot。Doctor 只在浏览器里解析这些结构化事实，并复用现有 Resolver / Diagnostics 的 canonical ID 给出确定性判断；不会执行 Screeps 代码、调用 Spawn、写 Memory 或上传 Snapshot。",
+    title: "Screeps Doctor V2",
+    intro: "选择一个已支持的症状并粘贴严格的 V1 Snapshot。Doctor 只在浏览器本地解析结构化事实，复用现有 Resolver / Diagnostics / API canonical ID 做确定性判断；不会执行 Screeps 动作、写 Memory 或上传 Snapshot。",
+    symptom: "选择症状",
     label: "Snapshot JSON",
-    placeholder: "粘贴 version=1 的 Spawn Snapshot JSON",
+    placeholder: "粘贴所选症状的 version=1 Snapshot JSON",
     sample: "载入示例",
     diagnose: "开始诊断",
     clear: "清空",
@@ -53,10 +72,11 @@ const COPY = {
   },
   en: {
     eyebrow: "READ-ONLY SNAPSHOT",
-    title: "Screeps Doctor V1 · Spawn not working",
-    intro: "Paste a strict V1 Snapshot. Doctor parses these structured facts locally in the browser and reuses canonical Resolver / Diagnostics IDs for deterministic diagnosis. It does not execute Screeps code, call Spawn, write Memory, or upload the Snapshot.",
+    title: "Screeps Doctor V2",
+    intro: "Choose a supported symptom and paste a strict V1 Snapshot. Doctor parses structured facts locally in the browser and reuses canonical Resolver / Diagnostics / API IDs for deterministic diagnosis. It does not execute Screeps actions, write Memory, or upload the Snapshot.",
+    symptom: "Choose a symptom",
     label: "Snapshot JSON",
-    placeholder: "Paste a version=1 Spawn Snapshot JSON",
+    placeholder: "Paste a version=1 Snapshot for the selected symptom",
     sample: "Load example",
     diagnose: "Diagnose",
     clear: "Clear",
@@ -78,7 +98,7 @@ const COPY = {
   },
 } as const;
 
-const RECOMMENDATIONS: Record<SpawnDoctorDiagnosis["fix"]["recommendationId"], { zh: string; en: string }> = {
+const RECOMMENDATIONS: Record<ScreepsDoctorDiagnosis["fix"]["recommendationId"], { zh: string; en: string }> = {
   "restore-room-visibility": {
     zh: "先恢复或确认房间视野，再重新采集 Snapshot；当前数据不足以判断 Spawn 故障。",
     en: "Restore or confirm room vision, then capture a new Snapshot; the current facts cannot establish a Spawn failure.",
@@ -103,27 +123,62 @@ const RECOMMENDATIONS: Record<SpawnDoctorDiagnosis["fix"]["recommendationId"], {
     zh: "只读事实无法证明精确调用失败。进入 canonical Resolver，采集真实 spawnCreep 返回值后再继续；Doctor 本身不会调用 spawnCreep。",
     en: "Read-only facts cannot prove the exact call failure. Continue in the canonical Resolver and capture the real spawnCreep return value; Doctor itself never calls spawnCreep.",
   },
+  "select-visible-creep": {
+    zh: "先确认目标 Creep 当前真实可见，再重新采集 Snapshot；不可见对象不足以证明移动故障。",
+    en: "Confirm the target Creep is currently visible, then capture again; an invisible object cannot establish a movement failure.",
+  },
+  "select-owned-creep": {
+    zh: "改用你拥有并控制的 Creep；当前 Snapshot 已直接观察到 ownership 阻断。",
+    en: "Use a Creep you own and control; the current Snapshot directly observed an ownership blocker.",
+  },
+  "restore-active-move-parts-or-replace-creep": {
+    zh: "当前没有可用 MOVE 部件。先恢复可用 MOVE 能力或替换该 Creep，再重新采集；Doctor 不会自动修改 Creep。",
+    en: "There are no active MOVE parts. Restore usable MOVE capability or replace the Creep, then capture again; Doctor does not modify the Creep.",
+  },
+  "wait-for-fatigue-recovery": {
+    zh: "fatigue 当前大于 0。等待恢复到 0 后重新采集，不要把冷却状态误判成寻路故障。",
+    en: "Fatigue is above zero. Wait for it to recover to zero and resnapshot instead of treating cooldown as a pathfinding failure.",
+  },
+  "capture-movement-return-code-in-canonical-resolver": {
+    zh: "可见、owned、有 MOVE 且 fatigue=0 仍不能证明精确失败原因。进入 canonical Resolver，保存真实 moveTo/move 返回值后继续。",
+    en: "Visible, owned, active MOVE capability, and zero fatigue still do not prove the exact failure. Continue in the canonical Resolver and capture the real moveTo/move result.",
+  },
 };
 
-const VERIFICATION: Record<SpawnDoctorDiagnosis["verification"]["nextCheckId"], { zh: string; en: string }> = {
+const VERIFICATION: Record<ScreepsDoctorDiagnosis["verification"]["nextCheckId"], { zh: string; en: string }> = {
   "resnapshot-visible-room": { zh: "房间重新可见后再采集 Snapshot。", en: "Capture a new Snapshot after room vision is restored." },
   "resnapshot-visible-spawn": { zh: "确认 Spawn 可见后重新采集。", en: "Capture again after the Spawn is visible." },
   "resnapshot-owned-spawn": { zh: "切换到 owned Spawn 后重新采集。", en: "Capture again after selecting an owned Spawn." },
   "resnapshot-until-idle": { zh: "等待 Spawn idle 后重新采集。", en: "Capture again once the Spawn becomes idle." },
   "resnapshot-energy-threshold": { zh: "能量达到 bodyCost 阈值后重新采集。", en: "Capture again when available energy reaches the bodyCost threshold." },
   "continue-canonical-resolver": { zh: "继续 canonical Resolver，并以真实返回值复核。", en: "Continue in the canonical Resolver and verify with the real return value." },
+  "resnapshot-visible-creep": { zh: "确认 Creep 可见后重新采集。", en: "Capture again after the Creep is visible." },
+  "resnapshot-owned-creep": { zh: "切换到 owned Creep 后重新采集。", en: "Capture again after selecting an owned Creep." },
+  "resnapshot-active-move-parts": { zh: "确认存在可用 MOVE 部件后重新采集。", en: "Capture again after confirming at least one active MOVE part." },
+  "resnapshot-until-fatigue-zero": { zh: "等待 fatigue=0 后重新采集。", en: "Capture again after fatigue reaches zero." },
+  "continue-movement-resolver": { zh: "继续 Creep movement Resolver，并以真实 moveTo/move 返回值复核。", en: "Continue in the Creep movement Resolver and verify with the real moveTo/move result." },
 };
 
 export function ScreepsDoctor({ locale }: { locale: Locale }) {
   const copy = COPY[locale];
   const prefix = locale === "en" ? "/en" : "";
+  const [symptom, setSymptom] = useState<DoctorSymptom>("spawn-not-working");
   const [snapshot, setSnapshot] = useState("");
-  const [diagnosis, setDiagnosis] = useState<SpawnDoctorDiagnosis | null>(null);
+  const [diagnosis, setDiagnosis] = useState<ScreepsDoctorDiagnosis | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  function selectSymptom(nextSymptom: DoctorSymptom) {
+    setSymptom(nextSymptom);
+    setSnapshot("");
+    setDiagnosis(null);
+    setError(null);
+  }
 
   function runDiagnosis() {
     try {
-      const result = diagnoseSpawnDoctor(snapshot);
+      const result = symptom === "spawn-not-working"
+        ? diagnoseSpawnDoctor(snapshot)
+        : diagnoseCreepMovementDoctor(snapshot);
       setDiagnosis(result);
       setError(null);
     } catch (cause) {
@@ -146,6 +201,23 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
         <p>{copy.intro}</p>
       </div>
 
+      <fieldset className={styles.symptoms}>
+        <legend>{copy.symptom}</legend>
+        <div>
+          {(Object.keys(SYMPTOM_LABELS) as DoctorSymptom[]).map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={item === symptom ? styles.activeSymptom : styles.symptomButton}
+              aria-pressed={item === symptom}
+              onClick={() => selectSymptom(item)}
+            >
+              {SYMPTOM_LABELS[item][locale]}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
       <label className={styles.label} htmlFor="screeps-doctor-snapshot">{copy.label}</label>
       <textarea
         id="screeps-doctor-snapshot"
@@ -160,7 +232,17 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
       <p className={styles.hint}>{copy.limit}</p>
       <div className={styles.actions}>
         <button type="button" onClick={runDiagnosis} disabled={!snapshot.trim()}>{copy.diagnose}</button>
-        <button type="button" className={styles.secondary} onClick={() => { setSnapshot(SAMPLE_SNAPSHOT); setDiagnosis(null); setError(null); }}>{copy.sample}</button>
+        <button
+          type="button"
+          className={styles.secondary}
+          onClick={() => {
+            setSnapshot(SAMPLE_SNAPSHOTS[symptom]);
+            setDiagnosis(null);
+            setError(null);
+          }}
+        >
+          {copy.sample}
+        </button>
         <button type="button" className={styles.secondary} onClick={clear}>{copy.clear}</button>
       </div>
 
@@ -182,7 +264,15 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
             <dl>
               <div><dt>{copy.classification}</dt><dd><code>{diagnosis.classification}</code></dd></div>
               <div><dt>{copy.confidence}</dt><dd><code>{diagnosis.confidence}</code></dd></div>
-              <div><dt>{copy.canonical}</dt><dd><code>{diagnosis.canonical.resolverFlowId}</code> · <code>{diagnosis.canonical.diagnosticSymptomId}</code>{diagnosis.canonical.resolverOutcomeId ? <> · <code>{diagnosis.canonical.resolverOutcomeId}</code></> : null}</dd></div>
+              <div>
+                <dt>{copy.canonical}</dt>
+                <dd>
+                  <code>{diagnosis.canonical.resolverFlowId}</code>
+                  {diagnosis.canonical.resolverStepId ? <> · <code>{diagnosis.canonical.resolverStepId}</code></> : null}
+                  {diagnosis.canonical.resolverOutcomeId ? <> · <code>{diagnosis.canonical.resolverOutcomeId}</code></> : null}
+                  <> · <code>{diagnosis.canonical.diagnosticSymptomId}</code></>
+                </dd>
+              </div>
             </dl>
           </div>
           <div className={styles.card}>
@@ -200,8 +290,8 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
             <div>
               <Link href={`${prefix}/resolver`}>{copy.resolver}</Link>
               <Link href={`${prefix}/diagnostics`}>{copy.diagnostics}</Link>
-              <Link href={`${prefix}/screeps-api`}>{copy.api}</Link>
-              <Link href={`${prefix}/tick-lab`}>{copy.tickLab}</Link>
+              <Link href={`${prefix}/screeps-api#${diagnosis.canonical.apiEntryId}`}>{copy.api}</Link>
+              {diagnosis.symptom === "spawn-not-working" ? <Link href={`${prefix}/tick-lab`}>{copy.tickLab}</Link> : null}
             </div>
           </div>
         </div>
