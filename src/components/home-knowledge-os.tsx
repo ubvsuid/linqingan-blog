@@ -22,7 +22,7 @@ const COPY = {
     doctorEyebrow: "DIAGNOSTIC ASSISTANT",
     doctorTitle: "遇到问题，先让 Doctor 收集正确的证据",
     doctorDescription:
-      "当前开发态覆盖 Spawn 不工作、Creep 不移动、Creep 不采集。Doctor 只解析受控的只读 Snapshot，数据留在浏览器本地；无法直接证明的原因会交回 canonical Resolver。",
+      "当前 Doctor 支持 Spawn 不工作、Creep 不移动、Creep 不采集。Doctor 只解析受控的只读 Snapshot，数据留在浏览器本地；无法直接证明的原因会交回 canonical Resolver。",
     doctorAction: "打开 Screeps Doctor",
     diagnosticsAction: "查看全部诊断问题",
     symptomsLabel: "当前 Doctor 切片",
@@ -35,7 +35,7 @@ const COPY = {
     doctorEyebrow: "DIAGNOSTIC ASSISTANT",
     doctorTitle: "Start with Doctor when you do not know what evidence to collect",
     doctorDescription:
-      "The current development surface covers Spawn not working, Creep not moving, and Creep not harvesting. Doctor parses bounded read-only Snapshots locally in the browser and hands anything unproven back to the canonical Resolver.",
+      "Doctor currently supports Spawn not working, Creep not moving, and Creep not harvesting. It parses bounded read-only Snapshots locally in the browser and hands anything unproven back to the canonical Resolver.",
     doctorAction: "Open Screeps Doctor",
     diagnosticsAction: "Browse all diagnostic symptoms",
     symptomsLabel: "Current Doctor slices",
