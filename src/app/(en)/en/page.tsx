@@ -31,17 +31,17 @@ export default function EnglishHomePage() {
     <main className={styles.home} lang="en">
       <section className={`${styles.hero} screeps-room-grid`}>
         <Container className={styles.heroInner}>
-          <p className="eyebrow">SCREEPS · JAVASCRIPT · VERIFIED BOUNDARIES</p>
-          <h1>Verified Screeps guides for safer automation and debugging</h1>
+          <p className="eyebrow">SCREEPS KNOWLEDGE OS · LEARN · BUILD · SOLVE · VERIFY</p>
+          <h1>Screeps Knowledge OS: from problem to verified fix</h1>
           <p className={styles.heroDescription}>
-            Learn with observable examples, return-code diagnostics, practical tools, and a clear record of what has been checked in documentation, offline tests, the Console, or a live room.
+            Linqingan connects tutorials, API references, tools, Resolver, Doctor, and Runtime Evidence into one path: learn the system, build code, diagnose failures, and verify the result. If you do not know where to start, start with Doctor.
           </p>
           <div className="english-hero-actions" aria-label="Primary English actions">
-            <Link className="english-primary-action" href="/en/beginner">Start the beginner roadmap</Link>
-            <Link href="/en/search">Search a problem</Link>
+            <Link className="english-primary-action" href="/en/resolver#screeps-doctor">Diagnose with Screeps Doctor</Link>
+            <Link href="/en/beginner">Start learning Screeps</Link>
           </div>
           <p className={styles.heroStats}>{publishedEnglishArticles.length} published English guides · 8 knowledge modules · 8 working tools</p>
-          <p className="english-verification-note">Every guide states its own verification level. Publication does not imply hidden live-room testing.</p>
+          <p className="english-verification-note">Doctor uses bounded read-only Snapshots locally in the browser. Every guide keeps its own verification level.</p>
         </Container>
       </section>
 

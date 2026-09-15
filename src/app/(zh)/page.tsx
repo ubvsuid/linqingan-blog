@@ -101,17 +101,17 @@ export default function HomePage() {
     <main className={styles.home}>
       <section className={`${styles.hero} screeps-room-grid`}>
         <Container className={styles.heroInner}>
-          <p className="eyebrow">SCREEPS · JAVASCRIPT · SYSTEMS</p>
-          <h1>构建，运行，迭代</h1>
+          <p className="eyebrow">SCREEPS KNOWLEDGE OS · LEARN · BUILD · SOLVE · VERIFY</p>
+          <h1>Screeps Knowledge OS：从问题到可验证的解决方案</h1>
           <p className={styles.heroDescription}>
-            面向 Screeps 玩家与 JavaScript 开发者的中文教程、API 查询、错误排查、实用工具与 Runtime Evidence 知识站。从按顺序学习的新手路线开始，再用知识库与诊断中心把代码逐步变成可以持续运行的系统。
+            把教程、API、工具、Resolver、Doctor 与 Runtime Evidence 连成一条路径：学习系统，构建代码，定位问题，验证结果。你不需要先知道该查什么；遇到问题就从 Doctor 开始。
           </p>
           <p className={styles.heroStats}>
             {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
           </p>
           <div className="button-row">
-            <Link className="button button-primary" href="/beginner">开始新手路线</Link>
-            <Link className="button button-secondary" href="/diagnostics">解决当前问题</Link>
+            <Link className="button button-primary" href="/resolver#screeps-doctor">用 Doctor 解决问题</Link>
+            <Link className="button button-secondary" href="/beginner">开始学习 Screeps</Link>
           </div>
         </Container>
       </section>
