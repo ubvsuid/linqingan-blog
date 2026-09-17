@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { getPlatformDatabase } from "@/db/client";
 import { articleFeedback, resolverEvents, toolEvents } from "@/db/schema";
 import type { ResolverTelemetryEvent } from "@/lib/problem-resolver-telemetry-contract";
+import type { ScreepsDoctorTelemetryEvent } from "@/lib/screeps-doctor-telemetry-contract";
 
 export const articleFeedbackValues = [
   "helpful",
@@ -116,6 +117,36 @@ export async function persistToolEvent(input: {
     return true;
   } catch (error) {
     console.warn("Tool event database write failed", error);
+    return false;
+  }
+}
+
+export async function persistDoctorEvent(
+  input: ScreepsDoctorTelemetryEvent,
+): Promise<boolean> {
+  const db = getPlatformDatabase();
+  if (!db) return false;
+
+  const metadata: Record<string, string> = {
+    symptom: input.symptom,
+    locale: input.locale,
+    source: input.source,
+  };
+  if ("diagnosisId" in input) metadata.diagnosisId = input.diagnosisId;
+  if ("flowId" in input) metadata.flowId = input.flowId;
+
+  try {
+    await db.insert(toolEvents).values({
+      toolId: "screeps-doctor",
+      action: input.eventName,
+      sourcePath: null,
+      anonymousId: null,
+      sessionId: null,
+      metadata,
+    });
+    return true;
+  } catch (error) {
+    console.warn("Doctor telemetry database write failed", error);
     return false;
   }
 }
