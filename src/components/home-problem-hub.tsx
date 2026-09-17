@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DoctorLauncherLink } from "@/components/doctor-launcher-link";
 import { screepsDiagnosticSymptoms } from "@/lib/screeps-diagnostic-symptoms";
 import { getScreepsDoctorLaunchByDiagnosticSymptom } from "@/lib/screeps-doctor-launcher";
 
@@ -50,9 +51,8 @@ export function HomeProblemHub() {
           const href = doctorLaunch
             ? `/resolver?doctor=${doctorLaunch.doctorSymptom}#screeps-doctor`
             : `/diagnostics#${symptom.id}`;
-
-          return (
-            <Link className={styles.card} href={href} key={symptom.id}>
+          const content = (
+            <>
               <span className={styles.kind}>{doctorLaunch ? "Doctor Quick Start" : "Diagnostics"}</span>
               <strong>{symptom.zhTitle}</strong>
               <p className={styles.checks}>
@@ -65,6 +65,21 @@ export function HomeProblemHub() {
                 ))}
                 <span>{doctorLaunch ? "启动 Doctor →" : "开始排查 →"}</span>
               </div>
+            </>
+          );
+
+          return doctorLaunch ? (
+            <DoctorLauncherLink
+              className={styles.card}
+              href={href}
+              key={symptom.id}
+              symptom={doctorLaunch.doctorSymptom}
+            >
+              {content}
+            </DoctorLauncherLink>
+          ) : (
+            <Link className={styles.card} href={href} key={symptom.id}>
+              {content}
             </Link>
           );
         })}

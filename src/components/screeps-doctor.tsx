@@ -11,6 +11,7 @@ import {
   type ScreepsDoctorDiagnosis,
 } from "@/lib/screeps-doctor";
 import { parseScreepsDoctorLaunchSymptom } from "@/lib/screeps-doctor-launcher";
+import { trackScreepsDoctorEvent } from "@/lib/screeps-doctor-telemetry-client";
 
 import styles from "./screeps-doctor.module.css";
 
@@ -109,6 +110,12 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
   }, []);
 
   function selectSymptom(nextSymptom: DoctorSymptom) {
+    trackScreepsDoctorEvent({
+      eventName: "doctor_vertical_selected",
+      symptom: nextSymptom,
+      locale,
+      source: "doctor_ui",
+    });
     setSymptom(nextSymptom);
     setSnapshot("");
     setDiagnosis(null);
@@ -123,6 +130,13 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
       else result = diagnoseCreepHarvestDoctor(snapshot);
       setDiagnosis(result);
       setError(null);
+      trackScreepsDoctorEvent({
+        eventName: "doctor_diagnosis_completed",
+        symptom: result.symptom,
+        locale,
+        source: "doctor_ui",
+        diagnosisId: result.classification,
+      });
     } catch (cause) {
       setDiagnosis(null);
       setError(cause instanceof Error ? cause.message : "Invalid Snapshot.");
@@ -181,7 +195,18 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
           <div className={styles.handoffs}>
             <strong>{copy.links}</strong>
             <div>
-              <Link href={`${prefix}/resolver`}>{copy.resolver}</Link>
+              <Link
+                href={`${prefix}/resolver`}
+                onClick={() => trackScreepsDoctorEvent({
+                  eventName: "doctor_resolver_handoff_clicked",
+                  symptom: diagnosis.symptom,
+                  locale,
+                  source: "doctor_result",
+                  flowId: diagnosis.canonical.resolverFlowId,
+                })}
+              >
+                {copy.resolver}
+              </Link>
               <Link href={`${prefix}/diagnostics`}>{copy.diagnostics}</Link>
               <Link href={`${prefix}/screeps-api#${diagnosis.canonical.apiEntryId}`}>{copy.api}</Link>
               {diagnosis.symptom === "spawn-not-working" ? <Link href={`${prefix}/tick-lab`}>{copy.tickLab}</Link> : null}
