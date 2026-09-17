@@ -7,10 +7,12 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(`[Screeps Doctor V2] ${message}`);
 };
 
-const [doctor, doctorUi, doctorStyles, resolver, diagnostics, zhResolverPage, enResolverPage, smokeAll] = await Promise.all([
+const [doctor, doctorLauncher, doctorUi, doctorStyles, homeProblemHub, resolver, diagnostics, zhResolverPage, enResolverPage, smokeAll] = await Promise.all([
   read("src/lib/screeps-doctor.ts"),
+  read("src/lib/screeps-doctor-launcher.ts"),
   read("src/components/screeps-doctor.tsx"),
   read("src/components/screeps-doctor.module.css"),
+  read("src/components/home-problem-hub.tsx"),
   read("src/lib/problem-resolver.ts"),
   read("src/lib/screeps-diagnostic-symptoms.ts"),
   read("src/app/(zh)/resolver/page.tsx"),
@@ -54,6 +56,12 @@ assert(doctor.includes('"target-not-visible"'), "harvest Doctor must distinguish
 assert(doctor.includes('"target-out-of-range"'), "harvest Doctor must distinguish range blockers without guessing return-code truth");
 assert(doctor.includes("resolverOutcomeId: null"), "harvest read-only blockers must not invent exact return-code outcomes");
 
+assert(doctorLauncher.includes("SPAWN_DOCTOR_CANONICAL_REFERENCES"), "Doctor launcher must derive Spawn routing from the canonical Doctor references");
+assert(doctorLauncher.includes("MOVEMENT_DOCTOR_CANONICAL_REFERENCES"), "Doctor launcher must derive movement routing from the canonical Doctor references");
+assert(doctorLauncher.includes("HARVEST_DOCTOR_CANONICAL_REFERENCES"), "Doctor launcher must derive harvest routing from the canonical Doctor references");
+assert(doctorLauncher.includes("getScreepsDoctorLaunchByDiagnosticSymptom"), "Doctor launcher must map canonical Diagnostic symptoms to supported Doctor symptoms");
+assert(doctorLauncher.includes("parseScreepsDoctorLaunchSymptom"), "Doctor launcher must strictly validate URL preselection values");
+
 const forbiddenDoctorPatterns = [
   [/\beval\s*\(/, "eval()"],
   [/\bnew\s+Function\b/, "new Function"],
@@ -80,6 +88,7 @@ assert(
   doctorUi.includes('"spawn-not-working"') && doctorUi.includes('"creep-not-moving"') && doctorUi.includes('"creep-not-harvesting"'),
   "Doctor UI must expose all three supported symptoms",
 );
+assert(doctorUi.includes('parseScreepsDoctorLaunchSymptom(new URLSearchParams(window.location.search).get("doctor"))'), "Doctor UI must support bounded canonical URL symptom preselection");
 assert(doctorUi.includes('maxLength={SCREEPS_DOCTOR_MAX_SNAPSHOT_CHARS}'), "Doctor UI must enforce the core Snapshot size boundary");
 assert(doctorUi.includes('Session Verification') && doctorUi.includes('public Runtime Evidence'), "Doctor UI must visibly separate session verification from public Runtime Evidence");
 assert(doctorUi.includes('diagnosis.symptom === "spawn-not-working"'), "Tick Lab must remain Spawn-only until movement or harvest experiments exist");
@@ -87,6 +96,10 @@ assert(doctorUi.includes('href={`${prefix}/resolver`}') && doctorUi.includes('hr
 assert(doctorUi.includes('href={`${prefix}/screeps-api#${diagnosis.canonical.apiEntryId}`}'), "Doctor UI must hand off to the exact canonical API entry");
 assert(doctorStyles.includes(".doctor") && doctorStyles.includes(".result"), "Doctor UI styles are missing");
 assert(doctorStyles.includes(".symptoms") && doctorStyles.includes(".activeSymptom"), "Doctor symptom-selector styles are missing");
+assert(homeProblemHub.includes("getScreepsDoctorLaunchByDiagnosticSymptom(symptom.id)"), "Home Problem Hub must derive Doctor eligibility from the shared launcher contract");
+assert(homeProblemHub.includes('`/resolver?doctor=${doctorLaunch.doctorSymptom}#screeps-doctor`'), "supported homepage symptoms must deep-link into the canonical Doctor surface");
+assert(homeProblemHub.includes('`/diagnostics#${symptom.id}`'), "unsupported homepage symptoms must remain on the Diagnostics surface");
+assert(homeProblemHub.includes('"creep-not-harvesting"'), "Home Problem Hub must expose the supported harvest Doctor quick start");
 assert(zhResolverPage.includes('import { ScreepsDoctor } from "@/components/screeps-doctor";'), "Chinese Resolver must expose the Doctor entry");
 assert(zhResolverPage.includes('<ScreepsDoctor locale="zh" />'), "Chinese Resolver must render the Doctor entry");
 assert(enResolverPage.includes('import { ScreepsDoctor } from "@/components/screeps-doctor";'), "English Resolver must expose the Doctor entry");
@@ -117,4 +130,4 @@ assert(diagnostics.includes('id: "creep-not-harvesting"'), "canonical harvest di
 assert(diagnostics.includes('directApiEntryIds: ["creep-harvest"]'), "harvest diagnostic must keep its canonical API entry");
 assert(smokeAll.includes('await import("./check-screeps-doctor-v1.mjs");'), "Doctor regression gate must remain in the production smoke chain");
 
-console.log("[Screeps Doctor V2] Spawn + movement + harvest core, UI, and canonical-link checks passed.");
+console.log("[Screeps Doctor V2] Spawn + movement + harvest core, UI, quick-start launcher, and canonical-link checks passed.");

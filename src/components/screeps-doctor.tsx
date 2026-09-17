@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   diagnoseCreepHarvestDoctor,
@@ -10,6 +10,7 @@ import {
   SCREEPS_DOCTOR_MAX_SNAPSHOT_CHARS,
   type ScreepsDoctorDiagnosis,
 } from "@/lib/screeps-doctor";
+import { parseScreepsDoctorLaunchSymptom } from "@/lib/screeps-doctor-launcher";
 
 import styles from "./screeps-doctor.module.css";
 
@@ -92,6 +93,20 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
   const [snapshot, setSnapshot] = useState("");
   const [diagnosis, setDiagnosis] = useState<ScreepsDoctorDiagnosis | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const requestedSymptom = parseScreepsDoctorLaunchSymptom(new URLSearchParams(window.location.search).get("doctor"));
+    if (!requestedSymptom) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      setSymptom(requestedSymptom);
+      setSnapshot("");
+      setDiagnosis(null);
+      setError(null);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
 
   function selectSymptom(nextSymptom: DoctorSymptom) {
     setSymptom(nextSymptom);
