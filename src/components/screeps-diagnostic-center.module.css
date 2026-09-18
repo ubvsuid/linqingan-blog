@@ -131,3 +131,205 @@
   .relations section:not(:last-child) { border-bottom: 1px solid var(--border); }
   .verification > div:first-child { display: grid; }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / DIAGNOSTICS */
+:global(.diagnostics-monochrome-page) .center {
+  gap: 0;
+  margin: 54px 0 72px;
+}
+
+:global(.diagnostics-monochrome-page) .heading {
+  align-items: start;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-radius: 0;
+  padding: 42px 0 34px;
+  background: transparent;
+}
+
+:global(.diagnostics-monochrome-page) .heading h2 {
+  margin: 8px 0 14px;
+  font-size: clamp(34px, 5vw, 58px);
+  letter-spacing: -.05em;
+}
+
+:global(.diagnostics-monochrome-page) .heading p:last-child {
+  max-width: 780px;
+  color: #666666;
+}
+
+:global(.diagnostics-monochrome-page) .heading > strong {
+  padding-top: 7px;
+  color: #777777;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+:global(.diagnostics-monochrome-page) .index {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+  border-top: 1px solid #dedede;
+}
+
+:global(.diagnostics-monochrome-page) .index a {
+  min-height: auto;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 13px 0;
+  background: transparent;
+  color: #666666;
+  font-size: 12px;
+}
+
+:global(.diagnostics-monochrome-page) .index a:hover {
+  color: #000000;
+}
+
+:global(.diagnostics-monochrome-page) .grid {
+  gap: 0;
+  margin-top: 58px;
+  border-top: 1px solid #000000;
+  counter-reset: diagnostic-section;
+}
+
+:global(.diagnostics-monochrome-page) .card {
+  counter-increment: diagnostic-section;
+  overflow: visible;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  background: transparent;
+}
+
+:global(.diagnostics-monochrome-page) .cardHead {
+  grid-template-columns: minmax(240px, .75fr) minmax(0, 1.25fr);
+  gap: 46px;
+  padding: 42px 0 30px;
+  border-bottom: 1px solid #ededed;
+}
+
+:global(.diagnostics-monochrome-page) .cardHead > div::before {
+  content: counter(diagnostic-section, decimal-leading-zero) " / SYMPTOM";
+  display: block;
+  margin-bottom: 12px;
+  color: #888888;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+
+:global(.diagnostics-monochrome-page) .cardHead span {
+  display: none;
+}
+
+:global(.diagnostics-monochrome-page) .cardHead h3 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: -.045em;
+}
+
+:global(.diagnostics-monochrome-page) .cardHead p {
+  color: #666666;
+}
+
+:global(.diagnostics-monochrome-page) .triage,
+:global(.diagnostics-monochrome-page) .errors {
+  padding: 24px 0;
+  border-bottom: 1px solid #ededed;
+}
+
+:global(.diagnostics-monochrome-page) .triage h4,
+:global(.diagnostics-monochrome-page) .errors h4,
+:global(.diagnostics-monochrome-page) .relations h4 {
+  color: #777777;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+:global(.diagnostics-monochrome-page) .triage ol {
+  max-width: 900px;
+  color: #444444;
+}
+
+:global(.diagnostics-monochrome-page) .chips {
+  gap: 10px 22px;
+}
+
+:global(.diagnostics-monochrome-page) .chips a {
+  min-height: auto;
+  border: 0;
+  border-bottom: 1px solid #bdbdbd;
+  border-radius: 0;
+  padding: 0 0 4px;
+  background: transparent;
+  color: #111111;
+}
+
+:global(.diagnostics-monochrome-page) .chips a:hover {
+  border-color: #000000;
+}
+
+:global(.diagnostics-monochrome-page) .moreRelations {
+  border-top-style: solid;
+  border-top-color: #ededed;
+}
+
+:global(.diagnostics-monochrome-page) .relations {
+  border-bottom: 1px solid #ededed;
+}
+
+:global(.diagnostics-monochrome-page) .relations section {
+  padding: 24px 0;
+}
+
+:global(.diagnostics-monochrome-page) .relations section:nth-child(odd) {
+  padding-right: 28px;
+  border-right: 1px solid #ededed;
+}
+
+:global(.diagnostics-monochrome-page) .relations section:nth-child(even) {
+  padding-left: 28px;
+}
+
+:global(.diagnostics-monochrome-page) .relations section:nth-child(-n + 2) {
+  border-bottom: 1px solid #ededed;
+}
+
+:global(.diagnostics-monochrome-page) .verification {
+  gap: 16px;
+  padding: 28px 0 42px;
+  background: transparent;
+}
+
+:global(.diagnostics-monochrome-page) .verification nav {
+  gap: 10px 22px;
+}
+
+:global(.diagnostics-monochrome-page) .verification nav a,
+:global(.diagnostics-monochrome-page) .linkStack a {
+  color: #111111;
+}
+
+@media (max-width: 760px) {
+  :global(.diagnostics-monochrome-page) .index {
+    grid-template-columns: 1fr;
+  }
+
+  :global(.diagnostics-monochrome-page) .cardHead {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  :global(.diagnostics-monochrome-page) .relations section:nth-child(odd),
+  :global(.diagnostics-monochrome-page) .relations section:nth-child(even) {
+    padding: 22px 0;
+    border-right: 0;
+  }
+}
