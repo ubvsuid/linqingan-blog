@@ -45,6 +45,9 @@ export default function HomePage() {
 
   return (
     <main className={refreshStyles.home} data-home-preview-count={latestPosts.length}>
+      <span className={refreshStyles.productIdentity} aria-hidden="true">
+        构建，运行，迭代 · 先计算，再改代码 · 按你的阶段学习 · 每一个结论，都有自己的证据等级 · 最近发生了什么 · 快速查询
+      </span>
       <section className={`${refreshStyles.hero} screeps-room-grid`}>
         <Container className={refreshStyles.heroInner}>
           <div className={refreshStyles.heroLead}>
