@@ -120,22 +120,22 @@ const relatedKindById = new Map<string, SearchV3TelemetryRelatedKind>(
     .map((node) => [node.id, node.kind as SearchV3TelemetryRelatedKind]),
 );
 
-const doctorTargetIds = new Set(
+const doctorTargetIds = new Set<string>(
   SCREEPS_DOCTOR_LAUNCHES.map((entry) => entry.doctorSymptom),
 );
-const resolverTargetIds = new Set(problemResolverFlows.map((flow) => flow.flowId));
-const diagnosticTargetIds = new Set(
+const resolverTargetIds = new Set<string>(problemResolverFlows.map((flow) => flow.flowId));
+const diagnosticTargetIds = new Set<string>(
   screepsEntityGraph.nodes
     .filter((node) => node.kind === "symptom")
     .map((node) => node.id.slice("symptom:".length)),
 );
-const apiTargetIds = new Set([
+const apiTargetIds = new Set<string>([
   ...screepsEntityGraph.nodes
     .filter((node) => node.kind === "api")
     .map((node) => node.id),
   "/en/blog/screeps-arena-spawn-creep",
 ]);
-const errorTargetIds = new Set(
+const errorTargetIds = new Set<string>(
   screepsEntityGraph.nodes
     .filter((node) => node.kind === "error")
     .map((node) => node.id),
