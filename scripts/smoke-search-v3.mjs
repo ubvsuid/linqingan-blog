@@ -18,6 +18,17 @@ function expectExcludes(html, value, label) {
   if (html.includes(value)) failures.push(`${label}: unexpectedly contained ${value}`);
 }
 
+async function postTelemetry(body) {
+  return fetch(`${baseUrl}/api/search-v3/event`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Platform-Smoke-Test": "1",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 const chineseMovement = await readPage(`/search?q=${encodeURIComponent("Creep 不动")}`);
 expectIncludes(chineseMovement, 'data-search-route-v1="symptom"', "Chinese symptom route");
 expectIncludes(chineseMovement, "/resolver?doctor=creep-not-moving#screeps-doctor", "Chinese Doctor action");
@@ -54,10 +65,36 @@ expectIncludes(ambiguous, "english-search-results", "Bare spawnCreep Search V2 p
 const unknown = await readPage(`/en/search?q=${encodeURIComponent("unknown random query")}`);
 expectExcludes(unknown, "data-search-route-v1=", "Unknown query fail-open");
 
+
+const validTelemetry = await postTelemetry({
+  eventName: "search_v3_route_shown",
+  routeVersion: 1,
+  locale: "en",
+  intentKind: "symptom",
+  intentId: "symptom:creep-not-moving",
+  source: "route_card",
+});
+if (validTelemetry.status !== 202) {
+  failures.push(`Search V3 telemetry smoke: expected 202, received ${validTelemetry.status}`);
+}
+
+const forbiddenTelemetry = await postTelemetry({
+  eventName: "search_v3_route_shown",
+  routeVersion: 1,
+  locale: "en",
+  intentKind: "symptom",
+  intentId: "symptom:creep-not-moving",
+  source: "route_card",
+  query: "creep not moving",
+});
+if (forbiddenTelemetry.status !== 400) {
+  failures.push(`Search V3 telemetry privacy gate: expected 400, received ${forbiddenTelemetry.status}`);
+}
+
 if (failures.length > 0) {
   for (const failure of failures) console.error(`ERROR: ${failure}`);
   console.error(`Search V3 smoke test failed: ${failures.length} issue(s).`);
   process.exit(1);
 }
 
-console.log("Search V3 smoke test passed: bilingual answer routing, strict Doctor/Resolver actions, return-code isolation, World/Arena boundaries, and Search V2 fallback are healthy.");
+console.log("Search V3 smoke test passed: bilingual answer routing, strict Doctor/Resolver actions, privacy-bounded product telemetry, World/Arena boundaries, and Search V2 fallback are healthy.");
