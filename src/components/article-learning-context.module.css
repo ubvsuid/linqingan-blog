@@ -55,3 +55,35 @@
     grid-column: auto;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3B / LEARNING CONTEXT */
+:global(.article-reading-system) .context {
+  max-width: 880px;
+  margin: 0 auto 38px;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  padding: 18px 0 20px;
+}
+
+:global(.article-reading-system) .context dl {
+  gap: 18px 28px;
+}
+
+:global(.article-reading-system) .context dt {
+  color: #888888;
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+:global(.article-reading-system) .context dd {
+  color: #111111;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+:global(.article-reading-system) .context a {
+  text-decoration: underline;
+  text-decoration-color: #a0a0a0;
+  text-underline-offset: 3px;
+}

@@ -195,7 +195,7 @@ export default async function PostPage({ params }: PostPageProps) {
   };
 
   return (
-    <main className="article-shell">
+    <main className="article-shell monochrome-system-page article-reading-system" data-reading-system="v1">
       <Container className="article-container">
         <script
           type="application/ld+json"

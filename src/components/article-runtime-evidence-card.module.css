@@ -86,3 +86,59 @@
     padding: 18px;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3B / RUNTIME EVIDENCE */
+:global(.article-reading-system) .card {
+  max-width: 880px;
+  margin: 0 auto 42px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 22px 0 24px;
+  background: transparent;
+}
+
+:global(.article-reading-system) .header {
+  margin-bottom: 18px;
+}
+
+:global(.article-reading-system) .header h2 {
+  font-size: clamp(19px, 2.6vw, 24px);
+  letter-spacing: -.025em;
+}
+
+:global(.article-reading-system) .header a {
+  color: #555555;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+:global(.article-reading-system) .list {
+  gap: 0;
+  border-top: 1px solid #dedede;
+}
+
+:global(.article-reading-system) .item {
+  gap: 9px;
+  border-top: 0;
+  border-bottom: 1px solid #dedede;
+  padding: 16px 0;
+}
+
+:global(.article-reading-system) .item:last-child {
+  border-bottom: 0;
+}
+
+:global(.article-reading-system) .relations {
+  gap: 6px 14px;
+}
+
+:global(.article-reading-system) .relations a {
+  border: 0;
+  border-bottom: 1px solid #bdbdbd;
+  border-radius: 0;
+  padding: 2px 0;
+  color: #555555;
+}

@@ -264,6 +264,57 @@ const checks = [
     required: ["articles:priority", "upload-artifact"],
     forbidden: [],
   },
+
+  {
+    path: "src/app/(zh)/blog/[slug]/page.tsx",
+    required: ["monochrome-system-page", "article-reading-system", 'data-reading-system="v1"'],
+    forbidden: [],
+  },
+  {
+    path: "src/components/site-header.tsx",
+    required: ['pathname.startsWith("/blog/")'],
+    forbidden: [],
+  },
+  {
+    path: "src/components/site-footer.tsx",
+    required: ['pathname.startsWith("/blog/")'],
+    forbidden: [],
+  },
+  {
+    path: "src/app/site-shell.css",
+    required: ["PHASE 3B / READING SYSTEM", ".article-reading-system .article-header h1", ".article-reading-system .article-content pre", ".article-reading-system .related-post-grid"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-quick-answer.module.css",
+    required: ["PHASE 3B / READING QUICK ANSWER", ':global(.article-reading-system)', "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-runtime-evidence-card.module.css",
+    required: ["PHASE 3B / RUNTIME EVIDENCE", ':global(.article-reading-system)', "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-learning-context.module.css",
+    required: ["PHASE 3B / LEARNING CONTEXT", ':global(.article-reading-system)'],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-knowledge-relations.module.css",
+    required: ["PHASE 3B / CURATED PATHS", ':global(.article-reading-system)', "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/article-feedback.module.css",
+    required: ["PHASE 3B / READER FEEDBACK", ':global(.article-reading-system)', "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "scripts/smoke-all.mjs",
+    required: ['smoke-reading-system-v1.mjs'],
+    forbidden: [],
+  },
 ];
 
 const failures = [];

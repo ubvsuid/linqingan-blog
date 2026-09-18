@@ -121,3 +121,61 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3B / CURATED PATHS */
+:global(.article-reading-system) .relations {
+  max-width: 880px;
+  gap: 20px;
+  margin: 0 auto 46px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 24px 0 26px;
+  background: transparent;
+}
+
+:global(.article-reading-system) .header {
+  align-items: start;
+}
+
+:global(.article-reading-system) .header h2 {
+  font-size: clamp(20px, 2.8vw, 26px);
+  letter-spacing: -.025em;
+}
+
+:global(.article-reading-system) .grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid #dedede;
+}
+
+:global(.article-reading-system) .panel {
+  gap: 12px;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 18px 0;
+  background: transparent;
+}
+
+:global(.article-reading-system) .panel:last-child {
+  border-bottom: 0;
+}
+
+:global(.article-reading-system) .links {
+  gap: 0;
+}
+
+:global(.article-reading-system) .links a {
+  min-height: 40px;
+  align-items: center;
+  border-top: 1px solid #ededed;
+  padding: 8px 0;
+}
+
+:global(.article-reading-system) .links a:first-child {
+  border-top: 1px solid #ededed;
+  padding-top: 8px;
+}
