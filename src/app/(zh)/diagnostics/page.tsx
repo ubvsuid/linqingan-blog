@@ -37,7 +37,7 @@ export default function DiagnosticsPage() {
         </header>
         <nav className="solve-entry-switch" aria-label="选择问题解决入口">
           <Link href="/resolver#screeps-doctor"><span>01</span><strong>Have a Snapshot</strong><small>进入 Doctor，用结构化事实做只读诊断。</small></Link>
-          <Link href="/resolver#problem-resolver-zh"><span>02</span><strong>Need guided checks</strong><small>进入 Resolver，按真实状态与返回值逐步排查。</small></Link>
+          <Link href="/resolver"><span>02</span><strong>Need guided checks</strong><small>进入 Resolver，按真实状态与返回值逐步排查。</small></Link>
         </nav>
         <ScreepsDiagnosticCenter locale="zh" />
       </Container>
