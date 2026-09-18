@@ -59,7 +59,7 @@ const principles = [
 
 export default function VerificationPage() {
   return (
-    <main className="page-shell verification-page">
+    <main className="page-shell verification-page monochrome-system-page">
       <Container>
         <nav className={styles.breadcrumb} aria-label="面包屑">
           <Link href="/knowledge">知识库</Link>
