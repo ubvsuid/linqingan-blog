@@ -40,7 +40,7 @@ export default function RoomDiagnosticsPage() {
   };
 
   return (
-    <main className="page-shell diagnostic-tool-page">
+    <main className="page-shell diagnostic-tool-page tool-detail-monochrome-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}

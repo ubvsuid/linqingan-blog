@@ -28,8 +28,8 @@ const quickEntries = [
 
 export default function EnglishHomePage() {
   return (
-    <main className={styles.home} lang="en">
-      <section className={`${styles.hero} screeps-room-grid`}>
+    <main className={`${styles.home} english-home-monochrome`} lang="en">
+      <section className={`${styles.hero} screeps-room-grid english-mono-hero`}>
         <Container className={styles.heroInner}>
           <p className="eyebrow">SCREEPS KNOWLEDGE OS · LEARN · BUILD · SOLVE · VERIFY</p>
           <h1>Screeps Knowledge OS: from problem to verified fix</h1>
@@ -67,7 +67,7 @@ export default function EnglishHomePage() {
         </Container>
       </section>
 
-      <section className={styles.learningSection} aria-labelledby="english-foundation-title">
+      <section className={`${styles.learningSection} english-mono-learning`} aria-labelledby="english-foundation-title">
         <Container>
           <div className={styles.sectionHeading}><div><p className="eyebrow">ENGLISH FOUNDATION</p><h2 id="english-foundation-title">Beginner lessons, references, and API safety guides</h2></div><Link href="/en/blog">Browse the guide library →</Link></div>
           <div className={styles.learningGrid}>
@@ -85,7 +85,7 @@ export default function EnglishHomePage() {
         </Container>
       </section>
 
-      <section className={styles.knowledgeSection} aria-labelledby="english-knowledge-title">
+      <section className={`${styles.knowledgeSection} english-mono-knowledge`} aria-labelledby="english-knowledge-title">
         <Container>
           <div className={styles.knowledgeCard}>
             <div className={styles.knowledgeIntro}><p className="eyebrow">KNOWLEDGE MAP</p><h2 id="english-knowledge-title">A structured Screeps knowledge base</h2><p>Browse the subjects the English section covers without mixing beginner lessons and advanced engineering into one list.</p><div className={styles.knowledgeStats} aria-label="Knowledge map size"><span><strong>8</strong> subject modules</span><span><strong>{publishedEnglishArticles.length}</strong> published guides</span></div><Link href="/en/knowledge">Open the knowledge map →</Link></div>
@@ -94,7 +94,7 @@ export default function EnglishHomePage() {
         </Container>
       </section>
 
-      <section className={styles.quickSection} aria-labelledby="english-quick-title">
+      <section className={`${styles.quickSection} english-mono-quick`} aria-labelledby="english-quick-title">
         <Container>
           <div className={styles.sectionHeading}><div><p className="eyebrow">QUICK LOOKUP</p><h2 id="english-quick-title">English guides, references, and tools</h2></div><Link href="/en/tools">View tools →</Link></div>
           <div className={styles.quickGrid}>{quickEntries.map((entry) => <Link href={entry.href} key={entry.href}><span className="eyebrow">{entry.eyebrow}</span><strong>{entry.title}</strong><p>{entry.description}</p><span aria-hidden="true">→</span></Link>)}</div>

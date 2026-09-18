@@ -158,7 +158,7 @@ export async function ScreepsApiHubPage({
   );
 
   return (
-    <main className={styles.page} lang={isEnglish ? "en" : "zh-CN"}>
+    <main className={`${styles.page} api-detail-monochrome-page`} lang={isEnglish ? "en" : "zh-CN"}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}

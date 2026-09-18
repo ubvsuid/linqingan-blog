@@ -40,7 +40,7 @@ export default function LabReactionBoostPlannerPage() {
   };
 
   return (
-    <main className="page-shell planning-tool-page">
+    <main className="page-shell planning-tool-page tool-detail-monochrome-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
         <nav className="planning-tool-breadcrumb" aria-label="面包屑"><Link href="/tools">工具</Link><span aria-hidden="true">/</span><span>Lab 反应与 Boost 规划器</span></nav>

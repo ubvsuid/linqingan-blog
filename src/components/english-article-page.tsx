@@ -153,7 +153,7 @@ export async function EnglishArticlePage({
         : null;
 
   return (
-    <main className="article-shell" lang="en">
+    <main className="article-shell article-reading-system english-article-reading-system" data-reading-system="v1-en" lang="en">
       <Container className="article-container">
         <script
           type="application/ld+json"

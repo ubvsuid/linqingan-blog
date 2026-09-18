@@ -562,3 +562,51 @@
     gap: 8px;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 4 / ENGLISH HOME */
+.english-monochrome-system .english-home-monochrome { background: #ffffff; color: #000000; }
+.english-monochrome-system .english-mono-hero { background: #ffffff; }
+.english-monochrome-system .english-hero-actions a {
+  border-radius: 0;
+  background: #ffffff;
+  color: #000000;
+}
+.english-monochrome-system .english-hero-actions .english-primary-action {
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
+}
+.english-monochrome-system .english-system-visual,
+.english-monochrome-system .english-task-grid article,
+.english-monochrome-system .english-learning-summary,
+.english-monochrome-system .beginner-roadmap-visual,
+.english-monochrome-system .beginner-stage {
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none !important;
+}
+.english-monochrome-system .english-task-grid article:nth-child(n) { box-shadow: none; }
+.english-monochrome-system .system-loop > div { border-radius: 0; background: #ffffff; }
+.english-monochrome-system .english-accent-energy,
+.english-monochrome-system .english-accent-controller { color: #000000; }
+.english-monochrome-system .system-console { background: #0d0d0d; }
+.english-monochrome-system .english-learning-summary-actions a,
+.english-monochrome-system .english-learning-summary-actions button,
+.english-monochrome-system .english-task-grid input,
+.english-monochrome-system .english-task-grid button {
+  border-radius: 0;
+}
+.english-monochrome-system .english-learning-progressbar,
+.english-monochrome-system .english-learning-progressbar::-webkit-progress-bar,
+.english-monochrome-system .english-learning-progressbar::-webkit-progress-value,
+.english-monochrome-system .english-learning-progressbar::-moz-progress-bar { border-radius: 0; }
+.english-monochrome-system .english-learning-progressbar::-webkit-progress-value,
+.english-monochrome-system .english-learning-progressbar::-moz-progress-bar { background: #000000; }
+.english-monochrome-system .english-mono-learning article,
+.english-monochrome-system .english-mono-knowledge article,
+.english-monochrome-system .english-mono-quick a {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #ffffff !important;
+}

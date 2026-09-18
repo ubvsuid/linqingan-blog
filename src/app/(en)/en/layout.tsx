@@ -34,7 +34,7 @@ const englishStructuredData = {
 
 export default function EnglishLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="english-root" lang="en">
+    <div className="english-root english-monochrome-system" lang="en">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

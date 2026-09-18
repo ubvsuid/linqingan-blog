@@ -53,19 +53,25 @@ export function SiteFooter() {
   const learningLinks = english ? englishLearningLinks : chineseLearningLinks;
   const siteLinks = english ? englishSiteLinks : chineseSiteLinks;
   const languageTarget = getLanguageSwitchTarget(pathname);
-  const monochromeShell = !english && (["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname) || pathname.startsWith("/blog/"));
+  const chineseMonochromeShell = !english && (
+    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname)
+    || pathname.startsWith("/blog/")
+    || pathname.startsWith("/tools/")
+    || pathname.startsWith("/screeps-api/")
+  );
+  const monochromeShell = english || chineseMonochromeShell;
 
   if (monochromeShell) {
     return (
-      <footer className="site-footer homepage-site-footer" lang="zh-CN">
+      <footer className="site-footer homepage-site-footer" lang={english ? "en" : "zh-CN"}>
         <Container className="homepage-footer-inner">
           <div className="homepage-footer-brand">
             <strong>linqingan.com</strong>
-            <p>Making Screeps easier to learn, build and master.</p>
+            <p>{english ? "Learn, build, solve, and verify Screeps with one system." : "Making Screeps easier to learn, build and master."}</p>
           </div>
-          <nav className="homepage-footer-links" aria-label="简洁页脚导航">
-            <Link href="/about">About</Link>
-            <Link href="/changelog">Changelog</Link>
+          <nav className="homepage-footer-links" aria-label={english ? "Minimal footer navigation" : "简洁页脚导航"}>
+            <Link href={english ? "/en/about" : "/about"}>About</Link>
+            <Link href={english ? "/en/changelog" : "/changelog"}>Changelog</Link>
             <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub</a>
             <a href={`mailto:${siteConfig.author.email}`}>Contact</a>
           </nav>

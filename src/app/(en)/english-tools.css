@@ -703,3 +703,31 @@
     height: 60px;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 4 / ENGLISH TOOL DETAIL */
+.english-monochrome-system .tool-related-grid a,
+.english-monochrome-system .body-builder-en,
+.english-monochrome-system .body-results-en {
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .body-presets-en button,
+.english-monochrome-system .body-stepper-en button,
+.english-monochrome-system .body-code-en button,
+.english-monochrome-system .tool-result-actions-en button,
+.english-monochrome-system .energy-budget-en input {
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .budget-status-en {
+  border: 1px solid #dedede;
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .body-code-en code {
+  border-color: #000000;
+  border-radius: 0;
+  background: #0d0d0d;
+  color: #f5f5f5;
+}

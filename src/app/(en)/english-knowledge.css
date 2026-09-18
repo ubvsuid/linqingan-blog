@@ -42,3 +42,17 @@
   .knowledge-system-map a + a { border-top: 1px solid var(--border); border-left: 0; }
   .knowledge-system-map i { display: none; }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 4 / ENGLISH KNOWLEDGE */
+.english-monochrome-system .knowledge-system-map {
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .knowledge-system-map a:hover { background: #f7f7f7; }
+.english-monochrome-system .knowledge-system-map i {
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #ffffff;
+  color: #000000;
+}

@@ -1509,3 +1509,192 @@ body:has(.monochrome-system-page) .homepage-site-footer {
     padding-left: 0;
   }
 }
+
+
+/* SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — PHASE 3C + PHASE 4 / COMPLETION */
+
+html:has(.english-monochrome-system),
+html:has(.tool-detail-monochrome-page),
+html:has(.api-detail-monochrome-page) {
+  background: #ffffff;
+}
+
+body:has(.english-monochrome-system),
+body:has(.tool-detail-monochrome-page),
+body:has(.api-detail-monochrome-page) {
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #f7f7f7;
+  --foreground: #000000;
+  --muted: #666666;
+  --border: #dedede;
+  --accent: #000000;
+  --accent-foreground: #ffffff;
+  --code: #f4f4f4;
+  --shadow: none;
+  --screeps-energy: #000000;
+  --screeps-controller: #000000;
+  --screeps-success: #000000;
+  background: #ffffff;
+  color: #000000;
+}
+
+.english-monochrome-system,
+.tool-detail-monochrome-page,
+.api-detail-monochrome-page {
+  background: #ffffff;
+  color: #000000;
+}
+
+.english-monochrome-system .button,
+.tool-detail-monochrome-page .button,
+.api-detail-monochrome-page .button {
+  border-radius: 0;
+  transition: none;
+}
+
+.english-monochrome-system .button:hover,
+.tool-detail-monochrome-page .button:hover,
+.api-detail-monochrome-page .button:hover {
+  transform: none;
+}
+
+.english-monochrome-system .eyebrow,
+.tool-detail-monochrome-page .eyebrow,
+.api-detail-monochrome-page .eyebrow {
+  color: #777777;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .14em;
+}
+
+.tool-detail-monochrome-page .page-header,
+.api-detail-monochrome-page .page-header {
+  max-width: 1040px;
+}
+
+.tool-detail-monochrome-page .page-header h1,
+.api-detail-monochrome-page h1 {
+  color: #000000;
+  font-size: clamp(52px, 7.6vw, 96px);
+  font-weight: 680;
+  line-height: .94;
+  letter-spacing: -.07em;
+}
+
+.tool-detail-monochrome-page .page-header > p:last-child,
+.api-detail-monochrome-page header > p {
+  color: #666666;
+}
+
+.tool-detail-monochrome-page .tool-utility-bar {
+  margin-top: -18px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 16px 0 18px;
+  background: transparent;
+}
+
+.tool-detail-monochrome-page .tool-utility-steps strong,
+.tool-detail-monochrome-page .tool-utility-actions button,
+.tool-detail-monochrome-page .tool-utility-actions a {
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .body-builder,
+.tool-detail-monochrome-page .body-results,
+.tool-detail-monochrome-page .diagnostic-inputs,
+.tool-detail-monochrome-page .diagnostic-results {
+  border-color: #dedede;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .body-presets button,
+.tool-detail-monochrome-page .body-stepper button,
+.tool-detail-monochrome-page .body-code button,
+.tool-detail-monochrome-page .diagnostic-heading button,
+.tool-detail-monochrome-page .diagnostic-field-grid input,
+.tool-detail-monochrome-page .energy-budget input {
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .body-part-grid,
+.tool-detail-monochrome-page .body-metrics,
+.tool-detail-monochrome-page .diagnostic-findings {
+  border-color: #dedede;
+}
+
+.tool-detail-monochrome-page .finding {
+  border-color: #dedede !important;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .finding > span {
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #ffffff;
+  color: #000000;
+}
+
+.tool-detail-monochrome-page .body-code code,
+.tool-detail-monochrome-page .diagnostic-probe pre {
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #0d0d0d;
+  color: #f5f5f5;
+}
+
+.tool-detail-monochrome-page .body-tool-notes,
+.tool-detail-monochrome-page .diagnostic-boundaries,
+.tool-detail-monochrome-page .planning-tool-notes {
+  border-top-color: #000000;
+}
+
+.english-monochrome-system .english-monochrome-page {
+  background: #ffffff;
+  color: #000000;
+}
+
+.english-monochrome-system .english-monochrome-page h1 {
+  color: #000000;
+  font-size: clamp(52px, 7.6vw, 96px);
+  line-height: .94;
+  letter-spacing: -.07em;
+}
+
+.english-monochrome-system .english-monochrome-page input,
+.english-monochrome-system .english-monochrome-page select,
+.english-monochrome-system .english-monochrome-page button {
+  border-radius: 0;
+}
+
+.english-monochrome-system .article-reading-system {
+  background: #ffffff;
+  color: #000000;
+}
+
+.english-monochrome-system .article-reading-system .english-discovery-strip a {
+  border: 0;
+  border-right: 1px solid #dedede;
+  border-radius: 0;
+  padding: 0 10px 0 0;
+  background: transparent;
+}
+
+.english-monochrome-system .article-reading-system .english-discovery-strip a + a {
+  padding-left: 10px;
+}
+
+@media (max-width: 640px) {
+  .tool-detail-monochrome-page .page-header h1,
+  .api-detail-monochrome-page h1,
+  .english-monochrome-system .english-monochrome-page h1 {
+    font-size: clamp(46px, 14vw, 68px);
+  }
+}

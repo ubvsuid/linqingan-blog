@@ -267,3 +267,52 @@
     text-align: left;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3C + PHASE 4 / API DETAIL */
+:global(.api-detail-monochrome-page) {
+  background: #ffffff;
+  color: #000000;
+}
+:global(.api-detail-monochrome-page) .section,
+:global(.api-detail-monochrome-page) .panel,
+:global(.api-detail-monochrome-page) .apiCard,
+:global(.api-detail-monochrome-page) .verifiedGrid article,
+:global(.api-detail-monochrome-page) .emptyVerification {
+  border-radius: 0;
+  background: #ffffff;
+}
+:global(.api-detail-monochrome-page) .section {
+  border-left: 0;
+  border-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+:global(.api-detail-monochrome-page) .apiGrid,
+:global(.api-detail-monochrome-page) .verifiedGrid {
+  gap: 0;
+  border-top: 1px solid #dedede;
+}
+:global(.api-detail-monochrome-page) .apiCard,
+:global(.api-detail-monochrome-page) .verifiedGrid article {
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  padding-left: 0;
+  padding-right: 0;
+}
+:global(.api-detail-monochrome-page) .tags span {
+  border: 0;
+  border-right: 1px solid #dedede;
+  border-radius: 0;
+  padding: 0 8px 0 0;
+}
+:global(.api-detail-monochrome-page) .panel {
+  border-left: 0;
+  border-right: 0;
+}
+:global(.api-detail-monochrome-page) .verification {
+  background: #ffffff;
+}
+:global(.api-detail-monochrome-page) .emptyVerification {
+  border-style: solid;
+}

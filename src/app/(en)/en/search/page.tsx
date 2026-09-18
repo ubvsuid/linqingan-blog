@@ -27,7 +27,7 @@ export default async function EnglishSearchPage({ searchParams }: EnglishSearchP
   const clusterHandoffs = getKnowledgeClusterHandoffSignals("en");
 
   return (
-    <main className={styles.page} lang="en">
+    <main className={`${styles.page} english-monochrome-page solve-system-page search-monochrome-page`} lang="en">
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Search</span>

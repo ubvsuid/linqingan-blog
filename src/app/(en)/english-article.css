@@ -219,3 +219,54 @@
     flex-direction: column;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 4 / ENGLISH READING */
+.english-monochrome-system .english-verification {
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  background: transparent;
+}
+.english-monochrome-system .english-verification summary { padding: 16px 0; }
+.english-monochrome-system .english-verification[open] summary { border-bottom-color: #dedede; }
+.english-monochrome-system .english-verification-details { padding: 22px 0; }
+.english-monochrome-system .english-source-panel > div:last-child a,
+.english-monochrome-system .english-tool-recommendation,
+.english-monochrome-system .english-related > div:last-child a,
+.english-monochrome-system .english-lesson-progress {
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .english-source-panel > div:last-child a {
+  border-left: 0;
+  border-right: 0;
+}
+.english-monochrome-system .english-tool-recommendation {
+  border-left: 0;
+  border-right: 0;
+}
+.english-monochrome-system .english-related > div:last-child {
+  gap: 0;
+  border-top: 1px solid #dedede;
+}
+.english-monochrome-system .english-related > div:last-child a {
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  padding-left: 0;
+  padding-right: 0;
+}
+.english-monochrome-system .english-lesson-progress {
+  border-left: 0;
+  border-right: 0;
+}
+.english-monochrome-system .english-lesson-progress button {
+  border-radius: 0;
+  background: #000000;
+  color: #ffffff;
+}
+.english-monochrome-system .english-lesson-progress button.is-complete {
+  background: #ffffff;
+  color: #000000;
+}
