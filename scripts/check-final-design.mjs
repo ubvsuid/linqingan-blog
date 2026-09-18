@@ -34,8 +34,13 @@ const checks = [
   },
   {
     path: "src/components/site-header.tsx",
-    required: ["profile-shortcut", "header-icon-link"],
+    required: ["profile-shortcut", "header-icon-link", '"/tools"', '"/screeps-api"', "monochromeShell"],
     forbidden: ["<style>", ".header-icon-link { display: none; }"],
+  },
+  {
+    path: "src/components/site-footer.tsx",
+    required: ['"/tools"', '"/screeps-api"', "monochromeShell", "homepage-site-footer"],
+    forbidden: [],
   },
   {
     path: "src/app/site-shell.css",
@@ -117,12 +122,37 @@ const checks = [
   },
   {
     path: "src/app/(zh)/tools/page.tsx",
-    required: ["CollectionPage", "ItemList", "toolCatalog", "getToolHref"],
+    required: ["CollectionPage", "ItemList", "toolCatalog", "getToolHref", "monochrome-system-page", "tools-hub-list", "Tools for Screeps.", "toolHubOrder"],
     forbidden: [
       'const tools = [',
       'href: "/tools/market-terminal-cost-calculator"',
       'href: "/tools/controller-downgrade-planner"',
     ],
+  },
+  {
+    path: "src/app/screeps-planning-tools.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 2 / TOOLS HUB", ".tools-monochrome-hub .tools-hub-row", ".tools-monochrome-hub .tools-hub-number"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/screeps-api/page.tsx",
+    required: ["monochrome-system-page", "screeps-api-monochrome-hub", "Know the API.", "ScreepsApiHubDirectory", "ScreepsApiCoverageSnapshot", "ScreepsApiExplorer"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/screeps-api-hub-directory.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 2 / API OBJECT INDEX", ':global(.screeps-api-monochrome-hub)', "counter-reset: api-hub-index"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/screeps-api-coverage-snapshot.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 2 / API COVERAGE", ':global(.screeps-api-monochrome-hub)'],
+    forbidden: [],
+  },
+  {
+    path: "src/components/screeps-api-explorer.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 2 / API EXPLORER", ':global(.screeps-api-monochrome-hub)'],
+    forbidden: [],
   },
   {
     path: "src/lib/tool-catalog.ts",

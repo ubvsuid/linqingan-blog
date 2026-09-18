@@ -41,7 +41,7 @@ export default function ScreepsApiPage() {
   };
 
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page screeps-api-monochrome-hub">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -56,28 +56,22 @@ export default function ScreepsApiPage() {
         </nav>
 
         <header className="page-header">
-          <p className="eyebrow">API QUICK REFERENCE</p>
-          <h1>Screeps API 快速查询</h1>
+          <p className="eyebrow">SCREEPS API</p>
+          <h1>Know the API.</h1>
           <p>
-            用对象名、方法名或关键词快速定位常用 API；也可以从 Creep、Room、Spawn、Controller、Market、Link、Tower、Terminal、Lab、PathFinder 与 Store Hub 进入对应的问题链。这里负责导航和实践解释，不替代官方 API Reference；涉及真实动作时，仍应保存返回值并在后续 tick 核对状态。
+            Screeps API 快速查询继续保留完整搜索与分组能力，但先从核心对象理解系统边界：Creep、Room、Spawn、Controller、Store、PathFinder，以及 Market、Link、Tower、Terminal 与 Lab。本站负责导航和实践解释，不替代官方 API Reference；真实动作仍应保存返回值并在后续 tick 核对状态。
           </p>
-          <div className="button-row">
-            <a
-              className="button button-secondary"
-              href="https://docs.screeps.com/api/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              打开官方 API Reference ↗
+          <div className={styles.actions} aria-label="API 快速入口">
+            <a href="#api-explorer-title">Search API ↓</a>
+            <Link href="/screeps-errors">Error Codes →</Link>
+            <a href="https://docs.screeps.com/api/" target="_blank" rel="noreferrer">
+              Official Reference ↗
             </a>
-            <Link className="button button-secondary" href="/screeps-errors">
-              查询错误码
-            </Link>
           </div>
         </header>
 
-        <ScreepsApiCoverageSnapshot locale="zh" />
         <ScreepsApiHubDirectory locale="zh" />
+        <ScreepsApiCoverageSnapshot locale="zh" />
         <ScreepsApiExplorer entries={entries} locale="zh" />
       </Container>
     </main>

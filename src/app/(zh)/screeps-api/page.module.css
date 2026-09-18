@@ -6,3 +6,36 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  margin-top: 34px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.actions a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.actions a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+:global(.screeps-api-monochrome-hub) .breadcrumb {
+  margin-bottom: 54px;
+  color: #777777;
+  font-size: 11px;
+}
+
+@media (max-width: 640px) {
+  :global(.screeps-api-monochrome-hub) .breadcrumb { margin-bottom: 38px; }
+  .actions { gap: 12px 20px; }
+}
