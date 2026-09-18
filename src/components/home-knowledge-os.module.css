@@ -295,7 +295,7 @@
 }
 
 .editorial .pathCard:hover {
-  background: #f5f5f7;
+  background: var(--surface-soft);
 }
 
 .editorial .pathCard h3 {

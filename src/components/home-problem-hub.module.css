@@ -58,12 +58,12 @@
 }
 
 .card:hover {
-  background: #f5f5f7;
+  background: var(--surface-soft);
   text-decoration: none;
 }
 
 .kind {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 9px;
   font-weight: 650;
   letter-spacing: .13em;
@@ -102,7 +102,7 @@
 .meta code {
   padding: 0;
   background: transparent;
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 9px;
 }
 

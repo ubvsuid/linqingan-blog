@@ -24,11 +24,11 @@
   gap: 14px;
   align-items: center;
   min-height: 62px;
-  border: 1px solid #cfcfd4;
+  border: 1px solid var(--border-strong);
   border-radius: 18px;
   padding: 7px 8px 7px 20px;
-  background: #fff;
-  box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
+  background: var(--surface);
+  box-shadow: var(--home-search-shadow);
 }
 
 .search > span {
@@ -46,7 +46,7 @@
 }
 
 .search input::placeholder {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
 }
 
 .search button {
@@ -62,7 +62,7 @@
 }
 
 .search button:hover {
-  background: #f5f5f7;
+  background: var(--surface-soft);
   color: var(--foreground);
 }
 
@@ -85,7 +85,7 @@
 
 .popular > span {
   margin-right: 4px;
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 9px;
   font-weight: 650;
   letter-spacing: .14em;
@@ -101,7 +101,7 @@
 }
 
 .popular a:hover {
-  border-color: #b9b9be;
+  border-color: var(--border-strong);
   color: var(--foreground);
 }
 
@@ -127,11 +127,11 @@
 }
 
 .context > a:hover {
-  background: #f5f5f7;
+  background: var(--surface-soft);
 }
 
 .context small {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 9px;
   font-weight: 650;
   letter-spacing: .13em;
@@ -160,7 +160,7 @@
 }
 
 .recent > span {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
 }
 
 .recent > div {

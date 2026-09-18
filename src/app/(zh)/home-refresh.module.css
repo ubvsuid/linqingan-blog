@@ -1,24 +1,42 @@
 .home {
-  --background: #fbfbfd;
-  --surface: #ffffff;
-  --surface-soft: #f5f5f7;
-  --foreground: #0b0b0c;
-  --muted: #6e6e73;
-  --border: #dedee2;
-  --accent: #0b0b0c;
-  --accent-foreground: #ffffff;
-  --energy-accent: #0b0b0c;
-  --screeps-controller: #0b0b0c;
-  --screeps-energy: #0b0b0c;
-  --screeps-success: #0b0b0c;
+  --background: #f4f4f1;
+  --surface: #fafaf8;
+  --surface-soft: #ecece8;
+  --foreground: #191918;
+  --muted: #71716c;
+  --border: #d6d5cf;
+  --border-strong: #c6c5be;
+  --accent: #191918;
+  --accent-foreground: #f8f8f5;
+  --energy-accent: #191918;
+  --screeps-controller: #191918;
+  --screeps-energy: #191918;
+  --screeps-success: #191918;
+  --home-titanium: #85847e;
+  --home-titanium-soft: #9c9a94;
+  --home-section-soft: #efefec;
+  --home-hero-bg: #f8f8f6;
+  --home-search-shadow: 0 1px 0 rgb(255 255 255 / 72%), 0 18px 50px rgb(25 25 24 / 7%);
   overflow: hidden;
   background: var(--background);
   color: var(--foreground);
 }
 
+/* Keep the homepage shell, sticky header, and footer on the same premium neutral palette. */
+:global(body):has(.home) {
+  --background: #f4f4f1;
+  --surface: #fafaf8;
+  --surface-soft: #ecece8;
+  --foreground: #191918;
+  --muted: #71716c;
+  --border: #d6d5cf;
+  --accent: #191918;
+  --accent-foreground: #f8f8f5;
+}
+
 .home :global(.eyebrow) {
   margin-bottom: 12px;
-  color: #86868b;
+  color: var(--home-titanium);
   font-family: inherit;
   font-size: 10px;
   font-weight: 650;
@@ -30,7 +48,7 @@
   display: grid;
   place-items: center;
   border-bottom: 1px solid var(--border);
-  background: var(--background);
+  background: var(--home-hero-bg);
 }
 
 .heroInner {
@@ -42,7 +60,7 @@
 
 .kicker {
   margin: 0 0 12px;
-  color: #86868b;
+  color: var(--home-titanium);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: .24em;
@@ -50,7 +68,7 @@
 
 .productIdentity {
   margin: 0 0 18px;
-  color: #8d8d93;
+  color: var(--home-titanium);
   font-size: 12px;
   font-weight: 560;
   letter-spacing: .015em;
@@ -102,7 +120,7 @@
 }
 
 .secondaryAction {
-  border-color: #c7c7cc;
+  border-color: var(--border-strong);
   background: transparent;
 }
 
@@ -113,12 +131,12 @@
 }
 
 .secondaryAction:hover {
-  background: #f2f2f4;
+  background: var(--surface-soft);
 }
 
 .heroNote {
   margin: 18px 0 0;
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 12px;
 }
 
@@ -129,6 +147,21 @@
 .quickSection {
   border-top: 1px solid var(--border);
   padding: clamp(82px, 9vw, 128px) 0;
+}
+
+.toolsSection,
+.activitySection {
+  background: var(--home-section-soft);
+}
+
+.verificationSection {
+  --foreground: #f2f1ed;
+  --muted: #aaa8a1;
+  --border: #34332f;
+  --home-titanium: #8f8d86;
+  --home-titanium-soft: #85837c;
+  background: #171716;
+  color: var(--foreground);
 }
 
 .sectionHeading {
@@ -190,7 +223,7 @@
 }
 
 .toolCard:hover {
-  background: #f5f5f7;
+  background: var(--surface-soft);
   text-decoration: none;
 }
 
@@ -249,7 +282,7 @@
 }
 
 .panelTopline > span {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 12px;
 }
 
@@ -295,7 +328,7 @@
 
 .learningSteps span,
 .moduleList span {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 11px;
 }
 
@@ -350,7 +383,7 @@
 }
 
 .verificationGrid span {
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 10px;
   letter-spacing: .08em;
 }
@@ -414,7 +447,7 @@
 .activityList div {
   display: grid;
   gap: 3px;
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 11px;
 }
 
@@ -470,12 +503,12 @@
 }
 
 .quickGrid > a:hover {
-  background: #f5f5f7;
+  background: var(--surface-soft);
 }
 
 .quickGrid > a span {
   grid-column: 1 / -1;
-  color: #9a9aa0;
+  color: var(--home-titanium-soft);
   font-size: 10px;
   letter-spacing: .12em;
 }
