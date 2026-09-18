@@ -80,8 +80,7 @@ function applyRenewCreepCtr20260910(
 export function applyEnglishRenewCreepCtr20260910(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
-  return applyEnglishCreepRolesCurrent20260917(
-    applyEnglishSpawnCreepCtr20260914(
+  const currentArticle = applyEnglishSpawnCreepCtr20260914(
     applyEnglishRecycleCreepCtr20260914(
       applyEnglishRequireModulesCtr20260913(
         applyEnglishIntroductionCtr20260913(
@@ -108,6 +107,8 @@ export function applyEnglishRenewCreepCtr20260910(
       ),
     ),
   );
+
+  return applyEnglishCreepRolesCurrent20260917(currentArticle);
 }
 
 export function getEnglishRenewCreepCtrUpdatedAt20260910(
