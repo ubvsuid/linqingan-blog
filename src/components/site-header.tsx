@@ -30,7 +30,7 @@ export function SiteHeader() {
     { label: "Tools", href: "/tools" },
     { label: "Knowledge Map", href: "/knowledge" },
   ];
-  const navigation = monochromeShell ? homepageNavigation : english ? englishNavigation : siteConfig.navigation;
+  const navigation = homepage ? homepageNavigation : monochromeShell ? homepageNavigation.slice(0, 6) : english ? englishNavigation : siteConfig.navigation;
   const languageTarget = getLanguageSwitchTarget(pathname);
   const isBeginnerArticle = beginnerSeriesSlugs.some((slug) => pathname === `/blog/${slug}`);
   const isKnowledgeArticle = knowledgeBaseSlugs.some((slug) => pathname === `/blog/${slug}`);
