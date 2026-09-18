@@ -1,4 +1,5 @@
 const productionBranch = "clean-blog-v1";
+const previewBranch = "preview/homepage-visual-v1";
 const branch = process.env.VERCEL_GIT_COMMIT_REF?.trim() ?? "";
 
 if (!branch) {
@@ -8,6 +9,11 @@ if (!branch) {
 
 if (branch === productionBranch) {
   console.log(`[vercel-ignore] allowing Production branch ${productionBranch}.`);
+  process.exit(1);
+}
+
+if (branch === previewBranch) {
+  console.log(`[vercel-ignore] allowing explicitly authorized Preview branch ${previewBranch}.`);
   process.exit(1);
 }
 
