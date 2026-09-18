@@ -65,6 +65,14 @@ function trackHomeAction(action: string) {
   track("home_task_action", { action });
 }
 
+const popularSearches = [
+  ["Spawn 不工作", "spawn 不工作"],
+  ["Creep 不移动", "Creep 不移动"],
+  ["ERR_NOT_ENOUGH_ENERGY", "ERR_NOT_ENOUGH_ENERGY"],
+  ["PathFinder", "PathFinder"],
+  ["房间布局", "房间布局"],
+] as const;
+
 export function HomeTaskHub() {
   const progress = useBeginnerProgress();
   const recentArticles = useRecentArticles();
@@ -76,60 +84,61 @@ export function HomeTaskHub() {
 
   return (
     <>
-      <HomeKnowledgeOs locale="zh" />
-      <section className={`${styles.hub} deferred-home-block`} aria-labelledby="home-task-title">
+      <section className={styles.hub} aria-labelledby="home-task-title">
         <div className={styles.heading}>
-          <p className="eyebrow">CHOOSE YOUR NEXT STEP</p>
-          <h2 id="home-task-title">你现在想完成什么？</h2>
-          <p>按当前状态选一个入口，不需要先理解整个站点结构。</p>
+          <p className="eyebrow">START WITH A QUESTION</p>
+          <h2 id="home-task-title">不知道从哪里开始？直接描述问题。</h2>
         </div>
 
-        <div className={styles.grid}>
-          <article className={`${styles.card} ${styles.primary}`}>
-            <span className={styles.number}>01</span>
-            <p className="eyebrow">刚开始玩</p>
-            <h3>{hasProgress ? "继续上次的新手路线" : "从零开始学习 Screeps"}</h3>
-            <p>
-              {hasProgress
-                ? `已完成 ${progress.completedSlugs.length} / ${beginnerSeriesSlugs.length} 篇，从第 ${resumeIndex} 篇继续。`
-                : "从 tick、第一只 Creep 和基础房间循环开始。"}
-            </p>
+        <form
+          action="/search"
+          className={styles.search}
+          role="search"
+          onSubmit={() => trackHomeAction("submit_search")}
+        >
+          <label className={styles.srOnly} htmlFor="home-task-search">搜索 Screeps 问题</label>
+          <span aria-hidden="true">⌕</span>
+          <input
+            id="home-task-search"
+            name="q"
+            type="search"
+            placeholder="例如：spawn 不工作、Creep 不移动、ERR_NOT_IN_RANGE"
+          />
+          <button type="submit">搜索全站 <span aria-hidden="true">→</span></button>
+        </form>
+
+        <div className={styles.popular} aria-label="热门搜索">
+          <span>POPULAR</span>
+          {popularSearches.map(([label, query]) => (
             <Link
-              href={`/blog/${resumeSlug}`}
-              onClick={() => trackHomeAction(hasProgress ? "resume_beginner" : "start_beginner")}
+              href={"/search?q=" + encodeURIComponent(query)}
+              key={query}
+              onClick={() => trackHomeAction("popular_search")}
             >
-              {hasProgress ? "继续学习" : "开始学习"} <span aria-hidden="true">→</span>
+              {label}
             </Link>
-          </article>
+          ))}
+        </div>
 
-          <article className={styles.card}>
-            <span className={styles.number}>02</span>
-            <p className="eyebrow">代码出了问题</p>
-            <h3>直接描述你看到的现象</h3>
-            <p>搜索错误码、API、Creep、Spawn、CPU 或中文问题。</p>
-            <form
-              action="/search"
-              role="search"
-              onSubmit={() => trackHomeAction("submit_search")}
-            >
-              <label htmlFor="home-task-search">描述你遇到的问题</label>
-              <div>
-                <input id="home-task-search" name="q" type="search" placeholder="例如：Creep 不移动" />
-                <button type="submit" aria-label="搜索网站">搜索</button>
-              </div>
-            </form>
-          </article>
-
-          <article className={styles.card}>
-            <span className={styles.number}>03</span>
-            <p className="eyebrow">已经有基础</p>
-            <h3>查专题知识与工程工具</h3>
-            <p>从 Memory、Spawn、寻路、市场到运行诊断，直接进入对应模块。</p>
-            <div className={styles.links}>
-              <Link href="/knowledge" onClick={() => trackHomeAction("open_knowledge")}>进入知识库 →</Link>
-              <Link href="/tools" onClick={() => trackHomeAction("open_tools")}>打开工具中心 →</Link>
-            </div>
-          </article>
+        <div className={styles.context}>
+          <Link
+            href={"/blog/" + resumeSlug}
+            onClick={() => trackHomeAction(hasProgress ? "resume_beginner" : "start_beginner")}
+          >
+            <small>{hasProgress ? "CONTINUE LEARNING" : "BEGINNER ROADMAP"}</small>
+            <strong>{hasProgress ? "继续第 " + resumeIndex + " 篇" : "从第一只 Creep 开始"}</strong>
+            <span>{hasProgress ? progress.completedSlugs.length + " / " + beginnerSeriesSlugs.length + " 已完成" : "开始学习 →"}</span>
+          </Link>
+          <Link href="/knowledge" onClick={() => trackHomeAction("open_knowledge")}>
+            <small>KNOWLEDGE</small>
+            <strong>按系统查知识</strong>
+            <span>知识地图 →</span>
+          </Link>
+          <Link href="/tools" onClick={() => trackHomeAction("open_tools")}>
+            <small>TOOLS</small>
+            <strong>先计算，再改代码</strong>
+            <span>工具中心 →</span>
+          </Link>
         </div>
 
         {recentArticles.length > 0 ? (
@@ -142,14 +151,15 @@ export function HomeTaskHub() {
                   key={article.slug}
                   onClick={() => trackHomeAction("resume_recent_article")}
                 >
-                  <strong>{article.title}</strong>
-                  <small>继续阅读 →</small>
+                  {article.title} <span aria-hidden="true">→</span>
                 </Link>
               ))}
             </div>
           </div>
         ) : null}
       </section>
+
+      <HomeKnowledgeOs locale="zh" />
     </>
   );
 }

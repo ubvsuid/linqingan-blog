@@ -1,210 +1,200 @@
 .hub {
   width: min(100%, 1120px);
-  margin: 46px auto 0;
+  margin: 0 auto;
+  padding: clamp(62px, 8vw, 94px) 0 22px;
   text-align: left;
 }
 
 .heading {
-  max-width: 720px;
-  margin: 0 auto 20px;
-  text-align: center;
+  max-width: 760px;
+  margin-bottom: 30px;
 }
 
 .heading h2 {
-  margin: 0;
-  font-size: clamp(30px, 4.5vw, 48px);
-  line-height: 1.08;
-  letter-spacing: -.045em;
+  margin: 8px 0 0;
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 560;
+  line-height: 1.03;
+  letter-spacing: -.052em;
 }
 
-.heading > p:last-child {
-  margin: 12px 0 0;
-  color: var(--muted);
-}
-
-.grid {
+.search {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
+  align-items: center;
+  min-height: 62px;
+  border: 1px solid #cfcfd4;
+  border-radius: 18px;
+  padding: 7px 8px 7px 20px;
+  background: #fff;
+  box-shadow: 0 10px 34px rgb(0 0 0 / 4%);
 }
 
-.card {
-  position: relative;
-  display: flex;
-  min-height: 250px;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 24px;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  box-shadow: 0 18px 50px rgb(20 20 16 / 5%);
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--border) 34%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--border) 34%, transparent) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(to bottom right, black, transparent 68%);
-  opacity: .35;
-}
-
-.card > * {
-  position: relative;
-}
-
-.primary {
-  border-color: color-mix(in srgb, var(--energy-accent) 58%, var(--border));
-}
-
-.number {
-  align-self: flex-end;
+.search > span {
   color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 12px;
+  font-size: 20px;
 }
 
-.card :global(.eyebrow) {
-  margin-top: 18px;
+.search input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 15px;
 }
 
-.card h3 {
-  margin: 0;
-  font-size: clamp(22px, 2.5vw, 28px);
-  line-height: 1.2;
-  letter-spacing: -.035em;
+.search input::placeholder {
+  color: #9a9aa0;
 }
 
-.card > p:not(:global(.eyebrow)) {
-  margin: 10px 0 18px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.65;
-}
-
-.card > a,
-.links,
-.card form {
-  margin-top: auto;
-}
-
-.card > a,
-.links a {
-  font-weight: 720;
-}
-
-.links {
-  display: grid;
-  gap: 8px;
-}
-
-.card form {
-  display: grid;
-  gap: 8px;
-}
-
-.card form label {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.card form > div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-}
-
-.card input,
-.card button {
-  min-height: 44px;
-  border: 1px solid var(--border);
+.search button {
+  min-height: 46px;
+  border: 0;
   border-radius: 12px;
-  background: var(--background);
+  padding: 0 16px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.search button:hover {
+  background: #f5f5f7;
   color: var(--foreground);
 }
 
-.card input {
-  min-width: 0;
-  padding: 0 13px;
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-.card button {
-  padding: 0 15px;
-  background: var(--foreground);
-  color: var(--background);
-  font-weight: 700;
-  cursor: pointer;
+.popular {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: center;
+  margin-top: 13px;
+}
+
+.popular > span {
+  margin-right: 4px;
+  color: #9a9aa0;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .14em;
+}
+
+.popular a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: var(--muted);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.popular a:hover {
+  border-color: #b9b9be;
+  color: var(--foreground);
+}
+
+.context {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 50px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.context > a {
+  display: grid;
+  min-height: 150px;
+  align-content: start;
+  gap: 8px;
+  padding: 24px 28px;
+  text-decoration: none;
+}
+
+.context > a + a {
+  border-left: 1px solid var(--border);
+}
+
+.context > a:hover {
+  background: #f5f5f7;
+}
+
+.context small {
+  color: #9a9aa0;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .13em;
+}
+
+.context strong {
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.context span {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .recent {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 18px;
-  margin-top: 14px;
-  border-top: 1px solid var(--border);
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 20px;
   padding-top: 18px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .recent > span {
-  color: var(--muted);
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 11px;
-  letter-spacing: .08em;
+  color: #9a9aa0;
 }
 
 .recent > div {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
 }
 
 .recent a {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
+  color: var(--foreground);
+  font-weight: 560;
 }
 
-.recent strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 13px;
-}
+@media (max-width: 760px) {
+  .search {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
 
-.recent small {
-  color: var(--muted);
-}
+  .search button {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+  }
 
-@media (max-width: 920px) {
-  .grid {
+  .context {
     grid-template-columns: 1fr;
   }
 
-  .card {
-    min-height: 0;
+  .context > a + a {
+    border-top: 1px solid var(--border);
+    border-left: 0;
   }
 
   .recent {
     grid-template-columns: 1fr;
-  }
-
-  .recent > div {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 520px) {
-  .hub {
-    margin-top: 38px;
-  }
-
-  .card {
-    border-radius: 18px;
-    padding: 22px;
   }
 }

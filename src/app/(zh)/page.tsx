@@ -13,7 +13,6 @@ import { getAllPosts } from "@/lib/posts";
 import { latestSiteAuditEntry } from "@/lib/site-audit-entry";
 import { toolCatalog } from "@/lib/tool-catalog";
 
-import styles from "../home.module.css";
 import refreshStyles from "./home-refresh.module.css";
 
 const baseMetadata = createPageMetadata({
@@ -99,20 +98,18 @@ export default function HomePage() {
 
   return (
     <main className={styles.home}>
-      <section className={`${styles.hero} screeps-room-grid`}>
-        <Container className={styles.heroInner}>
-          <p className="eyebrow">SCREEPS KNOWLEDGE OS · LEARN · BUILD · SOLVE · VERIFY</p>
-          <h1>Screeps Knowledge OS：从问题到可验证的解决方案</h1>
-          <p className={styles.heroDescription}>
-            把教程、API、工具、Resolver、Doctor 与 Runtime Evidence 连成一条路径：学习系统，构建代码，定位问题，验证结果。你不需要先知道该查什么；遇到问题就从 Doctor 开始。
+      <section className={refreshStyles.hero}>
+        <Container className={refreshStyles.heroInner}>
+          <p className={refreshStyles.kicker}>SCREEPS KNOWLEDGE OS</p>
+          <h1>Master Screeps.</h1>
+          <p className={refreshStyles.heroDescription}>
+            从第一只 Creep 到自动运行的 colony。学会系统，写出代码，定位问题，并用真实证据验证结果。
           </p>
-          <p className={styles.heroStats}>
-            {articleCount} 篇文章 · {sectionCount} 个知识模块 · {beginnerSeriesSlugs.length} 篇新手路线
-          </p>
-          <div className="button-row">
-            <Link className="button button-primary" href="/resolver#screeps-doctor">用 Doctor 解决问题</Link>
-            <Link className="button button-secondary" href="/beginner">开始学习 Screeps</Link>
+          <div className={refreshStyles.heroActions}>
+            <Link className={refreshStyles.primaryAction} href="/beginner">开始学习 <span aria-hidden="true">→</span></Link>
+            <Link className={refreshStyles.secondaryAction} href="/resolver#screeps-doctor">打开 Doctor <span aria-hidden="true">→</span></Link>
           </div>
+          <p className={refreshStyles.heroNote}>Learn. Build. Solve. Verify. Go deeper.</p>
         </Container>
       </section>
 

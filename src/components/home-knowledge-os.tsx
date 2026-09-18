@@ -137,7 +137,7 @@ export function HomeKnowledgeOs({ locale }: { locale: Locale }) {
   const productPaths = getProductPaths(locale);
 
   return (
-    <section className={styles.section} aria-labelledby={`knowledge-os-title-${locale}`}>
+    <section className={`${styles.section} ${locale === "zh" ? styles.editorial : ""}`} aria-labelledby={`knowledge-os-title-${locale}`}>
       <header className={styles.heading}>
         <div>
           <p className="eyebrow">SCREEPS KNOWLEDGE OS</p>
