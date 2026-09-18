@@ -150,7 +150,7 @@ export default function KnowledgePage() {
   };
 
   return (
-    <main className="page-shell knowledge-page">
+    <main className="page-shell knowledge-page monochrome-system-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

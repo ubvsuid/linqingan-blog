@@ -53,8 +53,9 @@ export function SiteFooter() {
   const learningLinks = english ? englishLearningLinks : chineseLearningLinks;
   const siteLinks = english ? englishSiteLinks : chineseSiteLinks;
   const languageTarget = getLanguageSwitchTarget(pathname);
+  const monochromeShell = !english && ["/", "/beginner", "/knowledge", "/verification"].includes(pathname);
 
-  if (!english && pathname === "/") {
+  if (monochromeShell) {
     return (
       <footer className="site-footer homepage-site-footer" lang="zh-CN">
         <Container className="homepage-footer-inner">
@@ -62,7 +63,7 @@ export function SiteFooter() {
             <strong>linqingan.com</strong>
             <p>Making Screeps easier to learn, build and master.</p>
           </div>
-          <nav className="homepage-footer-links" aria-label="首页页脚导航">
+          <nav className="homepage-footer-links" aria-label="简洁页脚导航">
             <Link href="/about">About</Link>
             <Link href="/changelog">Changelog</Link>
             <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub</a>

@@ -43,60 +43,21 @@ export function BeginnerProgressSummary() {
         .beginner-progress-summary {
           display: grid;
           gap: 16px;
-          margin: -12px 0 44px;
-          border: 1px solid var(--border);
-          border-radius: 18px;
-          padding: 20px 22px;
-          background: var(--surface);
+          margin: -18px 0 48px;
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+          padding: 20px 0 22px;
+          background: transparent;
         }
-
-        .beginner-progress-summary-copy {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-        }
-
-        .beginner-progress-summary-copy > div {
-          display: grid;
-          gap: 4px;
-        }
-
-        .beginner-progress-summary-copy span {
-          color: var(--muted);
-          font-size: 13px;
-        }
-
-        .beginner-progress-summary-copy strong {
-          font-size: 16px;
-        }
-
-        .beginner-progress-summary-copy a {
-          font-weight: 650;
-          white-space: nowrap;
-        }
-
-        .beginner-progress-summary-bar {
-          height: 3px;
-          overflow: hidden;
-          border-radius: 999px;
-          background: var(--surface-soft);
-        }
-
-        .beginner-progress-summary-bar span {
-          display: block;
-          height: 100%;
-          border-radius: inherit;
-          background: var(--foreground);
-          transition: width 220ms ease;
-        }
-
+        .beginner-progress-summary-copy { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+        .beginner-progress-summary-copy > div { display: grid; gap: 3px; }
+        .beginner-progress-summary-copy span { color: #888; font-size: 11px; }
+        .beginner-progress-summary-copy strong { color: #000; font-size: 15px; }
+        .beginner-progress-summary-copy a { font-size: 12px; font-weight: 650; white-space: nowrap; }
+        .beginner-progress-summary-bar { height: 2px; overflow: hidden; background: #ededed; }
+        .beginner-progress-summary-bar span { display: block; height: 100%; background: #000; transition: width 220ms ease; }
         @media (max-width: 640px) {
-          .beginner-progress-summary-copy {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 12px;
-          }
+          .beginner-progress-summary-copy { align-items: flex-start; flex-direction: column; gap: 12px; }
         }
       `}</style>
     </section>

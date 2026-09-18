@@ -12,11 +12,10 @@ const baseStyle: CSSProperties = {
   display: "inline-flex",
   minHeight: 24,
   alignItems: "center",
-  border: "1px solid var(--border)",
-  borderRadius: 999,
-  padding: "0 8px",
-  color: "var(--muted)",
-  fontSize: 11,
+  padding: 0,
+  color: "#888",
+  fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", monospace',
+  fontSize: 10,
 };
 
 export function BeginnerProgressMarker({
@@ -31,9 +30,7 @@ export function BeginnerProgressMarker({
         isCompleted
           ? {
               ...baseStyle,
-              borderColor:
-                "color-mix(in srgb, var(--foreground) 32%, var(--border))",
-              color: "var(--foreground)",
+              color: "#000",
             }
           : baseStyle
       }

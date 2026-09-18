@@ -583,3 +583,74 @@ body:has(.home) .header-icon-link {
     display: none;
   }
 }
+
+
+/* SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — internal shell */
+body:has(.monochrome-system-page) .site-header {
+  border-bottom: 1px solid #ededed;
+  background: #ffffff;
+}
+
+body:has(.monochrome-system-page) .header-inner {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 70px;
+  gap: 28px;
+}
+
+body:has(.monochrome-system-page) .site-nav {
+  grid-column: 2;
+  gap: clamp(14px, 1.5vw, 26px);
+  font-size: 11px;
+}
+
+body:has(.monochrome-system-page) .site-nav a {
+  padding-block: 8px;
+  color: #111111;
+}
+
+body:has(.monochrome-system-page) .site-nav a::after { background: #000000; }
+
+body:has(.monochrome-system-page) .header-controls {
+  grid-column: 3;
+  gap: 10px;
+}
+
+body:has(.monochrome-system-page) .language-switch,
+body:has(.monochrome-system-page) .header-icon-link {
+  min-width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+body:has(.monochrome-system-page) .language-switch {
+  padding: 0 6px;
+  color: #111111;
+  font-size: 11px;
+}
+
+body:has(.monochrome-system-page) .header-icon-link { width: 36px; }
+
+body:has(.monochrome-system-page) .homepage-site-footer {
+  border-top: 1px solid #dedede;
+  background: #ffffff;
+}
+
+@media (max-width: 980px) {
+  body:has(.monochrome-system-page) .header-inner {
+    grid-template-columns: 1fr auto;
+    min-height: 68px;
+  }
+
+  body:has(.monochrome-system-page) .site-nav {
+    grid-column: 1 / -1;
+    width: 100%;
+    border: 1px solid #dedede;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+  }
+
+  body:has(.monochrome-system-page) .site-nav a + a { border-top: 1px solid #ededed; }
+}

@@ -78,7 +78,7 @@ export function BeginnerArchive() {
   };
 
   return (
-    <main className="page-shell beginner-page">
+    <main className="page-shell beginner-page monochrome-system-page">
       <Container>
         <script
           type="application/ld+json"
@@ -198,250 +198,112 @@ export function BeginnerArchive() {
       </Container>
 
       <style>{`
-        .beginner-header {
-          max-width: 920px;
-        }
-
-        .beginner-header-note {
-          margin-top: 14px !important;
-          color: var(--muted);
-          font-size: 14px;
-        }
+        .beginner-header { max-width: 1020px; }
+        .beginner-header-note { max-width: 760px; margin-top: 18px !important; color: #777; font-size: 13px; line-height: 1.7; }
 
         .beginner-support-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
-          margin: 38px 0 28px;
+          gap: 0;
+          margin: 48px 0 36px;
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
         }
-
         .beginner-support-grid a {
           display: grid;
-          gap: 9px;
-          min-height: 172px;
-          border: 1px solid var(--border);
-          border-radius: 18px;
-          padding: 22px;
-          background: var(--surface);
-          transition: transform 160ms ease, border-color 160ms ease;
+          gap: 10px;
+          min-height: 178px;
+          border: 0;
+          border-right: 1px solid var(--border);
+          border-radius: 0;
+          padding: 30px 28px;
+          background: transparent;
+          transition: background-color 160ms ease;
         }
-
-        .beginner-support-grid a:hover {
-          transform: translateY(-2px);
-          border-color: var(--muted);
-          text-decoration: none;
-        }
-
-        .beginner-support-grid span {
-          color: var(--muted);
-          font-size: 12px;
-        }
-
-        .beginner-support-grid strong {
-          font-size: 18px;
-        }
-
-        .beginner-support-grid p {
-          margin: 0;
-          color: var(--muted);
-          font-size: 13px;
-          line-height: 1.7;
-        }
+        .beginner-support-grid a:first-child { padding-left: 0; }
+        .beginner-support-grid a:last-child { border-right: 0; padding-right: 0; }
+        .beginner-support-grid a:hover { background: #f7f7f7; text-decoration: none; }
+        .beginner-support-grid span { color: #888; font-family: "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+        .beginner-support-grid strong { color: #000; font-size: 20px; letter-spacing: -.025em; }
+        .beginner-support-grid p { margin: 0; color: #666; font-size: 13px; line-height: 1.7; }
 
         .beginner-stage-nav {
           display: flex;
           flex-wrap: wrap;
-          gap: 10px;
-          margin-bottom: 48px;
-        }
-
-        .beginner-stage-nav a {
-          border: 1px solid var(--border);
-          border-radius: 999px;
-          padding: 9px 13px;
-          background: var(--surface);
-          font-size: 13px;
-        }
-
-        .beginner-stage-nav a:hover {
-          border-color: var(--muted);
-          text-decoration: none;
-        }
-
-        .beginner-list {
+          gap: 0;
+          margin-bottom: 66px;
           border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
         }
+        .beginner-stage-nav a { border: 0; border-right: 1px solid var(--border); border-radius: 0; padding: 13px 18px; background: transparent; color: #666; font-size: 11px; }
+        .beginner-stage-nav a:first-child { padding-left: 0; }
+        .beginner-stage-nav a:last-child { border-right: 0; }
+        .beginner-stage-nav a:hover { color: #000; text-decoration: none; }
 
+        .beginner-list { border-top: 1px solid var(--border); }
         .beginner-stage-heading {
           display: grid;
-          grid-template-columns: 70px minmax(0, 1fr);
-          gap: 28px;
+          grid-template-columns: 74px minmax(0, 1fr);
+          gap: 34px;
           align-items: start;
-          scroll-margin-top: 24px;
+          scroll-margin-top: 84px;
           border-bottom: 1px solid var(--border);
-          padding: 32px 4px 24px;
-          background: color-mix(in srgb, var(--surface) 70%, transparent);
+          padding: 46px 0 34px;
+          background: transparent;
         }
-
-        .beginner-stage-heading > span {
-          color: var(--muted);
-          font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-          font-size: 12px;
-          text-transform: uppercase;
-        }
-
-        .beginner-stage-heading > div {
-          display: grid;
-          gap: 7px;
-        }
-
-        .beginner-stage-heading strong {
-          font-size: 18px;
-        }
-
-        .beginner-stage-heading p {
-          max-width: 760px;
-          margin: 0;
-          color: var(--muted);
-          line-height: 1.7;
-        }
-
-        .beginner-stage-heading a {
-          width: fit-content;
-          margin-top: 4px;
-          font-size: 13px;
-          font-weight: 650;
-        }
-
-        .beginner-stage-outcomes {
-          display: grid;
-          gap: 8px;
-          margin: 12px 0 8px;
-          border-left: 2px solid var(--border);
-          padding-left: 14px;
-        }
-
-        .beginner-stage-outcomes > span {
-          color: var(--foreground);
-          font-size: 12px;
-          font-weight: 700;
-        }
-
-        .beginner-stage-outcomes ul {
-          display: grid;
-          gap: 5px;
-          margin: 0;
-          padding-left: 18px;
-          color: var(--muted);
-          font-size: 12px;
-          line-height: 1.6;
-        }
+        .beginner-stage-heading > span { color: #888; font-family: "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+        .beginner-stage-heading > div { display: grid; gap: 9px; }
+        .beginner-stage-heading strong { color: #000; font-size: clamp(28px, 4vw, 42px); line-height: 1.08; letter-spacing: -.045em; }
+        .beginner-stage-heading p { max-width: 760px; margin: 0; color: #666; line-height: 1.7; }
+        .beginner-stage-heading a { width: fit-content; margin-top: 8px; font-size: 12px; font-weight: 650; }
+        .beginner-stage-outcomes { display: grid; gap: 8px; margin: 16px 0 6px; border-left: 1px solid #bdbdbd; padding-left: 16px; }
+        .beginner-stage-outcomes > span { color: #000; font-size: 11px; font-weight: 700; }
+        .beginner-stage-outcomes ul { display: grid; gap: 5px; margin: 0; padding-left: 18px; color: #777; font-size: 12px; line-height: 1.6; }
 
         .beginner-item {
           display: grid;
-          grid-template-columns: 70px minmax(0, 1fr) auto;
-          gap: 28px;
+          grid-template-columns: 74px minmax(0, 1fr) auto;
+          gap: 34px;
           align-items: center;
           border-bottom: 1px solid var(--border);
-          padding: 30px 4px;
-          transition: padding 180ms ease, background-color 180ms ease;
+          padding: 30px 0;
+          transition: padding 160ms ease, background-color 160ms ease;
         }
-
-        .beginner-item:hover {
-          padding-inline: 18px;
-          background: var(--surface);
-          text-decoration: none;
-        }
-
-        .beginner-number,
-        .beginner-meta {
-          color: var(--muted);
-          font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-          font-size: 12px;
-        }
-
-        .beginner-copy {
-          display: grid;
-          gap: 10px;
-        }
-
-        .beginner-copy strong {
-          font-size: clamp(24px, 3.4vw, 38px);
-          line-height: 1.2;
-          letter-spacing: -0.04em;
-        }
-
-        .beginner-copy > span {
-          max-width: 760px;
-          color: var(--muted);
-          line-height: 1.7;
-        }
-
-        .beginner-meta {
-          display: inline-flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 9px;
-          white-space: nowrap;
-        }
+        .beginner-item:hover { padding-inline: 14px; background: #f7f7f7; text-decoration: none; }
+        .beginner-number, .beginner-meta { color: #888; font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; }
+        .beginner-copy { display: grid; gap: 8px; }
+        .beginner-copy strong { color: #000; font-size: clamp(24px, 3.4vw, 38px); line-height: 1.15; letter-spacing: -.045em; }
+        .beginner-copy > span { max-width: 760px; color: #666; line-height: 1.7; }
+        .beginner-meta { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; white-space: nowrap; }
 
         .beginner-complete {
           display: grid;
           grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
-          gap: 38px;
-          margin-top: 72px;
-          border: 1px solid var(--border);
-          border-radius: 24px;
-          padding: clamp(28px, 5vw, 48px);
-          background: var(--surface);
+          gap: 56px;
+          margin-top: 86px;
+          border: 0;
+          border-top: 1px solid var(--border);
+          border-radius: 0;
+          padding: 66px 0 0;
+          background: transparent;
         }
-
-        .beginner-complete h2 {
-          margin: 8px 0 16px;
-          font-size: clamp(30px, 5vw, 48px);
-          line-height: 1.15;
-          letter-spacing: -.045em;
-        }
-
-        .beginner-complete p:not(.eyebrow) {
-          margin: 0;
-          color: var(--muted);
-          line-height: 1.8;
-        }
-
-        .beginner-complete-links {
-          display: grid;
-          align-content: center;
-          gap: 14px;
-          font-weight: 650;
-        }
+        .beginner-complete h2 { margin: 8px 0 16px; color: #000; font-size: clamp(34px, 5vw, 54px); line-height: 1.05; letter-spacing: -.055em; }
+        .beginner-complete p:not(.eyebrow) { margin: 0; color: #666; line-height: 1.8; }
+        .beginner-complete-links { display: grid; align-content: center; gap: 14px; font-weight: 650; }
 
         @media (max-width: 820px) {
-          .beginner-support-grid,
-          .beginner-complete {
-            grid-template-columns: 1fr;
+          .beginner-support-grid, .beginner-complete { grid-template-columns: 1fr; }
+          .beginner-support-grid a, .beginner-support-grid a:first-child, .beginner-support-grid a:last-child {
+            min-height: 0; border-right: 0; border-bottom: 1px solid var(--border); padding: 24px 0;
           }
+          .beginner-support-grid a:last-child { border-bottom: 0; }
         }
-
         @media (max-width: 760px) {
-          .beginner-stage-heading,
-          .beginner-item {
-            grid-template-columns: 44px minmax(0, 1fr);
-            gap: 16px;
-          }
-
-          .beginner-stage-heading {
-            padding-block: 24px 18px;
-          }
-
-          .beginner-item {
-            padding-block: 24px;
-          }
-
-          .beginner-meta {
-            grid-column: 2;
-            justify-content: flex-start;
-          }
+          .beginner-stage-heading, .beginner-item { grid-template-columns: 44px minmax(0, 1fr); gap: 16px; }
+          .beginner-stage-heading { padding-block: 30px 24px; }
+          .beginner-item { padding-block: 24px; }
+          .beginner-meta { grid-column: 2; justify-content: flex-start; }
+          .beginner-stage-nav a { width: 50%; border-bottom: 1px solid var(--border); }
         }
       `}</style>
     </main>
