@@ -156,7 +156,7 @@ const checks = [
   },
   {
     path: "src/app/(zh)/diagnostics/page.tsx",
-    required: ["monochrome-system-page", "diagnostics-monochrome-page", "Start with what you see.", "solve-entry-switch", "/resolver#screeps-doctor", "/resolver#problem-resolver-zh", "ScreepsDiagnosticCenter"],
+    required: ["monochrome-system-page", "diagnostics-monochrome-page", "Start with what you see.", "solve-entry-switch", "/resolver#screeps-doctor", 'href="/resolver"', "ScreepsDiagnosticCenter"],
     forbidden: ["error-tip"],
   },
   {
