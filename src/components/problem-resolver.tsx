@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import { buildIdentityHeaders } from "@/lib/browser-identity";
 import type { KnowledgeClusterHandoffSignal } from "@/lib/knowledge-cluster-handoff";
@@ -11,6 +11,7 @@ import type {
 } from "@/lib/problem-resolver-graph";
 import {
   getProblemResolverStep,
+  parseProblemResolverFlowId,
   problemResolverFlows,
   type ProblemResolverLocale,
   type ProblemResolverOption,
@@ -45,6 +46,20 @@ function recordResolverTelemetry(event: ResolverTelemetryEvent) {
   }
 }
 
+function subscribeToResolverLocation() {
+  return () => undefined;
+}
+
+function getResolverFlowFromLocation(): string | null {
+  return parseProblemResolverFlowId(
+    new URLSearchParams(window.location.search).get("flow"),
+  );
+}
+
+function getServerResolverFlow(): null {
+  return null;
+}
+
 export function ProblemResolver({
   locale,
   relatedPathsByStep = {},
@@ -55,12 +70,19 @@ export function ProblemResolver({
   clusterHandoffs?: readonly KnowledgeClusterHandoffSignal[];
 }) {
   const isEnglish = locale === "en";
-  const [flowId, setFlowId] = useState(problemResolverFlows[0].flowId);
+  const requestedFlowId = useSyncExternalStore(
+    subscribeToResolverLocation,
+    getResolverFlowFromLocation,
+    getServerResolverFlow,
+  );
+  const [selectedFlowId, setSelectedFlowId] = useState<string | null>(null);
+  const flowId = selectedFlowId ?? requestedFlowId ?? problemResolverFlows[0].flowId;
   const flow = useMemo(() => problemResolverFlows.find((item) => item.flowId === flowId) ?? problemResolverFlows[0], [flowId]);
   const [stepId, setStepId] = useState(flow.startStepId);
   const [history, setHistory] = useState<string[]>([]);
   const activeRunRef = useRef<string | null>(null);
   const step = getProblemResolverStep(flow, stepId) ?? getProblemResolverStep(flow, flow.startStepId);
+  const activeStepId = step?.stepId ?? flow.startStepId;
 
   function startFlowIfNeeded(nextFlowId: string) {
     const runKey = `${locale}:${nextFlowId}`;
@@ -77,7 +99,7 @@ export function ProblemResolver({
     const nextFlow = problemResolverFlows.find((item) => item.flowId === nextFlowId) ?? problemResolverFlows[0];
     activeRunRef.current = null;
     startFlowIfNeeded(nextFlow.flowId);
-    setFlowId(nextFlow.flowId);
+    setSelectedFlowId(nextFlow.flowId);
     setStepId(nextFlow.startStepId);
     setHistory([]);
   }
@@ -87,7 +109,7 @@ export function ProblemResolver({
     recordResolverTelemetry({
       eventName: "step_answered",
       flowId: flow.flowId,
-      stepId,
+      stepId: activeStepId,
       optionId: option.id,
       language: locale,
     });
@@ -102,7 +124,7 @@ export function ProblemResolver({
       });
     }
 
-    setHistory((items) => [...items, stepId]);
+    setHistory((items) => [...items, activeStepId]);
     setStepId(option.nextStepId);
   }
 

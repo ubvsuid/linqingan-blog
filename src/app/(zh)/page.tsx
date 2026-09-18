@@ -63,12 +63,6 @@ export default function HomePage() {
               <Link className={refreshStyles.secondaryAction} href="/resolver#screeps-doctor">用 Doctor 解决问题 <span aria-hidden="true">→</span></Link>
             </div>
           </div>
-
-          <aside className={refreshStyles.heroManifesto} aria-label="Screeps Knowledge OS workflow">
-            <span aria-hidden="true" />
-            <strong>Build.<br />Solve.<br />Verify.<br />Repeat.</strong>
-            <p>A complete knowledge system<br />for developers who want to go deeper.</p>
-          </aside>
         </Container>
       </section>
 

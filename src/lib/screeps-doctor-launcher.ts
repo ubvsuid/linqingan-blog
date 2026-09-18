@@ -31,3 +31,13 @@ export function parseScreepsDoctorLaunchSymptom(value: string | null): ScreepsDo
     ? (value as ScreepsDoctorLaunchSymptom)
     : null;
 }
+
+export function getScreepsDoctorDeepLink(
+  value: string,
+  locale: "zh" | "en",
+): string | null {
+  const symptom = parseScreepsDoctorLaunchSymptom(value);
+  if (!symptom) return null;
+  const base = locale === "en" ? "/en/resolver" : "/resolver";
+  return `${base}?doctor=${encodeURIComponent(symptom)}#screeps-doctor`;
+}
