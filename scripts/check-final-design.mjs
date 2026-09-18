@@ -34,12 +34,12 @@ const checks = [
   },
   {
     path: "src/components/site-header.tsx",
-    required: ["profile-shortcut", "header-icon-link", '"/tools"', '"/screeps-api"', "monochromeShell"],
+    required: ["profile-shortcut", "header-icon-link", '"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver"', '"/search"', "monochromeShell"],
     forbidden: ["<style>", ".header-icon-link { display: none; }"],
   },
   {
     path: "src/components/site-footer.tsx",
-    required: ['"/tools"', '"/screeps-api"', "monochromeShell", "homepage-site-footer"],
+    required: ['"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver"', '"/search"', "monochromeShell", "homepage-site-footer"],
     forbidden: [],
   },
   {
@@ -153,6 +153,56 @@ const checks = [
     path: "src/components/screeps-api-explorer.module.css",
     required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 2 / API EXPLORER", ':global(.screeps-api-monochrome-hub)'],
     forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/diagnostics/page.tsx",
+    required: ["monochrome-system-page", "diagnostics-monochrome-page", "Start with what you see.", "solve-entry-switch", "/resolver#screeps-doctor", "/resolver#problem-resolver-zh", "ScreepsDiagnosticCenter"],
+    forbidden: ["error-tip"],
+  },
+  {
+    path: "src/components/screeps-diagnostic-center.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / DIAGNOSTICS", ':global(.diagnostics-monochrome-page)', "counter-reset: diagnostic-section", "decimal-leading-zero"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/resolver/page.tsx",
+    required: ["monochrome-system-page", "resolver-monochrome-page", "Solve the problem.", "solve-mode-index", "ScreepsDoctor", "ProblemResolver", "Diagnosis → Fix → Verify"],
+    forbidden: ["error-tip"],
+  },
+  {
+    path: "src/components/screeps-doctor.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / DOCTOR", ':global(.resolver-monochrome-page)', "grid-template-columns: 1fr", "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/problem-resolver.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / RESOLVER", ':global(.resolver-monochrome-page)', "grid-template-columns: repeat(3", "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/search/page.tsx",
+    required: ["monochrome-system-page", "search-monochrome-page", "Ask. Route. Solve.", "search-system-map", "Search V3", "Search V2", "SiteSearchV2"],
+    forbidden: ["search-problem-path", "<style>{"],
+  },
+  {
+    path: "src/components/site-search-v2.tsx",
+    required: ["SearchRouteV1Card", "buildSearchRouteV1", "searchRoute", "SiteSearchV2"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/search-route-v1-card.module.css",
+    required: ["MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / SEARCH V3 ROUTE", ':global(.search-monochrome-page)', "border-radius: 0", "grid-template-columns: 1fr"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/site-shell.css",
+    required: ["SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / SOLVE SYSTEM", ".solve-system-hero", ".solve-mode-index", ".search-system-map", ".search-monochrome-page .site-search-results"],
+    forbidden: [],
+  },
+  {
+    path: "src/lib/search-route-v1.ts",
+    required: ["GRAPH_SEARCH_ANCHOR_MIN_SCORE", "buildSearchRouteV1", "buildSpawnCreepGameModeRoute", "Search V2 must remain usable", "doctor", "resolver"],
+    forbidden: ["drizzle-orm", "getPlatformDatabase"],
   },
   {
     path: "src/lib/tool-catalog.ts",
