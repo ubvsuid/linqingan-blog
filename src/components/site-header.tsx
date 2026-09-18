@@ -19,7 +19,17 @@ export function SiteHeader() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
   const english = isEnglishPath(pathname);
-  const navigation = english ? englishNavigation : siteConfig.navigation;
+  const homepage = !english && pathname === "/";
+  const homepageNavigation = [
+    { label: "Learn", href: "/beginner" },
+    { label: "Build", href: "/knowledge" },
+    { label: "Solve", href: "/diagnostics" },
+    { label: "Verify", href: "/verification" },
+    { label: "API", href: "/screeps-api" },
+    { label: "Tools", href: "/tools" },
+    { label: "Knowledge Map", href: "/knowledge" },
+  ];
+  const navigation = homepage ? homepageNavigation : english ? englishNavigation : siteConfig.navigation;
   const languageTarget = getLanguageSwitchTarget(pathname);
   const isBeginnerArticle = beginnerSeriesSlugs.some((slug) => pathname === `/blog/${slug}`);
   const isKnowledgeArticle = knowledgeBaseSlugs.some((slug) => pathname === `/blog/${slug}`);
@@ -78,10 +88,16 @@ export function SiteHeader() {
           aria-label={english ? "Linqingan English Screeps home" : "返回首页"}
           onClick={() => setMenuOpen(false)}
         >
-          <Image className="brand-logo" src="/brand-logo.svg" alt="" width={80} height={72} sizes="68px" />
-          {english ? (
-            <span className="brand-copy"><strong>Linqingan</strong><small>Screeps Guides &amp; Tools</small></span>
-          ) : null}
+          {homepage ? (
+            <span className="home-brand-wordmark">linqingan.com</span>
+          ) : (
+            <>
+              <Image className="brand-logo" src="/brand-logo.svg" alt="" width={80} height={72} sizes="68px" />
+              {english ? (
+                <span className="brand-copy"><strong>Linqingan</strong><small>Screeps Guides &amp; Tools</small></span>
+              ) : null}
+            </>
+          )}
         </Link>
 
         <div className="header-actions">
@@ -110,10 +126,15 @@ export function SiteHeader() {
             <Link className="header-icon-link" href={searchHref} aria-label={english ? "Search the English site" : "搜索网站"} title={english ? "Search" : "搜索网站"} prefetch={false} onClick={() => setMenuOpen(false)}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
             </Link>
-            <ThemeToggle />
-            {!english ? (
+            {!homepage ? <ThemeToggle /> : null}
+            {!english && !homepage ? (
               <Link className="profile-shortcut" href={aboutHref} aria-label="查看临清安的个人主页" title="个人主页" prefetch={false} onClick={() => setMenuOpen(false)}>
                 <Image src="/profile-avatar.webp" alt="" width={36} height={36} sizes="36px" />
+              </Link>
+            ) : null}
+            {homepage ? (
+              <Link className="home-doctor-link" href="/resolver#screeps-doctor" onClick={() => setMenuOpen(false)}>
+                Open Doctor
               </Link>
             ) : null}
             <button

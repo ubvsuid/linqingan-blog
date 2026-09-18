@@ -54,6 +54,26 @@ export function SiteFooter() {
   const siteLinks = english ? englishSiteLinks : chineseSiteLinks;
   const languageTarget = getLanguageSwitchTarget(pathname);
 
+  if (!english && pathname === "/") {
+    return (
+      <footer className="site-footer homepage-site-footer" lang="zh-CN">
+        <Container className="homepage-footer-inner">
+          <div className="homepage-footer-brand">
+            <strong>linqingan.com</strong>
+            <p>Making Screeps easier to learn, build and master.</p>
+          </div>
+          <nav className="homepage-footer-links" aria-label="首页页脚导航">
+            <Link href="/about">About</Link>
+            <Link href="/changelog">Changelog</Link>
+            <a href={siteConfig.links.github} rel="noreferrer" target="_blank">GitHub</a>
+            <a href={`mailto:${siteConfig.author.email}`}>Contact</a>
+          </nav>
+          <p className="homepage-footer-motto">Build. Learn. Solve. Repeat.</p>
+        </Container>
+      </footer>
+    );
+  }
+
   return (
     <footer className="site-footer" lang={english ? "en" : "zh-CN"}>
       <Container className="footer-inner">
