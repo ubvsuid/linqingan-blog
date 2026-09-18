@@ -13,8 +13,22 @@ export const metadata = createPageMetadata({
   path: "/tools",
 });
 
+const toolHubOrder: Record<string, number> = {
+  "room-diagnostics": 0,
+  "creep-body-calculator": 1,
+  "market-terminal-cost-calculator": 2,
+  "controller-downgrade-planner": 3,
+  "lab-reaction-boost-planner": 4,
+  "spawn-queue-replacement-planner": 5,
+  "hauling-throughput-planner": 6,
+  "tower-damage-heal-repair-calculator": 7,
+};
+
 export default function ToolsPage() {
   const pageUrl = `${siteConfig.url}/tools`;
+  const orderedTools = [...toolCatalog].sort(
+    (a, b) => (toolHubOrder[a.slug] ?? 999) - (toolHubOrder[b.slug] ?? 999),
+  );
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -29,8 +43,8 @@ export default function ToolsPage() {
       {
         "@type": "ItemList",
         "@id": `${pageUrl}#tools`,
-        numberOfItems: toolCatalog.length,
-        itemListElement: toolCatalog.map((tool, index) => ({
+        numberOfItems: orderedTools.length,
+        itemListElement: orderedTools.map((tool, index) => ({
           "@type": "ListItem",
           position: index + 1,
           name: tool.zhTitle,
@@ -48,23 +62,26 @@ export default function ToolsPage() {
   };
 
   return (
-    <main className="page-shell planning-tool-page">
+    <main className="page-shell planning-tool-page monochrome-system-page tools-monochrome-hub">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
         <nav className="planning-tool-breadcrumb" aria-label="面包屑"><Link href="/">首页</Link><span aria-hidden="true">/</span><span>工具</span></nav>
-        <header className="page-header">
+        <header className="page-header tools-hub-header">
           <p className="eyebrow">SCREEPS TOOLS</p>
-          <h1>计算、诊断与规划工具</h1>
-          <p>全部工具都在浏览器本地运行，不要求 Screeps Token，不连接玩家账号，也不会执行游戏操作。结果用于执行前检查，真实状态仍需通过返回码和后续 Tick 验证。</p>
+          <h1>Tools for Screeps.</h1>
+          <p>计算、诊断与规划工具，全部在浏览器本地运行：不要求 Screeps Token，不连接玩家账号，也不会执行游戏操作。先用工具检查，再用返回码与后续 Tick 验证真实状态。</p>
         </header>
 
-        <section className="tools-hub-grid" aria-label="Screeps 工具列表">
-          {toolCatalog.map((tool) => (
-            <Link className="tools-hub-card" href={getToolHref(tool.slug)} key={tool.slug}>
-              <span className="eyebrow">{tool.eyebrow}</span>
-              <h2>{tool.zhTitle}</h2>
-              <p>{tool.zhDescription}</p>
-              <strong>打开工具 →</strong>
+        <section className="tools-hub-list" aria-label="Screeps 工具列表">
+          {orderedTools.map((tool, index) => (
+            <Link className="tools-hub-row" href={getToolHref(tool.slug)} key={tool.slug}>
+              <span className="tools-hub-number">{String(index + 1).padStart(2, "0")}</span>
+              <span className="tools-hub-copy">
+                <span className="tools-hub-eyebrow">{tool.eyebrow}</span>
+                <strong>{tool.zhTitle}</strong>
+                <span>{tool.zhDescription}</span>
+              </span>
+              <span className="tools-hub-action">Open →</span>
             </Link>
           ))}
         </section>

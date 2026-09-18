@@ -394,3 +394,94 @@
     text-align: left;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 2 / TOOLS HUB */
+.tools-monochrome-hub .planning-tool-breadcrumb {
+  margin-bottom: 54px;
+  color: #777777;
+  font-size: 11px;
+}
+
+.tools-monochrome-hub .planning-tool-breadcrumb a {
+  color: #444444;
+}
+
+.tools-monochrome-hub .tools-hub-header {
+  max-width: 980px;
+}
+
+.tools-monochrome-hub .tools-hub-list {
+  border-top: 1px solid var(--border);
+}
+
+.tools-monochrome-hub .tools-hub-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 32px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding: 30px 0;
+  text-decoration: none;
+  transition: padding 160ms ease, background-color 160ms ease;
+}
+
+.tools-monochrome-hub .tools-hub-row:hover {
+  padding-inline: 14px;
+  background: #f7f7f7;
+  text-decoration: none;
+}
+
+.tools-monochrome-hub .tools-hub-number,
+.tools-monochrome-hub .tools-hub-eyebrow,
+.tools-monochrome-hub .tools-hub-action {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+.tools-monochrome-hub .tools-hub-number,
+.tools-monochrome-hub .tools-hub-eyebrow {
+  color: #888888;
+}
+
+.tools-monochrome-hub .tools-hub-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tools-monochrome-hub .tools-hub-copy > strong {
+  color: #000000;
+  font-size: clamp(26px, 3.6vw, 42px);
+  font-weight: 680;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.tools-monochrome-hub .tools-hub-copy > span:last-child {
+  max-width: 760px;
+  color: #666666;
+  line-height: 1.7;
+}
+
+.tools-monochrome-hub .tools-hub-action {
+  color: #111111;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .tools-monochrome-hub .planning-tool-breadcrumb { margin-bottom: 38px; }
+
+  .tools-monochrome-hub .tools-hub-row {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 16px;
+    padding-block: 24px;
+  }
+
+  .tools-monochrome-hub .tools-hub-action {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
