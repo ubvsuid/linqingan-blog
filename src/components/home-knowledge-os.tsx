@@ -89,7 +89,7 @@ function getProductPaths(locale: Locale): ProductPath[] {
   return [
     {
       eyebrow: "LEARN",
-      title: "先理解系统",
+      title: "Learn",
       description: "按新手路线建立基础，或直接进入按系统组织的知识模块，不再按发布时间翻文章。",
       primaryLabel: "新手路线",
       primaryHref: "/beginner",
@@ -98,7 +98,7 @@ function getProductPaths(locale: Locale): ProductPath[] {
     },
     {
       eyebrow: "BUILD",
-      title: "再写代码",
+      title: "Build",
       description: "从 API contract 进入计算器与规划工具，在真正修改 colony 代码之前先把边界算清楚。",
       primaryLabel: "Screeps API",
       primaryHref: "/screeps-api",
@@ -107,7 +107,7 @@ function getProductPaths(locale: Locale): ProductPath[] {
     },
     {
       eyebrow: "SOLVE",
-      title: "按症状排错",
+      title: "Solve",
       description: "先用 Doctor 收集受控 Snapshot，再进入 deterministic Resolver 与 Diagnostics 继续定位。",
       primaryLabel: "Screeps Doctor",
       primaryHref: "/resolver#screeps-doctor",
@@ -116,7 +116,7 @@ function getProductPaths(locale: Locale): ProductPath[] {
     },
     {
       eyebrow: "VERIFY",
-      title: "最后验证结论",
+      title: "Verify",
       description: "把官方文档、离线检查、Console 实测和 live-room 证据分开，不用推断冒充运行事实。",
       primaryLabel: "验证方法",
       primaryHref: "/verification",
@@ -137,7 +137,7 @@ export function HomeKnowledgeOs({ locale }: { locale: Locale }) {
   const productPaths = getProductPaths(locale);
 
   return (
-    <section className={styles.section} aria-labelledby={`knowledge-os-title-${locale}`}>
+    <section className={`${styles.section} ${locale === "zh" ? styles.editorial : ""}`} aria-labelledby={`knowledge-os-title-${locale}`}>
       <header className={styles.heading}>
         <div>
           <p className="eyebrow">SCREEPS KNOWLEDGE OS</p>

@@ -32,21 +32,25 @@ const featuredSymptoms = screepsDiagnosticSymptoms
       (featuredSymptomOrder.get(right.id) ?? 99),
   );
 
+const homepageSymptoms = featuredSymptoms.filter((symptom) =>
+  ["spawn-not-spawning", "creep-not-moving", "resources-not-moving"].includes(symptom.id),
+);
+
 export function HomeProblemHub() {
   return (
     <section className={styles.section} aria-labelledby="home-problem-title">
       <header className={styles.heading}>
         <div>
           <p className="eyebrow">SOLVE BY SYMPTOM</p>
-          <h2 id="home-problem-title">你现在遇到了什么问题？</h2>
+          <span className={styles.srOnly}>你现在遇到了什么问题？</span><h2 id="home-problem-title">Find out why.</h2><p className={styles.tagline}>Diagnose. Understand. Fix. Move forward.</p>
         </div>
         <p>
-          不需要先知道错误码。Spawn、移动和采集问题可直接进入 Doctor；其他症状继续进入 Diagnostics，再连接 Resolver、API、返回码和对应修复路径。
+          不需要先知道错误码。从最常见的 Spawn、移动与资源流问题开始，再进入完整 Diagnostics、Resolver、API 和返回码路径。
         </p>
       </header>
 
       <div className={styles.grid}>
-        {featuredSymptoms.map((symptom) => {
+        {homepageSymptoms.map((symptom) => {
           const doctorLaunch = getScreepsDoctorLaunchByDiagnosticSymptom(symptom.id);
           const href = doctorLaunch
             ? `/resolver?doctor=${doctorLaunch.doctorSymptom}#screeps-doctor`

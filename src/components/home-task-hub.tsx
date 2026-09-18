@@ -4,10 +4,6 @@ import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { useCallback, useSyncExternalStore } from "react";
 
-import { useBeginnerProgress } from "@/hooks/use-beginner-progress";
-import { getBeginnerResumeSlug } from "@/lib/beginner-progress";
-import { beginnerSeriesSlugs } from "@/lib/beginner-series";
-
 import { HomeKnowledgeOs } from "./home-knowledge-os";
 import styles from "./home-task-hub.module.css";
 
@@ -65,71 +61,37 @@ function trackHomeAction(action: string) {
   track("home_task_action", { action });
 }
 
+const popularSearches = [
+  ["spawn not working", "spawn 不工作"],
+  ["creep not moving", "Creep 不移动"],
+  ["ERR_NOT_ENOUGH_ENERGY", "ERR_NOT_ENOUGH_ENERGY"],
+  ["PathFinder", "PathFinder"],
+  ["room layout", "房间布局"],
+  ["CPU limit", "CPU bucket"],
+] as const;
+
 export function HomeTaskHub() {
-  const progress = useBeginnerProgress();
   const recentArticles = useRecentArticles();
-  const resumeSlug = getBeginnerResumeSlug(progress);
-  const resumeIndex = beginnerSeriesSlugs.indexOf(resumeSlug) + 1;
-  const hasProgress = Boolean(
-    progress.lastVisitedSlug || progress.completedSlugs.length > 0,
-  );
 
   return (
     <>
-      <HomeKnowledgeOs locale="zh" />
-      <section className={`${styles.hub} deferred-home-block`} aria-labelledby="home-task-title">
-        <div className={styles.heading}>
-          <p className="eyebrow">CHOOSE YOUR NEXT STEP</p>
-          <h2 id="home-task-title">你现在想完成什么？</h2>
-          <p>按当前状态选一个入口，不需要先理解整个站点结构。</p>
-        </div>
+      <section className={styles.hub} aria-labelledby="home-task-title">
+        <h2 className={styles.srOnly} id="home-task-title">你现在想完成什么？从一个问题开始。</h2>
 
-        <div className={styles.grid}>
-          <article className={`${styles.card} ${styles.primary}`}>
-            <span className={styles.number}>01</span>
-            <p className="eyebrow">刚开始玩</p>
-            <h3>{hasProgress ? "继续上次的新手路线" : "从零开始学习 Screeps"}</h3>
-            <p>
-              {hasProgress
-                ? `已完成 ${progress.completedSlugs.length} / ${beginnerSeriesSlugs.length} 篇，从第 ${resumeIndex} 篇继续。`
-                : "从 tick、第一只 Creep 和基础房间循环开始。"}
-            </p>
-            <Link
-              href={`/blog/${resumeSlug}`}
-              onClick={() => trackHomeAction(hasProgress ? "resume_beginner" : "start_beginner")}
-            >
-              {hasProgress ? "继续学习" : "开始学习"} <span aria-hidden="true">→</span>
+        <form action="/search" className={styles.search} role="search" onSubmit={() => trackHomeAction("submit_search")}>
+          <label className={styles.srOnly} htmlFor="home-task-search">搜索 Screeps 问题</label>
+          <span className={styles.searchIcon} aria-hidden="true">⌕</span>
+          <input id="home-task-search" name="q" type="search" placeholder={'Describe your problem, e.g. "spawn not working"'} />
+          <button type="submit">Search <span aria-hidden="true">→</span></button>
+        </form>
+
+        <div className={styles.popular} aria-label="热门搜索">
+          <span>Popular:</span>
+          {popularSearches.map(([label, query]) => (
+            <Link href={"/search?q=" + encodeURIComponent(query)} key={query} onClick={() => trackHomeAction("popular_search")}>
+              {label}
             </Link>
-          </article>
-
-          <article className={styles.card}>
-            <span className={styles.number}>02</span>
-            <p className="eyebrow">代码出了问题</p>
-            <h3>直接描述你看到的现象</h3>
-            <p>搜索错误码、API、Creep、Spawn、CPU 或中文问题。</p>
-            <form
-              action="/search"
-              role="search"
-              onSubmit={() => trackHomeAction("submit_search")}
-            >
-              <label htmlFor="home-task-search">描述你遇到的问题</label>
-              <div>
-                <input id="home-task-search" name="q" type="search" placeholder="例如：Creep 不移动" />
-                <button type="submit" aria-label="搜索网站">搜索</button>
-              </div>
-            </form>
-          </article>
-
-          <article className={styles.card}>
-            <span className={styles.number}>03</span>
-            <p className="eyebrow">已经有基础</p>
-            <h3>查专题知识与工程工具</h3>
-            <p>从 Memory、Spawn、寻路、市场到运行诊断，直接进入对应模块。</p>
-            <div className={styles.links}>
-              <Link href="/knowledge" onClick={() => trackHomeAction("open_knowledge")}>进入知识库 →</Link>
-              <Link href="/tools" onClick={() => trackHomeAction("open_tools")}>打开工具中心 →</Link>
-            </div>
-          </article>
+          ))}
         </div>
 
         {recentArticles.length > 0 ? (
@@ -137,19 +99,16 @@ export function HomeTaskHub() {
             <span>最近阅读</span>
             <div>
               {recentArticles.slice(0, 3).map((article) => (
-                <Link
-                  href={article.href}
-                  key={article.slug}
-                  onClick={() => trackHomeAction("resume_recent_article")}
-                >
-                  <strong>{article.title}</strong>
-                  <small>继续阅读 →</small>
+                <Link href={article.href} key={article.slug} onClick={() => trackHomeAction("resume_recent_article")}>
+                  {article.title} <span aria-hidden="true">→</span>
                 </Link>
               ))}
             </div>
           </div>
         ) : null}
       </section>
+
+      <HomeKnowledgeOs locale="zh" />
     </>
   );
 }
