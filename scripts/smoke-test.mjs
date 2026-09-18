@@ -44,7 +44,7 @@ const checks = [
   ["/en/blog/screeps-transfer-energy-to-spawn", ["How to Make a Screeps Creep Deliver Energy to a Spawn", "Keep delivery mode until the Creep is empty", "Static code review", "Passed", "Live round-trip test", "Pending"]],
   ["/en/blog/screeps-creep-body-parts", ["Why Your Screeps Creep Cannot Harvest, Carry, or Move", "Offline calculation", "Passed", "Live room inspection", "Pending"]],
   ["/en/blog/screeps-spawn-creep", ["How to Make a Screeps Spawn Create a New Creep", "Offline branch review", "Passed", "Live spawn cycle", "Pending"]],
-  ["/en/blog/screeps-creep-roles", ["Why Multiple Screeps Creeps Need Simple Roles", "Role terminology", "player/project-defined", "invalid-role-result", "Screeps Console test", "Live multi-tick verification pending", "Pending"]],
+  ["/en/blog/screeps-creep-roles", ["Why Multiple Screeps Creeps Need Simple Roles", "Body ability, player-defined role, and current action", "Harvester1", "Upgrader1", "Builder1", "Game.creeps", "Screeps Console test", "Live multi-tick verification pending", "Pending"]],
   ["/en/blog/screeps-upgrade-controller", ["How to Make a Screeps Creep Upgrade the Room Controller", "API range and codes", "Checked", "Live multi-tick test", "Pending"]],
   ["/en/blog/screeps-first-extension", ["Build Your First Screeps Extension Without Missing a Blocked Site", "Official engine source", "Live boundary test", "Pending"]],
   ["/en/blog/screeps-build-repair", ["Run a Screeps Builder Without Hiding Build, Repair, or Controller Errors", "Official engine source", "Live multi-tick verification", "Pending"]],

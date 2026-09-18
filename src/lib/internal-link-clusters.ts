@@ -147,6 +147,7 @@ export const curatedInternalLinkClusters: Record<string, CuratedInternalLinkClus
     "cluster": "Spawn",
     "links": [
       { "href": "/en/blog/screeps-spawn-creep", "label": "spawnCreep basics", "role": "Primary API guide" },
+      { "href": "/en/blog/screeps-arena-spawn-creep", "label": "Using Screeps Arena? Follow the Arena spawnCreep contract", "role": "Game mode boundary" },
       { "href": "/en/blog/screeps-spawn-exit-blocked-directions", "label": "Blocked Spawn exits", "role": "Concrete failure" },
       { "href": "/en/diagnostics", "label": "Diagnostics", "role": "Continue debugging" }
     ]

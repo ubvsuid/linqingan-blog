@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { applyEnglishCreepRolesCurrent20260917 } from "@/lib/english-ctr-creep-roles-20260917";
 import { applyEnglishCreateConstructionSiteCtr20260912 } from "@/lib/english-ctr-create-construction-site-20260912";
 import { applyEnglishDeadCreepMemoryCtr20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 import { applyEnglishErrNoPathCtr20260913 } from "@/lib/english-ctr-err-no-path-20260913";
@@ -79,7 +80,7 @@ function applyRenewCreepCtr20260910(
 export function applyEnglishRenewCreepCtr20260910(
   article: EnglishBeginnerArticle | undefined,
 ): EnglishBeginnerArticle | undefined {
-  return applyEnglishSpawnCreepCtr20260914(
+  const currentArticle = applyEnglishSpawnCreepCtr20260914(
     applyEnglishRecycleCreepCtr20260914(
       applyEnglishRequireModulesCtr20260913(
         applyEnglishIntroductionCtr20260913(
@@ -106,6 +107,8 @@ export function applyEnglishRenewCreepCtr20260910(
       ),
     ),
   );
+
+  return applyEnglishCreepRolesCurrent20260917(currentArticle);
 }
 
 export function getEnglishRenewCreepCtrUpdatedAt20260910(
