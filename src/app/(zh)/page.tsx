@@ -53,7 +53,7 @@ export default function HomePage() {
           <div className={refreshStyles.heroLead}>
             <p className={refreshStyles.kicker}>SCREEPS KNOWLEDGE OS</p>
             <p className={refreshStyles.productIdentity}>Screeps Knowledge OS：从问题到可验证的解决方案</p>
-            <h1>Master<br />Screeps.</h1>
+            <h1>Master Screeps.</h1>
             <p className={refreshStyles.heroDescription}>
               Practical knowledge. Real solutions.<br />
               从第一只 Creep 到稳定运行的自动化 colony。
