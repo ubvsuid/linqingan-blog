@@ -145,6 +145,7 @@
 }
 
 :global(.screeps-api-monochrome-hub) .controls {
+  scroll-margin-top: 96px;
   gap: 22px;
   border: 0;
   border-bottom: 1px solid var(--border);
