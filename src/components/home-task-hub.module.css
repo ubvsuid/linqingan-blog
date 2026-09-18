@@ -1,21 +1,6 @@
 .hub {
-  width: min(100%, 1120px);
-  margin: 0 auto;
-  padding: clamp(62px, 8vw, 94px) 0 22px;
-  text-align: left;
-}
-
-.heading {
-  max-width: 760px;
-  margin-bottom: 30px;
-}
-
-.heading h2 {
-  margin: 8px 0 0;
-  font-size: clamp(34px, 5vw, 58px);
-  font-weight: 560;
-  line-height: 1.03;
-  letter-spacing: -.052em;
+  width: 100%;
+  padding: 42px 0 10px;
 }
 
 .search {
@@ -23,17 +8,17 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
-  min-height: 62px;
-  border: 1px solid var(--border-strong);
-  border-radius: 18px;
-  padding: 7px 8px 7px 20px;
-  background: var(--surface);
-  box-shadow: var(--home-search-shadow);
+  min-height: 58px;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  padding: 6px 10px 6px 18px;
+  background: #fff;
 }
 
-.search > span {
-  color: var(--muted);
-  font-size: 20px;
+.searchIcon {
+  color: #000;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .search input {
@@ -41,29 +26,28 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--foreground);
-  font-size: 15px;
+  color: #000;
+  font-size: 14px;
 }
 
 .search input::placeholder {
-  color: var(--home-titanium-soft);
+  color: #838383;
 }
 
 .search button {
-  min-height: 46px;
+  min-height: 44px;
   border: 0;
-  border-radius: 12px;
-  padding: 0 16px;
-  background: transparent;
-  color: var(--muted);
+  border-radius: 6px;
+  padding: 0 14px;
+  background: #fff;
+  color: #000;
   font-size: 12px;
   font-weight: 650;
   cursor: pointer;
 }
 
 .search button:hover {
-  background: var(--surface-soft);
-  color: var(--foreground);
+  background: #f5f5f5;
 }
 
 .srOnly {
@@ -78,120 +62,61 @@
 .popular {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 10px;
+  gap: 8px;
   align-items: center;
-  margin-top: 13px;
+  margin-top: 12px;
+  color: #222;
+  font-size: 10px;
 }
 
 .popular > span {
-  margin-right: 4px;
-  color: var(--home-titanium-soft);
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: .14em;
+  margin-right: 2px;
+  color: #333;
 }
 
 .popular a {
-  border: 1px solid var(--border);
+  border: 1px solid #dedede;
   border-radius: 999px;
   padding: 5px 10px;
-  color: var(--muted);
-  font-size: 10px;
+  color: #555;
   text-decoration: none;
 }
 
 .popular a:hover {
-  border-color: var(--border-strong);
-  color: var(--foreground);
-}
-
-.context {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 50px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.context > a {
-  display: grid;
-  min-height: 150px;
-  align-content: start;
-  gap: 8px;
-  padding: 24px 28px;
-  text-decoration: none;
-}
-
-.context > a + a {
-  border-left: 1px solid var(--border);
-}
-
-.context > a:hover {
-  background: var(--surface-soft);
-}
-
-.context small {
-  color: var(--home-titanium-soft);
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: .13em;
-}
-
-.context strong {
-  margin-top: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -.02em;
-}
-
-.context span {
-  margin-top: auto;
-  color: var(--muted);
-  font-size: 11px;
+  border-color: #000;
+  color: #000;
 }
 
 .recent {
   display: grid;
-  grid-template-columns: 100px minmax(0, 1fr);
-  gap: 20px;
-  padding-top: 18px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.recent > span {
-  color: var(--home-titanium-soft);
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  color: #777;
+  font-size: 10px;
 }
 
 .recent > div {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 22px;
+  gap: 8px 18px;
 }
 
 .recent a {
-  color: var(--foreground);
-  font-weight: 560;
+  color: #444;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 640px) {
   .search {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
   .search button {
     grid-column: 1 / -1;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid #e5e5e5;
     border-radius: 0;
-  }
-
-  .context {
-    grid-template-columns: 1fr;
-  }
-
-  .context > a + a {
-    border-top: 1px solid var(--border);
-    border-left: 0;
   }
 
   .recent {
