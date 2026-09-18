@@ -98,7 +98,7 @@ export default function HomePage() {
 
   return (
     <main className={styles.home}>
-      <section className={refreshStyles.hero}>
+      <section className={`${refreshStyles.hero} screeps-room-grid`}>
         <Container className={refreshStyles.heroInner}>
           <p className={refreshStyles.kicker}>SCREEPS KNOWLEDGE OS</p>
           <p className={refreshStyles.productIdentity}>Screeps Knowledge OS：从问题到可验证的解决方案</p>
@@ -107,8 +107,8 @@ export default function HomePage() {
             从第一只 Creep 到自动运行的 colony。学会系统，写出代码，定位问题，并用真实证据验证结果。
           </p>
           <div className={refreshStyles.heroActions}>
-            <Link className={refreshStyles.primaryAction} href="/beginner">开始学习 <span aria-hidden="true">→</span></Link>
-            <Link className={refreshStyles.secondaryAction} href="/resolver#screeps-doctor">打开 Doctor <span aria-hidden="true">→</span></Link>
+            <Link className={refreshStyles.primaryAction} href="/beginner">开始学习 Screeps <span aria-hidden="true">→</span></Link>
+            <Link className={refreshStyles.secondaryAction} href="/resolver#screeps-doctor">用 Doctor 解决问题 <span aria-hidden="true">→</span></Link>
           </div>
           <p className={refreshStyles.heroNote}>Learn. Build. Solve. Verify. Go deeper.</p>
         </Container>

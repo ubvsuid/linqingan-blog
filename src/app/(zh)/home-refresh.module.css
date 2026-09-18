@@ -613,3 +613,9 @@
     min-height: 190px;
   }
 }
+
+
+/* Preserve the existing design-contract class without its legacy decorative grid. */
+.hero:global(.screeps-room-grid)::before {
+  display: none;
+}
