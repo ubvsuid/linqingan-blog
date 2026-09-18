@@ -16,6 +16,7 @@ export const constructionInternalLinkClusters: Record<string, CuratedInternalLin
       { "href": "/blog/screeps-first-extension", "label": "从第一座 Extension 开始", "role": "前置教程" },
       { "href": "/blog/screeps-construction-site-progress", "label": "确认 Builder 的实际建造进度", "role": "结果验证" },
       { "href": "/blog/screeps-room-event-log", "label": "用 Event Log 核对 build / repair", "role": "运行证据" },
+      { "href": "/tools/room-diagnostics", "label": "Builder 不工作时用房间运行诊断继续排查", "role": "故障诊断" },
       { "href": "/blog/screeps-container-decay-repair-deadline", "label": "处理 Container decay 维修期限", "role": "进阶故障" }
     ]
   },
@@ -68,6 +69,7 @@ export const constructionInternalLinkClusters: Record<string, CuratedInternalLin
       { "href": "/en/blog/screeps-first-extension", "label": "Start from the first Extension", "role": "Prerequisite tutorial" },
       { "href": "/en/blog/screeps-construction-site-progress", "label": "Verify the Builder's actual progress", "role": "Result verification" },
       { "href": "/en/blog/screeps-room-event-log", "label": "Check build and repair events", "role": "Runtime evidence" },
+      { "href": "/en/tools/room-diagnostics", "label": "Use Room Diagnostics when a Builder is not making progress", "role": "Failure diagnosis" },
       { "href": "/en/blog/screeps-container-decay-repair-deadline", "label": "Handle Container decay repair deadlines", "role": "Advanced failure" }
     ]
   },
