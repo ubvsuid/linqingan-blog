@@ -9,14 +9,14 @@
     "graphUnmapped": 0,
     "pageNodes": 161,
     "curatedSources": 115,
-    "curatedEdges": 380,
+    "curatedEdges": 383,
     "chineseMarkdownEditorialEdges": 447,
     "markdownCoveredPrerequisitePaths": 19,
-    "zeroCuratedInbound": 41,
-    "weakCuratedInbound": 31,
+    "zeroCuratedInbound": 40,
+    "weakCuratedInbound": 32,
     "directPrerequisiteGaps": 7,
     "semanticPageGaps": 1,
-    "articleToolGaps": 5,
+    "articleToolGaps": 4,
     "bilingualPairs": 80,
     "bilingualAsymmetry": 7
   },
@@ -173,14 +173,6 @@
           "locale": "zh",
           "type": "BeginnerLesson",
           "title": "Screeps tick game loop",
-          "curatedInbound": 0
-        },
-        {
-          "id": "en_article_7b437bc8-aeb9-4d7a-a565-86ef6dc54b21",
-          "href": "/en/blog/screeps-arena-spawn-creep",
-          "locale": "en",
-          "type": "Article",
-          "title": "screeps-arena-spawn-creep",
           "curatedInbound": 0
         },
         {
@@ -578,6 +570,14 @@
           "curatedInbound": 1
         },
         {
+          "id": "en_article_7b437bc8-aeb9-4d7a-a565-86ef6dc54b21",
+          "href": "/en/blog/screeps-arena-spawn-creep",
+          "locale": "en",
+          "type": "Article",
+          "title": "screeps-arena-spawn-creep",
+          "curatedInbound": 1
+        },
+        {
           "id": "en_article_b11438d0-e2ad-4c47-a8d6-8f8ce389270c",
           "href": "/en/blog/screeps-cpu-bucket-degradation",
           "locale": "en",
@@ -812,28 +812,6 @@
             "locale": "zh",
             "type": "Tool",
             "title": "Creep 身体计算器"
-          },
-          "evidence": [
-            "shared-symptom:symptom:builder-not-building"
-          ]
-        },
-        {
-          "priority": "P1",
-          "kind": "article-tool-bridge",
-          "source": {
-            "id": "article_b315e239-9ba7-453c-8743-e98b9c394adb",
-            "href": "/blog/screeps-build-and-repair",
-            "locale": "zh",
-            "type": "BeginnerLesson",
-            "title": "Screeps Creep build repair",
-            "curatedInbound": 2
-          },
-          "target": {
-            "id": "tool_6ac1022c-28cc-4fef-8dd3-fc9b118638f7",
-            "href": "/tools/room-diagnostics",
-            "locale": "zh",
-            "type": "Tool",
-            "title": "房间运行诊断"
           },
           "evidence": [
             "shared-symptom:symptom:builder-not-building"
