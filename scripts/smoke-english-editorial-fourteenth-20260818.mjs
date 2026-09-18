@@ -79,7 +79,7 @@ if (sitemapResponse.status !== 200) {
     ["/en/blog/screeps-introduction", "2026-09-13"],
     ["/en/blog/screeps-first-room", "2026-09-14"],
     ["/en/blog/screeps-tick-game-loop", "2026-09-11"],
-    ["/en/blog/screeps-creep-roles", "2026-08-18"],
+    ["/en/blog/screeps-creep-roles", "2026-09-17"],
     ["/en/blog/screeps-clean-dead-creep-memory", "2026-09-11"],
   ]);
 

@@ -122,7 +122,7 @@ if (sitemapResponse.status !== 200) {
 
   const twelfthPassFreshness = new Map([
     ["/en/blog/screeps-tick-game-loop", "2026-09-11"],
-    ["/en/blog/screeps-creep-roles", "2026-08-18"],
+    ["/en/blog/screeps-creep-roles", "2026-09-17"],
     ["/en/blog/screeps-clean-dead-creep-memory", "2026-09-11"],
   ]);
   for (const [path, modifiedAt] of twelfthPassFreshness) {

@@ -1,4 +1,5 @@
 import type { EnglishBeginnerArticle } from "@/lib/english-beginner-content";
+import { getEnglishCreepRolesCurrentUpdatedAt20260917 } from "@/lib/english-ctr-creep-roles-20260917";
 import { getEnglishCreateConstructionSiteCtrUpdatedAt20260912 } from "@/lib/english-ctr-create-construction-site-20260912";
 import { getEnglishDeadCreepMemoryCtrUpdatedAt20260911 } from "@/lib/english-ctr-dead-creep-memory-20260911";
 import { getEnglishErrNoPathCtrUpdatedAt20260913 } from "@/lib/english-ctr-err-no-path-20260913";
@@ -29,7 +30,8 @@ export function applyEnglishMemoryBasicsCtr20260911(
 export function getEnglishMemoryBasicsCtrUpdatedAt20260911(
   slug: string,
 ): string | undefined {
-  return getEnglishIntroductionCtrUpdatedAt20260913(slug)
+  return getEnglishCreepRolesCurrentUpdatedAt20260917(slug)
+    ?? getEnglishIntroductionCtrUpdatedAt20260913(slug)
     ?? getEnglishErrNoPathCtrUpdatedAt20260913(slug)
     ?? getEnglishFirstRoomCodeCtrUpdatedAt20260913(slug)
     ?? getEnglishErrNotInRangeCtrUpdatedAt20260913(slug)

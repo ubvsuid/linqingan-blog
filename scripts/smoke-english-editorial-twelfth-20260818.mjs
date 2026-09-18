@@ -21,15 +21,14 @@ const articles = [
   {
     path: "/en/blog/screeps-creep-roles",
     chinesePath: "/blog/screeps-creep-roles",
-    currentModifiedAt: "2026-08-18",
+    currentModifiedAt: "2026-09-17",
     signals: [
-      "Make role dispatch fail closed",
-      "ROLE_HANDLERS",
-      "invalid-role",
-      "invalid-role-result",
-      "Object.prototype.hasOwnProperty.call",
-      "A valid role label still does not prove",
-      "Current official-documentation review plus static code review",
+      "Body ability, player-defined role, and current action",
+      "Harvester1",
+      "Upgrader1",
+      "Builder1",
+      "Game.creeps",
+      "Current official-documentation review plus static content/code review",
       "Screeps Console test",
       "Live multi-tick verification pending",
     ],
@@ -96,8 +95,17 @@ if (!tickBody.includes("later movement intent wins")) {
 }
 
 const { body: rolesBody } = await fetchText("/en/blog/screeps-creep-roles");
-if (!rolesBody.includes("invalid-role-result")) {
-  failures.push("Roles page does not guard malformed handler results");
+for (const forbidden of [
+  "ROLE_HANDLERS",
+  "invalid-role-result",
+  'id="role-contract"',
+  'id="role-capability-boundary"',
+  "Make role dispatch fail closed",
+  "Publication status",
+]) {
+  if (rolesBody.includes(forbidden)) {
+    failures.push(`Roles current layer still exposes advanced/stale signal “${forbidden}”`);
+  }
 }
 if (rolesBody.includes("Harvester, Upgrader, and Builder are official")) {
   failures.push("Roles page presents player-defined role names as official engine classes");
@@ -161,5 +169,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  "Twelfth English editorial smoke passed: tick snapshot/intent priority, strict role dispatch, spawning-safe dead-memory cleanup, historical payloads plus scoped current freshness supersession, canonical/hreflang, structured data, and Pending live evidence.",
+  "Twelfth English editorial smoke passed: tick snapshot/intent priority, creep-role Beginner current supersession, spawning-safe dead-memory cleanup, historical payloads plus scoped current freshness supersession, canonical/hreflang, structured data, and Pending live evidence.",
 );

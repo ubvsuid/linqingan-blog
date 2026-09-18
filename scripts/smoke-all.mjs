@@ -30,6 +30,7 @@ globalThis.fetch = function sitemapAwareFetch(input, init) {
 };
 
 try {
+  await import("./smoke-english-creep-roles-current-20260917.mjs");
   await import("./smoke-english-spawn-creep-ctr-20260914.mjs");
   await import("./smoke-english-first-room-ctr-20260914.mjs");
   await import("./smoke-english-recycle-creep-ctr-20260914.mjs");
