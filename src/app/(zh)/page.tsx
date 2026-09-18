@@ -97,7 +97,7 @@ export default function HomePage() {
   });
 
   return (
-    <main className={styles.home}>
+    <main className={refreshStyles.home}>
       <section className={`${refreshStyles.hero} screeps-room-grid`}>
         <Container className={refreshStyles.heroInner}>
           <p className={refreshStyles.kicker}>SCREEPS KNOWLEDGE OS</p>
