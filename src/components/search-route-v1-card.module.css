@@ -152,3 +152,120 @@
     flex-direction: column;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / SEARCH V3 ROUTE */
+:global(.search-monochrome-page) .card {
+  gap: 22px;
+  margin: 34px 0 46px;
+  padding: 32px 0 38px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  background: transparent;
+}
+
+:global(.search-monochrome-page) .header h2 {
+  font-size: clamp(30px, 4vw, 44px);
+  letter-spacing: -.045em;
+}
+
+:global(.search-monochrome-page) .header > span {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  color: #777777;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+}
+
+:global(.search-monochrome-page) .eyebrow {
+  color: #777777;
+}
+
+:global(.search-monochrome-page) .answer {
+  max-width: 880px;
+  color: #333333;
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.7;
+}
+
+:global(.search-monochrome-page) .actions {
+  gap: 12px 20px;
+}
+
+:global(.search-monochrome-page) .actions a {
+  min-height: 44px;
+  border-radius: 0;
+  padding: 0 18px;
+}
+
+:global(.search-monochrome-page) .primary {
+  background: #000000;
+  color: #ffffff;
+}
+
+:global(.search-monochrome-page) .secondary {
+  border: 0;
+  border-bottom: 1px solid #9b9b9b;
+  padding-inline: 0;
+  background: transparent;
+  color: #111111;
+}
+
+:global(.search-monochrome-page) .related {
+  margin-top: 8px;
+  gap: 0;
+  border-top: 1px solid #dedede;
+}
+
+:global(.search-monochrome-page) .related h3 {
+  padding: 18px 0 10px;
+  color: #777777;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+:global(.search-monochrome-page) .related > div {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+:global(.search-monochrome-page) .related a {
+  grid-template-columns: 90px minmax(180px, .65fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 20px;
+  border: 0;
+  border-top: 1px solid #ededed;
+  border-radius: 0;
+  padding: 16px 0;
+  background: transparent;
+}
+
+:global(.search-monochrome-page) .related a > span {
+  color: #888888;
+}
+
+:global(.search-monochrome-page) .related a > small {
+  color: #666666;
+}
+
+:global(.search-monochrome-page) .cluster {
+  align-items: start;
+  padding-top: 22px;
+  border-top: 1px solid #dedede;
+}
+
+:global(.search-monochrome-page) .cluster span {
+  color: #888888;
+}
+
+@media (max-width: 700px) {
+  :global(.search-monochrome-page) .related a {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+}

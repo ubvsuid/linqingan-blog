@@ -26,12 +26,19 @@ export default function DiagnosticsPage() {
   };
 
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page solve-system-page diagnostics-monochrome-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
         <nav className="resource-breadcrumb" aria-label="面包屑"><Link href="/knowledge">知识库</Link><span aria-hidden="true">/</span><span>故障诊断中心</span></nav>
-        <header className="page-header"><p className="eyebrow">SCREEPS DIAGNOSTIC CENTER</p><h1>先说“哪里不对”，再定位错误码</h1><p>这里不是另一份错误码字典。它从你能直接观察到的症状开始，把排查过程连接到真实返回值、API、对象 Hub、专题教程、浏览器本地工具与已接受的 Runtime Verification。</p></header>
-        <aside className="error-tip"><strong>推荐使用方式</strong><p>如果你希望被一步步引导，先进入 <Link href="/resolver">Problem Resolver V1</Link>；如果已经拿到真实返回值，可以直接使用下面的症状关系图。</p></aside>
+        <header className="page-header solve-system-hero">
+          <p className="eyebrow">DIAGNOSTICS / SYMPTOM FIRST</p>
+          <h1>Start with what you see.</h1>
+          <p>从你能直接观察到的症状开始，把问题缩小到真实返回值、API、对象 Hub、教程、工具与 accepted Runtime Evidence。这里不猜隐藏状态，也不是另一份错误码字典。</p>
+        </header>
+        <nav className="solve-entry-switch" aria-label="选择问题解决入口">
+          <Link href="/resolver#screeps-doctor"><span>01</span><strong>Have a Snapshot</strong><small>进入 Doctor，用结构化事实做只读诊断。</small></Link>
+          <Link href="/resolver#problem-resolver-zh"><span>02</span><strong>Need guided checks</strong><small>进入 Resolver，按真实状态与返回值逐步排查。</small></Link>
+        </nav>
         <ScreepsDiagnosticCenter locale="zh" />
       </Container>
     </main>

@@ -24,27 +24,24 @@ export default function ProblemResolverPage() {
   const clusterHandoffs = getKnowledgeClusterHandoffSignals("zh");
 
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page solve-system-page resolver-monochrome-page">
       <Container>
         <nav className="resource-breadcrumb" aria-label="面包屑">
           <Link href="/diagnostics">故障诊断中心</Link><span aria-hidden="true">/</span><span>问题解决器</span>
         </nav>
-        <header className="page-header">
-          <p className="eyebrow">DETERMINISTIC PROBLEM SOLVING</p>
-          <h1>一步一步定位 Screeps 问题</h1>
-          <p>选择你看到的现象，回答少量可验证的问题。Resolver 不执行你的代码，也不猜测隐藏状态；它只根据你提供的运行事实进入确定分支，然后把你送回站内现有的 API、教程、工具、Tick Lab 与 accepted Runtime Evidence 路径。</p>
+        <header className="page-header solve-system-hero">
+          <p className="eyebrow">DOCTOR / GUIDED RESOLVER</p>
+          <h1>Solve the problem.</h1>
+          <p>有结构化 Snapshot，就让 Doctor 先读事实；只有症状或真实返回值，就进入 Guided Resolver。两条路径都坚持确定性判断，并最终回到 Diagnosis → Fix → Verify。</p>
         </header>
-        <aside className="error-tip">
-          <strong>边界</strong>
-          <p>这是确定性的 V1：没有 AI 推断，也不执行任意 JavaScript；它不会写入 Runtime Evidence 或你的 Screeps 业务状态。为改进流程，站点会尽力记录一组受限、匿名的结构化 Resolver 事件；这些记录不接收自由文本、IP、Referer、User-Agent 或地理位置。遇到不确定状态时，流程会要求你先保存真实返回值。</p>
-        </aside>
-        <aside className="error-tip">
-          <strong>Knowledge Graph V1 已接入</strong>
-          <p>
-            Resolver 现在消费同一套只读 Graph 语义层：{graphCoverage.nodes} 个节点、{graphCoverage.edges} 条关系、{graphCoverage.unmapped} 个未映射项。
-            {" "}<Link href="/knowledge/coverage">查看 Knowledge Coverage →</Link>
-          </p>
-        </aside>
+        <nav className="solve-mode-index" aria-label="选择解决方式">
+          <Link href="#screeps-doctor"><span>01</span><strong>Doctor</strong><small>Snapshot → observed facts → diagnosis → fix → verify</small></Link>
+          <Link href="#problem-resolver-zh"><span>02</span><strong>Guided Resolver</strong><small>Symptom → checks → return code → next action</small></Link>
+        </nav>
+        <section className="solve-system-boundary" aria-label="Resolver safety boundary">
+          <div><span>BOUNDARY</span><p>不执行任意 JavaScript，不写你的 Screeps 状态，也不会把 Session Verification 自动写入 Runtime Evidence。</p></div>
+          <div><span>KNOWLEDGE GRAPH</span><p>{graphCoverage.nodes} nodes · {graphCoverage.edges} relations · {graphCoverage.unmapped} unmapped。 <Link href="/knowledge/coverage">Coverage →</Link></p></div>
+        </section>
         <ScreepsDoctor locale="zh" />
         <ProblemResolver
           locale="zh"

@@ -24,7 +24,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     : null;
 
   return (
-    <main className="page-shell search-page">
+    <main className="page-shell search-page monochrome-system-page solve-system-page search-monochrome-page">
       <Container>
         <nav className="search-breadcrumb" aria-label="面包屑">
           <Link href="/knowledge">知识库</Link>
@@ -32,27 +32,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <span>站内搜索</span>
         </nav>
 
-        <header className="page-header search-header">
-          <p className="eyebrow">SEARCH + DIAGNOSTICS</p>
-          <h1>从问题开始，不只找一篇文章</h1>
+        <header className="page-header search-header solve-system-hero">
+          <p className="eyebrow">SEARCH / ANSWER ROUTING</p>
+          <h1>Ask. Route. Solve.</h1>
           <p>
-            Search V2 负责发现最相关的文章、术语、错误码和工具；如果问题仍未定位，继续沿着症状诊断、API、返回码和 accepted Runtime Evidence 缩小范围。
+            Search V3 只在高置信的症状、API 或错误码意图上给出直接 Answer Route；其余查询继续由 Search V2 负责发现，不猜测、不强行路由。
           </p>
         </header>
 
-        <aside className="search-problem-path" aria-label="Screeps 问题解决链路">
-          <div>
-            <p className="eyebrow">PROBLEM-SOLVING PATH</p>
-            <h2>问题 → 可能原因 → 返回码 / API → 教程 / 工具 → Runtime Evidence</h2>
-            <p>搜索用于发现，Diagnostics 用于排查，Runtime Evidence 用于判断某条结论是否真的在 Screeps Console 或 Live 主循环里跑过。</p>
-          </div>
-          <nav>
-            <Link href="/diagnostics">症状诊断</Link>
-            <Link href="/screeps-api">API Reference</Link>
-            <Link href="/screeps-errors">错误码</Link>
-            <Link href="/verified">Runtime Evidence</Link>
-          </nav>
-        </aside>
+        <section className="search-system-map" aria-label="Screeps 问题解决链路">
+          <div><span>01</span><strong>SEARCH</strong><small>问题、API、错误码</small></div>
+          <div><span>02</span><strong>ROUTE</strong><small>Doctor / Resolver / Reference</small></div>
+          <div><span>03</span><strong>SOLVE</strong><small>Fix / Tool / Guide</small></div>
+          <div><span>04</span><strong>VERIFY</strong><small>Runtime Evidence</small></div>
+        </section>
 
         <section aria-label="筛选搜索结果">
           <SiteSearchV2
@@ -62,14 +55,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </section>
       </Container>
 
-      <style>{`
-        .search-breadcrumb { display: flex; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 13px; }
-        .search-header { max-width: 900px; }
-        .search-problem-path { display: grid; gap: 18px; margin: 0 0 28px; padding: 22px 24px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
-        .search-problem-path h2 { margin: 6px 0 8px; font-size: clamp(20px, 3vw, 28px); }
-        .search-problem-path p:last-child { margin: 0; color: var(--muted); line-height: 1.7; }
-        .search-problem-path nav { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 13px; }
-      `}</style>
     </main>
   );
 }
