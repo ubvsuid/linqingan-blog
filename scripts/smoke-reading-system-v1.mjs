@@ -47,17 +47,28 @@ const englishBody = await englishResponse.text();
 if (englishResponse.status !== 200) {
   failures.push(`${englishPath}: expected 200, received ${englishResponse.status}`);
 } else {
-  if (englishBody.includes('data-reading-system="v1"')) {
-    failures.push(`${englishPath}: Chinese Reading System marker leaked into English article output`);
+  for (const expected of [
+    'data-reading-system="v1-en"',
+    "article-reading-system",
+    "english-article-reading-system",
+    "english-monochrome-system",
+    "home-brand-wordmark",
+  ]) {
+    if (!englishBody.includes(expected)) {
+      failures.push(`${englishPath}: missing English Reading System marker: ${expected}`);
+    }
   }
-  if (englishBody.includes("article-reading-system")) {
-    failures.push(`${englishPath}: Chinese Reading System class leaked into English article output`);
+  if (englishBody.includes('data-reading-system="v1"')) {
+    failures.push(`${englishPath}: Chinese-only Reading System marker leaked into English article output`);
+  }
+  if (englishBody.includes('class="theme-toggle"')) {
+    failures.push(`${englishPath}: legacy theme control leaked into the English monochrome article shell`);
   }
 }
 
 if (failures.length > 0) {
-  console.error("Reading System V1 smoke failed:\n" + failures.map((item) => `- ${item}`).join("\n"));
+  console.error("Reading System smoke failed:\n" + failures.map((item) => `- ${item}`).join("\n"));
   process.exit(1);
 }
 
-console.log("Reading System V1 smoke passed: 3 representative Chinese article shapes use the monochrome reading shell and the English article surface remains unchanged.");
+console.log("Reading System smoke passed: 3 representative Chinese article shapes use v1 and the representative English article uses the scoped v1-en monochrome reading shell.");
