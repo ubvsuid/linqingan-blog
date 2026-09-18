@@ -39,7 +39,7 @@ export default function ProblemResolverPage() {
           <Link href="#problem-resolver-zh"><span>02</span><strong>Guided Resolver</strong><small>Symptom → checks → return code → next action</small></Link>
         </nav>
         <section className="solve-system-boundary" aria-label="Resolver safety boundary">
-          <div><span>BOUNDARY</span><p>不执行任意 JavaScript，不写你的 Screeps 状态，也不会把 Session Verification 自动写入 Runtime Evidence。</p></div>
+          <div><span>BOUNDARY</span><p>不执行任意 JavaScript，也不会写入 Runtime Evidence 或你的 Screeps 业务状态。为改进流程，只记录受限、匿名的结构化 Resolver 事件；不接收自由文本、IP、Referer、User-Agent 或地理位置。Session Verification 也不会自动进入 public Runtime Evidence。</p></div>
           <div><span>KNOWLEDGE GRAPH</span><p>{graphCoverage.nodes} nodes · {graphCoverage.edges} relations · {graphCoverage.unmapped} unmapped。 <Link href="/knowledge/coverage">Coverage →</Link></p></div>
         </section>
         <ScreepsDoctor locale="zh" />
