@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </nav>
 
         <header className="page-header search-header solve-system-hero">
-          <p className="eyebrow">SEARCH / ANSWER ROUTING</p>
+          <p className="eyebrow">PROBLEM-SOLVING PATH / SEARCH V3</p>
           <h1>Ask. Route. Solve.</h1>
           <p>
             Search V3 只在高置信的症状、API 或错误码意图上给出直接 Answer Route；其余查询继续由 Search V2 负责发现，不猜测、不强行路由。
