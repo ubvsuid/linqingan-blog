@@ -203,6 +203,21 @@ export function getProblemResolverFlow(flowId: string): ProblemResolverFlow | un
   return problemResolverFlows.find((flow) => flow.flowId === flowId);
 }
 
+export function parseProblemResolverFlowId(value: string | null): string | null {
+  if (!value) return null;
+  return getProblemResolverFlow(value)?.flowId ?? null;
+}
+
+export function getProblemResolverDeepLink(
+  value: string,
+  locale: ProblemResolverLocale,
+): string | null {
+  const flowId = parseProblemResolverFlowId(value);
+  if (!flowId) return null;
+  const base = locale === "en" ? "/en/resolver" : "/resolver";
+  return `${base}?flow=${encodeURIComponent(flowId)}#problem-resolver-${locale}`;
+}
+
 export function getProblemResolverStep(flow: ProblemResolverFlow, stepId: string): ProblemResolverStep | undefined {
   return flow.steps.find((step) => step.stepId === stepId);
 }

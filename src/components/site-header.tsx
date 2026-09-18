@@ -20,7 +20,7 @@ export function SiteHeader() {
   const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
   const english = isEnglishPath(pathname);
   const homepage = !english && pathname === "/";
-  const monochromeShell = !english && ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api"].includes(pathname);
+  const monochromeShell = !english && ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname);
   const homepageNavigation = [
     { label: "Learn", href: "/beginner" },
     { label: "Build", href: "/knowledge" },

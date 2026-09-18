@@ -202,3 +202,165 @@
     grid-column: auto;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / DOCTOR */
+:global(.resolver-monochrome-page) .doctor {
+  margin: 60px 0 0;
+  padding: 52px 0 58px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-radius: 0;
+  background: transparent;
+  scroll-margin-top: 90px;
+}
+
+:global(.resolver-monochrome-page) .header {
+  max-width: 820px;
+  margin-bottom: 34px;
+}
+
+:global(.resolver-monochrome-page) .header h2 {
+  margin: 8px 0 14px;
+  font-size: clamp(34px, 5vw, 58px);
+  letter-spacing: -.05em;
+}
+
+:global(.resolver-monochrome-page) .header p:last-child,
+:global(.resolver-monochrome-page) .hint {
+  color: #666666;
+}
+
+:global(.resolver-monochrome-page) .symptoms {
+  margin-bottom: 34px;
+}
+
+:global(.resolver-monochrome-page) .symptoms legend,
+:global(.resolver-monochrome-page) .label {
+  color: #777777;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+:global(.resolver-monochrome-page) .symptoms > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 12px;
+  border-top: 1px solid #dedede;
+}
+
+:global(.resolver-monochrome-page) .symptomButton,
+:global(.resolver-monochrome-page) .activeSymptom {
+  min-height: 56px;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 0 14px;
+  background: transparent;
+  color: #555555;
+  text-align: left;
+}
+
+:global(.resolver-monochrome-page) .symptomButton + .symptomButton,
+:global(.resolver-monochrome-page) .activeSymptom + .symptomButton,
+:global(.resolver-monochrome-page) .symptomButton + .activeSymptom {
+  border-left: 1px solid #ededed;
+}
+
+:global(.resolver-monochrome-page) .activeSymptom {
+  background: #000000;
+  color: #ffffff;
+}
+
+:global(.resolver-monochrome-page) .textarea {
+  min-height: 18rem;
+  border: 1px solid #cfcfcf;
+  border-radius: 0;
+  padding: 18px;
+  background: #ffffff;
+  color: #111111;
+}
+
+:global(.resolver-monochrome-page) .actions {
+  gap: 12px 20px;
+  margin-top: 18px;
+}
+
+:global(.resolver-monochrome-page) .actions button {
+  min-height: 44px;
+  border: 1px solid #000000;
+  border-radius: 0;
+  padding: 0 18px;
+  background: #000000;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+:global(.resolver-monochrome-page) .actions .secondary {
+  border-color: transparent;
+  border-bottom-color: #9b9b9b;
+  padding-inline: 0;
+  background: transparent;
+  color: #111111;
+}
+
+:global(.resolver-monochrome-page) .error {
+  border-radius: 0;
+}
+
+:global(.resolver-monochrome-page) .result {
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 54px;
+  border-top: 1px solid #000000;
+}
+
+:global(.resolver-monochrome-page) .card,
+:global(.resolver-monochrome-page) .handoffs {
+  padding: 28px 0;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+}
+
+:global(.resolver-monochrome-page) .card h3 {
+  margin: 0 0 14px;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -.035em;
+}
+
+:global(.resolver-monochrome-page) .card p,
+:global(.resolver-monochrome-page) .card li,
+:global(.resolver-monochrome-page) .card dd {
+  color: #444444;
+}
+
+:global(.resolver-monochrome-page) .handoffs {
+  grid-column: auto;
+}
+
+:global(.resolver-monochrome-page) .handoffs div {
+  gap: 10px 24px;
+}
+
+:global(.resolver-monochrome-page) .handoffs a {
+  color: #111111;
+  border-bottom: 1px solid #bdbdbd;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  :global(.resolver-monochrome-page) .symptoms > div {
+    grid-template-columns: 1fr;
+  }
+
+  :global(.resolver-monochrome-page) .symptomButton + .symptomButton,
+  :global(.resolver-monochrome-page) .activeSymptom + .symptomButton,
+  :global(.resolver-monochrome-page) .symptomButton + .activeSymptom {
+    border-left: 0;
+  }
+}

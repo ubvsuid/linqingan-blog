@@ -26,3 +26,170 @@
 .controls { display: flex; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 18px; }
 .controls button:disabled { cursor: not-allowed; opacity: .45; }
 @media (max-width: 720px) { .intro { align-items: start; flex-direction: column; } .options { grid-template-columns: 1fr; } }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3A / RESOLVER */
+:global(.resolver-monochrome-page) .shell {
+  gap: 0;
+  margin-top: 0;
+  padding: 58px 0 72px;
+  border-top: 1px solid #000000;
+  scroll-margin-top: 90px;
+}
+
+:global(.resolver-monochrome-page) .intro {
+  align-items: start;
+  padding-bottom: 30px;
+}
+
+:global(.resolver-monochrome-page) .intro h2 {
+  font-size: clamp(34px, 5vw, 58px);
+  letter-spacing: -.05em;
+}
+
+:global(.resolver-monochrome-page) .intro p:last-child {
+  max-width: 820px;
+  color: #666666;
+}
+
+:global(.resolver-monochrome-page) .intro > span {
+  padding-top: 8px;
+  color: #777777;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+:global(.resolver-monochrome-page) .flowTabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 4px 0 44px;
+  border-top: 1px solid #dedede;
+}
+
+:global(.resolver-monochrome-page) .flowTabs button {
+  min-height: 58px;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 0 14px;
+  background: transparent;
+  color: #666666;
+  text-align: left;
+}
+
+:global(.resolver-monochrome-page) .flowTabs button:not(:nth-child(3n + 1)) {
+  border-left: 1px solid #ededed;
+}
+
+:global(.resolver-monochrome-page) .flowTabs button[aria-pressed="true"] {
+  background: #000000;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+:global(.resolver-monochrome-page) .panel {
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+:global(.resolver-monochrome-page) .flowHeader {
+  max-width: none;
+  padding: 34px 0 28px;
+  border-bottom: 1px solid #ededed;
+}
+
+:global(.resolver-monochrome-page) .flowHeader > span,
+:global(.resolver-monochrome-page) .stepCount,
+:global(.resolver-monochrome-page) .resultLabel {
+  color: #888888;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+:global(.resolver-monochrome-page) .flowHeader h3 {
+  font-size: clamp(30px, 4vw, 46px);
+}
+
+:global(.resolver-monochrome-page) .flowHeader p,
+:global(.resolver-monochrome-page) .help,
+:global(.resolver-monochrome-page) .outcome > p {
+  color: #666666;
+}
+
+:global(.resolver-monochrome-page) .question,
+:global(.resolver-monochrome-page) .outcome {
+  max-width: 920px;
+  padding: 34px 0 12px;
+}
+
+:global(.resolver-monochrome-page) .options {
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 28px;
+  border-top: 1px solid #dedede;
+}
+
+:global(.resolver-monochrome-page) .options button {
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 17px 0;
+  background: transparent;
+  color: #111111;
+  text-align: left;
+}
+
+:global(.resolver-monochrome-page) .options button:hover {
+  padding-left: 10px;
+  border-color: #000000;
+}
+
+:global(.resolver-monochrome-page) .outcome code {
+  border-radius: 0;
+  background: #f3f3f3;
+}
+
+:global(.resolver-monochrome-page) .actions {
+  gap: 10px 24px;
+}
+
+:global(.resolver-monochrome-page) .actions a {
+  color: #111111;
+  border-bottom: 1px solid #bdbdbd;
+  text-decoration: none;
+}
+
+:global(.resolver-monochrome-page) .controls {
+  gap: 18px;
+  margin-top: 30px;
+  border-top: 1px solid #ededed;
+  padding-top: 20px;
+}
+
+:global(.resolver-monochrome-page) .controls button {
+  border: 0;
+  border-bottom: 1px solid #bdbdbd;
+  border-radius: 0;
+  padding: 0 0 4px;
+  background: transparent;
+  color: #111111;
+}
+
+@media (max-width: 760px) {
+  :global(.resolver-monochrome-page) .flowTabs {
+    grid-template-columns: 1fr;
+  }
+
+  :global(.resolver-monochrome-page) .flowTabs button:not(:nth-child(3n + 1)) {
+    border-left: 0;
+  }
+}
