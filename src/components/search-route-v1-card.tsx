@@ -2,8 +2,10 @@
 
 import { track } from "@vercel/analytics";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 import type { KnowledgeClusterHandoff } from "@/lib/knowledge-cluster-handoff";
+import { trackSearchV3Event } from "@/lib/search-v3-telemetry-client";
 import type {
   SearchRouteV1,
   SearchRouteV1Action,
@@ -23,6 +25,16 @@ function recordAction(
     actionKind: action.kind,
     targetId: action.targetId.slice(0, 96),
   });
+  trackSearchV3Event({
+    eventName: "search_v3_action_clicked",
+    routeVersion: route.version,
+    locale: route.locale,
+    intentKind: route.intent.kind,
+    intentId: route.intent.entityId,
+    source: "route_card",
+    actionKind: action.kind,
+    targetId: action.targetId,
+  });
 }
 
 function recordRelatedPath(
@@ -36,6 +48,16 @@ function recordRelatedPath(
     relatedKind: path.kind,
     targetId: path.targetId.slice(0, 96),
   });
+  trackSearchV3Event({
+    eventName: "search_v3_related_path_clicked",
+    routeVersion: route.version,
+    locale: route.locale,
+    intentKind: route.intent.kind,
+    intentId: route.intent.entityId,
+    source: "route_card",
+    relatedKind: path.kind,
+    targetId: path.targetId,
+  });
 }
 
 function recordCluster(
@@ -46,6 +68,15 @@ function recordCluster(
     routeVersion: route.version,
     locale: route.locale,
     intentKind: route.intent.kind,
+    clusterId: cluster.clusterId,
+  });
+  trackSearchV3Event({
+    eventName: "search_v3_cluster_clicked",
+    routeVersion: route.version,
+    locale: route.locale,
+    intentKind: route.intent.kind,
+    intentId: route.intent.entityId,
+    source: "route_card",
     clusterId: cluster.clusterId,
   });
 }
@@ -61,6 +92,38 @@ export function SearchRouteV1Card({
 }) {
   const isEnglish = route.locale === "en";
   const titleId = `search-route-v1-title-${route.locale}`;
+  const lastShownRouteRef = useRef("");
+
+  useEffect(() => {
+    const routeKey = [
+      route.version,
+      route.locale,
+      route.intent.kind,
+      route.intent.entityId,
+    ].join("|");
+    if (lastShownRouteRef.current === routeKey) return;
+    lastShownRouteRef.current = routeKey;
+
+    track("search_v3_route_shown", {
+      routeVersion: route.version,
+      locale: route.locale,
+      intentKind: route.intent.kind,
+      targetId: route.intent.entityId.slice(0, 96),
+    });
+    trackSearchV3Event({
+      eventName: "search_v3_route_shown",
+      routeVersion: route.version,
+      locale: route.locale,
+      intentKind: route.intent.kind,
+      intentId: route.intent.entityId,
+      source: "route_card",
+    });
+  }, [
+    route.version,
+    route.locale,
+    route.intent.kind,
+    route.intent.entityId,
+  ]);
 
   return (
     <aside

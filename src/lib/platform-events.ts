@@ -4,6 +4,7 @@ import { getPlatformDatabase } from "@/db/client";
 import { articleFeedback, resolverEvents, toolEvents } from "@/db/schema";
 import type { ResolverTelemetryEvent } from "@/lib/problem-resolver-telemetry-contract";
 import type { ScreepsDoctorTelemetryEvent } from "@/lib/screeps-doctor-telemetry-contract";
+import type { SearchV3TelemetryEvent } from "@/lib/search-v3-telemetry-contract";
 
 export const articleFeedbackValues = [
   "helpful",
@@ -147,6 +148,40 @@ export async function persistDoctorEvent(
     return true;
   } catch (error) {
     console.warn("Doctor telemetry database write failed", error);
+    return false;
+  }
+}
+
+export async function persistSearchV3Event(
+  input: SearchV3TelemetryEvent,
+): Promise<boolean> {
+  const db = getPlatformDatabase();
+  if (!db) return false;
+
+  const metadata: Record<string, string> = {
+    routeVersion: String(input.routeVersion),
+    locale: input.locale,
+    intentKind: input.intentKind,
+    intentId: input.intentId,
+    source: input.source,
+  };
+  if ("actionKind" in input) metadata.actionKind = input.actionKind;
+  if ("relatedKind" in input) metadata.relatedKind = input.relatedKind;
+  if ("targetId" in input) metadata.targetId = input.targetId;
+  if ("clusterId" in input) metadata.clusterId = input.clusterId;
+
+  try {
+    await db.insert(toolEvents).values({
+      toolId: "site-search-v3",
+      action: input.eventName,
+      sourcePath: null,
+      anonymousId: null,
+      sessionId: null,
+      metadata,
+    });
+    return true;
+  } catch (error) {
+    console.warn("Search V3 telemetry database write failed", error);
     return false;
   }
 }
