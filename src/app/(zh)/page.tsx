@@ -101,6 +101,7 @@ export default function HomePage() {
       <section className={refreshStyles.hero}>
         <Container className={refreshStyles.heroInner}>
           <p className={refreshStyles.kicker}>SCREEPS KNOWLEDGE OS</p>
+          <p className={refreshStyles.productIdentity}>Screeps Knowledge OS：从问题到可验证的解决方案</p>
           <h1>Master Screeps.</h1>
           <p className={refreshStyles.heroDescription}>
             从第一只 Creep 到自动运行的 colony。学会系统，写出代码，定位问题，并用真实证据验证结果。

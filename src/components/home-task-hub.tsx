@@ -87,7 +87,7 @@ export function HomeTaskHub() {
       <section className={styles.hub} aria-labelledby="home-task-title">
         <div className={styles.heading}>
           <p className="eyebrow">START WITH A QUESTION</p>
-          <h2 id="home-task-title">不知道从哪里开始？直接描述问题。</h2>
+          <h2 id="home-task-title">你现在想完成什么？从一个问题开始。</h2>
         </div>
 
         <form
