@@ -1124,3 +1124,387 @@ body:has(.monochrome-system-page) .homepage-site-footer {
   }
 }
 
+
+/* SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — PHASE 3B / READING SYSTEM */
+
+.article-reading-system {
+  padding-top: clamp(58px, 7vw, 92px);
+  padding-bottom: 110px;
+}
+
+.article-reading-system .article-container {
+  max-width: 980px;
+}
+
+.article-reading-system .article-header {
+  max-width: 880px;
+  margin: 0 auto 54px;
+}
+
+.article-reading-system .article-breadcrumb {
+  gap: 10px;
+  margin-bottom: 36px;
+  color: #8a8a8a;
+  font-size: 11px;
+}
+
+.article-reading-system .article-breadcrumb a {
+  color: #555555;
+}
+
+.article-reading-system .article-header > .eyebrow {
+  margin-bottom: 14px;
+}
+
+.article-reading-system .article-header h1 {
+  max-width: 860px;
+  color: #000000;
+  font-size: clamp(46px, 7vw, 82px);
+  font-weight: 680;
+  line-height: .98;
+  letter-spacing: -.06em;
+}
+
+.article-reading-system .article-description {
+  max-width: 790px;
+  margin-top: 24px;
+  color: #5f5f5f;
+  font-size: clamp(18px, 2vw, 21px);
+  line-height: 1.72;
+}
+
+.article-reading-system .article-header .post-meta {
+  gap: 8px 12px;
+  margin-top: 25px;
+  color: #777777;
+  font-size: 10px;
+  letter-spacing: .04em;
+}
+
+.article-reading-system .article-header .tag-list {
+  gap: 0;
+  margin-top: 24px;
+  border-top: 1px solid #dedede;
+  padding-top: 16px;
+}
+
+.article-reading-system .article-header .tag {
+  border: 0;
+  border-radius: 0;
+  padding: 0 13px 0 0;
+  background: transparent;
+  color: #777777;
+  font-size: 11px;
+}
+
+.article-reading-system .article-header .tag + .tag {
+  border-left: 1px solid #dedede;
+  padding-left: 13px;
+}
+
+.article-reading-system .article-verification-summary,
+.article-reading-system .series-status,
+.article-reading-system .article-revision,
+.article-reading-system .article-toc,
+.article-reading-system .related-posts,
+.article-reading-system .article-pagination {
+  max-width: 880px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.article-reading-system .article-verification-summary {
+  margin-top: 0;
+  margin-bottom: 42px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  background: transparent;
+}
+
+.article-reading-system .article-verification-summary > summary {
+  min-height: 62px;
+  padding: 15px 0;
+}
+
+.article-reading-system .article-verification-summary dl {
+  border-top-color: #dedede;
+  padding: 20px 0 22px;
+}
+
+.article-reading-system .series-status {
+  margin-top: 0;
+  margin-bottom: 42px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 18px 0 20px;
+  background: transparent;
+}
+
+.article-reading-system .series-progress {
+  border-radius: 0;
+  background: #eeeeee;
+}
+
+.article-reading-system .series-progress span {
+  border-radius: 0;
+  background: #000000;
+}
+
+.article-reading-system .article-revision {
+  margin-top: 0;
+  margin-bottom: 42px;
+  border: 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 26px 0;
+  background: transparent;
+}
+
+.article-reading-system .article-revision h2 {
+  font-size: clamp(24px, 3.4vw, 32px);
+}
+
+.article-reading-system .article-revision a {
+  color: #111111;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.article-reading-system .article-toc {
+  margin-bottom: 58px;
+  border-top-color: #000000;
+  border-bottom-color: #dedede;
+}
+
+.article-reading-system .article-toc > summary {
+  min-height: 62px;
+  padding: 0;
+}
+
+.article-reading-system .article-toc > ol {
+  padding-bottom: 26px;
+}
+
+.article-reading-system .toc-group-heading button {
+  min-height: 30px;
+  border: 0;
+  border-bottom: 1px solid #bdbdbd;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: #777777;
+}
+
+.article-reading-system .article-content {
+  max-width: 760px;
+  margin-right: auto;
+  margin-left: auto;
+  color: #111111;
+  font-size: 17.5px;
+  line-height: 1.92;
+}
+
+.article-reading-system .article-content h2 {
+  margin: 78px 0 20px;
+  color: #000000;
+  font-size: clamp(30px, 4.2vw, 40px);
+  font-weight: 680;
+  line-height: 1.17;
+  letter-spacing: -.045em;
+}
+
+.article-reading-system .article-content h3 {
+  margin: 50px 0 16px;
+  color: #111111;
+  font-size: clamp(22px, 3vw, 28px);
+  letter-spacing: -.035em;
+}
+
+.article-reading-system .article-content p {
+  margin: 24px 0;
+}
+
+.article-reading-system .article-content a {
+  color: #000000;
+  text-decoration-color: #8c8c8c;
+  text-underline-offset: 4px;
+}
+
+.article-reading-system .article-content blockquote {
+  margin: 38px 0;
+  border-left: 1px solid #000000;
+  padding: 4px 0 4px 24px;
+  color: #555555;
+}
+
+.article-reading-system .article-content code {
+  border-radius: 0;
+  background: #f1f1f1;
+  color: #111111;
+}
+
+.article-reading-system .article-content pre {
+  margin: 38px 0;
+  border: 1px solid #000000;
+  border-radius: 0;
+  padding: 24px;
+  background: #0d0d0d;
+  color: #f5f5f5;
+}
+
+.article-reading-system .article-content pre.has-copy-button {
+  padding-top: 58px;
+}
+
+.article-reading-system .article-content pre code {
+  background: transparent;
+  color: inherit;
+}
+
+.article-reading-system .copy-code-button {
+  top: 13px;
+  right: 13px;
+  min-width: 0;
+  border: 1px solid #4a4a4a;
+  border-radius: 0;
+  padding: 7px 10px;
+  background: #0d0d0d;
+  color: #bdbdbd;
+}
+
+.article-reading-system .copy-code-button:hover {
+  border-color: #8a8a8a;
+  color: #ffffff;
+}
+
+.article-reading-system .article-content table {
+  margin: 34px 0;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+
+.article-reading-system .article-content th,
+.article-reading-system .article-content td {
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  padding: 12px 10px;
+}
+
+.article-reading-system .article-content th {
+  color: #555555;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.article-reading-system .heading-link-button {
+  border-radius: 0;
+}
+
+.article-reading-system .article-back-to-toc {
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.article-reading-system .related-posts {
+  grid-template-columns: minmax(170px, .5fr) minmax(0, 1.5fr);
+  gap: 46px;
+  margin-top: 86px;
+  border-top: 1px solid #000000;
+  padding-top: 30px;
+}
+
+.article-reading-system .related-posts h2 {
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.article-reading-system .related-post-grid {
+  gap: 0;
+  counter-reset: reading-related;
+  border-top: 1px solid #dedede;
+}
+
+.article-reading-system .related-post-grid a {
+  position: relative;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 5px 14px;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 18px 0;
+  background: transparent;
+  counter-increment: reading-related;
+}
+
+.article-reading-system .related-post-grid a::before {
+  grid-row: 1 / span 2;
+  content: counter(reading-related, decimal-leading-zero);
+  color: #888888;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+}
+
+.article-reading-system .related-post-grid a:hover {
+  border-color: #000000;
+}
+
+.article-reading-system .related-post-grid strong {
+  grid-column: 2;
+}
+
+.article-reading-system .related-post-grid small {
+  grid-column: 3;
+}
+
+.article-reading-system .article-pagination {
+  gap: 0;
+  margin-top: 82px;
+  border-top: 1px solid #000000;
+  padding-top: 0;
+}
+
+.article-reading-system .article-pagination-link {
+  min-height: 118px;
+  border: 0;
+  border-bottom: 1px solid #dedede;
+  border-radius: 0;
+  padding: 22px 0;
+  background: transparent;
+  transition: none;
+}
+
+.article-reading-system .article-pagination-link + .article-pagination-link {
+  border-left: 1px solid #ededed;
+  padding-left: 26px;
+}
+
+.article-reading-system .article-pagination-link:hover {
+  transform: none;
+  border-color: #000000;
+}
+
+@media (max-width: 720px) {
+  .article-reading-system .article-header h1 {
+    font-size: clamp(42px, 13vw, 64px);
+  }
+
+  .article-reading-system .related-posts {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .article-reading-system .article-pagination {
+    grid-template-columns: 1fr;
+  }
+
+  .article-reading-system .article-pagination-link + .article-pagination-link {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
