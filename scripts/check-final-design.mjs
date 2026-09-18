@@ -315,6 +315,142 @@ const checks = [
     required: ['smoke-reading-system-v1.mjs'],
     forbidden: [],
   },
+
+  {
+    path: "src/app/(en)/en/layout.tsx",
+    required: ["english-monochrome-system"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/site-header.tsx",
+    required: ["englishMonochromeNavigation", 'pathname.startsWith("/tools/")', 'pathname.startsWith("/screeps-api/")', '"/en/resolver#screeps-doctor"'],
+    forbidden: [],
+  },
+  {
+    path: "src/components/site-footer.tsx",
+    required: ["chineseMonochromeShell", 'english ? "/en/about" : "/about"', "Minimal footer navigation"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/en/page.tsx",
+    required: ["english-home-monochrome", "english-mono-hero", "english-mono-learning", "english-mono-knowledge", "english-mono-quick"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/en/diagnostics/page.tsx",
+    required: ["diagnostics-monochrome-page", "solve-system-page", "english-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/en/resolver/page.tsx",
+    required: ["resolver-monochrome-page", "solve-system-page", "english-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/en/search/page.tsx",
+    required: ["search-monochrome-page", "solve-system-page", "english-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/english-article-page.tsx",
+    required: ["article-reading-system", "english-article-reading-system", 'data-reading-system="v1-en"'],
+    forbidden: [],
+  },
+  {
+    path: "src/components/screeps-api-hub-page.tsx",
+    required: ["api-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/site-shell.css",
+    required: ["PHASE 3C + PHASE 4 / COMPLETION", ".english-monochrome-system", ".tool-detail-monochrome-page", ".api-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/screeps-planning-tools.css",
+    required: ["PHASE 3C + PHASE 4 / TOOL DETAIL", ".tool-detail-monochrome-page .planning-panel", ".english-monochrome-system .planning-panel"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/english-home.css",
+    required: ["PHASE 4 / ENGLISH HOME", ".english-home-monochrome", ".english-task-grid article"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/english-tools.css",
+    required: ["PHASE 4 / ENGLISH TOOL DETAIL", ".body-builder-en", ".tool-related-grid a"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/english-knowledge.css",
+    required: ["PHASE 4 / ENGLISH KNOWLEDGE", ".knowledge-system-map"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/english-search.css",
+    required: ["PHASE 4 / ENGLISH SEARCH", ".english-search-field"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/english-article.css",
+    required: ["PHASE 4 / ENGLISH READING", ".english-verification", ".english-related"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(en)/en/english.module.css",
+    required: ["PHASE 4 / ENGLISH HUBS", ".card", ".knowledgeModule"],
+    forbidden: [],
+  },
+  {
+    path: "src/components/screeps-api-hub-page.module.css",
+    required: ["PHASE 3C + PHASE 4 / API DETAIL", ':global(.api-detail-monochrome-page)', "border-radius: 0"],
+    forbidden: [],
+  },
+  {
+    path: "scripts/smoke-all.mjs",
+    required: ["smoke-monochrome-completion-v1.mjs"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/creep-body-calculator/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/room-diagnostics/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/market-terminal-cost-calculator/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/controller-downgrade-planner/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/lab-reaction-boost-planner/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/spawn-queue-replacement-planner/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/hauling-throughput-planner/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/tools/tower-damage-heal-repair-calculator/page.tsx",
+    required: ["tool-detail-monochrome-page"],
+    forbidden: [],
+  },
 ];
 
 const failures = [];

@@ -377,3 +377,28 @@
     gap: 10px;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 4 / ENGLISH HUBS */
+.page { background: #ffffff; color: #000000; }
+.header h1 {
+  color: #000000;
+  font-size: clamp(52px, 7.6vw, 96px);
+  line-height: .94;
+  letter-spacing: -.07em;
+}
+.card,
+.knowledgeModule,
+.acceptedEvidenceScope,
+.notice,
+.tableWrap {
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+.statusBadge {
+  border-radius: 0;
+  background: #ffffff;
+}
+.table { background: #ffffff; }
+.changelogList time { color: #666666; }

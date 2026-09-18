@@ -485,3 +485,67 @@
     justify-self: start;
   }
 }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 3C + PHASE 4 / TOOL DETAIL */
+
+.tool-detail-monochrome-page .planning-panel,
+.english-monochrome-system .planning-panel {
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .planning-tabs button,
+.tool-detail-monochrome-page .planning-actions button,
+.english-monochrome-system .planning-tabs button,
+.english-monochrome-system .planning-actions button {
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .planning-tabs button[aria-selected="true"],
+.tool-detail-monochrome-page .planning-tabs button[aria-checked="true"],
+.english-monochrome-system .planning-tabs button[aria-selected="true"],
+.english-monochrome-system .planning-tabs button[aria-checked="true"] {
+  background: #000000;
+  color: #ffffff;
+}
+
+.tool-detail-monochrome-page .planning-fields input,
+.tool-detail-monochrome-page .planning-fields select,
+.tool-detail-monochrome-page .planning-check,
+.tool-detail-monochrome-page .planning-profile,
+.english-monochrome-system .planning-fields input,
+.english-monochrome-system .planning-fields select,
+.english-monochrome-system .planning-check,
+.english-monochrome-system .planning-profile {
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .planning-alert,
+.english-monochrome-system .planning-alert {
+  border: 1px solid #dedede;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .planning-alert-ok,
+.tool-detail-monochrome-page .planning-alert-warning,
+.english-monochrome-system .planning-alert-ok,
+.english-monochrome-system .planning-alert-warning {
+  background: #ffffff;
+}
+
+.tool-detail-monochrome-page .planning-code pre,
+.english-monochrome-system .planning-code pre {
+  border: 1px solid #000000;
+  border-radius: 0;
+  background: #0d0d0d;
+  color: #f5f5f5;
+}
+
+.tool-detail-monochrome-page .planning-results,
+.english-monochrome-system .planning-results {
+  top: 82px;
+}

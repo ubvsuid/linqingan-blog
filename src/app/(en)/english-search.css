@@ -31,3 +31,28 @@
 .english-search-empty button { border: 1px solid var(--border); border-radius: 999px; padding: 9px 13px; background: var(--surface); color: var(--foreground); text-decoration: none; cursor: pointer; }
 @media (max-width: 760px) { .english-search-toolbar { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .english-search-field > div { grid-template-columns: 1fr; } .english-search-field button { justify-self: start; } }
+
+
+/* MONOCHROME DESIGN SYSTEM V1 — PHASE 4 / ENGLISH SEARCH */
+.english-monochrome-system .english-search-field,
+.english-monochrome-system .english-search-type,
+.english-monochrome-system .english-search-loading,
+.english-monochrome-system .english-search-empty {
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .english-search-field input,
+.english-monochrome-system .english-search-type select,
+.english-monochrome-system .english-search-field button,
+.english-monochrome-system .english-popular-searches button,
+.english-monochrome-system .english-search-results article > span,
+.english-monochrome-system .english-search-results small,
+.english-monochrome-system .english-search-empty a,
+.english-monochrome-system .english-search-empty button {
+  border-radius: 0;
+  background: #ffffff;
+}
+.english-monochrome-system .english-search-results h2 mark {
+  border-radius: 0;
+  background: #eeeeee;
+}

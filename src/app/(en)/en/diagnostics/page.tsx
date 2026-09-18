@@ -24,7 +24,7 @@ export default function EnglishDiagnosticsPage() {
   };
 
   return (
-    <main className={styles.page} lang="en">
+    <main className={`${styles.page} english-monochrome-page solve-system-page diagnostics-monochrome-page`} lang="en">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb"><Link href="/en/knowledge">Knowledge</Link><span aria-hidden="true">/</span><span>Diagnostic Center</span></nav>

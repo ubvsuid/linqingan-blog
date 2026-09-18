@@ -20,7 +20,13 @@ export function SiteHeader() {
   const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
   const english = isEnglishPath(pathname);
   const homepage = !english && pathname === "/";
-  const monochromeShell = !english && (["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname) || pathname.startsWith("/blog/"));
+  const chineseMonochromeShell = !english && (
+    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname)
+    || pathname.startsWith("/blog/")
+    || pathname.startsWith("/tools/")
+    || pathname.startsWith("/screeps-api/")
+  );
+  const monochromeShell = english || chineseMonochromeShell;
   const homepageNavigation = [
     { label: "Learn", href: "/beginner" },
     { label: "Build", href: "/knowledge" },
@@ -30,7 +36,21 @@ export function SiteHeader() {
     { label: "Tools", href: "/tools" },
     { label: "Knowledge Map", href: "/knowledge" },
   ];
-  const navigation = homepage ? homepageNavigation : monochromeShell ? homepageNavigation.slice(0, 6) : english ? englishNavigation : siteConfig.navigation;
+  const englishMonochromeNavigation = [
+    { label: "Learn", href: "/en/beginner" },
+    { label: "Build", href: "/en/knowledge" },
+    { label: "Solve", href: "/en/diagnostics" },
+    { label: "Verify", href: "/en/verification" },
+    { label: "API", href: "/en/screeps-api" },
+    { label: "Tools", href: "/en/tools" },
+  ];
+  const navigation = homepage
+    ? homepageNavigation
+    : monochromeShell
+      ? (english ? englishMonochromeNavigation : homepageNavigation.slice(0, 6))
+      : english
+        ? englishNavigation
+        : siteConfig.navigation;
   const languageTarget = getLanguageSwitchTarget(pathname);
   const isBeginnerArticle = beginnerSeriesSlugs.some((slug) => pathname === `/blog/${slug}`);
   const isKnowledgeArticle = knowledgeBaseSlugs.some((slug) => pathname === `/blog/${slug}`);
@@ -134,7 +154,7 @@ export function SiteHeader() {
               </Link>
             ) : null}
             {monochromeShell ? (
-              <Link className="home-doctor-link" href="/resolver#screeps-doctor" onClick={() => setMenuOpen(false)}>
+              <Link className="home-doctor-link" href={english ? "/en/resolver#screeps-doctor" : "/resolver#screeps-doctor"} onClick={() => setMenuOpen(false)}>
                 Open Doctor
               </Link>
             ) : null}
