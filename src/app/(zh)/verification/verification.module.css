@@ -1,31 +1,31 @@
 .breadcrumb {
   display: flex;
   gap: 10px;
-  margin-bottom: 28px;
-  color: var(--muted);
-  font-size: 13px;
+  margin-bottom: 34px;
+  color: #888;
+  font-size: 11px;
 }
 
-.header {
-  max-width: 900px;
-}
+.header { max-width: 1020px; }
 
 .levels,
 .principles,
 .next {
   display: grid;
-  grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr);
-  gap: 58px;
-  margin-top: 78px;
+  grid-template-columns: minmax(220px, .62fr) minmax(0, 1.38fr);
+  gap: 64px;
+  margin-top: 92px;
   border-top: 1px solid var(--border);
-  padding-top: 68px;
+  padding-top: 64px;
 }
 
 .sectionHeading h2,
 .next h2 {
   margin: 8px 0 0;
-  font-size: clamp(34px, 5vw, 50px);
-  letter-spacing: -0.045em;
+  color: #000;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -.055em;
 }
 
 .levels ol {
@@ -38,34 +38,36 @@
 
 .levels li {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 22px;
   border-bottom: 1px solid var(--border);
-  padding: 26px 0;
+  padding: 28px 0;
 }
 
 .levels li > span {
-  color: var(--muted);
+  color: #999;
   font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .levels li div > p:first-child {
   margin: 0;
-  color: var(--muted);
+  color: #888;
   font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .levels h3 {
   margin: 8px 0 0;
-  font-size: 21px;
+  color: #000;
+  font-size: 23px;
+  letter-spacing: -.025em;
 }
 
 .levels li div > p:last-child,
 .next p {
   margin: 10px 0 0;
-  color: var(--muted);
+  color: #666;
   line-height: 1.75;
 }
 
@@ -79,33 +81,36 @@
 
 .principles li {
   border-bottom: 1px solid var(--border);
-  padding: 22px 0;
+  padding: 24px 0;
+  color: #222;
   line-height: 1.7;
 }
 
-.next {
-  padding-bottom: 30px;
-}
+.next { padding-bottom: 24px; }
 
 .next > div:last-child {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   align-content: flex-start;
-  gap: 12px;
+  border-top: 1px solid var(--border);
 }
 
 .next a {
-  display: inline-flex;
-  min-height: 44px;
+  display: flex;
+  min-height: 50px;
   align-items: center;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0 16px;
+  justify-content: space-between;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0;
+  color: #000;
+  font-size: 12px;
   font-weight: 650;
 }
 
 .next a:hover {
-  border-color: var(--muted);
+  padding-left: 8px;
+  background: #f7f7f7;
   text-decoration: none;
 }
 
@@ -114,6 +119,7 @@
   .principles,
   .next {
     grid-template-columns: 1fr;
-    gap: 34px;
+    gap: 36px;
+    margin-top: 70px;
   }
 }

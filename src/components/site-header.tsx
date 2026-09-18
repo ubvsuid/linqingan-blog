@@ -20,6 +20,7 @@ export function SiteHeader() {
   const firstNavigationLinkRef = useRef<HTMLAnchorElement>(null);
   const english = isEnglishPath(pathname);
   const homepage = !english && pathname === "/";
+  const monochromeShell = !english && ["/", "/beginner", "/knowledge", "/verification"].includes(pathname);
   const homepageNavigation = [
     { label: "Learn", href: "/beginner" },
     { label: "Build", href: "/knowledge" },
@@ -29,7 +30,7 @@ export function SiteHeader() {
     { label: "Tools", href: "/tools" },
     { label: "Knowledge Map", href: "/knowledge" },
   ];
-  const navigation = homepage ? homepageNavigation : english ? englishNavigation : siteConfig.navigation;
+  const navigation = homepage ? homepageNavigation : monochromeShell ? homepageNavigation.slice(0, 6) : english ? englishNavigation : siteConfig.navigation;
   const languageTarget = getLanguageSwitchTarget(pathname);
   const isBeginnerArticle = beginnerSeriesSlugs.some((slug) => pathname === `/blog/${slug}`);
   const isKnowledgeArticle = knowledgeBaseSlugs.some((slug) => pathname === `/blog/${slug}`);
@@ -88,7 +89,7 @@ export function SiteHeader() {
           aria-label={english ? "Linqingan English Screeps home" : "返回首页"}
           onClick={() => setMenuOpen(false)}
         >
-          {homepage ? (
+          {monochromeShell ? (
             <span className="home-brand-wordmark">linqingan.com</span>
           ) : (
             <>
@@ -126,13 +127,13 @@ export function SiteHeader() {
             <Link className="header-icon-link" href={searchHref} aria-label={english ? "Search the English site" : "搜索网站"} title={english ? "Search" : "搜索网站"} prefetch={false} onClick={() => setMenuOpen(false)}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
             </Link>
-            {!homepage ? <ThemeToggle /> : null}
-            {!english && !homepage ? (
+            {!monochromeShell ? <ThemeToggle /> : null}
+            {!english && !monochromeShell ? (
               <Link className="profile-shortcut" href={aboutHref} aria-label="查看临清安的个人主页" title="个人主页" prefetch={false} onClick={() => setMenuOpen(false)}>
                 <Image src="/profile-avatar.webp" alt="" width={36} height={36} sizes="36px" />
               </Link>
             ) : null}
-            {homepage ? (
+            {monochromeShell ? (
               <Link className="home-doctor-link" href="/resolver#screeps-doctor" onClick={() => setMenuOpen(false)}>
                 Open Doctor
               </Link>

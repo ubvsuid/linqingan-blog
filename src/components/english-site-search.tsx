@@ -4,14 +4,12 @@ import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { SearchRouteV1Card } from "@/components/search-route-v1-card";
 import type { EnglishSearchDocument } from "@/lib/english-search";
 import type { KnowledgeClusterHandoffSignal } from "@/lib/knowledge-cluster-handoff";
 import {
   getKnowledgeGraphSearchAnchorEntityId,
   getKnowledgeGraphSearchSignalScore,
 } from "@/lib/knowledge-graph-search-policy";
-import { buildSearchRouteV1 } from "@/lib/search-route-v1";
 import { getScreepsIntentPromotions, type ScreepsEntityKind } from "@/lib/screeps-entity-intent";
 
 const popularQueries = ["ERR_NOT_IN_RANGE", "creep not moving", "CPU bucket", "body calculator", "Memory cleanup"];
@@ -133,10 +131,6 @@ export function EnglishSiteSearch({
   const loadingRef = useRef(false);
   const lastTrackedZeroQueryRef = useRef("");
   const normalizedQuery = normalize(query);
-  const searchRoute = useMemo(
-    () => buildSearchRouteV1(query, "en"),
-    [query],
-  );
 
   const loadSearchIndex = useCallback(async () => {
     if (fullIndexLoaded || loadingRef.current) return;
@@ -268,11 +262,22 @@ export function EnglishSiteSearch({
   }, [documents, normalizedQuery, query, type]);
 
   const activeClusterHandoff = useMemo(() => {
-    if (!searchRoute) return null;
+    if (!normalizedQuery || documents.length === 0) return null;
+    const promotions = getScreepsIntentPromotions(query, "en", 8);
+    const availableGraphAnchorEntityIds = new Set(
+      documents.flatMap((document) =>
+        document.graphSearch?.map((signal) => signal.anchorEntityId) ?? [],
+      ),
+    );
+    const graphAnchorEntityId = getKnowledgeGraphSearchAnchorEntityId(
+      promotions,
+      availableGraphAnchorEntityIds,
+    );
+    if (!graphAnchorEntityId) return null;
     return clusterHandoffs.find((handoff) =>
-      handoff.anchorEntityIds.includes(searchRoute.intent.entityId),
+      handoff.anchorEntityIds.includes(graphAnchorEntityId),
     ) ?? null;
-  }, [clusterHandoffs, searchRoute]);
+  }, [clusterHandoffs, documents, normalizedQuery, query]);
 
   function updateQuery(value: string) {
     setQuery(value);
@@ -355,12 +360,12 @@ export function EnglishSiteSearch({
             : "Recommended English resources"}
       </p>
 
-      {normalizedQuery && searchRoute ? (
-        <SearchRouteV1Card
-          route={searchRoute}
-          clusterHandoff={activeClusterHandoff}
-          clusterBoundaryNote="This handoff is derived from the same high-confidence canonical entity anchor; it does not change search ranking."
-        />
+      {normalizedQuery && activeClusterHandoff ? (
+        <aside className="english-search-empty" aria-label="Knowledge Cluster handoff">
+          <strong>Continue in the complete problem space: {activeClusterHandoff.title}</strong>
+          <p>{activeClusterHandoff.description} This handoff is derived from the same high-confidence canonical entity anchor; it does not change search ranking.</p>
+          <div><Link href={activeClusterHandoff.href} prefetch={false}>Open the Knowledge Cluster →</Link></div>
+        </aside>
       ) : null}
 
       {loadState === "error" && (normalizedQuery || type) && documents.length === 0 ? (

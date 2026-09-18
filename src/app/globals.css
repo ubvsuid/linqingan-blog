@@ -1004,3 +1004,73 @@ textarea:focus-visible,
 .article-floating-toc { scrollbar-width: thin; }
 .article-floating-toc:focus-within { z-index: 60; background: var(--background); }
 @media (max-width: 720px) { .article-verification-summary { margin-bottom: 30px; } .article-verification-summary > summary { grid-template-columns: 1fr; gap: 5px; } .article-verification-summary .verification-toggle-label { white-space: normal; } .article-verification-summary dl { grid-template-columns: 1fr; } .article-verification-summary .verification-wide { grid-column: auto; } .toc-group-heading { grid-template-columns: 1fr; } .toc-group-heading button { width: fit-content; } }
+
+
+/* SITE-WIDE MONOCHROME DESIGN SYSTEM V1
+   Scoped rollout: homepage + selected internal hubs only. */
+html:has(.monochrome-system-page) { background: #ffffff; }
+
+body:has(.monochrome-system-page) {
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #f7f7f7;
+  --foreground: #000000;
+  --muted: #666666;
+  --border: #dedede;
+  --accent: #000000;
+  --accent-foreground: #ffffff;
+  --code: #f4f4f4;
+  --shadow: none;
+  --energy-accent: #000000;
+  --energy-accent-soft: #eeeeee;
+  background: #ffffff;
+  color: #000000;
+}
+
+.monochrome-system-page {
+  min-height: 100%;
+  padding: clamp(68px, 8vw, 104px) 0 124px;
+  background: #ffffff;
+  color: #000000;
+}
+
+.monochrome-system-page .eyebrow {
+  margin-bottom: 16px;
+  color: #777777;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .14em;
+}
+
+.monochrome-system-page .page-header {
+  max-width: 1040px;
+  margin-bottom: clamp(64px, 8vw, 108px);
+}
+
+.monochrome-system-page .page-header h1 {
+  color: #000000;
+  font-size: clamp(58px, 8.4vw, 108px);
+  font-weight: 680;
+  line-height: .92;
+  letter-spacing: -.075em;
+}
+
+.monochrome-system-page .page-header > p:last-child {
+  max-width: 760px;
+  margin: 30px 0 0;
+  color: #666666;
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.65;
+}
+
+.monochrome-system-page a:focus-visible,
+body:has(.monochrome-system-page) button:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .monochrome-system-page { padding: 58px 0 92px; }
+  .monochrome-system-page .page-header h1 { font-size: clamp(48px, 15vw, 72px); }
+  .monochrome-system-page .page-header { margin-bottom: 58px; }
+}

@@ -77,7 +77,7 @@ const symptomAliasOverrides: Record<
   },
   "spawn-not-spawning": {
     zh: ["spawn不生产", "spawn不出creep", "生产不出来", "孵化失败"],
-    en: ["spawn not spawning", "spawn not working", "spawn will not spawn", "cannot spawn creep"],
+    en: ["spawn not spawning", "spawn will not spawn", "cannot spawn creep"],
   },
   "controller-downgrade": {
     zh: ["controller掉级", "controller快掉级", "快掉级", "要降级", "升级不上"],
@@ -94,10 +94,6 @@ const symptomAliasOverrides: Record<
   "cpu-too-high": {
     zh: ["cpu太高", "cpu过高", "爆cpu", "bucket下降"],
     en: ["cpu too high", "high cpu", "cpu spike", "bucket dropping"],
-  },
-  "lab-boost-failed": {
-    zh: ["lab boost失败", "lab强化失败", "boostcreep失败"],
-    en: ["lab boost failed", "boostcreep failed", "lab boost not working"],
   },
   "resources-not-moving": {
     zh: ["资源运不过去", "资源搬不过去", "物流断了", "搬运卡住"],
