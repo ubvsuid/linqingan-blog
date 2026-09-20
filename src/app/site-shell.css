@@ -1125,6 +1125,7 @@ body:has(.monochrome-system-page) .homepage-site-footer {
 }
 
 
+
 /* SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — PHASE 3B / READING SYSTEM */
 
 .article-reading-system {
@@ -1509,6 +1510,7 @@ body:has(.monochrome-system-page) .homepage-site-footer {
   }
 }
 
+
 /* SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — PHASE 3C + PHASE 4 / COMPLETION */
 
 html:has(.english-monochrome-system),
@@ -1695,4 +1697,59 @@ body:has(.api-detail-monochrome-page) {
   .english-monochrome-system .english-monochrome-page h1 {
     font-size: clamp(46px, 14vw, 68px);
   }
+}
+
+/* RESOURCE INDEX MONOCHROME CLOSURE V1: archive, glossary, return codes and accepted evidence.
+   Visual-only overrides: the underlying query, pagination and evidence contracts stay unchanged. */
+.resource-monochrome-page.page-shell { padding: clamp(64px, 8vw, 104px) 0 120px; }
+.resource-monochrome-page .page-header { max-width: 1020px; margin-bottom: clamp(46px, 7vw, 84px); }
+.resource-monochrome-page .page-header h1 { font-size: clamp(52px, 7.6vw, 96px); font-weight: 680; line-height: .96; letter-spacing: -.07em; }
+.resource-monochrome-page .page-header > p:last-child { color: #666666; }
+.resource-monochrome-page .resource-breadcrumb { border-bottom: 1px solid #dedede; padding-bottom: 18px; }
+.resource-monochrome-page .post-list { gap: 0; border-top: 1px solid #000000; }
+.resource-monochrome-page .post-card {
+  min-height: 0; border: 0; border-bottom: 1px solid #dedede; border-radius: 0;
+  padding: clamp(26px, 4vw, 44px) 0; background: transparent; box-shadow: none; transition: none;
+}
+.resource-monochrome-page .post-card:hover { transform: none; box-shadow: none; }
+.resource-monochrome-page .post-card h2 {
+  max-width: 960px; margin: 16px 0; font-size: clamp(27px, 4.2vw, 48px);
+  letter-spacing: -.055em; line-height: 1.12;
+}
+.resource-monochrome-page .post-card > p { max-width: 820px; line-height: 1.75; }
+.resource-monochrome-page .post-card .tag-list { gap: 0; margin-top: 22px; }
+.resource-monochrome-page .post-card .tag { border: 0; border-radius: 0; padding: 0 13px 0 0; background: transparent; color: #666666; }
+.resource-monochrome-page .post-card .tag + .tag { border-left: 1px solid #dedede; padding-left: 13px; }
+.resource-monochrome-page .resource-toolbar,
+.resource-monochrome-page .error-search {
+  border: 0; border-top: 1px solid #000000; border-bottom: 1px solid #dedede;
+  border-radius: 0; padding: 22px 0; background: transparent;
+}
+.resource-monochrome-page .resource-search input,
+.resource-monochrome-page .error-search input,
+.resource-monochrome-page .resource-filters button { border-radius: 0; background: #ffffff; }
+.resource-monochrome-page .resource-filters button.resource-filter-active { background: #000000; color: #ffffff; }
+.resource-monochrome-page .glossary-grid,
+.resource-monochrome-page .error-list { grid-template-columns: 1fr; gap: 0; border-top: 1px solid #000000; }
+.resource-monochrome-page .glossary-grid article,
+.resource-monochrome-page .error-list article {
+  border: 0; border-bottom: 1px solid #dedede; border-radius: 0;
+  padding: clamp(24px, 3vw, 36px) 0; background: transparent; box-shadow: none;
+}
+.resource-monochrome-page .error-list article { padding: 0; }
+.resource-monochrome-page .error-list header,
+.resource-monochrome-page .error-list dl div,
+.resource-monochrome-page .error-detail-section,
+.resource-monochrome-page .error-code-comparison > div,
+.resource-monochrome-page .error-related-links { padding-right: 0; padding-left: 0; }
+.resource-monochrome-page .error-operation-list code { border-radius: 0; }
+.resource-monochrome-page .error-code-comparison pre {
+  border: 0; border-radius: 0; background: #0d0d0d; color: #ffffff;
+}
+.resource-monochrome-page .error-empty,
+.resource-monochrome-page .resource-empty,
+.resource-monochrome-page .error-tip { border-radius: 0; }
+@media (max-width: 640px) {
+  .resource-monochrome-page.page-shell { padding: 56px 0 90px; }
+  .resource-monochrome-page .page-header h1 { font-size: clamp(45px, 13vw, 72px); }
 }

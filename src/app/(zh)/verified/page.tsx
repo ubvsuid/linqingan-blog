@@ -25,7 +25,7 @@ export default async function VerifiedPage() {
   const evidenceCount = verifiedPosts.reduce((total, post) => total + post.evidenceCount, 0);
 
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page resource-monochrome-page resource-evidence-index">
       <Container>
         <nav className={styles.breadcrumb} aria-label="面包屑">
           <Link href="/knowledge">知识库</Link>

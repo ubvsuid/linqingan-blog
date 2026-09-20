@@ -38,7 +38,7 @@ const errorCodes = [
 
 export default function EnglishScreepsErrorsPage() {
   return (
-    <main className={styles.page} lang="en">
+    <main className={`${styles.page} resource-monochrome-page resource-error-index`} lang="en">
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/en">Home</Link><span aria-hidden="true">/</span><span>Error Codes</span>

@@ -132,3 +132,14 @@
     justify-content: center;
   }
 }
+
+/* Resource Index Monochrome: Chinese article archive pagination only. */
+:global(.resource-blog-archive) .link,
+:global(.resource-blog-archive) .submit,
+:global(.resource-blog-archive) .input { border-radius: 0; box-shadow: none; }
+:global(.resource-blog-archive) .link:hover,
+:global(.resource-blog-archive) .submit:hover { transform: none; }
+:global(.resource-blog-archive) .input:focus-visible {
+  outline: 2px solid #000000; outline-offset: 3px;
+}
+

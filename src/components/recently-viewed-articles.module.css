@@ -69,3 +69,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Resource Index Monochrome: flat recent reads on Chinese article archive only. */
+:global(.resource-blog-archive) .section {
+  border: 0; border-top: 1px solid #dedede; border-bottom: 1px solid #dedede;
+  border-radius: 0; padding: 22px 0; background: transparent;
+}
+:global(.resource-blog-archive) .list { gap: 0; }
+:global(.resource-blog-archive) .list a {
+  border: 0; border-right: 1px solid #dedede; border-radius: 0;
+  padding: 12px; background: transparent;
+}
+:global(.resource-blog-archive) .list li:last-child a { border-right: 0; }
+@media (max-width: 760px) {
+  :global(.resource-blog-archive) .list a {
+    border-right: 0; border-bottom: 1px solid #dedede; padding-left: 0;
+  }
+}

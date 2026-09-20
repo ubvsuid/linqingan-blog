@@ -1,0 +1,47 @@
+schema_version: 1
+runtime_id: codex-repo
+profile_authoritative: false
+purpose: >-
+  Runtime capability hints for the linqingan.com Codex adapter. Actual availability
+  must be resolved in the current session; these values never grant permission.
+
+canonical_state_access: runtime_detect
+
+capabilities:
+  project_state.canonical.read: runtime_detect
+  project_rules.read: runtime_detect
+  agent_system.read: runtime_detect
+  repo.current.read: expected
+  repo.gpt_work.write: requires_fresh_l2_preflight
+  repo.ci.read: runtime_detect
+  repo.shell.execute: runtime_detect
+  web.public.read: runtime_detect
+  growth.gsc.settled.read: runtime_detect
+  growth.master.read: runtime_detect
+  production.git.read: runtime_detect
+  production.git.write: requires_explicit_current_l3_authorization
+  production.vercel.read: runtime_detect
+  production.vercel.action: requires_explicit_current_l3_authorization
+  neon.production.read: runtime_detect
+  neon.production.write: requires_explicit_specialized_l3_authorization
+  runtime_evidence.read: runtime_detect
+  runtime_evidence.lifecycle.write: requires_explicit_specialized_l3_authorization
+  skill.invoke: optional_runtime_detect
+  mcp.external.invoke: optional_runtime_detect
+
+context_modes:
+  FULL_CONTEXT: canonical state plus all mandatory workline capabilities available
+  DEGRADED_CONTEXT: canonical state available with contract-permitted capability gaps
+  LOCAL_ONLY: canonical state unavailable; bounded L0 repo inspection only
+
+default_forbidden_without_fresh_preflight:
+  - repository mutation
+  - preview
+  - production
+  - production_neon_mutation
+  - runtime_evidence_lifecycle
+
+notes:
+  - Tool visibility is not authorization.
+  - Provider names are bindings, not business capability IDs.
+  - Skills/MCP are optional and must not become a second rule or truth store.

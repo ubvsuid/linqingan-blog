@@ -54,7 +54,7 @@ export function SiteFooter() {
   const siteLinks = english ? englishSiteLinks : chineseSiteLinks;
   const languageTarget = getLanguageSwitchTarget(pathname);
   const chineseMonochromeShell = !english && (
-    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname)
+    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search", "/blog", "/glossary", "/screeps-errors", "/verified"].includes(pathname)
     || pathname.startsWith("/blog/")
     || pathname.startsWith("/tools/")
     || pathname.startsWith("/screeps-api/")

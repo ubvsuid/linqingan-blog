@@ -41,6 +41,10 @@ const checks = [
     path: "/en/blog/screeps-introduction",
     required: ["english-monochrome-system", "article-reading-system", 'data-reading-system="v1-en"', "home-brand-wordmark"],
   },
+  ...[
+    "/blog", "/blog/page/2", "/glossary", "/screeps-errors", "/verified",
+    "/en/blog", "/en/glossary", "/en/screeps-errors", "/en/verified",
+  ].map((path) => ({ path, required: ["resource-monochrome-page", "home-brand-wordmark"] })),
 ];
 
 const failures = [];

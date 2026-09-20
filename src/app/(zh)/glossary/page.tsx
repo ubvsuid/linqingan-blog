@@ -13,7 +13,7 @@ export const metadata = createPageMetadata({
 
 export default function GlossaryPage() {
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page resource-monochrome-page resource-glossary-index">
       <Container>
         <nav className="resource-breadcrumb" aria-label="面包屑"><Link href="/knowledge">知识库</Link><span aria-hidden="true">/</span><span>术语表</span></nav>
         <header className="page-header"><p className="eyebrow">GLOSSARY</p><h1>Screeps 术语表</h1><p>遇到不熟悉的英文对象或玩家常用说法时，可以在这里先看一个新手版本的解释，再进入相关教程。</p></header>

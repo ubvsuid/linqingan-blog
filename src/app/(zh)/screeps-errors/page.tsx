@@ -16,7 +16,7 @@ export const metadata = createPageMetadata({
 
 export default function ScreepsErrorsPage() {
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page resource-monochrome-page resource-error-index">
       <Container>
         <nav className="resource-breadcrumb" aria-label="面包屑"><Link href="/knowledge">知识库</Link><span aria-hidden="true">/</span><span>错误码查询</span></nav>
         <header className="page-header"><p className="eyebrow">ERROR CODES</p><h1>Screeps 错误码查询</h1><p>Screeps 的多数动作不会抛出异常，而是返回一个数字。先保存返回值，再根据错误码进入对应诊断路径，继续检查 API、对象状态、距离、资源、工具与后续 tick。</p></header>

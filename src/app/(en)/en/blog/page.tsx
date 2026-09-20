@@ -83,7 +83,7 @@ export default async function EnglishBlogPage({ searchParams }: EnglishBlogPageP
   const params = parseEnglishArticleBrowseParams(await searchParams);
 
   return (
-    <main className={styles.page} lang="en">
+    <main className={`${styles.page} resource-monochrome-page resource-blog-archive`} lang="en">
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/en">Home</Link>

@@ -1,0 +1,91 @@
+name: GPT Work completion validation
+
+on:
+  push:
+    branches:
+      - gpt-work
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gpt-work-completion-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Generate Knowledge Graph V1 artifact
+        run: node scripts/generate-knowledge-graph-v1.mjs
+
+      - name: Persist deterministic graph artifact
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain -- src/generated/knowledge-graph-v1.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/generated/knowledge-graph-v1.json
+            git commit -m "chore: refresh Knowledge Graph V1 artifact"
+            git push origin HEAD:gpt-work
+          fi
+
+      - name: Generate Graph-powered Internal Link Audit V1
+        run: node scripts/report-graph-internal-link-audit.mjs --write
+
+      - name: Persist deterministic internal-link audit artifact
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain -- reports/graph-internal-link-audit-v1.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add reports/graph-internal-link-audit-v1.json
+            git commit -m "chore: refresh Graph internal-link audit"
+            git push origin HEAD:gpt-work
+          fi
+
+      - name: Check Graph-powered Internal Link Audit V1 freshness
+        run: node scripts/report-graph-internal-link-audit.mjs --check
+
+      - name: Generate Knowledge Cluster Coverage V1
+        run: node scripts/report-knowledge-cluster-coverage.mjs --write
+
+      - name: Persist deterministic Knowledge Cluster coverage artifact
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain -- reports/knowledge-cluster-coverage-v1.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add reports/knowledge-cluster-coverage-v1.json
+            git commit -m "chore: refresh Knowledge Cluster coverage"
+            git push origin HEAD:gpt-work
+          fi
+
+      - name: Check Knowledge Cluster Coverage V1 freshness
+        run: node scripts/report-knowledge-cluster-coverage.mjs --check
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit all dependencies
+        run: npm audit --audit-level=high
+
+      - name: Run complete production build and smoke gate
+        run: npm run build

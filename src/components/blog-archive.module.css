@@ -5,9 +5,11 @@
 .overview {
   display: grid;
   grid-template-columns: repeat(2, minmax(130px, .35fr)) minmax(260px, 1fr);
-  gap: 16px;
+  gap: 0;
   align-items: stretch;
   margin-bottom: 38px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .overview > div,
@@ -15,10 +17,15 @@
   display: grid;
   align-content: center;
   min-height: 112px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px 22px;
-  background: var(--surface);
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  padding: 20px 22px 20px 0;
+  background: transparent;
+}
+
+.overview > a {
+  padding-left: 22px;
 }
 
 .overview > div {
@@ -40,35 +47,34 @@
 }
 
 .overview > a:hover {
-  border-color: var(--muted);
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 .topicLinks {
   display: flex;
   flex-wrap: wrap;
-  gap: 9px;
+  gap: 0;
   align-items: center;
   margin: -14px 0 36px;
 }
 
 .topicLinks > span {
-  margin-right: 4px;
+  margin-right: 12px;
   color: var(--muted);
   font-size: 12px;
 }
 
 .topicLinks a {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 8px 12px;
-  background: var(--surface);
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  padding: 4px 12px;
+  background: transparent;
   font-size: 12px;
 }
 
 .topicLinks a:hover {
-  border-color: var(--muted);
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 @media (max-width: 700px) {
@@ -78,5 +84,8 @@
 
   .overview > a {
     grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+    padding-left: 0;
   }
 }
