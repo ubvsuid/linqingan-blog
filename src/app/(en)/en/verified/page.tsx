@@ -46,7 +46,7 @@ export default async function EnglishVerifiedPage() {
   const evidenceCount = verifiedPosts.reduce((total, post) => total + post.evidenceCount, 0);
 
   return (
-    <main className={styles.page} lang="en">
+    <main className={`${styles.page} resource-monochrome-page resource-evidence-index`} lang="en">
       <Container>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/en/knowledge">Knowledge Base</Link>

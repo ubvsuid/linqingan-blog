@@ -20,7 +20,7 @@ export function BlogArchive({ currentPage }: BlogArchiveProps) {
   const topicArticleCount = Math.max(0, allPosts.length - beginnerSeriesSlugs.length);
 
   return (
-    <main className="page-shell">
+    <main className="page-shell monochrome-system-page resource-monochrome-page resource-blog-archive">
       <Container>
         <header className={`page-header ${styles.header}`}>
           <p className="eyebrow">WRITING</p>

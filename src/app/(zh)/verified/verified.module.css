@@ -103,3 +103,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Resource Index Monochrome: flat metadata without changing evidence counts. */
+:global(.resource-evidence-index) .summary {
+  gap: 0; margin-top: 36px; border-top: 1px solid #000000; border-bottom: 1px solid #dedede;
+}
+:global(.resource-evidence-index) .summary div {
+  border: 0; border-radius: 0; padding: 20px 18px 20px 0; background: transparent;
+}
+:global(.resource-evidence-index) .summary div + div {
+  border-left: 1px solid #dedede; padding-left: 18px;
+}
+:global(.resource-evidence-index) .empty { border-radius: 0; }
+@media (max-width: 680px) {
+  :global(.resource-evidence-index) .summary div + div {
+    border-top: 1px solid #dedede; border-left: 0; padding-left: 0;
+  }
+}

@@ -402,3 +402,31 @@
 }
 .table { background: #ffffff; }
 .changelogList time { color: #666666; }
+
+/* RESOURCE INDEX MONOCHROME CLOSURE V1: English archive and resource reference surfaces. */
+.page:global(.resource-monochrome-page) .header { max-width: 1020px; margin-bottom: clamp(48px, 7vw, 80px); }
+.page:global(.resource-monochrome-page) .header h1 { font-size: clamp(52px, 7.6vw, 96px); line-height: .96; }
+.page:global(.resource-monochrome-page) .breadcrumb { border-bottom: 1px solid #dedede; padding-bottom: 18px; }
+.page:global(.resource-monochrome-page) .notice {
+  border: 0; border-top: 1px solid #000000; border-bottom: 1px solid #dedede;
+  border-radius: 0; padding: 20px 0; background: transparent;
+}
+.page:global(.resource-monochrome-page) .card {
+  border: 0; border-bottom: 1px solid #dedede; border-radius: 0;
+  padding: clamp(24px, 3vw, 38px) 0; background: transparent;
+}
+.page:global(.resource-glossary-index) .grid { grid-template-columns: 1fr; gap: 0; border-top: 1px solid #000000; }
+.page:global(.resource-evidence-index) .grid { gap: 0; border-top: 1px solid #000000; }
+.page:global(.resource-evidence-index) .grid .card { padding-right: 18px; }
+.page:global(.resource-evidence-index) .grid .card + .card { padding-left: 18px; border-left: 1px solid #dedede; }
+.page:global(.resource-error-index) .referenceCardGrid { gap: 20px; border-top: 1px solid #000000; }
+.page:global(.resource-monochrome-page) .tableWrap { border: 0; border-top: 1px solid #000000; border-radius: 0; }
+.page:global(.resource-evidence-index) .knowledgeModules { gap: 0; border-top: 1px solid #000000; }
+.page:global(.resource-evidence-index) .knowledgeModule {
+  border: 0; border-bottom: 1px solid #dedede; border-radius: 0;
+  padding: clamp(26px, 3vw, 38px) 0; background: transparent;
+}
+@media (max-width: 760px) {
+  .page:global(.resource-evidence-index) .grid { grid-template-columns: 1fr; }
+  .page:global(.resource-evidence-index) .grid .card + .card { border-left: 0; padding-left: 0; }
+}

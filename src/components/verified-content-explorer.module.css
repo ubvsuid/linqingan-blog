@@ -151,3 +151,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Resource Index Monochrome: visual-only acceptance evidence explorer treatment. */
+:global(.resource-evidence-index) .filterPanel {
+  border: 0; border-top: 1px solid #000000; border-bottom: 1px solid #dedede;
+  border-radius: 0; padding: 24px 0; background: transparent;
+}
+:global(.resource-evidence-index) .filters select,
+:global(.resource-evidence-index) .filters button { border-radius: 0; background: #ffffff; }
+:global(.resource-evidence-index) .empty { border-radius: 0; }
+

@@ -21,7 +21,7 @@ export function SiteHeader() {
   const english = isEnglishPath(pathname);
   const homepage = !english && pathname === "/";
   const chineseMonochromeShell = !english && (
-    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search"].includes(pathname)
+    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search", "/blog", "/glossary", "/screeps-errors", "/verified"].includes(pathname)
     || pathname.startsWith("/blog/")
     || pathname.startsWith("/tools/")
     || pathname.startsWith("/screeps-api/")
