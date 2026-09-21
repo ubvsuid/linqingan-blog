@@ -34,12 +34,12 @@ const checks = [
   },
   {
     path: "src/components/site-header.tsx",
-    required: ["profile-shortcut", "header-icon-link", '"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver"', '"/search"', "monochromeShell"],
+    required: ["home-brand-wordmark", "header-icon-link", '"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver#screeps-doctor"', '"/search"', "monochromeShell"],
     forbidden: ["<style>", ".header-icon-link { display: none; }"],
   },
   {
     path: "src/components/site-footer.tsx",
-    required: ['"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver"', '"/search"', "monochromeShell", "homepage-site-footer"],
+    required: ["chineseLearningLinks", "englishLearningLinks", '"/screeps-api"', '"/search"', "monochromeShell", "homepage-site-footer", "const chineseMonochromeShell = !english;"],
     forbidden: [],
   },
   {
