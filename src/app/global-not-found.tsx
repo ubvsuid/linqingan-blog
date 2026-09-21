@@ -9,7 +9,7 @@ import "./globals.css";
 import "./site-shell.css";
 
 export const metadata: Metadata = {
-  title: { absolute: "Page not found / 页面不存在 | Linqingan" },
+  title: { absolute: "页面不存在｜临清安 / Page not found" },
   description: "This page does not exist. 页面不存在，请返回首页或使用站内搜索。",
   robots: { index: false, follow: false },
 };
