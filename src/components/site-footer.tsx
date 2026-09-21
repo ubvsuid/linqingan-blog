@@ -53,13 +53,9 @@ export function SiteFooter() {
   const learningLinks = english ? englishLearningLinks : chineseLearningLinks;
   const siteLinks = english ? englishSiteLinks : chineseSiteLinks;
   const languageTarget = getLanguageSwitchTarget(pathname);
-  const chineseMonochromeShell = !english && (
-    ["/", "/beginner", "/knowledge", "/verification", "/tools", "/screeps-api", "/diagnostics", "/resolver", "/search", "/blog", "/glossary", "/screeps-errors", "/verified"].includes(pathname)
-    || pathname.startsWith("/blog/")
-    || pathname.startsWith("/tools/")
-    || pathname.startsWith("/screeps-api/")
-  );
+  const chineseMonochromeShell = !english;
   const monochromeShell = english || chineseMonochromeShell;
+
 
   if (monochromeShell) {
     return (

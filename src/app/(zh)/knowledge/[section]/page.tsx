@@ -104,7 +104,7 @@ export default async function KnowledgeSectionPage({
   };
 
   return (
-    <main className="page-shell knowledge-module-page">
+    <main className="page-shell knowledge-module-page monochrome-system-page">
       <Container>
         <script
           type="application/ld+json"
@@ -215,11 +215,15 @@ export default async function KnowledgeSectionPage({
         .module-header { max-width: 930px; margin-bottom: 54px; }
         .module-header h1 { max-width: 900px; margin: 10px 0 20px; font-size: clamp(46px, 8vw, 86px); letter-spacing: -.06em; line-height: 1.02; }
         .module-description { max-width: 800px; margin: 0; color: var(--muted); font-size: clamp(17px, 2.2vw, 21px); line-height: 1.8; }
-        .module-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-        .module-stats span { border: 1px solid var(--border); border-radius: 999px; padding: 9px 14px; color: var(--muted); font-size: 13px; }
+        .module-stats { display: flex; flex-wrap: wrap; gap: 0; margin-top: 28px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .module-stats span { border: 0; border-right: 1px solid var(--border); border-radius: 0; padding: 14px 20px; color: var(--muted); font-size: 13px; }
+        .module-stats span:first-child { padding-left: 0; }
+        .module-stats span:last-child { border-right: 0; }
         .module-stats strong { color: var(--foreground); font-size: 16px; }
-        .module-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 42px; }
-        .module-overview > div { border: 1px solid var(--border); border-radius: 22px; padding: clamp(24px, 4vw, 38px); background: var(--surface); }
+        .module-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin-bottom: 58px; border-top: 1px solid var(--foreground); border-bottom: 1px solid var(--border); }
+        .module-overview > div { border: 0; border-radius: 0; padding: clamp(24px, 4vw, 38px) 28px; background: transparent; }
+        .module-overview > div:first-child { border-right: 1px solid var(--border); padding-left: 0; }
+        .module-overview > div:last-child { padding-right: 0; }
         .module-overview h2 { margin: 8px 0 14px; font-size: clamp(26px, 4vw, 38px); letter-spacing: -.04em; }
         .module-overview p:last-child { margin: 0; color: var(--muted); line-height: 1.75; }
         .module-stage-list { display: grid; gap: 78px; }
@@ -236,12 +240,14 @@ export default async function KnowledgeSectionPage({
         .module-stage li strong { font-size: clamp(18px, 2.4vw, 23px); line-height: 1.45; }
         .module-stage li small { color: var(--muted); font-size: 12px; }
         .module-stage li p { max-width: 760px; margin: 2px 0 0; color: var(--muted); line-height: 1.65; }
-        .module-pagination { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 86px; }
-        .module-pagination a { display: grid; gap: 7px; border: 1px solid var(--border); border-radius: 18px; padding: 22px; background: var(--surface); }
+        .module-pagination { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin-top: 86px; border-top: 1px solid var(--foreground); border-bottom: 1px solid var(--border); }
+        .module-pagination a { display: grid; gap: 7px; border: 0; border-radius: 0; padding: 22px 28px; background: transparent; }
+        .module-pagination a:first-child { border-right: 1px solid var(--border); padding-left: 0; }
+        .module-pagination a:last-child { padding-right: 0; }
         .module-pagination a:hover { border-color: var(--muted); text-decoration: none; }
         .module-pagination span { color: var(--muted); font-size: 12px; }
         .module-pagination strong { line-height: 1.45; }
-        @media (max-width: 720px) { .module-overview, .module-pagination { grid-template-columns: 1fr; } .module-stage > header, .module-stage li { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; } }
+        @media (max-width: 720px) { .module-overview, .module-pagination { grid-template-columns: 1fr; } .module-overview > div, .module-pagination a { padding-inline: 0; } .module-overview > div:first-child, .module-pagination a:first-child { border-right: 0; border-bottom: 1px solid var(--border); } .module-stage > header, .module-stage li { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; } }
       `}</style>
     </main>
   );
