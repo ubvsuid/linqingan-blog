@@ -34,12 +34,12 @@ const checks = [
   },
   {
     path: "src/components/site-header.tsx",
-    required: ["profile-shortcut", "header-icon-link", '"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver"', '"/search"', "monochromeShell"],
+    required: ["home-brand-wordmark", "header-icon-link", '"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver#screeps-doctor"', '"/search"', "monochromeShell"],
     forbidden: ["<style>", ".header-icon-link { display: none; }"],
   },
   {
     path: "src/components/site-footer.tsx",
-    required: ['"/tools"', '"/screeps-api"', '"/diagnostics"', '"/resolver"', '"/search"', "monochromeShell", "homepage-site-footer"],
+    required: ["chineseLearningLinks", "englishLearningLinks", '"/screeps-api"', '"/search"', "monochromeShell", "homepage-site-footer", "const chineseMonochromeShell = !english;"],
     forbidden: [],
   },
   {
@@ -277,8 +277,8 @@ const checks = [
   },
   {
     path: "src/components/site-footer.tsx",
-    required: ['pathname.startsWith("/blog/")'],
-    forbidden: [],
+    required: ["const chineseMonochromeShell = !english;"],
+    forbidden: ["const chineseMonochromeShell = !english && ("],
   },
   {
     path: "src/app/site-shell.css",
@@ -323,7 +323,7 @@ const checks = [
   },
   {
     path: "src/components/site-header.tsx",
-    required: ["englishMonochromeNavigation", 'pathname.startsWith("/tools/")', 'pathname.startsWith("/screeps-api/")', '"/en/resolver#screeps-doctor"'],
+    required: ["englishMonochromeNavigation", "const chineseMonochromeShell = !english;", '"/en/resolver#screeps-doctor"'],
     forbidden: [],
   },
   {
@@ -450,6 +450,31 @@ const checks = [
     path: "src/app/(zh)/tools/tower-damage-heal-repair-calculator/page.tsx",
     required: ["tool-detail-monochrome-page"],
     forbidden: [],
+  },
+  {
+    path: "src/components/site-header.tsx",
+    required: ["const chineseMonochromeShell = !english;", "const monochromeShell = english || chineseMonochromeShell;"],
+    forbidden: ["const chineseMonochromeShell = !english && ("],
+  },
+  {
+    path: "src/components/site-footer.tsx",
+    required: ["const chineseMonochromeShell = !english;", "homepage-site-footer"],
+    forbidden: ["const chineseMonochromeShell = !english && ("],
+  },
+  {
+    path: "src/app/site-shell.css",
+    required: ["VISUAL CONSISTENCY CLOSURE V1 — FIRST BATCH", "html:has(.site-header)", "--energy-accent: #000000", ":focus-visible"],
+    forbidden: [],
+  },
+  {
+    path: "src/app/(zh)/knowledge/[section]/page.tsx",
+    required: ["knowledge-module-page monochrome-system-page", ".module-stats span:first-child", ".module-overview > div:first-child", ".module-pagination a:first-child"],
+    forbidden: ["border-radius: 999px", "border-radius: 22px", "border-radius: 18px"],
+  },
+  {
+    path: "src/components/tick-lab/tick-lab.module.css",
+    required: [".hero {", "background: #ffffff;", "box-shadow: none;", "border-radius: 0;", "outline: 2px solid #000000;"],
+    forbidden: ["radial-gradient(", "background: #11110f;", "box-shadow: 0 1px 0"],
   },
 ];
 

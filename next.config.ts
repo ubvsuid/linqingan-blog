@@ -73,6 +73,7 @@ const nextConfig: NextConfig = {
   compress: true,
   trailingSlash: false,
   turbopack: { root: process.cwd() },
+  experimental: { globalNotFound: true },
   async redirects() {
     return [
       {

@@ -586,37 +586,37 @@ body:has(.home) .header-icon-link {
 
 
 /* SITE-WIDE MONOCHROME DESIGN SYSTEM V1 — internal shell */
-body:has(.monochrome-system-page) .site-header {
+body:has(.site-header) .site-header {
   border-bottom: 1px solid #ededed;
   background: #ffffff;
 }
 
-body:has(.monochrome-system-page) .header-inner {
+body:has(.site-header) .header-inner {
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-height: 70px;
   gap: 28px;
 }
 
-body:has(.monochrome-system-page) .site-nav {
+body:has(.site-header) .site-nav {
   grid-column: 2;
   gap: clamp(14px, 1.5vw, 26px);
   font-size: 11px;
 }
 
-body:has(.monochrome-system-page) .site-nav a {
+body:has(.site-header) .site-nav a {
   padding-block: 8px;
   color: #111111;
 }
 
-body:has(.monochrome-system-page) .site-nav a::after { background: #000000; }
+body:has(.site-header) .site-nav a::after { background: #000000; }
 
-body:has(.monochrome-system-page) .header-controls {
+body:has(.site-header) .header-controls {
   grid-column: 3;
   gap: 10px;
 }
 
-body:has(.monochrome-system-page) .language-switch,
-body:has(.monochrome-system-page) .header-icon-link {
+body:has(.site-header) .language-switch,
+body:has(.site-header) .header-icon-link {
   min-width: 36px;
   height: 36px;
   border: 0;
@@ -624,26 +624,26 @@ body:has(.monochrome-system-page) .header-icon-link {
   background: transparent;
 }
 
-body:has(.monochrome-system-page) .language-switch {
+body:has(.site-header) .language-switch {
   padding: 0 6px;
   color: #111111;
   font-size: 11px;
 }
 
-body:has(.monochrome-system-page) .header-icon-link { width: 36px; }
+body:has(.site-header) .header-icon-link { width: 36px; }
 
-body:has(.monochrome-system-page) .homepage-site-footer {
+body:has(.site-header) .homepage-site-footer {
   border-top: 1px solid #dedede;
   background: #ffffff;
 }
 
 @media (max-width: 980px) {
-  body:has(.monochrome-system-page) .header-inner {
+  body:has(.site-header) .header-inner {
     grid-template-columns: 1fr auto;
     min-height: 68px;
   }
 
-  body:has(.monochrome-system-page) .site-nav {
+  body:has(.site-header) .site-nav {
     grid-column: 1 / -1;
     width: 100%;
     border: 1px solid #dedede;
@@ -652,7 +652,7 @@ body:has(.monochrome-system-page) .homepage-site-footer {
     font-size: 14px;
   }
 
-  body:has(.monochrome-system-page) .site-nav a + a { border-top: 1px solid #ededed; }
+  body:has(.site-header) .site-nav a + a { border-top: 1px solid #ededed; }
 }
 
 
@@ -1752,4 +1752,31 @@ body:has(.api-detail-monochrome-page) {
 @media (max-width: 640px) {
   .resource-monochrome-page.page-shell { padding: 56px 0 90px; }
   .resource-monochrome-page .page-header h1 { font-size: clamp(45px, 13vw, 72px); }
+}
+
+/* VISUAL CONSISTENCY CLOSURE V1 — FIRST BATCH: neutral public shell,
+   including deep Chinese routes and route-level not-found/error states. */
+html:has(.site-header) { background: #ffffff; }
+body:has(.site-header) {
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #f7f7f7;
+  --foreground: #000000;
+  --muted: #666666;
+  --border: #dedede;
+  --accent: #000000;
+  --accent-foreground: #ffffff;
+  --code: #f4f4f4;
+  --shadow: none;
+  --energy-accent: #000000;
+  --energy-accent-soft: #eeeeee;
+  --screeps-controller: #000000;
+  --screeps-energy: #000000;
+  --screeps-success: #000000;
+  background: #ffffff;
+  color: #000000;
+}
+body:has(.site-header) :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 4px;
 }
