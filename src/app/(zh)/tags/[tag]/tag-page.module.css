@@ -30,6 +30,7 @@
 .postList h2 {
   margin: 13px 0 0;
   font-size: clamp(23px, 3vw, 32px);
+  overflow-wrap: anywhere;
 }
 
 .postList p {

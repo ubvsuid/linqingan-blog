@@ -94,6 +94,7 @@
   margin: 5px 0 2px;
   font-size: clamp(28px, 4vw, 44px);
   letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 
 .labHeader p:not(.experimentIndex) {
