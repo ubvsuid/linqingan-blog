@@ -529,7 +529,14 @@ fieldset.controlCard {
 }
 
 @media (max-width: 900px) {
-  .stageGrid,
+  .stageGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stageGrid > .panel {
+    min-width: 0;
+  }
+
   .controlGrid,
   .timelineResultGrid {
     grid-template-columns: 1fr;
