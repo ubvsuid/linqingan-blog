@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import ts from "typescript";
 
 const root = process.cwd();
 const read = (relativePath) => readFile(path.join(root, relativePath), "utf8");
@@ -92,7 +93,39 @@ assert(doctorUi.includes('parseScreepsDoctorLaunchSymptom(new URLSearchParams(wi
 assert(doctorUi.includes('maxLength={SCREEPS_DOCTOR_MAX_SNAPSHOT_CHARS}'), "Doctor UI must enforce the core Snapshot size boundary");
 assert(doctorUi.includes('Session Verification') && doctorUi.includes('public Runtime Evidence'), "Doctor UI must visibly separate session verification from public Runtime Evidence");
 assert(doctorUi.includes('diagnosis.symptom === "spawn-not-working"'), "Tick Lab must remain Spawn-only until movement or harvest experiments exist");
-assert(doctorUi.includes('href={`${prefix}/resolver`}') && doctorUi.includes('href={`${prefix}/diagnostics`}'), "Doctor UI must hand off to existing Resolver and Diagnostics surfaces");
+const resolverHandoff = doctorUi.match(/<a\b[\s\S]*?doctor_resolver_handoff_clicked[\s\S]*?<\/a>/)?.[0] ?? "";
+assert(doctorUi.includes('import { getProblemResolverDeepLink } from "@/lib/problem-resolver";'), "Doctor must reuse the canonical Resolver deep-link helper");
+assert(resolverHandoff.includes('href={getProblemResolverDeepLink(diagnosis.canonical.resolverFlowId, locale)'), "Doctor result must bind its canonical flow and locale to the Resolver href");
+assert(resolverHandoff.includes("flowId: diagnosis.canonical.resolverFlowId"), "Resolver handoff telemetry must use the same canonical flow as the link");
+assert(resolverHandoff.includes("target.pathname === window.location.pathname && target.search === window.location.search") && resolverHandoff.includes("window.location.hash = target.hash") && resolverHandoff.includes("window.location.reload()"), "same-document Doctor handoffs must reload at the canonical anchor so previous Resolver state cannot override the flow");
+assert(resolverHandoff.includes("event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey"), "Doctor handoff must preserve modified-click navigation");
+assert(doctorUi.includes('href={`${prefix}/diagnostics`}'), "Doctor UI must hand off to the existing Diagnostics surface");
+
+const resolverModule = ts.transpileModule(resolver, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
+}).outputText;
+const { getProblemResolverDeepLink, getProblemResolverFlow } = await import(
+  `data:text/javascript;base64,${Buffer.from(resolverModule).toString("base64")}`
+);
+for (const [flowId, startStepId] of [
+  ["spawn-not-working", "spawn-busy"],
+  ["creep-not-moving", "move-fatigue"],
+  ["creep-not-harvesting", "harvest-result"],
+]) {
+  const flow = getProblemResolverFlow(flowId);
+  assert(flow?.startStepId === startStepId, `${flowId} must retain its necessary starting question`);
+  assert(flow.steps.find((step) => step.stepId === startStepId)?.kind === "question", `${flowId} must not deep-link directly to an outcome`);
+  for (const locale of ["zh", "en"]) {
+    const base = locale === "en" ? "/en/resolver" : "/resolver";
+    const href = getProblemResolverDeepLink(flowId, locale);
+    assert(href === `${base}?flow=${flowId}#problem-resolver-${locale}`, `${locale}/${flowId} must use the canonical flow and anchor`);
+    const url = new URL(href, "https://example.invalid");
+    assert([...url.searchParams.keys()].join(",") === "flow", "Doctor handoff URL must carry only the canonical flow, never Snapshot or sensitive data");
+  }
+}
+for (const locale of ["zh", "en"]) {
+  assert(getProblemResolverDeepLink("unknown-flow", locale) === null, "Resolver deep links must reject unknown flow IDs");
+}
 assert(doctorUi.includes('href={`${prefix}/screeps-api#${diagnosis.canonical.apiEntryId}`}'), "Doctor UI must hand off to the exact canonical API entry");
 assert(doctorStyles.includes(".doctor") && doctorStyles.includes(".result"), "Doctor UI styles are missing");
 assert(doctorStyles.includes(".symptoms") && doctorStyles.includes(".activeSymptom"), "Doctor symptom-selector styles are missing");

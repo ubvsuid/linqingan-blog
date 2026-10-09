@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { getProblemResolverDeepLink } from "@/lib/problem-resolver";
 import {
   diagnoseCreepHarvestDoctor,
   diagnoseCreepMovementDoctor,
@@ -195,18 +196,28 @@ export function ScreepsDoctor({ locale }: { locale: Locale }) {
           <div className={styles.handoffs}>
             <strong>{copy.links}</strong>
             <div>
-              <Link
-                href={`${prefix}/resolver`}
-                onClick={() => trackScreepsDoctorEvent({
-                  eventName: "doctor_resolver_handoff_clicked",
-                  symptom: diagnosis.symptom,
-                  locale,
-                  source: "doctor_result",
-                  flowId: diagnosis.canonical.resolverFlowId,
-                })}
+              {/* A fresh document clears any previous Resolver flow and step state. */}
+              <a
+                href={getProblemResolverDeepLink(diagnosis.canonical.resolverFlowId, locale) ?? `${prefix}/resolver`}
+                onClick={(event) => {
+                  trackScreepsDoctorEvent({
+                    eventName: "doctor_resolver_handoff_clicked",
+                    symptom: diagnosis.symptom,
+                    locale,
+                    source: "doctor_result",
+                    flowId: diagnosis.canonical.resolverFlowId,
+                  });
+                  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                  const target = new URL(event.currentTarget.href);
+                  if (target.pathname === window.location.pathname && target.search === window.location.search) {
+                    event.preventDefault();
+                    window.location.hash = target.hash;
+                    window.location.reload();
+                  }
+                }}
               >
                 {copy.resolver}
-              </Link>
+              </a>
               <Link href={`${prefix}/diagnostics`}>{copy.diagnostics}</Link>
               <Link href={`${prefix}/screeps-api#${diagnosis.canonical.apiEntryId}`}>{copy.api}</Link>
               {diagnosis.symptom === "spawn-not-working" ? <Link href={`${prefix}/tick-lab`}>{copy.tickLab}</Link> : null}
