@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import ts from "typescript";
+import { createRequire } from "node:module";
+import { runInNewContext } from "node:vm";
 
 const root = process.cwd();
 const read = (relativePath) => readFile(path.join(root, relativePath), "utf8");
@@ -162,5 +164,185 @@ assert(diagnostics.includes('directApiEntryIds: ["creep-move-to", "game-map-find
 assert(diagnostics.includes('id: "creep-not-harvesting"'), "canonical harvest diagnostic symptom is missing");
 assert(diagnostics.includes('directApiEntryIds: ["creep-harvest"]'), "harvest diagnostic must keep its canonical API entry");
 assert(smokeAll.includes('await import("./check-screeps-doctor-v1.mjs");'), "Doctor regression gate must remain in the production smoke chain");
+
+// Execute the current UI handlers in a bounded React-state harness. This is not a browser test.
+const compile = (source) => ts.transpileModule(source, {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
+}).outputText;
+const loadModule = (source, dependencies = {}) => {
+  const exports = {};
+  runInNewContext(compile(source), {
+    exports,
+    Error,
+    require: (name) => {
+      assert(Object.hasOwn(dependencies, name), `Unexpected module in Doctor harness: ${name}`);
+      return dependencies[name];
+    },
+  });
+  return exports;
+};
+const core = loadModule(doctor);
+const sourceFile = ts.createSourceFile("screeps-doctor.tsx", doctorUi, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+const supportNames = new Set(["SAMPLE_SNAPSHOTS", "CAPTURE_COPY", "CAPTURE_GUIDANCE", "SNAPSHOT_ERROR_COPY", "nextSnapshotSource", "getSnapshotErrorHelp"]);
+const supportSource = sourceFile.statements.filter((statement) => {
+  if (ts.isFunctionDeclaration(statement)) return supportNames.has(statement.name?.text);
+  return ts.isVariableStatement(statement) && statement.declarationList.declarations.some((declaration) => ts.isIdentifier(declaration.name) && supportNames.has(declaration.name.text));
+}).map((statement) => statement.getText(sourceFile)).join("\n");
+const support = loadModule(`${supportSource}\nexport { ${[...supportNames].join(", ")} };`);
+const diagnose = {
+  "spawn-not-working": core.diagnoseSpawnDoctor,
+  "creep-not-moving": core.diagnoseCreepMovementDoctor,
+  "creep-not-harvesting": core.diagnoseCreepHarvestDoctor,
+};
+const expectedClassifications = ["energy-blocked", "fatigue-blocked", "target-out-of-range"];
+const leafPaths = (value, prefix = "") => Object.entries(value).flatMap(([key, item]) => {
+  const path = prefix ? `${prefix}.${key}` : key;
+  return item !== null && typeof item === "object" ? leafPaths(item, path) : [path];
+});
+for (const [index, symptom] of Object.keys(diagnose).entries()) {
+  const sample = support.SAMPLE_SNAPSHOTS[symptom];
+  const result = diagnose[symptom](sample);
+  assert(result.classification === expectedClassifications[index], `Example diagnosis changed for ${symptom}`);
+  assert(sample.length <= core.SCREEPS_DOCTOR_MAX_SNAPSHOT_CHARS, "Displayed examples must fit the parser limit");
+  const fields = support.CAPTURE_GUIDANCE[symptom].fields;
+  assert([...fields.map((field) => field.path)].sort().join("|") === leafPaths(JSON.parse(sample)).sort().join("|"), `Guidance must describe exactly the canonical fields for ${symptom}`);
+  for (const locale of ["zh", "en"]) {
+    const guide = support.CAPTURE_GUIDANCE[symptom];
+    assert(guide.steps[locale] && guide.mistakes[locale] && guide.verify[locale], `${locale}/${symptom} guidance is incomplete`);
+    assert(fields.every((field) => field.description[locale]), `${locale}/${symptom} field descriptions are incomplete`);
+  }
+}
+
+const spawnSample = JSON.parse(support.SAMPLE_SNAPSHOTS["spawn-not-working"]);
+const movementSample = JSON.parse(support.SAMPLE_SNAPSHOTS["creep-not-moving"]);
+const harvestSample = JSON.parse(support.SAMPLE_SNAPSHOTS["creep-not-harvesting"]);
+for (const [snapshot, fn, expected] of [
+  [{ ...spawnSample, room: { visible: false, energyAvailable: null }, spawn: { visible: false, owned: null, spawning: null, remainingTime: null }, request: { bodyCost: null } }, core.diagnoseSpawnDoctor, "room-not-visible"],
+  [{ ...spawnSample, spawn: { visible: false, owned: null, spawning: null, remainingTime: null } }, core.diagnoseSpawnDoctor, "spawn-not-visible"],
+  [{ ...spawnSample, spawn: { visible: true, owned: true, spawning: true, remainingTime: 5 } }, core.diagnoseSpawnDoctor, "spawn-busy"],
+  [{ ...spawnSample, request: { bodyCost: null } }, core.diagnoseSpawnDoctor, "return-code-required"],
+  [{ ...movementSample, creep: { visible: false, owned: null, fatigue: null, activeMoveParts: null } }, core.diagnoseCreepMovementDoctor, "creep-not-visible"],
+  [{ ...harvestSample, target: { visible: false, inRange: null } }, core.diagnoseCreepHarvestDoctor, "target-not-visible"],
+  [{ ...harvestSample, creep: { visible: false, owned: null, activeWorkParts: null }, target: { visible: true, inRange: null } }, core.diagnoseCreepHarvestDoctor, "creep-not-visible"],
+]) assert(fn(JSON.stringify(snapshot)).classification === expected, `Unavailable/unknown/busy case failed: ${expected}`);
+
+const invalidSnapshots = [
+  ["{", core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, version: "1" }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, symptom: "creep-not-moving" }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, room: { visible: true } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, privateMarker: "DO_NOT_ECHO" }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, room: { visible: true, energyAvailable: "300" } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, spawn: { ...spawnSample.spawn, owned: "true" } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, room: { visible: false, energyAvailable: 300 } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, spawn: { ...spawnSample.spawn, remainingTime: 0 } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, spawn: { ...spawnSample.spawn, remainingTime: 2 } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...spawnSample, spawn: { ...spawnSample.spawn, spawning: true } }), core.parseSpawnDoctorSnapshot],
+  [JSON.stringify({ ...movementSample, creep: { ...movementSample.creep, fatigue: null } }), core.parseCreepMovementDoctorSnapshot],
+  [JSON.stringify({ ...movementSample, creep: { ...movementSample.creep, visible: false } }), core.parseCreepMovementDoctorSnapshot],
+  [JSON.stringify({ ...harvestSample, target: { visible: false, inRange: false } }), core.parseCreepHarvestDoctorSnapshot],
+  [JSON.stringify({ ...harvestSample, target: { visible: true, inRange: null } }), core.parseCreepHarvestDoctorSnapshot],
+  [" ".repeat(4097), core.parseSpawnDoctorSnapshot],
+];
+for (const [input, parse] of invalidSnapshots) {
+  let message;
+  try { parse(input); } catch (error) { message = error.message; }
+  assert(message, "Invalid Snapshot must remain rejected by the canonical parser");
+  for (const locale of ["zh", "en"]) {
+    const explanation = support.getSnapshotErrorHelp(message, locale);
+    assert(explanation && !explanation.includes("could not be classified") && !explanation.includes("无法解释"), `${locale} error needs a verified classification: ${message}`);
+    assert(!explanation.includes("DO_NOT_ECHO") && !explanation.includes("privateMarker"), "Error explanation must not echo arbitrary input keys or values");
+  }
+}
+for (const message of ["Unknown DO_NOT_ECHO", "constructor", "__proto__"]) {
+  for (const locale of ["zh", "en"]) {
+    const help = support.getSnapshotErrorHelp(message, locale);
+    assert(typeof help === "string" && !help.includes("DO_NOT_ECHO"), "Unknown errors must use a safe local fallback");
+  }
+}
+const require = createRequire(import.meta.url);
+const jsxRuntime = require("react/jsx-runtime");
+const launcherModule = loadModule(doctorLauncher, { "./screeps-doctor": core });
+const resolverCommonJs = loadModule(resolver);
+let hookIndex = 0;
+let state = [];
+let telemetry = [];
+const ui = loadModule(doctorUi, {
+  "react/jsx-runtime": jsxRuntime,
+  "react": {
+    useEffect: () => undefined,
+    useState: (initial) => {
+      const index = hookIndex++;
+      if (!(index in state)) state[index] = initial;
+      return [state[index], (next) => { state[index] = typeof next === "function" ? next(state[index]) : next; }];
+    },
+  },
+  "next/link": { __esModule: true, default: "a" },
+  "@/lib/problem-resolver": resolverCommonJs,
+  "@/lib/screeps-doctor": core,
+  "@/lib/screeps-doctor-launcher": launcherModule,
+  "@/lib/screeps-doctor-telemetry-client": { trackScreepsDoctorEvent: (event) => telemetry.push(event) },
+  "./screeps-doctor.module.css": { __esModule: true, default: new Proxy({}, { get: (_, name) => name }) },
+});
+const nodes = (node) => {
+  if (Array.isArray(node)) return node.flatMap(nodes);
+  if (!node || typeof node !== "object" || !node.props) return [];
+  return [node, ...nodes(node.props.children)];
+};
+const content = (node) => {
+  if (Array.isArray(node)) return node.map(content).join("");
+  if (node && typeof node === "object") return content(node.props?.children);
+  return node === null || node === undefined || typeof node === "boolean" ? "" : String(node);
+};
+const render = (locale) => { hookIndex = 0; return ui.ScreepsDoctor({ locale }); };
+const find = (tree, predicate) => {
+  const result = nodes(tree).find(predicate);
+  assert(result, "Expected Doctor UI element is missing");
+  return result;
+};
+const button = (tree, label) => find(tree, (node) => node.type === "button" && content(node) === label);
+for (const locale of ["zh", "en"]) {
+  state = []; telemetry = [];
+  for (const symptom of Object.keys(diagnose)) {
+    let tree = render(locale);
+    const symptomButton = nodes(tree).find((node) => node.type === "button" && node.props.onClick && content(node) === ({ "spawn-not-working": { zh: "Spawn 不工作", en: "Spawn not working" }, "creep-not-moving": { zh: "Creep 不移动", en: "Creep not moving" }, "creep-not-harvesting": { zh: "Creep 不采集", en: "Creep not harvesting" } })[symptom][locale]);
+    symptomButton.props.onClick(); tree = render(locale);
+    const details = find(tree, (node) => node.type === "details");
+    assert(details.props.open === undefined && !details.props.onToggle, "Capture help must default closed and have no state-mutating toggle handler");
+    assert(content(details).includes(support.CAPTURE_GUIDANCE[symptom].steps[locale]), "Help must follow the current symptom and locale");
+    assert(!nodes(tree).some((node) => node.props.id === "screeps-doctor-example"), "Switching symptoms must clear example provenance");
+    const shownFields = nodes(details).filter((node) => node.type === "dt").map((node) => content(node.props.children[0]));
+    assert(shownFields.join("|") === support.CAPTURE_GUIDANCE[symptom].fields.map((field) => field.path).join("|"), "Displayed fields must match only the selected symptom");
+    button(tree, locale === "zh" ? "载入示例" : "Load example").props.onClick(); tree = render(locale);
+    assert(content(tree).includes(support.CAPTURE_COPY[locale].example), "Loaded samples must be labelled demonstration data");
+    const textarea = find(tree, (node) => node.type === "textarea");
+    assert(textarea.props.value === support.SAMPLE_SNAPSHOTS[symptom], "Load example must preserve the existing sample");
+    const eventCount = telemetry.length;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      button(tree, locale === "zh" ? "开始诊断" : "Diagnose").props.onClick(); tree = render(locale);
+      assert(content(tree).includes(support.CAPTURE_COPY[locale].example), "Repeated example diagnoses must retain the demonstration label");
+      const href = find(tree, (node) => node.type === "a" && node.props.href === getProblemResolverDeepLink(symptom, locale)).props.href;
+      assert(href.includes(`flow=${symptom}`), "Diagnosed example must preserve canonical Resolver handoff");
+    }
+    assert(telemetry.length === eventCount + 2, "Diagnosis telemetry cardinality must remain unchanged");
+    find(tree, (node) => node.type === "textarea").props.onChange({ target: { value: `${textarea.props.value}\n` } }); tree = render(locale);
+    assert(content(tree).includes(support.CAPTURE_COPY[locale].editedExample), "Editing a sample must retain its provenance reminder");
+    assert(!nodes(tree).some((node) => node.props.className === "result"), "Editing input must remove stale diagnosis results");
+    button(tree, locale === "zh" ? "清空" : "Clear").props.onClick(); tree = render(locale);
+    assert(find(tree, (node) => node.type === "textarea").props.value === "", "Clear must empty the input");
+    assert(!nodes(tree).some((node) => node.props.id === "screeps-doctor-example"), "Clear must remove example provenance");
+    find(tree, (node) => node.type === "textarea").props.onChange({ target: { value: support.SAMPLE_SNAPSHOTS[symptom] } }); tree = render(locale);
+    assert(!nodes(tree).some((node) => node.props.id === "screeps-doctor-example"), "Fully manual input must not be labelled a loaded example or verified fact");
+    find(tree, (node) => node.type === "textarea").props.onChange({ target: { value: "{" } }); tree = render(locale);
+    const beforeInvalid = telemetry.length;
+    button(tree, locale === "zh" ? "开始诊断" : "Diagnose").props.onClick(); tree = render(locale);
+    assert(content(find(tree, (node) => node.props.role === "alert")).includes(support.getSnapshotErrorHelp("Snapshot must be valid JSON.", locale)), "UI must use the actual parser error's localized explanation");
+    assert(telemetry.length === beforeInvalid, "Invalid input must not emit diagnosis telemetry");
+    assert(!JSON.stringify(telemetry).includes("snapshot") && !JSON.stringify(telemetry).includes("DO_NOT_ECHO"), "Snapshot and raw errors must stay out of telemetry");
+  }
+}
+assert(doctorStyles.includes(".captureHelp summary:focus-visible") && doctorStyles.includes("white-space: pre-wrap") && doctorStyles.includes("overflow-wrap: anywhere"), "Guidance needs keyboard focus and wrapping styles");
+
+console.log("[Doctor Snapshot Guidance] Six bilingual handler/field cases, example provenance, strict parser cases, localized errors, and telemetry boundaries passed; browser validation remains separate.");
 
 console.log("[Screeps Doctor V2] Spawn + movement + harvest core, UI, quick-start launcher, and canonical-link checks passed.");
