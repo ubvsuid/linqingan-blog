@@ -33,13 +33,16 @@ featured: false
 
 ## 一、创建前需要准备什么
 
-本文假设房间中已经有一个属于自己的 Spawn。
+本文适用于 Screeps World/MMO；Arena 使用不同的对象获取方式、参数和返回值，不能直接复用这里的示例。
 
 开始前，请确认：
 
-- 你知道 Spawn 的真实名称；
-- 房间当前可用于生成 Creep 的 Energy 足够；
-- 游戏中还没有名为 `Worker1` 的 Creep。
+- 能在 `Game.spawns` 中找到属于自己的 Spawn，并使用它的真实名称；
+- Spawn 当前可用（`spawn.isActive()` 为 `true`），且没有正在生成其他 Creep；
+- 对本文的 `[WORK, CARRY, MOVE]`，`spawn.room.energyAvailable` 至少为 `200`。这里看的是当前可用 Energy，不是 `energyCapacityAvailable` 或 Storage 中的总能量；
+- 计划使用的 Creep 名称没有被占用，存在检查与创建请求使用同一个名称。
+
+条件不足时，先检查具体缺项，再结合后文的实际返回值排查；不要把改名称或反复调用当成能量、所有权或 Spawn 状态问题的解决办法。
 
 本文示例使用：
 
@@ -316,6 +319,16 @@ Game.creeps.Worker1?.spawning === false
 4. 生成阶段的 `Game.creeps['Worker1'].spawning` 是否为 `true`；
 5. 等待后续 tick，直到 `spawning` 变为 `false`；
 6. 再让角色逻辑开始控制这只 Creep。
+
+**从采集课程过来的读者，什么时候返回？**
+
+`dryRun` 返回 `OK` 只是检查通过。正式创建请求返回 `OK` 后，还要观察对应的 Creep；等它存在且 `spawning === false`，再返回[第 4 篇：移动并采集能量](/blog/screeps-first-creep-harvest)。仅看到对象存在，不能当作生成完成。
+
+如果实际名称是 `Worker1`，把第 4 篇采集代码中的 `'Harvester1'` 换成 `'Worker1'`，并同步修改日志中的示例名称；若使用了别的名字，就统一使用那个真实名称。
+
+本篇的创建主循环不会自动采集。开始采集练习时，改用第 4 篇的完整主循环；不要把两段 `module.exports.loop` 原样连续粘贴，后一次赋值会覆盖前一次。开始这一步前，先保留当前代码，避免覆盖已有的其他控制逻辑。
+
+已经完成采集练习的读者，仍可按原路线进入下一篇角色分工。
 
 ### 为什么房间画面里还没看到可工作的 Creep？
 

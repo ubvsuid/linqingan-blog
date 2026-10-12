@@ -83,7 +83,11 @@ Controller 决定房间控制权和 Room Controller Level。点击它可以查�
 
 Creep 是玩家通过代码控制的单位。点击一只 Creep，可以查看名称、身体部件、剩余生命和携带资源等信息。
 
-如果当前没有 Creep，不要凭空假设名称。先确认房间和 Spawn 状态，后面的文章会讲创建和自动补员。
+本路线中的对象检查和控制示例适用于 Screeps World/MMO；Arena 使用不同的 API，不能直接照抄。
+
+如果当前没有 Creep，先完成本篇的房间、Spawn 和 Console 检查，再阅读下一篇的 tick 与主循环。开始第 4 篇采集练习前，请先按[第 7 篇：用 Spawn 创建 Creep](/blog/screeps-spawn-create-creep)补齐前置条件，完成创建后再回到采集课程。
+
+如果已经有可用的基础工作 Creep，就按原来的课程顺序继续。无论走哪条路径，都记下实际名称，不要把示例名当成你的游戏对象。
 
 ## 用只读 Console 命令确认对象
 

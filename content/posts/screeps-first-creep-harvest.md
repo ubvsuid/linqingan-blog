@@ -42,7 +42,13 @@ featured: false
 
 ## 一、开始前需要准备什么
 
-本文默认你的房间中已经有一只基础工作 Creep。
+本篇适用于 Screeps World/MMO。Arena 的对象获取和 API 合同不同，请使用[Arena 官方文档](https://arena.screeps.com/docs/)，不要套用本篇的 `Game.creeps` 示例。
+
+开始前，需要一只属于自己、已经完成生成的基础工作 Creep。已有符合条件的 Creep 时，直接继续下面的采集练习。
+
+**当前没有 Creep？** 先阅读[第 7 篇：用 Spawn 创建 Creep](/blog/screeps-spawn-create-creep)，按它的创建条件完成练习，再回到本篇。若自己的 Spawn、可用 Energy 或其他创建条件尚未满足，先停在创建课程处理对应问题，不要继续运行依赖 Creep 的采集代码。
+
+返回时，确认 `Game.creeps[实际名称]` 存在，且它的 `spawning === false`。如果你创建的是 `Worker1`，本篇代码中的 `'Harvester1'` 应换成 `'Worker1'`，日志里的示例名称也同步修改；不需要另外创建一只叫 `Harvester1` 的 Creep。
 
 为了让它能够移动、采集并把 Energy 装进 Store，通常会使用下面三个基础身体部件：
 
