@@ -122,6 +122,7 @@ export function ToolUtilityBar({ title, issueUrl }: ToolUtilityBarProps) {
       if (!(target instanceof Element)) return;
       if (target.closest(".tool-utility-bar")) return;
       if (!target.closest("button, input, select, textarea")) return;
+      if (toolId === "room-diagnostics" && !target.closest(".room-diagnostics")) return;
 
       try {
         if (window.sessionStorage.getItem(useKey)) return;
