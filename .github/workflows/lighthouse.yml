@@ -18,12 +18,28 @@ on:
   schedule:
     - cron: "30 17 * * 0"
   workflow_dispatch:
+    inputs:
+      validation_mode:
+        description: Existing ref audit, or explicitly isolated three-file candidate validation
+        type: choice
+        options: [current-ref, isolated-candidate]
+        default: current-ref
+      candidate_confirmation:
+        description: Candidate mode requires VALIDATE_THREE_FILE_CANDIDATE_ONCE
+        type: string
+        default: ""
+      expected_controller_sha:
+        description: Candidate mode requires the exact current gpt-work controller SHA
+        type: string
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: lighthouse-${{ github.workflow }}-${{ github.ref }}
+  # Keep the original concurrency group for all existing event/default modes.
+  # Candidate/invalid modes cannot cancel a regular audit and cannot be rerun.
+  group: ${{ (inputs.validation_mode != '' && inputs.validation_mode != 'current-ref') && format('lighthouse-isolated-{0}', github.run_id) || format('lighthouse-{0}-{1}', github.workflow, github.ref) }}
   cancel-in-progress: true
 
 jobs:
@@ -61,7 +77,7 @@ jobs:
           retention-days: 30
 
   full-build-audit:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.validation_mode == '' || inputs.validation_mode == 'current-ref'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
 
@@ -94,7 +110,7 @@ jobs:
           retention-days: 30
 
   production-audit:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.validation_mode == '' || inputs.validation_mode == 'current-ref'))
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -121,4 +137,621 @@ jobs:
           name: lighthouse-production-${{ github.run_id }}
           path: lhci-production-results
           if-no-files-found: warn
+          retention-days: 30
+
+  isolated-candidate-audit:
+    # Unknown non-default inputs enter only this job and fail before checkout.
+    if: github.event_name == 'workflow_dispatch' && inputs.validation_mode != '' && inputs.validation_mode != 'current-ref'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      REQUESTED_MODE: ${{ inputs.validation_mode }}
+      CANDIDATE_CONFIRMATION: ${{ inputs.candidate_confirmation }}
+      EXPECTED_CONTROLLER_SHA: ${{ inputs.expected_controller_sha }}
+
+    steps:
+      - name: Initialize isolated validator and reject unapproved dispatch inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The validator and all evidence live outside both repository worktrees.
+          cat > "$RUNNER_TEMP/lhci-candidate-runner.py" <<'PY'
+          import base64
+          import collections
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import platform
+          import re
+          import shutil
+          import signal
+          import socket
+          import struct
+          import subprocess
+          import sys
+          import tempfile
+          import time
+          import urllib.request
+          from urllib.parse import urlsplit
+
+          ROOT = Path(os.environ['RUNNER_TEMP'])
+          EVIDENCE = ROOT / 'lhci-isolated-evidence'
+          CANDIDATE = ROOT / 'lhci-isolated-candidate'
+          CONTROLLER = Path(os.environ['GITHUB_WORKSPACE'])
+          BASE = 'e03a871c8f198101d147e4c79aaf71b91071a7ec'
+          BASE_TREE = 'a9c54676c16fecb73299554fe45037f02ee5b2e3'
+          SOURCE = '0d828ccb49972dde700aafc5ddce278749ef10a2'
+          SOURCE_TREE = '7aa979c0fc4f73ae2f7c12d0e7594d32122a579a'
+          EXPECTED_TREE = 'e0c4e97f689cc68383e376ea5a2b7cb862bf5166'
+          NEXT_ENV = '9edff1c7cacb3bfac9a1eadcf6f51eaa99565e38'
+          BLOBS = {
+              'package.json': '550c0a1b7550e39e443caccf42991bec50fbb0fd',
+              'package-lock.json': 'c031c18bcec9227e99dc5f00376c626f5441d9ef',
+              'scripts/check-eslint-glob-boundary.mjs': 'a4fea84f47f327ae461784dbba1e03f5ffce5e0b',
+          }
+          EVIDENCE.mkdir(parents=True, exist_ok=True)
+
+
+          def require(condition, message):
+              if not condition:
+                  raise RuntimeError(message)
+
+
+          def save(name, data):
+              (EVIDENCE / name).write_text(json.dumps(data, indent=2) + '\n')
+
+
+          def read(name):
+              return json.loads((EVIDENCE / name).read_text())
+
+
+          def command(label, args, cwd=CANDIDATE, timeout=1200, check=True, env=None):
+              started = time.time()
+              with (EVIDENCE / (label + '.stdout')).open('wb') as out, \
+                      (EVIDENCE / (label + '.stderr')).open('wb') as err:
+                  try:
+                      result = subprocess.run(args, cwd=cwd, env=env, stdout=out, stderr=err,
+                                              timeout=timeout, check=False)
+                      code = result.returncode
+                  except subprocess.TimeoutExpired:
+                      save(label + '.command.json', {'argv': args, 'timeout': timeout,
+                                                    'result': 'TIMEOUT'})
+                      raise
+              save(label + '.command.json', {'argv': args, 'cwd': str(cwd), 'exit': code,
+                                            'seconds': time.time() - started})
+              print(f'{label}: exit={code}', flush=True)
+              if check:
+                  require(code == 0, f'{label} failed; see saved stdout/stderr')
+              return code, (EVIDENCE / (label + '.stdout')).read_text(errors='replace')
+
+
+          def git(*args, cwd=CANDIDATE, data=None):
+              return subprocess.check_output(['git', *args], cwd=cwd, input=data).decode().strip()
+
+
+          def entries(ref):
+              raw = subprocess.check_output(['git', 'ls-tree', '-rz', ref], cwd=CANDIDATE)
+              return {row.split(b'\t', 1)[1].decode(): row.split(b'\t', 1)[0].decode()
+                      for row in raw.split(b'\0') if row}
+
+
+          def scope(label):
+              identity = read('identity.json')
+              require(git('rev-parse', 'HEAD') == identity['candidate_commit'], 'Candidate HEAD drift')
+              require(git('rev-parse', 'HEAD^{tree}') == EXPECTED_TREE, 'Candidate tree drift')
+              require(git('show', '-s', '--format=%P', 'HEAD') == BASE, 'Candidate parent drift')
+              before, after = entries(BASE), entries('HEAD')
+              changed = sorted(p for p in before.keys() | after.keys() if before.get(p) != after.get(p))
+              require(changed == sorted(BLOBS), 'Candidate is not an exact three-file projection')
+              for name, blob in BLOBS.items():
+                  require(after[name] == f'100644 blob {blob}', f'Unapproved mode/blob: {name}')
+                  require(git('hash-object', name) == blob, f'Working file drift: {name}')
+              status = git('status', '--porcelain=v1', '--untracked-files=all')
+              (EVIDENCE / (label + '.status')).write_text(status)
+              require(not status, f'{label}: candidate worktree is not clean')
+              save(label + '.json', {'result': 'PASS', 'changed_paths': changed,
+                                     'other_paths_modes_blobs_unchanged': True})
+
+
+          def gate_inputs():
+              context = {k: os.environ.get(k) for k in ['GITHUB_REPOSITORY', 'GITHUB_EVENT_NAME',
+                  'GITHUB_REF', 'GITHUB_SHA', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'GITHUB_JOB',
+                  'REQUESTED_MODE', 'EXPECTED_CONTROLLER_SHA']}
+              save('controller-context.json', context)
+              require(context['GITHUB_REPOSITORY'] == 'ubvsuid/linqingan-blog', 'Wrong repository')
+              require(context['GITHUB_EVENT_NAME'] == 'workflow_dispatch', 'Manual validation only')
+              require(context['GITHUB_REF'] == 'refs/heads/gpt-work', 'Controller must use gpt-work')
+              require(context['GITHUB_RUN_ATTEMPT'] == '1', 'Reruns are not authorized')
+              require(context['REQUESTED_MODE'] == 'isolated-candidate', 'Unknown validation mode')
+              require(os.environ.get('CANDIDATE_CONFIRMATION') == 'VALIDATE_THREE_FILE_CANDIDATE_ONCE',
+                      'Explicit candidate confirmation required')
+              expected = context['EXPECTED_CONTROLLER_SHA'] or ''
+              require(bool(re.fullmatch('[0-9a-f]{40}', expected)) and expected == context['GITHUB_SHA'],
+                      'Explicit exact controller SHA required')
+
+
+          def identity():
+              gate_inputs()
+              require(git('rev-parse', 'HEAD', cwd=CONTROLLER) == os.environ['GITHUB_SHA'],
+                      'Checkout differs from controller SHA')
+              _, refs_text = command('fresh-remote-refs', ['git', 'ls-remote', 'origin',
+                  'refs/heads/clean-blog-v1', 'refs/heads/gpt-work'], cwd=CONTROLLER)
+              refs = dict(line.split()[::-1] for line in refs_text.splitlines())
+              require(refs.get('refs/heads/clean-blog-v1') == BASE, 'Production baseline changed')
+              require(refs.get('refs/heads/gpt-work') == os.environ['GITHUB_SHA'], 'Controller is stale')
+              command('fetch-baselines', ['git', 'fetch', '--no-tags', 'origin', 'clean-blog-v1',
+                                        'gpt-work'], cwd=CONTROLLER)
+              require(git('rev-parse', BASE + '^{tree}', cwd=CONTROLLER) == BASE_TREE, 'Wrong base tree')
+              require(git('rev-parse', SOURCE + '^{tree}', cwd=CONTROLLER) == SOURCE_TREE, 'Wrong source tree')
+              for name, blob in BLOBS.items():
+                  for ref in [SOURCE, os.environ['GITHUB_SHA']]:
+                      require(git('rev-parse', ref + ':' + name, cwd=CONTROLLER) == blob,
+                              f'Source blob drift: {name}')
+              require(not CANDIDATE.exists(), 'Candidate directory already exists')
+              command('create-local-worktree', ['git', 'worktree', 'add', '--detach', str(CANDIDATE), BASE],
+                      cwd=CONTROLLER)
+              for name, blob in BLOBS.items():
+                  target = CANDIDATE / name
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(subprocess.check_output(['git', 'cat-file', 'blob', blob], cwd=CONTROLLER))
+                  git('update-index', '--add', '--cacheinfo', f'100644,{blob},{name}')
+              tree = git('write-tree')
+              require(tree == EXPECTED_TREE, 'Unchanged baseline produced an unexpected candidate tree')
+              commit = git('-c', 'user.name=Isolated Candidate Validator', '-c',
+                           'user.email=isolated-validator@users.noreply.github.com',
+                           'commit-tree', tree, '-p', BASE,
+                           data=b'validation: local-only exact three-file security candidate\n')
+              git('checkout', '--detach', commit)
+              save('identity.json', {'controller_sha': os.environ['GITHUB_SHA'],
+                  'baseline_commit': BASE, 'baseline_tree': BASE_TREE, 'source_commit': SOURCE,
+                  'source_tree': SOURCE_TREE, 'source_blobs': BLOBS, 'candidate_parent': BASE,
+                  'candidate_tree': tree, 'candidate_commit': commit, 'remote_candidate_writes': 0})
+              (EVIDENCE / 'candidate.diff').write_text(git('diff', '--binary', BASE, commit))
+              (EVIDENCE / 'candidate.raw-diff').write_text(git('diff-tree', '--no-commit-id', '--raw',
+                                                            '-r', '--abbrev=40', commit))
+              save('lighthouse-config-blobs.json', {p: git('rev-parse', 'HEAD:' + p) for p in
+                  ['lighthouserc.json', 'lighthouserc.production.json', 'next-env.d.ts']})
+              scope('initial-scope')
+
+
+          def runtime():
+              save('toolchain-paths.json', {name: {'command_path': shutil.which(name),
+                  'real_path': str(Path(shutil.which(name)).resolve())} for name in ['node', 'npm']})
+              command('node-version', ['node', '--version'])
+              _, version = command('npm-version', ['npm', '--version'])
+              require(version.strip() == '10.9.9', 'Expected matched npm 10.9.9')
+              command('node-runtime', ['node', '-e', '''
+              const assert = require('node:assert/strict');
+              assert.equal(process.versions.node, '22.23.3');
+              assert.equal(process.platform, 'linux'); assert.equal(process.arch, 'x64');
+              assert.ok(process.report.getReport().header.glibcVersionRuntime);
+              const interfaces = require('node:os').networkInterfaces();
+              assert.ok(Object.keys(interfaces).length);
+              console.log(JSON.stringify({execPath:process.execPath, versions:process.versions,
+                glibc:process.report.getReport().header.glibcVersionRuntime,interfaces,
+                NODE:process.env.NODE,npm_execpath:process.env.npm_execpath,
+                npm_node_execpath:process.env.npm_node_execpath,PATH:process.env.PATH}));
+              '''])
+              with tempfile.TemporaryDirectory(prefix='lhci-socket-') as d:
+                  with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                      s.bind(str(Path(d) / 'probe.sock'))
+                      s.listen(1)
+                  with socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, socket.NETLINK_ROUTE) as s:
+                      s.bind((0, 0))
+              save('socket-capabilities.json', {'AF_UNIX': 'PASS', 'AF_NETLINK': 'PASS',
+                                               'platform': platform.platform()})
+              probe = ROOT / 'lhci-nested-probe.cjs'
+              probe.write_text('''
+              const a=require('node:assert/strict'), fs=require('node:fs'), cp=require('node:child_process');
+              a.equal(process.env.npm_command,'exec');
+              a.equal(fs.realpathSync(process.env.npm_node_execpath),fs.realpathSync(process.execPath));
+              console.log(JSON.stringify({execPath:process.execPath,NODE:process.env.NODE,
+                npm_node_execpath:process.env.npm_node_execpath,npm_execpath:process.env.npm_execpath,
+                PATH:process.env.PATH}));
+              for(const args of [['--version'],['run','locksynccheck']]) {
+                const r=cp.spawnSync('npm',args,{stdio:'inherit'});a.equal(r.status,0);
+              }
+              ''')
+              command('nested-npm', ['npm', 'exec', '--offline', '--call',
+                                     'node "$RUNNER_TEMP/lhci-nested-probe.cjs"'])
+              chrome = next((shutil.which(n) for n in ['google-chrome', 'google-chrome-stable', 'chromium']
+                             if shutil.which(n)), None)
+              require(chrome, 'No existing Chrome executable')
+              chrome = str(Path(chrome).resolve())
+              _, chrome_version = command('chrome-version', [chrome, '--version'])
+              _, lhci_version = command('lhci-version', ['npx', '--yes', '--package=@lhci/cli@0.15.1',
+                                                       'lhci', '--version'])
+              require(lhci_version.strip() == '0.15.1', 'Wrong LHCI version')
+              save('browser-runtime.json', {'chrome_path': chrome, 'chrome_version': chrome_version.strip(),
+                                           'lhci_version': lhci_version.strip()})
+              chrome_probe(chrome)
+
+
+          def recv_exact(connection, size):
+              data = b''
+              while len(data) < size:
+                  block = connection.recv(size - len(data))
+                  require(block, 'CDP socket closed unexpectedly')
+                  data += block
+              return data
+
+
+          def chrome_probe(chrome):
+              with tempfile.TemporaryDirectory(prefix='lhci-chrome-') as d, \
+                      (EVIDENCE / 'chrome-probe.stdout').open('wb') as out, \
+                      (EVIDENCE / 'chrome-probe.stderr').open('wb') as err:
+                  process = subprocess.Popen([chrome, '--no-sandbox', '--headless',
+                      '--user-data-dir=' + d, '--remote-debugging-port=0', 'about:blank'],
+                      stdout=out, stderr=err, start_new_session=True)
+                  try:
+                      active = Path(d) / 'DevToolsActivePort'
+                      deadline = time.monotonic() + 20
+                      while not active.exists() and time.monotonic() < deadline:
+                          require(process.poll() is None, 'Chrome exited before CDP readiness')
+                          time.sleep(0.1)
+                      require(active.exists(), 'Chrome debugging port was not established')
+                      port = int(active.read_text().splitlines()[0])
+                      with urllib.request.urlopen(f'http://127.0.0.1:{port}/json/version', timeout=5) as r:
+                          version = json.load(r)
+                      url = urlsplit(version['webSocketDebuggerUrl'])
+                      require(url.hostname in ['127.0.0.1', 'localhost'] and url.port == port,
+                              'Unexpected CDP endpoint')
+                      with socket.create_connection((url.hostname, port), timeout=10) as connection:
+                          key = base64.b64encode(os.urandom(16)).decode()
+                          request = (f'GET {url.path} HTTP/1.1\r\nHost: {url.hostname}:{port}\r\n'
+                              f'Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: {key}\r\n'
+                              'Sec-WebSocket-Version: 13\r\n\r\n')
+                          connection.sendall(request.encode())
+                          header = b''
+                          while not header.endswith(b'\r\n\r\n'):
+                              header += recv_exact(connection, 1)
+                              require(len(header) < 16384, 'Invalid WebSocket response')
+                          require(header.startswith(b'HTTP/1.1 101 '), 'CDP WebSocket upgrade failed')
+                          accept = base64.b64encode(hashlib.sha1(
+                              (key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').encode()).digest())
+                          require(accept.lower() in header.lower(), 'Invalid CDP handshake')
+                          payload = b'{"id":1,"method":"Browser.getVersion"}'
+                          mask = os.urandom(4)
+                          connection.sendall(bytes([0x81, 0x80 | len(payload)]) + mask +
+                                             bytes(c ^ mask[i % 4] for i, c in enumerate(payload)))
+                          first, second = recv_exact(connection, 2)
+                          size = second & 127
+                          if size == 126:
+                              size = struct.unpack('!H', recv_exact(connection, 2))[0]
+                          elif size == 127:
+                              size = struct.unpack('!Q', recv_exact(connection, 8))[0]
+                          require(first & 15 == 1 and not second & 128 and size < 100000,
+                                  'Unexpected CDP response frame')
+                          response = json.loads(recv_exact(connection, size))
+                          require(response.get('id') == 1 and 'product' in response.get('result', {}),
+                                  'CDP Browser.getVersion failed')
+                          save('cdp-response.json', {'http_version': version, 'response': response})
+                  finally:
+                      if process.poll() is None:
+                          os.killpg(process.pid, signal.SIGTERM)
+                          try:
+                              process.wait(timeout=10)
+                          except subprocess.TimeoutExpired:
+                              os.killpg(process.pid, signal.SIGKILL)
+                              process.wait(timeout=5)
+
+
+          def closure():
+              command('clean-install', ['npm', 'ci'])
+              command('manifest-lock', ['npm', 'run', 'locksynccheck'])
+              rc, text = command('npm-ls-all', ['npm', 'ls', '--all', '--json'], check=False)
+              require(rc == 0, 'npm ls exit code is not zero')
+              installed = json.loads(text)
+              rc, text = command('npm-ls-lock-only', ['npm', 'ls', '--package-lock-only', '--all', '--json'],
+                                 check=False)
+              require(rc == 0, 'Lock-only npm ls failed')
+              lock_tree = json.loads(text)
+              require(not lock_tree.get('problems'), 'Lock-only dependency problems')
+              packages = json.loads((CANDIDATE / 'package-lock.json').read_text())['packages']
+              optional = {'@img/sharp-wasm32': '0.35.5', '@emnapi/runtime': '1.11.3'}
+              allowed = {f'extraneous: {name}@{version} {CANDIDATE}/node_modules/{name}'
+                         for name, version in optional.items()}
+              problems = installed.get('problems', [])
+              require(len(problems) == len(set(problems)) and set(problems) <= allowed,
+                      'Unexplained npm dependency problems')
+              def inspect(node, path='', lock_only=False):
+                  require(not node.get('problems') if lock_only else
+                          set(node.get('problems', [])) <= allowed, f'Unexplained nested problems: {path}')
+                  require(not node.get('missing') and not node.get('invalid'), f'Missing/invalid {path}')
+                  if node.get('extraneous'):
+                      require(path in optional and node.get('version') == optional[path],
+                              f'Unexplained extraneous installation: {path}')
+                  for name, dependency in node.get('dependencies', {}).items():
+                      inspect(dependency, name, lock_only)
+              inspect(installed)
+              inspect(lock_tree, lock_only=True)
+              for name, version in optional.items():
+                  meta = packages['node_modules/' + name]
+                  require(meta['optional'] is True and meta['version'] == version, 'Optional metadata drift')
+                  location = CANDIDATE / 'node_modules' / name
+                  if location.exists():
+                      require(not location.is_symlink(), 'Unexpected optional installation link')
+                      require(json.loads((location / 'package.json').read_text())['version'] == version,
+                              'Optional installed version drift')
+              for name, selector, value in [('@img/sharp-freebsd-wasm32', 'os', ['freebsd']),
+                                            ('@img/sharp-webcontainers-wasm32', 'cpu', ['wasm32'])]:
+                  meta = packages['node_modules/' + name]
+                  require(meta['optional'] is True and meta[selector] == value and
+                          meta['dependencies']['@img/sharp-wasm32'] == '0.35.5', 'Optional parent drift')
+                  require(packages['node_modules/sharp']['optionalDependencies'][name] == '0.35.5',
+                          'Sharp optional parent relationship drift')
+                  require(not (CANDIDATE / 'node_modules' / name).exists(), 'Platform-inapplicable parent installed')
+              require(packages['node_modules/@img/sharp-wasm32']['dependencies']['@emnapi/runtime'] == '^1.11.3',
+                      'Wasm runtime relationship drift')
+              require(not any(re.search(r'(?:^|/)node_modules/(braces|micromatch)$', p) for p in packages),
+                      'Vulnerable dependency chain returned')
+              command('installed-inventory', ['node', '-e', '''
+              const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+              const {createRequire}=require('node:module');
+              const Arborist=createRequire(process.argv[1])('@npmcli/arborist');
+              const lock=JSON.parse(fs.readFileSync('package-lock.json')).packages;
+              const allowed=new Map([['node_modules/@img/sharp-wasm32','0.35.5'],
+                                     ['node_modules/@emnapi/runtime','1.11.3']]);
+              (async()=>{
+                const actual=await new Arborist({path:process.cwd()}).loadActual();
+                const virtual=await new Arborist({path:process.cwd()}).loadVirtual();
+                const inventory=[];
+                for(const node of actual.inventory.values()) {
+                  for(const edge of node.edgesOut.values()) assert.ok(!edge.error,
+                    `${node.location} -> ${edge.name}: ${edge.error}`);
+                  if(node.isRoot)continue;
+                  assert.ok(!node.isLink,`Unexpected link: ${node.location}`);
+                  assert.ok(lock[node.location],`Unrecorded dependency: ${node.location}`);
+                  assert.equal(node.version,lock[node.location].version);
+                  assert.ok(!['braces','micromatch'].includes(node.package.name));
+                  if(node.extraneous)assert.equal(allowed.get(node.location),node.version);
+                  inventory.push({location:node.location,name:node.package.name,version:node.version,
+                                  extraneous:node.extraneous,optional:node.optional});
+                }
+                for(const [location,version] of allowed) {
+                  const node=virtual.inventory.get(location);
+                  assert.ok(node && node.optional && !node.extraneous);assert.equal(node.version,version);
+                }
+                console.log(JSON.stringify(inventory));
+              })().catch(e=>{console.error(e);process.exitCode=1;});
+              ''', str(Path(shutil.which('npm')).resolve())])
+              command('sharp-native-load', ['node', '-e', '''
+              const assert=require('node:assert/strict'),fs=require('node:fs');
+              const sharp=require('sharp');
+              for(const [name,version] of [['@img/sharp-linux-x64','0.35.5'],
+                                         ['@img/sharp-libvips-linux-x64','1.3.4']]) {
+                assert.equal(JSON.parse(fs.readFileSync('node_modules/'+name+'/package.json')).version,version);
+              }
+              const loaded=Object.keys(require.cache).filter(p=>p.endsWith('.node'));
+              assert.ok(loaded.some(p=>p.includes('/@img/sharp-linux-x64/')));
+              assert.equal(sharp.versions.sharp,'0.35.5');assert.ok(sharp.versions.vips);
+              sharp({create:{width:1,height:1,channels:3,background:'#fff'}}).png().toBuffer()
+                .then(b=>{assert.ok(b.length);console.log(JSON.stringify({versions:sharp.versions,loaded}));})
+                .catch(e=>{console.error(e);process.exitCode=1;});
+              '''])
+              save('dependency-closure.json', {'result': 'PASS', 'raw_problems': problems,
+                  'classification': 'EXPECTED_PLATFORM_OPTIONAL_CLASSIFICATION' if problems else 'CLEAN',
+                  'optional_parent_platforms': {'freebsd': 'not applicable', 'wasm32': 'not applicable'}})
+              scope('dependency-scope')
+
+
+          def security():
+              for label, args in [('production-audit', ['--omit=dev']), ('full-audit', [])]:
+                  _, text = command(label, ['npm', 'audit', *args, '--audit-level=high', '--json'])
+                  data = json.loads(text)
+                  require('error' not in data and 'dependencies' in data.get('metadata', {}),
+                          'Incomplete or unavailable audit response')
+                  counts = data['metadata']['vulnerabilities']
+                  require(counts['high'] == 0 and counts['critical'] == 0, 'High/critical audit findings')
+                  save(label + '.counts.json', counts)
+
+
+          def restore_generated(label):
+              status = git('status', '--porcelain=v1', '--untracked-files=all')
+              (EVIDENCE / (label + '.status-before')).write_text(status)
+              (EVIDENCE / (label + '.diff')).write_text(git('diff', '--', 'next-env.d.ts'))
+              original = subprocess.check_output(['git', 'show', 'HEAD:next-env.d.ts'], cwd=CANDIDATE)
+              actual = (CANDIDATE / 'next-env.d.ts').read_bytes()
+              (EVIDENCE / (label + '.next-env-before')).write_bytes(actual)
+              if status:
+                  require(status == 'M next-env.d.ts', 'Unexpected generated or tracked file changes')
+                  addition = b'import "./.next/types/root-params.d.ts";\n'
+                  require(addition not in original and actual.count(addition) == 1 and
+                          actual.replace(addition, b'', 1) == original, 'Unapproved next-env generation diff')
+                  (CANDIDATE / 'next-env.d.ts').write_bytes(original)
+              require(git('hash-object', 'next-env.d.ts') == NEXT_ENV, 'next-env restoration blob mismatch')
+              (EVIDENCE / (label + '.next-env-after')).write_bytes((CANDIDATE / 'next-env.d.ts').read_bytes())
+              scope(label + '-scope')
+
+
+          def quality():
+              command('glob-guard-positive-negative', ['node', 'scripts/check-eslint-glob-boundary.mjs'])
+              command('lint', ['npm', 'run', 'lint'])
+              command('typecheck', ['npm', 'run', 'typecheck'])
+              _, output = command('standard-build-smoke', ['npm', 'run', 'build'])
+              manifest = json.loads((CANDIDATE / 'package.json').read_text())
+              expected = re.findall(r'npm run ([\w:.-]+)', manifest['scripts']['prebuild'])
+              invoked = re.findall(r'^> \S+@\S+ (\S+)\s*$', output, re.MULTILINE)
+              require(len(expected) == 65 and invoked == ['prebuild', *expected, 'build'],
+                      'Standard lifecycle/prebuild execution evidence differs from the approved scripts')
+              save('prebuild-execution.json', {'expected_count': 65, 'actual_scripts': invoked})
+              restore_generated('post-build')
+              for label, args in [
+                  ('product-experience', ['node', 'scripts/check-product-experience-v1.mjs']),
+                  ('tick-lab', ['node', '--experimental-strip-types', 'scripts/check-tick-lab.mjs']),
+                  ('evidence-model', ['node', 'scripts/check-evidence-model.mjs']),
+                  ('evidence-pipeline', ['node', 'scripts/check-verification-evidence-pipeline.mjs']),
+                  ('environment-isolation', ['node', 'scripts/check-environment-isolation.mjs']),
+                  ('backup-recovery', ['node', 'scripts/check-backup-recovery.mjs']),
+              ]:
+                  command(label, args)
+              restore_generated('post-quality')
+
+
+          def server():
+              config = json.loads((CANDIDATE / 'lighthouserc.json').read_text())['ci']['collect']
+              require(config['startServerCommand'] == 'npm run start' and
+                      config['startServerReadyPattern'] == 'ready' and
+                      config['startServerReadyTimeout'] == 30000, 'Original server configuration drift')
+              with (EVIDENCE / 'server.stdout').open('wb') as out, \
+                      (EVIDENCE / 'server.stderr').open('wb') as err:
+                  process = subprocess.Popen(['npm', 'run', 'start'], cwd=CANDIDATE,
+                                             stdout=out, stderr=err, start_new_session=True)
+                  started = time.monotonic()
+                  try:
+                      matched = False
+                      while time.monotonic() - started < 30:
+                          require(process.poll() is None, 'Production server exited before readiness')
+                          text = ((EVIDENCE / 'server.stdout').read_text(errors='replace') +
+                                  (EVIDENCE / 'server.stderr').read_text(errors='replace'))
+                          if re.search(config['startServerReadyPattern'], text, re.IGNORECASE):
+                              matched = True
+                              break
+                          time.sleep(0.1)
+                      require(matched, 'Original server ready pattern timed out')
+                      with urllib.request.urlopen('http://localhost:3000/', timeout=10) as r:
+                          require(r.status == 200 and r.read(4096), 'Local production HTTP response failed')
+                          save('server-readiness.json', {'pattern': 'ready', 'timeout_ms': 30000,
+                              'elapsed_seconds': time.monotonic() - started, 'http_status': r.status})
+                  finally:
+                      if process.poll() is None:
+                          os.killpg(process.pid, signal.SIGTERM)
+                          try:
+                              process.wait(timeout=10)
+                          except subprocess.TimeoutExpired:
+                              os.killpg(process.pid, signal.SIGKILL)
+                              process.wait(timeout=5)
+              with socket.socket() as connection:
+                  require(connection.connect_ex(('127.0.0.1', 3000)) != 0, 'Probe server left port 3000 occupied')
+
+
+          def lighthouse():
+              scope('pre-lighthouse-scope')
+              config = json.loads((CANDIDATE / 'lighthouserc.json').read_text())['ci']['collect']
+              env = dict(os.environ, CHROME_PATH=read('browser-runtime.json')['chrome_path'])
+              command('lighthouse', ['npm', 'run', 'lighthouse'], timeout=4200, env=env)
+              reports = []
+              for path in sorted((CANDIDATE / '.lighthouseci').glob('lhr-*.json')):
+                  report = json.loads(path.read_text())
+                  reports.append({'file': path.name, 'url': report.get('requestedUrl'),
+                                  'finalUrl': report.get('finalUrl'),
+                                  'runtimeError': report.get('runtimeError'),
+                                  'lighthouseVersion': report.get('lighthouseVersion')})
+              save('lighthouse-runs.json', reports)
+              require(not any(r['runtimeError'] for r in reports), 'Lighthouse runtime errors')
+              expected = collections.Counter({url: config['numberOfRuns'] for url in config['url']})
+              require(collections.Counter(r['url'] for r in reports) == expected,
+                      'Missing, duplicate or unexpected Lighthouse URL/run reports')
+              assertions = CANDIDATE / '.lighthouseci' / 'assertion-results.json'
+              require(assertions.is_file(), 'Missing original Lighthouse assertion results')
+              results = json.loads(assertions.read_text())
+              require(isinstance(results, list) and not any(not r.get('passed') and
+                      r.get('level') == 'error' for r in results),
+                      'Lighthouse assertions contain errors')
+              require({r.get('url') for r in results} == {r['finalUrl'] for r in reports},
+                      'Lighthouse assertion URL coverage is incomplete')
+              require((CANDIDATE / 'lhci-results' / 'manifest.json').is_file(), 'Missing report upload manifest')
+              manifest = json.loads((CANDIDATE / 'lhci-results' / 'manifest.json').read_text())
+              require(collections.Counter(r['url'] for r in manifest) == expected,
+                      'Incomplete filesystem report manifest')
+              for entry in manifest:
+                  for key in ['jsonPath', 'htmlPath']:
+                      path = Path(entry[key]).resolve()
+                      require(path.is_relative_to(CANDIDATE / 'lhci-results') and path.is_file() and
+                              path.stat().st_size > 0, 'Missing filesystem report content')
+              restore_generated('post-lighthouse')
+              save('candidate-lighthouse-result.json', {'result': 'CANDIDATE_LIGHTHOUSE_PASS',
+                  'candidate': read('identity.json'), 'reports': len(reports),
+                  'urls': len(expected), 'runs_per_url': config['numberOfRuns'], 'assertions': 'PASS',
+                  'production_pushed': False})
+
+
+          def collect():
+              if CANDIDATE.exists():
+                  for directory in ['.lighthouseci', 'lhci-results']:
+                      source = CANDIDATE / directory
+                      if source.is_dir():
+                          shutil.copytree(source, EVIDENCE / directory, symlinks=True, dirs_exist_ok=True)
+                  (EVIDENCE / 'final-worktree.status').write_text(git('status', '--porcelain=v1',
+                                                                   '--untracked-files=all'))
+                  (EVIDENCE / 'final-worktree.diff').write_text(git('diff', '--binary'))
+              files = []
+              for path in sorted(EVIDENCE.rglob('*')):
+                  if path.is_file() and not path.is_symlink() and path.name != 'artifact-manifest.json':
+                      data = path.read_bytes()
+                      files.append({'path': str(path.relative_to(EVIDENCE)), 'bytes': len(data),
+                                    'sha256': hashlib.sha256(data).hexdigest()})
+              save('artifact-manifest.json', {'run_id': os.environ['GITHUB_RUN_ID'],
+                  'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'controller_sha': os.environ['GITHUB_SHA'],
+                  'job': os.environ['GITHUB_JOB'], 'files': files,
+                  'result_file_exists': (EVIDENCE / 'candidate-lighthouse-result.json').is_file(),
+                  'reports_present': (EVIDENCE / 'lhci-results' / 'manifest.json').is_file()})
+
+
+          if __name__ == '__main__':
+              phase = sys.argv[1]
+              try:
+                  {'inputs': gate_inputs, 'identity': identity, 'runtime': runtime, 'dependencies': closure,
+                   'security': security, 'quality': quality, 'server': server, 'lighthouse': lighthouse,
+                   'collect': collect}[phase]()
+                  if phase != 'collect':
+                      save(phase + '.phase.json', {'result': 'PASS'})
+              except Exception as error:
+                  save(phase + '.phase.json', {'result': 'FAIL', 'error': str(error),
+                                              'type': type(error).__name__})
+                  print(f'{phase} FAILED: {error}', file=sys.stderr, flush=True)
+                  raise
+          PY
+          python "$RUNNER_TEMP/lhci-candidate-runner.py" inputs
+
+      - name: Check out the exact controller without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Reconstruct and verify the local-only exact candidate
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" identity
+
+      - name: Use the matched Node.js 22 and npm toolchain
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.3
+          cache: npm
+          cache-dependency-path: ${{ runner.temp }}/lhci-isolated-candidate/package-lock.json
+
+      - name: Qualify Node, nested npm, sockets, network interfaces, Chrome and CDP
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" runtime
+
+      - name: Clean install and verify the exact optional dependency closure
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" dependencies
+
+      - name: Run both complete dependency audits at the original high threshold
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" security
+
+      - name: Run guard, lint, types, standard build and smoke, and candidate quality gates
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" quality
+
+      - name: Qualify the unchanged production-server readiness contract
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" server
+
+      - name: Run the unchanged full-build Lighthouse gate once
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" lighthouse
+
+      - name: Preserve identity, raw reports, stdout, stderr and the artifact manifest
+        if: always()
+        run: python "$RUNNER_TEMP/lhci-candidate-runner.py" collect
+
+      - name: Upload actual isolated candidate evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-isolated-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lhci-isolated-evidence
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 30
