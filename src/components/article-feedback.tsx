@@ -4,6 +4,7 @@ import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 
+import { isReaderFeedbackArticlePilot, ReaderFeedback } from "@/components/reader-feedback";
 import { buildIdentityHeaders } from "@/lib/browser-identity";
 import { siteConfig } from "@/lib/site";
 
@@ -60,6 +61,7 @@ export function ArticleFeedback({
   changelogHref,
 }: ArticleFeedbackProps) {
   const isEnglish = language === "en";
+  const isFeedbackPilot = isReaderFeedbackArticlePilot(articleUrl);
   const storageKey = `article-feedback:${slug}`;
   const [copied, setCopied] = useState(false);
   const subscribe = useCallback(
@@ -95,7 +97,42 @@ export function ArticleFeedback({
   const feedback = useSyncExternalStore(subscribe, getSnapshot, () => null);
 
   const githubHref = useMemo(() => {
-    const body = isEnglish
+    let reportUrl = articleUrl;
+    if (isFeedbackPilot) {
+      const url = new URL(articleUrl);
+      url.search = "";
+      url.hash = "";
+      reportUrl = url.toString();
+    }
+    const body = isFeedbackPilot
+      ? (isEnglish
+          ? [
+              `Page: ${title}`,
+              reportUrl,
+              "",
+              "This GitHub issue is public. Use private email for private feedback.",
+              "Do not include tokens, room snapshots, game code, Console output, or personal information.",
+              "",
+              "Specific location or step:",
+              "",
+              "What happened or was unclear:",
+              "",
+              "Expected behavior or suggestion:",
+            ]
+          : [
+              `页面：${title}`,
+              `地址：${reportUrl}`,
+              "",
+              "GitHub Issue 为公开渠道，私下反馈请使用邮箱。",
+              "请勿提供 Token、Room Snapshot、游戏代码、Console 输出或个人信息。",
+              "",
+              "具体位置或步骤：",
+              "",
+              "遇到的现象或不清楚的内容：",
+              "",
+              "期望或建议：",
+            ]).join("\n")
+      : isEnglish
       ? [
           "## Affected guide",
           articleUrl,
@@ -125,7 +162,7 @@ export function ArticleFeedback({
     });
 
     return `${issueUrl}?${params.toString()}`;
-  }, [articleUrl, isEnglish, issueUrl, title]);
+  }, [articleUrl, isEnglish, isFeedbackPilot, issueUrl, title]);
 
   const socialShareLinks = useMemo(() => {
     const xArticleUrl = addSocialTracking(articleUrl, "x");
@@ -190,7 +227,9 @@ export function ArticleFeedback({
       : feedback === "partly"
         ? "Recorded. A missing edge case or clearer example may be needed."
         : feedback === "not-solved"
-          ? "Recorded. Use the issue link to include the return code, tick state, and minimal code."
+          ? isFeedbackPilot
+            ? "Recorded. Describe the issue below without sensitive data; GitHub issues are public."
+            : "Recorded. Use the issue link to include the return code, tick state, and minimal code."
           : feedback === "outdated"
             ? "Recorded as potentially outdated. Please include the relevant API or behavior change."
             : feedback === "suggestion"
@@ -221,9 +260,13 @@ export function ArticleFeedback({
             : "这篇文章解决了你的问题吗？"}
         </h2>
         <p className={styles.intro}>
-          {isEnglish
-            ? "Responses are stored in the current browser and anonymously summarized in the platform data layer. Technical reports open a public issue with this guide already included."
-            : "反馈会匿名汇总到平台数据层，同时保存在当前浏览器。具体错误仍可通过 GitHub 或邮箱提交。"}
+          {isFeedbackPilot
+            ? isEnglish
+              ? "Response choices are saved in this browser and summarized on the site. Describe specific issues using private email below or a public GitHub issue."
+              : "选项反馈保存在当前浏览器并汇总到平台。具体问题可通过下方私下邮件或公开 GitHub Issue 说明。"
+            : isEnglish
+              ? "Responses are stored in the current browser and anonymously summarized in the platform data layer. Technical reports open a public issue with this guide already included."
+              : "反馈会匿名汇总到平台数据层，同时保存在当前浏览器。具体错误仍可通过 GitHub 或邮箱提交。"}
         </p>
       </div>
 
@@ -288,24 +331,34 @@ export function ArticleFeedback({
               if (isEnglish) saveFeedback("not-solved");
             }}
           >
-            {isEnglish
-              ? "No — report the missing case ↗"
-              : "在 GitHub 提交问题 ↗"}
+            {isFeedbackPilot
+              ? isEnglish
+                ? "Report a public GitHub issue ↗"
+                : "在 GitHub 公开提交问题 ↗"
+              : isEnglish
+                ? "No — report the missing case ↗"
+                : "在 GitHub 提交问题 ↗"}
           </a>
-          <a
-            href={`mailto:${email}?subject=${encodeURIComponent(
-              isEnglish
-                ? `English guide feedback: ${title}`
-                : `文章反馈：${title}`,
-            )}&body=${encodeURIComponent(
-              isEnglish
-                ? `Guide: ${articleUrl}\n\nProblem description:`
-                : `文章：${articleUrl}\n\n问题描述：`,
-            )}`}
-          >
-            {isEnglish ? "Send private feedback" : "通过邮箱反馈"}
-          </a>
+          {!isFeedbackPilot ? (
+            <a
+              href={`mailto:${email}?subject=${encodeURIComponent(
+                isEnglish
+                  ? `English guide feedback: ${title}`
+                  : `文章反馈：${title}`,
+              )}&body=${encodeURIComponent(
+                isEnglish
+                  ? `Guide: ${articleUrl}\n\nProblem description:`
+                  : `文章：${articleUrl}\n\n问题描述：`,
+              )}`}
+            >
+              {isEnglish ? "Send private feedback" : "通过邮箱反馈"}
+            </a>
+          ) : null}
         </div>
+
+        {isFeedbackPilot ? (
+          <ReaderFeedback title={title} pageUrl={articleUrl} email={email} language={language} />
+        ) : null}
 
         <div className={styles.social} aria-label={isEnglish ? "Follow and share" : "关注与分享"}>
           <div>

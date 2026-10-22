@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { ReaderFeedback } from "@/components/reader-feedback";
 import { EnglishRoomDiagnostics } from "@/components/room-diagnostics-en";
 import { createEnglishPageMetadata } from "@/lib/english-metadata";
 import { siteConfig } from "@/lib/site";
@@ -101,6 +102,7 @@ export default function EnglishRoomDiagnosticsPage() {
             ))}
           </div>
         </section>
+        <ReaderFeedback title="Room Snapshot Diagnostic" pageUrl={pageUrl} email={siteConfig.author.email} language="en" />
       </Container>
     </main>
   );

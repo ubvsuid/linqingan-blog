@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { ReaderFeedback } from "@/components/reader-feedback";
 import { RoomDiagnostics } from "@/components/room-diagnostics";
 import { ToolUtilityBar } from "@/components/tool-utility-bar";
 import { createPageMetadata } from "@/lib/metadata";
@@ -76,6 +77,7 @@ export default function RoomDiagnosticsPage() {
             </div>
           </div>
         </section>
+        <ReaderFeedback title="房间运行诊断" pageUrl={pageUrl} email={siteConfig.author.email} />
       </Container>
       <style>{`
         .diagnostic-breadcrumb { display: flex; gap: 10px; margin-bottom: 28px; color: var(--muted); font-size: 13px; }

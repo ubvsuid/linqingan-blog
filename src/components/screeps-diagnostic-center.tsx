@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ReaderFeedback } from "@/components/reader-feedback";
 import { getKnowledgeClusterHandoffForGraphNodeId } from "@/lib/knowledge-cluster-handoff";
 import {
   localizeDiagnosticLink,
@@ -13,6 +14,7 @@ import {
 import { getLocalizedScreepsApiReference } from "@/lib/screeps-api-reference-localized";
 import { getScreepsApiHubHref, screepsApiHubs } from "@/lib/screeps-api-hubs";
 import { screepsErrorCodes } from "@/lib/screeps-errors";
+import { siteConfig } from "@/lib/site";
 import { getEvidenceApiReferenceId } from "@/lib/verification-evidence-relations";
 import {
   getVerifiedContentWithEvidence,
@@ -346,6 +348,12 @@ export async function ScreepsDiagnosticCenter({ locale }: { locale: ScreepsDiagn
           );
         })}
       </div>
+      <ReaderFeedback
+        title={isEnglish ? "Screeps Diagnostic Center" : "Screeps 故障诊断中心"}
+        pageUrl={`${siteConfig.url}${isEnglish ? "/en/diagnostics" : "/diagnostics"}`}
+        email={siteConfig.author.email}
+        language={isEnglish ? "en" : "zh-CN"}
+      />
     </section>
   );
 }

@@ -1,0 +1,139 @@
+.root.root {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  margin: 28px 0 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  padding: 16px 0 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.root > summary,
+.category > summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  font-weight: 650;
+  list-style: none;
+}
+
+.root > summary::-webkit-details-marker,
+.category > summary::-webkit-details-marker {
+  display: none;
+}
+
+.root > summary::after,
+.category > summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  font-weight: 400;
+}
+
+.root[open] > summary::after,
+.category[open] > summary::after {
+  content: "−";
+}
+
+.body,
+.categoryBody {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.body p {
+  margin: 0;
+}
+
+.email {
+  user-select: text;
+}
+
+.privacy,
+.status {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.categories {
+  min-width: 0;
+  margin-top: 4px;
+}
+
+.category {
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  padding: 6px 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+
+.root.root .actions a,
+.root.root .actions button {
+  display: inline-flex;
+  min-height: 44px;
+  max-width: 100%;
+  align-items: center;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 8px 0;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  line-height: 1.5;
+  text-align: start;
+  white-space: normal;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.root.root .actions a:hover,
+.root.root .actions button:hover {
+  border-color: var(--foreground);
+}
+
+.root summary:focus-visible,
+.root a:focus-visible,
+.root button:focus-visible,
+.root textarea:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 4px;
+}
+
+.status {
+  min-height: 1.65em;
+}
+
+.root textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  resize: vertical;
+}
