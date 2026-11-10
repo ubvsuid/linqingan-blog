@@ -1,3 +1,5 @@
+import sharp from "sharp";
+
 const baseUrl = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 const checks = [
@@ -107,6 +109,53 @@ const requiredEnglishBeginnerPaths = [
   "/en/blog/screeps-first-room-code",
 ];
 
+const socialImagePaths = [
+  "/en/blog/screeps-introduction",
+  "/en/blog/screeps-memory-basics",
+  "/en/blog/screeps-creep-body-parts",
+  "/blog/screeps-memory-basics",
+];
+
+function htmlAttributes(tag) {
+  const decode = (value) => value.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[\da-f]+);/gi, (entity) => {
+    const named = { "&amp;": "&", "&quot;": '"', "&apos;": "'", "&lt;": "<", "&gt;": ">" };
+    return named[entity.toLowerCase()] ?? String.fromCodePoint(
+      entity[2].toLowerCase() === "x" ? parseInt(entity.slice(3), 16) : parseInt(entity.slice(2), 10),
+    );
+  });
+  return Object.fromEntries([...tag.matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)]
+    .map(([, key, doubleQuoted, singleQuoted]) => [key.toLowerCase(), decode(doubleQuoted ?? singleQuoted)]));
+}
+
+const socialImageRequests = new Map();
+
+async function checkSocialImage(imageUrl, pathname) {
+  const declared = new URL(imageUrl, "https://www.linqingan.com");
+  if (!["https://www.linqingan.com", new URL(baseUrl).origin].includes(declared.origin)
+    || !declared.pathname.startsWith(`${pathname}/opengraph-image`)) {
+    throw new Error(`unexpected article image URL: ${imageUrl}`);
+  }
+  // Validate this build even when its public metadata uses the canonical host.
+  const localUrl = new URL(declared.pathname + declared.search, baseUrl).href;
+  if (!socialImageRequests.has(localUrl)) {
+    socialImageRequests.set(localUrl, (async () => {
+      const response = await fetch(localUrl, { redirect: "manual", signal: AbortSignal.timeout(15_000) });
+      if (response.status !== 200) throw new Error(`image HTTP ${response.status}`);
+      const contentType = response.headers.get("content-type") ?? "";
+      if (!contentType.startsWith("image/png")) throw new Error(`image MIME ${contentType || "missing"}`);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      const image = sharp(bytes, { failOn: "warning", limitInputPixels: 1200 * 630 });
+      if ((await image.metadata()).format !== "png") throw new Error("image is not PNG");
+      // Decode every pixel; a valid header alone does not prove a valid image.
+      const { info } = await image.raw().toBuffer({ resolveWithObject: true });
+      if (info.width !== 1200 || info.height !== 630) {
+        throw new Error(`image size ${info.width}x${info.height}, expected 1200x630`);
+      }
+    })());
+  }
+  await socialImageRequests.get(localUrl);
+}
+
 async function waitForServer() {
   for (let attempt = 1; attempt <= 30; attempt += 1) {
     try {
@@ -202,6 +251,39 @@ for (const pathname of metadataPaths) {
   }
   if (!/<meta[^>]+name="twitter:image"[^>]+content="[^"]+"/i.test(body)) {
     failures.push(`${pathname}: 缺少 twitter:image`);
+  }
+}
+
+for (const pathname of socialImagePaths) {
+  try {
+    const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual", signal: AbortSignal.timeout(15_000) });
+    if (response.status !== 200) throw new Error(`page HTTP ${response.status}`);
+    const body = await response.text();
+    const metas = [...body.matchAll(/<meta\b[^>]*>/gi)].map(([tag]) => htmlAttributes(tag));
+    const links = [...body.matchAll(/<link\b[^>]*>/gi)].map(([tag]) => htmlAttributes(tag));
+    const canonical = `https://www.linqingan.com${pathname}`;
+    if (!/<title>[^<]+<\/title>/.test(body) || !/<h1\b[^>]*>/.test(body)
+      || !links.some((link) => link.rel === "canonical" && link.href === canonical)) {
+      throw new Error("missing title, H1, or expected canonical");
+    }
+    const chinesePath = pathname.replace(/^\/en(?=\/)/, "");
+    for (const language of ["en", "zh-CN", "x-default"]) {
+      const expectedPath = language === "zh-CN" ? chinesePath : `/en${chinesePath}`;
+      if (!links.some((link) => link.hreflang === language && link.href === `https://www.linqingan.com${expectedPath}`)) {
+        throw new Error(`missing expected ${language} alternate`);
+      }
+    }
+    for (const name of ["og:image", "twitter:image"]) {
+      const images = metas.filter((meta) => (meta.property ?? meta.name) === name);
+      if (!images.length) throw new Error(`missing ${name}`);
+      for (const image of images) {
+        if (!image.content) throw new Error(`empty ${name}`);
+        await checkSocialImage(image.content, pathname);
+        console.log(`Social image PASS: ${pathname} ${name} ${image.content} (200 image/png, decoded 1200x630)`);
+      }
+    }
+  } catch (error) {
+    failures.push(`${pathname}: social metadata ${error.message}`);
   }
 }
 

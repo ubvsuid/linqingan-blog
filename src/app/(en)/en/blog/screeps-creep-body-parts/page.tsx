@@ -18,7 +18,6 @@ function requireBodyPartsArticle(): EnglishBeginnerArticle {
 const article = requireBodyPartsArticle();
 const discovery = getEnglishDiscoveryArticle(article.path);
 const articleUrl = `${siteConfig.url}${article.path}`;
-const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
 const modifiedTime = getEnglishEditorialFifthUpdatedAt20260816(article.slug)
   ?? discovery?.updatedAt
   ?? article.publishedAt;
@@ -43,13 +42,11 @@ export const metadata: Metadata = {
     publishedTime: article.publishedAt,
     modifiedTime,
     tags: discovery?.tags ?? article.tags,
-    images: [{ url: socialImage, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${article.title} | Linqingan`,
     description: article.description,
-    images: [socialImage],
   },
 };
 

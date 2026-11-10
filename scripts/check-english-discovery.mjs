@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import ts from "typescript";
 
 const root = process.cwd();
 const libDirectory = path.join(root, "src", "lib");
@@ -78,7 +79,6 @@ const assertions = [
   ["src/app/(en)/en/tags/[tag]/page.tsx", "index: tag.count >= 3", "English thin-topic noindex threshold"],
   ["src/app/(zh)/blog/[slug]/layout.tsx", "hrefLang=\"en\"", "reciprocal English hreflang"],
   ["src/app/(zh)/blog/[slug]/layout.tsx", "hrefLang=\"zh-CN\"", "reciprocal Chinese hreflang"],
-  ["src/app/(en)/en/blog/[slug]/page.tsx", "/opengraph-image", "article-specific Open Graph image"],
   ["src/components/english-article-page.tsx", "getRelatedEnglishArticles", "related English guides"],
   ["src/components/english-article-page.tsx", "/en/tags/", "clickable English topic links"],
 ];
@@ -91,6 +91,46 @@ for (const [relativePath, expected, label] of assertions) {
   }
   const source = fs.readFileSync(absolutePath, "utf8");
   if (!source.includes(expected)) failures.push(`Missing ${label} in ${relativePath}`);
+}
+
+// Source-contract checks only. HTTP status and image decoding belong to smoke.
+for (const directory of ["[slug]", "screeps-creep-body-parts"]) {
+  const routeDirectory = path.join(root, "src/app/(en)/en/blog", directory);
+  const pagePath = path.join(routeDirectory, "page.tsx");
+  const imagePath = path.join(routeDirectory, "opengraph-image.tsx");
+  if (!fs.existsSync(pagePath) || !fs.existsSync(imagePath)) {
+    failures.push(`Missing page or file-based OG handler for ${directory}`);
+    continue;
+  }
+  const parse = (file) => ts.createSourceFile(file, fs.readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const propertyName = (node) => node.name && (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) ? node.name.text : undefined;
+  const page = parse(pagePath);
+  const metadataObjects = { openGraph: [], twitter: [] };
+  const visitPage = (node) => {
+    if (ts.isPropertyAssignment(node) && Object.hasOwn(metadataObjects, propertyName(node)) && ts.isObjectLiteralExpression(node.initializer)) {
+      metadataObjects[propertyName(node)].push(node.initializer);
+    }
+    ts.forEachChild(node, visitPage);
+  };
+  visitPage(page);
+  for (const [kind, field, expected] of [["openGraph", "type", "article"], ["twitter", "card", "summary_large_image"]]) {
+    const objects = metadataObjects[kind];
+    if (objects.length !== 1 || objects[0].properties.some((node) => propertyName(node) === "images" || ts.isSpreadAssignment(node))) {
+      failures.push(`${directory}: ${kind} must use the existing file-based image without an images override`);
+    }
+    const value = objects[0]?.properties.find((node) => propertyName(node) === field);
+    if (!value || !ts.isPropertyAssignment(value) || !ts.isStringLiteral(value.initializer) || value.initializer.text !== expected) {
+      failures.push(`${directory}: preserve ${kind}.${field}=${expected}`);
+    }
+  }
+  const image = parse(imagePath);
+  let hasImageResponse = false;
+  const visitImage = (node) => {
+    if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "ImageResponse") hasImageResponse = true;
+    ts.forEachChild(node, visitImage);
+  };
+  visitImage(image);
+  if (!hasImageResponse) failures.push(`${directory}: file-based OG handler must generate an ImageResponse`);
 }
 
 function extractTopicMappings(source, objectName) {

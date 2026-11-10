@@ -207,7 +207,6 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
   if (!article || staticBeginnerSlugs.has(slug)) return { title: "Article not found", robots: { index: false, follow: false } };
 
   const articleUrl = `${siteConfig.url}${article.path}`;
-  const socialImage = `${siteConfig.url}${article.path}/opengraph-image`;
   const discovery = getEnglishDiscoveryArticle(article.path);
   const modifiedTime = getModifiedTime(
     slug,
@@ -236,13 +235,11 @@ export async function generateMetadata({ params }: EnglishArticlePageProps): Pro
       modifiedTime,
       authors: ["Linqingan"],
       tags: discovery?.tags ?? article.tags,
-      images: [{ url: socialImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${article.title} | Linqingan`,
       description: article.description,
-      images: [socialImage],
     },
   };
 }
